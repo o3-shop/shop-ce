@@ -1,0 +1,28 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  oxid_esales.command.module_activate_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ModuleActivateCommand
+    tags:
+    - { name: 'console.command', command: 'oe:module:activate' }
+  oxid_esales.command.module_deactivate_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ModuleDeactivateCommand
+    tags:
+    - { name: 'console.command', command: 'oe:module:deactivate' }
+
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\InstallModuleConfigurationCommand:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\InstallModuleConfigurationCommand
+    tags:
+    - { name: 'console.command', command: 'oe:module:install-configuration' }
+  
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\UninstallModuleConfigurationCommand:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\UninstallModuleConfigurationCommand
+    tags:
+    - { name: 'console.command', command: 'oe:module:uninstall-configuration' }
+
+  oxid_esales.command.apply_modules_configuration_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ApplyModulesConfigurationCommand
+    tags:
+      - { name: 'console.command', command: 'oe:module:apply-configuration' }

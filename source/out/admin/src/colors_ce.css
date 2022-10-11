@@ -1,0 +1,24 @@
+/* main.css */
+#liste td.listitem1, #liste table td.listitem4 {background-color:#82ba00;border-color:#82ba00;}
+div.export  {background:#82ba00;}
+
+/* nav.css */
+.version, .act .rc,  .act .rc b {background-color: #82ba00;color:#fff;}
+span.new {color: #82ba00;}
+.main span.new {color: #535353;}
+
+div.admin-login-box {border-color: #82ba00;}
+
+/* facelift */
+#liste table td.listitem4 { background-color: #82ba00 !important; }
+.tabs .tab .b1 a:hover { color: #0c2937; }
+.tabs .tab.active .b1 { color: #82ba00; }
+
+#top ul li a { color: #82ba00 !important; }
+#top ul li:hover a { color: #0c2937 !important; }
+#top .version { color: #82ba00; }
+#top .version:hover { color: #0c2937; }
+
+#nav ul li.exp { border-left-color: #82ba00; }
+
+div.admin-login-box input[type="submit"] { background: #82ba00; }

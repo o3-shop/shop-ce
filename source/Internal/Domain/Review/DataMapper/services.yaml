@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ProductRatingDataMapperInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ProductRatingDataMapper
+  OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\RatingDataMapperInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\RatingDataMapper
+  OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ReviewDataMapperInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Review\DataMapper\ReviewDataMapper

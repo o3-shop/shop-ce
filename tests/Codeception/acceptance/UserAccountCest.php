@@ -1,0 +1,382 @@
+<?php
+
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2022 OXID eSales AG (https://www.oxid-esales.com)
+ * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\EshopCommunity\Tests\Codeception;
+
+use Codeception\Util\Fixtures;
+use OxidEsales\Codeception\Step\Start;
+use OxidEsales\Codeception\Module\Translation\Translator;
+
+final class UserAccountCest
+{
+    public function _after(AcceptanceTester $I) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->cleanUpUserData($I);
+    }
+
+    protected function cleanUpUserData(AcceptanceTester $I)
+    {
+        /** Change Germany and Belgium data to original. */
+        $I->updateInDatabase('oxcountry', ['oxvatstatus' => 1], ['OXID' => 'a7c40f632e04633c9.47194042']);
+        $I->updateInDatabase('oxcountry', ['oxvatstatus' => 1], ['OXID' => 'a7c40f631fc920687.20179984']);
+        $userData = $this->getExistingUserData();
+        $I->deleteFromDatabase('oxaddress', ['OXUSERID' => $userData['userId']]);
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function loginUserInFrontend(AcceptanceTester $I)
+    {
+        $I->wantToTest('user login (popup in top of the page)');
+
+        $startPage = $I->openShop();
+
+        //login when username/pass are incorrect. error msg should be in place etc.
+        $startPage->loginUser('non-existing-user@oxid-esales.dev', '');
+        $I->see(Translator::translate('LOGIN'));
+        $I->see(Translator::translate('ERROR_MESSAGE_USER_NOVALIDLOGIN'), $startPage->badLoginError);
+
+        //login with correct user name/pass
+        $userData = $this->getExistingUserData();
+        $startPage->loginUser($userData['userLoginName'], $userData['userPassword']);
+        $I->dontSee(Translator::translate('LOGIN'));
+
+        $accountPage = $startPage->openAccountPage();
+        $breadCrumb = Translator::translate('MY_ACCOUNT') . ' - ' . $userData['userLoginName'];
+        $accountPage->seeOnBreadCrumb($breadCrumb);
+        $I->see(Translator::translate('LOGOUT'));
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function changeUserAccountPassword(AcceptanceTester $I)
+    {
+        $I->wantTo('change user password in my account navigation');
+
+        $userData = $this->getExistingUserData();
+        $userName = $userData['userLoginName'];
+        $userPassword = $userData['userPassword'];
+
+        $startPage = $I->openShop()
+            ->loginUser($userName, $userPassword);
+        $I->dontSee(Translator::translate('LOGIN'));
+
+        $accountPage = $startPage->openAccountPage();
+        $breadCrumb = Translator::translate('MY_ACCOUNT') . ' - ' . $userName;
+        $accountPage->seeOnBreadCrumb($breadCrumb);
+
+        $changePasswordPage = $accountPage->openChangePasswordPage();
+
+        //entered not matching new passwords
+        $changePasswordPage->fillPasswordFields($userPassword, 'user1user', 'useruser');
+        $I->see(Translator::translate('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH'));
+
+        //new pass is too short
+        $changePasswordPage->changePassword($userPassword, 'user', 'user');
+        $I->see(Translator::translate('ERROR_MESSAGE_PASSWORD_TOO_SHORT'));
+
+        //correct new pass
+        $changePasswordPage->changePassword($userPassword, 'user1user', 'user1user');
+        $I->see(Translator::translate('MESSAGE_PASSWORD_CHANGED'));
+
+        $changePasswordPage->logoutUser();
+
+        // try to login with old password
+        $changePasswordPage->loginUser($userName, $userPassword);
+        $I->see(Translator::translate('LOGIN'));
+        $I->see(Translator::translate('ERROR_MESSAGE_USER_NOVALIDLOGIN'), $changePasswordPage->badLoginError);
+
+        // try to login with new password
+        $changePasswordPage->loginUser($userName, 'user1user');
+        $I->dontSee(Translator::translate('LOGIN'));
+
+        //reset new pass to old one
+        $changePasswordPage->changePassword('user1user', $userPassword, $userPassword);
+        $I->see(Translator::translate('MESSAGE_PASSWORD_CHANGED'));
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function sendUserPasswordReminder(AcceptanceTester $I)
+    {
+        $I->wantToTest('user password reminder in my account navigation');
+
+        $userData = $this->getExistingUserData();
+
+        $startPage = $I->openShop();
+
+        //open password reminder page in account menu popup
+        $passwordReminderPage = $startPage->openUserPasswordReminderPage();
+        $I->see(Translator::translate('HAVE_YOU_FORGOTTEN_PASSWORD'));
+
+        //enter not existing email
+        $passwordReminderPage = $passwordReminderPage->resetPassword('not_existing_user@oxid-esales.dev');
+        $I->see(Translator::translate('ERROR_MESSAGE_PASSWORD_EMAIL_INVALID'));
+
+        //enter existing email
+        $passwordReminderPage = $passwordReminderPage->resetPassword($userData['userLoginName']);
+        $I->see(Translator::translate('PASSWORD_WAS_SEND_TO') . ' ' . $userData['userLoginName']);
+
+        //open password reminder page in main user account page
+        $passwordReminderPage->openAccountPage()
+            ->openUserPasswordReminderPage();
+        $I->see(Translator::translate('HAVE_YOU_FORGOTTEN_PASSWORD'));
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function changeUserEmailInBillingAddress(AcceptanceTester $I)
+    {
+        $I->wantTo('change user email in my account');
+
+        $userData = $this->getExistingUserData();
+
+        $userAddressPage = $I->openShop()
+            ->loginUser($userData['userLoginName'], $userData['userPassword'])
+            ->openAccountPage()
+            ->openUserAddressPage()
+            ->openUserBillingAddressForm();
+        $I->see('Germany', $userAddressPage->billCountryId);
+        $I->see(Translator::translate('PLEASE_SELECT_STATE'), $userAddressPage->billStateId);
+
+        //change user password
+        $userAddressPage = $userAddressPage->changeEmail('example02@oxid-esales.dev', $userData['userPassword']);
+
+        $I->dontSee(Translator::translate('COMPLETE_MARKED_FIELDS'));
+        $userAddressPage = $userAddressPage->logoutUser();
+
+        //try to login with old and new email address
+        $userAddressPage->loginUser($userData['userLoginName'], $userData['userPassword']);
+        $I->see(Translator::translate('LOGIN'));
+        $I->see(Translator::translate('ERROR_MESSAGE_USER_NOVALIDLOGIN'), $userAddressPage->badLoginError);
+        //login with new email address
+        $userAddressPage->loginUser('example02@oxid-esales.dev', $userData['userPassword']);
+        $I->dontSee(Translator::translate('LOGIN'));
+
+        //change password back to original
+        $userAddressPage->openUserBillingAddressForm()
+            ->changeEmail('example_test@oxid-esales.dev', $userData['userPassword'])
+            ->logoutUser();
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function subscribeNewsletterInUserAccount(AcceptanceTester $I)
+    {
+        $start = new Start($I);
+        $I->wantToTest('newsletter subscription in my account navigation');
+
+        $userData = $this->getExistingUserData();
+
+        $newsletterSettingsPage = $start->loginOnStartPage($userData['userLoginName'], $userData['userPassword'])
+            ->openAccountPage()
+            ->openNewsletterSettingsPage();
+        $I->see(Translator::translate('MESSAGE_NEWSLETTER_SUBSCRIPTION'));
+        $newsletterSettingsPage->seeNewsletterUnSubscribed();
+
+        //subscribe for a newsletter
+        $newsletterSettingsPage->subscribeNewsletter()
+            ->seeNewsletterSubscribed();
+
+        //unsubscribe a newsletter
+        $newsletterSettingsPage->unSubscribeNewsletter()
+            ->seeNewsletterUnSubscribed();
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function changeUserBillingAddress(AcceptanceTester $I)
+    {
+        $start = new Start($I);
+        $I->wantToTest('user billing address in my account');
+        $I->retry(3, 2000);
+
+        $I->updateConfigInDatabase('blShowBirthdayFields', true, 'bool');
+        $I->updateConfigInDatabase('blVatIdCheckDisabled', true, 'bool');
+        /** Change Germany and Belgium to non EU country to skip online VAT validation. */
+        $I->updateInDatabase('oxcountry', ['oxvatstatus' => 0], ['OXID' => 'a7c40f632e04633c9.47194042']);
+        $I->updateInDatabase('oxcountry', ['oxvatstatus' => 0], ['OXID' => 'a7c40f631fc920687.20179984']);
+
+        $existingUserData = $this->getExistingUserData();
+
+        $userAddressPage = $start
+            ->loginOnStartPage($existingUserData['userLoginName'], $existingUserData['userPassword'])
+            ->openAccountPage()
+            ->openUserAddressPage()
+            ->openUserBillingAddressForm();
+        $I->see('Germany', $userAddressPage->billCountryId);
+        $I->see(Translator::translate('PLEASE_SELECT_STATE'), $userAddressPage->billStateId);
+
+        $userLoginData['userLoginNameField'] = $existingUserData['userLoginName'];
+        $addressData = $this->getUserAddressData('1', 'Belgium');
+        $userData = $this->getUserData('1');
+        $userData['userUstIDField'] = 'BE0410521222';
+        $userAddressPage = $userAddressPage
+            ->enterUserData($userData)
+            ->enterAddressData($addressData)
+            ->saveAddress()
+            ->validateUserBillingAddress(array_merge($addressData, $userData, $userLoginData));
+
+        $userData['userUstIDField'] = '';
+        $addressData['UserFirstName'] = $existingUserData['userName'];
+        $addressData['UserLastName'] = $existingUserData['userLastName'];
+        $userAddressPage = $userAddressPage->openUserBillingAddressForm()
+            ->enterUserData($userData)
+            ->enterAddressData($addressData)
+            ->selectBillingCountry('Germany')
+            ->saveAddress();
+        $I->see('Germany', $userAddressPage->billingAddress);
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function modifyUserShippingAddress(AcceptanceTester $I)
+    {
+        $start = new Start($I);
+        $I->wantToTest('modify user shipping address in my account');
+
+        $I->retry(2, 3000);
+        
+        $userData = $this->getExistingUserData();
+
+        $userAddressPage = $start->loginOnStartPage($userData['userLoginName'], $userData['userPassword'])
+            ->openAccountPage()
+            ->openUserAddressPage()
+            ->seeNumberOfShippingAddresses(0)
+            ->openUserBillingAddressForm();
+        $I->see('Germany', $userAddressPage->billCountryId);
+        $I->see(Translator::translate('PLEASE_SELECT_STATE'), $userAddressPage->billStateId);
+
+        $deliveryAddressData = $this->getUserAddressData('1_2');
+
+        $userAddressPage = $userAddressPage
+            ->openShippingAddressForm()
+            ->enterShippingAddressData($deliveryAddressData)
+            ->saveAddress()
+            ->validateUserDeliveryAddress($deliveryAddressData);
+
+        $deliveryAddressData = $this->getUserAddressData('1_4');
+
+        $userAddressPage->selectShippingAddress(1)
+            ->enterShippingAddressData($deliveryAddressData)
+            ->saveAddress()
+            ->validateUserDeliveryAddress($deliveryAddressData);
+    }
+
+    /**
+     * @group myAccount
+     *
+     * @param AcceptanceTester $I
+     */
+    public function createAndDeleteUserShippingAddress(AcceptanceTester $I)
+    {
+        $start = new Start($I);
+        $I->wantToTest('user shipping address create and delete');
+
+        $I->retry(3, 2000);
+        
+        $userData = $this->getExistingUserData();
+
+        $userAddressPage = $start->loginOnStartPage($userData['userLoginName'], $userData['userPassword'])
+            ->openAccountPage()
+            ->openUserAddressPage()
+            ->seeNumberOfShippingAddresses(0)
+            ->openUserBillingAddressForm();
+        $I->see('Germany', $userAddressPage->billCountryId);
+        $I->see(Translator::translate('PLEASE_SELECT_STATE'), $userAddressPage->billStateId);
+
+        $deliveryAddressData = $this->getUserAddressData('1_2');
+
+        $userAddressPage = $userAddressPage
+            ->openShippingAddressForm()
+            ->enterShippingAddressData($deliveryAddressData)
+            ->saveAddress()
+            ->validateUserDeliveryAddress($deliveryAddressData);
+
+        $userAddressPage->seeNumberOfShippingAddresses(1)
+            ->selectShippingAddress(1)
+            ->deleteShippingAddress(1)
+            ->seeNumberOfShippingAddresses(0);
+    }
+
+
+    private function getExistingUserData()
+    {
+        return Fixtures::get('existingUser');
+    }
+
+    private function getUserData($userId)
+    {
+        return [
+            'userUstIDField' => '',
+            'userMobFonField' => '111-111111-' . $userId,  //still needed?
+            'userPrivateFonField' => '11111111' . $userId,
+            'userBirthDateDayField' => random_int(10, 28),
+            'userBirthDateMonthField' => random_int(8, 10),
+            'userBirthDateYearField' => random_int(1960, 2000),
+        ];
+    }
+
+    private function getUserAddressData($userId, $userCountry = 'Germany')
+    {
+        $addressData = [
+            'userSalutation' => 'Mrs',
+            'userFirstName' => 'user' . $userId . ' name_šÄßüл',
+            'userLastName' => 'user' . $userId . ' last name_šÄßüл',
+            'companyName' => 'user' . $userId . ' company_šÄßüл',
+            'street' => 'user' . $userId . ' street_šÄßüл',
+            'streetNr' => $userId . '-' . $userId,
+            'ZIP' => '1234' . $userId,
+            'city' => 'user' . $userId . ' city_šÄßüл',
+            'additionalInfo' => 'user' . $userId . ' additional info_šÄßüл',
+            'fonNr' => '111-111-' . $userId,
+            'faxNr' => '111-111-111-' . $userId,
+            'countryId' => $userCountry,
+        ];
+        if ($userCountry === 'Germany') {
+            $addressData['stateId'] = 'Berlin';
+        }
+        return $addressData;
+    }
+}

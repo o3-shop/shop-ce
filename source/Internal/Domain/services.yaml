@@ -1,0 +1,5 @@
+imports:
+    - { resource: Review/services.yaml }
+    - { resource: Authentication/services.yaml }
+    - { resource: Contact/services.yaml }
+    - { resource: Email/services.yaml }

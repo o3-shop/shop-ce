@@ -1,0 +1,24 @@
+Thank you for using the O3-Shop!
+
+This software is written in PHP + MySQL and runs platform independent on Apache web servers.
+You can check the system requirements here (dependent from your edition):
+http://www.o3-shop.com/en/products/facts/shop-community-edition/system-requirements.html
+
+Installation:
+=============
+- unzip the downloaded file and upload it to your webserver via FTP
+- create a blank database
+- point your browser to http://www.yourshop.com and follow the instructions of the installation script
+
+See more detailed installation instructions in our manual:
+http://www.o3-shop.com/en/support-services/documentation-and-help/shop/installation.html
+
+List of 3rd party licenses:
+https://docs.o3-shop.com/developer/en/latest/development/modules_components_themes/licenses.html
+
+In case of any difficulties feel free to visit our community support forums at
+http://community.o3-shop.com/
+
+Have fun with your O3-Shop!
+
+The O3-Shop team

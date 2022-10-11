@@ -1,0 +1,117 @@
+{
+    "name": "o3-shop/shop-ce",
+    "description": "This package contains O3-Shop CE source code.",
+    "type": "oxideshop",
+    "keywords": ["o3-shop", "modules", "eShop"],
+    "homepage": "https://www.o3-shop.com/",
+    "license": "GPL-3.0-only",
+    "author": [
+        {
+            "name": "OXID eSales AG",
+            "email": "info@oxid-esales.com",
+            "homepage": "https://oxid-esales.com",
+            "role": "Developer"
+        },
+        {
+            "name": "O3-Shop",
+            "email": "info@o3-shop.com",
+            "homepage": "https://www.o3-shop.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "phpmailer/phpmailer": "^v6.5.0",
+        "smarty/smarty": "^v2.6.31",
+        "doctrine/dbal": "<=2.12.1",
+        "doctrine/collections": "^1.4.0",
+        "monolog/monolog": "^v1.23.0",
+        "psr/container": "1.0.*",
+        "symfony/event-dispatcher": "^3.4",
+        "symfony/dependency-injection": "^3.4.26",
+        "symfony/config": "~3.3 || ~4.0",
+        "symfony/yaml": "~3.4 || ~4.0",
+        "symfony/expression-language": "^4.4.30",
+        "symfony/lock": "^3.4",
+        "symfony/console": "^v3.4.15",
+        "webmozart/path-util": "^2.3",
+        "symfony/finder": "^3.4",
+        "symfony/filesystem": "^4.4.17",
+        "o3-shop/flow-theme": "^v1.0.0",
+        "o3-shop/shop-doctrine-migration-wrapper": "^v1.0.0",
+        "o3-shop/shop-db-views-generator": "^v1.0.0",
+        "o3-shop/shop-demodata-installer": "^v1.0.0",
+        "o3-shop/shop-composer-plugin": "^v1.0.0",
+        "o3-shop/shop-unified-namespace-generator": "^v1.0.0",
+        "o3-shop/shop-facts": "^v1.0.0"
+    },
+    "require-dev": {
+        "o3-shop/testing-library": "^v1.0.0",
+        "incenteev/composer-parameter-handler": "~v2.0",
+        "o3-shop/shop-ide-helper": "^v1.0.0",
+        "squizlabs/php_codesniffer": "^3.5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "OxidEsales\\EshopCommunity\\": "./source"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OxidEsales\\EshopCommunity\\Tests\\": "./tests"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "bin": ["bin/oe-console"],
+    "scripts": {
+        "post-install-cmd": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+            "@oe:ide-helper:generate"
+        ],
+        "post-update-cmd": [
+            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+            "@oe:ide-helper:generate"
+        ],
+        "oe:ide-helper:generate": [
+            "if [ -f ./vendor/bin/oe-eshop-ide_helper ]; then oe-eshop-ide_helper; fi"
+        ]
+    },
+    "extra": {
+        "oxideshop": {
+            "blacklist-filter": [
+                "Application/Component/**/*",
+                "Application/Controller/**/*",
+                "Application/Model/**/*",
+                "Core/**/*",
+                "Internal/**/*"
+            ]
+        },
+        "incenteev-parameters": {
+            "file": "test_config.yml",
+            "dist-file": "vendor/o3-shop/testing-library/test_config.yml.dist",
+            "parameter-key": "mandatory_parameters",
+            "env-map": {
+                "shop_path": "SHOP_PATH",
+                "shop_tests_path": "SHOP_TESTS_PATH",
+                "partial_module_paths": "PARTIAL_MODULE_PATHS"
+            }
+        },
+        "branch-alias": {
+            "dev-b-7.0.x": "7.0.x-dev",
+            "dev-b-6.5.x": "6.5.x-dev",
+            "dev-b-6.4.x": "6.4.x-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "o3-shop/shop-composer-plugin": true,
+            "o3-shop/shop-unified-namespace-generator": true
+        }
+    },
+    "replace": {
+        "oxid-esales/oxideshop-ce": "6.10.3"
+    }
+}

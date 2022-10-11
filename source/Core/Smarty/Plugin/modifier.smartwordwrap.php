@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2022 OXID eSales AG (https://www.oxid-esales.com)
+ * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+/**
+ * Smarty smartwordwrap modifier plugin
+ *
+ * Type:     modifier<br>
+ * Name:     smartwordwrap<br>
+ * Purpose:  wrap a string of text at a given length and row count
+ *
+ * @param string
+ * @param integer
+ * @param string
+ * @param integer
+ * @return integer
+ */
+function smarty_modifier_smartwordwrap($string, $length = 80, $break = "\n", $cutrows = 0, $tollerance = 0, $etc = '...')
+{
+    $wraptag = "<wrap>";
+    $wrapchars = ["-"];
+    $afterwrapchars = ["-" . $wraptag];
+
+
+    $string = trim($string);
+
+    if (strlen($string) <= $length) {
+        return $string;
+    }
+
+    //trying to wrap without cut
+    $str  = wordwrap($string, $length, $wraptag, false);
+    $arr  = explode($wraptag, $str);
+
+    $alt  = [];
+
+    $ok = true;
+    foreach ($arr as $row) {
+        if (strlen($row) > ($length + $tollerance)) {
+            $tmpstr = str_replace($wrapchars, $afterwrapchars, $row);
+            $tmparr = explode($wraptag, $tmpstr);
+
+            foreach ($tmparr as $altrow) {
+                array_push($alt, $altrow);
+
+                if (strlen($altrow) > ($length + $tollerance)) {
+                    $ok = false;
+                }
+            }
+        } else {
+            array_push($alt, $row);
+        }
+    }
+
+    $arr = $alt;
+
+    if (!$ok) {
+        //trying to wrap with cut
+        $str  = wordwrap($string, $length, $wraptag, true);
+        $arr  = explode($wraptag, $str);
+    }
+
+    if ($cutrows && count($arr) > $cutrows) {
+        $arr = array_splice($arr, 0, $cutrows);
+
+        if (strlen($arr[$cutrows] . $etc) > $length + $tollerance) {
+            $arr[$cutrows - 1] = substr($arr[$cutrows - 1], 0, $length - strlen($etc));
+        }
+
+        $arr[$cutrows - 1] = $arr[$cutrows - 1] . $etc;
+    }
+
+    return implode($break, $arr);
+}

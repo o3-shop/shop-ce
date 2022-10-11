@@ -1,0 +1,57 @@
+#!/usr/bin/env php
+<?php
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2022 OXID eSales AG (https://www.oxid-esales.com)
+ * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+use OxidEsales\EshopCommunity\Internal\Framework\Console\Executor;
+use OxidEsales\Facts\Facts;
+use Symfony\Component\Console\Input\ArgvInput;
+use Webmozart\PathUtil\Path;
+
+$autoloadFileExist = false;
+$autoloadFiles = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../vendor/autoload.php',
+    __DIR__ . '/../../../vendor/autoload.php',
+    __DIR__ . '/../../../../vendor/autoload.php',
+];
+foreach ($autoloadFiles as $autoloadFile) {
+    if (file_exists($autoloadFile)) {
+        require_once $autoloadFile;
+        $autoloadFileExist = true;
+        break;
+    }
+}
+
+if (!$autoloadFileExist) {
+    exit("autoload.php file was not found!");
+}
+
+$shopId = (int) (new ArgvInput())->getParameterOption(
+    '--' . Executor::SHOP_ID_PARAMETER_OPTION_NAME,
+    0
+);
+if ($shopId !== 0) {
+    $_POST['shp'] = $shopId;
+}
+$bootstrapFilePath = Path::join((new Facts())->getSourcePath(), 'bootstrap.php');
+require_once $bootstrapFilePath;
+
+$factory = \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance();
+$factory->getContainer()->get(OxidEsales\EshopCommunity\Internal\Framework\Console\ExecutorInterface::class)->execute();

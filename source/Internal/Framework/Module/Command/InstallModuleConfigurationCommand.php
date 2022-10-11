@@ -1,0 +1,184 @@
+<?php
+
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2022 OXID eSales AG (https://www.oxid-esales.com)
+ * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Command;
+
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleConfigurationInstallerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Webmozart\PathUtil\Path;
+
+/**
+ * @deprecated command will be superseded by oe:module:install in next major
+ */
+class InstallModuleConfigurationCommand extends Command
+{
+    const MESSAGE_INSTALLATION_WAS_SUCCESSFUL = 'Module configuration has been installed.';
+    const MESSAGE_INSTALLATION_FAILED = 'An error occurred while installing module configuration.';
+    const MESSAGE_TARGET_PATH_IS_REQUIRED = 'The given module source path is not inside the shop modules ' .
+    'directory. Please provide a second parameter with the modules ' .
+    'target path inside the shop modules directory.';
+
+    /**
+     * @var ModuleConfigurationInstallerInterface
+     */
+    private $moduleConfigurationInstaller;
+
+    /**
+     * @var BasicContextInterface
+     */
+    private $context;
+
+    /**
+     * @param ModuleConfigurationInstallerInterface $moduleConfigurationInstaller
+     * @param BasicContextInterface $context
+     */
+    public function __construct(
+        ModuleConfigurationInstallerInterface $moduleConfigurationInstaller,
+        BasicContextInterface $context
+    ) {
+        $this->moduleConfigurationInstaller = $moduleConfigurationInstaller;
+        $this->context = $context;
+
+        parent::__construct();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function configure(): void
+    {
+        $this
+            ->setName(
+                'oe:module:install-configuration'
+            )
+            ->setDescription(
+                'Install module configuration into project configuration file.'
+                . 'Module configuration already present in the project configuration file will be overwritten.'
+            )
+            ->addArgument(
+                'module-source-path',
+                InputArgument::REQUIRED,
+                'Path to module source, e.g. vendor/my_vendor/my_module;'
+                . ' If the module source path is in source/modules directory, e.g. source/modules/vendor/my_module 
+                then module-target-path is optional'
+            )
+            ->addArgument(
+                'module-target-path',
+                InputArgument::OPTIONAL,
+                'Path to module target, e.g. source/modules/vendor/my_module'
+            );
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @throws \Throwable
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        try {
+            $moduleSourcePath = $this->getModuleSourcePath($input);
+            $this->validatePath($moduleSourcePath);
+
+            $moduleTargetPath = $this->getModuleTargetPath($input);
+            $this->validatePath($moduleTargetPath);
+
+            $this->moduleConfigurationInstaller->install($moduleSourcePath, $moduleTargetPath);
+            $output->writeln('<info>' . self::MESSAGE_INSTALLATION_WAS_SUCCESSFUL . '</info>');
+        } catch (ModuleTargetPathIsMissingException $exception) {
+            $output->writeln('<error>' . self::MESSAGE_TARGET_PATH_IS_REQUIRED . '</error>');
+        } catch (\Throwable $throwable) {
+            $output->writeln('<error>' . self::MESSAGE_INSTALLATION_FAILED . '</error>');
+
+            throw $throwable;
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return string
+     */
+    private function getModuleSourcePath(InputInterface $input): string
+    {
+        return $this->getAbsolutePath($input->getArgument('module-source-path'));
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return string
+     * @throws ModuleTargetPathIsMissingException
+     */
+    private function getModuleTargetPath(InputInterface $input): string
+    {
+        $moduleTargetPath = $input->getArgument('module-target-path');
+        if ($moduleTargetPath !== null) {
+            return $this->getAbsolutePath($moduleTargetPath);
+        }
+
+        $moduleSourcePath = $this->getModuleSourcePath($input);
+        if ($this->isDirectoryInsideShopModulesDirectory($moduleSourcePath)) {
+            return $moduleSourcePath;
+        }
+
+        throw new ModuleTargetPathIsMissingException();
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    private function isDirectoryInsideShopModulesDirectory(string $path): bool
+    {
+        if (Path::isRelative($path)) {
+            $path = Path::join($this->context->getShopRootPath(), $path);
+        }
+
+        return Path::isBasePath($this->context->getModulesPath(), $path);
+    }
+
+    /**
+     * @param string $path
+     */
+    private function validatePath(string $path)
+    {
+        if (!file_exists($path) || !is_dir($path)) {
+            throw new \InvalidArgumentException($path . ' directory doesn\'t exist');
+        }
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    private function getAbsolutePath(string $path): string
+    {
+        return Path::isRelative($path)
+            ? Path::makeAbsolute($path, getcwd())
+            : $path;
+    }
+}
