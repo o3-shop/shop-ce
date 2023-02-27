@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [v1.0.0] - 2023-03-05
 
 ### Fixed
-- ...
+- DB needs to return integer fields as string in PHP 8.1
 
 # [O3-Shop]
 
