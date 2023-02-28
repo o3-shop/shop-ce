@@ -177,7 +177,7 @@ class Utilities extends Core
         // try referer
         $sFilepath = @$_SERVER['HTTP_REFERER'];
         if (!isset($sFilepath) || !$sFilepath) {
-            $sFilepath = "http://" . @$_SERVER['HTTP_HOST'] . @$_SERVER['SCRIPT_NAME'];
+            $sFilepath = "https://" . @$_SERVER['HTTP_HOST'] . @$_SERVER['SCRIPT_NAME'];
         }
         $aParams['sShopURL'] = ltrim($this->_extractPath(explode("/", $sFilepath)), "/");
 

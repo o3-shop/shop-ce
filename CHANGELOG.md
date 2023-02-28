@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - DB needs to return integer fields as string in PHP 8.1
 
+### Changed
+- Setup use https URL
+- Shop URL is written in SSL and non-SSL configuration to prevent session parameter in URL
+
 # [O3-Shop]
 
 > All changes from this moment on will be published as O3-Shop.
