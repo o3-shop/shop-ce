@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Setup use https URL
 - Shop URL is written in SSL and non-SSL configuration to prevent session parameter in URL
+- allow PHP 8.1 as dependency
 
 # [O3-Shop]
 
