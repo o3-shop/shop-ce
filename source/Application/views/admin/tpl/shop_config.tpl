@@ -475,7 +475,7 @@ function editThis(sID)
             <a href="#" onclick="_groupExp(this);return false;" class="rc"><b>[{oxmultilang ident="SHOP_OPTIONS_GROUP_VAT"}]</b></a>
             <dl>
                 <dt>
-                    <input type=text class="txt" style="width:70" name=confnum[dDefaultVAT] value="[{$confnum.dDefaultVAT}]" [{$readonly}]>
+                    <input type=text class="txt" style="width:70px" name=confnum[dDefaultVAT] value="[{$confnum.dDefaultVAT}]" [{$readonly}]>
                     [{oxinputhelp ident="HELP_SHOP_CONFIG_DEFAULTVAT"}]
                 </dt>
                 <dd>
@@ -726,7 +726,7 @@ function editThis(sID)
 
             <dl [{if !$confstrs.blPsBasketReservationEnabled}]class="rowhide"[{/if}] id="basketreservedtime">
                 <dt>
-                    <input type=text class="txt" style="width:70" name=confstrs[iPsBasketReservationTimeout] value="[{if $confstrs.iPsBasketReservationTimeout}][{$confstrs.iPsBasketReservationTimeout}][{else}]1200[{/if}]" [{$readonly}]>
+                    <input type=text class="txt" style="width:70px" name=confstrs[iPsBasketReservationTimeout] value="[{if $confstrs.iPsBasketReservationTimeout}][{$confstrs.iPsBasketReservationTimeout}][{else}]1200[{/if}]" [{$readonly}]>
                     [{oxinputhelp ident="HELP_SHOP_CONFIG_BASKETRESERVATIONTIMEOUT"}]
                 </dt>
                 <dd>
@@ -757,7 +757,7 @@ function editThis(sID)
 
             <dl [{if !$confstrs.blInvitationsEnabled}]class="rowhide"[{/if}] id="pointsforinvitation">
                 <dt>
-                    <input type=text class="txt" style="width:70" name=confstrs[dPointsForInvitation] value="[{$confstrs.dPointsForInvitation}]" [{$readonly}]>
+                    <input type=text class="txt" style="width:70px" name=confstrs[dPointsForInvitation] value="[{$confstrs.dPointsForInvitation}]" [{$readonly}]>
                     [{oxinputhelp ident="HELP_SHOP_CONFIG_POINTSFORINVITATION"}]
                 </dt>
                 <dd>
@@ -768,7 +768,7 @@ function editThis(sID)
 
             <dl [{if !$confstrs.blInvitationsEnabled}]class="rowhide"[{/if}] id="pointsforregistration">
                 <dt>
-                    <input type=text class="txt" style="width:70" name=confstrs[dPointsForRegistration] value="[{$confstrs.dPointsForRegistration}]" [{$readonly}]>
+                    <input type=text class="txt" style="width:70px" name=confstrs[dPointsForRegistration] value="[{$confstrs.dPointsForRegistration}]" [{$readonly}]>
                     [{oxinputhelp ident="HELP_SHOP_CONFIG_POINTSFORREGISTRATION"}]
                 </dt>
                 <dd>

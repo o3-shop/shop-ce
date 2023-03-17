@@ -48,6 +48,7 @@ function smarty_function_oxvariantselect($params, &$smarty)
     $aSelectBoxes = [];
     //real variants to MD variants
     $aRealVariants = [];
+    $sCallMethod = null;
 
     if (count($oMdVariants->getMdSubvariants())) {
         $sOutput = oxvariantselect_addSubvariants($oMdVariants->getMdSubvariants(), 0, $aSelectBoxes, $aRealVariants, $sSeparator, $sCallMethod, $sArtId);

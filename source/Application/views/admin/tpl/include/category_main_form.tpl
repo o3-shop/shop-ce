@@ -92,7 +92,7 @@
                 [{ oxinputhelp ident="HELP_CATEGORY_MAIN_PROMOTION_ICON" }]
             </td>
             <td class="edittext">
-                [{ if (!($edit->oxcategories__oxpromoicon->value=="nopic.jpg" || $edit->oxcategories__oxpromoicon->value=="" || $edit->oxcategories__oxpromoicon->value=="nopic_ico.jpg")) }]
+                [{if (!($edit->oxcategories__oxpromoicon->value=="nopic.jpg" || $edit->oxcategories__oxpromoicon->value=="" || $edit->oxcategories__oxpromoicon->value=="nopic_ico.jpg")) }]
                     <a href="Javascript:DeletePic('oxpromoicon');" class="delete left" [{include file="help.tpl" helpid=item_delete}]></a>
                 [{/if}]
                 <input class="editinput" name="myfile[PICO@oxcategories__oxpromoicon]" type="file" size="26" >
@@ -126,7 +126,7 @@
                 <select name="editval[oxcategories__oxdefsort]" class="editinput" onChange="JavaScript:SchnellSortManager(this);">
                     <option value="">[{oxmultilang ident="CATEGORY_MAIN_NONE"}]</option>
                     [{foreach from=$sortableFields key=field item=desc}]
-                        [{assign var="ident" value=GENERAL_ARTICLE_$desc}]
+                        [{assign var="ident" value="GENERAL_ARTICLE_"|cat:$desc}]
                         [{assign var="ident" value=$ident|oxupper}]
                         <option value="[{$desc}]" [{if $defsort == $desc}]SELECTED[{/if}]>[{oxmultilang|oxtruncate:20:"..":true ident=$ident}]</option>
                     [{/foreach}]

@@ -20,6 +20,10 @@
  */
 
 /**
+ * @var Smarty $smarty
+ */
+
+/**
  * Include the {@link modifier.escape.php} plugin
  */
 require_once $smarty->_get_plugin_filepath('modifier', 'escape');

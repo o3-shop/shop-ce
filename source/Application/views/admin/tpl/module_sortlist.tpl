@@ -26,7 +26,7 @@
                             <td class="listheader">[{oxmultilang ident="MODULE_PROBLEMATIC_FILES"}]</td>
                         </tr>
                         [{foreach from=$aDeletedExt item=aModules key=sModuleId}]
-                            [{assign var="listclass" value=listitem$blWhite}]
+                            [{assign var="listclass" value="listitem"|cat:$blWhite}]
                             <tr>
                                 <td valign="top" class="[{$listclass}]">[{$sModuleId}]</td>
                                 <td valign="top" class="[{$listclass}]">

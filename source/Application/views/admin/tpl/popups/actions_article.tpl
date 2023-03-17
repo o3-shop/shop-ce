@@ -91,7 +91,8 @@
             if (window.opener && window.opener.document && window.opener.document.myedit) {
                 window.opener.document.getElementById("assignedArticleTitle").innerHTML = sArticleTitle;
             }
-        } catch ( oErr ) {}
+        } finally {
+        }
     }
 
 </script>

@@ -42,6 +42,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         parent::render();
 
         if ($sType = $this->_getType()) {
+            $iLang = null;
             $oObject = oxNew($sType);
             if ($oObject->load($this->getEditObjectId())) {
                 $oOtherLang = $oObject->getAvailableInLangs();

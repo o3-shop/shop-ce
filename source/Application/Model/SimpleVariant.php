@@ -331,6 +331,8 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
     {
+        // possible required linktype for articles doesn't exist
+        $iLinkType = null;
         if (!isset($this->_aBaseStdUrls[$iLang][$iLinkType])) {
             $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
             $oArticle->setId($this->getId());
@@ -375,6 +377,8 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function getBaseSeoLink($iLang)
     {
+        // possible required linktype for articles doesn't exist
+        $iLinkType = null;
         return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class)->getArticleUrl($this, $iLang, $iLinkType);
     }
 

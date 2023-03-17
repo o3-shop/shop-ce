@@ -2284,6 +2284,8 @@ class Article extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             return;
         }
 
+        $rs = false;
+
         // article is not variant - should be updated current amount
         if (!$this->oxarticles__oxparentid->value) {
             //updating by SQL query, due to wrong behaviour if saving article using not admin mode
