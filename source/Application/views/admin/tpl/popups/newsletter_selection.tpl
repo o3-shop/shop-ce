@@ -50,7 +50,8 @@
             if (window.opener && window.opener.document && window.opener.document.myedit) {
                 window.opener.document.myedit.submit();
             }
-        } catch ( oErr ) {}
+        } finally {
+        }
     }
 </script>
 

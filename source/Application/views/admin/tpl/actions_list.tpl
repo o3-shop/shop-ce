@@ -81,10 +81,10 @@ window.onload = function ()
     [{if $listitem->blacklist == 1}]
         [{assign var="listclass" value=listitem3}]
     [{else}]
-        [{assign var="listclass" value=listitem$blWhite}]
+        [{assign var="listclass" value="listitem"|cat:$blWhite}]
     [{/if}]
     [{if $listitem->getId() == $oxid}]
-        [{assign var="listclass" value=listitem4}]
+        [{assign var="listclass" value="listitem4"}]
     [{/if}]
 
     [{block name="admin_actions_list_item"}]

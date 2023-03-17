@@ -192,7 +192,7 @@ class StrMb
      * @param int    $iLimit   (optional) only sub strings up to limit are returned
      * @param int    $iFlag    flags
      *
-     * @return string
+     * @return array|false
      */
     public function preg_split($sPattern, $sString, $iLimit = -1, $iFlag = 0)
     {

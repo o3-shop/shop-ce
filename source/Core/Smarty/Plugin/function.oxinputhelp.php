@@ -36,6 +36,7 @@ function smarty_function_oxinputhelp($params, &$smarty)
     $sIdent = $params['ident'];
     $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
     $iLang  = $oLang->getTplLanguage();
+    $blAdmin = null;
 
     try {
         $sTranslation = $oLang->translateString($sIdent, $iLang, $blAdmin);
