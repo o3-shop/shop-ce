@@ -120,14 +120,14 @@ class SystemRequirements
      *
      * @var string
      */
-    protected $_sReqInfoUrl = "https://docs.o3-shop.com/user/installation/SystemRequirements.html";
+    protected $_sReqInfoUrl = "https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/SystemRequirements.html";
 
     /**
      * Installation preparation info url
      *
      * @var string
      */
-    protected $_sPreparationInfoUrl = "https://docs.o3-shop.com/user/installation/PermissionSettings.html";
+    protected $_sPreparationInfoUrl = "https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/PrepareInstallation.html";
 
     /**
      * Module or system configuration mapping with installation requirements info url anchor
@@ -136,7 +136,7 @@ class SystemRequirements
      */
     protected $_aInfoMap = [
         "php_version"        => "php",
-        "mod_rewrite"        => "web-server",
+        "mod_rewrite"        => "webserver",
         "mysql_version"      => "database",
 
         "allow_url_fopen"    => "php",
@@ -165,7 +165,7 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        "server_permissions" => "schritt-customising-file-and-directory-permissions",
+        "server_permissions" => "adjusting-file-and-directory-permissions",
     ];
 
     /**
