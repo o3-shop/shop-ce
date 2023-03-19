@@ -192,7 +192,7 @@ class StrRegular
      * @param int    $iLimit   (optional) only substrings up to limit are returned
      * @param int    $iFlag    flags
      *
-     * @return string
+     * @return array|false
      */
     // phpcs:disable
     public function preg_split($sPattern, $sString, $iLimit = -1, $iFlag = 0)

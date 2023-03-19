@@ -68,7 +68,7 @@ function editThis( sID )
 </form>
 
 [{assign var="blWhite" value=""}]
-[{assign var="listclass" value=listitem$blWhite}]
+[{assign var="listclass" value="listitem"|cat:$blWhite}]
   <table border="0">
     <tr>
       [{block name="admin_article_variant_selectlist"}]
@@ -189,7 +189,7 @@ function editThis( sID )
           [{assign var="_cnt1" value=$_cnt1+1}]
           <tr id="test_variant.[{$_cnt1}]">
             [{block name="admin_article_variant_listitem"}]
-            [{assign var="listclass" value=listitem$blWhite}]
+            [{assign var="listclass" value="listitem"|cat:$blWhite}]
             [{assign var="hasvariants" value=true}]
             <td class="[{$listclass}]"><a href="Javascript:editThis('[{$listitem->oxarticles__oxid->value}]');" class="[{$listclass}]" [{include file="help.tpl" helpid=editvariant}]><img src="[{$oViewConf->getImageUrl()}]/editvariant.gif" width="15" height="15" alt="" border="0" align="absmiddle"></a></td>
             <td class="[{$listclass}]" align="center"><input class="edittext" type="checkbox" name="editval[[{$listitem->oxarticles__oxid->value}]][oxarticles__oxactive]" value='1' [{if $listitem->oxarticles__oxactive->value == 1}]checked[{/if}] [{$readonly}]></td>
@@ -236,7 +236,7 @@ function editThis( sID )
 
           <tr>
 
-            [{assign var="listclass" value=listitem$blWhite}]
+            [{assign var="listclass" value="listitem"|cat:$blWhite}]
             <form name="myedit4" id="myedit4" action="[{$oViewConf->getSelfLink()}]" method="post">
             [{$oViewConf->getHiddenSid()}]
             <input type="hidden" name="editlanguage" value="[{$editlanguage}]">

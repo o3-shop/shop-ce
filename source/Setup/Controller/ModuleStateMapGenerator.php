@@ -101,6 +101,10 @@ class ModuleStateMapGenerator
         $moduleStateMap = [];
 
         $iteration = SystemRequirements::iterateThroughSystemRequirementsInfo($this->systemRequirementsInfo);
+        /**
+         * @var string $groupId
+         * @var  string $moduleId
+         */
         foreach ($iteration as list($groupId, $moduleId, $moduleState)) {
             $moduleStateMap[$groupId][] = [
                 self::MODULE_ID_KEY => $moduleId,

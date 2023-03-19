@@ -48,7 +48,7 @@
                     [{oxmultilang ident="TOOLS_MAIN_SQLDUMB"}] ([{oxmultilang ident="GENERAL_MAX_FILE_UPLOAD"}] [{$sMaxFormattedFileSize}])&nbsp;&nbsp;&nbsp;
                 </td>
                 <td class="edittext"><br>
-                    <input type="file" style="width: 370" class="edittext" name="myfile[SQL1@usqlfile]" [{$readonly}]>
+                    <input type="file" style="width: 370px" class="edittext" name="myfile[SQL1@usqlfile]" [{$readonly}]>
                     [{oxinputhelp ident="HELP_TOOLS_MAIN_SQLDUMB"}]
                 </td>
             </tr>

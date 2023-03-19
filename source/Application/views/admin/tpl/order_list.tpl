@@ -72,7 +72,7 @@ window.onload = function ()
                 <select name="addsearchfld" class="folderselect" >
                     <option value="-1" style="color: #000000;">[{oxmultilang ident="ORDER_LIST_PAID"}]</option>
                     [{foreach from=$asearch key=table item=desc}]
-                    [{assign var="ident" value=ORDER_SEARCH_FIELD_$desc}]
+                    [{assign var="ident" value="ORDER_SEARCH_FIELD_"|cat:$desc}]
                     [{assign var="ident" value=$ident|oxupper}]
                     <option value="[{$table}]" [{if $addsearchfld == $table}]SELECTED[{/if}]>[{oxmultilang|oxtruncate:20:"..":true ident=$ident}]</option>
                     [{/foreach}]
@@ -121,7 +121,7 @@ window.onload = function ()
                 [{if $listitem->blacklist == 1}]
                     [{assign var="listclass" value=listitem3}]
                 [{else}]
-                    [{assign var="listclass" value=listitem$blWhite}]
+                    [{assign var="listclass" value="listitem"|cat:$blWhite}]
                 [{/if}]
             [{/if}]
             [{if $listitem->getId() == $oxid}]

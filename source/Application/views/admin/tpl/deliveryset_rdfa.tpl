@@ -31,7 +31,7 @@
         [{block name="admin_payment_main_form"}]
             [{foreach key=key item=oDelivery from=$aAllRDFaDeliveries}]
                 [{assign var="name" value=$oDelivery->name}]
-                [{assign var="ident" value=DELIVERY_RDFA_$name}]
+                [{assign var="ident" value="DELIVERY_RDFA_"|cat:$name}]
                 [{assign var="ident" value=$ident|oxupper}]
                 [{if $oDelivery->type == 0}]
                 <tr>
@@ -53,7 +53,7 @@
         [{block name="admin_payment_main_form"}]
             [{foreach key=key item=oDelivery from=$aAllRDFaDeliveries}]
                 [{assign var="name" value=$oDelivery->name}]
-                [{assign var="ident" value=DELIVERY_RDFA_$name}]
+                [{assign var="ident" value="DELIVERY_RDFA_"|cat:$name}]
                 [{assign var="ident" value=$ident|oxupper}]
                 [{if $oDelivery->type == 1}]
                 <tr>

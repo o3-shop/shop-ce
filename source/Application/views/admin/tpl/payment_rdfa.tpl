@@ -33,7 +33,7 @@
         [{block name="admin_payment_main_form"}]
             [{foreach key=key item=oPayment from=$aAllRDFaPayments}]
                 [{assign var="name" value=$oPayment->name}]
-                [{assign var="ident" value=PAYMENT_RDFA_$name}]
+                [{assign var="ident" value="PAYMENT_RDFA_"|cat:$name}]
                 [{assign var="ident" value=$ident|oxupper}]
                 [{if $oPayment->type == 0}]
                 <tr>
@@ -55,7 +55,7 @@
         [{block name="admin_payment_main_form"}]
             [{foreach key=key item=oPayment from=$aAllRDFaPayments}]
                 [{assign var="name" value=$oPayment->name}]
-                [{assign var="ident" value=PAYMENT_RDFA_$name}]
+                [{assign var="ident" value="PAYMENT_RDFA_"|cat:$name}]
                 [{assign var="ident" value=$ident|oxupper}]
                 [{if $oPayment->type == 1}]
                 <tr>
