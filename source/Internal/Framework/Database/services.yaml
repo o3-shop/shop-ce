@@ -16,3 +16,16 @@ services:
 
   OxidEsales\EshopCommunity\Internal\Framework\Database\TransactionServiceInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Database\TransactionService
+
+  OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerBridgeInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerBridge
+    public: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerFactoryInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerFactory
+
+  OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\MysqlCheckerInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\MysqlChecker
+
+  OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\MariaDbCheckerInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\MariaDbChecker
