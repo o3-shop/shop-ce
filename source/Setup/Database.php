@@ -23,6 +23,9 @@ namespace OxidEsales\EshopCommunity\Setup;
 
 use Conf;
 use Exception;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerFactoryInterface;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -230,19 +233,14 @@ class Database extends Core
 
             // testing version
             $oSysReq = getSystemReqCheck();
-            if (0 === $oSysReq->checkMysqlVersion($this->getDatabaseVersion())) {
+            if (false === $oSysReq->checkDatabaseVersionIsAllowed($this->getDatabaseVersion())) {
                 throw new Exception($this->getInstance("Language")->getText('ERROR_MYSQL_VERSION_DOES_NOT_FIT_REQUIREMENTS'), Database::ERROR_MYSQL_VERSION_DOES_NOT_FIT_REQUIREMENTS);
             }
 
-            $databaseConnectProblem = null;
             try {
                 $this->_oConn->exec("USE `{$aParams['dbName']}`");
             } catch (Exception $e) {
                 $databaseConnectException = new Exception($this->getInstance("Language")->getText('ERROR_COULD_NOT_CREATE_DB') . " - " . $e->getMessage(), Database::ERROR_COULD_NOT_CREATE_DB, $e);
-            }
-
-            if ((1 === $oSysReq->checkMysqlVersion($this->getDatabaseVersion())) && !$this->userDecidedIgnoreDBWarning()) {
-                throw new Exception($this->getInstance("Language")->getText('ERROR_MYSQL_VERSION_DOES_NOT_FIT_RECOMMENDATIONS'), Database::ERROR_MYSQL_VERSION_DOES_NOT_FIT_RECOMMENDATIONS);
             }
 
             if (is_a($databaseConnectException, 'Exception')) {

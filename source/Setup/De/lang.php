@@ -63,9 +63,7 @@ $aLang = [
 'ERROR_PASSWORD_TOO_SHORT'                      => 'Passwort zu kurz',
 'ERROR_PASSWORDS_DO_NOT_MATCH'                  => 'Passwörter stimmen nicht überein',
 'ERROR_USER_NAME_DOES_NOT_MATCH_PATTERN'        => 'Bitte geben Sie eine gültige E-Mail-Adresse ein!',
-'ERROR_MYSQL_VERSION_DOES_NOT_FIT_REQUIREMENTS' => 'Die MySQL Version erfüllt nicht die Systemvoraussetzungen!',
-'ERROR_MYSQL_VERSION_DOES_NOT_FIT_RECOMMENDATIONS' => 'WARNUNG: Ein Bug in MySQL 5.6 kann zu Problemen im O3-Shop führen. MySQL 5.6 wird daher nicht empfohlen.',
-
+'ERROR_MYSQL_VERSION_DOES_NOT_FIT_REQUIREMENTS' => 'Die Datenbank Version erfüllt nicht die Systemvoraussetzungen!',
 
 'ERROR_VIEWS_CANT_CREATE'                       => 'FEHLER: Kann Views nicht erstellen. Bitte prüfen Sie Ihre Benutzerrechte für die Datenbank.',
 'ERROR_VIEWS_CANT_SELECT'                       => 'FEHLER: Kann nicht auf Views zugreifen. Bitte prüfen Sie Ihre Benutzerrechte für die Datenbank.',
@@ -90,7 +88,7 @@ $aLang = [
 'MOD_TOKENIZER'                                 => 'Tokenizer',
 'MOD_BC_MATH'                                   => 'BCMath',
 'MOD_MYSQL_CONNECT'                             => 'PDO_MySQL',
-'MOD_MYSQL_VERSION'                             => 'MySQL Version 5.5, 5.7 oder MariaDB',
+'MOD_MYSQL_VERSION'                             => 'MySQL Version 5.5, 5.7 oder MariaDB 10.4',
 'MOD_GD_INFO'                                   => 'GDlib v2 incl. JPEG Unterstützung',
 'MOD_INI_SET'                                   => 'ini_set erlaubt',
 'MOD_REGISTER_GLOBALS'                          => 'register_globals muss ausgeschaltet sein',

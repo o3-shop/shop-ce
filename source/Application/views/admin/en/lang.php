@@ -1271,7 +1271,7 @@ $aLang = [
     'SYSREQ_MYSQL_CONNECT'                    => 'PDO_MySQL',
 
     // @deprecated since v6.5.1 (2020-03-12); We do not check mysql version
-    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5 or 5.7',
+    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7 or MariaDB 10.4',
     // END deprecated
 
     'SYSREQ_GD_INFO'                          => 'GDlib v2 incl. JPEG support',

@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Core;
 use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Database\Adapter\ResultSetInterface;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoaderInterface;
 
 /**
@@ -725,11 +726,29 @@ class SystemRequirements
     }
 
     /**
+     * @param $installedVersion
+     *
+     * @return bool
+     * @throws \OxidEsales\Eshop\Core\Exception\DatabaseConnectionException
+     */
+    public function checkDatabaseVersionIsAllowed($installedVersion = null): bool
+    {
+        if ($installedVersion === null) {
+            $resultContainingDatabaseVersion = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getRow("SHOW VARIABLES LIKE 'version'");
+            $installedVersion = $resultContainingDatabaseVersion[1];
+        }
+
+        /** @var DatabaseCheckerBridgeInterface $dbChecker */
+        $dbChecker = ContainerFactory::getInstance()->getContainer()->get(DatabaseCheckerBridgeInterface::class);
+        return $dbChecker->version($installedVersion)->isAllowed();
+    }
+
+    /**
      * Checks if current mysql version matches requirements
      * @param string $installedVersion MySQL version
      * @return int
      *
-     * @deprecated since v6.5.1 (2020-02-12); method will be removed completely.
+     * @deprecated since O3 v1.0.0 (2020-02-12); method will be removed completely. Use checkDatabaseVersionIsAllowed() instead
      */
     public function checkMysqlVersion($installedVersion = null)
     {
