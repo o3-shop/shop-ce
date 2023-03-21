@@ -261,7 +261,8 @@ class SystemRequirements
             $aRequiredServerConfigs = [
                 'php_version',
                 'mod_rewrite',
-                'server_permissions'
+                'server_permissions',
+                'mysql_version'
             ];
 
             if ($this->isAdmin()) {
