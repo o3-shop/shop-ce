@@ -253,7 +253,7 @@ class SettingDao implements SettingDaoInterface
     {
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder
-            ->select('decode(oxvarvalue, :key) as value, oxvartype as type, oxvarname as name')
+            ->select('oxvarvalue as value, oxvartype as type, oxvarname as name')
             ->from('oxconfig')
             ->where('oxshopid = :shopId')
             ->andWhere('oxmodule = :moduleId')
@@ -262,7 +262,6 @@ class SettingDao implements SettingDaoInterface
                 'shopId'    => $shopId,
                 'moduleId'  => $this->getPrefixedModuleId($moduleId),
                 'name'      => $name,
-                'key'       => $this->context->getConfigurationEncryptionKey(),
             ]);
 
         $result = $queryBuilder->execute()->fetch();
