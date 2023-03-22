@@ -137,11 +137,9 @@ class ModuleVariablesLocator
         $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
 
         $shopId = $this->getShopIdCalculator()->getShopId();
-        $configKey = $this->getConfigurationKey();
 
-        $query = "SELECT DECODE( oxvarvalue , :configkey ) FROM oxconfig WHERE oxvarname = :oxvarname AND oxshopid = :oxshopid";
+        $query = "SELECT oxvarvalue FROM oxconfig WHERE oxvarname = :oxvarname AND oxshopid = :oxshopid";
         $value = $masterDb->getOne($query, [
-            ':configkey' => $configKey,
             ':oxvarname' => $name,
             ':oxshopid'  => $shopId
         ]);

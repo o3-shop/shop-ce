@@ -207,7 +207,7 @@ class ShopMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
 
         $selectShopConfigurationQuery =
             "select oxvarname, oxvartype,
-            DECODE( oxvarvalue, " . $db->quote($config->getConfigParam('sConfigKey')) . ") as oxvarvalue, oxmodule
+            oxvarvalue as oxvarvalue, oxmodule
             from oxconfig where oxshopid = '1'";
         $shopConfiguration = $db->select($selectShopConfigurationQuery);
         if ($shopConfiguration != false && $shopConfiguration->count() > 0) {

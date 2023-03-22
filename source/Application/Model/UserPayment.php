@@ -138,7 +138,7 @@ class UserPayment extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function load($sOxId)
     {
-        $sSelect = 'select oxid, oxuserid, oxpaymentsid, DECODE( oxvalue, "' . $this->getPaymentKey() . '" ) as oxvalue
+        $sSelect = 'select oxid, oxuserid, oxpaymentsid, oxvalue
                     from oxuserpayments where oxid = ' . \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sOxId);
 
         return $this->assignRecord($sSelect);

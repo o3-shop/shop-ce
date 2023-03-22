@@ -220,7 +220,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $rs = $database->select(
             "select cfg.oxvarname,
                     cfg.oxvartype,
-                    DECODE( cfg.oxvarvalue, " . $database->quote($config->getConfigParam('sConfigKey')) . ") as oxvarvalue,
+                    cfg.oxvarvalue as oxvarvalue,
                         disp.oxvarconstraint,
                         disp.oxgrouping
                 from oxconfig as cfg

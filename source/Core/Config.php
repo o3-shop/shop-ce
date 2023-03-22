@@ -1993,7 +1993,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getDecodeValueQuery($fieldName = "oxvarvalue")
     {
-        return " DECODE( {$fieldName}, '" . $this->getConfigParam('sConfigKey') . "') ";
+        return " $fieldName ";
     }
 
     /**

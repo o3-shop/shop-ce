@@ -336,7 +336,7 @@ class Database extends Core
         $this->addConfigValueIfShopInfoShouldBeSent($oUtils, $sBaseShopId, $aParams, $oConfk, $oSession);
 
         //set only one active language
-        $oStatement = $oPdo->query("select oxvarname, oxvartype, DECODE( oxvarvalue, '" . $oConfk->sConfigKey . "') AS oxvarvalue from oxconfig where oxvarname='aLanguageParams'");
+        $oStatement = $oPdo->query("select oxvarname, oxvartype, oxvarvalue from oxconfig where oxvarname='aLanguageParams'");
         if ($oStatement && false !== ($aRow = $oStatement->fetch())) {
             if ($aRow['oxvartype'] == 'arr' || $aRow['oxvartype'] == 'aarr') {
                 $aRow['oxvarvalue'] = unserialize($aRow['oxvarvalue']);
