@@ -320,7 +320,7 @@ class Database extends Core
         // $this->execSql( "delete from oxconfig where oxvarname = 'aLanguageParams'" );
 
         $oInsert = $oPdo->prepare("insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue)
-                                             values (:oxid, :shopId, :name, :type, ENCODE(:value, :key))");
+                                             values (:oxid, :shopId, :name, :type, :value)");
 
         $oInsert->execute(
             [
@@ -328,8 +328,7 @@ class Database extends Core
                 'shopId' => $sBaseShopId,
                 'name' => 'sDefaultLang',
                 'type' => 'str',
-                'value' => $sShopLang,
-                'key' => $oConfk->sConfigKey
+                'value' => $sShopLang
             ]
         );
 
@@ -356,8 +355,7 @@ class Database extends Core
                     'shopId' => $sBaseShopId,
                     'name' => 'aLanguageParams',
                     'type' => 'aarr',
-                    'value' => $sValue,
-                    'key' => $oConfk->sConfigKey
+                    'value' => $sValue
                 ]
             );
         }
@@ -453,7 +451,7 @@ class Database extends Core
         $this->execSql("delete from oxconfig where oxvarname = 'blSendShopDataToOxid'");
         $this->execSql(
             "insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue)
-                             values('$sID', '$baseShopId', 'blSendShopDataToOxid', 'bool', ENCODE( '$blSendShopDataToOxid', '" . $configKey->sConfigKey . "'))"
+                             values('$sID', '$baseShopId', 'blSendShopDataToOxid', 'bool', '$blSendShopDataToOxid')"
         );
     }
 }

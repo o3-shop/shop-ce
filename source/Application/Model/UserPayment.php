@@ -167,7 +167,7 @@ class UserPayment extends \OxidEsales\Eshop\Core\Model\BaseModel
             // Function is called from inside a transaction in Category::save (see ESDEV-3804 and ESDEV-3822).
             // No need to explicitly force master here.
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sEncodedValue = $database->getOne("select encode( " . $database->quote($sValue) . ", '" . $this->getPaymentKey() . "' )");
+            $sEncodedValue = $database->getOne("select " . $database->quote($sValue));
             $this->oxuserpayments__oxvalue->setValue($sEncodedValue);
         }
 
@@ -196,7 +196,7 @@ class UserPayment extends \OxidEsales\Eshop\Core\Model\BaseModel
             // No need to explicitly force master here.
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-            $sEncodedValue = $database->getOne("select encode( " . $database->quote($sValue) . ", '" . $this->getPaymentKey() . "' )");
+            $sEncodedValue = $database->getOne("select " . $database->quote($sValue));
             $this->oxuserpayments__oxvalue->setValue($sEncodedValue);
         }
 
