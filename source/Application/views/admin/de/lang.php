@@ -1270,9 +1270,7 @@ $aLang = [
     'SYSREQ_BC_MATH'                          => 'BCMath',
     'SYSREQ_MYSQL_CONNECT'                    => 'PDO_MySQL',
 
-    // @deprecated since v6.5.1 (2020-03-12); We do not check mysql version
-    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7 oder MariaDB 10.4',
-    // END deprecated
+    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10.4',
 
     'SYSREQ_GD_INFO'                          => 'GDlib v2 incl. JPEG Unterstützung',
     'SYSREQ_INI_SET'                          => 'ini_set erlaubt',
