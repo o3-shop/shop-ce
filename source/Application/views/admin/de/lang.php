@@ -1150,10 +1150,6 @@ $aLang = [
     'SHOP_CONFIG_STOCKOFFDEFAULTMESSAGE'                      => 'Die "Nicht-auf-Lager"-Standardmeldung nutzen',
     'SHOP_CONFIG_STOCKONDEFAULTMESSAGE'                       => 'Die "Auf-Lager"-Standardmeldung nutzen',
 
-    // @deprecated since v6.5.1 (2019-02-07); credit card payment method will be no longer supported
-    'SHOP_CONFIG_STORECREDITCARDINFO'                         => 'Kreditkarten-Informationen speichern',
-    // END deprecated
-
     'SHOP_CONFIG_SHOWTSINTERNATIONALFEESMESSAGE'              => 'Zeige Meldung über mögliche internationale Liefergebühren',
     'SHOP_CONFIG_SHOWTSCODMESSAGE'                            => 'Zeige Meldung über mögliche Nachnahmegebühren',
     'SHOP_CONFIG_TIMEFORMAT'                                  => 'Zeitformat im Administrationsbereich',
@@ -1270,9 +1266,10 @@ $aLang = [
     'SYSREQ_BC_MATH'                          => 'BCMath',
     'SYSREQ_MYSQL_CONNECT'                    => 'PDO_MySQL',
 
-    // @deprecated since v6.5.1 (2020-03-12); We do not check mysql version
-    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7 oder MariaDB 10.4',
-    // END deprecated
+     // @deprecated since v6.5.1 (2020-03-12); We do not check mysql version
+     'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7 oder MariaDB 10.4',
+     // END deprecated
+
 
     'SYSREQ_GD_INFO'                          => 'GDlib v2 incl. JPEG Unterstützung',
     'SYSREQ_INI_SET'                          => 'ini_set erlaubt',
@@ -1877,14 +1874,6 @@ $aLang = [
     'PAYMENT_RDFA_BYINVOICE'               => 'Rechnung',
     'PAYMENT_RDFA_CHECKINADVANCE'          => 'Barscheck',
     'PAYMENT_RDFA_BYBANKTRANSFERINADVANCE' => 'Vorauskasse',
-
-    'PAYMENT_RDFA_CREDITCARD'              => 'Kreditkartenzahlung',
-    'PAYMENT_RDFA_AMERICANEXPRESS'         => 'American Express',
-    'PAYMENT_RDFA_DINERSCLUB'              => 'Diners Club',
-    'PAYMENT_RDFA_DISCOVER'                => 'Discover',
-    'PAYMENT_RDFA_JCB'                     => 'JCB',
-    'PAYMENT_RDFA_MASTERCARD'              => 'MasterCard',
-    'PAYMENT_RDFA_VISA'                    => 'VISA',
 
     'DELIVERY_RDFA_ASIGN_DELIVERY'             => 'Versandarten zuordnen',
     'DELIVERY_RDFA_ADVICE'                     => '<b>Hinweis:</b> Bitte wählen Sie nur die in GoodRelations vordefinierten Versandarten aus, die Ihrer Versandart %s entsprechen',

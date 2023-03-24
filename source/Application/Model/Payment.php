@@ -419,7 +419,7 @@ class Payment extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Function checks if loaded payment is valid to current basket
      *
-     * @param array                                    $aDynValue    dynamical value (in this case oxidcreditcard and oxiddebitnote are checked only)
+     * @param array                                    $aDynValue    dynamical value (in this case oxiddebitnote are checked only)
      * @param string                                   $sShopId      id of current shop
      * @param \OxidEsales\Eshop\Application\Model\User $oUser        the current user
      * @param double                                   $dBasketPrice the current basket price (oBasket->dPrice)

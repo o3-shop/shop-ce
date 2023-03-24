@@ -82,8 +82,7 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     }
 
     /**
-     * Returns user payment used for current order. In case current order was executed using
-     * credit card and user payment info is not stored in db (if \OxidEsales\Eshop\Core\Config::blStoreCreditCardInfo = false),
+     * Returns user payment used for current order.
      * just for preview user payment is set from oxPayment
      *
      * @param object $oOrder Order object

@@ -75,12 +75,6 @@ $aLang = [
 'BLOCK_PRICE'                                                 => 'Mengenstaffelpreise',
 'CANCEL'                                                      => 'Beenden',
 
-// @deprecated since v6.5.1 (2019-02-07); credit card payment method will be no longer supported
-'CARD_MASTERCARD'                                             => 'Mastercard',
-'CARD_SECURITY_CODE'                                          => 'Prüfziffer',
-'CARD_SECURITY_CODE_DESCRIPTION'                              => 'Diese befindet sich auf der Rückseite Ihrer Kreditkarte. Die Prüfziffer sind die letzten drei Ziffern im Unterschriftsfeld.',
-'CARD_VISA'                                                   => 'Visa',
-// END deprecated
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'CARD_TO'                                                     => 'Karte an',
 /** end deprecated */
@@ -116,9 +110,6 @@ $aLang = [
 'COUPON'                                                      => 'Gutschein',
 'COUPON_NOT_ACCEPTED'                                         => 'Der Gutschein "%s" kann nicht akzeptiert werden.',
 'CREATE_PASSWORD'                                             => 'Passwort erstellen',
-// @deprecated since v6.5.1 (2019-02-07); credit card payment method will be no longer supported
-'CREDITCARD'                                                  => 'Karte',
-// END deprecated
 'CURRENT_PRODUCT'                                             => 'Aktueller Artikel',
 'CUSTOMERS_ALSO_BOUGHT'                                       => 'Kunden, die diesen Artikel gekauft haben, kauften auch',
 'DATE'                                                        => 'Datum',

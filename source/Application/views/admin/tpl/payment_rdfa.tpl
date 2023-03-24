@@ -49,28 +49,6 @@
         [{/block}]
         </table>
     </td>
-    <td valign="top" class="edittext" align="left" width="50%">
-        <b>[{oxmultilang ident="PAYMENT_RDFA_CREDITCARD"}]</b>
-        <table cellspacing="0" cellpadding="0" border="0">
-        [{block name="admin_payment_main_form"}]
-            [{foreach key=key item=oPayment from=$aAllRDFaPayments}]
-                [{assign var="name" value=$oPayment->name}]
-                [{assign var="ident" value="PAYMENT_RDFA_"|cat:$name}]
-                [{assign var="ident" value=$ident|oxupper}]
-                [{if $oPayment->type == 1}]
-                <tr>
-                    <td class="edittext" width="70">
-                    [{oxmultilang ident=$ident}]
-                    </td>
-                    <td class="edittext">
-                    <input type="checkbox" class="edittext" name="ardfapayments[]" value="[{$oPayment->name}]" [{if $oPayment->checked}]checked[{/if}] [{$readonly}]>
-                    </td>
-                </tr>
-                [{/if}]
-            [{/foreach}]
-        [{/block}]
-        </table>
-    </td>
 
     </tr>
 </table>
