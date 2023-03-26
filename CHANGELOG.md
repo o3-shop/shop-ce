@@ -1,8 +1,28 @@
 # Change Log for O3-Shop Community Edition Core Component
 
 All notable changes to this project will be documented in this file.
-The format is based on [Keep a Changelog](http://keepachangelog.com/)
+The format is based on [Keep a Changelog](https://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## [unreleased]
+
+### Added
+- database version checkers
+- database version to system requirement check
+
+### Changed
+- Wave configuration settings, set Wave as default theme
+- documentation URL
+- removing the optional flow theme from the shop core package dependencies (still included in the metapackage)
+- outdated setup favicon replaced
+- system requirements documentation deep links
+
+### Removed
+- built-in credit card checks
+
+### Fixed
+- make database port configurable in setup process
+- small template issues
 
 ## [v1.0.0] - 2023-03-05
 
@@ -1148,7 +1168,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [6.0-beta.1] - 2016-11-30
 
-[v1.0.0]: https://github.com/o3-shop/shop_ce/releases/tag/v1.0.0
+[unreleased]: https://gitlab.o3-shop.com/o3/shop_ce/compare/v1.0.0...b-1.0
+[v1.1.0]: https://gitlab.o3-shop.com/o3/shop_ce/-/compare/v1.0.0...v1.1.0
+[v1.0.0]: https://gitlab.o3-shop.com/o3/shop_ce/-/tags/v1.0.0
 [O3-Shop]: https://www.o3-shop.com/
 [6.10.3]: https://github.com/OXID-eSales/oxideshop_ce/compare/v6.10.2...v6.10.3
 [6.10.2]: https://github.com/OXID-eSales/oxideshop_ce/compare/v6.10.1...v6.10.2

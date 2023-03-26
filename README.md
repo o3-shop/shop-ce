@@ -11,4 +11,4 @@ This package ist part of the O3-Shop. For more informations, consult the [docume
 
 ## Bugs and issues
 
-If you experience any bugs or issues, please report them in the section **O3-Shop (all versions)** of [https://bugs.o3-shop.com](https://bugs.o3-shop.com).
+If you experience any bugs or issues, please report them in the section **O3-Shop (all versions)** of [https://issues.o3-shop.com](https://issues.o3-shop.com).
