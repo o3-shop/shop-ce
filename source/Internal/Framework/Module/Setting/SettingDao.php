@@ -194,7 +194,7 @@ class SettingDao implements SettingDaoInterface
                 'oxshopid'      => ':shopId',
                 'oxvarname'     => ':name',
                 'oxvartype'     => ':type',
-                'oxvarvalue'    => 'encode(:value, :key)',
+                'oxvarvalue'    => ':value',
             ])
             ->setParameters([
                 'id'        => $this->shopAdapter->generateUniqueId(),
@@ -206,7 +206,6 @@ class SettingDao implements SettingDaoInterface
                     $shopModuleSetting->getType(),
                     $shopModuleSetting->getValue()
                 ),
-                'key'       => $this->context->getConfigurationEncryptionKey(),
             ]);
 
         $queryBuilder->execute();

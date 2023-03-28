@@ -53,12 +53,12 @@ class Version20180703135728 extends AbstractMigration
                       `OXVARVALUE`
                   )
                   SELECT  
-                      REPLACE(UUID( ) , '-', '' ), 
+                      REPLACE(UUID( ) , '-', '' ),
                       `OXID`,
                       ?, 
                       ?, 
-                      ENCODE(?, ?)
-                  FROM `oxshops`                  
+                      ?
+                  FROM `oxshops`
                   WHERE NOT EXISTS (
                       SELECT `OXVARNAME` 
                       FROM `oxconfig`
@@ -67,7 +67,7 @@ class Version20180703135728 extends AbstractMigration
                   )";
         $this->addSql(
             $query,
-            [$varName, $varType, $rawValue, $configKey, $varName]
+            [$varName, $varType, $rawValue, $varName]
         );
     }
 

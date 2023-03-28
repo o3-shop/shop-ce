@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
+use Doctrine\DBAL\Platforms\MySQL57Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\BlobType;
 use Doctrine\Migrations\AbstractMigration;
@@ -32,34 +33,38 @@ final class Version20230322213324 extends AbstractMigration
 {
     public function up(Schema $schema): void
     {
+        $this->skipIf(!$this->connection->getDatabasePlatform() instanceof MySQL57Platform, 'Config values can be decoded on MySQL 5.x only');
+
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $table = $schema->getTable('oxconfig');
         $column = $table->getColumn('oxvarvalue');
 
-        if ($column->getType() instanceof BlobType) {
-            $this->addSql('ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_UNENC` text;');
-            $this->addSql("UPDATE oxconfig SET `OXVARVALUE_UNENC` = DECODE(OXVARVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
-            $this->addSql('ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` text;');
-            $this->addSql("UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_UNENC` WHERE 1;");
-            $this->addSql('ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_UNENC`;');
-        }
+        $this->skipIf(!$column->getType() instanceof BlobType, 'Config values are already decoded');
+
+        $this->addSql('ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_UNENC` text;');
+        $this->addSql("UPDATE oxconfig SET `OXVARVALUE_UNENC` = DECODE(OXVARVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
+        $this->addSql('ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` text;');
+        $this->addSql("UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_UNENC` WHERE 1;");
+        $this->addSql('ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_UNENC`;');
     }
 
     public function down(Schema $schema): void
     {
+        $this->skipIf(!$this->connection->getDatabasePlatform() instanceof MySQL57Platform, 'Config values can be encoded on MySQL 5.x only');
+
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $table = $schema->getTable('oxconfig');
         $column = $table->getColumn('oxvarvalue');
 
-        if (!$column->getType() instanceof BlobType) {
-            $this->addSql( 'ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_ENC` text;' );
-            $this->addSql( "UPDATE oxconfig SET `OXVARVALUE_ENC` = ENCODE(OXVARVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;" );
-            $this->addSql( 'ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` mediumblob;' );
-            $this->addSql( "UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_ENC` WHERE 1;" );
-            $this->addSql( 'ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_ENC`;' );
-        }
+        $this->skipIf($column->getType() instanceof BlobType, 'Config values are already encoded');
+
+        $this->addSql( 'ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_ENC` text;' );
+        $this->addSql( "UPDATE oxconfig SET `OXVARVALUE_ENC` = ENCODE(OXVARVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;" );
+        $this->addSql( 'ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` mediumblob;' );
+        $this->addSql( "UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_ENC` WHERE 1;" );
+        $this->addSql( 'ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_ENC`;' );
     }
 
     public function isTransactional(): bool
