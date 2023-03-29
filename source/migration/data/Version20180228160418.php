@@ -34,8 +34,7 @@ class Version20180228160418 extends AbstractMigration
      */
     public function up(Schema $schema): void
     {
-        $sql = "ALTER TABLE `oxconfig` CHANGE COLUMN `OXVARVALUE` `OXVARVALUE` MEDIUMBLOB NOT NULL COMMENT 'Variable value' AFTER `OXVARTYPE`;";
-        $this->addSql($sql);
+        $this->skipIf(true, 'Migration can no longer be applied.');
     }
 
     /**
