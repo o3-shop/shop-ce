@@ -78,7 +78,7 @@ $aLang = [
 'MOD_ALLOW_URL_FOPEN'                           => 'allow_url_fopen und fsockopen auf Port 80',
 'MOD_PHP4_COMPAT'                               => 'Zend Kompatibilitätsmodus muss ausgeschaltet sein',
 // @deprecated since v.6.5.1 (2020-02-12);
-'MOD_PHP_VERSION'                               => 'PHP Version ab 7.4 bis 8.1',
+'MOD_PHP_VERSION'                               => 'PHP Version ab 7.4 bis 8.2',
 // END deprecated
 'MOD_REQUEST_URI'                               => 'REQUEST_URI vorhanden',
 'MOD_LIB_XML2'                                  => 'LIB XML2',
@@ -88,7 +88,7 @@ $aLang = [
 'MOD_TOKENIZER'                                 => 'Tokenizer',
 'MOD_BC_MATH'                                   => 'BCMath',
 'MOD_MYSQL_CONNECT'                             => 'PDO_MySQL',
-'MOD_MYSQL_VERSION'                             => 'MySQL Version 5.5, 5.7 oder MariaDB 10.4',
+'MOD_MYSQL_VERSION'                             => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10.4',
 'MOD_GD_INFO'                                   => 'GDlib v2 incl. JPEG Unterstützung',
 'MOD_INI_SET'                                   => 'ini_set erlaubt',
 'MOD_REGISTER_GLOBALS'                          => 'register_globals muss ausgeschaltet sein',

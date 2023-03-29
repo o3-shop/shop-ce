@@ -54,8 +54,8 @@ class Version20180928072235 extends AbstractMigration
                       `OXID`,
                       ?, 
                       ?, 
-                      ENCODE(?, ?)
-                  FROM `oxshops`                  
+                      ?
+                  FROM `oxshops`
                   WHERE NOT EXISTS (
                       SELECT `OXVARNAME` 
                       FROM `oxconfig`
@@ -69,7 +69,6 @@ class Version20180928072235 extends AbstractMigration
                 $configSettingName,
                 $configSettingType,
                 $configSettingValue,
-                $this->getConfigEncryptionKey(),
                 $configSettingName,
             ]
         );

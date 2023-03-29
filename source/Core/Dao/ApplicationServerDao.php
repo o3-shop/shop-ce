@@ -172,12 +172,11 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      */
     protected function update($appServer)
     {
-        $query = "UPDATE oxconfig SET oxvarvalue = ENCODE(:value, :key)
+        $query = "UPDATE oxconfig SET oxvarvalue = :value
                   WHERE oxvarname = :oxvarname and oxshopid = :oxshopid";
 
         $parameter = [
             ':value' => $this->convertAppServerToConfigOption($appServer),
-            ':key' => $this->config->getConfigParam('sConfigKey'),
             ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $appServer->getId(),
             ':oxshopid' => $this->config->getBaseShopId()
         ];
@@ -193,15 +192,14 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     protected function insert($appServer)
     {
         $query = "insert into oxconfig (oxid, oxshopid, oxmodule, oxvarname, oxvartype, oxvarvalue)
-                  values (:oxid, :oxshopid, '', :oxvarname, :oxvartype, ENCODE(:value, :key))";
+                  values (:oxid, :oxshopid, '', :oxvarname, :oxvartype, :value)";
 
         $parameter = [
             ':oxid' => \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID(),
             ':oxshopid' => $this->config->getBaseShopId(),
             ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $appServer->getId(),
             ':oxvartype' => 'arr',
-            ':value' => $this->convertAppServerToConfigOption($appServer),
-            ':key' => $this->config->getConfigParam('sConfigKey')
+            ':value' => $this->convertAppServerToConfigOption($appServer)
         ];
 
         $this->database->execute($query, $parameter);

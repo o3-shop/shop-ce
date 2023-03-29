@@ -78,7 +78,7 @@ $aLang = [
 'MOD_ALLOW_URL_FOPEN'                           => 'allow_url_fopen and fsockopen to port 80',
 'MOD_PHP4_COMPAT'                               => 'Zend compatibility mode must be off',
 // @deprecated since v.6.5.1 (2020-02-12);
-'MOD_PHP_VERSION'                               => 'PHP version from 7.4 to 8.1',
+'MOD_PHP_VERSION'                               => 'PHP version from 7.4 to 8.2',
 // END deprecated
 'MOD_REQUEST_URI'                               => 'REQUEST_URI set',
 'MOD_LIB_XML2'                                  => 'LIB XML2',
@@ -88,7 +88,7 @@ $aLang = [
 'MOD_TOKENIZER'                                 => 'Tokenizer',
 'MOD_BC_MATH'                                   => 'BCMath',
 'MOD_MYSQL_CONNECT'                             => 'PDO_MySQL',
-'MOD_MYSQL_VERSION'                             => 'MySQL version 5.5, 5.7 or MariaDB 10.4',
+'MOD_MYSQL_VERSION'                             => 'MySQL version 5.5, 5.7, 8.0 or MariaDB 10.4',
 'MOD_GD_INFO'                                   => 'GDlib v2 incl. JPEG support',
 'MOD_INI_SET'                                   => 'ini_set allowed',
 'MOD_REGISTER_GLOBALS'                          => 'register_globals must be off',

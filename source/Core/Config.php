@@ -1906,15 +1906,14 @@ class Config extends \OxidEsales\Eshop\Core\Base
         ]);
 
         $query = "insert into oxconfig (oxid, oxshopid, oxmodule, oxvarname, oxvartype, oxvarvalue)
-                  values (:oxid, :oxshopid, :oxmodule, :oxvarname, :oxvartype, ENCODE(:value, :key))";
+                  values (:oxid, :oxshopid, :oxmodule, :oxvarname, :oxvartype, :value)";
         $db->execute($query, [
             ':oxid' => $newOXID,
             ':oxshopid' => $shopId,
             ':oxmodule' => $module ?: '',
             ':oxvarname' => $varName,
             ':oxvartype' => $varType,
-            ':value' => $value ?? '',
-            ':key' => $this->getConfigParam('sConfigKey'),
+            ':value' => $value ?? ''
         ]);
 
         $this->informServicesAfterConfigurationChanged($varName, $shopId, $module);
@@ -1993,7 +1992,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getDecodeValueQuery($fieldName = "oxvarvalue")
     {
-        return " DECODE( {$fieldName}, '" . $this->getConfigParam('sConfigKey') . "') ";
+        return " $fieldName ";
     }
 
     /**

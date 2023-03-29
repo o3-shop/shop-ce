@@ -1255,7 +1255,7 @@ $aLang = [
     'SYSREQ_ALLOW_URL_FOPEN'                  => 'allow_url_fopen or fsockopen to port 80',
     'SYSREQ_PHP4_COMPAT'                      => 'Zend compatibility mode must be off',
     // @deprecated since v.6.5.1 (2020-02-12);
-    'SYSREQ_PHP_VERSION'                      => 'PHP version from 7.4 to 8.1',
+    'SYSREQ_PHP_VERSION'                      => 'PHP version from 7.4 to 8.2',
     // END deprecated
     'SYSREQ_REQUEST_URI'                      => 'REQUEST_URI set',
     'SYSREQ_LIB_XML2'                         => 'LIB XML2',
@@ -1266,9 +1266,7 @@ $aLang = [
     'SYSREQ_BC_MATH'                          => 'BCMath',
     'SYSREQ_MYSQL_CONNECT'                    => 'PDO_MySQL',
 
-    // @deprecated since v6.5.1 (2020-03-12); We do not check mysql version
-    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7 or MariaDB 10.4',
-    // END deprecated
+    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7, 8.0 or MariaDB 10.4',
 
     'SYSREQ_GD_INFO'                          => 'GDlib v2 incl. JPEG support',
     'SYSREQ_INI_SET'                          => 'ini_set allowed',
