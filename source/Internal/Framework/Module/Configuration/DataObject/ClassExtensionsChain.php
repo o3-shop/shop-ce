@@ -25,6 +25,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Data
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
+use Traversable;
 
 class ClassExtensionsChain implements \IteratorAggregate
 {
@@ -134,9 +135,9 @@ class ClassExtensionsChain implements \IteratorAggregate
     }
 
     /**
-     * @return \Traversable
+     * @return Traversable
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new \ArrayIterator($this->chain);
     }
