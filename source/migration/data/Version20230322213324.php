@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
-use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\BlobType;
 use Doctrine\Migrations\AbstractMigration;
@@ -33,7 +33,7 @@ final class Version20230322213324 extends AbstractMigration
 {
     public function up(Schema $schema): void
     {
-        $this->skipIf(!$this->connection->getDatabasePlatform() instanceof MySQL57Platform, 'Config values can be decoded on MySQL 5.x only');
+        $this->skipIf($this->connection->getDatabasePlatform() instanceof MySQL80Platform, 'Config values can\'t decoded on MySQL 8');
 
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
@@ -51,7 +51,7 @@ final class Version20230322213324 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf(!$this->connection->getDatabasePlatform() instanceof MySQL57Platform, 'Config values can be encoded on MySQL 5.x only');
+        $this->skipIf($this->connection->getDatabasePlatform() instanceof MySQL80Platform, 'Config values can\'t encoded on MySQL 8');
 
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 

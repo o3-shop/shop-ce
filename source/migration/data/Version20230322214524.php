@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
-use Doctrine\DBAL\Platforms\MySQL57Platform;
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\BlobType;
 use Doctrine\Migrations\AbstractMigration;
@@ -33,14 +33,14 @@ final class Version20230322214524 extends AbstractMigration
 {
     public function up(Schema $schema): void
     {
-        $this->skipIf(!$this->connection->getDatabasePlatform() instanceof MySQL57Platform, 'Config values can be decoded on MySQL 5.x only');
+        $this->skipIf($this->connection->getDatabasePlatform() instanceof MySQL80Platform, 'Userpayment values can\'t decoded on MySQL 8');
 
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $table = $schema->getTable('oxuserpayments');
         $column = $table->getColumn('oxvalue');
 
-        $this->skipIf(!$column->getType() instanceof BlobType, 'Config values are already decoded');
+        $this->skipIf(!$column->getType() instanceof BlobType, 'Userpayment values are already decoded');
 
         $this->addSql('ALTER TABLE oxuserpayments ADD COLUMN `OXVALUE_UNENC` text;');
         $this->addSql("UPDATE oxuserpayments SET `OXVALUE_UNENC` = DECODE(OXVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
@@ -51,14 +51,14 @@ final class Version20230322214524 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->skipIf(!$this->connection->getDatabasePlatform() instanceof MySQL57Platform, 'Config values can be encoded on MySQL 5.x only');
+        $this->skipIf($this->connection->getDatabasePlatform() instanceof MySQL80Platform, 'Userpayment values can\'t encoded on MySQL 8');
 
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $table = $schema->getTable('oxuserpayments');
         $column = $table->getColumn('oxvalue');
 
-        $this->skipIf($column->getType() instanceof BlobType, 'Config values are already encoded');
+        $this->skipIf($column->getType() instanceof BlobType, 'Userpayment values are already encoded');
 
         $this->addSql('ALTER TABLE oxuserpayments ADD COLUMN `OXVALUE_ENC` text;');
         $this->addSql("UPDATE oxuserpayments SET `OXVALUE_ENC` = ENCODE(OXVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
