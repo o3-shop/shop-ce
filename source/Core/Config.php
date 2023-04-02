@@ -43,6 +43,8 @@ define('MAX_64BIT_INTEGER', '18446744073709551615');
  */
 class Config extends \OxidEsales\Eshop\Core\Base
 {
+    use DynamicPropertiesTrait;
+
     /**
      * @deprecated since v6.5.0 (2019-11-28); Constant will be removed
      * because MySQL 8 removed ENCODE and DECODE methods

@@ -26,6 +26,8 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class ConfigFile
 {
+    use DynamicPropertiesTrait;
+
     /**
      * Initializes the instance. Loads config variables from the file.
      *

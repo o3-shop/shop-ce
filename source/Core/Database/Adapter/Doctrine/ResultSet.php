@@ -126,7 +126,7 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
      *
      * @return Statement The Statment class implements Traversable
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->close();
         $this->getStatement()->execute();
@@ -179,7 +179,7 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
      *
      *  @return int The number of rows retrieved by the current statement.
      */
-    public function count()
+    public function count(): int
     {
         return $this->getStatement()->rowCount();
     }

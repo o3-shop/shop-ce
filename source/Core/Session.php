@@ -301,7 +301,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
      */
     public function getSessionChallengeToken()
     {
-        $sRet = preg_replace('/[^a-z0-9]/i', '', $this->getVariable('sess_stoken'));
+        $sRet = preg_replace('/[^a-z0-9]/i', '', $this->getVariable('sess_stoken') ?? '');
         if (!$sRet) {
             $this->_initNewSessionChallenge();
             $sRet = $this->getVariable('sess_stoken');

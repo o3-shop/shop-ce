@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Service;
 
+use OxidEsales\EshopCommunity\Core\DynamicPropertiesTrait;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 
 /**
@@ -30,6 +31,8 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
  */
 class ShopStateService implements ShopStateServiceInterface
 {
+    use DynamicPropertiesTrait;
+
     /**
      * @var BasicContextInterface
      */
