@@ -487,4 +487,12 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
     {
         return (string) $this->_getFieldData('oxcontents__oxtitle');
     }
+
+    /**
+     * @return bool
+     */
+    public function isPlain(): bool
+    {
+        return (bool) $this->getFieldData('oxisplain');
+    }
 }

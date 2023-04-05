@@ -71,6 +71,16 @@ function ShowMenueFields( iVal)
                   </td>
                 </tr>
                 <tr>
+                  <td class="edittext" width="70">
+                  [{oxmultilang ident="CONTENT_MAIN_ISPLAIN"}]
+                  </td>
+                  <td class="edittext">
+                  <input class="edittext" type="hidden" name="editval[oxcontents__oxisplain]" value='0' [{$readonly}]>
+                  <input class="edittext" type="checkbox" name="editval[oxcontents__oxisplain]" value='1' [{if $edit->oxcontents__oxisplain->value == 1}]checked[{/if}] [{$readonly}]>
+                  [{oxinputhelp ident="HELP_CONTENT_MAIN_ISPLAIN"}]
+                  </td>
+                </tr>
+                <tr>
                   <td class="edittext">
                   [{oxmultilang ident="GENERAL_TITLE"}]
                   </td>
