@@ -447,6 +447,7 @@ CREATE TABLE `oxcontents` (
   `OXCATID` varchar(32) character set latin1 collate latin1_general_ci default NULL COMMENT 'Category id (oxcategories), used only when type = 2',
   `OXFOLDER` varchar(32) NOT NULL default '' COMMENT 'Content Folder (available options at oxconfig.OXVARNAME = aCMSfolder)',
   `OXTERMVERSION` char(32) character set latin1 collate latin1_general_ci NOT NULL default '' COMMENT 'Term and Conditions version (used only when OXLOADID = oxagb)',
+  `OXISPLAIN` int(1) NOT NULL default '0',
   `OXTIMESTAMP` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'Timestamp',
   PRIMARY KEY  (`OXID`),
   UNIQUE KEY `OXLOADID` (`OXLOADID`),
