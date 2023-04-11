@@ -597,6 +597,7 @@ $aLang = [
     'CONTENT_LIST_ALL'                          => 'Alle',
     'CONTENT_LIST_MENUITEM'                     => 'Kundeninformation',
     'CONTENT_LIST_MENUSUBITEM'                  => 'CMS-Seiten',
+    'CONTENT_MAIN_ISPLAIN'                      => 'Plaintext',
     'CONTENT_MAIN_MAINMENU'                     => 'Hauptmenü',
     'CONTENT_MAIN_INSERTBEFORE'                 => 'Eingefügt vor',
     'CONTENT_MAIN_SNIPPET'                      => 'Snippet',
