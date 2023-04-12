@@ -465,6 +465,8 @@ class Controller extends Core
         try {
             $parameters = array_merge((array)$session->getSessionParam('aDB'), $pathCollection);
 
+            $utils->updateEnvFile($parameters);
+
             // updating config file
             $utils->updateConfigFile($parameters);
 
