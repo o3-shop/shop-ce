@@ -39,10 +39,11 @@
         "webmozart/path-util": "^2.3",
         "symfony/finder": "^3.4",
         "symfony/filesystem": "^4.4.17",
+        "vlucas/phpdotenv": "^5.5",
         "o3-shop/shop-doctrine-migration-wrapper": "^v1.0.0",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
-        "o3-shop/shop-composer-plugin": "^v1.0.0",
+        "o3-shop/shop-composer-plugin": "dev-dev-b-1.0.x-env as v1.1.0",
         "o3-shop/shop-unified-namespace-generator": "^v1.0.0",
         "o3-shop/shop-facts": "^v1.0.0"
     },

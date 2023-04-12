@@ -191,13 +191,13 @@ class Utilities extends Core
      *
      * @throws Exception File can't be found, opened for reading or written.
      */
-    public function updateConfigFile($parameters)
+    public function updateEnvFile($parameters)
     {
         $configFile = '';
         $language = $this->getInstance("Language");
 
         if (isset($parameters['sShopDir'])) {
-            $configFile = $parameters['sShopDir'] . "/config.inc.php";
+            $configFile = $parameters['sShopDir'] . "/../.env";
         }
         $this->handleMissingConfigFileException($configFile);
 
@@ -219,7 +219,28 @@ class Utilities extends Core
         if (!file_put_contents($configFile, $configFileContent)) {
             throw new Exception(sprintf($language->getText('ERROR_CONFIG_FILE_IS_NOT_WRITABLE'), $configFile));
         }
-        // Make config file read-only, this is our recomnedation for config.inc.php
+
+        @chmod($configFile, getDefaultConfigFileMode());
+    }
+
+    /**
+     * Updates config.inc.php file contents.
+     *
+     * @param array $parameters Configuration parameters as submitted by the user
+     *
+     * @throws Exception File can't be found, opened for reading or written.
+     */
+    public function updateConfigFile($parameters)
+    {
+        $configFile = '';
+        $language = $this->getInstance("Language");
+
+        if (isset($parameters['sShopDir'])) {
+            $configFile = $parameters['sShopDir'] . "/config.inc.php";
+        }
+        $this->handleMissingConfigFileException($configFile);
+
+        // Make config file read-only, this is our recommendation for config.inc.php
         @chmod($configFile, getDefaultConfigFileMode());
     }
 

@@ -19,21 +19,36 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
+// get configuration data from environment variables (../.env in the default)
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv->load();
+$dotenv->required([
+     'O3SHOP_CONF_DBHOST',
+     'O3SHOP_CONF_DBPORT',
+     'O3SHOP_CONF_DBNAME',
+     'O3SHOP_CONF_DBUSER',
+     'O3SHOP_CONF_DBPWD',
+     'O3SHOP_CONF_SHOPURL',
+     'O3SHOP_CONF_SHOPDIR',
+     'O3SHOP_CONF_COMPILEDIR'
+])->notEmpty();
+
 // Database connection information
-$this->dbType = 'pdo_mysql';
+$this->dbType    = 'pdo_mysql';
 $this->dbCharset = 'utf8';
-$this->dbHost = '<dbHost>'; // database host name
-$this->dbPort  = '<dbPort>'; // tcp port to which the database is bound
-$this->dbName = '<dbName>'; // database name
-$this->dbUser = '<dbUser>'; // database user name
-$this->dbPwd  = '<dbPwd>'; // database user password
-$this->dbDriverOptions = []; // database driver options
-$this->dbUnixSocket = null; // unix domain socket, optional
-$this->sShopURL     = '<sShopURL>'; // Shop base url, required
-$this->sSSLShopURL  = '<sShopURL>'; // Shop SSL url, optional
-$this->sAdminSSLURL = null;            // Shop Admin SSL url, optional
-$this->sShopDir     = '<sShopDir>';
-$this->sCompileDir  = '<sCompileDir>';
+$this->dbHost    = $_ENV['O3SHOP_CONF_DBHOST'];     // database host name
+$this->dbPort    = $_ENV['O3SHOP_CONF_DBPORT'];     // tcp port to which the database is bound
+$this->dbName    = $_ENV['O3SHOP_CONF_DBNAME'];     // database name
+$this->dbUser    = $_ENV['O3SHOP_CONF_DBUSER'];     // database user name
+$this->dbPwd     = $_ENV['O3SHOP_CONF_DBPWD'];      // database user password
+$this->dbDriverOptions = [];                        // database driver options
+$this->dbUnixSocket = null;                         // unix domain socket, optional
+$this->sShopURL     = $_ENV['O3SHOP_CONF_SHOPURL']; // Shop base url, required
+$this->sSSLShopURL  = $_ENV['O3SHOP_CONF_SSLSHOPURL'];  // Shop SSL url, optional
+$this->sAdminSSLURL = $_ENV['O3SHOP_CONF_ADMINSSLURL']; // Shop Admin SSL url, optional
+$this->sShopDir     = $_ENV['O3SHOP_CONF_SHOPDIR'];
+$this->sCompileDir  = $_ENV['O3SHOP_CONF_COMPILEDIR'];
 
 /**
  * Force shop edition. Shop edition can still be forced here.
@@ -83,7 +98,7 @@ $this->blSeoLogging = false;
  * 6 = SMTP Debug Messages
  * 8 = display smarty template names (requires /tmp cleanup)
  */
-$this->iDebug = 0;
+$this->iDebug = $_ENV['O3SHOP_CONF_DEBUG'];
 
 /**
  * Should template blocks be highlighted in frontend?
@@ -92,7 +107,7 @@ $this->iDebug = 0;
 $this->blDebugTemplateBlocks = false;
 
 // Force admin email. Offline warnings are sent with high priority to this address.
-$this->sAdminEmail = '';
+$this->sAdminEmail = $_ENV['O3SHOP_CONF_ADMINEMAIL'];
 
 // Defines the time interval in seconds warnings are sent during the shop is offline.
 $this->offlineWarningInterval = 60 * 5;
@@ -171,7 +186,7 @@ $this->blUseCron = false;
 $this->blDoNotDisableModuleOnError = false;
 
 // Enable temporarily in case you can't access the backend due to broken views
-$this->blSkipViewUsage = false;
+$this->blSkipViewUsage = $_ENV['O3SHOP_CONF_SKIPVIEWUSAGE'];
 
 //Time limit in ms to be notified about slow queries
 $this->iDebugSlowQueryTime = 20;
@@ -198,7 +213,7 @@ $this->blShowUpdateViews = true;
 $this->aSlaveHosts = null;
 
 // Control the removal of Setup directory
-$this->blDelSetupDir = true;
+$this->blDelSetupDir = $_ENV['O3SHOP_CONF_DELSETUPDIR'];
 
 /**
  * Needed for backwards compatibility. Do not change the value of this property.

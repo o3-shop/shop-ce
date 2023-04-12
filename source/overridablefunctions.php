@@ -23,7 +23,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 
 if (!defined('ESHOP_CONFIG_FILE')) {
-    define('ESHOP_CONFIG_FILE', 'config.inc.php');
+    define('ESHOP_CONFIG_FILE', '.env');
 }
 
 if (!function_exists('redirectIfShopNotConfigured')) {
@@ -32,7 +32,7 @@ if (!function_exists('redirectIfShopNotConfigured')) {
      */
     function redirectIfShopNotConfigured()
     {
-        $configFileName = __DIR__ . DIRECTORY_SEPARATOR . ESHOP_CONFIG_FILE;
+        $configFileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . ESHOP_CONFIG_FILE;
 
         if (file_exists($configFileName) && strpos(file_get_contents($configFileName), '<dbHost') === false) {
             return;
