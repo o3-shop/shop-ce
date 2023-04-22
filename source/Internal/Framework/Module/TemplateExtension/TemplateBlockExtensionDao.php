@@ -54,6 +54,10 @@ class TemplateBlockExtensionDao implements TemplateBlockExtensionDaoInterface
      */
     public function add(TemplateBlockExtension $templateBlockExtension)
     {
+        if ($this->exists($templateBlockExtension)) {
+            return;
+        };
+
         $queryBuilder = $this->queryBuilderFactory->create();
         $queryBuilder
             ->insert('oxtplblocks')
@@ -80,6 +84,34 @@ class TemplateBlockExtensionDao implements TemplateBlockExtensionDaoInterface
             ]);
 
         $queryBuilder->execute();
+    }
+
+    public function exists(TemplateBlockExtension $templateBlockExtension)
+    {
+        $queryBuilder = $this->queryBuilderFactory->create();
+        $queryBuilder
+            ->select(1)
+            ->from('oxtplblocks')
+            ->where(
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq('oxshopid', ':shopId'),
+                    $queryBuilder->expr()->eq('oxmodule', ':moduleId'),
+                    $queryBuilder->expr()->eq('oxtheme', ':themeId'),
+                    $queryBuilder->expr()->eq('oxblockname', ':name'),
+                    $queryBuilder->expr()->eq('oxfile', ':filePath'),
+                    $queryBuilder->expr()->eq('oxtemplate', ':templatePath')
+                )
+            )
+            ->setParameters([
+                'shopId'        => $templateBlockExtension->getShopId(),
+                'moduleId'      => $templateBlockExtension->getModuleId(),
+                'themeId'       => $templateBlockExtension->getThemeId(),
+                'name'          => $templateBlockExtension->getName(),
+                'filePath'      => $templateBlockExtension->getFilePath(),
+                'templatePath'  => $templateBlockExtension->getExtendedBlockTemplatePath(),
+            ]);
+
+        return (bool) $queryBuilder->execute()->fetchOne();
     }
 
     /**
