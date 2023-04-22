@@ -13,6 +13,12 @@ services:
     arguments:
       $classExtensionChainService: '@oxid_esales.module.setup.class_extension_chain_service'
 
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\TemplateBlockModuleSettingHandlerBridgeInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\TemplateBlockModuleSettingHandlerBridge
+    public: true
+    arguments:
+      $templateBlockModuleSettingHandlerService: '@oxid_esales.module.setup.template_blocks_module_setting_handler'
+
   OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationServiceInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleActivationService
     arguments:
