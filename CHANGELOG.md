@@ -6,6 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+## [v1.2.0] - 2023-04-25
+
+### Added
+- mySQL 8 support
+- dotEnv support for config.inc variables
+- limited PHP 8.2 support
+- bridge for TemplateBlockModuleSettingHandler service
+- isPlain option for CMS items
+
+### Changed
+- don't use ENCODE / DECODE functions in oxconfig table (mySQL 8 compatibility)
+- complete database migrations
+- replace outdated favicon
+- prevents duplicate tplblock entries
+
 ## [v1.1.0] - 2023-03-29
 
 ### Added

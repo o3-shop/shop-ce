@@ -24,7 +24,7 @@
         "ext-pdo": "*",
         "ext-json": "*",
         "phpmailer/phpmailer": "^v6.5.0",
-        "o3-shop/smarty": "dev-support/2.6 as 2.6.34",
+        "o3-shop/smarty": "~2.6.34",
         "doctrine/dbal": "<=2.12.1",
         "doctrine/collections": "^1.4.0",
         "monolog/monolog": "^v1.23.0",
@@ -43,7 +43,7 @@
         "o3-shop/shop-doctrine-migration-wrapper": "^v1.0.0",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
-        "o3-shop/shop-composer-plugin": "dev-dev-b-1.0.x-env as v1.1.0",
+        "o3-shop/shop-composer-plugin": "^v1.1.0",
         "o3-shop/shop-unified-namespace-generator": "^v1.0.0",
         "o3-shop/shop-facts": "^v1.0.0"
     },
