@@ -43,12 +43,12 @@
         "o3-shop/shop-doctrine-migration-wrapper": "^v1.0.0",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
-        "o3-shop/shop-composer-plugin": "^v1.1.0",
+        "o3-shop/shop-composer-plugin": "dev-dev-b-1.x",
         "o3-shop/shop-unified-namespace-generator": "^v1.0.0",
         "o3-shop/shop-facts": "^v1.0.0"
     },
     "require-dev": {
-        "o3-shop/testing-library": "^v1.0.0",
+        "o3-shop/testing-library": "^v1.0.0 || dev-dev-b-1.x",
         "incenteev/composer-parameter-handler": "~v2.0",
         "o3-shop/shop-ide-helper": "^v1.0.0",
         "squizlabs/php_codesniffer": "^3.5.4"
