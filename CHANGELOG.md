@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+## [v1.1.0] - 2023-03-29
+
 ### Added
 - database version checkers
 - database version to system requirement check
