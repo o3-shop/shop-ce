@@ -569,8 +569,7 @@ class ConfigTest extends \OxidTestCase
 
         $oConfig->UNITloadVarsFromDB($sShopId, array($sVar));
 
-        $considerToBeTrue = ($sVal ||$sVal == 'true' || $sVal == '1' );
-        $this->assertTrue($considerToBeTrue, $oConfig->getConfigParam($sVar));
+        $this->assertEquals(($sVal || $sVal == 'true' || $sVal == '1' ), $oConfig->getConfigParam($sVar));
     }
 
     // testing random array parameter
@@ -583,7 +582,7 @@ class ConfigTest extends \OxidTestCase
         $sQ = 'select oxvarname from oxconfig where oxvartype="arr" and oxshopid="' . $sShopId . '"  and oxmodule="" order by rand()';
         $sVar = oxDb::getDb()->getOne($sQ);
 
-        $sQ = 'select DECODE( oxvarvalue, "' . $oConfig->getConfigParam('sConfigKey') . '") from oxconfig where oxshopid="' . $sShopId . '" and oxvarname="' . $sVar . '" and oxmodule=""';
+        $sQ = 'select oxvarvalue from oxconfig where oxshopid="' . $sShopId . '" and oxvarname="' . $sVar . '" and oxmodule=""';
         $sVal = oxDb::getDb()->getOne($sQ);
 
         $oConfig->UNITloadVarsFromDB($sShopId, array($sVar));
