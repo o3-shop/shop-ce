@@ -2529,12 +2529,12 @@ class ConfigTest extends OxidTestCase
     {
         $oConfig = oxNew('oxConfig');
         $oConfig->init();
-        $oConfig->setConfigParam('sTheme', 'azure');
+        $oConfig->setConfigParam('sTheme', 'wave');
 
         $sMainURL = $oConfig->getConfigParam('sShopURL');
         $sMallURL = 'http://www.example.com/';
 
-        $sDir = 'out/azure/src/';
+        $sDir = 'out/wave/src/';
 
         $oConfig->setConfigParam('sMallShopURL', $sMallURL);
 
