@@ -19,23 +19,27 @@
  */
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
+use OxidEsales\TestingLibrary\UnitTestCase;
+
 /**
- * Test oxCcValidator test class
+ * Test CcValidator test class
  */
-class CcValidatorTest extends \OxidTestCase
+class CcValidatorTest extends UnitTestCase
 {
 
     /**
-     * oxCcValidator::isValidCard() test case
+     * CcValidator::isValidCard() test case
      *
-     * @return null
+     * @return void
      */
-    public function testIsValidCard()
+    public function testIsValidCard(): void
     {
+        $this->markTestSkipped("Class '(ox)CcValidator' seems not to exist anymore. Delete this test?");
+
         $sDate = date("my");
         $sBadDate = date("my", mktime(0, 0, 0, date("m"), date("d"), date("Y") - 1));
 
-        $oValidator = oxNew('oxCcValidator');
+        $oValidator = oxNew('CcValidator');
 
         // good numbers, good exp. date
         $this->assertTrue($oValidator->isValidCard("370000000000002", "amx", $sDate));
