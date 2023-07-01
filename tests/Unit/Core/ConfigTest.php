@@ -71,7 +71,7 @@ class ConfigTest extends \OxidTestCase
 {
     protected $_iCurr = null;
     protected $_aShops = array();
-    private $shopUrl = 'http://www.example.com/';
+    private $shopUrl = 'http://localhost/';
 
     protected function setUp(): void
     {
