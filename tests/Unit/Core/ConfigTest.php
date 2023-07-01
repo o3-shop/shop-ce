@@ -82,7 +82,7 @@ class ConfigTest extends \OxidTestCase
         $this->_iCurr = $this->getSession()->getVariable('currency');
 
         $theme = oxNew(Theme::class);
-        $theme->load('azure');
+        $theme->load('wave');
         $theme->activate();
     }
 
