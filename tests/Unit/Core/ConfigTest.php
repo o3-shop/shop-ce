@@ -569,7 +569,8 @@ class ConfigTest extends \OxidTestCase
 
         $oConfig->UNITloadVarsFromDB($sShopId, array($sVar));
 
-        $this->assertTrue((bool)$sVal, $oConfig->getConfigParam($sVar));
+        $considerToBeTrue = ($sVal ||$sVal == 'true' || $sVal == '1' );
+        $this->assertTrue($considerToBeTrue, $oConfig->getConfigParam($sVar));
     }
 
     // testing random array parameter
