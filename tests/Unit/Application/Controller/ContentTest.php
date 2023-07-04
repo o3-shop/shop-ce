@@ -772,7 +772,7 @@ class ContentTest extends \OxidTestCase
         $contentView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ContentController::class, array("getContent"));
         $contentView->expects($this->once())->method('getContent')->will($this->returnValue($contentMock));
 
-        $this->assertEquals("testStdUrl", $contentView->getCanonicalUrl());
+        $this->assertEquals("testStdUrl?lang=0", $contentView->getCanonicalUrl());
     }
 
     /**
