@@ -415,6 +415,8 @@ class PaymentTest extends \OxidTestCase
 
     public function testGetCreditYears()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oPayment = $this->getProxyClass("payment");
 
         $this->assertEquals(range(date('Y'), date('Y') + 10), $oPayment->getCreditYears());
@@ -477,6 +479,8 @@ class PaymentTest extends \OxidTestCase
 
     public function testFilterDynDataNotFiltered()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oSubj = $this->getProxyClass("payment");
         $this->setConfigParam("blStoreCreditCardInfo", 1);
 
@@ -531,6 +535,8 @@ class PaymentTest extends \OxidTestCase
 
     public function testFilterDynDataFiltered()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oSubj = $this->getProxyClass("payment");
         $this->setConfigParam("blStoreCreditCardInfo", 0);
 
@@ -761,6 +767,8 @@ class PaymentTest extends \OxidTestCase
      */
     public function testGetDynDataFilteredFalse()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oPayment = oxNew('Payment');
 
         $this->assertFalse($oPayment->getDynDataFiltered());
@@ -772,6 +780,8 @@ class PaymentTest extends \OxidTestCase
      */
     public function testGetDynDataFilteredFalseInit()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oPayment = oxNew('Payment');
         $this->setConfigParam("blStoreCreditCardInfo", 0);
         $oPayment->init();
@@ -784,6 +794,8 @@ class PaymentTest extends \OxidTestCase
      */
     public function testGetDynDataFilteredTrueSessDataInit()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oPayment = oxNew('Payment');
         $this->setConfigParam("blStoreCreditCardInfo", 0);
         $sTNumber = "tstNumber";
@@ -815,6 +827,8 @@ class PaymentTest extends \OxidTestCase
      */
     public function testGetDynDataFilteredTrueReqDataInit()
     {
+        $this->markTestSkipped('Review with D.S. Guess, this method was removed.');
+
         $oPayment = oxNew('Payment');
         $this->setConfigParam("blStoreCreditCardInfo", 0);
         //TODO populate session and request variables with data
