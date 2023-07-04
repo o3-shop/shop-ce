@@ -171,7 +171,7 @@ class AlistTest extends \OxidTestCase
         $oListView->expects($this->once())->method('getActPage')->will($this->returnValue(1));
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
-        $this->assertEquals("testStdUrl", $oListView->getCanonicalUrl());
+        $this->assertEquals("testStdUrl?lang=0", $oListView->getCanonicalUrl());
     }
 
     /**
