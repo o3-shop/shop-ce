@@ -104,7 +104,7 @@ class AlistTest extends \OxidTestCase
 
         // Demo data is different in EE and CE
         $shopVersion = 6;
-        $sPrefix = "Woman - Jackets. O3-Shop $shopVersion";
+        $sPrefix = "Woman - Jackets. O3-Shop";
 
         $oCategory = oxNew('oxCategory');
         $oCategory->load($sCatId);
