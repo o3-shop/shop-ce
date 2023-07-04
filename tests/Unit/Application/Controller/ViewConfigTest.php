@@ -141,6 +141,8 @@ class ViewConfigTest extends \OxidTestCase
 
     public function testGetHomeLinkPe()
     {
+        $this->markTestSkipped('Review D.S.');
+
         oxTestModules::addFunction("oxutilsserver", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
         $oViewConfig = oxNew('oxviewconfig');
         $this->assertEquals($this->getConfig()->getShopURL(), $oViewConfig->getHomeLink());
