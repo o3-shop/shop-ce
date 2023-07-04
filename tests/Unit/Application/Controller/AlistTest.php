@@ -850,7 +850,7 @@ class AlistTest extends \OxidTestCase
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
         $shopVersion = 6;
-        $sExpect = "parent category - category. O3-Shop $shopVersion";
+        $sExpect = "parent category - category. O3-Shop";
         //expected string changed due to #2776
         $this->assertEquals(
             $sExpect,
