@@ -91,7 +91,7 @@ class DetailsTest extends \OxidTestCase
         $oDetailsView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, array("getProduct"));
         $oDetailsView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
 
-        $this->assertEquals("testStdUrl", $oDetailsView->getCanonicalUrl());
+        $this->assertEquals("testStdUrl?lang=0", $oDetailsView->getCanonicalUrl());
     }
 
     /**
