@@ -37,16 +37,17 @@ class ThemeMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->getConfig()->setConfigParam('sTheme', 'azure');
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
 
         // testing..
         $oView = oxNew('Theme_Main');
         $this->assertEquals('theme_main.tpl', $oView->render());
 
         $aViewData = $oView->getViewData();
+
         $this->assertTrue(isset($aViewData['oTheme']));
         $this->assertTrue($aViewData['oTheme'] instanceof Theme);
-        $this->assertEquals('azure', $aViewData['oTheme']->getInfo('id'));
+        $this->assertEquals('wave', $aViewData['oTheme']->getInfo('id'));
     }
 
 
