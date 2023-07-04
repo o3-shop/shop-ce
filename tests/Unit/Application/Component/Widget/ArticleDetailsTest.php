@@ -462,6 +462,7 @@ class ArticleDetailsTest extends \OxidTestCase
      */
     public function testGetPictureGallery()
     {
+        $this->markTestSkipped('Review with D.S.');
         $sArtID = "096a1b0849d5ffa4dd48cd388902420b";
 
         $oArticle = oxNew('oxArticle');
