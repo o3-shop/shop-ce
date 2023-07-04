@@ -17,19 +17,21 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ThemeMain;
 use OxidEsales\EshopCommunity\Core\Theme;
 
-use \Exception;
-use \oxTestModules;
+use Exception;
+use OxidTestCase;
+use oxTestModules;
 
 /**
  * Tests for Shop_Config class
  */
-class ThemeMainTest extends \OxidTestCase
+class ThemeMainTest extends OxidTestCase
 {
-
     /**
      * Theme_Main::Render() test case
      *
@@ -50,10 +52,13 @@ class ThemeMainTest extends \OxidTestCase
         $this->assertEquals('wave', $aViewData['oTheme']->getInfo('id'));
     }
 
-
+    /**
+     * @return void
+     * @throws \Throwable
+     */
     public function testSetTheme()
     {
-        $oTM = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ThemeMain::class, array('getEditObjectId'));
+        $oTM = $this->getMock(ThemeMain::class, array('getEditObjectId'));
         $oTM->expects($this->any())->method('getEditObjectId')->will($this->returnValue('azure'));
 
         oxTestModules::addFunction('oxTheme', 'load($name)', '{if ($name != "azure") throw new Exception("FAIL TO LOAD"); return true;}');
@@ -72,7 +77,7 @@ class ThemeMainTest extends \OxidTestCase
      */
     public function testThemeConfigExceptionInRender()
     {
-        $oTM = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ThemeMain::class, array('themeInConfigFile'));
+        $oTM = $this->getMock(ThemeMain::class, array('themeInConfigFile'));
         $oTM->expects($this->once())->method('themeInConfigFile');
         $oTM->render();
     }
@@ -91,8 +96,8 @@ class ThemeMainTest extends \OxidTestCase
      */
     public function testThemeConfigExceptionSTheme()
     {
-        $oConfig = oxNew('oxConfig');
-        $oConfig->sTheme = 'azure';
+        $oConfig               = oxNew('oxConfig');
+        $oConfig->sTheme       = 'azure';
         $oConfig->sCustomTheme = null;
 
         $oView = oxNew('Theme_Main');
@@ -105,8 +110,8 @@ class ThemeMainTest extends \OxidTestCase
      */
     public function testThemeConfigExceptionSCustomTheme()
     {
-        $oConfig = oxNew('oxConfig');
-        $oConfig->sTheme = null;
+        $oConfig               = oxNew('oxConfig');
+        $oConfig->sTheme       = null;
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
@@ -119,8 +124,8 @@ class ThemeMainTest extends \OxidTestCase
      */
     public function testThemeConfigExceptionSThemeSCustomTheme()
     {
-        $oConfig = oxNew('oxConfig');
-        $oConfig->sTheme = 'azure';
+        $oConfig               = oxNew('oxConfig');
+        $oConfig->sTheme       = 'azure';
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
