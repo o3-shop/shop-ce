@@ -321,7 +321,7 @@ class UBaseTest extends \OxidTestCase
 
     public function testGetMetaDescriptionForStartView()
     {
-        $sVal = 'Alles zum Thema Wassersport, Sportbekleidung und Mode. Umfangreiches Produktsortiment mit den neusten Trendprodukten. Blitzschneller Versand.';
+        $sVal = 'Kleine Figuren, große Freude - das ist unser Motto! Entdecken Sie unsere Kollektion von handgefertigten Keramikfiguren und lassen Sie sich von unseren einzigartigen Katzen, Geckos, Kühen, Füchsen, Einhörnern, Pinguinen und Pandas verzaubern.';
         $oView = oxNew('start');
 
         $this->assertEquals($sVal, $oView->getMetaDescription());
