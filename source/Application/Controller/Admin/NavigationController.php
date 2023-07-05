@@ -29,13 +29,6 @@ use OxidEsales\Eshop\Core\Registry;
 class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
 {
     /**
-     * Allowed host url
-     *
-     * @var string
-     */
-    protected $_sAllowedHost = "http://admin.oxid-esales.com";
-
-    /**
      * Executes parent method parent::render(), generates menu HTML code,
      * passes data to Smarty engine, returns name of template file "nav_frame.tpl".
      *
