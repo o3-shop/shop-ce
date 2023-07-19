@@ -127,13 +127,13 @@ class NewsletterTest extends \OxidTestCase
 
         $oTestNews->addme();
         $oUserGroups = $oUser->getUserGroups();
-        $this->assertTrue(isset($oUserGroups['o3newsletter']), 'user should be subscribed for newsletter group.');
+        $this->assertTrue(isset($oUserGroups['oxidnewsletter']), 'user should be subscribed for newsletter group.');
 
         $oTestNews->removeme();
         $oUser2 = oxNew('oxuser');
         $oUser2->load('testAddMe');
         $oUserGroups = $oUser2->getUserGroups();
-        $this->assertFalse(isset($oUserGroups['o3newsletter']), 'user should be unsubscribed from newsletter group.');
+        $this->assertFalse(isset($oUserGroups['oxidnewsletter']), 'user should be unsubscribed from newsletter group.');
     }
 
     public function testGetNewsletterStatusAfterAddme()

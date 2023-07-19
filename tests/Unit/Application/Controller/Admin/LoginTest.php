@@ -150,8 +150,6 @@ class LoginTest extends \OxidTestCase
         $oLang->oxid = "de";
         $oLang->abbr = "de";
         $oLang->name = "Deutsch";
-        $oLang->active = 1;
-        $oLang->sort = 1;
         $oLang->selected = 1;
 
         $aLanguages[] = $oLang;
@@ -161,8 +159,6 @@ class LoginTest extends \OxidTestCase
         $oLang->oxid = "en";
         $oLang->abbr = "en";
         $oLang->name = "English";
-        $oLang->active = 1;
-        $oLang->sort = 2;
         $oLang->selected = 0;
 
         $aLanguages[] = $oLang;
@@ -187,8 +183,6 @@ class LoginTest extends \OxidTestCase
         $oLang->oxid = "de";
         $oLang->abbr = "de";
         $oLang->name = "Deutsch";
-        $oLang->active = 1;
-        $oLang->sort = 1;
         $oLang->selected = 0;
 
         $aLanguages[] = $oLang;
@@ -198,8 +192,6 @@ class LoginTest extends \OxidTestCase
         $oLang->oxid = "en";
         $oLang->abbr = "en";
         $oLang->name = "English";
-        $oLang->active = 1;
-        $oLang->sort = 2;
         $oLang->selected = 1;
 
         $aLanguages[] = $oLang;
@@ -224,8 +216,6 @@ class LoginTest extends \OxidTestCase
         $oLang->oxid = "de";
         $oLang->abbr = "de";
         $oLang->name = "Deutsch";
-        $oLang->active = 1;
-        $oLang->sort = 1;
         $oLang->selected = 0;
 
         $aLanguages[] = $oLang;
@@ -235,8 +225,6 @@ class LoginTest extends \OxidTestCase
         $oLang->oxid = "en";
         $oLang->abbr = "en";
         $oLang->name = "English";
-        $oLang->active = 1;
-        $oLang->sort = 2;
         $oLang->selected = 1;
 
         $aLanguages[] = $oLang;

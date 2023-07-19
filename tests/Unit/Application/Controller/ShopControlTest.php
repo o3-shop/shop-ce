@@ -355,7 +355,7 @@ class ShopControlTest extends \OxidTestCase
     public function testProcess()
     {
         ContainerFactory::resetContainer();
-        $this->getConfig()->setConfigParam('sTheme', 'azure');
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
 
         $controllerClassName = 'content';
 
@@ -395,7 +395,7 @@ class ShopControlTest extends \OxidTestCase
     public function testProcessJson()
     {
         ContainerFactory::resetContainer();
-        $this->getConfig()->setConfigParam('sTheme', 'azure');
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
 
         $controllerClassName = 'content';
 
@@ -439,7 +439,7 @@ class ShopControlTest extends \OxidTestCase
     public function testProcessJsonWithErrors()
     {
         ContainerFactory::resetContainer();
-        $this->getConfig()->setConfigParam('sTheme', 'azure');
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
 
         $controllerClassName = 'content';
 

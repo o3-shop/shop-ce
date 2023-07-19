@@ -90,18 +90,18 @@ class LanguageListTest extends \OxidTestCase
         $oLang1->oxid = 'de';
         $oLang1->abbr = 'de';
         $oLang1->name = 'Deutsch';
-        $oLang1->active = "1";
-        $oLang1->sort = "1";
+        $oLang1->active = 1;
+        $oLang1->sort = null;
         $oLang1->selected = 1;
-        $oLang1->default = true;
+        $oLang1->default = false;
 
         $oLang2 = new stdClass();
         $oLang2->id = 1;
         $oLang2->oxid = 'en';
         $oLang2->abbr = 'en';
         $oLang2->name = 'English';
-        $oLang2->active = "1";
-        $oLang2->sort = "2";
+        $oLang2->active = 1;
+        $oLang2->sort = null;
         $oLang2->selected = 0;
         $oLang2->default = false;
 

@@ -80,7 +80,7 @@ class AccountNewsletterTest extends \OxidTestCase
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("removeFromGroup", "getNewsSubscription"));
-        $oUser->expects($this->once())->method('removeFromGroup')->with($this->equalTo('o3newsletter'));
+        $oUser->expects($this->once())->method('removeFromGroup')->with($this->equalTo('oxidnewsletter'));
         $oUser->expects($this->once())->method('getNewsSubscription')->will($this->returnValue($oSubscription));
 
         /** @var Account_Newsletter|PHPUnit\Framework\MockObject\MockObject $oView */

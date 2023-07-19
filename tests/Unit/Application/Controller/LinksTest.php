@@ -36,7 +36,7 @@ class LinksTest extends \OxidTestCase
     {
         $oLinks = $this->getProxyClass('links');
         $oLink = $oLinks->getLinksList()->current();
-        $this->assertEquals('http://www.oxid-esales.com', $oLink->oxlinks__oxurl->value);
+        $this->assertEquals('http://www.o3-shop.com', $oLink->oxlinks__oxurl->value);
     }
 
     /**
