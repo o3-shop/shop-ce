@@ -462,12 +462,12 @@ class ArticleDetailsTest extends \OxidTestCase
      */
     public function testGetPictureGallery()
     {
-        $this->markTestSkipped('Review with D.S.');
+        $this->markTestSkipped('Fix: Create picture file (getShopBasePath()) and remove after, fix test naming. RT, use VFS?');
         $sArtID = "096a1b0849d5ffa4dd48cd388902420b";
 
         $oArticle = oxNew('oxArticle');
         $oArticle->load($sArtID);
-        $sActPic = $this->getConfig()->getPictureUrl(null) . "generated/product/1/250_200_75/" . basename($oArticle->oxarticles__oxpic1->value);
+        $sActPic = $this->getConfig()->getPictureUrl(null) . "generated/product/1/540_340_75/" . basename($oArticle->oxarticles__oxpic1->value);
 
         $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, array("getPicturesProduct"));
         $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
