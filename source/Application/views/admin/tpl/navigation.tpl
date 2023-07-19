@@ -21,7 +21,9 @@
     </script>
 </head>
 <body>
-    <div id="shopLogo"><img src="[{$oViewConf->getImageUrl('logo.svg')}]" /></div>
+    [{block name="admin_navigation_shoplogo"}]
+        <div id="shopLogo"><img src="[{$oViewConf->getImageUrl('logo.svg')}]" /></div>
+    [{/block}]
     <table>
     <tr><td class="main">
     [{include file="include/navigation_shopselect.tpl"}]

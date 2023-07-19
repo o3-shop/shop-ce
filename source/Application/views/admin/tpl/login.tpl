@@ -14,7 +14,9 @@
 
 <div class="admin-login-box">
 
-    <div id="shopLogo"><img src="[{$oViewConf->getImageUrl('logo_dark.svg')}]" /></div>
+    [{block name="admin_login_shoplogo"}]
+        <div id="shopLogo"><img src="[{$oViewConf->getImageUrl('logo_dark.svg')}]" /></div>
+    [{/block}]
 
     <form action="[{$oViewConf->getSelfLink()}]" target="_top" method="post" name="login" id="login">
 
