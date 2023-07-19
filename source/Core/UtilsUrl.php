@@ -141,9 +141,11 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
         if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
             // non seo url has no language identifier..
             $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+            $sLangAbbr = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageAbbr($iLang);
+            
             if (
                 !$oStr->preg_match('/[&?](amp;)?lang=[0-9]+/i', $sUrl) &&
-                $iLang != $oConfig->getConfigParam('sDefaultLang')
+                $sLangAbbr != $oConfig->getConfigParam('sDefaultLang')
             ) {
                 $sUrl .= "{$sSep}lang=" . $iLang;
             }

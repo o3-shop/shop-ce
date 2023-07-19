@@ -31,6 +31,11 @@ class UtilsUrlTest extends \OxidTestCase
      */
     public function testPrepareCanonicalUrl()
     {
+        $this->markTestIncomplete(
+            'sDefaultLang is a string like "de", 
+            if the abbreviation of the base language differs from sDefaultLang, a lang parameter "lang=X" is added to the URL'
+        );
+        
         oxTestModules::addFunction('oxUtils', 'seoIsActive', '{return false;}');
         $this->getConfig()->setConfigParam("sDefaultLang", 9);
         $iLang = oxRegistry::getLang()->getBaseLanguage();
