@@ -462,6 +462,8 @@ class ArticleDetailsTest extends \OxidTestCase
      */
     public function testGetPictureGallery()
     {
+        $this->markTestSkipped('Fix: Create picture file (getShopBasePath()) and remove after, fix test naming. RT, use VFS?');
+
         $sArtID = "096a1b0849d5ffa4dd48cd388902420b";
 
         $from = __DIR__ . '/../../../../Fixtures/front_z1(1).jpg';
