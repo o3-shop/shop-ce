@@ -477,11 +477,9 @@ class ArticleDetailsTest extends \OxidTestCase
         $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
         $aPicGallery = $oDetails->getPictureGallery();
 
-        print_r($aPicGallery);
-
         $this->assertEquals($sActPic, $aPicGallery['ActPic']);
 
-        // unlink ($to);
+        unlink ($to);
     }
 
     /**
