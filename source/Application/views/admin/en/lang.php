@@ -1582,6 +1582,7 @@ $aLang = [
     'mxuadmin'                 => 'Administer Users',
     'mxurls'                   => 'Links',
     'mxugroups'                => 'User Groups',
+    'mxurights'                => 'User Rights',
     'mxusers'                  => 'Users',
     'mxvendor'                 => 'Distributors',
     'mxmanufacturer'           => 'Brands/Manufacturers',

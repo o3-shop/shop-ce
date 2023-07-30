@@ -1391,6 +1391,24 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\UserRightsController'          => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\UserRightsController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\UserRightsList'                => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\UserRightsList::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\UserRightsMain'                => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\UserRightsMain::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\UserList'                     => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\UserList::class,
         'isAbstract'       => false,

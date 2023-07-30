@@ -132,6 +132,9 @@
                 <TAB id="tbclusergroup_main" cl="usergroup_main" />
                 <BTN id="usergroup_new" />
             </SUBMENU>
+            <SUBMENU id="mxurights" cl="userrights" list="userrights_list">
+                <TAB id="tbcluserrights_main" cl="userrights_main" />
+            </SUBMENU>
             <SUBMENU id="mxlist" cl="list_user" />
         </MAINMENU>
         <MAINMENU id="mxorders">
