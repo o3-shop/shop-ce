@@ -26,7 +26,7 @@ use \oxDb;
 use \oxRegistry;
 use \oxTestModules;
 
-class EmailAzureTplTest extends \OxidTestCase
+class EmailWaveTplTest extends \OxidTestCase
 {
     protected $_oEmail = null;
     protected $_oUser = null;
