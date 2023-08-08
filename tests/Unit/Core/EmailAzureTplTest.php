@@ -155,8 +155,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendOrderEmailToUser()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $this->getConfig()->setConfigParam('blShowVATForDelivery', false);
 
         $oPrice = oxNew('oxPrice');
@@ -273,8 +271,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendOrderEmailToOwner()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $this->getConfig()->setConfigParam('blShowVATForDelivery', false);
 
         $oPrice = oxNew('oxPrice');
@@ -382,8 +378,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendOrderEMailToOwnerWhenShopLangIsDifferentFromAdminLang()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         oxRegistry::getLang()->setTplLanguage(1);
         oxRegistry::getLang()->setBaseLanguage(1);
 
@@ -442,8 +436,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendRegisterEMail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("_sendMail", "_getShop", "_getUseInlineImages"));
         $oEmail->expects($this->once())->method('_sendMail')->will($this->returnValue(true));
         $oEmail->expects($this->any())->method('_getShop')->will($this->returnValue($this->_oShop));
@@ -471,8 +463,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendForgotPwdEmail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("_sendMail", "_getShop", "_getUseInlineImages"));
         $oEmail->expects($this->once())->method('_sendMail')->will($this->returnValue(true));
         $oEmail->expects($this->any())->method('_getShop')->will($this->returnValue($this->_oShop));
@@ -499,8 +489,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendForgotPwdEmailToNotExistingUser()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("_sendMail", "_getShop"));
         $oEmail->expects($this->never())->method('_sendMail');
         $oEmail->expects($this->any())->method('_getShop')->will($this->returnValue($this->_oShop));
@@ -544,8 +532,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendNewsletterDBOptInMail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $this->getSession()->setId('xsessx');
 
         /** @var oxEmail|PHPUnit\Framework\MockObject\MockObject $oEmail */
@@ -605,8 +591,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendSuggestMail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $oParams = new stdClass();
         $oParams->rec_email = 'username@useremail.nl';
         $oParams->rec_name = 'testUserFName testUserLName';
@@ -644,8 +628,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendSendedNowMail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $myConfig = $this->getConfig();
         $myConfig->setConfigParam('blAdmin', true);
         $myConfig->setAdminMode(true);
@@ -706,8 +688,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendDownloadLinksMail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $myConfig = $this->getConfig();
         $myConfig->setConfigParam('blAdmin', true);
         $myConfig->setAdminMode(true);
@@ -787,8 +767,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendStockReminder()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         //set params for stock reminder
         $this->_oArticle->oxarticles__oxstock = new oxField('9', oxField::T_RAW);
         $this->_oArticle->oxarticles__oxremindamount = new oxField('9', oxField::T_RAW);
@@ -824,8 +802,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendWishlistMail()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $oParams = new stdClass();
 
         $oParams->rec_email = 'username@useremail.nl';
@@ -863,8 +839,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendPriceAlarmNotification()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $params['email'] = 'username@useremail.nl';
         $params['aid'] = '_testArticleId';
 
@@ -895,8 +869,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendPriceAlarmToCustomer()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $config = $this->getConfig();
         $config->setConfigParam('blAdmin', true);
         $config->setAdminMode(true);
@@ -935,8 +907,6 @@ class EmailAzureTplTest extends \OxidTestCase
      */
     public function testSendPriceAlarmNotificationInEN()
     {
-        $this->markTestSkipped('Review with D.S.');
-
         $aParams['aid'] = $this->_oArticle->getId();
         $aParams['email'] = 'user@oxid-esales.com';
 
