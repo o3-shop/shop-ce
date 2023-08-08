@@ -85,8 +85,6 @@ class OxConfigFileTest extends \OxidTestCase
             'testVar2' => 'testValue2',
         );
 
-        print_r($aVars);
-
         $this->assertSame($expectedArray, $aVars);
     }
 
