@@ -31,35 +31,31 @@ class UtilsViewTest extends \OxidTestCase
         parent::setUp();
 
         $theme = oxNew(Theme::class);
-        $theme->load('azure');
+        $theme->load('wave');
         $theme->activate();
     }
 
-    public function testGetTemplateDirsContainsAzure()
+    public function testGetTemplateDirsContainsAWave()
     {
-        if ($this->getTestConfig()->getShopEdition() != 'CE') {
-            $this->markTestSkipped('This test is for Community edition only.');
-        }
-
-        $expectedTemplateDirs = $this->getTemplateDirsAzure();
+        $expectedTemplateDirs = $this->getTemplateDirsWave();
         $utilsView = $this->getUtilsViewMockNotAdmin();
 
         $this->assertArraySubsetOxid($expectedTemplateDirs, $utilsView->getTemplateDirs());
     }
 
-    public function testGetTemplateDirsOnlyAzure()
+    public function testGetTemplateDirsOnlyWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
         }
 
-        $expectedTemplateDirs = $this->getTemplateDirsAzure();
+        $expectedTemplateDirs = $this->getTemplateDirsWave();
         $utilsView = $this->getUtilsViewMockNotAdmin();
 
         $this->assertEquals($expectedTemplateDirs, $utilsView->getTemplateDirs());
     }
 
-    public function testGetEditionTemplateDirsContainsAzure()
+    public function testGetEditionTemplateDirsContainsWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
@@ -68,8 +64,8 @@ class UtilsViewTest extends \OxidTestCase
         $shopPath = $this->getShopPath();
 
         $dirs = [
-            $shopPath . 'Application/views/azure/tpl/',
-            $shopPath . 'out/azure/tpl/',
+            $shopPath . 'Application/views/wave/tpl/',
+            $shopPath . 'out/wave/tpl/',
         ];
 
         $utilsView = $this->getUtilsViewMockNotAdmin();
@@ -77,7 +73,7 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertArraySubsetOxid($dirs, $utilsView->getTemplateDirs());
     }
 
-    public function testGetEditionTemplateDirsOnlyAzure()
+    public function testGetEditionTemplateDirsOnlyWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
@@ -86,8 +82,8 @@ class UtilsViewTest extends \OxidTestCase
         $shopPath = $this->getShopPath();
 
         $dirs = [
-            $shopPath . 'Application/views/azure/tpl/',
-            $shopPath . 'out/azure/tpl/',
+            $shopPath . 'Application/views/wave/tpl/',
+            $shopPath . 'out/wave/tpl/',
         ];
 
         $utilsView = $this->getUtilsViewMockNotAdmin();
@@ -95,7 +91,7 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertEquals($dirs, $utilsView->getTemplateDirs());
     }
 
-    public function testGetEditionTemplateDirsForAdminContainsAzure()
+    public function testGetEditionTemplateDirsForAdminContainsWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
@@ -112,7 +108,7 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertArraySubsetOxid($dirs, $utilsView->getTemplateDirs());
     }
 
-    public function testGetEditionTemplateDirsForAdminOnlyAzure()
+    public function testGetEditionTemplateDirsForAdminOnlyWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
@@ -129,7 +125,7 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertEquals($dirs, $utilsView->getTemplateDirs());
     }
 
-    public function testSetTemplateDirContainsAzure()
+    public function testSetTemplateDirContainsWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
@@ -144,7 +140,7 @@ class UtilsViewTest extends \OxidTestCase
             $aDirs[] = $sDir;
         }
 
-        $sDir = $myConfig->getOutDir(true) . "azure/tpl/";
+        $sDir = $myConfig->getOutDir(true) . "wave/tpl/";
         if (!in_array($sDir, $aDirs)) {
             $aDirs[] = $sDir;
         }
@@ -157,7 +153,7 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertArraySubsetOxid($aDirs, $utilsView->getTemplateDirs());
     }
 
-    public function testSetTemplateDirOnlyAzure()
+    public function testSetTemplateDirOnlyWave()
     {
         if ($this->getTestConfig()->getShopEdition() != 'CE') {
             $this->markTestSkipped('This test is for Community edition only.');
@@ -172,7 +168,7 @@ class UtilsViewTest extends \OxidTestCase
             $aDirs[] = $sDir;
         }
 
-        $sDir = $myConfig->getOutDir(true) . "azure/tpl/";
+        $sDir = $myConfig->getOutDir(true) . "wave/tpl/";
         if (!in_array($sDir, $aDirs)) {
             $aDirs[] = $sDir;
         }
@@ -631,7 +627,7 @@ class UtilsViewTest extends \OxidTestCase
     /**
      * @return array
      */
-    private function getTemplateDirsAzure()
+    private function getTemplateDirsWave()
     {
         $config = $this->getConfig();
         $dirs = [];
@@ -640,7 +636,7 @@ class UtilsViewTest extends \OxidTestCase
         if (!in_array($dir, $dirs)) {
             $dirs[] = $dir;
         }
-        $dir = $config->getOutDir(true) . "azure/tpl/";
+        $dir = $config->getOutDir(true) . "wave/tpl/";
         if (!in_array($dir, $dirs)) {
             $dirs[] = $dir;
         }
