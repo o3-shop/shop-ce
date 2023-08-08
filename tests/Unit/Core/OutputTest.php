@@ -94,7 +94,25 @@ class OutputTest extends \OxidTestCase
 
         $editionName = $this->getEditionName();
         $this->assertNotEquals($test, $result);
-        $this->assertEquals("<head>foo</head>\n  <!-- O3-Shop ". $editionName ." Edition, Version $majorVersion, Shopping Cart System (c) OXID eSales AG 2003 - $currentYear - https://www.oxid-esales.com -->bar<head>test2</head>", $result);
+
+        $expected = <<<HEADER
+<head>foo</head>
+<!--
+=========================================================
+O3-Shop (c) 2022-{$currentYear} [www.O3-shop.com]
+=========================================================
+A stable and proven community driven ecommerce platform.
+O3-Shop is redistributable under the GNU General Public License 3 [https://www.gnu.org/licenses/gpl-3.0.de.html].
+based on: OXID eShop Community Edition, Version 6, Shopping Cart System (c) OXID eSales AG 2003 - 2022 - https://www.oxid-esales.com
+Bugs? Feature requests? Questions? Information or answers wanted? -> Join the Community [https://community.o3-shop.com/]
+=========================================================
+O3-Shop (c) 2022-{$currentYear} [www.O3-shop.com]
+=========================================================
+-->bar<head>test2</head>
+HEADER;
+
+        $this->assertEquals($expected, $result);
+
     }
 
     /**
@@ -113,7 +131,26 @@ class OutputTest extends \OxidTestCase
 
         $editionName = $this->getEditionName();
         $this->assertNotEquals($sTest, $sRes);
-        $this->assertEquals("<head>foo</head>\n  <!-- O3-Shop ". $editionName ." Edition, Version $sMajorVersion, Shopping Cart System (c) OXID eSales AG 2003 - $sCurYear - https://www.oxid-esales.com -->bar", $sRes);
+
+        $currentYear = date("Y");
+
+        $expected = <<<HEADER
+<head>foo</head>
+<!--
+=========================================================
+O3-Shop (c) 2022-{$currentYear} [www.O3-shop.com]
+=========================================================
+A stable and proven community driven ecommerce platform.
+O3-Shop is redistributable under the GNU General Public License 3 [https://www.gnu.org/licenses/gpl-3.0.de.html].
+based on: OXID eShop Community Edition, Version 6, Shopping Cart System (c) OXID eSales AG 2003 - 2022 - https://www.oxid-esales.com
+Bugs? Feature requests? Questions? Information or answers wanted? -> Join the Community [https://community.o3-shop.com/]
+=========================================================
+O3-Shop (c) 2022-{$currentYear} [www.O3-shop.com]
+=========================================================
+-->bar
+HEADER;
+
+        $this->assertEquals($expected, $sRes);
     }
 
     /**
