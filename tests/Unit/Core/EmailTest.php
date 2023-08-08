@@ -45,7 +45,7 @@ class EmailTest extends \OxidTestCase
     {
         parent::setUp();
 
-        $this->getConfig()->setConfigParam('sTheme', 'azure');
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
 
         $this->_oEmail = oxNew("oxEmail");
 
@@ -285,7 +285,6 @@ class EmailTest extends \OxidTestCase
      */
     public function testSendOrderEMailToOwnerAddsHistoryRecord()
     {
-        $this->markTestSkipped('Error Smarty error: unable to read resource: &quot;email/html/order_owner.tpl&quot; -> Needs to be fixed. RT.');
         $myDb = oxDb::getDb();
 
         $oPayment = oxNew('oxPayment');
@@ -337,8 +336,6 @@ class EmailTest extends \OxidTestCase
      */
     public function testSendForgotPwdEmailSendingFailed()
     {
-        $this->markTestSkipped('Error Smarty error: unable to read resource: &quot;email/html/forgotpwd.tpl&quot; -> Needs to be fixed. RT.');
-
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("send", "_getShop"));
         $oEmail->expects($this->any())->method('send')->will($this->returnValue(false));
         $oEmail->expects($this->any())->method('_getShop')->will($this->returnValue($this->_oShop));
