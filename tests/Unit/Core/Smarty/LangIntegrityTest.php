@@ -44,7 +44,7 @@ class LangIntegrityTest extends \OxidTestCase
      *
      * @var string
      */
-    protected $_sTheme = 'azure';
+    protected $_sTheme = 'wave';
 
     /**
      * @return string theme name
