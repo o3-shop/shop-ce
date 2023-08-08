@@ -46,7 +46,7 @@ class UtilsFileTest extends \OxidTestCase
         $sFilePath = $this->getConfig()->getPictureDir(false) . "/master/product/1/";
 
         $oUtilsFile = oxNew('oxUtilsFile');
-        $this->assertEquals("2010_speed3_120_1(1).jpg", $oUtilsFile->UNITgetUniqueFileName($sFilePath, "2010_speed3_120_1", "jpg"));
+        $this->assertEquals("2010_speed3_120_1.jpg", $oUtilsFile->UNITgetUniqueFileName($sFilePath, "2010_speed3_120_1", "jpg"));
     }
 
     public function testGetImageSize()
