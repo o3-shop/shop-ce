@@ -44,8 +44,8 @@ class UtilsPicTest extends \OxidTestCase
                 $myConfig = $this->getConfig();
 
                 // setup-> create a copy of a picture and delete this one for successful test
-                $sOrigTestPicFile = "detail1_z3_ico_th.jpg";
-                $sOrigTestIconFile = "detail1_z3_ico_th.jpg"; // we simply fake an icon file by copying the same
+                $sOrigTestPicFile  = "01_10.jpg";
+                $sOrigTestIconFile = "01_10.jpg"; // we simply fake an icon file by copying the same
                 $sCloneTestPicFile = "CCdetail1_z3_ico_th.jpg";
                 $sCloneTestIconFile = "CCdetail1_z3_ico_th.jpg";
 
