@@ -41,7 +41,7 @@ class EmailAzureTplTest extends \OxidTestCase
     {
         parent::setUp();
 
-        $this->getConfig()->setConfigParam('sTheme', 'azure');
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
 
         // reload smarty
         \OxidEsales\Eshop\Core\Registry::getUtilsView()->getSmarty(true);
@@ -1006,9 +1006,9 @@ class EmailAzureTplTest extends \OxidTestCase
     protected function checkMailBody($sFuncName, $sBody, $blWriteToTestFile = false)
     {
         // uncomment line to generate template for checking mail body
-        // file_put_contents (__DIR__ ."/../TestData/email_templates/azure/$sFuncName.html", $sBody);
+        // file_put_contents (__DIR__ ."/../TestData/email_templates/wave/$sFuncName.html", $sBody);
 
-        $sPath = __DIR__ .'/../testData/email_templates/azure/' . $sFuncName . '.html';
+        $sPath = __DIR__ .'/../testData/email_templates/wave/' . $sFuncName . '.html';
         if (!($sExpectedBody = file_get_contents($sPath))) {
             $this->fail("Template '$sPath' was not found!");
         }
@@ -1033,15 +1033,15 @@ class EmailAzureTplTest extends \OxidTestCase
         $sExpectedBody = str_replace("> <", "><", $sExpectedBody);
         $sBody = str_replace("> <", "><", $sBody);
 
-        $sExpectedShopUrl = "http://eshop/";
+        $sExpectedShopUrl = "http://localhost/";
         $sShopUrl = $this->getConfig()->getConfigParam('sShopURL');
 
         //remove shop url base path from links
         $sBody = str_replace($sShopUrl, $sExpectedShopUrl, $sBody);
 
         if ($blWriteToTestFile) {
-            file_put_contents(__DIR__ .'/../testData/email_templates/azure/' . $sFuncName . '_test_expecting.html', $sExpectedBody);
-            file_put_contents(__DIR__ .'/../testData/email_templates/azure/' . $sFuncName . '_test_result.html', $sBody);
+            file_put_contents(__DIR__ .'/../testData/email_templates/wave/' . $sFuncName . '_test_expecting.html', $sExpectedBody);
+            file_put_contents(__DIR__ .'/../testData/email_templates/wave/' . $sFuncName . '_test_result.html', $sBody);
         }
 
         $this->assertEquals(strtolower(trim($sExpectedBody)), strtolower(trim($sBody)), "Incorect mail body");
