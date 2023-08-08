@@ -36,10 +36,6 @@ class EditionSelectorTest extends UnitTestCase
 
     public function testCheckActiveEdition()
     {
-        if ($this->getTestConfig()->getShopEdition() !== 'CE') {
-            $this->markTestSkipped('This test is for Community editions only.');
-        }
-
         $editionSelector = new EditionSelector();
 
         $this->assertSame('CE', $editionSelector->getEdition());
