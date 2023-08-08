@@ -159,7 +159,7 @@ class EmailUtf8Test extends \OxidTestCase
         $userProvidedEmailAddress = 'ADMIN';
 
         $oEmailMock = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("send", "setRecipient"));
-        $oEmailMock->expects($this->once())->method("setRecipient")->with($realEmailAddress, 'John Doe');
+        $oEmailMock->expects($this->once())->method("setRecipient")->with($realEmailAddress, 'Erika Mustermann');
         $oEmailMock->expects($this->once())->method("send")->will($this->returnValue(true));
 
         $oEmailMock->sendForgotPwdEmail($userProvidedEmailAddress);
@@ -175,7 +175,7 @@ class EmailUtf8Test extends \OxidTestCase
         $realEmailAddress = 'admin';
 
         $oEmailMock = $this->getMock(\OxidEsales\Eshop\Core\Email::class, ["send", "setRecipient"]);
-        $oEmailMock->expects($this->atLeastOnce())->method("setRecipient")->with($realEmailAddress, 'John Doe');
+        $oEmailMock->expects($this->atLeastOnce())->method("setRecipient")->with($realEmailAddress, 'Erika Mustermann');
         $oEmailMock->expects($this->atLeastOnce())->method("send")->will($this->returnValue(true));
 
         $oEmailMock->sendForgotPwdEmail($bogusEmailAddress);
