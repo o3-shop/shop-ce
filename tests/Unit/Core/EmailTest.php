@@ -450,8 +450,6 @@ class EmailTest extends \OxidTestCase
      */
     public function testSendStockReminderIfStockFlag2()
     {
-        $this->markTestSkipped('Error &quot; -> Fix. RT.');
-
         //set params for stock reminder
         $this->_oArticle->oxarticles__oxstock = new oxField('0', oxField::T_RAW);
         $this->_oArticle->oxarticles__oxstockflag = new oxField('2', oxField::T_RAW);
@@ -1153,8 +1151,6 @@ class EmailTest extends \OxidTestCase
 
     public function testProductReviewLinksAreIncludedByDefaultInSendedNowMail()
     {
-        $this->markTestSkipped('&quot; -> Fix. RT');
-
         $orderStub = $this->getOrderStub();
         $emailStub = $this->getEmailStub();
 
@@ -1177,7 +1173,6 @@ class EmailTest extends \OxidTestCase
         bool $isReviewLinkExpectedToBeIncluded,
         string $message
     ) {
-        $this->markTestSkipped('&quot; -> Fix. RT');
 
         $this->setConfigParam('bl_perfLoadReviews', $configParameterLoadReviewsValue);
         $orderStub = $this->getOrderStub();
@@ -1209,8 +1204,6 @@ class EmailTest extends \OxidTestCase
 
     public function testProductReviewLinksAreNotIncludedByDefaultInOrderEmail()
     {
-        $this->markTestSkipped('&quot; -> Fix. RT');
-
         $orderStub = $this->getOrderStub();
         $emailStub = $this->getEmailStub();
 
@@ -1235,8 +1228,6 @@ class EmailTest extends \OxidTestCase
         bool $isReviewLinkExpectedToBeIncluded,
         string $message
     ) {
-        $this->markTestSkipped('&quot; -> Fix. RT');
-
         $this->setConfigParam('bl_perfLoadReviews', $configParameterLoadReviews);
         $this->setConfigParam('includeProductReviewLinksInEmail', $configParameterIncludeProductReviewLinksInEmail);
         $orderStub = $this->getOrderStub();
