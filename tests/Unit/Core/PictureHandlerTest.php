@@ -679,11 +679,9 @@ class PictureHandlerTest extends \OxidTestCase
      */
     public function testGetProductPicUrlNopic()
     {
-        $this->markTestSkipped('Review with D.S. Picture thing.');
-
         $oConfig = $this->getConfig();
         $sSize = $oConfig->getConfigParam('aDetailImageSizes');
-        $sPath = $oConfig->getPictureUrl("") . 'generated/product/1/250_200_75/nopic.jpg';
+        $sPath = $oConfig->getPictureUrl("") . 'generated/product/1/540_340_75/nopic.jpg';
 
         $oPicHandler = oxNew('oxPictureHandler');
         $this->assertEquals($sPath, $oPicHandler->getProductPicUrl("product/1/", false, $sSize, "oxpic1"));
