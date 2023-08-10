@@ -124,7 +124,7 @@ class SystemRequirementsTest extends \OxidTestCase
 
     public function testGetReqInfoUrlWithServerPermissionsParameterWillAddAnchorToUrl(): void
     {
-        $this->markTestSkipped('Review with D.S. This test looks weird. Remove?.');
+        $this->markTestSkipped('Review with D.S. This test looks weird. Needs to be fixed? Current link: https://docs.o3-shop.com/en/latest/User/Installation/NewInstallation.html#adjust-file-and-directory-permissions.');
 
         $parameter = 'server_permissions';
         $anchor = '#schritt-customising-file-and-directory-permissions';
