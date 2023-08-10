@@ -1115,9 +1115,7 @@ EOD;
             // LanguageCode, Type, FileName
             ['en', '', 'translit_lang.php'],
             ['en', '', 'lang.php'],
-            ['en', $themeName, 'cust_lang.php'],
             ['en', $themeName, 'lang.php'],
-            ['en', $themeName, 'map.php'],
             ['en', $themeName, 'theme_options.php'],
             ['en', 'admin', 'cust_lang.php.dist'],
             ['en', 'admin', 'help_lang.php'],
@@ -1126,9 +1124,7 @@ EOD;
 
             ['de', '', 'translit_lang.php'],
             ['de', '', 'lang.php'],
-            ['de', $themeName, 'cust_lang.php'],
             ['de', $themeName, 'lang.php'],
-            ['de', $themeName, 'map.php'],
             ['de', $themeName, 'theme_options.php'],
             ['de', 'admin', 'cust_lang.php.dist'],
             ['de', 'admin', 'help_lang.php'],
@@ -1148,8 +1144,6 @@ EOD;
      */
     public function testAllLanguageFilesForExistence($languageCode, $type, $fileName)
     {
-        $this->markTestSkipped('Review with D.S.. Language thing. "The file (empty string) was not found"');
-
         $filePath = $this->_getLanguageFilePath($type, $languageCode, $fileName);
         $isFilePathCorrect = static::file_exists_case_sensitive($filePath);
 
