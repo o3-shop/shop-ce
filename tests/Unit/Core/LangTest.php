@@ -1605,24 +1605,16 @@ class LangTest extends \OxidTestCase
      */
     public function testGetSimilarByKey()
     {
-        $this->markTestSkipped('Review with D.S. $oLang->getSimilarByKey gives 3 results. Error?');
-
-//        {
-//            "DETAILS_VPE_MESSAGE": "Dieser Artikel kann nur in Verpackungseinheiten zu je %s erworben werden.",
-//            "DETAILS_VPE_MESSAGE_1": "Dieser Artikel kann nur in Verpackungseinheiten zu je",
-//            "DETAILS_VPE_MESSAGE_2": "erworben werden."
-//        }
-
         $oLang = oxNew('oxLang');
 
         // non admin
         $aRes = $oLang->getSimilarByKey("DETAILS_VPE_MESSAGE", 0, false);
 
-        $this->assertEquals(1, count($aRes));
+        $this->assertEquals(3, count($aRes));
         $this->assertTrue(isset($aRes["DETAILS_VPE_MESSAGE"]));
 
         $aRes = $oLang->getSimilarByKey("DETAILS_VPE_MESSAGE", 1, false);
-        $this->assertEquals(1, count($aRes));
+        $this->assertEquals(3, count($aRes));
         $this->assertTrue(isset($aRes["DETAILS_VPE_MESSAGE"]));
 
         // non admin from map
