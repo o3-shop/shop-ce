@@ -21,16 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-/**
- * Collects System information.
- * Admin Menu: Service -> System Requirements.
- */
-class UserRightsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class AdminRights extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
 {
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = 'sysreq_list.tpl';
+    protected $_sThisTemplate = 'adminrights.tpl';
 }

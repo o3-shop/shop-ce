@@ -15,6 +15,7 @@
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
  *
  * @copyright  Copyright (c) 2022 OXID eSales AG (https://www.oxid-esales.com)
+ * @copyright  Copyright (c) 2020 egate media GmbH (https://www.egate-media.com)
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
@@ -22,6 +23,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 
 /**
  * Administrator GUI navigation manager class.
@@ -225,5 +227,18 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
                 );
             }
         }
+    }
+
+    public function canShowAllMenuItems()
+    {
+        $adminViewSettings = oxNew(AdminViewSetting::class);
+        return $adminViewSettings->canShowAllMenuItems();
+    }
+
+    public function toggleAdminView()
+    {
+        $adminViewSettings = oxNew(AdminViewSetting::class);
+        $adminViewSettings->toggleShowAllMenuItems();
+        $this->addTplParam('doRedirect', true);
     }
 }

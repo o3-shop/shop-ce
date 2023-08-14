@@ -33,7 +33,7 @@ final class Version20230730131836 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return 'add admin navigation rights table';
+        return 'add admin navigation roles table';
     }
 
     public function up(Schema $schema) : void
@@ -47,9 +47,9 @@ final class Version20230730131836 extends AbstractMigration
 
     public function adminNaviTable(Schema $schema): void
     {
-        $adminNaviTable = $schema->hasTable('emadminnavi') ?
-            $schema->getTable('emadminnavi') :
-            $schema->createTable('emadminnavi');
+        $adminNaviTable = $schema->hasTable('o3rightsroles') ?
+            $schema->getTable('o3rightsroles') :
+            $schema->createTable('o3rightsroles');
 
         if (!$adminNaviTable->hasColumn('OXID')) {
             $adminNaviTable->addColumn('OXID', (new StringType())->getName())
@@ -62,10 +62,10 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(11)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('USERID')) {
-            $adminNaviTable->addColumn('USERID', (new StringType())->getName())
-                ->setLength(32)
-                ->setFixed(true)
+        if (!$adminNaviTable->hasColumn('TITLE')) {
+            $adminNaviTable->addColumn('TITLE', (new StringType())->getName())
+                ->setLength(255)
+                ->setFixed(false)
                 ->setNotnull(true);
         }
         if (!$adminNaviTable->hasColumn('NAVIGATIONID')) {
@@ -82,8 +82,8 @@ final class Version20230730131836 extends AbstractMigration
 
         $adminNaviTable->hasPrimaryKey() ?: $adminNaviTable->setPrimaryKey(['OXID', 'OXID']);
 
-        if ($adminNaviTable->hasIndex('SHOPID') === false) {
-            $adminNaviTable->addIndex(['USERID', 'NAVIGATIONID'], 'USERNAVIGATION');
+        if ($adminNaviTable->hasIndex('SHOPNAVIGATION') === false) {
+            $adminNaviTable->addIndex(['SHOPID', 'NAVIGATIONID'], 'SHOPNAVIGATION');
         }
     }
 }

@@ -46,6 +46,7 @@
             <td>
                 <select name="user" id="user" onchange="document.getElementById('fnc').value=''; document.getElementById('myedit').submit();">
                     <option value="">Bitte Benutzer ausw&auml;hlen</option>
+                    <option value="reducedview">reduzierte Ansicht für alle Benutzer</option>
                     [{foreach from=$oView->getMallAdminUsers() item="user"}]
                         <option value="[{$user.oxid}]" [{if $user.selected}] selected[{/if}]>[{$user.oxusername}] ([{$user.oxfname}] [{$user.oxlname}])</option>
                     [{/foreach}]

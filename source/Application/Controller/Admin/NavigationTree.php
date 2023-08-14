@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
@@ -903,7 +904,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
 
                         if ($this->isNavNodeDeactivated($navigationNodeId)) {
                             $oMenuItem->parentNode->removeChild($oMenuItem);
-                            $this->SetUserNavigation();
+                            $this->setUserNavigation();
                             return;
                         }
 
@@ -917,7 +918,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
                                     }
                                     if ($this->isNavNodeDeactivated($navigationNodeId)) {
                                         $oSubMenuIten->parentNode->removeChild($oSubMenuIten);
-                                        $this->SetUserNavigation();
+                                        $this->setUserNavigation();
                                         return;
                                     }
 
@@ -928,7 +929,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
                                                 $navigationNodeId = $oTab->getAttribute('id');
                                                 if ($this->isNavNodeDeactivated($navigationNodeId)) {
                                                     $oTab->parentNode->removeChild($oTab);
-                                                    $this->SetUserNavigation();
+                                                    $this->setUserNavigation();
                                                     return;
                                                 }
                                             }

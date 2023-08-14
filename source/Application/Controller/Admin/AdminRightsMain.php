@@ -21,13 +21,21 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\EshopCommunity\Application\Model\RightsRoles;
+use OxidEsales\EshopCommunity\Application\Model\adminNaviRights;
+use OxidEsales\EshopCommunity\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\EshopCommunity\Tests\Unit\Core\oxNoJsValidatorTest;
 use oxSysRequirements;
 
 /**
  * Collects System information.
  * Admin Menu: Service -> System Requirements -> Main.
  */
-class UserRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
     /**
      * Loads article Mercators info, passes it to Smarty engine and
@@ -39,12 +47,60 @@ class UserRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     {
         parent::render();
 
-        $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
+        $this->addTplParam('adminNaviRights', oxNew(adminNaviRights::class));
 
-        $this->_aViewData['aInfo'] = $oSysReq->getSystemInfo();
-        $this->_aViewData['aCollations'] = $oSysReq->checkCollation();
+        return "userrights_main.tpl";
+    }
 
-        return "sysreq_main.tpl";
+    public function getMallAdminUsers()
+    {
+        $currentUserId = $this->getUser()->getId();
+        $selectedId = Registry::getRequest()->getRequestEscapedParameter('user');
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(QueryBuilderFactoryInterface::class)
+            ->create();
+
+        $queryBuilder->select('oxid', 'oxusername', 'oxfname', 'oxlname', 'IF (oxid = \''.$selectedId.'\', 1, 0) as selected')
+            ->from((oxNew(User::class))->getViewName())
+            ->where(
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                        'oxrights',
+                        $queryBuilder->createNamedParameter('malladmin')
+                    ),
+                    $queryBuilder->expr()->neq(
+                        'oxid',
+                        $queryBuilder->createNamedParameter($currentUserId)
+                    )
+                )
+            );
+
+        $users = $queryBuilder->execute()->fetchAllAssociative();
+
+        return $users;
+    }
+
+    public function showSelectableMenuItems()
+    {
+        return (bool) Registry::getRequest()->getRequestEscapedParameter('user');
+    }
+
+    public function save()
+    {
+        $userId = Registry::getRequest()->getRequestEscapedParameter('user');
+
+        $item = oxNew(RightsRoles::class);
+        $item->clearItemsFromUser($userId);
+
+        foreach (Registry::getRequest()->getRequestEscapedParameter('emadminnavirightsnavi') as $itemId) {
+            $item = oxNew(RightsRoles::class);
+            $item->saveItemForUser($itemId, $userId);
+        }
+
+        parent::save();
     }
 
     /**
