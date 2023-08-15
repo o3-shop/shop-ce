@@ -1340,6 +1340,7 @@ $aLang = [
     // END deprecated
     'TOOLTIPS_NEWSHOP'                        => 'Neuen Shop anlegen',
     'TOOLTIPS_NEWUSERGROUP'                   => 'Neue Benutzergruppe anlegen',
+    'TOOLTIPS_NEWROLE'                        => 'Neue Rolle anlegen',
     'TOOLTIPS_NEWCATEGORY'                    => 'Neue Kategorie anlegen',
     'TOOLTIPS_NEWCOUNTRY'                     => 'Neues Land anlegen',
     'TOOLTIPS_NEWLANGUAGE'                    => 'Neue Sprache anlegen',
@@ -1419,8 +1420,10 @@ $aLang = [
     'USERGROUP_LIST_MENUSUBITEM'              => 'Benutzergruppen',
     'USERGROUP_MAIN_MEMBERINGROUP'            => 'Mitglieder der Benutzergruppe',
     'USERGROUP_MAIN_ALLMEMBERS'               => 'Alle Benutzer',
-    'USERRIGHTS_LIST_MENUITEM'                => 'Benutzerrechte',
-    'USERRIGHTS_LIST_MENUSUBITEM'             => 'Adminrechte',
+    'ADMINRIGHTS_LIST_MENUITEM'               => 'Benutzerrechte',
+    'ADMINRIGHTS_LIST_MENUSUBITEM'            => 'Benutzerrollen',
+    'ADMINRIGHTS_MAIN_ALLMEMBERS'             => 'Alle Benutzer',
+    'ADMINRIGHTS_MAIN_USERSINROLE'            => 'Benutzer der Rolle',
     'VENDOR_LIST_MENUITEM'                    => 'Stammdaten',
     'VENDOR_LIST_MENUSUBITEM'                 => 'Lieferanten',
     'VENDOR_LIST_TITLE'                       => '[OXID Lieferantenverwaltung]',
@@ -1694,7 +1697,7 @@ $aLang = [
     //  usergroup_list',
     'tbclusergroup_main'       => 'Stamm',
     //  userrights_list',
-    'tbcluserrights_main'      => 'Adminrechte',
+    'tbcluserrights_main'      => 'Benutzerrollen',
     //  vendor_list',
     'tbclvendor_main'          => 'Stamm',
     'tbclmanufacturer_main'    => 'Stamm',
@@ -1895,6 +1898,12 @@ $aLang = [
     // @deprecated Functionality for Newsletter management will be removed.
     'NEWSLETTER_SUBJECT'                       => 'Betreff',
     // END deprecated
+
+    'RIGHTSROLES_ACTIVE'                         => 'Aktiv',
+    'RIGHTSROLES_TITLE'                          => 'Name',
+    'RIGHTSROLES_ITEMS'                          => 'aktive Menüeinträge',
+    'RIGHTSROLES_TAB'                            => 'Tab',
+    'RIGHTSROLES_BUTTON'                         => 'Button',
 
     'SHOP_PERF_SEO_CACHE'                        => 'SEO Cache aktivieren',
     'SHOP_PERF_SYSREQ_CHECK'                     => 'Meldungen der Systemgesundheitsprüfung auf der Startseite aktivieren',

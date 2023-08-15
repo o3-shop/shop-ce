@@ -1339,6 +1339,7 @@ $aLang = [
     // END deprecated
     'TOOLTIPS_NEWSHOP'                        => 'Create New Shop',
     'TOOLTIPS_NEWUSERGROUP'                   => 'Create New User Group',
+    'TOOLTIPS_NEWROLE'                        => 'Create New Role',
     'TOOLTIPS_NEWCATEGORY'                    => 'Create New Category',
     'TOOLTIPS_NEWCOUNTRY'                     => 'Create New Country',
     'TOOLTIPS_NEWLANGUAGE'                    => 'Create New Language',
@@ -1418,8 +1419,10 @@ $aLang = [
     'USERGROUP_LIST_MENUSUBITEM'              => 'User Groups',
     'USERGROUP_MAIN_MEMBERINGROUP'            => 'User Group Members',
     'USERGROUP_MAIN_ALLMEMBERS'               => 'All Users',
-    'USERRIGHTS_LIST_MENUITEM'                => 'user rights',
-    'USERRIGHTS_LIST_MENUSUBITEM'             => 'admin rights',
+    'ADMINRIGHTS_LIST_MENUITEM'               => 'user rights',
+    'ADMINRIGHTS_LIST_MENUSUBITEM'            => 'user roles',
+    'ADMINRIGHTS_MAIN_ALLMEMBERS'             => 'All Users',
+    'ADMINRIGHTS_MAIN_USERSINROLE'            => 'Role Users',
     'VENDOR_LIST_MENUITEM'                    => 'Master Settings',
     'VENDOR_LIST_MENUSUBITEM'                 => 'Distributors',
     'VENDOR_LIST_TITLE'                       => '[OXID Vendor Administration]',
@@ -1726,7 +1729,7 @@ $aLang = [
     //  usergroup_list',
     'tbclusergroup_main'       => 'Main',
     //  userrights_list',
-    'tbcluserrights_main'      => 'admin rights',
+    'tbcluserrights_main'      => 'user roles',
     //  vendor_list',
     'tbclvendor_main'          => 'Main',
     'tbclmanufacturer_main'    => 'Main',
@@ -1892,6 +1895,12 @@ $aLang = [
     // @deprecated Functionality for Newsletter management will be removed.
     'NEWSLETTER_SUBJECT'                       => 'Subject',
     // END deprecated
+
+    'RIGHTSROLES_ACTIVE'                         => 'Active',
+    'RIGHTSROLES_TITLE'                          => 'Name',
+    'RIGHTSROLES_ITEMS'                          => 'active menu items',
+    'RIGHTSROLES_TAB'                            => 'tab',
+    'RIGHTSROLES_BUTTON'                         => 'button',
 
     'SHOP_PERF_SEO_CACHE'                        => 'Enable SEO cache',
     'SHOP_PERF_SYSREQ_CHECK'                     => 'Enable system health messages at the start page',
