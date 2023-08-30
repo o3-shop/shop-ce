@@ -2792,6 +2792,8 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         // Admin view: can only login with higher than 'user' rights
         if ($blAdmin) {
             $sShopSelect = " and ( oxrights != 'user' ) ";
+        } else {
+            $sShopSelect = " and ( oxrights = 'user' ) ";
         }
 
         return $sShopSelect;
