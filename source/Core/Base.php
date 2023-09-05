@@ -53,11 +53,9 @@ class Base
     /**
      * oxrights instance
      *
-     * @deprecated since v6.5.2 (2020-02-19); This attribute will be removed completely at 7.0, this is party of the Enterprise edition.
-     *
      * @var oxrights
      */
-    protected static $_oRights = null;
+    protected static $rights = null;
 
     /**
      * oxuser object

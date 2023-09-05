@@ -2489,6 +2489,12 @@ return [
         'isInterface'      => true,
         'isDeprecated'     => false
     ],
+    'OxidEsales\Eshop\Core\Controller\AdminNaviRights'                            => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\AdminNaviRights::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
     'OxidEsales\Eshop\Core\Controller\BaseController'                            => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Controller\BaseController::class,
         'isAbstract'       => false,

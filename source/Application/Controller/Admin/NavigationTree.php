@@ -22,17 +22,16 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use OxidEsales\Eshop\Core\AdminNaviRights;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
 use DOMXPath;
 use DOMDocument;
 use DOMElement;
+use RecursiveTreeIterator;
 use stdClass;
-use OxidEsales\Eshop\Core\Edition\EditionRootPathProvider;
-use OxidEsales\Eshop\Core\Edition\EditionPathProvider;
-use OxidEsales\Eshop\Core\Edition\EditionSelector;
 
 /**
  * Navigation tree control class
@@ -849,6 +848,22 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function onGettingDomXml()
     {
+        if (($rights = $this->getAdminNaviRights())) {
+            $rights->cleanTree($this->_oDom);
+        }
+    }
+
+    public function getAdminNaviRights()
+    {
+        $rightsRolesConfiguration = (int) Registry::getConfig()->getConfigParam('blUseRightsRoles');
+        if ($rightsRolesConfiguration && self::$rights === null) {
+            self::$rights = oxNew(AdminNaviRights::class);
+            if ($this->isAdmin() && ($rightsRolesConfiguration & 1)) {
+                self::$rights->load();
+            }
+        }
+
+        return self::$rights;
     }
 
     /**

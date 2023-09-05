@@ -51,6 +51,43 @@ class RightsRolesElementsList extends ListModel
         return $this;
     }
 
+    /**
+     * @param string $roleId
+     * @return $this
+     */
+    public function getElementsByUserId(string $userId)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder->select('DISTINCT(re.elementid)')
+            ->from((oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()), 'rr')
+            ->leftJoin(
+                'rr',
+                'o3object2role',
+                'o2r',
+                $queryBuilder->expr()->eq('rr.oxid', 'o2r.roleid')
+            )
+            ->leftJoin(
+                'rr',
+                $this->getBaseObject()->getViewName(),
+                're',
+                $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
+            )
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'o2r.objectid',
+                    $queryBuilder->createNamedParameter($userId)
+                )
+            );
+
+        return array_map(
+            function (array $qbItem) {
+                return $qbItem[0];
+            },
+            $queryBuilder->execute()->fetchAllNumeric()
+        );
+    }
+
     public function getElementsIdsByRole(string $roleId)
     {
         $this->getElementsByRole($roleId);
