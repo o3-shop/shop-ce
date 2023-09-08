@@ -122,6 +122,14 @@ final class Version20230730131836 extends AbstractMigration
                 ->setFixed(true)
                 ->setNotnull(true);
         }
+        if (!$adminNaviTable->hasColumn('TYPE')) {
+            $adminNaviTable->addColumn('TYPE', (new IntegerType())->getName())
+                ->setLength(1)
+                ->setFixed(true)
+                ->setNotnull(true)
+                ->setDefault(1)
+                ->setComment('right type: 0 = hidden, 1 = editable, 2 = readonly');
+        }
         if (!$adminNaviTable->hasColumn('OXTIMESTAMP')) {
             $adminNaviTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
                 ->setNotnull(true)

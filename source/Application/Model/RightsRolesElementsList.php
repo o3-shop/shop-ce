@@ -74,9 +74,15 @@ class RightsRolesElementsList extends ListModel
                 $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
             )
             ->where(
-                $queryBuilder->expr()->eq(
-                    'o2r.objectid',
-                    $queryBuilder->createNamedParameter($userId)
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                        'o2r.objectid',
+                        $queryBuilder->createNamedParameter($userId)
+                    ),
+                    $queryBuilder->expr()->in(
+                        're.type',
+                        [RightsRolesElement::TYPE_EDITABLE, RightsRolesElement::TYPE_READONLY]
+                    )
                 )
             );
         return array_map(
@@ -106,9 +112,15 @@ class RightsRolesElementsList extends ListModel
                 $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
             )
             ->where(
-                $queryBuilder->expr()->eq(
-                'rr.restrictedview',
-                    $queryBuilder->createNamedParameter(1)
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                    'rr.restrictedview',
+                        $queryBuilder->createNamedParameter(1)
+                    ),
+                    $queryBuilder->expr()->in(
+                        're.type',
+                        [RightsRolesElement::TYPE_EDITABLE, RightsRolesElement::TYPE_READONLY]
+                    )
                 )
             );
 
@@ -149,7 +161,8 @@ class RightsRolesElementsList extends ListModel
             $element = oxNew($this->_sObjectsInListName);
             $element->assign([
                 'elementid' => $naviSetting,
-                'roleid'    => $roleId
+                'roleid'    => $roleId,
+                'type'      => RightsRolesElement::TYPE_EDITABLE
             ]);
             $element->save();
         }
