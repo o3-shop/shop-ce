@@ -44,7 +44,7 @@ class MariaDbChecker implements MariaDbCheckerInterface, DatabaseCheckerInterfac
     public function isAllowed(): bool
     {
         return
-            version_compare($this->version, '10.4', '>=') &&
-            version_compare($this->version, '10.5', '<');
+            version_compare($this->version, '10.0', '>=') &&
+            version_compare($this->version, '10.11', '<');
     }
 }
