@@ -129,10 +129,21 @@
                                 </label>
                             </td>
                             <td class="edittext">
-                                <input type="hidden" name="editval[o3rightsroles__active]" value="0">
                                 <input type="hidden" name="editval[o3rightsroles__active]" value='0' [{$readonly}]>
                                 <input id="o3rightsroles__active" class="edittext" type="checkbox" name="editval[o3rightsroles__active]" value='1' [{if $edit->o3rightsroles__active->value == 1}]checked[{/if}] [{$readonly}]>
                                 [{oxinputhelp ident="HELP_RIGHTSROLES_ACTIVE"}]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="edittext">
+                                <label for="o3rightsroles__restrictedview">
+                                    [{oxmultilang ident="RIGHTSROLES_RESTRICTEDVIEW"}]
+                                </label>
+                            </td>
+                            <td class="edittext">
+                                <input type="hidden" name="editval[o3rightsroles__restrictedview]" value='0' [{$readonly}]>
+                                <input id="o3rightsroles__restrictedview" class="edittext" type="checkbox" name="editval[o3rightsroles__restrictedview]" value='1' [{if $edit->o3rightsroles__restrictedview->value == 1}]checked[{/if}] [{$readonly}]>
+                                [{oxinputhelp ident="HELP_RIGHTSROLES_RESTRICTEDVIEW"}]
                             </td>
                         </tr>
                         <tr>
@@ -258,7 +269,7 @@
                     <tr>
                         <td class="edittext">
                             [{block name="admin_adminrights_main_assign_users"}]
-                                [{if $oxid != "-1"}]
+                                [{if $oxid != "-1" && !$edit->o3rightsroles__restrictedview->value}]
                                     <input [{$readonly}] type="button" value="[{oxmultilang ident="GENERAL_ASSIGNUSERS"}]" class="edittext" onclick="showDialog('&cl=adminrights_main&aoc=1&oxid=[{$oxid}]');">
                                 [{/if}]
                             [{/block}]

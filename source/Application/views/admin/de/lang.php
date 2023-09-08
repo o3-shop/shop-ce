@@ -1901,6 +1901,7 @@ $aLang = [
 
     'RIGHTSROLES_ACTIVE'                         => 'Aktiv',
     'RIGHTSROLES_TITLE'                          => 'Name',
+    'RIGHTSROLES_RESTRICTEDVIEW'                 => 'globale Einstellungen für reduzierte Adminansicht',
     'RIGHTSROLES_ITEMS'                          => 'aktive Menüeinträge',
     'RIGHTSROLES_TAB'                            => 'Tab',
     'RIGHTSROLES_BUTTON'                         => 'Button',

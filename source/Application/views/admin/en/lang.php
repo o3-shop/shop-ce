@@ -1898,6 +1898,7 @@ $aLang = [
 
     'RIGHTSROLES_ACTIVE'                         => 'Active',
     'RIGHTSROLES_TITLE'                          => 'Name',
+    'RIGHTSROLES_RESTRICTEDVIEW'                 => 'global settings for resticted backend view',
     'RIGHTSROLES_ITEMS'                          => 'active menu items',
     'RIGHTSROLES_TAB'                            => 'tab',
     'RIGHTSROLES_BUTTON'                         => 'button',

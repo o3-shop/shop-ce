@@ -67,6 +67,7 @@ final class Version20230730131836 extends AbstractMigration
             $adminNaviTable->addColumn('ACTIVE', (new IntegerType())->getName())
                 ->setLength(1)
                 ->setFixed(true)
+                ->setDefault(1)
                 ->setNotnull(true);
         }
         if (!$adminNaviTable->hasColumn('TITLE')) {
@@ -74,6 +75,14 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(255)
                 ->setFixed(false)
                 ->setNotnull(true);
+        }
+        if (!$adminNaviTable->hasColumn('RESTRICTEDVIEW')) {
+            $adminNaviTable->addColumn('RESTRICTEDVIEW', (new IntegerType())->getName())
+                ->setLength(1)
+                ->setFixed(true)
+                ->setDefault(0)
+                ->setNotnull(true)
+                ->setComment('mark role as global for restricted backend view');
         }
         if (!$adminNaviTable->hasColumn('OXTIMESTAMP')) {
             $adminNaviTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
@@ -83,9 +92,9 @@ final class Version20230730131836 extends AbstractMigration
 
         $adminNaviTable->hasPrimaryKey() ?: $adminNaviTable->setPrimaryKey(['OXID', 'OXID']);
 
-        if ($adminNaviTable->hasIndex('SHOPNAVIGATION') === false) {
-            $adminNaviTable->addIndex(['SHOPID', 'NAVIGATIONID'], 'SHOPNAVIGATION');
-        }
+//        if ($adminNaviTable->hasIndex('SHOPNAVIGATION') === false) {
+//            $adminNaviTable->addIndex(['SHOPID', 'NAVIGATIONID'], 'SHOPNAVIGATION');
+//        }
     }
 
     public function rightsRolesElementsTable(Schema $schema): void
