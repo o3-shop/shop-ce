@@ -57,7 +57,7 @@ class AdminNaviRights extends Base
     protected function getAllowedMenuItemIds()
     {
         $roleRights = $this->doLoad ? $this->getRoleRights() : [];
-        $viewRights = $this->getRestrictedViewRights();
+        $viewRights = $this->getRestrictedViewRights(oxNew(AdminViewSetting::class)->canShowAllMenuItems());
 
         if (count($roleRights) && count($viewRights)) {
             return array_intersect($roleRights, $viewRights);
@@ -73,23 +73,22 @@ class AdminNaviRights extends Base
         );
     }
 
-    protected function getRestrictedViewRights()
+    protected function getRestrictedViewRights(bool $showAllMenuItem)
     {
-        if ((oxNew(AdminViewSetting::class))->canShowAllMenuItems()) {
-            return [];
+        $restrictedViewElements = oxNew(RightsRolesElementsList::class)->getRestrictedViewElements();
+        $adminViewSettings = oxNew(AdminViewSetting::class);
+
+        if ($adminViewSettings->canHaveRestrictedView($restrictedViewElements, $this->getRoleRights()) &&
+            !$showAllMenuItem
+        ) {
+            return $restrictedViewElements;
         }
 
-        return [
-            'mxmainmenu',
-            'mxshopsett',
-            'mxextensions',
-            'mxcustnews',
-            'mxservice',
-            'mxcategories',
-            'mxattributes',
-            'mxsellist',
-            'mxugroups',
-            'mxlist'
-        ];
+        return [];
+    }
+
+    public function canHaveRestrictedView()
+    {
+        return (bool) count($this->getRestrictedViewRights(false));
     }
 }

@@ -21,6 +21,7 @@
 namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 
 class AdminViewSetting
 {
@@ -38,5 +39,12 @@ class AdminViewSetting
     {
         $session = Registry::getSession();
         return $session->hasVariable(self::ALL_MENU_ITEMS) && $session->getVariable(self::ALL_MENU_ITEMS);
+    }
+
+    public function canHaveRestrictedView(array $restrictedViewElements, array $rightElements)
+    {
+        return count($rightElements) ?
+            count(array_intersect($restrictedViewElements, $rightElements)) :
+            count($restrictedViewElements);
     }
 }

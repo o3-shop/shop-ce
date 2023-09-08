@@ -23,6 +23,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 
 /**
@@ -229,6 +230,12 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         }
     }
 
+    public function canHaveRestrictedView()
+    {
+        $adminNaviRights = oxNew(AdminNaviRights::class);
+        return $adminNaviRights->canHaveRestrictedView();
+    }
+y
     public function canShowAllMenuItems()
     {
         $adminViewSettings = oxNew(AdminViewSetting::class);
