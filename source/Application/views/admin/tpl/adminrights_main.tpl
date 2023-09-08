@@ -4,14 +4,14 @@
     <!--
     function editThis( sID )
     {
-        var oTransfer = top.basefrm.edit.document.getElementById( "transfer" );
+        let oTransfer = top.basefrm.edit.document.getElementById( "transfer" );
         oTransfer.oxid.value = sID;
         oTransfer.cl.value = top.basefrm.list.sDefClass;
 
         //forcing edit frame to reload after submit
         top.forceReloadingEditFrame();
 
-        var oSearch = top.basefrm.list.document.getElementById( "search" );
+        let oSearch = top.basefrm.list.document.getElementById( "search" );
         oSearch.oxid.value = sID;
         oSearch.actedit.value = 0;
         oSearch.submit();
@@ -20,9 +20,9 @@
     window.onload = function ()
     {
         [{if $updatelist == 1}]
-        top.oxid.admin.updateList('[{$oxid}]');
+            top.oxid.admin.updateList('[{$oxid}]');
         [{/if}]
-        var oField = top.oxid.admin.getLockTarget();
+        let oField = top.oxid.admin.getLockTarget();
         oField.onchange = oField.onkeyup = oField.onmouseout = top.oxid.admin.unlockSave;
     }
 
@@ -70,19 +70,6 @@
 [{/if}]
 
 <style>
-    .indent1 {
-        margin-left: 20px;
-    }
-    .indent2 {
-        margin-left: 40px;
-    }
-    .indent3 {
-        margin-left: 60px;
-    }
-    .indent4 {
-        margin-left: 80px;
-    }
-
     ul#nav li,
     ul#nav li li {
         list-style: none;
@@ -94,11 +81,20 @@
         display: none;
     }
 
+    ul#nav > li > ul {
+        display: block;
+    }
+
     #nav input {
         margin-right: 5px;
     }
     .vatop {
         vertical-align: top;
+    }
+
+    #nav li ul::before {
+        content: '⌊';
+        float: left;
     }
 </style>
 
@@ -117,13 +113,13 @@
     <input type="hidden" name="oxid" value="[{$oxid}]">
     <input type="hidden" name="editval[o3rightsroles__oxid]" value="[{$oxid}]">
 
-    <table cellspacing="0" cellpadding="0" border="0" style="width:98%;">
+    <table style="border: 0; border-collapse: collapse; border-spacing: 0; width:98%;">
         <tr>
             <td class="vatop edittext" style="width: 50%; padding-top:10px;padding-left:10px;">
                 <table>
                     [{block name="admin_adminrights_main_left"}]
                         <tr>
-                            <td class="edittext" width="120">
+                            <td class="edittext" style="width: 120px;">
                                 <label for="o3rightsroles__active">
                                     [{oxmultilang ident="RIGHTSROLES_ACTIVE"}]
                                 </label>
@@ -157,102 +153,42 @@
                                 [{oxinputhelp ident="HELP_RIGHTSROLES_TITLE"}]
                             </td>
                         </tr>
-                        [{if $oxid != '-1'}]
-                            <tr>
-                                <td class="vatop">
-                                    [{oxmultilang ident="RIGHTSROLES_ITEMS"}]
-                                </td>
-                                <td>
-                                    [{assign var="selectedElements" value=$roleElementsList->getElementsIdsByRole($oxid)}]
-                                    [{block name="admin_navigation_menustructure"}]
-                                        [{assign var='mh' value=0}]
-                                        [{foreach from=$oView->getMenuTree() item=menuholder}]
-                                            [{if $menuholder->nodeType == XML_ELEMENT_NODE && $menuholder->childNodes->length}]
-                                                [{assign var='mh' value=$mh+1}]
-                                                [{assign var='mn' value=0}]
-                                                <ul id="nav">
-                                                    [{strip}]
-                                                        [{foreach from=$menuholder->childNodes item=menuitem name=menuloop}]
-                                                            [{assign var='actClass' value=$menuitem->childNodes->length}]
-                                                            [{if $menuitem->nodeType == XML_ELEMENT_NODE}]
-                                                                [{assign var='mn' value=$mn+1}]
-                                                                [{assign var='sm' value=0}]
-                                                                <li id="nav-[{$mh}]-[{$mn}]">
-                                                                    [{assign var="menuid" value=$menuitem->getAttribute('id')}]
-                                                                    <input onclick="selectChilds(this);" id="[{$menuid}]" type="checkbox" name="roleElements[]" value="[{$menuid}]" [{if $menuid|in_array:$selectedElements}]checked[{/if}]>
-                                                                    <label for="[{$menuid}]"></label>
-                                                                    <a onclick="toggle(this)" href="#" class="rc">
-                                                                        [{if $menuitem->childNodes->length}]&raquo; [{/if}]
-                                                                        [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuid noerror=true}]
-                                                                    </a>
-                                                                    [{if $menuitem->childNodes->length}]
-                                                                        <ul>
-                                                                            [{foreach from=$menuitem->childNodes item=submenuitem}]
-                                                                                [{if $submenuitem->nodeType == XML_ELEMENT_NODE}]
-                                                                                    [{assign var='sm' value=$sm+1}]
-                                                                                    [{assign var='xs' value=0}]
-                                                                                    [{if $submenuitem->getAttribute('linkicon')}] [{assign var='linkicon' value=$submenuitem->getAttribute('linkicon')}][{/if}]
-                                                                                    <li id="nav-[{$mh}]-[{$mn}]-[{$sm}]" rel="nav-[{$mh}]-[{$mn}]">
-                                                                                        [{assign var="tabs" value=$oView->getTabs($submenuitem->getAttribute('cl'))}]
-                                                                                        [{assign var="menuid" value=$submenuitem->getAttribute('id')}]
-                                                                                        <input onclick="selectChilds(this);" id="[{$menuid}]" type="checkbox" name="roleElements[]" value="[{$menuid}]" [{if $menuid|in_array:$selectedElements}]checked[{/if}]>
-                                                                                        <label for="[{$menuid}]"></label>
-                                                                                        [{if $tabs->count()}]
-                                                                                            <a  onclick="toggle(this);" href="#" class="rc">
-                                                                                            [{if $linkicon}]<span class="[{$linkicon}]">[{/if}]
-                                                                                            [{if $tabs}]&raquo; [{/if}]
-                                                                                        [{/if}]
-                                                                                            [{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]
-                                                                                            [{if $linkicon}]</span>[{/if}]
-                                                                                        [{if $tabs}]
-                                                                                            </a>
-                                                                                        [{/if}]
-
-                                                                                        [{if $tabs->count()}]
-                                                                                            <ul>
-                                                                                                [{foreach from=$tabs item="tab"}]
-                                                                                                    [{if $tab->nodeType == XML_ELEMENT_NODE}]
-                                                                                                        [{assign var='xs' value=$xs+1}]
-                                                                                                        <li id="nav-[{$mh}]-[{$mn}]-[{$sm}]-[{$xs}]">
-                                                                                                            [{assign var="tabid" value=$tab->getAttribute('id')}]
-                                                                                                            <input onclick="selectChilds(this);" id="[{$tabid}]" type="checkbox" name="roleElements[]" value="[{$tabid}]" [{if $tabid|in_array:$selectedElements}]checked[{/if}]>
-                                                                                                            <label for="[{$tabid}]"></label>
-                                                                                                            [{oxmultilang ident="RIGHTSROLES_TAB" suffix="COLON"}] [{oxmultilang ident=$tab->getAttribute('name')|default:$tab->getAttribute('id') noerror=true}]
-                                                                                                        </li>
-                                                                                                    [{/if}]
-                                                                                                [{/foreach}]
-                                                                                            </ul>
-
-    [{*                                                                                        [{assign var="buttons" value=$oView->getButtons($tab->getAttribute('cl'))}]*}]
-    [{*                                                                                        [{if $buttons}]*}]
-    [{*                                                                                            <ul>*}]
-    [{*                                                                                                [{foreach from=$buttons item="btn" key="btnid"}]*}]
-    [{*                                                                                                    <li>*}]
-    [{*                                                                                                        <input id="[{$btnid}]" type="checkbox" name="roleElements[]" value="[{$btnid}]" [{if $btnid|in_array:$selectedElements}]checked[{/if}]>*}]
-    [{*                                                                                                        <label for="[{$btnid}]"></label>*}]
-    [{*                                                                                                        [{oxmultilang ident="RIGHTSROLES_BUTTON" suffix="COLON"}] [{oxmultilang ident=$btnid noerror=true}]*}]
-    [{*                                                                                                    </li>*}]
-    [{*                                                                                                [{/foreach}]*}]
-    [{*                                                                                            </ul>*}]
-    [{*                                                                                            [{oxscript add="toggle(document.querySelectorAll('#nav-$mh-$mn-$sm > ul')[0]);"}]*}]
-    [{*                                                                                        [{/if}]*}]
-                                                                                        [{/if}]
-                                                                                    </li>
-                                                                                    [{assign var='linkicon' value=''}]
-                                                                                [{/if}]
-                                                                            [{/foreach}]
-                                                                        </ul>
-                                                                    [{/if}]
-                                                                </li>
-                                                            [{/if}]
-                                                        [{/foreach}]
-                                                    [{/strip}]
-                                                </ul>
+                        <tr>
+                            <td class="vatop">
+                                [{oxmultilang ident="RIGHTSROLES_ITEMS"}]
+                            </td>
+                            <td>
+                                [{assign var="selectedElements" value=$roleElementsList->getElementsIdsByRole($oxid)}]
+                                [{assign var="cssClass" value="nav"}]
+                                <ul id="nav">
+                                    [{assign var="deepLevel" value=0}]
+                                    [{defun name="tree" root=$oView->getMenuTree() cssClass=$cssClass}]
+                                        [{assign var="index" value=0}]
+                                        [{foreach name="loop" from=$root item="menuitem"}]
+                                            [{assign var="deepLevel" value=$deepLevel+1}]
+                                            [{if $menuitem->nodeType == XML_ELEMENT_NODE && $menuitem->nodeName != "BTN"}]
+                                                [{assign var="index" value=$index+1}]
+                                                [{assign var="currCssClass" value=$cssClass|cat:"-"|cat:$index}]
+                                                <li id="[{$currCssClass}]">
+                                                    [{assign var="menuid" value=$menuitem->getAttribute('id')}]
+                                                    <input onclick="selectChilds(this);" id="[{$menuid}]" type="checkbox" name="roleElements[]" value="[{$menuid}]" [{if $menuid|in_array:$selectedElements}]checked[{/if}]>
+                                                    <label for="[{$menuid}]"></label>
+                                                    [{if $menuitem->childNodes->length}]<a onclick="toggle(this)" href="#" class="rc">[{/if}]
+                                                        [{if $menuitem->childNodes->length}]&raquo; [{/if}]
+                                                        [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuid noerror=true}]
+                                                    [{if $menuitem->childNodes->length}]</a>[{/if}]
+                                                    [{if $menuitem->childNodes->length}]
+                                                        <ul>
+                                                            [{fun name="tree" root=$menuitem->childNodes cssClass=$currCssClass}]
+                                                        </ul>
+                                                    [{/if}]
+                                                </li>
+                                                [{assign var="deepLevel" value=$deepLevel-1}]
                                             [{/if}]
                                         [{/foreach}]
-                                    [{/block}]
-                                </td>
-                            [{/if}]
+                                    [{/defun}]
+                                </ul>
+                            </td>
                         </tr>
                     [{/block}]
                     <tr>

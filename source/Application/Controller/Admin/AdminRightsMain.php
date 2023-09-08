@@ -32,7 +32,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
             $rightsUserAjax = oxNew(AdminRightsMainAjax::class);
-            $this->_aViewData['oxajax'] = $rightsUserAjax->getColumns();
+            $this->addTplParam('oxajax', $rightsUserAjax->getColumns());
 
             return "popups/adminrights_user.tpl";
         }
@@ -88,17 +88,5 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     {
         $navTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
         return $navTree->getDomXml()->documentElement->childNodes;
-    }
-
-    public function getTabs($parentId)
-    {
-        $navTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
-        return $navTree->getTabs($parentId, 1, false);
-    }
-
-    public function getButtons($parentClass)
-    {
-        $navTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
-        return $navTree->getBtn($parentClass);
     }
 }
