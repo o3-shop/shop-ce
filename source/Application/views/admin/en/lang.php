@@ -812,6 +812,8 @@ $aLang = [
     'NAVIGATION_SYSREQ_MESSAGE2'                     => "<b>system health check</b>.",
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => "The permanent system health check has been deactivated. You can re-activate it in the Perform. tab at Master settings -> Core settings. To check it anyway, please click on this link: ",
     'NAVIGATION_SHOPFRONT'                           => "Shop's start page",
+    'NAVIGATION_FULLVIEW'                            => 'full view',
+    'NAVIGATION_REDUCEDVIEW'                         => 'reduced view',
 
     // @deprecated Functionality for Newsletter management will be removed.
     'NEWSLETTER_DONE_NEWSSEND'                           => 'Your Newsletter has been sent.',

@@ -6,6 +6,21 @@
             <b>[{oxmultilang ident="NAVIGATION_HOME"}]</b>
         </a>
     </li>
+
+    [{if $oView->canHaveRestrictedView()}]
+        <li class="sep">
+            <a href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=header.tpl&fnc=toggleAdminView" id="adminviewlink" class="rc">
+                <b>
+                    [{if $oView->canShowAllMenuItems()}]
+                        [{oxmultilang ident="NAVIGATION_REDUCEDVIEW"}]
+                    [{else}]
+                        [{oxmultilang ident="NAVIGATION_FULLVIEW"}]
+                    [{/if}]
+                </b>
+            </a>
+        </li>
+    [{/if}]
+
     <li class="sep">
         <a href="[{$oConfig->getShopURL()}]" id="shopfrontlink" target="_blank" class="rc">
             <b>[{oxmultilang ident="NAVIGATION_SHOPFRONT"}]</b>
@@ -18,3 +33,9 @@
     </li>
     [{/block}]
 </ul>
+
+[{if $doRedirect}]
+    <script type="text/javascript">
+        window.top.location = "[{$oViewConf->getSelfLink()|replace:"&amp;":"&"}]";
+    </script>
+[{/if}]
