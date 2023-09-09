@@ -170,13 +170,15 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $aMultiShopTables = ['oxarticles', 'oxdiscount', 'oxcategories', 'oxattribute',
-                                        'oxlinks', 'oxvoucherseries', 'oxmanufacturers',
-                                        // @deprecated 6.5.6 "News" feature will be removed completely
-                                        'oxnews',
-                                        // END deprecated
-                                        'oxselectlist', 'oxwrapping',
-                                        'oxdeliveryset', 'oxdelivery', 'oxvendor', 'oxobject2category'];
+    protected $aMultiShopTables = [
+        'o3rightsroles', 'oxarticles', 'oxdiscount', 'oxcategories', 'oxattribute',
+        'oxlinks', 'oxvoucherseries', 'oxmanufacturers',
+        // @deprecated 6.5.6 "News" feature will be removed completely
+        'oxnews',
+        // END deprecated
+        'oxselectlist', 'oxwrapping',
+        'oxdeliveryset', 'oxdelivery', 'oxvendor', 'oxobject2category'
+    ];
 
     /**
      * Application starter instance

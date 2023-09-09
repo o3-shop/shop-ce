@@ -109,7 +109,7 @@
 <form name="myedit" id="myedit" action="[{$oViewConf->getSelfLink()}]" method="post" style="padding: 0;margin: 0;height:0;">
     [{$oViewConf->getHiddenSid()}]
     <input type="hidden" name="cl" value="[{$oViewConf->getActiveClassName()}]">
-    <input type="hidden" id="fnc" name="fnc" value="save">
+    <input type="hidden" id="fnc" name="fnc" value="">
     <input type="hidden" name="oxid" value="[{$oxid}]">
     <input type="hidden" name="editval[o3rightsroles__oxid]" value="[{$oxid}]">
 
@@ -191,6 +191,11 @@
                             </td>
                         </tr>
                     [{/block}]
+                    <tr>
+                        <td class="edittext" colspan="2"><br>
+                            [{include file="language_edit.tpl"}]<br>
+                        </td>
+                    </tr>
                     <tr>
                         <td>
                             <input type="submit" class="edittext" id="oLockButton" name="saveArticle" value="[{oxmultilang ident="ARTICLE_MAIN_SAVE"}]" onClick="document.myedit.fnc.value='save'" [{$readonly}]>

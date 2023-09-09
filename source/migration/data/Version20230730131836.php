@@ -58,8 +58,8 @@ final class Version20230730131836 extends AbstractMigration
                 ->setFixed(true)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('SHOPID')) {
-            $adminNaviTable->addColumn('SHOPID', (new IntegerType())->getName())
+        if (!$adminNaviTable->hasColumn('OXSHOPID')) {
+            $adminNaviTable->addColumn('OXSHOPID', (new IntegerType())->getName())
                 ->setLength(11)
                 ->setNotnull(true);
         }
@@ -75,6 +75,14 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(255)
                 ->setFixed(false)
                 ->setNotnull(true);
+        }
+        for ($lang = 1; $lang <= 3; $lang++) {
+            if ( ! $adminNaviTable->hasColumn( 'TITLE_'.$lang ) ) {
+                $adminNaviTable->addColumn( 'TITLE_'.$lang, ( new StringType() )->getName() )
+                    ->setLength( 255 )
+                    ->setFixed( false )
+                    ->setNotnull( true );
+            }
         }
         if (!$adminNaviTable->hasColumn('RESTRICTEDVIEW')) {
             $adminNaviTable->addColumn('RESTRICTEDVIEW', (new IntegerType())->getName())
@@ -154,13 +162,6 @@ final class Version20230730131836 extends AbstractMigration
                            ->setLength(32)
                            ->setFixed(true)
                            ->setNotnull(true);
-        }
-
-        if (!$object2RoleTable->hasColumn('OXSHOPID')) {
-            $object2RoleTable->addColumn('OXSHOPID', (new StringType())->getName())
-                             ->setLength(32)
-                             ->setFixed(true)
-                             ->setNotnull(true);
         }
         if (!$object2RoleTable->hasColumn('OBJECTID')) {
             $object2RoleTable->addColumn('OBJECTID', (new StringType())->getName())

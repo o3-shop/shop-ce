@@ -40,8 +40,28 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $roleElementsList = oxNew(RightsRolesElementsList::class);
         $role = oxNew(RightsRoles::class);
 
-        if ($this->getEditObjectId() != '-1') {
-            $role->load($this->getEditObjectId());
+        $soxId = $this->getEditObjectId();
+        $this->addTplParam("oxid", $soxId);
+
+        if ($soxId != '-1') {
+            $role->loadInLang($this->_iEditLang, $soxId);
+
+            $oOtherLang = $role->getAvailableInLangs();
+            if (!isset($oOtherLang[$this->_iEditLang])) {
+                $role->loadInLang(key($oOtherLang), $soxId);
+            }
+
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
+            if (count($aLang)) {
+                $this->addTplParam("posslang", $aLang);
+            }
+dumpvar($oOtherLang);
+            foreach ($oOtherLang as $id => $language) {
+                $oLang = new \stdClass();
+                $oLang->sLangDesc = $language;
+                $oLang->selected = ($id == $this->_iEditLang);
+                $this->_aViewData["otherlang"][$id] = clone $oLang;
+            }
         }
         $this->addTplParam('roleElementsList', $roleElementsList);
         $this->addTplParam('edit', $role);
@@ -54,10 +74,11 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $soxId = $this->getEditObjectId();
 
         $rightsRole = oxNew(RightsRoles::class);
+        $rightsRole->setLanguage(0);
         $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
 
         if ($soxId != "-1") {
-            $rightsRole->load($soxId);
+            $rightsRole->loadInLang($this->_iEditLang, $soxId);
             $rightsRole->assign($aParams);
         } else {
             $rightsRole->assign(
@@ -70,6 +91,8 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
                 )
             );
         }
+
+        $rightsRole->setLanguage($this->_iEditLang);
         $rightsRole->save();
 
         $this->setEditObjectId($rightsRole->getId());
@@ -82,6 +105,14 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         );
 
         parent::save();
+    }
+
+    /**
+     * Saves changed selected group parameters in different language.
+     */
+    public function saveinnlang()
+    {
+        $this->save();
     }
 
     public function getMenuTree()

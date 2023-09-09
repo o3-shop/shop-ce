@@ -44,6 +44,11 @@
                         <div class="r1">
                             <div class="b1">
                                 <div class="find">
+                                    <select name="changelang" class="editinput" onChange="top.oxid.admin.changeLanguage();">
+                                        [{foreach from=$languages item=lang}]
+                                            <option value="[{$lang->id}]" [{if $lang->selected}]SELECTED[{/if}]>[{$lang->name}]</option>
+                                        [{/foreach}]
+                                    </select>
                                     <input class="listedit" type="submit" name="submitit" value="[{oxmultilang ident="GENERAL_SEARCH"}]" onClick="document.search.lstrt.value=0;">
                                 </div>
                             </div>

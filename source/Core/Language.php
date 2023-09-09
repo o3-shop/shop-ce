@@ -1261,18 +1261,20 @@ class Language extends \OxidEsales\Eshop\Core\Base
      */
     public function getMultiLangTables()
     {
-        $aTables = ["oxarticles", "oxartextends", "oxattribute",
-                         "oxcategories", "oxcontents", "oxcountry",
-                         "oxdelivery", "oxdiscount", "oxgroups",
-                         "oxlinks",
-                         // @deprecated 6.5.6 "News" feature will be removed completely
-                         "oxnews",
-                         // END deprecated
-                         "oxobject2attribute",
-                         "oxpayments", "oxselectlist", "oxshops",
-                         "oxactions", "oxwrapping", "oxdeliveryset",
-                         "oxvendor", "oxmanufacturers", "oxmediaurls",
-                         "oxstates"];
+        $aTables = [
+            'o3rightsroles', "oxarticles", "oxartextends", "oxattribute",
+            "oxcategories", "oxcontents", "oxcountry",
+            "oxdelivery", "oxdiscount", "oxgroups",
+            "oxlinks",
+            // @deprecated 6.5.6 "News" feature will be removed completely
+            "oxnews",
+            // END deprecated
+            "oxobject2attribute",
+            "oxpayments", "oxselectlist", "oxshops",
+            "oxactions", "oxwrapping", "oxdeliveryset",
+            "oxvendor", "oxmanufacturers", "oxmediaurls",
+            "oxstates"
+        ];
 
         $aMultiLangTables = $this->getConfig()->getConfigParam('aMultiLangTables');
 
