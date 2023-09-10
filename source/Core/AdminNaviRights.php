@@ -36,18 +36,15 @@ class AdminNaviRights extends Base
     public function cleanTree($tree)
     {
         $xPath = new DOMXPath($tree);
-
         $allowedMenuItemIds = $this->getAllowedMenuItemIds();
-//dumpvar($allowedMenuItemIds);
+
         if (count($allowedMenuItemIds)) {
             $oXPath = new DOMXPath($tree);
             $oNodeList = $oXPath->query('//*');
             /** @var DOMNode $node */
             foreach ($oNodeList as $node) {
                 /** @var DOMElement $node */
-                if ( $node->getAttribute( 'id' ) && ! in_array( $node->getAttribute( 'id' ), $allowedMenuItemIds )
-                     && $node->getAttribute( 'id' ) !== 'NAVIGATION_ESHOPADMIN'
-                ) {
+                if ( $node->getAttribute( 'id' ) && ! in_array( $node->getAttribute( 'id' ), array_keys($allowedMenuItemIds) ) ) {
                     $node->parentNode->removeChild( $node );
                 }
             }
@@ -60,7 +57,7 @@ class AdminNaviRights extends Base
         $viewRights = $this->getRestrictedViewRights(oxNew(AdminViewSetting::class)->canShowAllMenuItems());
 
         if (count($roleRights) && count($viewRights)) {
-            return array_intersect($roleRights, $viewRights);
+            return array_intersect_key($roleRights, $viewRights);
         }
 
         return count($roleRights) ? $roleRights : $viewRights;

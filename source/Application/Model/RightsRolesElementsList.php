@@ -59,7 +59,7 @@ class RightsRolesElementsList extends ListModel
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->select('DISTINCT(re.elementid)')
+        $queryBuilder->select('DISTINCT(re.elementid) as elementid', 'MAX(re.TYPE) as type')
             ->from((oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()), 'rr')
             ->leftJoin(
                 'rr',
@@ -84,20 +84,31 @@ class RightsRolesElementsList extends ListModel
                         [RightsRolesElement::TYPE_EDITABLE, RightsRolesElement::TYPE_READONLY]
                     )
                 )
-            );
-        return array_map(
-            function (array $qbItem) {
-                return $qbItem[0];
-            },
-            $queryBuilder->execute()->fetchAllNumeric()
-        );
+            )
+            ->groupBy('re.elementid');
+
+        return
+            array_combine(
+                array_filter(array_map(
+                    function (array $qbItem) {
+                        return $qbItem['elementid'];
+                    },
+                    $queryBuilder->execute()->fetchAllAssociative()
+                )),
+                array_filter(array_map(
+                    function (array $qbItem) {
+                        return (int) $qbItem['type'];
+                    },
+                    $queryBuilder->execute()->fetchAllAssociative()
+                )
+            ));
     }
 
     public function getRestrictedViewElements()
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->select('DISTINCT(re.elementid)')
+        $queryBuilder->select('DISTINCT(re.elementid) as elementid, MAX(re.type) as type')
             ->from((oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()), 'rr')
             ->leftJoin(
                 'rr',
@@ -122,13 +133,22 @@ class RightsRolesElementsList extends ListModel
                         [RightsRolesElement::TYPE_EDITABLE, RightsRolesElement::TYPE_READONLY]
                     )
                 )
-            );
+            )
+            ->groupBy('re.elementid');
 
-        return array_map(
-            function (array $qbItem) {
-                return $qbItem[0];
-            },
-            $queryBuilder->execute()->fetchAllNumeric()
+        return  array_combine(
+            array_filter(array_map(
+                function (array $qbItem) {
+                    return $qbItem['elementid'];
+                },
+                $queryBuilder->execute()->fetchAllAssociative()
+            )),
+            array_filter(array_map(
+                function (array $qbItem) {
+                    return (int)  $qbItem['type'];
+                },
+                $queryBuilder->execute()->fetchAllAssociative()
+            ))
         );
     }
 

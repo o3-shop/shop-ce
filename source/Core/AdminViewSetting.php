@@ -44,7 +44,7 @@ class AdminViewSetting
     public function canHaveRestrictedView(array $restrictedViewElements, array $rightElements)
     {
         return count($rightElements) ?
-            count(array_intersect($restrictedViewElements, $rightElements)) :
+            count(array_intersect_key($restrictedViewElements, $rightElements)) :
             count($restrictedViewElements);
     }
 }

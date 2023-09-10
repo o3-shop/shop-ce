@@ -55,7 +55,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             if (count($aLang)) {
                 $this->addTplParam("posslang", $aLang);
             }
-dumpvar($oOtherLang);
+
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new \stdClass();
                 $oLang->sLangDesc = $language;
