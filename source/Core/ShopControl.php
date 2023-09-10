@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Exception\AccessDeniedException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\RoutingException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
@@ -154,6 +155,8 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
             $controllerClass = $this->getControllerClass($controllerKey);
 
             $this->_process($controllerClass, $function, $parameters, $viewsChain);
+        } catch (AccessDeniedException $exception) {
+            $this->handleAccessDeniedException($exception);
         } catch (\OxidEsales\Eshop\Core\Exception\SystemComponentException $exception) {
             $this->_handleSystemException($exception);
         } catch (\OxidEsales\Eshop\Core\Exception\CookieException $exception) {
@@ -421,6 +424,9 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      */
     protected function onViewCreation($view)
     {
+        if ($this->isAdmin() && $rights = $this->getAdminNaviRights()) {
+            $rights->applyRights($view);
+        }
     }
 
     /**
@@ -754,6 +760,12 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         $message .= $debugInfo->formatExecutionTime($this->getTotalTime());
 
         return $message;
+    }
+
+    protected function handleAccessDeniedException(AccessDeniedException $exception)
+    {
+        echo $exception->getMessage();
+        exit();
     }
 
     /**

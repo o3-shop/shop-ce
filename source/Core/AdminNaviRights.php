@@ -22,6 +22,8 @@ namespace OxidEsales\EshopCommunity\Core;
 
 use DOMNode;
 use DOMXPath;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\Exception\AccessDeniedException;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 
 class AdminNaviRights extends Base
@@ -48,6 +50,25 @@ class AdminNaviRights extends Base
                     $node->parentNode->removeChild( $node );
                 }
             }
+        }
+    }
+
+    public function applyRights(BaseController $oView)
+    {
+        if (!$this->getUser()) {
+            return;
+        }
+
+        if ($oView->getViewId() && in_array($oView->getViewId(), ['login'])) {
+            return;
+        }
+
+        $allowedMenuItemIds = $this->getAllowedMenuItemIds() ?? [];
+
+        if (count($allowedMenuItemIds) && $oView->getViewId() &&
+            !in_array($oView->getViewId(), array_keys($allowedMenuItemIds))
+        ) {
+            throw oxNew(AccessDeniedException::class);
         }
     }
 
