@@ -30,10 +30,12 @@
         let i = 0;
         let toggled = document.querySelectorAll('#' + reference.parentNode.id + ' > ul');
         while (i < toggled.length) {
-            if (toggled[i].style.display === "none" || toggled[i].style.display === '') {
-                toggled[i].style.display = "block";
+            if (toggled[i].classList.contains("expanded")) {
+                toggled[i].classList.remove('expanded');
+                toggled[i].parentNode.classList.remove('expandedChild');
             } else {
-                toggled[i].style.display = "none";
+                toggled[i].classList.add('expanded');
+                toggled[i].parentNode.classList.add('expandedChild');
             }
             i++;
         }
@@ -82,6 +84,10 @@
         position: relative;
     }
 
+    #nav li ul.expanded {
+        display: block;
+    }
+
     ul#nav > li > ul {
         display: block;
     }
@@ -113,6 +119,26 @@
         border: solid #AAA;
         border-width: 0 0 1px 1px;
         float: left;
+    }
+
+    #nav ul li a::before {
+        content: '+';
+        width: 8px;
+        height: 9px;
+        border: 1px solid #AAA;
+        display: block;
+        position: absolute;
+        background-color: white;
+        line-height: 7px;
+        left: 3px;
+        color: #AAA;
+        margin-top: -14px;
+        text-align: center;
+        padding-right: 1px;
+    }
+
+    #nav ul li.expandedChild > a::before {
+        content: '−';
     }
 </style>
 
@@ -192,7 +218,6 @@
                                                     <input onclick="selectChilds(this);" id="[{$menuid}]" type="checkbox" name="roleElements[]" value="[{$menuid}]" [{if $menuid|in_array:$selectedElements}]checked[{/if}]>
                                                     <label for="[{$menuid}]"></label>
                                                     [{if $menuitem->childNodes->length}]<a onclick="toggle(this)" href="#" class="rc">[{/if}]
-                                                        [{if $menuitem->childNodes->length}]&raquo; [{/if}]
                                                         [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuid noerror=true}]
                                                     [{if $menuitem->childNodes->length}]</a>[{/if}]
                                                     [{if $menuitem->childNodes->length}]
