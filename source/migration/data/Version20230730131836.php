@@ -48,107 +48,108 @@ final class Version20230730131836 extends AbstractMigration
 
     public function rightsRolesTable(Schema $schema): void
     {
-        $adminNaviTable = $schema->hasTable('o3rightsroles') ?
+        $rightsRolesTable = $schema->hasTable('o3rightsroles') ?
             $schema->getTable('o3rightsroles') :
             $schema->createTable('o3rightsroles');
 
-        if (!$adminNaviTable->hasColumn('OXID')) {
-            $adminNaviTable->addColumn('OXID', (new StringType())->getName())
+        if (!$rightsRolesTable->hasColumn('OXID')) {
+            $rightsRolesTable->addColumn('OXID', (new StringType())->getName())
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('OXSHOPID')) {
-            $adminNaviTable->addColumn('OXSHOPID', (new IntegerType())->getName())
+        if (!$rightsRolesTable->hasColumn('OXSHOPID')) {
+            $rightsRolesTable->addColumn('OXSHOPID', (new IntegerType())->getName())
                 ->setLength(11)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('ACTIVE')) {
-            $adminNaviTable->addColumn('ACTIVE', (new IntegerType())->getName())
+        if (!$rightsRolesTable->hasColumn('ACTIVE')) {
+            $rightsRolesTable->addColumn('ACTIVE', (new IntegerType())->getName())
                 ->setLength(1)
                 ->setFixed(true)
                 ->setDefault(1)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('TITLE')) {
-            $adminNaviTable->addColumn('TITLE', (new StringType())->getName())
+        if (!$rightsRolesTable->hasColumn('TITLE')) {
+            $rightsRolesTable->addColumn('TITLE', (new StringType())->getName())
                 ->setLength(255)
                 ->setFixed(false)
                 ->setNotnull(true);
         }
         for ($lang = 1; $lang <= 3; $lang++) {
-            if ( ! $adminNaviTable->hasColumn( 'TITLE_'.$lang ) ) {
-                $adminNaviTable->addColumn( 'TITLE_'.$lang, ( new StringType() )->getName() )
+            if ( ! $rightsRolesTable->hasColumn( 'TITLE_'.$lang ) ) {
+                $rightsRolesTable->addColumn( 'TITLE_'.$lang, ( new StringType() )->getName() )
                     ->setLength( 255 )
                     ->setFixed( false )
                     ->setNotnull( true );
             }
         }
-        if (!$adminNaviTable->hasColumn('RESTRICTEDVIEW')) {
-            $adminNaviTable->addColumn('RESTRICTEDVIEW', (new IntegerType())->getName())
+        if (!$rightsRolesTable->hasColumn('RESTRICTEDVIEW')) {
+            $rightsRolesTable->addColumn('RESTRICTEDVIEW', (new IntegerType())->getName())
                 ->setLength(1)
                 ->setFixed(true)
                 ->setDefault(0)
                 ->setNotnull(true)
                 ->setComment('mark role as global for restricted backend view');
         }
-        if (!$adminNaviTable->hasColumn('OXTIMESTAMP')) {
-            $adminNaviTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
+        if (!$rightsRolesTable->hasColumn('OXTIMESTAMP')) {
+            $rightsRolesTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
                 ->setNotnull(true)
                 ->setDefault('CURRENT_TIMESTAMP');
         }
 
-        $adminNaviTable->hasPrimaryKey() ?: $adminNaviTable->setPrimaryKey(['OXID', 'OXID']);
+        $rightsRolesTable->hasPrimaryKey() ?: $rightsRolesTable->setPrimaryKey(['OXID', 'OXID']);
 
-//        if ($adminNaviTable->hasIndex('SHOPNAVIGATION') === false) {
-//            $adminNaviTable->addIndex(['SHOPID', 'NAVIGATIONID'], 'SHOPNAVIGATION');
-//        }
+        $rightsRolesTable->hasIndex('RESTRICTED_IDX') ?:
+            $rightsRolesTable->addIndex(['ACTIVE', 'RESTRICTEDVIEW'], 'RESTRICTED_IDX');
     }
 
     public function rightsRolesElementsTable(Schema $schema): void
     {
-        $adminNaviTable = $schema->hasTable('o3rightsroleselements') ?
+        $rightsRolesElementsTable = $schema->hasTable('o3rightsroleselements') ?
             $schema->getTable('o3rightsroleselements') :
             $schema->createTable('o3rightsroleselements');
 
-        if (!$adminNaviTable->hasColumn('OXID')) {
-            $adminNaviTable->addColumn('OXID', (new StringType())->getName())
+        if (!$rightsRolesElementsTable->hasColumn('OXID')) {
+            $rightsRolesElementsTable->addColumn('OXID', (new StringType())->getName())
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true);
         }
 
-        if (!$adminNaviTable->hasColumn('ELEMENTID')) {
-            $adminNaviTable->addColumn('ELEMENTID', (new StringType())->getName())
+        if (!$rightsRolesElementsTable->hasColumn('ELEMENTID')) {
+            $rightsRolesElementsTable->addColumn('ELEMENTID', (new StringType())->getName())
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('ROLEID')) {
-            $adminNaviTable->addColumn('ROLEID', (new StringType())->getName())
+        if (!$rightsRolesElementsTable->hasColumn('ROLEID')) {
+            $rightsRolesElementsTable->addColumn('ROLEID', (new StringType())->getName())
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true);
         }
-        if (!$adminNaviTable->hasColumn('TYPE')) {
-            $adminNaviTable->addColumn('TYPE', (new IntegerType())->getName())
+        if (!$rightsRolesElementsTable->hasColumn('TYPE')) {
+            $rightsRolesElementsTable->addColumn('TYPE', (new IntegerType())->getName())
                 ->setLength(1)
                 ->setFixed(true)
                 ->setNotnull(true)
                 ->setDefault(1)
                 ->setComment('right type: 0 = hidden, 1 = editable, 2 = readonly');
         }
-        if (!$adminNaviTable->hasColumn('OXTIMESTAMP')) {
-            $adminNaviTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
+        if (!$rightsRolesElementsTable->hasColumn('OXTIMESTAMP')) {
+            $rightsRolesElementsTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
                 ->setNotnull(true)
                 ->setDefault('CURRENT_TIMESTAMP');
         }
 
-        $adminNaviTable->hasPrimaryKey() ?: $adminNaviTable->setPrimaryKey(['OXID', 'OXID']);
+        $rightsRolesElementsTable->hasPrimaryKey() ?: $rightsRolesElementsTable->setPrimaryKey(['OXID', 'OXID']);
 
-        //        if ($adminNaviTable->hasIndex('SHOPNAVIGATION') === false) {
-        //            $adminNaviTable->addIndex(['SHOPID', 'NAVIGATIONID'], 'SHOPNAVIGATION');
-        //        }
+        $rightsRolesElementsTable->hasIndex('ROLE_IDX') ?:
+            $rightsRolesElementsTable->addIndex(['ROLEID'], 'ROLE_IDX');
+
+        $rightsRolesElementsTable->hasIndex('ROLETYPE_IDX') ?:
+            $rightsRolesElementsTable->addIndex(['ROLEID', 'TYPE'], 'ROLETYPE_IDX');
     }
     
     public function object2roleTable(Schema $schema)
@@ -159,32 +160,31 @@ final class Version20230730131836 extends AbstractMigration
 
         if (!$object2RoleTable->hasColumn('OXID')) {
             $object2RoleTable->addColumn('OXID', (new StringType())->getName())
-                           ->setLength(32)
-                           ->setFixed(true)
-                           ->setNotnull(true);
+                ->setLength(32)
+                ->setFixed(true)
+                ->setNotnull(true);
         }
         if (!$object2RoleTable->hasColumn('OBJECTID')) {
             $object2RoleTable->addColumn('OBJECTID', (new StringType())->getName())
-                           ->setLength(32)
-                           ->setFixed(true)
-                           ->setNotnull(true);
+                ->setLength(32)
+                ->setFixed(true)
+                ->setNotnull(true);
         }
         if (!$object2RoleTable->hasColumn('ROLEID')) {
             $object2RoleTable->addColumn('ROLEID', (new StringType())->getName())
-                           ->setLength(32)
-                           ->setFixed(true)
-                           ->setNotnull(true);
+                ->setLength(32)
+                ->setFixed(true)
+                ->setNotnull(true);
         }
         if (!$object2RoleTable->hasColumn('OXTIMESTAMP')) {
             $object2RoleTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
-                           ->setNotnull(true)
-                           ->setDefault('CURRENT_TIMESTAMP');
+                ->setNotnull(true)
+                ->setDefault('CURRENT_TIMESTAMP');
         }
 
         $object2RoleTable->hasPrimaryKey() ?: $object2RoleTable->setPrimaryKey(['OXID', 'OXID']);
 
-        //        if ($adminNaviTable->hasIndex('SHOPNAVIGATION') === false) {
-        //            $adminNaviTable->addIndex(['SHOPID', 'NAVIGATIONID'], 'SHOPNAVIGATION');
-        //        }
+        $object2RoleTable->hasIndex('ROLEOBJECT_IDX') ?:
+            $object2RoleTable->addUniqueIndex( [ 'ROLEID', 'OBJECTID' ], 'ROLEOBJECT_IDX' );
     }
 }
