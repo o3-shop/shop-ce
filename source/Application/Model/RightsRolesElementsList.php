@@ -74,34 +74,34 @@ class RightsRolesElementsList extends ListModel
                 $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
             )
             ->where(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'o2r.objectid',
-                        $queryBuilder->createNamedParameter($userId)
-                    ),
-                    $queryBuilder->expr()->in(
-                        're.type',
-                        [RightsRolesElement::TYPE_EDITABLE, RightsRolesElement::TYPE_READONLY]
-                    )
+                $queryBuilder->expr()->eq(
+                    'o2r.objectid',
+                    $queryBuilder->createNamedParameter($userId)
                 )
             )
             ->groupBy('re.elementid');
 
         return
             array_combine(
-                array_filter(array_map(
-                    function (array $qbItem) {
-                        return $qbItem['elementid'];
-                    },
-                    $queryBuilder->execute()->fetchAllAssociative()
-                )),
-                array_filter(array_map(
-                    function (array $qbItem) {
-                        return (int) $qbItem['type'];
-                    },
-                    $queryBuilder->execute()->fetchAllAssociative()
+                array_filter(
+                    array_map(
+                        function (array $qbItem) {
+                            return $qbItem['elementid'];
+                        },
+                        $queryBuilder->execute()->fetchAllAssociative()
+                    ),
+                    [$this, 'filterEmptyButZero']
+                ),
+                array_filter(
+                    array_map(
+                        function (array $qbItem) {
+                            return (int) $qbItem['type'];
+                        },
+                        $queryBuilder->execute()->fetchAllAssociative()
+                    ),
+                    [$this, 'filterEmptyButZero']
                 )
-            ));
+            );
     }
 
     /**
@@ -127,32 +127,32 @@ class RightsRolesElementsList extends ListModel
                 $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
             )
             ->where(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                    'rr.restrictedview',
-                        $queryBuilder->createNamedParameter(1)
-                    ),
-                    $queryBuilder->expr()->in(
-                        're.type',
-                        [RightsRolesElement::TYPE_EDITABLE, RightsRolesElement::TYPE_READONLY]
-                    )
+                $queryBuilder->expr()->eq(
+                'rr.restrictedview',
+                    $queryBuilder->createNamedParameter(1)
                 )
             )
             ->groupBy('re.elementid');
 
         return  array_combine(
-            array_filter(array_map(
-                function (array $qbItem) {
-                    return $qbItem['elementid'];
-                },
-                $queryBuilder->execute()->fetchAllAssociative()
-            )),
-            array_filter(array_map(
-                function (array $qbItem) {
-                    return (int)  $qbItem['type'];
-                },
-                $queryBuilder->execute()->fetchAllAssociative()
-            ))
+            array_filter(
+                array_map(
+                    function (array $qbItem) {
+                        return $qbItem['elementid'];
+                    },
+                    $queryBuilder->execute()->fetchAllAssociative()
+                ),
+                [$this, 'filterEmptyButZero']
+            ),
+            array_filter(
+                array_map(
+                    function (array $qbItem) {
+                        return (int)  $qbItem['type'];
+                    },
+                    $queryBuilder->execute()->fetchAllAssociative()
+                ),
+                [$this, 'filterEmptyButZero']
+            )
         );
     }
 
@@ -160,12 +160,27 @@ class RightsRolesElementsList extends ListModel
     {
         $this->getElementsByRole($roleId);
 
-        return array_map(
-        /** @var $item RightsRolesElement */
-            function ($item) {
-                return $item->getFieldData('elementid');
-            },
-            $this->getArray()
+        return array_combine(
+            array_filter(
+                array_map(
+                /** @var $item RightsRolesElement */
+                    function ($item) {
+                        return $item->getFieldData('elementid');
+                    },
+                    $this->getArray()
+                ),
+                [$this, 'filterEmptyButZero']
+            ),
+            array_filter(
+                array_map(
+                /** @var $item RightsRolesElement */
+                    function ($item) {
+                        return $item->getFieldData('type');
+                    },
+                    $this->getArray()
+                ),
+                [$this, 'filterEmptyButZero']
+            )
         );
     }
 
@@ -181,12 +196,12 @@ class RightsRolesElementsList extends ListModel
             );
         $delete->execute();
 
-        foreach ($aNaviSetting as $naviSetting) {
+        foreach ($aNaviSetting as $naviSetting => $rightType) {
             $element = oxNew($this->_sObjectsInListName);
             $element->assign([
                 'elementid' => $naviSetting,
                 'roleid'    => $roleId,
-                'type'      => RightsRolesElement::TYPE_EDITABLE
+                'type'      => $rightType
             ]);
             $element->save();
         }
@@ -201,5 +216,10 @@ class RightsRolesElementsList extends ListModel
             ->getContainer()
             ->get(QueryBuilderFactoryInterface::class)
             ->create();
+    }
+
+    protected function filterEmptyButZero($var)
+    {
+        return ($var !== NULL && $var !== FALSE && $var !== '');
     }
 }

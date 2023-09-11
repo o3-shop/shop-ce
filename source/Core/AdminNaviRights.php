@@ -24,13 +24,14 @@ use DOMNode;
 use DOMXPath;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\Exception\AccessDeniedException;
+use OxidEsales\EshopCommunity\Application\Model\RightsRolesElement;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 
 class AdminNaviRights extends Base
 {
     protected $doLoad = false;
 
-    protected $allowedMenuItemIds = null;
+    protected $menuItemRights = null;
 
     public function load()
     {
@@ -40,43 +41,47 @@ class AdminNaviRights extends Base
     public function cleanTree($tree)
     {
         $xPath = new DOMXPath($tree);
-        $allowedMenuItemIds = $this->getAllowedMenuItemIds();
+        $menuItemRights = $this->getMenuItemRights();
 
-        if (count($allowedMenuItemIds)) {
+        if (count($menuItemRights)) {
             $oXPath = new DOMXPath($tree);
             $oNodeList = $oXPath->query('//*');
             /** @var DOMNode $node */
             foreach ($oNodeList as $node) {
                 /** @var DOMElement $node */
-                if ( $node->getAttribute( 'id' ) && ! in_array( $node->getAttribute( 'id' ), array_keys($allowedMenuItemIds) ) ) {
+                $nodeId = strtolower($node->getAttribute( 'id' ));
+                if ( $nodeId &&
+                     in_array( $nodeId, array_keys($menuItemRights) ) &&
+                     $menuItemRights[$nodeId] == RightsRolesElement::TYPE_HIDDEN
+                ) {
                     $node->parentNode->removeChild( $node );
                 }
             }
         }
     }
 
-    public function applyRights(BaseController $oView)
+    public function applyRights(BaseController $view)
     {
-        if (!$this->getUser()) {
-            return;
-        }
+        if (!$this->getUser() || !$view->getViewId()) return;
 
-        if ($oView->getViewId() && in_array($oView->getViewId(), ['login'])) {
-            return;
-        }
-
-        $allowedMenuItemIds = $this->getAllowedMenuItemIds() ?? [];
-
-        if (count($allowedMenuItemIds) && $oView->getViewId() &&
-            !in_array($oView->getViewId(), array_keys($allowedMenuItemIds))
-        ) {
+        if ($this->isDenied($view)) {
             throw oxNew(AccessDeniedException::class);
         }
     }
 
-    protected function getAllowedMenuItemIds()
+    protected function isDenied(BaseController $view)
     {
-        if ($this->allowedMenuItemIds === null) {
+        $menuItemRights = $this->getMenuItemRights() ?? [];
+
+        if (!count($menuItemRights)) return;
+
+        return in_array($view->getViewId(), array_keys($menuItemRights)) &&
+            $menuItemRights[$view->getViewId()] == RightsRolesElement::TYPE_HIDDEN;
+    }
+
+    protected function getMenuItemRights()
+    {
+        if ($this->menuItemRights === null) {
             $roleRights = $this->doLoad ? $this->getRoleRights() : [];
             $viewRights = $this->getRestrictedViewRights(
                 oxNew( AdminViewSetting::class )->canShowAllMenuItems(),
@@ -84,13 +89,15 @@ class AdminNaviRights extends Base
             );
 
             if ( count( $roleRights ) && count( $viewRights ) ) {
-                $this->allowedMenuItemIds = array_intersect_key( $roleRights, $viewRights );
+                $this->menuItemRights = $this->intersectRightLists( $roleRights, $viewRights );
             } else {
-                $this->allowedMenuItemIds = count( $roleRights ) ? $roleRights : $viewRights;
+                $this->menuItemRights = count( $roleRights ) ? $roleRights : $viewRights;
             }
         }
 
-        return $this->allowedMenuItemIds;
+        $this->menuItemRights = array_change_key_case($this->menuItemRights, CASE_LOWER);
+
+        return $this->menuItemRights;
     }
 
     protected function getRoleRights()
@@ -117,5 +124,17 @@ class AdminNaviRights extends Base
     public function canHaveRestrictedView()
     {
         return (bool) count($this->getRestrictedViewRights(false, $this->getRoleRights()));
+    }
+
+    public function intersectRightLists(array $list1, array $list2)
+    {
+        foreach ($list2 as $key => $value) {
+            $list1[$key] = min(
+                (int) $list1[$key] ?? RightsRolesElement::TYPE_EDITABLE,
+                (int) $list2[$key] ?? RightsRolesElement::TYPE_EDITABLE
+            );
+        }
+
+        return $list1;
     }
 }
