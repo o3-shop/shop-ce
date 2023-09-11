@@ -79,6 +79,7 @@
     #nav li ul {
         padding: 0 0 0 5px;
         display: none;
+        position: relative;
     }
 
     ul#nav > li > ul {
@@ -92,8 +93,25 @@
         vertical-align: top;
     }
 
-    #nav li ul::before {
-        content: '⌊';
+    #nav ul li{
+        margin-left: 3px;
+        border-left : 1px solid #AAA;
+    }
+
+    #nav ul li:last-child{
+        border-color : transparent;
+    }
+
+    #nav ul li::before{
+        content: '';
+        display: block;
+        position: absolute;
+        margin-top: -3px;
+        left: 8px;
+        width: 10px;
+        height: 10px;
+        border: solid #AAA;
+        border-width: 0 0 1px 1px;
         float: left;
     }
 </style>
