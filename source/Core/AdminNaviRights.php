@@ -30,6 +30,8 @@ class AdminNaviRights extends Base
 {
     protected $doLoad = false;
 
+    protected $allowedMenuItemIds = null;
+
     public function load()
     {
         $this->doLoad = true;
@@ -74,14 +76,21 @@ class AdminNaviRights extends Base
 
     protected function getAllowedMenuItemIds()
     {
-        $roleRights = $this->doLoad ? $this->getRoleRights() : [];
-        $viewRights = $this->getRestrictedViewRights(oxNew(AdminViewSetting::class)->canShowAllMenuItems());
+        if ($this->allowedMenuItemIds === null) {
+            $roleRights = $this->doLoad ? $this->getRoleRights() : [];
+            $viewRights = $this->getRestrictedViewRights(
+                oxNew( AdminViewSetting::class )->canShowAllMenuItems(),
+                $roleRights
+            );
 
-        if (count($roleRights) && count($viewRights)) {
-            return array_intersect_key($roleRights, $viewRights);
+            if ( count( $roleRights ) && count( $viewRights ) ) {
+                $this->allowedMenuItemIds = array_intersect_key( $roleRights, $viewRights );
+            } else {
+                $this->allowedMenuItemIds = count( $roleRights ) ? $roleRights : $viewRights;
+            }
         }
 
-        return count($roleRights) ? $roleRights : $viewRights;
+        return $this->allowedMenuItemIds;
     }
 
     protected function getRoleRights()
@@ -91,13 +100,13 @@ class AdminNaviRights extends Base
         );
     }
 
-    protected function getRestrictedViewRights(bool $showAllMenuItem)
+    protected function getRestrictedViewRights(bool $showAllMenuItem, array $roleRights)
     {
         $restrictedViewElements = oxNew(RightsRolesElementsList::class)->getRestrictedViewElements();
         $adminViewSettings = oxNew(AdminViewSetting::class);
 
-        if ($adminViewSettings->canHaveRestrictedView($restrictedViewElements, $this->getRoleRights()) &&
-            !$showAllMenuItem
+        if (!$showAllMenuItem &&
+            $adminViewSettings->canHaveRestrictedView($restrictedViewElements, $roleRights)
         ) {
             return $restrictedViewElements;
         }
@@ -107,6 +116,6 @@ class AdminNaviRights extends Base
 
     public function canHaveRestrictedView()
     {
-        return (bool) count($this->getRestrictedViewRights(false));
+        return (bool) count($this->getRestrictedViewRights(false, $this->getRoleRights()));
     }
 }

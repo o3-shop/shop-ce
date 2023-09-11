@@ -53,9 +53,9 @@ class RightsRolesElementsList extends ListModel
 
     /**
      * @param string $roleId
-     * @return $this
+     * @return array
      */
-    public function getElementsByUserId(string $userId)
+    public function getElementsByUserId(string $userId): array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
@@ -104,7 +104,11 @@ class RightsRolesElementsList extends ListModel
             ));
     }
 
-    public function getRestrictedViewElements()
+    /**
+     * @return array
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getRestrictedViewElements(): array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
