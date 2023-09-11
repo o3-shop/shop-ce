@@ -27,6 +27,7 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\Migrations\AbstractMigration;
+use OxidEsales\EshopCommunity\Application\Model\RightsRolesElement;
 
 final class Version20230730131836 extends AbstractMigration
 {
@@ -134,8 +135,8 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(1)
                 ->setFixed(true)
                 ->setNotnull(true)
-                ->setDefault(1)
-                ->setComment('right type: 0 = hidden, 1 = editable, 2 = readonly');
+                ->setDefault(RightsRolesElement::TYPE_EDITABLE)
+                ->setComment('right type: 0 = hidden, 1 = readonly, 2 = editable');
         }
         if (!$rightsRolesElementsTable->hasColumn('OXTIMESTAMP')) {
             $rightsRolesElementsTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())

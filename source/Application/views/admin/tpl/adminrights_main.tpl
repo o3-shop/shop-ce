@@ -215,7 +215,8 @@
                                                 [{assign var="currCssClass" value=$cssClass|cat:"-"|cat:$index}]
                                                 <li id="[{$currCssClass}]">
                                                     [{assign var="menuid" value=$menuitem->getAttribute('id')}]
-                                                    <input onclick="selectChilds(this);" id="[{$menuid}]" type="checkbox" name="roleElements[]" value="[{$menuid}]" [{if $menuid|in_array:$selectedElements}]checked[{/if}]>
+                                                    <input type="hidden" name="roleElements[[{$menuid}]]" value="0">
+                                                    <input onclick="selectChilds(this);" id="[{$menuid}]" type="checkbox" name="roleElements[[{$menuid}]]" value="2" [{if $selectedElements.$menuid == '2'}]checked[{/if}]>
                                                     <label for="[{$menuid}]"></label>
                                                     [{if $menuitem->childNodes->length}]<a onclick="toggle(this)" href="#" class="rc">[{/if}]
                                                         [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuid noerror=true}]
