@@ -78,6 +78,10 @@
         background: none;
     }
 
+    #nav > li {
+        padding-left: 0;
+    }
+
     #nav li ul {
         padding: 0 0 0 5px;
         display: none;
@@ -85,10 +89,6 @@
     }
 
     #nav li ul.expanded {
-        display: block;
-    }
-
-    ul#nav > li > ul {
         display: block;
     }
 
@@ -221,7 +221,7 @@
                                                         [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuid noerror=true}]
                                                     [{if $menuitem->childNodes->length}]</a>[{/if}]
                                                     [{if $menuitem->childNodes->length}]
-                                                        <ul>
+                                                        <ul class="[{if $deepLevel == 1}]expanded[{/if}]">
                                                             [{fun name="tree" root=$menuitem->childNodes cssClass=$currCssClass}]
                                                         </ul>
                                                     [{/if}]
