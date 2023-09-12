@@ -60,7 +60,10 @@ class RightsRolesElementsList extends ListModel
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('DISTINCT(re.elementid) as elementid', 'MAX(re.TYPE) as type')
-            ->from((oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()), 'rr')
+            ->from(
+                (oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()),
+                'rr'
+            )
             ->leftJoin(
                 'rr',
                 'o3object2role',
@@ -74,9 +77,15 @@ class RightsRolesElementsList extends ListModel
                 $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
             )
             ->where(
-                $queryBuilder->expr()->eq(
-                    'o2r.objectid',
-                    $queryBuilder->createNamedParameter($userId)
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                        'rr.active',
+                        $queryBuilder->createNamedParameter(1)
+                    ),
+                    $queryBuilder->expr()->eq(
+                        'o2r.objectid',
+                        $queryBuilder->createNamedParameter($userId)
+                    )
                 )
             )
             ->groupBy('re.elementid');
@@ -113,7 +122,10 @@ class RightsRolesElementsList extends ListModel
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('DISTINCT(re.elementid) as elementid, MAX(re.type) as type')
-            ->from((oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()), 'rr')
+            ->from(
+                (oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()),
+                'rr'
+            )
             ->leftJoin(
                 'rr',
                 'o3object2role',
@@ -127,9 +139,15 @@ class RightsRolesElementsList extends ListModel
                 $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
             )
             ->where(
-                $queryBuilder->expr()->eq(
-                'rr.restrictedview',
-                    $queryBuilder->createNamedParameter(1)
+                $queryBuilder->expr()->and(
+                    $queryBuilder->expr()->eq(
+                        'rr.active',
+                        $queryBuilder->createNamedParameter(1)
+                    ),
+                    $queryBuilder->expr()->eq(
+                    'rr.restrictedview',
+                        $queryBuilder->createNamedParameter(1)
+                    )
                 )
             )
             ->groupBy('re.elementid');
