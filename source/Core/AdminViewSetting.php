@@ -21,11 +21,16 @@
 namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\RightsRolesElement;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 
 class AdminViewSetting
 {
     public const ALL_MENU_ITEMS = 'showAllMenuItems';
+    public const TREEDEPTH_OXMENU = 1;
+    public const TREEDEPTH_MAINMENU = 2;
+    public const TREEDEPTH_SUBMENU = 3;
+    public const TREEDEPTH_TABS = 4;
 
     public function toggleShowAllMenuItems(): void
     {
@@ -41,10 +46,60 @@ class AdminViewSetting
         return $session->hasVariable(self::ALL_MENU_ITEMS) && $session->getVariable(self::ALL_MENU_ITEMS);
     }
 
-    public function canHaveRestrictedView(array $restrictedViewElements, array $rightElements)
+    public function canHaveRestrictedView(array $restrictedViewElements, array $rightElements, \DOMXPath $xPath = null)
     {
-        return count($rightElements) ?
-            count(array_intersect_key($restrictedViewElements, $rightElements)) :
-            count($restrictedViewElements);
+        $filterTypes = [RightsRolesElement::TYPE_READONLY, RightsRolesElement::TYPE_EDITABLE];
+
+        $availableRestrictedViewElements = $this->filterListByTypes($restrictedViewElements, $filterTypes);
+        $availableRightElements  = $this->filterListByTypes($rightElements, $filterTypes);
+
+        return count($availableRightElements) ?
+            count($this->getDisplayableMenuItems($availableRestrictedViewElements, $availableRightElements, $xPath)) :
+            count($availableRestrictedViewElements);
+    }
+
+    protected function getDisplayableMenuItems($availableRestrictedViewElements, $availableRightElements, \DOMXPath $xPath = null)
+    {
+        return !$xPath ?
+            array_intersect_key($availableRestrictedViewElements, $availableRightElements) :
+            array_filter(
+                array_intersect_key($availableRestrictedViewElements, $availableRightElements),
+                function ($right, $menuId) use ($xPath)
+                {
+                    $node = $xPath->query('//*[@id="'.$menuId.'"]')->item(0);
+
+                    $depth = -2;
+                    while ($node != null)
+                    {
+                        $depth++;
+                        $node = $node->parentNode;
+                    }
+
+                    return $depth >= self::TREEDEPTH_TABS;
+                },
+                ARRAY_FILTER_USE_BOTH
+            );
+    }
+
+    public function getDepthInTree($node)
+    {
+        $depth = -1;
+        while ($node != null)
+        {
+            $depth++;
+            $node = $node->parentNode;
+        }
+
+        return $depth;
+    }
+
+    public function filterListByTypes(array $list, array $rightTypes)
+    {
+        return array_filter(
+            $list,
+            function($rightType) use ($rightTypes) {
+                return in_array($rightType, $rightTypes);
+            }
+        );
     }
 }

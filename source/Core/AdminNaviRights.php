@@ -41,19 +41,18 @@ class AdminNaviRights extends Base
     public function cleanTree($tree)
     {
         $xPath = new DOMXPath($tree);
-        $menuItemRights = $this->getMenuItemRights();
+        $menuItemRights = (oxNew(AdminViewSetting::class))->filterListByTypes(
+            $this->getMenuItemRights($xPath),
+            [RightsRolesElement::TYPE_HIDDEN]
+        );
 
         if (count($menuItemRights)) {
-            $oXPath = new DOMXPath($tree);
-            $oNodeList = $oXPath->query('//*');
+            $oNodeList = $xPath->query('//*');
             /** @var DOMNode $node */
             foreach ($oNodeList as $node) {
                 /** @var DOMElement $node */
                 $nodeId = strtolower($node->getAttribute( 'id' ));
-                if ( $nodeId &&
-                     in_array( $nodeId, array_keys($menuItemRights) ) &&
-                     $menuItemRights[$nodeId] == RightsRolesElement::TYPE_HIDDEN
-                ) {
+                if ( $nodeId && in_array( $nodeId, array_keys($menuItemRights))) {
                     $node->parentNode->removeChild( $node );
                 }
             }
@@ -79,13 +78,14 @@ class AdminNaviRights extends Base
             $menuItemRights[$view->getViewId()] == RightsRolesElement::TYPE_HIDDEN;
     }
 
-    protected function getMenuItemRights()
+    protected function getMenuItemRights(DOMXPath $xPath = null)
     {
         if ($this->menuItemRights === null) {
             $roleRights = $this->doLoad ? $this->getRoleRights() : [];
             $viewRights = $this->getRestrictedViewRights(
                 oxNew( AdminViewSetting::class )->canShowAllMenuItems(),
-                $roleRights
+                $roleRights,
+                $xPath
             );
 
             if ( count( $roleRights ) && count( $viewRights ) ) {
@@ -107,13 +107,13 @@ class AdminNaviRights extends Base
         );
     }
 
-    protected function getRestrictedViewRights(bool $showAllMenuItem, array $roleRights)
+    protected function getRestrictedViewRights(bool $showAllMenuItem, array $roleRights, DOMXPath $xPath = null)
     {
         $restrictedViewElements = oxNew(RightsRolesElementsList::class)->getRestrictedViewElements();
         $adminViewSettings = oxNew(AdminViewSetting::class);
 
         if (!$showAllMenuItem &&
-            $adminViewSettings->canHaveRestrictedView($restrictedViewElements, $roleRights)
+            $adminViewSettings->canHaveRestrictedView($restrictedViewElements, $roleRights, $xPath)
         ) {
             return $restrictedViewElements;
         }
@@ -121,9 +121,9 @@ class AdminNaviRights extends Base
         return [];
     }
 
-    public function canHaveRestrictedView()
+    public function canHaveRestrictedView($tree)
     {
-        return (bool) count($this->getRestrictedViewRights(false, $this->getRoleRights()));
+        return (bool) count($this->getRestrictedViewRights(false, $this->getRoleRights(), new DOMXPath($tree)));
     }
 
     public function intersectRightLists(array $list1, array $list2)

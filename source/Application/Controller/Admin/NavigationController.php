@@ -233,7 +233,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     public function canHaveRestrictedView()
     {
         $adminNaviRights = oxNew(AdminNaviRights::class);
-        return $adminNaviRights->canHaveRestrictedView();
+        return $adminNaviRights->canHaveRestrictedView($this->getNavigation()->getDomXml());
     }
 
     public function canShowAllMenuItems()
