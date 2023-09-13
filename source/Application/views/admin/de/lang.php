@@ -812,8 +812,8 @@ $aLang = [
     'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>Systemgesundheitsprüfung</b>.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'Die permanente Systemgesundheitsprüfung wurde deaktiviert. Sie können diese auf der Registerkarte Perform. unter Stammdaten -> Grundeinstellungen aktivieren. Um dennoch zu prüfen, klicken Sie bitte hier: ',
     'NAVIGATION_SHOPFRONT'                           => 'Startseite des Shops',
-    'NAVIGATION_FULLVIEW'                            => 'vollständige Ansicht',
-    'NAVIGATION_REDUCEDVIEW'                         => 'reduzierte Ansicht',
+    'NAVIGATION_FULLVIEW'                            => 'Menü anzeigen',
+    'NAVIGATION_REDUCEDVIEW'                         => 'Menü reduzieren',
 
     // @deprecated Functionality for Newsletter management will be removed.
     'NEWSLETTER_DONE_NEWSSEND'                           => 'Ihr Newsletter wurde versendet.',

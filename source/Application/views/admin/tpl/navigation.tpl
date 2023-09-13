@@ -10,7 +10,7 @@
         //reloading main frame
         window.onload = function ()
         {
-            if ( '[{$listview}]' != '' ) {
+            if ( '[{$listview}]' !== '' ) {
                 top.basefrm.list.location = "[{$oViewConf->getSelfLink()|replace:"&amp;":"&"}]&cl=[{$listview}]&oxid=[{$oViewConf->getActiveShopId()}]&actedit=[{$actedit}]";
                 top.basefrm.edit.location = "[{$oViewConf->getSelfLink()|replace:"&amp;":"&"}]&cl=[{$editview}]&oxid=[{$oViewConf->getActiveShopId()}]";
             } else if ( top.basefrm ) {
@@ -19,11 +19,46 @@
         }
         [{/if}]
     </script>
-</head>
-<body>
-    [{block name="admin_navigation_shoplogo"}]
-        <div id="shopLogo"><img src="[{$oViewConf->getImageUrl('logo.svg')}]" /></div>
-    [{/block}]
+    <style type="text/css">
+        #adminviewlink::before,
+        .on #adminviewlink:active::before {
+            display: block;
+            float: left;
+            content: "";
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="%2382ba00" d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 1rem 1rem;
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            margin-right: 4px;
+            transform: rotate(0);
+        }
+        #adminviewlink:active::before,
+        .on #adminviewlink::before {
+            transform: rotate(180deg);
+        }
+    </style>
+        </head>
+        <body class="sidebar-mini layout-fixed">
+            [{block name="admin_navigation_shoplogo"}]
+                <div id="shopLogo"><img src="[{$oViewConf->getImageUrl('logo.svg')}]" alt="shop logo" /></div>
+            [{/block}]
+
+            [{if $oView->canHaveRestrictedView()}]
+                <div class="toggleview [{if $oView->canShowAllMenuItems()}]on[{/if}]" style="padding: 15px 23px; border-bottom: 2px solid rgba(0, 0, 0, .3)">
+                    <a href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=navigation.tpl&fnc=toggleAdminView" id="adminviewlink" class="rc" style="font-size: 0.8rem; color: #82ba00 !important">
+                        <b>
+                            [{if $oView->canShowAllMenuItems()}]
+                                [{oxmultilang ident="NAVIGATION_REDUCEDVIEW"}]
+                            [{else}]
+                                [{oxmultilang ident="NAVIGATION_FULLVIEW"}]
+                            [{/if}]
+                        </b>
+                    </a>
+                </div>
+            [{/if}]
+
     <table>
     <tr><td class="main">
     [{include file="include/navigation_shopselect.tpl"}]
@@ -130,6 +165,10 @@
     </table>
 
     <script type="text/javascript">
+        [{if $doRedirect}]
+            window.top.location = "[{$oViewConf->getSelfLink()|replace:"&amp;":"&"}]";
+        [{/if}]
+
         [{block name="admin_navigation_scripts"}]
             <!--
             var _expid = [{if $blOpenHistory}]'[{$sHistoryId}]'[{elseif $sNavExpId}]'[{$sNavExpId}]'[{else}]0[{/if}];
