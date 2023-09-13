@@ -200,6 +200,7 @@
                         <tr>
                             <td class="vatop">
                                 [{oxmultilang ident="RIGHTSROLES_ITEMS"}]
+                                [{oxinputhelp ident="HELP_RIGHTSROLES_ITEMS"}]
                             </td>
                             <td>
                                 [{assign var="selectedElements" value=$roleElementsList->getElementsIdsByRole($oxid)}]

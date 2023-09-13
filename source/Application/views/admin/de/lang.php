@@ -1903,10 +1903,11 @@ $aLang = [
 
     'RIGHTSROLES_ACTIVE'                         => 'Aktiv',
     'RIGHTSROLES_TITLE'                          => 'Name',
+    'HELP_RIGHTSROLES_TITLE'                     => 'interner Titel zur Unterscheidung der Rollen',
     'RIGHTSROLES_RESTRICTEDVIEW'                 => 'globale Einstellungen für reduzierte Adminansicht',
+    'HELP_RIGHTSROLES_RESTRICTEDVIEW'            => 'Um die Backendbenutzung zu vereinfachen, lassen sich selten genutzte Menüeinträge ausblenden. Welche Einträge ausgeblendet werden sollen, definieren die Benutzerrollen mit dieser Checkbox. Bei mehreren als global markierten Rollen summieren sich deren Rechte. Globale Rollen sind für alle Backendbenutzer gleichermaßen gültig. Soll eine benutzerspezfische Rolle definiert werden, lassen Sie diese Checkbox leer.',
     'RIGHTSROLES_ITEMS'                          => 'aktive Menüeinträge',
-    'RIGHTSROLES_TAB'                            => 'Tab',
-    'RIGHTSROLES_BUTTON'                         => 'Button',
+    'HELP_RIGHTSROLES_ITEMS'                     => 'Verfügbare Menüeintrage sind ausgewählt. Ist kein Eintrag ausgewählt, wird diese Benutzerrolle nicht beachtet und es stehen den Benutzern alle Menüeinträge zur Verfügung.',
 
     'SHOP_PERF_SEO_CACHE'                        => 'SEO Cache aktivieren',
     'SHOP_PERF_SYSREQ_CHECK'                     => 'Meldungen der Systemgesundheitsprüfung auf der Startseite aktivieren',

@@ -27,20 +27,24 @@
         <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <colgroup>
                 [{block name="admin_rights_list_colgroup"}]
-                    <col width="98%">
+                    <col width="3%">
+                    <col width="95%">
                     <col width="2%">
                 [{/block}]
             </colgroup>
             <tr class="listitem">
                 [{block name="admin_rights_list_filter"}]
-                    <td valign="top" class="listfilter" align="left">
+                    <td style="vertical-align: top; text-align: right" class="listfilter first">
+                        <div class="r1"><div class="b1">&nbsp;</div></div>
+                    </td>
+                    <td style="vertical-align: top; text-align: right" class="listfilter">
                         <div class="r1">
                             <div class="b1">
                                 <input class="listedit" type="text" size="50" maxlength="128" name="where[o3rightsroles][title]" value="[{$where.o3rightsroles.title}]">
                             </div>
                         </div>
                     </td>
-                    <td valign="top" class="listfilter" nowrap>
+                    <td style="vertical-align: top" class="listfilter" nowrap>
                         <div class="r1">
                             <div class="b1">
                                 <div class="find">
@@ -58,7 +62,8 @@
             </tr>
             <tr class="listitem">
                 [{block name="admin_rights_list_sorting"}]
-                    <td class="listheader first" height="15" width="30" align="center"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'o3rightsroles', 'title', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="GENERAL_TITLE"}]</a></td>
+                    <td class="listheader first" style="height: 15px; width: 30px; text-align: center"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'o3rightsroles', 'oxactive', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="GENERAL_ACTIVTITLE"}]</a></td>
+                    <td class="listheader first" style="height: 15px; width: 30px; text-align: center"><a href="Javascript:top.oxid.admin.setSorting( document.search, 'o3rightsroles', 'title', 'asc');document.search.submit();" class="listheader">[{oxmultilang ident="GENERAL_TITLE"}]</a></td>
                     <td class="listheader"></td>
                 [{/block}]
             </tr>
@@ -78,6 +83,13 @@
                         [{if $listitem->getId() == $oxid}]
                             [{assign var="listclass" value=listitem4}]
                         [{/if}]
+                        <td valign="top" class="[{$listclass}][{if $listitem->getFieldData('active') == 1}] active[{/if}]" height="15">
+                            <div class="listitemfloating">
+                                <a href="Javascript:top.oxid.admin.editThis('[{$listitem->getId()}]');" class="[{$listclass}]">
+                                    &nbsp
+                                </a>
+                            </div>
+                        </td>
                         <td valign="top" class="[{$listclass}]">
                             <div class="listitemfloating">
                                 <a href="Javascript:top.oxid.admin.editThis('[{$listitem->getId()}]');" class="[{$listclass}]">

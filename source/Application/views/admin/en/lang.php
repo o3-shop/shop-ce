@@ -1900,10 +1900,11 @@ $aLang = [
 
     'RIGHTSROLES_ACTIVE'                         => 'Active',
     'RIGHTSROLES_TITLE'                          => 'Name',
+    'HELP_RIGHTSROLES_TITLE'                     => 'Internal title to distinguish the roles',
     'RIGHTSROLES_RESTRICTEDVIEW'                 => 'global settings for resticted backend view',
+    'HELP_RIGHTSROLES_RESTRICTEDVIEW'            => 'To simplify the use of the backend, rarely used menu items can be hidden. This checkbox specifies the user roles that have the items that are to be hidden. If several roles are marked as global, their rights add up. Global roles are valid for all backend users. If a user-specific role should be defined, leave this checkbox empty.',
     'RIGHTSROLES_ITEMS'                          => 'active menu items',
-    'RIGHTSROLES_TAB'                            => 'tab',
-    'RIGHTSROLES_BUTTON'                         => 'button',
+    'HELP_RIGHTSROLES_ITEMS'                     => 'Available menu items are selected. If no entry is selected, this user role is ignored and all menu items are available to users.',
 
     'SHOP_PERF_SEO_CACHE'                        => 'Enable SEO cache',
     'SHOP_PERF_SYSREQ_CHECK'                     => 'Enable system health messages at the start page',
