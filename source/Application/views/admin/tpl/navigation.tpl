@@ -4,6 +4,9 @@
     <title>[{oxmultilang ident="NAVIGATION_TITLE"}]</title>
     <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]nav.css">
     <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]colors_[{$oViewConf->getEdition()|lower}].css">
+    <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]css/libs/fontawesome/fontawesome.css">
+    <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]css/libs/fontawesome/solid.css">
+    <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]css/libs/fontawesome/brands.css">
     <meta http-equiv="Content-Type" content="text/html; charset=[{$charset}]">
     <script type="text/javascript">
         [{if $loadbasefrm}]
@@ -20,22 +23,15 @@
         [{/if}]
     </script>
     <style type="text/css">
-        #adminviewlink::before,
-        .on #adminviewlink:active::before {
-            display: block;
-            float: left;
-            content: "";
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path fill="%2382ba00" d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>');
-            background-repeat: no-repeat;
-            background-size: 1rem 1rem;
-            width: 16px;
-            height: 16px;
-            margin-top: 2px;
-            margin-right: 4px;
+        #adminviewlink {
+            text-decoration: none;
+        }
+        #adminviewlink i,
+        .on #adminviewlink:active i {
             transform: rotate(0);
         }
-        #adminviewlink:active::before,
-        .on #adminviewlink::before {
+        #adminviewlink:active i,
+        .on #adminviewlink i {
             transform: rotate(180deg);
         }
     </style>
@@ -48,13 +44,12 @@
             [{if $oView->canHaveRestrictedView()}]
                 <div class="toggleview [{if $oView->canShowAllMenuItems()}]on[{/if}]" style="padding: 15px 23px; border-bottom: 2px solid rgba(0, 0, 0, .3)">
                     <a href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=navigation.tpl&fnc=toggleAdminView" id="adminviewlink" class="rc" style="font-size: 0.8rem; color: #82ba00 !important">
-                        <b>
-                            [{if $oView->canShowAllMenuItems()}]
-                                [{oxmultilang ident="NAVIGATION_REDUCEDVIEW"}]
-                            [{else}]
-                                [{oxmultilang ident="NAVIGATION_FULLVIEW"}]
-                            [{/if}]
-                        </b>
+                        <i class="fa-fw fa-solid fa-toggle-on"></i>&nbsp;
+                        [{if $oView->canShowAllMenuItems()}]
+                            [{oxmultilang ident="NAVIGATION_REDUCEDVIEW"}]
+                        [{else}]
+                            [{oxmultilang ident="NAVIGATION_FULLVIEW"}]
+                        [{/if}]
                     </a>
                 </div>
             [{/if}]
@@ -69,6 +64,9 @@
             [{assign var='mh' value=$mh+1}]
             [{assign var='mn' value=0}]
             <h2>
+                [{if $menuholder->getAttribute('iconclass')}]
+                    <i class="fa-fw [{$menuholder->getAttribute('iconclass')}]"></i>&nbsp;
+                [{/if}]
                 [{if $menuholder->getAttribute('url')}]<a href="[{$oViewConf->getSelfLink()}]&cl=navigation&amp;fnc=exturl&amp;url=[{$menuholder->getAttribute('url')|escape:'url'}]" target="basefrm" >[{/if}]
                 [{oxmultilang ident=$menuholder->getAttribute('name')|default:$menuholder->getAttribute('id') noerror=true}]
                 [{if $menuholder->getAttribute('url')}]</a>[{/if}]
@@ -82,20 +80,52 @@
                     [{assign var='sm' value=0}]
                     <li class="[{if $menuitem->getAttribute('active')}]exp[{assign var='sNavExpId' value="nav-`$mh`-`$mn`"}][{/if}]" id="nav-[{$mh}]-[{$mn}]">
                         [{if $menuitem->getAttribute('url')}]
-                            <a href="[{$menuitem->getAttribute('url')}]" onclick="_navAct(this);" class="rc" target="[{if $menuitem->getAttribute('target')}][{$menuitem->getAttribute('target')}][{else}]basefrm[{/if}]"><b>[{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuitem->getAttribute('id') noerror=true}]</b></a>
+                            <a href="[{$menuitem->getAttribute('url')}]" onclick="_navAct(this);" class="rc" target="[{if $menuitem->getAttribute('target')}][{$menuitem->getAttribute('target')}][{else}]basefrm[{/if}]">
+                                <b>
+                                    [{if $menuitem->getAttribute('iconclass')}]
+                                        <i class="fa-fw [{$menuitem->getAttribute('iconclass')}]"></i>&nbsp;
+                                    [{/if}]
+                                    [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuitem->getAttribute('id') noerror=true}]
+                                </b>
+                            </a>
                         [{elseif $menuitem->getAttribute('expand') == 'none'}]
-                            <a href="[{$menuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc"><b>[{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuitem->getAttribute('id') noerror=true}]</b></a>
+                            <a href="[{$menuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc">
+                                <b>
+                                    [{if $menuitem->getAttribute('iconclass')}]
+                                        <i class="fa-fw [{$menuitem->getAttribute('iconclass')}]"></i>&nbsp;
+                                    [{/if}]
+                                    [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuitem->getAttribute('id') noerror=true}]
+                                </b>
+                            </a>
                         [{else}]
-                            <a href="#" onclick="_navExp(this);return false;" class="rc"><b>[{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuitem->getAttribute('id') noerror=true}]</b></a>
+                            <a href="#" onclick="_navExp(this);return false;" class="rc">
+                                <b>
+                                    [{if $menuitem->getAttribute('iconclass')}]
+                                        <i class="fa-fw [{$menuitem->getAttribute('iconclass')}]"></i>&nbsp;
+                                    [{/if}]
+                                    [{oxmultilang ident=$menuitem->getAttribute('name')|default:$menuitem->getAttribute('id') noerror=true}]
+                                </b>
+                            </a>
                         [{/if}]
                         [{if $menuitem->childNodes->length}]
                         <ul>
                             [{foreach from=$menuitem->childNodes item=submenuitem}]
                             [{if $submenuitem->nodeType == XML_ELEMENT_NODE}]
                                 [{assign var='sm' value=$sm+1}]
-                                [{if $submenuitem->getAttribute('linkicon')}] [{assign var='linkicon' value=$submenuitem->getAttribute('linkicon')}][{/if}]
+                                [{if $submenuitem->getAttribute('linkicon')}]
+                                    [{assign var='linkicon' value=$submenuitem->getAttribute('linkicon')}]
+                                [{/if}]
                                 <li class="[{if $submenuitem->getAttribute('active')}]act[{assign var='sNavActId' value="nav-`$mh`-`$mn`-`$sm`"}][{/if}]" id="nav-[{$mh}]-[{$mn}]-[{$sm}]" name="nav_[{$submenuitem->getAttribute('cl')}]" rel="nav-[{$mh}]-[{$mn}]">
-                                    <a href="[{if $submenuitem->getAttribute('url')}][{$submenuitem->getAttribute('url')}][{else}][{$submenuitem->getAttribute('link')}][{/if}]" onclick="_navAct(this);" target="basefrm" class="rc"><b>[{if $linkicon}]<span class="[{$linkicon}]">[{/if}][{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}][{if $linkicon}]</span>[{/if}]</b></a>
+                                    <a href="[{if $submenuitem->getAttribute('url')}][{$submenuitem->getAttribute('url')}][{else}][{$submenuitem->getAttribute('link')}][{/if}]" onclick="_navAct(this);" target="basefrm" class="rc">
+                                        <b>
+                                            [{if $submenuitem->getAttribute('iconclass')}]
+                                                <i class="fa-fw [{$submenuitem->getAttribute('iconclass')}]"></i>&nbsp;
+                                            [{/if}]
+                                            [{if $linkicon}]<span class="[{$linkicon}]">[{/if}]
+                                            [{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]
+                                            [{if $linkicon}]</span>[{/if}]
+                                        </b>
+                                    </a>
                                 </li>
                                 [{assign var='linkicon' value=''}]
                             [{/if}]
@@ -120,14 +150,26 @@
                 [{assign var='mn' value=1}]
                 [{assign var='sm' value=0}]
                 <li id="nav-[{$mh}]-[{$mn}]" class="[{if $blOpenHistory}]exp[{assign var='sHistoryId' value="nav-`$mh`-`$mn`"}][{/if}]">
-                    <a class="rc" name="_hist" href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=navigation.tpl&openHistory=1&[{$smarty.now}]#_hist"><b>[{oxmultilang ident=NAVIGATION_HISTORY noerror=true}]</b></a>
+                    <a class="rc" name="_hist" href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=navigation.tpl&openHistory=1&[{$smarty.now}]#_hist">
+                        <b>
+                            <i class="fa-fw fa-solid fa-clock-rotate-left"></i>&nbsp;
+                            [{oxmultilang ident=NAVIGATION_HISTORY noerror=true}]
+                        </b>
+                    </a>
 
                     <ul>
                         [{foreach from=$menuhistory item=submenuitem}]
                             [{if $submenuitem->nodeType == XML_ELEMENT_NODE}]
                                 [{assign var='sm' value=$sm+1}]
                                 <li id="nav-[{$mh}]-[{$mn}]-[{$sm}]" class="">
-                                    <a href="[{$submenuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc"><b>[{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]</b></a>
+                                    <a href="[{$submenuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc">
+                                        <b>
+                                            [{if $submenuitem->getAttribute('iconclass')}]
+                                                <i class="fa-fw [{$menuitem->getAttribute('iconclass')}]"></i>&nbsp;
+                                            [{/if}]
+                                            [{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]
+                                        </b>
+                                    </a>
                                 </li>
                             [{/if}]
                         [{/foreach}]
@@ -144,14 +186,26 @@
                 [{assign var='mn' value=1}]
                 [{assign var='sm' value=0}]
                 <li id="nav-[{$mh}]-[{$mn}]">
-                    <a class="rc" onclick="_navExp(this);return false;" href="#" ><b>[{oxmultilang ident=NAVIGATION_FAVORITES noerror=true}]</b></a>
+                    <a class="rc" onclick="_navExp(this);return false;" href="#" >
+                        <b>
+                            <i class="fa-fw fa-solid fa-star"></i>&nbsp;
+                            [{oxmultilang ident=NAVIGATION_FAVORITES noerror=true}]
+                        </b>
+                    </a>
                     <a class="ed" href="[{$oViewConf->getSelfLink()}]&cl=navigation&amp;item=favorites.tpl" target="basefrm" >[{oxmultilang ident=NAVIGATION_FAVORITES_EDIT noerror=true}]</a>
                     <ul>
                         [{foreach from=$menufavorites item=submenuitem}]
                             [{if $submenuitem->nodeType == XML_ELEMENT_NODE}]
                                 [{assign var='sm' value=$sm+1}]
                                 <li id="nav-[{$mh}]-[{$mn}]-[{$sm}]" class="">
-                                    <a href="[{$submenuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc"><b>[{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]</b></a>
+                                    <a href="[{$submenuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc">
+                                        <b>
+                                            [{if $submenuitem->getAttribute('iconclass')}]
+                                                <i class="fa-fw [{$submenuitem->getAttribute('iconclass')}]"></i>&nbsp;
+                                            [{/if}]
+                                            [{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]
+                                        </b>
+                                    </a>
                                 </li>
                             [{/if}]
                         [{/foreach}]
@@ -176,8 +230,8 @@
                 var _cur = el.parentNode,
                     _exp = document.getElementById(_expid);
                 _cur.className = "exp";
-                if(_expid != 0){ _exp.className = "";}
-                if(_expid == _cur.id){ _expid = 0;}else{_expid = _cur.id;}
+                if(_expid !== 0){ _exp.className = "";}
+                if(_expid === _cur.id){ _expid = 0;}else{_expid = _cur.id;}
             }
 
             var _actid = [{if $sNavActId}]'[{$sNavActId}]'[{else}]0[{/if}];
@@ -185,7 +239,7 @@
                  var _cur = el.parentNode,
                      _act = document.getElementById(_actid);
                 _cur.className = "act";
-                if(_actid != 0 && _actid != _cur.id){ _act.className = "";}
+                if(_actid !== 0 && _actid !== _cur.id){ _act.className = "";}
                 _actid = _cur.id;
             }
 
@@ -213,7 +267,7 @@
             }
 
             function _navExtExpActByName(sbid){
-                var sbid = "nav_" + sbid;
+                sbid = "nav_" + sbid;
                 var _sbli = document.getElementsByName(sbid)[0];
                 if(_sbli) {
                     var mnid = _sbli.getAttribute("rel");
