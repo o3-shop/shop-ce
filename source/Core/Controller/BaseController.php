@@ -706,12 +706,18 @@ class BaseController extends \OxidEsales\Eshop\Core\Base
      */
     public function getShopFullEdition()
     {
-        $sEdition = $this->getShopEdition();
-        $sFullEdition = "Community Edition";
-
-        return $sFullEdition;
+        return "O3-Shop";
     }
 
+    /**
+     * Returns shop full edition
+     *
+     * @return string
+     */
+    public function getSupportMarker()
+    {
+        return "LTS";
+    }
 
     /**
      * Returns if current shop is demo version

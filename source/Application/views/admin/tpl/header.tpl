@@ -17,6 +17,7 @@
         <b>
             [{$oView->getShopFullEdition()}]
             [{$oView->getShopVersion()}]
+            [{$oView->getSupportMarker()}]
         </b>
     </div>
 </body>
