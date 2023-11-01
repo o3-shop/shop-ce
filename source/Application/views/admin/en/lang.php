@@ -804,10 +804,6 @@ $aLang = [
     'NEWS_MAIN_SHOWFORGROUP'                         => 'Visible for User Group',
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Invisible for User Group',
     // END deprecated
-    'NAVIGATION_FAVORITES'                           => 'Favorites',
-    'NAVIGATION_FAVORITES_EDIT'                      => '[ edit ]',
-    'FAVORITES_DESC'                                 => 'favorites description ...',
-    'NAVIGATION_HISTORY'                             => 'History',
     'NAVIGATION_SYSREQ_MESSAGE'                      => "System health check shows setup/server setup of this O3-Shop might be broken. Probably this O3-Shop behaves strange in some cases. Please fix this as soon as possible. Support for fixing find in ",
     'NAVIGATION_SYSREQ_MESSAGE2'                     => "<b>system health check</b>.",
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => "The permanent system health check has been deactivated. You can re-activate it in the Perform. tab at Master settings -> Core settings. To check it anyway, please click on this link: ",

@@ -302,38 +302,12 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
 
             $sActTab = $iActTab ? "&actedit=$iActTab" : '';
 
-            // store navigation history
-            $this->_addNavigationHistory($sNode);
-
             // list url
             $this->_aViewData['listurl'] = $myAdminNavig->getListUrl($sNode) . $sActTab;
 
             // edit url
             $this->_aViewData['editurl'] = $myAdminNavig->getEditUrl($sNode, $iActTab) . $sActTab;
         }
-    }
-
-    /**
-     * Store navigation history parameters to cookie
-     *
-     * @param string $sNode active view id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addNavigationHistory" in next major
-     */
-    protected function _addNavigationHistory($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $myUtilsServer = \OxidEsales\Eshop\Core\Registry::getUtilsServer();
-
-        // store navigation history
-        $aHistory = explode('|', $myUtilsServer->getOxCookie('oxidadminhistory'));
-        if (!is_array($aHistory)) {
-            $aHistory = [];
-        }
-
-        if (!in_array($sNode, $aHistory)) {
-            $aHistory[] = $sNode;
-        }
-
-        $myUtilsServer->setOxCookie('oxidadminhistory', implode('|', $aHistory));
     }
 
     /**

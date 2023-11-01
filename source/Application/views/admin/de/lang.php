@@ -804,10 +804,6 @@ $aLang = [
     'NEWS_MAIN_SHOWFORGROUP'                         => 'Sichtbar für Benutzergruppe',
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Nicht sichtbar für Benutzergruppe',
     // END deprecated
-    'NAVIGATION_FAVORITES'                           => 'Favoriten',
-    'NAVIGATION_FAVORITES_EDIT'                      => '[ändern]',
-    'FAVORITES_DESC'                                 => 'Beschreibung der Favoriten ...',
-    'NAVIGATION_HISTORY'                             => 'History',
     'NAVIGATION_SYSREQ_MESSAGE'                      => "Die Systemgesundheit dieses Shops ist gefährdet. Möglicherweise verhält sich Ihr O3-Shop in einigen Bereichen unerwartet. Bitte stellen Sie sicher, dass die Servereinstellungen korrekt vorgenommen werden. Unterstützung finden Sie in der ",
     'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>Systemgesundheitsprüfung</b>.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'Die permanente Systemgesundheitsprüfung wurde deaktiviert. Sie können diese auf der Registerkarte Perform. unter Stammdaten -> Grundeinstellungen aktivieren. Um dennoch zu prüfen, klicken Sie bitte hier: ',

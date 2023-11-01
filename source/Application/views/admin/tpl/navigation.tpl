@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]css/libs/fontawesome/fontawesome.css">
     <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]css/libs/fontawesome/solid.css">
     <link rel="stylesheet" href="[{$oViewConf->getResourceUrl()}]css/libs/fontawesome/brands.css">
+
+    [{* ADMIN LTE *}]
+[{*    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>*}]
+[{*    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">*}]
+
     <meta http-equiv="Content-Type" content="text/html; charset=[{$charset}]">
     <script type="text/javascript">
         [{if $loadbasefrm}]
@@ -140,81 +145,6 @@
         [{/if}]
         [{/foreach}]
     [{/block}]
-    </td></tr>
-    <tr><td class="extra">
-
-    <ul>
-        [{block name="admin_navigation_history"}]
-            [{strip}]
-                [{assign var='mh' value=$mh+1}]
-                [{assign var='mn' value=1}]
-                [{assign var='sm' value=0}]
-                <li id="nav-[{$mh}]-[{$mn}]" class="[{if $blOpenHistory}]exp[{assign var='sHistoryId' value="nav-`$mh`-`$mn`"}][{/if}]">
-                    <a class="rc" name="_hist" href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=navigation.tpl&openHistory=1&[{$smarty.now}]#_hist">
-                        <b>
-                            <i class="fa-fw fa-solid fa-clock-rotate-left"></i>&nbsp;
-                            [{oxmultilang ident=NAVIGATION_HISTORY noerror=true}]
-                        </b>
-                    </a>
-
-                    <ul>
-                        [{foreach from=$menuhistory item=submenuitem}]
-                            [{if $submenuitem->nodeType == XML_ELEMENT_NODE}]
-                                [{assign var='sm' value=$sm+1}]
-                                <li id="nav-[{$mh}]-[{$mn}]-[{$sm}]" class="">
-                                    <a href="[{$submenuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc">
-                                        <b>
-                                            [{if $submenuitem->getAttribute('iconclass')}]
-                                                <i class="fa-fw [{$menuitem->getAttribute('iconclass')}]"></i>&nbsp;
-                                            [{/if}]
-                                            [{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]
-                                        </b>
-                                    </a>
-                                </li>
-                            [{/if}]
-                        [{/foreach}]
-                    </ul>
-                </li>
-            [{/strip}]
-        [{/block}]
-    </ul>
-
-    <ul>
-        [{block name="admin_navigation_favorites"}]
-            [{strip}]
-                [{assign var='mh' value=$mh+1}]
-                [{assign var='mn' value=1}]
-                [{assign var='sm' value=0}]
-                <li id="nav-[{$mh}]-[{$mn}]">
-                    <a class="rc" onclick="_navExp(this);return false;" href="#" >
-                        <b>
-                            <i class="fa-fw fa-solid fa-star"></i>&nbsp;
-                            [{oxmultilang ident=NAVIGATION_FAVORITES noerror=true}]
-                        </b>
-                    </a>
-                    <a class="ed" href="[{$oViewConf->getSelfLink()}]&cl=navigation&amp;item=favorites.tpl" target="basefrm" >[{oxmultilang ident=NAVIGATION_FAVORITES_EDIT noerror=true}]</a>
-                    <ul>
-                        [{foreach from=$menufavorites item=submenuitem}]
-                            [{if $submenuitem->nodeType == XML_ELEMENT_NODE}]
-                                [{assign var='sm' value=$sm+1}]
-                                <li id="nav-[{$mh}]-[{$mn}]-[{$sm}]" class="">
-                                    <a href="[{$submenuitem->getAttribute('link')}]" onclick="_navAct(this);" target="basefrm" class="rc">
-                                        <b>
-                                            [{if $submenuitem->getAttribute('iconclass')}]
-                                                <i class="fa-fw [{$submenuitem->getAttribute('iconclass')}]"></i>&nbsp;
-                                            [{/if}]
-                                            [{oxmultilang ident=$submenuitem->getAttribute('name')|default:$submenuitem->getAttribute('id') noerror=true}]
-                                        </b>
-                                    </a>
-                                </li>
-                            [{/if}]
-                        [{/foreach}]
-                    </ul>
-                </li>
-            [{/strip}]
-        [{/block}]
-    </ul>
-
     </td></tr>
     </table>
 

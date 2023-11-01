@@ -46,10 +46,6 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         $sItem = $sItem ? basename($sItem) : false;
         if (!$sItem) {
             $sItem = "nav_frame.tpl";
-            $aFavorites = Registry::getConfig()->getRequestParameter("favorites");
-            if (is_array($aFavorites)) {
-                $myUtilsServer->setOxCookie('oxidadminfavorites', implode('|', $aFavorites));
-            }
         } else {
             $oNavTree = $this->getNavigation();
 
@@ -69,23 +65,6 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
                 //removing reload param to force requirements checking next time
                 Registry::getSession()->deleteVariable("navReload");
             }
-
-            // favorite navigation
-            $aFavorites = explode('|', $myUtilsServer->getOxCookie('oxidadminfavorites'));
-
-            if (is_array($aFavorites) && count($aFavorites)) {
-                $this->_aViewData["menufavorites"] = $oNavTree->getListNodes($aFavorites);
-                $this->_aViewData["aFavorites"] = $aFavorites;
-            }
-
-            // history navigation
-            $aHistory = explode('|', $myUtilsServer->getOxCookie('oxidadminhistory'));
-            if (is_array($aHistory) && count($aHistory)) {
-                $this->_aViewData["menuhistory"] = $oNavTree->getListNodes($aHistory);
-            }
-
-            // open history node ?
-            $this->_aViewData["blOpenHistory"] = Registry::getConfig()->getRequestParameter('openHistory');
         }
 
         $blisMallAdmin = Registry::getSession()->getVariable('malladmin');
@@ -185,7 +164,6 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
                 $messages['message'] .= $sVersionNotice;
             }
         }
-
 
         // check if setup dir is deleted
         if (file_exists($this->getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
