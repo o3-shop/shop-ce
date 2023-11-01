@@ -808,8 +808,8 @@ $aLang = [
     'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>Systemgesundheitsprüfung</b>.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'Die permanente Systemgesundheitsprüfung wurde deaktiviert. Sie können diese auf der Registerkarte Perform. unter Stammdaten -> Grundeinstellungen aktivieren. Um dennoch zu prüfen, klicken Sie bitte hier: ',
     'NAVIGATION_SHOPFRONT'                           => 'Startseite des Shops',
-    'NAVIGATION_FULLVIEW'                            => 'Expertenmenü anzeigen',
-    'NAVIGATION_REDUCEDVIEW'                         => 'Anwendermenü anzeigen',
+    'NAVIGATION_FULLVIEW'                            => 'Expertenmenü zeigen',
+    'NAVIGATION_REDUCEDVIEW'                         => 'Anwendermenü zeigen',
 
     // @deprecated Functionality for Newsletter management will be removed.
     'NEWSLETTER_DONE_NEWSSEND'                           => 'Ihr Newsletter wurde versendet.',
@@ -1580,6 +1580,7 @@ $aLang = [
     'mxsysinfo'                => 'Systeminfo',
     'mxsysreq'                 => 'Systemgesundheit',
     'mxtools'                  => 'Tools',
+    'mxadminnavigation'        => 'Adminnavigation',
     'mxtheme'                  => 'Themes',
     'mxmodule'                 => 'Module',
     'mxextensions'             => 'Erweiterungen',
@@ -1904,6 +1905,8 @@ $aLang = [
     'HELP_RIGHTSROLES_RESTRICTEDVIEW'            => 'Um die Backendbenutzung zu vereinfachen, lassen sich selten genutzte Menüeinträge ausblenden. Welche Einträge ausgeblendet werden sollen, definieren die Benutzerrollen mit dieser Checkbox. Bei mehreren als global markierten Rollen summieren sich deren Rechte. Globale Rollen sind für alle Backendbenutzer gleichermaßen gültig. Soll eine benutzerspezfische Rolle definiert werden, lassen Sie diese Checkbox leer.',
     'RIGHTSROLES_ITEMS'                          => 'aktive Menüeinträge',
     'HELP_RIGHTSROLES_ITEMS'                     => 'Verfügbare Menüeintrage sind ausgewählt. Ist kein Eintrag ausgewählt, wird diese Benutzerrolle nicht beachtet und es stehen den Benutzern alle Menüeinträge zur Verfügung.',
+    'ADMINNAVIGATION_DESC'                       => 'Um den Adminbereich übersichtlich zu halten, können Sie die Menüeinträge bereinigen. Markieren Sie dazu in der folgenden Liste alle Einträge, die Sie oft verwenden. Alle anderen Einträge werden ausgeblendet. Sie können dann zwischen dem reduzierten Anwendermenü und dem vollständigen Expertenmenü wechseln. Wählen Sie keinen Eintrag, wird Ihnen immer das vollständige Menü gezeigt.',
+    'ADMINNAVIGATION_ITEMS'                      => 'aktive Einträge im vereinfachten Anwendermenü',
 
     'SHOP_PERF_SEO_CACHE'                        => 'SEO Cache aktivieren',
     'SHOP_PERF_SYSREQ_CHECK'                     => 'Meldungen der Systemgesundheitsprüfung auf der Startseite aktivieren',

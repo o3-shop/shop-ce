@@ -157,38 +157,20 @@
     <input type="hidden" name="oxid" value="[{$oxid}]">
     <input type="hidden" name="editval[o3rightsroles__oxid]" value="[{$oxid}]">
 
+    <h1>[{oxmultilang ident="mxadminnavigation"}]</h1>
+
+    <p>
+        [{oxmultilang ident="ADMINNAVIGATION_DESC"}]
+    </p>
+
     <table style="border: 0; border-collapse: collapse; border-spacing: 0; width:98%;">
         <tr>
             <td class="vatop edittext" style="width: 50%; padding-top:10px;padding-left:10px;">
                 <table>
                     [{block name="admin_adminrights_main_left"}]
                         <tr>
-                            <td class="edittext" style="width: 120px;">
-                                <label for="o3rightsroles__active">
-                                    [{oxmultilang ident="RIGHTSROLES_ACTIVE"}]
-                                </label>
-                            </td>
-                            <td class="edittext">
-                                <input type="hidden" name="editval[o3rightsroles__active]" value='0' [{$readonly}]>
-                                <input id="o3rightsroles__active" class="edittext" type="checkbox" name="editval[o3rightsroles__active]" value='1' [{if $edit->o3rightsroles__active->value == 1}]checked[{/if}] [{$readonly}]>
-                                [{oxinputhelp ident="HELP_RIGHTSROLES_ACTIVE"}]
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="edittext">
-                                <label for="o3rightsroles__title">
-                                    [{oxmultilang ident="RIGHTSROLES_TITLE"}]
-                                </label>
-                            </td>
-                            <td class="edittext">
-                                <input id="o3rightsroles__title" type="text" class="editinput" size="25" maxlength="[{$edit->o3rightsroles__title->fldmax_length}]" name="editval[o3rightsroles__title]" value="[{$edit->o3rightsroles__title->value}]" [{$readonly}]>
-                                [{oxinputhelp ident="HELP_RIGHTSROLES_TITLE"}]
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="vatop">
-                                [{oxmultilang ident="RIGHTSROLES_ITEMS"}]
-                                [{oxinputhelp ident="HELP_RIGHTSROLES_ITEMS"}]
+                                [{oxmultilang ident="ADMINNAVIGATION_ITEMS"}]
                             </td>
                             <td>
                                 [{assign var="selectedElements" value=$roleElementsList->getElementsIdsByRole($oxid)}]
@@ -225,11 +207,6 @@
                         </tr>
                     [{/block}]
                     <tr>
-                        <td class="edittext" colspan="2"><br>
-                            [{include file="language_edit.tpl"}]<br>
-                        </td>
-                    </tr>
-                    <tr>
                         <td>
                             <input type="submit" class="edittext" id="oLockButton" name="saveArticle" value="[{oxmultilang ident="ARTICLE_MAIN_SAVE"}]" onClick="document.myedit.fnc.value='save'" [{$readonly}]>
                         </td>
@@ -242,11 +219,6 @@
                 <table>
                     <tr>
                         <td class="edittext">
-                            [{block name="admin_adminrights_main_assign_users"}]
-                                [{if $oxid != "-1"}]
-                                    <input [{$readonly}] type="button" value="[{oxmultilang ident="GENERAL_ASSIGNUSERS"}]" class="edittext" onclick="showDialog('&cl=adminrights_main&aoc=1&oxid=[{$oxid}]');">
-                                [{/if}]
-                            [{/block}]
                         </td>
                     </tr>
                 </table>

@@ -123,31 +123,13 @@ class RightsRolesElementsList extends ListModel
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('DISTINCT(re.elementid) as elementid, MAX(re.type) as type')
             ->from(
-                (oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()),
-                'rr'
-            )
-            ->leftJoin(
-                'rr',
-                'o3object2role',
-                'o2r',
-                $queryBuilder->expr()->eq('rr.oxid', 'o2r.roleid')
-            )
-            ->leftJoin(
-                'rr',
                 $this->getBaseObject()->getViewName(),
-                're',
-                $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
+                're'
             )
             ->where(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'rr.active',
-                        $queryBuilder->createNamedParameter(1)
-                    ),
-                    $queryBuilder->expr()->eq(
-                    'rr.restrictedview',
-                        $queryBuilder->createNamedParameter(1)
-                    )
+                $queryBuilder->expr()->eq(
+                    're.roleid',
+                    $queryBuilder->createNamedParameter(Registry::getSession()->getUser()->getId())
                 )
             )
             ->groupBy('re.elementid');

@@ -127,6 +127,7 @@ class ShopControllerMapProvider implements \OxidEsales\Eshop\Core\Contract\Contr
         'tools'                                => \OxidEsales\Eshop\Application\Controller\Admin\ToolsController::class,
         'tools_list'                           => \OxidEsales\Eshop\Application\Controller\Admin\ToolsList::class,
         'tools_main'                           => \OxidEsales\Eshop\Application\Controller\Admin\ToolsMain::class,
+        'adminnavigation'                      => \OxidEsales\Eshop\Application\Controller\Admin\AdminNavigation::class,
         'user_address'                         => \OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class,
         'user_article'                         => \OxidEsales\Eshop\Application\Controller\Admin\UserArticle::class,
         'user_extend'                          => \OxidEsales\Eshop\Application\Controller\Admin\UserExtend::class,

@@ -193,6 +193,7 @@
             </SUBMENU>
             <SUBMENU id="mxgenexp" cl="genexport" />
             <SUBMENU id="mxgenimp" cl="genimport" />
+            <SUBMENU id="mxadminnavigation" cl="adminnavigation" />
         </MAINMENU>
     </OXMENU>
 </OX>

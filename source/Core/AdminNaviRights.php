@@ -52,6 +52,7 @@ class AdminNaviRights extends Base
             foreach ($oNodeList as $node) {
                 /** @var DOMElement $node */
                 $nodeId = strtolower($node->getAttribute( 'id' ));
+
                 if ( $nodeId && in_array( $nodeId, array_keys($menuItemRights))) {
                     $node->parentNode->removeChild( $node );
                 }
@@ -80,13 +81,19 @@ class AdminNaviRights extends Base
 
     protected function getMenuItemRights(DOMXPath $xPath = null)
     {
+        $controllersWithoutViewRights = [
+            'adminnavigation',
+            'adminrights_main'
+        ];
+
         if ($this->menuItemRights === null) {
             $roleRights = $this->doLoad ? $this->getRoleRights() : [];
-            $viewRights = $this->getRestrictedViewRights(
-                oxNew( AdminViewSetting::class )->canShowAllMenuItems(),
-                $roleRights,
-                $xPath
-            );
+            $viewRights = !in_array(Registry::getConfig()->getActiveView()->getClassKey(), $controllersWithoutViewRights) ?
+                $this->getRestrictedViewRights(
+                    oxNew( AdminViewSetting::class )->canShowAllMenuItems(),
+                    $roleRights,
+                    $xPath
+                ) : [];
 
             if ( count( $roleRights ) && count( $viewRights ) ) {
                 $this->menuItemRights = $this->intersectRightLists( $roleRights, $viewRights );

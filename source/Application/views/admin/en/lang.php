@@ -1579,6 +1579,7 @@ $aLang = [
     'mxsysinfo'                => 'System Info',
     'mxsysreq'                 => 'System health',
     'mxtools'                  => 'Tools',
+    'mxadminnavigation'        => 'Admin Navigation',
     'mxtheme'                  => 'Themes',
     'mxmodule'                 => 'Modules',
     'mxextensions'             => 'Extensions',
@@ -1901,6 +1902,8 @@ $aLang = [
     'HELP_RIGHTSROLES_RESTRICTEDVIEW'            => 'To simplify the use of the backend, rarely used menu items can be hidden. This checkbox specifies the user roles that have the items that are to be hidden. If several roles are marked as global, their rights add up. Global roles are valid for all backend users. If a user-specific role should be defined, leave this checkbox empty.',
     'RIGHTSROLES_ITEMS'                          => 'active menu items',
     'HELP_RIGHTSROLES_ITEMS'                     => 'Available menu items are selected. If no entry is selected, this user role is ignored and all menu items are available to users.',
+    'ADMINNAVIGATION_DESC'                       => 'To keep the admin area clear, you can clean up the menu items. To do this, select all items in the following list that you use often. All other items are hidden. You can then switch between the reduced user menu and the complete expert menu. If you do not select an item, the full menu is shown.',
+    'ADMINNAVIGATION_ITEMS'                      => 'Active items in the simplified user menu',
 
     'SHOP_PERF_SEO_CACHE'                        => 'Enable SEO cache',
     'SHOP_PERF_SYSREQ_CHECK'                     => 'Enable system health messages at the start page',
