@@ -31,14 +31,6 @@
         #adminviewlink {
             text-decoration: none;
         }
-        #adminviewlink i,
-        .on #adminviewlink:active i {
-            transform: rotate(0);
-        }
-        #adminviewlink:active i,
-        .on #adminviewlink i {
-            transform: rotate(180deg);
-        }
     </style>
         </head>
         <body class="sidebar-mini layout-fixed">
@@ -49,7 +41,6 @@
             [{if $oView->canHaveRestrictedView()}]
                 <div class="toggleview [{if $oView->canShowAllMenuItems()}]on[{/if}]" style="padding: 15px 23px; border-bottom: 2px solid rgba(0, 0, 0, .3)">
                     <a href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=navigation.tpl&fnc=toggleAdminView" id="adminviewlink" class="rc" style="font-size: 0.8rem; color: #82ba00 !important">
-                        <i class="fa-fw fa-solid fa-toggle-on"></i>&nbsp;
                         [{if $oView->canShowAllMenuItems()}]
                             [{oxmultilang ident="NAVIGATION_REDUCEDVIEW"}]
                         [{else}]
