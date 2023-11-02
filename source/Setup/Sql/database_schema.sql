@@ -11,15 +11,12 @@ create table o3rightsroles
     TITLE varchar(255) not null,
     ACTIVE tinyint(1) not null,
     OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
-    RESTRICTEDVIEW int default 0 not null comment 'mark role as global for restricted backend view',
     TITLE_1 varchar(255) not null,
     TITLE_2 varchar(255) not null,
     TITLE_3 varchar(255) not null,
     OXSHOPID int not null
 )
     collate=utf8_unicode_ci;
-create index RESTRICTED_IDX
-    on o3rightsroles (RESTRICTEDVIEW, ACTIVE);
 create index SHOPNAVIGATION
     on o3rightsroles (SHOPID, ACTIVE);
 
@@ -39,17 +36,17 @@ create table o3object2role
 create table o3rightsroleselements
 (
     ELEMENTID char(32) not null,
-    ROLEID char(32) not null,
+    OBJECTID char(32) not null,
     OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
     OXID char(32) not null
         primary key,
     TYPE int default 1 not null comment 'right type: 0 = hidden, 1 = editable, 2 = readonly'
 )
     collate=utf8_unicode_ci;
-create index o3rightsroleselements_ROLEID_TYPE_index
-    on o3rightsroleselements (ROLEID, TYPE);
-create index o3rightsroleselements_ROLEID_index
-    on o3rightsroleselements (ROLEID);
+create index ROLETYPE_IDX
+    on o3rightsroleselements (OBJECTID, TYPE);
+create index OBJECT_IDX
+    on o3rightsroleselements (OBJECTID);
 
 #
 # Table structure for table `oxacceptedterms`

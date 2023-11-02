@@ -85,14 +85,6 @@ final class Version20230730131836 extends AbstractMigration
                     ->setNotnull( true );
             }
         }
-        if (!$rightsRolesTable->hasColumn('RESTRICTEDVIEW')) {
-            $rightsRolesTable->addColumn('RESTRICTEDVIEW', (new IntegerType())->getName())
-                ->setLength(1)
-                ->setFixed(true)
-                ->setDefault(0)
-                ->setNotnull(true)
-                ->setComment('mark role as global for restricted backend view');
-        }
         if (!$rightsRolesTable->hasColumn('OXTIMESTAMP')) {
             $rightsRolesTable->addColumn('OXTIMESTAMP', (new DateTimeType())->getName())
                 ->setNotnull(true)
@@ -100,9 +92,6 @@ final class Version20230730131836 extends AbstractMigration
         }
 
         $rightsRolesTable->hasPrimaryKey() ?: $rightsRolesTable->setPrimaryKey(['OXID', 'OXID']);
-
-        $rightsRolesTable->hasIndex('RESTRICTED_IDX') ?:
-            $rightsRolesTable->addIndex(['ACTIVE', 'RESTRICTEDVIEW'], 'RESTRICTED_IDX');
     }
 
     public function rightsRolesElementsTable(Schema $schema): void
@@ -124,11 +113,12 @@ final class Version20230730131836 extends AbstractMigration
                 ->setFixed(true)
                 ->setNotnull(true);
         }
-        if (!$rightsRolesElementsTable->hasColumn('ROLEID')) {
-            $rightsRolesElementsTable->addColumn('ROLEID', (new StringType())->getName())
+        if (!$rightsRolesElementsTable->hasColumn('OBJECTID')) {
+            $rightsRolesElementsTable->addColumn('OBJECTID', (new StringType())->getName())
                 ->setLength(32)
                 ->setFixed(true)
-                ->setNotnull(true);
+                ->setNotnull(true)
+                ->setComment('role or user id');
         }
         if (!$rightsRolesElementsTable->hasColumn('TYPE')) {
             $rightsRolesElementsTable->addColumn('TYPE', (new IntegerType())->getName())
@@ -146,11 +136,11 @@ final class Version20230730131836 extends AbstractMigration
 
         $rightsRolesElementsTable->hasPrimaryKey() ?: $rightsRolesElementsTable->setPrimaryKey(['OXID', 'OXID']);
 
-        $rightsRolesElementsTable->hasIndex('ROLE_IDX') ?:
-            $rightsRolesElementsTable->addIndex(['ROLEID'], 'ROLE_IDX');
+        $rightsRolesElementsTable->hasIndex('OBJECT_IDX') ?:
+            $rightsRolesElementsTable->addIndex(['OBJECTID'], 'OBJECT_IDX');
 
         $rightsRolesElementsTable->hasIndex('ROLETYPE_IDX') ?:
-            $rightsRolesElementsTable->addIndex(['ROLEID', 'TYPE'], 'ROLETYPE_IDX');
+            $rightsRolesElementsTable->addIndex(['OBJECTID', 'TYPE'], 'ROLETYPE_IDX');
     }
     
     public function object2roleTable(Schema $schema)

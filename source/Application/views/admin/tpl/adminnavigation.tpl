@@ -173,7 +173,7 @@
                                 [{oxmultilang ident="ADMINNAVIGATION_ITEMS"}]
                             </td>
                             <td>
-                                [{assign var="selectedElements" value=$roleElementsList->getElementsIdsByRole($oxid)}]
+                                [{assign var="selectedElements" value=$roleElementsList->getElementsIdsByObjectId($oxid)}]
                                 [{assign var="cssClass" value="nav"}]
                                 <ul id="nav">
                                     [{assign var="deepLevel" value=0}]

@@ -22,6 +22,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\EshopCommunity\Core\Model\ListModel;
+use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 
@@ -30,10 +31,11 @@ class RightsRolesElementsList extends ListModel
     protected $_sObjectsInListName = RightsRolesElement::class;
 
     /**
-     * @param string $roleId
+     * @param string $objectId
+     *
      * @return $this
      */
-    public function getElementsByRole(string $roleId)
+    public function getElementsByObjectId(string $objectId)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
@@ -41,8 +43,8 @@ class RightsRolesElementsList extends ListModel
             ->from($this->getBaseObject()->getViewName())
             ->where(
                 $queryBuilder->expr()->eq(
-                    'roleid',
-                    $queryBuilder->createNamedParameter($roleId)
+                    'objectid',
+                    $queryBuilder->createNamedParameter( $objectId)
                 )
             );
 
@@ -52,7 +54,7 @@ class RightsRolesElementsList extends ListModel
     }
 
     /**
-     * @param string $roleId
+     * @param string $userId
      * @return array
      */
     public function getElementsByUserId(string $userId): array
@@ -74,7 +76,7 @@ class RightsRolesElementsList extends ListModel
                 'rr',
                 $this->getBaseObject()->getViewName(),
                 're',
-                $queryBuilder->expr()->eq('rr.oxid', 're.roleid')
+                $queryBuilder->expr()->eq('rr.oxid', 're.objectid')
             )
             ->where(
                 $queryBuilder->expr()->and(
@@ -128,7 +130,7 @@ class RightsRolesElementsList extends ListModel
             )
             ->where(
                 $queryBuilder->expr()->eq(
-                    're.roleid',
+                    're.objectid',
                     $queryBuilder->createNamedParameter(Registry::getSession()->getUser()->getId())
                 )
             )
@@ -156,9 +158,9 @@ class RightsRolesElementsList extends ListModel
         );
     }
 
-    public function getElementsIdsByRole(string $roleId)
+    public function getElementsIdsByObjectId(string $objectId)
     {
-        $this->getElementsByRole($roleId);
+        $this->getElementsByObjectId($objectId);
 
         return array_combine(
             array_filter(
@@ -184,14 +186,14 @@ class RightsRolesElementsList extends ListModel
         );
     }
 
-    public function setNaviSettings(array $aNaviSetting, $roleId)
+    public function setNaviSettings(array $aNaviSetting, $objectId)
     {
         $delete = $this->getQueryBuilder();
         $delete->delete($this->getBaseObject()->getCoreTableName())
             ->where(
                 $delete->expr()->eq(
-                    'roleid',
-                    $delete->createNamedParameter($roleId)
+                    'objectid',
+                    $delete->createNamedParameter( $objectId)
                 )
             );
         $delete->execute();
@@ -200,7 +202,7 @@ class RightsRolesElementsList extends ListModel
             $element = oxNew($this->_sObjectsInListName);
             $element->assign([
                 'elementid' => $naviSetting,
-                'roleid'    => $roleId,
+                'objectid'  => $objectId,
                 'type'      => $rightType
             ]);
             $element->save();
