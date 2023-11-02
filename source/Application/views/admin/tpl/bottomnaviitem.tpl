@@ -32,6 +32,10 @@
                     [{if $bottom_buttons->usergroup_new}]
                         <li><a [{if !$firstitem}]class="firstitem"[{assign var="firstitem" value="1"}][{/if}] id="btn.new" href="#" onClick="Javascript:top.oxid.admin.editThis( -1 );return false" target="edit">[{oxmultilang ident="TOOLTIPS_NEWUSERGROUP"}]</a> |</li>
                     [{/if}]
+                    [{* rights roles *}]
+                    [{if $bottom_buttons->rightsroles_new}]
+                        <li><a [{if !$firstitem}]class="firstitem"[{assign var="firstitem" value="1"}][{/if}] id="btn.new" href="#" onClick="Javascript:top.oxid.admin.editThis( -1 );return false" target="edit">[{oxmultilang ident="TOOLTIPS_NEWROLE"}]</a> |</li>
+                    [{/if}]
                     [{* category *}]
                     [{if $bottom_buttons->category_new}]
                         <li><a [{if !$firstitem}]class="firstitem"[{assign var="firstitem" value="1"}][{/if}] id="btn.new" href="#" onClick="Javascript:top.oxid.admin.editThis( -1 );return false" target="edit">[{oxmultilang ident="TOOLTIPS_NEWCATEGORY"}]</a> |</li>
