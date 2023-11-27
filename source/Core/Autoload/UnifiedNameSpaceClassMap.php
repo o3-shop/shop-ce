@@ -317,6 +317,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminNavigation'          => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminNavigation::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\AdminNews'                    => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminNews::class,
         'isAbstract'       => false,
@@ -343,6 +349,30 @@ return [
     ],
     'OxidEsales\Eshop\Application\Controller\Admin\AdminPriceAlarm'              => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminPriceAlarm::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminRights'              => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRights::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminRightsList'              => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRightsList::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminRightsMain'              => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRightsMain::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminRightsMainAjax'              => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRightsMainAjax::class,
         'isAbstract'       => false,
         'isInterface'      => false,
         'isDeprecated'     => false
@@ -2033,6 +2063,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false
     ],
+    'OxidEsales\Eshop\Application\Model\Object2Role'                            => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\Object2Role::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
     'OxidEsales\Eshop\Application\Model\Order'                                   => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\Order::class,
         'isAbstract'       => false,
@@ -2125,6 +2161,12 @@ return [
     ],
     'OxidEsales\Eshop\Application\Model\Review'                                  => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\Review::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false
+    ],
+    'OxidEsales\Eshop\Application\Model\RightsRoles'                             => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\RightsRoles::class,
         'isAbstract'       => false,
         'isInterface'      => false,
         'isDeprecated'     => false

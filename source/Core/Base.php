@@ -236,4 +236,17 @@ class Base
     {
         return ContainerFactory::getInstance()->getContainer();
     }
+
+    public function getAdminNaviRights()
+    {
+        $rightsRolesConfiguration = (int) Registry::getConfig()->getConfigParam('blUseRightsRoles');
+        if ($rightsRolesConfiguration && self::$rights === null) {
+            self::$rights = oxNew(AdminNaviRights::class);
+            if ($this->isAdmin() && ($rightsRolesConfiguration & 1)) {
+                self::$rights->load();
+            }
+        }
+
+        return self::$rights;
+    }
 }

@@ -647,8 +647,6 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             $this->onGettingDomXml();
             $this->_cleanEmptyParents($this->_oDom, '//SUBMENU[@id][@list]', 'TAB');
             $this->_cleanEmptyParents($this->_oDom, '//MAINMENU[@id]', 'SUBMENU');
-
-            $this->setUserNavigation();
         }
 
         return $this->_oDom;
@@ -864,98 +862,5 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
         }
 
         return self::$rights;
-    }
-
-    /**
-     * @param $navigationNodeId
-     * @return bool
-     * @throws \Doctrine\DBAL\Exception
-     */
-    protected function isNavNodeDeactivated($navigationNodeId)
-    {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = ContainerFactory::getInstance()
-            ->getContainer()
-            ->get(QueryBuilderFactoryInterface::class)
-            ->create();
-
-        $queryBuilder->select('count(*)')
-            ->from('emadminnavi')
-            ->where(
-                $queryBuilder->expr()->and(
-                    $queryBuilder->expr()->eq(
-                        'USERID',
-                        $queryBuilder->createNamedParameter($this->getUser()->getId())
-                    ),
-                    $queryBuilder->expr()->eq(
-                        'NAVIGATIONID',
-                        $queryBuilder->createNamedParameter($navigationNodeId)
-                    )
-                )
-            )
-            ->setMaxResults(1);
-
-        return (bool) $queryBuilder->execute()->fetchOne();
-    }
-
-    public function setUserNavigation()
-    {
-        foreach ($this->_oDom->documentElement->childNodes as $aMenuHolder) {
-            if ($aMenuHolder->nodeType == XML_ELEMENT_NODE && $aMenuHolder->childNodes->length) {
-                $navigationNodeId  = $aMenuHolder->getAttribute('id');
-
-                if ($this->isNavNodeDeactivated($navigationNodeId)) {
-                    $aMenuHolder->parentNode->removeChild($aMenuHolder);
-                    $this->setUserNavigation();
-                }
-
-                foreach ($aMenuHolder->childNodes as $oMenuItem) {
-                    if ($oMenuItem->nodeType == XML_ELEMENT_NODE) {
-                        $navigationNodeId = $oMenuItem->getAttribute('id');
-                        if ($navigationNodeId == '') {
-                            $text = $oMenuItem->getAttribute('name');
-                            $navigationNodeId  = $text;
-                        }
-
-                        if ($this->isNavNodeDeactivated($navigationNodeId)) {
-                            $oMenuItem->parentNode->removeChild($oMenuItem);
-                            $this->setUserNavigation();
-                            return;
-                        }
-
-                        if ($oMenuItem->childNodes->length) {
-                            foreach ($oMenuItem->childNodes as $oSubMenuIten) {
-                                if ($oSubMenuIten->nodeType == XML_ELEMENT_NODE) {
-                                    $navigationNodeId = $oSubMenuIten->getAttribute('id');
-                                    if ($navigationNodeId == '') {
-                                        $text = $oMenuItem->getAttribute('name');
-                                        $navigationNodeId  = $text;
-                                    }
-                                    if ($this->isNavNodeDeactivated($navigationNodeId)) {
-                                        $oSubMenuIten->parentNode->removeChild($oSubMenuIten);
-                                        $this->setUserNavigation();
-                                        return;
-                                    }
-
-                                    // tabs and buttons
-                                    if ($oSubMenuIten->childNodes->length) {
-                                        foreach ($oSubMenuIten->childNodes as $oTab) {
-                                            if ($oTab->nodeType == XML_ELEMENT_NODE) {
-                                                $navigationNodeId = $oTab->getAttribute('id');
-                                                if ($this->isNavNodeDeactivated($navigationNodeId)) {
-                                                    $oTab->parentNode->removeChild($oTab);
-                                                    $this->setUserNavigation();
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
