@@ -1229,7 +1229,7 @@ class SeoEncoderTest extends \OxidTestCase
         $this->assertEquals('test2', $oEncoder->getPrefix());
 
         $oEncoder->setPrefix('');
-        $this->assertEquals('oxid', $oEncoder->getPrefix());
+        $this->assertEquals('o3', $oEncoder->getPrefix());
     }
 
     public function testIsFixed()

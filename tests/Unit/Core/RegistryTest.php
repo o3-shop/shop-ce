@@ -19,6 +19,7 @@
  */
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
+use modOxUtilsDate;
 use oxConfig;
 use OxidEsales\Eshop\Core\Registry;
 use oxLang;
@@ -348,8 +349,7 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testRegistryGetUtilsDate()
     {
-        $object = Registry::getUtilsDate();
-        $this->assertTrue(is_a($object, \OxidEsales\Eshop\Core\UtilsDate::class));
+        $this->assertTrue(is_a(Registry::getUtilsDate(), modOxUtilsDate::class));
     }
 
     /**
@@ -357,8 +357,7 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testRegistryGetUtilsFile()
     {
-        $object = Registry::getUtilsFile();
-        $this->assertTrue(is_a($object, \OxidEsales\Eshop\Core\UtilsFile::class));
+        $this->assertTrue(is_a(Registry::getUtilsFile(), \OxidEsales\Eshop\Core\UtilsFile::class, ));
     }
 
     /**
@@ -466,7 +465,7 @@ class RegistryTest extends \OxidEsales\TestingLibrary\UnitTestCase
             ['getSeoDecoder', \OxidEsales\Eshop\Core\SeoDecoder::class],
             ['getSeoEncoder', \OxidEsales\Eshop\Core\SeoEncoder::class],
             ['getUtilsCount', \OxidEsales\Eshop\Core\UtilsCount::class],
-            ['getUtilsDate', \OxidEsales\Eshop\Core\UtilsDate::class],
+            ['getUtilsDate', modOxUtilsDate::class],
             ['getUtilsFile', \OxidEsales\Eshop\Core\UtilsFile::class],
             ['getUtilsPic', \OxidEsales\Eshop\Core\UtilsPic::class],
             ['getUtilsServer', \OxidEsales\Eshop\Core\UtilsServer::class],

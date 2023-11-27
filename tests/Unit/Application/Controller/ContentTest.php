@@ -763,8 +763,6 @@ class ContentTest extends \OxidTestCase
      */
     public function testGetCanonicalUrlSeoOff()
     {
-        $this->markTestSkipped('Seems to be a bug in UtilsUrl.php::prepareCanonicalUrl -> Check.');
-
         $this->setConfigParam('blSeoMode', false);
 
         $contentMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, array("getBaseSeoLink", "getBaseStdLink"));

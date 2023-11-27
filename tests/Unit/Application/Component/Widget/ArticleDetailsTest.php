@@ -463,7 +463,13 @@ class ArticleDetailsTest extends \OxidTestCase
     public function testGetPictureGallery()
     {
         $this->markTestSkipped('Fix: Create picture file (getShopBasePath()) and remove after, fix test naming. RT, use VFS?');
+
         $sArtID = "096a1b0849d5ffa4dd48cd388902420b";
+
+        $from = __DIR__ . '/../../../../Fixtures/front_z1(1).jpg';
+        $to = getShopBasePath() . '/out/pictures/generated/product/1/540_340_75/front_z1(1).jpg';
+
+        copy($from, $to);
 
         $oArticle = oxNew('oxArticle');
         $oArticle->load($sArtID);
@@ -474,6 +480,8 @@ class ArticleDetailsTest extends \OxidTestCase
         $aPicGallery = $oDetails->getPictureGallery();
 
         $this->assertEquals($sActPic, $aPicGallery['ActPic']);
+
+        unlink ($to);
     }
 
     /**

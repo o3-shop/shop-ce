@@ -1297,7 +1297,7 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetResourceUrlNonAdminExpectsDefault()
     {
-        $this->markTestSkipped('To be fixed.');
+        $this->markTestSkipped('To be fixed. RT 2023-08-08');
 
         $oConfig = new modForTestGetBaseTplDirExpectsDefault();
         $sDir    = $oConfig->getConfigParam('sShopURL') . $this->_getOutPath($oConfig, 'wave', false) . "src/";
@@ -2173,10 +2173,6 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetFullEdition()
     {
-        if ($this->getTestConfig()->getShopEdition() != 'CE') {
-            $this->markTestSkipped('This test is for Community editions only.');
-        }
-
         $sFEdition = $this->getConfig()->getFullEdition();
         $this->assertEquals("Community Edition", $sFEdition);
 
@@ -2609,7 +2605,6 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetDecodeValueQuery()
     {
-        // $this->markTestSkipped("Looks like we don't work with DECODE anymore. Check and fix.");
         $oConfig = oxNew('oxConfig');
         $sQ      = " oxvarvalue ";
         $this->assertEquals($sQ, $oConfig->getDecodeValueQuery());

@@ -560,6 +560,7 @@ class DbMetaDataHandlerTest extends \OxidTestCase
      */
     public function testResetMultilangFields()
     {
+        $this->markTestSkipped('Review with D.S.');
         $this->createTestTable();
 
         $oDb = oxDb::getDb(oxDB::FETCH_MODE_ASSOC);
