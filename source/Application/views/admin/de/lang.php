@@ -1265,7 +1265,7 @@ $aLang = [
     'SYSREQ_BC_MATH'                          => 'BCMath',
     'SYSREQ_MYSQL_CONNECT'                    => 'PDO_MySQL',
 
-    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10.4',
+    'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10',
 
 
     'SYSREQ_GD_INFO'                          => 'GDlib v2 incl. JPEG Unterstützung',
