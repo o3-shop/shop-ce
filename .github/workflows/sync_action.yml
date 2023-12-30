@@ -1,0 +1,13 @@
+name: GitlabSync
+
+on:
+  - push
+  - delete
+
+jobs:
+  sync:
+    uses: o3-shop/GHA/.github/workflows/sync_action.yml@main
+
+    secrets:
+      sync_username: ${{ secrets.SYNC_USERNAME }}
+      sync_token: ${{ secrets.SYNC_TOKEN }}
