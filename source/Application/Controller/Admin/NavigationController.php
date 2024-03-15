@@ -144,7 +144,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $messages = [];
 
-        if ($this->getConfig()->getConfigParam('blCheckSysReq') !== false) {
+        if ($this->getConfig()->getConfigParam('blCheckSysReq')) {
             // check if system requirements are ok
             $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
             if (!$oSysReq->getSysReqStatus()) {
