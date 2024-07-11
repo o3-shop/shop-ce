@@ -21,15 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Translarent shop manager (executed automatically), sets
+ * Transparent shop manager (executed automatically), sets
  * registration information and current shop object.
  *
  * @subpackage oxcmp
  */
-class ShopComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class ShopComponent extends BaseController
 {
     /**
      * Marking object as component
@@ -47,7 +48,7 @@ class ShopComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     {
         parent::render();
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         // is shop active?
         $oShop = $myConfig->getActiveShop();
@@ -56,7 +57,7 @@ class ShopComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         if (!$oShop->$sActiveField->value && 'oxstart' != $sClassName && !$this->isAdmin()) {
             // redirect to offline if there is no active shop
-            \OxidEsales\Eshop\Core\Registry::getUtils()->redirectOffline();
+            Registry::getUtils()->showOfflinePage();
         }
 
         return $oShop;

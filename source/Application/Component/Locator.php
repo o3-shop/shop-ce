@@ -21,20 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
 use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
+use OxidEsales\Eshop\Application\Model\SeoEncoderRecomm;
 use OxidEsales\Eshop\Application\Model\SeoEncoderVendor;
+use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
-use oxSeoEncoderRecomm;
-use oxSeoEncoderCategory;
 
 /**
  * Locator controller for: category, vendor, manufacturers and search lists.
  */
-class Locator extends \OxidEsales\Eshop\Core\Base
+class Locator extends Base
 {
     /**
      * Locator type
@@ -87,7 +90,7 @@ class Locator extends \OxidEsales\Eshop\Core\Base
 
         try {
             call_user_func([$this, $sLocfnc], $oLocatorTarget, $oCurrArticle);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->_sType = '';
             getLogger()->warning('Locator Type is wrong ' . $this->_sType);
         }
@@ -105,30 +108,41 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _setListLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->setListLocatorData($oLocatorTarget, $oCurrArticle);
+    }
+    
+    /**
+     * Sets details locator data for articles that came from regular list.
+     *
+     * @param FrontendController $oLocatorTarget view object
+     * @param Article            $oCurrArticle   current article
+     */
+    protected function setListLocatorData($oLocatorTarget, $oCurrArticle)
+    {
         // if no active category is loaded - lets check for category passed by post/get
         if (($oCategory = $oLocatorTarget->getActiveCategory())) {
             $sOrderBy = $oLocatorTarget->getSortingSql($oLocatorTarget->getSortIdent());
-            $oIdList = $this->_loadIdsInList($oCategory, $oCurrArticle, $sOrderBy);
+            $oIdList = $this->loadIdsInList($oCategory, $oCurrArticle, $sOrderBy);
 
             //page number
-            $iPage = $this->_findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
+            $iPage = $this->findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
 
             // setting product position in list, amount of articles etc
             $oCategory->iCntOfProd = $oIdList->count();
-            $oCategory->iProductPos = $this->_getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
+            $oCategory->iProductPos = $this->getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
 
             if (Registry::getUtils()->seoIsActive() && $iPage) {
-                /** @var \OxidEsales\Eshop\Application\Model\SeoEncoderCategory $oSeoEncoderCategory */
-                $oSeoEncoderCategory = Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class);
+                /** @var SeoEncoderCategory $oSeoEncoderCategory */
+                $oSeoEncoderCategory = Registry::get(SeoEncoderCategory::class);
                 $oCategory->toListLink = $oSeoEncoderCategory->getCategoryPageUrl($oCategory, $iPage);
             } else {
-                $oCategory->toListLink = $this->_makeLink($oCategory->getLink(), $this->_getPageNumber($iPage));
+                $oCategory->toListLink = $this->makeLink($oCategory->getLink(), $this->getPageNumber($iPage));
             }
 
             $oNextProduct = $this->_oNextProduct;
             $oBackProduct = $this->_oBackProduct;
-            $oCategory->nextProductLink = $oNextProduct ? $this->_makeLink($oNextProduct->getLink(), '') : null;
-            $oCategory->prevProductLink = $oBackProduct ? $this->_makeLink($oBackProduct->getLink(), '') : null;
+            $oCategory->nextProductLink = $oNextProduct ? $this->makeLink($oNextProduct->getLink(), '') : null;
+            $oCategory->prevProductLink = $oBackProduct ? $this->makeLink($oBackProduct->getLink(), '') : null;
 
             // active category
             $oLocatorTarget->setActiveCategory($oCategory);
@@ -149,6 +163,17 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _setVendorLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->setVendorLocatorData($oLocatorTarget, $oCurrArticle);
+    }
+    
+    /**
+     * Sets details locator data for articles that came from vendor list.
+     *
+     * @param FrontendController $oLocatorTarget FrontendController object
+     * @param Article            $oCurrArticle   current article
+     */
+    protected function setVendorLocatorData($oLocatorTarget, $oCurrArticle)
+    {
         if (($oVendor = $oLocatorTarget->getActVendor())) {
             $sVendorId = $oVendor->getId();
             $myUtils = Registry::getUtils();
@@ -156,12 +181,12 @@ class Locator extends \OxidEsales\Eshop\Core\Base
             $blSeo = $myUtils->seoIsActive();
 
             // loading data for article navigation
-            $oIdList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $oIdList = oxNew(ArticleList::class);
             $oIdList->setCustomSorting($oLocatorTarget->getSortingSql($oLocatorTarget->getSortIdent()));
             $oIdList->loadVendorIds($sVendorId);
 
             //page number
-            $iPage = $this->_findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
+            $iPage = $this->findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
 
             $sAdd = null;
             if (!$blSeo) {
@@ -170,18 +195,18 @@ class Locator extends \OxidEsales\Eshop\Core\Base
 
             // setting product position in list, amount of articles etc
             $oVendor->iCntOfProd = $oIdList->count();
-            $oVendor->iProductPos = $this->_getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
+            $oVendor->iProductPos = $this->getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
 
             if ($blSeo && $iPage) {
                 $oVendor->toListLink = Registry::get(SeoEncoderVendor::class)->getVendorPageUrl($oVendor, $iPage);
             } else {
-                $oVendor->toListLink = $this->_makeLink($oVendor->getLink(), $this->_getPageNumber($iPage));
+                $oVendor->toListLink = $this->makeLink($oVendor->getLink(), $this->getPageNumber($iPage));
             }
 
             $oNextProduct = $this->_oNextProduct;
             $oBackProduct = $this->_oBackProduct;
-            $oVendor->nextProductLink = $oNextProduct ? $this->_makeLink($oNextProduct->getLink(), $sAdd) : null;
-            $oVendor->prevProductLink = $oBackProduct ? $this->_makeLink($oBackProduct->getLink(), $sAdd) : null;
+            $oVendor->nextProductLink = $oNextProduct ? $this->makeLink($oNextProduct->getLink(), $sAdd) : null;
+            $oVendor->prevProductLink = $oBackProduct ? $this->makeLink($oBackProduct->getLink(), $sAdd) : null;
         }
     }
 
@@ -194,6 +219,17 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _setManufacturerLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->setManufacturerLocatorData($oLocatorTarget, $oCurrArticle);
+    }
+    
+    /**
+     * Sets details locator data for articles that came from Manufacturer list.
+     *
+     * @param FrontendController $oLocatorTarget FrontendController object
+     * @param Article            $oCurrArticle   current article
+     */
+    protected function setManufacturerLocatorData($oLocatorTarget, $oCurrArticle)
+    {
         if (($oManufacturer = $oLocatorTarget->getActManufacturer())) {
             $sManufacturerId = $oManufacturer->getId();
             $myUtils = Registry::getUtils();
@@ -201,12 +237,12 @@ class Locator extends \OxidEsales\Eshop\Core\Base
             $blSeo = $myUtils->seoIsActive();
 
             // loading data for article navigation
-            $oIdList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $oIdList = oxNew(ArticleList::class);
             $oIdList->setCustomSorting($oLocatorTarget->getSortingSql($oLocatorTarget->getSortIdent()));
             $oIdList->loadManufacturerIds($sManufacturerId);
 
             //page number
-            $iPage = $this->_findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
+            $iPage = $this->findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
 
             $sAdd = null;
             if (!$blSeo) {
@@ -215,20 +251,20 @@ class Locator extends \OxidEsales\Eshop\Core\Base
 
             // setting product position in list, amount of articles etc
             $oManufacturer->iCntOfProd = $oIdList->count();
-            $oManufacturer->iProductPos = $this->_getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
+            $oManufacturer->iProductPos = $this->getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
 
             if ($blSeo && $iPage) {
                 /** @var SeoEncoderManufacturer $oSeoEncoderManufacturer */
                 $oSeoEncoderManufacturer = Registry::get(SeoEncoderManufacturer::class);
                 $oManufacturer->toListLink = $oSeoEncoderManufacturer->getManufacturerPageUrl($oManufacturer, $iPage);
             } else {
-                $oManufacturer->toListLink = $this->_makeLink($oManufacturer->getLink(), $this->_getPageNumber($iPage));
+                $oManufacturer->toListLink = $this->makeLink($oManufacturer->getLink(), $this->getPageNumber($iPage));
             }
 
             $oNextProduct = $this->_oNextProduct;
             $oBackProduct = $this->_oBackProduct;
-            $oManufacturer->nextProductLink = $oNextProduct ? $this->_makeLink($oNextProduct->getLink(), $sAdd) : null;
-            $oManufacturer->prevProductLink = $oBackProduct ? $this->_makeLink($oBackProduct->getLink(), $sAdd) : null;
+            $oManufacturer->nextProductLink = $oNextProduct ? $this->makeLink($oNextProduct->getLink(), $sAdd) : null;
+            $oManufacturer->prevProductLink = $oBackProduct ? $this->makeLink($oBackProduct->getLink(), $sAdd) : null;
 
             // active Manufacturer
             $oLocatorTarget->setActiveCategory($oManufacturer);
@@ -249,28 +285,39 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _setSearchLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->setSearchLocatorData($oLocatorTarget, $oCurrArticle);
+    }
+    
+    /**
+     * Sets details locator data for articles that came from search list.
+     *
+     * @param FrontendController $oLocatorTarget FrontendController object
+     * @param Article            $oCurrArticle   current article
+     */
+    protected function setSearchLocatorData($oLocatorTarget, $oCurrArticle)
+    {
         if (($oSearchCat = $oLocatorTarget->getActSearch())) {
             // #1834/1184M - specialchar search
-            $sSearchParam = Registry::getConfig()->getRequestParameter('searchparam', true);
-            $sSearchFormParam = Registry::getConfig()->getRequestParameter('searchparam');
+            $sSearchParam = Registry::getRequest()->getRequestEscapedParameter('searchparam', true);
+            $sSearchFormParam = Registry::getRequest()->getRequestEscapedParameter('searchparam');
             $sSearchLinkParam = rawurlencode($sSearchParam);
 
-            $sSearchCat = Registry::getConfig()->getRequestParameter('searchcnid');
+            $sSearchCat = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
             $sSearchCat = $sSearchCat ? rawurldecode($sSearchCat) : $sSearchCat;
 
-            $sSearchVendor = Registry::getConfig()->getRequestParameter('searchvendor');
+            $sSearchVendor = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
             $sSearchVendor = $sSearchVendor ? rawurldecode($sSearchVendor) : $sSearchVendor;
 
-            $sSearchManufacturer = Registry::getConfig()->getRequestParameter('searchmanufacturer');
+            $sSearchManufacturer = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
             $sSearchManufacturer = $sSearchManufacturer ? rawurldecode($sSearchManufacturer) : $sSearchManufacturer;
 
             // loading data for article navigation
-            $oIdList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $oIdList = oxNew(ArticleList::class);
             $oIdList->setCustomSorting($oLocatorTarget->getSortingSql($oLocatorTarget->getSortIdent()));
             $oIdList->loadSearchIds($sSearchParam, $sSearchCat, $sSearchVendor, $sSearchManufacturer);
 
             //page number
-            $iPage = $this->_findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
+            $iPage = $this->findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
 
             $sAddSearch = "searchparam={$sSearchLinkParam}";
             $sAddSearch .= '&amp;listtype=search';
@@ -289,15 +336,15 @@ class Locator extends \OxidEsales\Eshop\Core\Base
 
             // setting product position in list, amount of articles etc
             $oSearchCat->iCntOfProd = $oIdList->count();
-            $oSearchCat->iProductPos = $this->_getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
+            $oSearchCat->iProductPos = $this->getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
 
-            $sPageNr = $this->_getPageNumber($iPage);
+            $sPageNr = $this->getPageNumber($iPage);
             $sParams = $sPageNr . ($sPageNr ? '&amp;' : '') . $sAddSearch;
-            $oSearchCat->toListLink = $this->_makeLink($oSearchCat->link, $sParams);
+            $oSearchCat->toListLink = $this->makeLink($oSearchCat->link, $sParams);
             $oNextProd = $this->_oNextProduct;
             $oBackProd = $this->_oBackProduct;
-            $oSearchCat->nextProductLink = $oNextProd ? $this->_makeLink($oNextProd->getLink(), $sAddSearch) : null;
-            $oSearchCat->prevProductLink = $oBackProd ? $this->_makeLink($oBackProd->getLink(), $sAddSearch) : null;
+            $oSearchCat->nextProductLink = $oNextProd ? $this->makeLink($oNextProd->getLink(), $sAddSearch) : null;
+            $oSearchCat->prevProductLink = $oBackProd ? $this->makeLink($oBackProd->getLink(), $sAddSearch) : null;
 
             $sFormat = Registry::getLang()->translateString('SEARCH_RESULT');
             $oLocatorTarget->setSearchTitle(sprintf($sFormat, $sSearchFormParam));
@@ -320,33 +367,34 @@ class Locator extends \OxidEsales\Eshop\Core\Base
     {
         if (($oRecommList = $oLocatorTarget->getActiveRecommList())) {
             // loading data for article navigation
-            $oIdList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $oIdList = oxNew(ArticleList::class);
             $oIdList->loadRecommArticleIds($oRecommList->getId(), null);
 
             //page number
-            $iPage = $this->_findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
+            $iPage = $this->findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
 
-            $sSearchRecomm = Registry::getConfig()->getRequestParameter('searchrecomm', true);
+            $sAddSearch = '';
+            $sSearchRecomm = Registry::getRequest()->getRequestEscapedParameter('searchrecomm', true);
 
             if ($sSearchRecomm !== null) {
-                $sSearchFormRecomm = Registry::getConfig()->getRequestParameter('searchrecomm');
+                $sSearchFormRecomm = Registry::getRequest()->getRequestEscapedParameter('searchrecomm');
                 $sSearchLinkRecomm = rawurlencode($sSearchRecomm);
                 $sAddSearch = 'searchrecomm=' . $sSearchLinkRecomm;
             }
 
             // setting product position in list, amount of articles etc
             $oRecommList->iCntOfProd = $oIdList->count();
-            $oRecommList->iProductPos = $this->_getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
+            $oRecommList->iProductPos = $this->getProductPos($oCurrArticle, $oIdList, $oLocatorTarget);
             $blSeo = Registry::getUtils()->seoIsActive();
 
             if ($blSeo && $iPage) {
-                /** @var \OxidEsales\Eshop\Application\Model\SeoEncoderRecomm $oSeoEncoderRecomm */
-                $oSeoEncoderRecomm = Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class);
+                /** @var SeoEncoderRecomm $oSeoEncoderRecomm */
+                $oSeoEncoderRecomm = Registry::get(SeoEncoderRecomm::class);
                 $oRecommList->toListLink = $oSeoEncoderRecomm->getRecommPageUrl($oRecommList, $iPage);
             } else {
-                $oRecommList->toListLink = $this->_makeLink($oRecommList->getLink(), $this->_getPageNumber($iPage));
+                $oRecommList->toListLink = $this->makeLink($oRecommList->getLink(), $this->getPageNumber($iPage));
             }
-            $oRecommList->toListLink = $this->_makeLink($oRecommList->toListLink, $sAddSearch);
+            $oRecommList->toListLink = $this->makeLink($oRecommList->toListLink, $sAddSearch);
 
             $sAdd = '';
             if (!$blSeo) {
@@ -355,8 +403,8 @@ class Locator extends \OxidEsales\Eshop\Core\Base
             $sAdd .= $sAddSearch;
             $oNextProduct = $this->_oNextProduct;
             $oBackProduct = $this->_oBackProduct;
-            $oRecommList->nextProductLink = $oNextProduct ? $this->_makeLink($oNextProduct->getLink(), $sAdd) : null;
-            $oRecommList->prevProductLink = $oBackProduct ? $this->_makeLink($oBackProduct->getLink(), $sAdd) : null;
+            $oRecommList->nextProductLink = $oNextProduct ? $this->makeLink($oNextProduct->getLink(), $sAdd) : null;
+            $oRecommList->prevProductLink = $oBackProduct ? $this->makeLink($oBackProduct->getLink(), $sAdd) : null;
 
             $oLang = Registry::getLang();
             $sTitle = $oLang->translateString('RECOMMLIST');
@@ -371,7 +419,7 @@ class Locator extends \OxidEsales\Eshop\Core\Base
     /**
      * Setting product position in list, amount of articles etc
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCategory    active category id
+     * @param Category $oCategory    active category id
      * @param object                                       $oCurrArticle current article
      * @param string                                       $sOrderBy     order by fields
      *
@@ -380,7 +428,21 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _loadIdsInList($oCategory, $oCurrArticle, $sOrderBy = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oIdList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        return $this->loadIdsInList($oCategory, $oCurrArticle, $sOrderBy);
+    }
+    
+    /**
+     * Setting product position in list, amount of articles etc
+     *
+     * @param Category $oCategory    active category id
+     * @param object                                       $oCurrArticle current article
+     * @param string                                       $sOrderBy     order by fields
+     *
+     * @return object
+     */
+    protected function loadIdsInList($oCategory, $oCurrArticle, $sOrderBy = null)
+    {
+        $oIdList = oxNew(ArticleList::class);
         $oIdList->setCustomSorting($sOrderBy);
 
         // additionally check if this category is loaded and is price category ?
@@ -412,6 +474,19 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _makeLink($sLink, $sParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->makeLink($sLink, $sParams);
+    }
+    
+    /**
+     * Appends urs with currently passed parameters
+     *
+     * @param string $sLink   url to add parameters
+     * @param string $sParams parameters to add to url
+     *
+     * @return string
+     */
+    protected function makeLink($sLink, $sParams)
+    {
         if ($sParams) {
             $sLink .= ((strpos($sLink, '?') !== false) ? '&amp;' : '?') . $sParams;
         }
@@ -432,12 +507,27 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _findActPageNumber($iPageNr, $oIdList = null, $oArticle = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->findActPageNumber($iPageNr, $oIdList, $oArticle);
+    }
+    
+    /**
+     * If page number is not passed trying to fetch it from list of ids. To search
+     * for position in list, article ids list and current article id must be passed
+     *
+     * @param int       $iPageNr  current page number (user defined or passed by request)
+     * @param ListModel $oIdList  list of article ids (optional)
+     * @param Article   $oArticle active article id (optional)
+     *
+     * @return int
+     */
+    protected function findActPageNumber($iPageNr, $oIdList = null, $oArticle = null)
+    {
         //page number
         $iPageNr = (int) $iPageNr;
 
         // maybe there is no page number passed, but we still can find the position in id's list
         if (!$iPageNr && $oIdList && $oArticle) {
-            $iNrofCatArticles = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+            $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
             $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
             $sParentIdField = 'oxarticles__oxparentid';
             $sArticleId = $oArticle->$sParentIdField->value ? $oArticle->$sParentIdField->value : $oArticle->getId();
@@ -458,6 +548,18 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getPageNumber($iPageNr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getPageNumber($iPageNr);
+    }
+    
+    /**
+     * Gets current page number.
+     *
+     * @param int $iPageNr page number
+     *
+     * @return string $sPageNum
+     */
+    protected function getPageNumber($iPageNr)
+    {
         //page number
         $iPageNr = (int) $iPageNr;
 
@@ -475,6 +577,20 @@ class Locator extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductPos" in next major
      */
     protected function _getProductPos($oArticle, $oIdList, $oLocatorTarget) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getProductPos($oArticle, $oIdList, $oLocatorTarget);
+    }
+    
+    /**
+     * Searches for current article in article list and sets previous/next product ids
+     *
+     * @param Article            $oArticle       current Article
+     * @param object             $oIdList        articles list containing only fake article objects !!!
+     * @param FrontendController $oLocatorTarget FrontendController object
+     *
+     * @return integer
+     */
+    protected function getProductPos($oArticle, $oIdList, $oLocatorTarget)
     {
         // variant handling
         $sOxid = $oArticle->oxarticles__oxparentid->value

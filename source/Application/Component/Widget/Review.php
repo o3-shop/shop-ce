@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Product reviews widget
  */
@@ -124,7 +126,7 @@ class Review extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContro
      */
     public function getReviews()
     {
-        $oReview = $this->getConfig()->getTopActiveView();
+        $oReview = Registry::getConfig()->getTopActiveView();
 
         return $oReview->getReviews();
     }

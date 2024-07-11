@@ -34,7 +34,7 @@ class CategoryTree extends \OxidEsales\Eshop\Application\Component\Widget\Widget
     /**
      * Names of components (classes) that are initiated and executed
      * before any other regular operation.
-     * Cartegory component used in template.
+     * Category component used in template.
      *
      * @var array
      */

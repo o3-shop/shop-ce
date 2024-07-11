@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Vendor list widget.
  * Forms vendor list.
@@ -34,6 +36,8 @@ class VendorList extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      */
     protected $_sThisTemplate = 'widget/footer/vendorlist.tpl';
 
+    protected $_aVendorlist = null;
+
     /**
      * Template variable getter. Returns vendorlist for search
      *
@@ -43,7 +47,7 @@ class VendorList extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     {
         if ($this->_aVendorlist === null) {
             $oVendorTree = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
-            $oVendorTree->buildVendorTree('vendorlist', null, $this->getConfig()->getShopHomeUrl());
+            $oVendorTree->buildVendorTree('vendorlist', null, Registry::getConfig()->getShopHomeUrl());
             $this->_aVendorlist = $oVendorTree;
         }
 

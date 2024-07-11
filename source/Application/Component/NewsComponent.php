@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use OxidEsales\Eshop\Application\Model\NewsList;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
- * News list manager, loads some news informetion.
+ * News list manager, loads some news information.
  *
  * @subpackage oxcmp
  *
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class NewsComponent extends BaseController
 {
     /**
      * Marking object as component
@@ -42,13 +46,13 @@ class NewsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * news array element (if user in admin sets to show more than 1
      * item in news box - will return whole array).
      *
-     * @return array $oActNews a List of news, or null if not configured to load news
+     * @return array|void $oActNews a List of news, or null if not configured to load news
      */
     public function render()
     {
         parent::render();
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oActView = $myConfig->getActiveView();
 
         // news loading is disabled
@@ -71,7 +75,7 @@ class NewsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $iNewsToLoad = $myConfig->getConfigParam('sCntOfNewsLoaded');
         $iNewsToLoad = $iNewsToLoad ? $iNewsToLoad : 1;
 
-        $oActNews = oxNew(\OxidEsales\Eshop\Application\Model\NewsList::class);
+        $oActNews = oxNew(NewsList::class);
         $oActNews->loadNews(0, $iNewsToLoad);
 
         return $oActNews;

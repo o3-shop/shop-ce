@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Controller\RecommListController;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+
 /**
  * Recomendation list.
  * Forms recomendation list.
@@ -54,7 +57,7 @@ class Recommendation extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         $aArticleIds = $this->getViewParameter("aArticleIds");
 
-        $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+        $oRecommList = oxNew(RecommendationList::class);
 
         return $oRecommList->getRecommListsByIds($aArticleIds);
     }
@@ -66,6 +69,6 @@ class Recommendation extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      */
     public function getRecommList()
     {
-        return oxNew(\OxidEsales\Eshop\Application\Controller\RecommListController::class);
+        return oxNew(RecommListController::class);
     }
 }
