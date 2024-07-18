@@ -24,7 +24,6 @@ use OxidEsales\Eshop\Application\Model\Object2Role;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 use oxDb;
 use oxField;
 

@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin article main discount manager.
  * There is possibility to change discount name, article, user

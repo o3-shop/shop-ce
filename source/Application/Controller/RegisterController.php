@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxField;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * User registration window.

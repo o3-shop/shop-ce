@@ -30,7 +30,6 @@ use OxidEsales\Eshop\Core\UtilsObject;
 use oxNoArticleException;
 use oxOrder;
 use oxOutOfStockException;
-use oxRegistry;
 use oxUtilsObject;
 
 /**

@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin category main attributes manager.
  * There is possibility to change attribute description, assign categories to

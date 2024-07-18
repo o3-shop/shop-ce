@@ -22,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxUtilsDate;
-use oxRegistry;
 use oxField;
 use oxPaymentList;
 

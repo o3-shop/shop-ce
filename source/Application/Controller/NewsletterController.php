@@ -24,7 +24,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 use oxField;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Newsletter opt-in/out.

@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin user payment settings manager.
  * Collects user payment settings, updates it on user submit, etc.

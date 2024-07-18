@@ -25,7 +25,6 @@ use oxField;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxObjectException;
-use oxRegistry;
 
 /**
  * Current user recommlist manager.

@@ -25,7 +25,6 @@ use oxField;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * PriceAlarm window.

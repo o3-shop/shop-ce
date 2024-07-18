@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * @deprecated Functionality for Newsletter management will be removed.
  * Newsletter plain manager.

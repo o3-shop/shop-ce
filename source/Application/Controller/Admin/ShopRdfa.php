@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Admin shop system RDFa manager.

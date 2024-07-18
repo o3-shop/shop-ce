@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxRegistry;
-
 /**
  * Interesting, useful links window.
  * Arranges interesting links window (contents may be changed in

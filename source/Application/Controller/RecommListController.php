@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 use oxrecommlist;
 use oxUBase;
 use oxRssFeed;

@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
 use oxStr;
-use oxRegistry;
 use oxAdminDetails;
 
 /**

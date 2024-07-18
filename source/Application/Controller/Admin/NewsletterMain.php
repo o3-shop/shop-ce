@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin article main newsletter manager.
  * Performs collection and updatind (on user submit) main item information.

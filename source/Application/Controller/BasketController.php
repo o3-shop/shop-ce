@@ -24,7 +24,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 use oxArticle;
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 use oxList;
 use oxBasketContentMarkGenerator;
 use oxBasket;

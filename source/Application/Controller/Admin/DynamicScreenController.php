@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin dynscreen manager.
  * Returns template, that arranges two other templates ("dynscreen_list.tpl"

@@ -22,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Admin shop list manager.

@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Registry;
 use Doctrine\DBAL\Exception\ConnectionException;
-use oxRegistry;
 use oxDb;
 use oxNoJsValidator;
 use Exception;

@@ -31,7 +31,6 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
 use oxPaymentList;
-use oxRegistry;
 use oxField;
 use oxVariantSelectList;
 

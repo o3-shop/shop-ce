@@ -38,7 +38,6 @@ use oxManufacturer;
 use oxManufacturerList;
 use oxPrice;
 use oxRecommList;
-use oxRegistry;
 use oxShop;
 use oxVendor;
 use oxViewConfig;

@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin article attributes/selections lists manager.
  * Collects available attributes/selections lists for chosen article, may add

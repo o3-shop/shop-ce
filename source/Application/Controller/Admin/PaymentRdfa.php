@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
-use oxRegistry;
 use oxDb;
 use stdClass;
 use oxField;

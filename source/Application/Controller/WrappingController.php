@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use oxList;
-use oxRegistry;
 use oxUBase;
 
 /**

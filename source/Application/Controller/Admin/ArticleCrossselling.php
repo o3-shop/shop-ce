@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-
 /**
  * Admin article crosselling/accesories manager.
  * Creates list of available articles, there is ability to assign or remove
