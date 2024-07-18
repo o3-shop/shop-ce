@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -49,7 +50,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     {
         parent::render();
 
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         ini_set("session.gc_maxlifetime", 36000);
 
@@ -97,7 +98,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     protected function countActivePriceAlerts()
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $shopId = $config->getShopId();
 
         $activeAlarmsQuery =
@@ -128,7 +129,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     protected function sendPriceChangeNotifications($start, $limit)
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
         $shopId = $config->getShopId();
 

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -70,7 +71,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         // looking for table/view
         $articlesViewName = $this->_getViewName('oxarticles');
@@ -109,7 +110,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function _addFilter($query) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $articleViewName = $this->_getViewName('oxarticles');
         $query = parent::_addFilter($query);
 
@@ -124,11 +125,11 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function removeManufacturer()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $articleIds = $this->_getActionIds('oxarticles.oxid');
         $manufacturerId = $config->getRequestParameter('oxid');
 
-        if ($this->getConfig()->getRequestParameter("all")) {
+        if (Registry::getConfig()->getRequestParameter("all")) {
             $articleViewTable = $this->_getViewName('oxarticles');
             $articleIds = $this->_getAll($this->_addFilter("select $articleViewTable.oxid " . $this->_getQuery()));
         }
@@ -161,7 +162,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addManufacturer()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $articleIds = $this->_getActionIds('oxarticles.oxid');
         $manufacturerId = $config->getRequestParameter('synchoxid');

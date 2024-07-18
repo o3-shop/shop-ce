@@ -100,7 +100,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
 
             // Load user Orderlist
             if ($oUser = $this->getUser()) {
-                $iNrofCatArticles = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+                $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
                 $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
                 $this->_iAllArtCnt = $oUser->getOrderCount();
                 if ($this->_iAllArtCnt && $this->_iAllArtCnt > 0) {

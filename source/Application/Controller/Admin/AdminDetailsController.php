@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\TextEditorHandler;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 
 /**
@@ -89,9 +90,9 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         // A. replace ONLY if long description is not processed by smarty, or users will not be able to
         // store smarty tags ([{$shop->currenthomedir}]/[{$oViewConf->getCurrentHomeDir()}]) in long
         // descriptions, which are filled dynamically
-        if (!$this->getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
+        if (!Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
             $aReplace = ['[{$shop->currenthomedir}]', '[{$oViewConf->getCurrentHomeDir()}]'];
-            $sValue = str_replace($aReplace, $this->getConfig()->getCurrentShopURL(false), $sValue);
+            $sValue = str_replace($aReplace, Registry::getConfig()->getCurrentShopURL(false), $sValue);
         }
 
         return $sValue;

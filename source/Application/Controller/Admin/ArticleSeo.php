@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -395,7 +396,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
 
         $sId = $this->_getSaveObjectId();
         $iLang = (int) $this->getEditLang();
-        $iShopId = $this->getConfig()->getShopId();
+        $iShopId = Registry::getConfig()->getShopId();
         $sParam = $this->processParam($this->getActCatId());
 
         $sQ = "select oxfixed from oxseo where

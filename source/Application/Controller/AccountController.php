@@ -207,7 +207,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * For some user actions (like writing product
      * review) user must be logged in. So e.g. in product details page
      * there is a link leading to current view. Link contains parameter
-     * "sourcecl", which tells where to redirect after successfull login.
+     * "sourcecl", which tells where to redirect after successful login.
      * If this parameter is defined and oxcmp_user::getLoginStatus() ==
      * USER_LOGIN_SUCCESS (means user has just logged in) then user is
      * redirected back to source view.
@@ -221,7 +221,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
             ($sourceClass = Registry::getConfig()->getRequestParameter("sourcecl")) &&
             $this->_oaComponents['oxcmp_user']->getLoginStatus() === USER_LOGIN_SUCCESS
         ) {
-            $redirectUrl = $this->getConfig()->getShopUrl() . 'index.php?cl=' . rawurlencode($sourceClass);
+            $redirectUrl = Registry::getConfig()->getShopUrl() . 'index.php?cl=' . rawurlencode($sourceClass);
 
             // building redirect link
             foreach ($this->getNavigationParams() as $key => $value) {
@@ -366,7 +366,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $title = parent::getTitle();
 
-        if ($this->getConfig()->getActiveView()->getClassName() == 'account') {
+        if (Registry::getConfig()->getActiveView()->getClassName() == 'account') {
             $baseLanguageId = Registry::getLang()->getBaseLanguage();
             $title = Registry::getLang()->translateString('PAGE_TITLE_ACCOUNT', $baseLanguageId, false);
             if ($user = $this->getUser()) {
@@ -390,7 +390,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
          * Setting derived to false allows mall users to delete their account being in a different shop as the shop
          * the account was originally created in.
          */
-        if ($this->getConfig()->getConfigParam('blMallUsers')) {
+        if (Registry::getConfig()->getConfigParam('blMallUsers')) {
             $user->setIsDerived(false);
         }
 
@@ -419,7 +419,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Template variable getter. Returns true, if a user account has been sucessfully deleted, else false.
+     * Template variable getter. Returns true, if a user account has been successfully deleted, else false.
      *
      * @return bool
      */

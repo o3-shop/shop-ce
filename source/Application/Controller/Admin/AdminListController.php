@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -177,7 +178,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->_iViewListSize) {
-            $config = $this->getConfig();
+            $config = Registry::getConfig();
             if ($profile = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('profile')) {
                 if (isset($profile[1])) {
                     $config->setConfigParam('iAdminListSize', (int)$profile[1]);
@@ -516,7 +517,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
             if (is_array($filter)) {
                 $listItem = $this->getItemListBaseObject();
                 $languageId = $listItem->isMultilang() ? $listItem->getLanguage() : \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-                $localDateFormat = $this->getConfig()->getConfigParam('sLocalDateFormat');
+                $localDateFormat = Registry::getConfig()->getConfigParam('sLocalDateFormat');
 
                 foreach ($filter as $table => $filterData) {
                     foreach ($filterData as $name => $value) {
@@ -799,7 +800,7 @@ class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin
 
             \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('tabelle', $this->_sListClass);
             $this->_aViewData['listTable'] = getViewName($listObject->getCoreTableName());
-            $this->getConfig()->setGlobalParameter('ListCoreTable', $listObject->getCoreTableName());
+            Registry::getConfig()->setGlobalParameter('ListCoreTable', $listObject->getCoreTableName());
 
             if ($listObject->isMultilang()) {
                 // is the object multilingual?

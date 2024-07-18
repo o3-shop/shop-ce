@@ -138,7 +138,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
             } else {
                 $oUser->oxuser__oxactive = new Field(1, Field::T_RAW);
                 $oUser->oxuser__oxrights = new Field('user', Field::T_RAW);
-                $oUser->oxuser__oxshopid = new Field($this->getConfig()->getShopId(), Field::T_RAW);
+                $oUser->oxuser__oxshopid = new Field(Registry::getConfig()->getShopId(), Field::T_RAW);
                 $oUser->oxuser__oxfname = new Field($aParams['oxuser__oxfname'], Field::T_RAW);
                 $oUser->oxuser__oxlname = new Field($aParams['oxuser__oxlname'], Field::T_RAW);
                 $oUser->oxuser__oxsal = new Field($aParams['oxuser__oxsal'], Field::T_RAW);
@@ -155,7 +155,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
             //removing user from subscribe list before adding
             $oUser->setNewsSubscription(false, false);
 
-            $blOrderOptInEmail = $this->getConfig()->getConfigParam('blOrderOptInEmail');
+            $blOrderOptInEmail = Registry::getConfig()->getConfigParam('blOrderOptInEmail');
             if ($oUser->setNewsSubscription(true, $blOrderOptInEmail)) {
                 // done, confirmation required?
                 if ($blOrderOptInEmail) {
@@ -228,7 +228,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     {
         if ($this->_oActionArticles === null) {
             $this->_oActionArticles = false;
-            if ($this->getConfig()->getConfigParam('bl_perfLoadAktion')) {
+            if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
                 $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
                 $oArtList->loadActionArticles('OXTOPSTART');
                 if ($oArtList->count()) {
@@ -267,7 +267,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     {
         if ($this->_sHomeCountryId === null) {
             $this->_sHomeCountryId = false;
-            $aHomeCountry = $this->getConfig()->getConfigParam('aHomeCountry');
+            $aHomeCountry = Registry::getConfig()->getConfigParam('aHomeCountry');
             if (is_array($aHomeCountry)) {
                 $this->_sHomeCountryId = current($aHomeCountry);
             }

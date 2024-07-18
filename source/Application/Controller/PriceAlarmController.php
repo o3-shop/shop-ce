@@ -76,7 +76,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
      */
     public function addme()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $myUtils = Registry::getUtils();
 
         $aParams = Registry::getConfig()->getRequestParameter('pa');
@@ -118,7 +118,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
             $this->_sBidPrice = false;
 
             $aParams = $this->_getParams();
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
             $iPrice = Registry::getUtils()->currency2Float($aParams['price']);
             $this->_sBidPrice = Registry::getLang()->formatCurrency($iPrice, $oCur);
         }

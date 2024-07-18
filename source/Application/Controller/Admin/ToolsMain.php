@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 
 /**
@@ -38,7 +39,7 @@ class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
      */
     public function render()
     {
-        if ($this->getConfig()->isDemoShop()) {
+        if (Registry::getConfig()->isDemoShop()) {
             \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Access denied !");
         }
 
@@ -48,7 +49,7 @@ class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         $oAuthUser->loadAdminUser();
         $this->_aViewData["blIsMallAdmin"] = $oAuthUser->oxuser__oxrights->value == "malladmin";
 
-        $blShowUpdateViews = $this->getConfig()->getConfigParam('blShowUpdateViews');
+        $blShowUpdateViews = Registry::getConfig()->getConfigParam('blShowUpdateViews');
         $this->_aViewData['showViewUpdate'] = (isset($blShowUpdateViews) && !$blShowUpdateViews) ? false : true;
 
         return "tools_main.tpl";

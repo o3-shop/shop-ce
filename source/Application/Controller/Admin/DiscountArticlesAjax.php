@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -74,7 +75,7 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
@@ -125,7 +126,7 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $aChosenArt = $this->_getActionIds('oxobject2discount.oxid');
 
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = parent::_addFilter("delete oxobject2discount.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -139,7 +140,7 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addDiscArt()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $articleIds = $this->_getActionIds('oxarticles.oxid');
         $discountListId = $config->getRequestParameter('synchoxid');
 

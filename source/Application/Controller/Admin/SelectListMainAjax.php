@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -79,7 +80,7 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         // looking for table/view
         $sArtTable = $this->_getViewName('oxarticles');

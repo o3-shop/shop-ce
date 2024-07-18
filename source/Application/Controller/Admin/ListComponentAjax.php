@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterAdminAjaxRequestProcessedEvent;
 
 /**
@@ -383,7 +384,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _getFilter() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sQ = '';
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $aFilter = $oConfig->getRequestParameter('aFilter');
         if (is_array($aFilter) && count($aFilter)) {
             $aCols = $this->_getVisibleColNames();
@@ -570,7 +571,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $aResponse['sort'] = '_' . $this->_getSortCol();
         $aResponse['dir'] = $this->_getSortDir();
 
-        $iDebug = $this->getConfig()->getConfigParam('iDebug');
+        $iDebug = Registry::getConfig()->getConfigParam('iDebug');
         if ($iDebug) {
             $aResponse['countsql'] = $sCountQ;
         }
@@ -612,7 +613,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             $aArtIds = [$aArtIds];
         }
 
-        $sShopId = $this->getConfig()->getShopId();
+        $sShopId = Registry::getConfig()->getShopId();
         foreach ($aArtIds as $sArtId) {
             /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
             \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
@@ -624,7 +625,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     public function resetContentCache()
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
             $this->_resetCaches();
@@ -642,7 +643,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     public function resetCounter($sCounterType, $sValue = null)
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
             $myUtilsCount = \OxidEsales\Eshop\Core\Registry::getUtilsCount();

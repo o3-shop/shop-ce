@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -69,7 +70,7 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         // looking for table/view
         $sUserTable = $this->_getViewName('oxuser');

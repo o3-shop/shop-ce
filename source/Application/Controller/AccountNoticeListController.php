@@ -25,7 +25,7 @@ use oxRegistry;
 
 /**
  * Current user notice list manager.
- * When user is logged in in this manager window he can modify
+ * When user is logged-in in this manager window he can modify
  * his notice list status - remove articles from notice list or
  * store them to shopping basket, view detail information.
  * O3-Shop -> MY ACCOUNT -> Newsletter.
@@ -40,14 +40,14 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
     protected $_sThisTemplate = 'page/account/noticelist.tpl';
 
     /**
-     * Check if there is an product in the noticelist.
+     * Check if there is a product in the noticelist.
      *
      * @var array
      */
     protected $_aNoticeProductList = null;
 
     /**
-     * return the similar prodcuts from the notice list.
+     * return the similar products from the notice list.
      *
      * @var array
      */

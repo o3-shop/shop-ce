@@ -206,7 +206,7 @@ class ContactController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getTitle()
     {
-        return $this->getConfig()->getActiveShop()->oxshops__oxcompany->value;
+        return Registry::getConfig()->getActiveShop()->oxshops__oxcompany->value;
     }
 
     /**

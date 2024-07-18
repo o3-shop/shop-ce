@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use Doctrine\DBAL\Exception\ConnectionException;
 use oxRegistry;
 use oxDb;
@@ -171,10 +172,10 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         if ($this->isValidLanguageData($this->_aLangData)) {
             //saving languages info
-            $this->getConfig()->saveShopConfVar('aarr', 'aLanguageParams', $this->_aLangData['params']);
-            $this->getConfig()->saveShopConfVar('aarr', 'aLanguages', $this->_aLangData['lang']);
-            $this->getConfig()->saveShopConfVar('arr', 'aLanguageURLs', $this->_aLangData['urls']);
-            $this->getConfig()->saveShopConfVar('arr', 'aLanguageSSLURLs', $this->_aLangData['sslUrls']);
+            Registry::getConfig()->saveShopConfVar('aarr', 'aLanguageParams', $this->_aLangData['params']);
+            Registry::getConfig()->saveShopConfVar('aarr', 'aLanguages', $this->_aLangData['lang']);
+            Registry::getConfig()->saveShopConfVar('arr', 'aLanguageURLs', $this->_aLangData['urls']);
+            Registry::getConfig()->saveShopConfVar('arr', 'aLanguageSSLURLs', $this->_aLangData['sslUrls']);
             //checking if added language already has created multilang fields
             //with new base ID - if not, creating new fields
             if ($blNewLanguage) {
@@ -203,7 +204,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected function _getLanguageInfo($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDefaultLang = $this->getConfig()->getConfigParam('sDefaultLang');
+        $sDefaultLang = Registry::getConfig()->getConfigParam('sDefaultLang');
 
         $aLangData = $this->_aLangData['params'][$sOxId];
         $aLangData['abbr'] = $sOxId;
@@ -236,10 +237,10 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected function _getLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aLangData['params'] = $this->getConfig()->getConfigParam('aLanguageParams');
-        $aLangData['lang'] = $this->getConfig()->getConfigParam('aLanguages');
-        $aLangData['urls'] = $this->getConfig()->getConfigParam('aLanguageURLs');
-        $aLangData['sslUrls'] = $this->getConfig()->getConfigParam('aLanguageSSLURLs');
+        $aLangData['params'] = Registry::getConfig()->getConfigParam('aLanguageParams');
+        $aLangData['lang'] = Registry::getConfig()->getConfigParam('aLanguages');
+        $aLangData['urls'] = Registry::getConfig()->getConfigParam('aLanguageURLs');
+        $aLangData['sslUrls'] = Registry::getConfig()->getConfigParam('aLanguageSSLURLs');
 
         // empty languages parameters array - creating new one with default values
         if (!is_array($aLangData['params'])) {
@@ -333,7 +334,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     protected function _setDefaultLang($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sDefaultId = $this->_aLangData['params'][$sOxId]['baseId'];
-        $this->getConfig()->saveShopConfVar('str', 'sDefaultLang', $sDefaultId);
+        Registry::getConfig()->saveShopConfVar('str', 'sDefaultLang', $sDefaultId);
     }
 
     /**
@@ -373,7 +374,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected function _checkLangTranslations($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $sDir = dirname($myConfig->getTranslationsDir('lang.php', $sOxId));
 

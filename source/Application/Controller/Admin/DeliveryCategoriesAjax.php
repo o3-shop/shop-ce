@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -60,8 +61,8 @@ class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         // looking for table/view
         $sCatTable = $this->_getViewName('oxcategories');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDelId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchDelId = $this->getConfig()->getRequestParameter('synchoxid');
+        $sDelId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchDelId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDelId) {
@@ -98,7 +99,7 @@ class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         $aChosenCat = $this->_getActionIds('oxobject2delivery.oxid');
 
         // removing all
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
@@ -114,10 +115,10 @@ class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     public function addCatToDel()
     {
         $aChosenCat = $this->_getActionIds('oxcategories.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sCatTable = $this->_getViewName('oxcategories');
             $aChosenCat = $this->_getAll($this->_addFilter("select $sCatTable.oxid " . $this->_getQuery()));
         }

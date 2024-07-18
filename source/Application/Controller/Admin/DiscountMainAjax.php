@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -58,7 +59,7 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $sCountryTable = $this->_getViewName('oxcountry');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $sId = $oConfig->getRequestParameter('oxid');
@@ -85,7 +86,7 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function removeDiscCountry()
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $aChosenCntr = $this->_getActionIds('oxobject2discount.oxid');
         if ($oConfig->getRequestParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
@@ -101,7 +102,7 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function addDiscCountry()
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
         $soxId = $oConfig->getRequestParameter('synchoxid');
 

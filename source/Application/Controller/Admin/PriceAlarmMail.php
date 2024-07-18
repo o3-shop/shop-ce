@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -39,7 +40,7 @@ class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         parent::render();
 

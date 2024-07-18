@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -70,7 +71,7 @@ class AttributeMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         $sArticleTable = $this->_getViewName('oxarticles');
@@ -122,7 +123,7 @@ class AttributeMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $sQ = parent::_addFilter($sQ);
 
         // display variants or not ?
-        if ($this->getConfig()->getConfigParam('blVariantsSelection')) {
+        if (Registry::getConfig()->getConfigParam('blVariantsSelection')) {
             $sQ .= ' group by ' . $this->_getViewName('oxarticles') . '.oxid ';
 
             $oStr = getStr();

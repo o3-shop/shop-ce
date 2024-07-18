@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -61,7 +62,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $sArticleTable = $this->_getViewName('oxarticles');
         $sViewName = $this->_getViewName('oxobject2category');
@@ -108,7 +109,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $sQ = parent::_addFilter($sQ);
 
         // display variants or not ?
-        $sQ .= $this->getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
+        $sQ .= Registry::getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
 
         return $sQ;
     }
@@ -119,7 +120,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     public function removeActionArticle()
     {
         $sActionId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        //$sActionId = $this->getConfig()->getConfigParam( 'oxid' );
+        //$sActionId = Registry::getConfig()->getConfigParam( 'oxid' );
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 

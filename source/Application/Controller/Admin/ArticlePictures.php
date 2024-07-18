@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxField;
 
@@ -59,7 +60,7 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             }
         }
 
-        $this->_aViewData["iPicCount"] = $this->getConfig()->getConfigParam('iPicCount');
+        $this->_aViewData["iPicCount"] = Registry::getConfig()->getConfigParam('iPicCount');
 
         return "article_pictures.tpl";
     }
@@ -71,7 +72,7 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     public function save()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if ($myConfig->isDemoShop()) {
             // disabling uploading pictures if this is demo shop
@@ -109,7 +110,7 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     public function deletePicture()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if ($myConfig->isDemoShop()) {
             // disabling uploading pictures if this is demo shop

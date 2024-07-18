@@ -317,7 +317,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _checkDemoShopDenials($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$this->getConfig()->isDemoShop()) {
+        if (!Registry::getConfig()->isDemoShop()) {
             // nothing to check for non demo shop
             return;
         }
@@ -575,7 +575,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
                 $reload = false;
                 $dynLang = $this->_getDynMenuLang();
 
-                $shopId = $this->getConfig()->getActiveShop()->getShopId();
+                $shopId = Registry::getConfig()->getActiveShop()->getShopId();
                 $cacheName = 'menu_' . $dynLang . $shopId . '_xml';
                 $cacheFile = $myOxUtlis->getCacheFilePath($cacheName);
                 $cacheContents = $myOxUtlis->fromFileCache($cacheName);
@@ -745,7 +745,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getAdminUrl() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if (($adminSslUrl = $myConfig->getConfigParam('sAdminSSLURL'))) {
             $url = trim($adminSslUrl, '/');
@@ -832,7 +832,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getDynMenuLang() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $lang = \OxidEsales\Eshop\Core\Registry::getLang();
 
         $dynLang = $myConfig->getConfigParam('iDynInterfaceLanguage');

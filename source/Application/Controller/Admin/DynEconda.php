@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin Econda manager.
  *
@@ -39,7 +41,7 @@ class DynEconda extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfi
     public function render()
     {
         parent::render();
-        $this->_aViewData['oxid'] = $this->getConfig()->getShopId();
+        $this->_aViewData['oxid'] = Registry::getConfig()->getShopId();
 
         return "dyn_econda.tpl";
     }

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -79,7 +80,7 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
             $sQGroups = " oxobject2group.oxobjectid is null ";
         }
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $iSendCnt = 0;
         $iMaxCnt = (int) $myConfig->getConfigParam('iCntofMails');

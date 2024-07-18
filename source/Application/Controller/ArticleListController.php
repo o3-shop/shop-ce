@@ -184,7 +184,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $category = $this->getCategoryToRender();
 
@@ -227,7 +227,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     protected function getCategoryToRender()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $this->_blIsCat = false;
 
@@ -386,7 +386,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     protected function _loadArticles($category) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $numberOfCategoryArticles = (int) $config->getConfigParam('iNrofCatArticles');
         $numberOfCategoryArticles = $numberOfCategoryArticles ? $numberOfCategoryArticles : 1;
@@ -525,7 +525,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
 
         // and final component ..
         //changed for #2776
-        if (($suffix = $this->getConfig()->getActiveShop()->oxshops__oxtitleprefix->value)) {
+        if (($suffix = Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value)) {
             $description .= " {$suffix}";
         }
 
@@ -788,7 +788,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     public function getTitleSuffix()
     {
         if ($this->getActiveCategory()->oxcategories__oxshowsuffix->value) {
-            return $this->getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
+            return Registry::getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
         }
     }
 
@@ -1035,7 +1035,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     {
         if ($this->_aBargainArticleList === null) {
             $this->_aBargainArticleList = [];
-            if ($this->getConfig()->getConfigParam('bl_perfLoadAktion') && $this->_isActCategory()) {
+            if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion') && $this->_isActCategory()) {
                 $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
                 $articleList->loadActionArticles('OXBARGAIN');
                 if ($articleList->count()) {
@@ -1095,7 +1095,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function canSelectDisplayType()
     {
-        return $this->getConfig()->getConfigParam('blShowListDisplayType');
+        return Registry::getConfig()->getConfigParam('blShowListDisplayType');
     }
 
     /**

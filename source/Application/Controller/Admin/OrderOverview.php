@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxField;
 use oxDb;
@@ -41,7 +42,7 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         parent::render();
 
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);

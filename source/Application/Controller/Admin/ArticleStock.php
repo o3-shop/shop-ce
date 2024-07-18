@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -42,7 +43,7 @@ class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         parent::render();
 
@@ -143,7 +144,7 @@ class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     public function addprice($sOXID = null, $aUpdateParams = null)
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $this->resetContentCache();
 

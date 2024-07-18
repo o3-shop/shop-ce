@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -41,7 +42,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         parent::render();
 
@@ -243,7 +244,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $masterDb->getOne("select oxid from oxcontents where oxloadid = :oxloadid and oxid != :oxid and oxshopid = :oxshopid", [
             ':oxloadid' => $sIdent,
             ':oxid' => $sOxId,
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
             ])
         ) {
             $blAllow = true;

@@ -123,7 +123,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
     public function render()
     {
         \OxidEsales\Eshop\Application\Controller\FrontendController::render();
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $this->_iAllArtCnt = 0;
 
@@ -153,7 +153,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
         }
 
         if ($oList && $oList->count()) {
-            $iNrofCatArticles = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+            $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
             $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
             $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
         }
@@ -280,7 +280,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
                 $iActPage = ($iActPage < 0) ? 0 : $iActPage;
 
                 // load only lists which we show on screen
-                $iNrofCatArticles = $this->getConfig()->getConfigParam('iNrofCatArticles');
+                $iNrofCatArticles = Registry::getConfig()->getConfigParam('iNrofCatArticles');
                 $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
 
                 $this->_aArticleList = $oActiveRecommList->getArticles(
@@ -343,7 +343,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
      */
     public function isReviewActive()
     {
-        return $this->getConfig()->getConfigParam('bl_perfLoadReviews');
+        return Registry::getConfig()->getConfigParam('bl_perfLoadReviews');
     }
 
     /**
@@ -452,7 +452,7 @@ class RecommListController extends \OxidEsales\Eshop\Application\Controller\Arti
         $aPath[0]->oxcategories__oxtitle = new Field($oLang->translateString('RECOMMLIST'));
 
         if ($sSearchParam = $this->getRecommSearch()) {
-            $shopHomeURL = $this->getConfig()->getShopHomeUrl();
+            $shopHomeURL = Registry::getConfig()->getShopHomeUrl();
             $sUrl = $shopHomeURL . "cl=recommlist&amp;searchrecomm=" . rawurlencode($sSearchParam);
             $sTitle = $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchParam . '"';
 

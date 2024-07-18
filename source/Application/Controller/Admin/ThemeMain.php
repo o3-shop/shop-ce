@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxTheme;
 use oxException;
@@ -71,8 +72,8 @@ class ThemeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
      */
     public function themeInConfigFile()
     {
-        $blThemeSet = isset($this->getConfig()->sTheme);
-        $blCustomThemeSet = isset($this->getConfig()->sCustomTheme);
+        $blThemeSet = isset(Registry::getConfig()->sTheme);
+        $blCustomThemeSet = isset(Registry::getConfig()->sCustomTheme);
 
         return ($blThemeSet || $blCustomThemeSet);
     }

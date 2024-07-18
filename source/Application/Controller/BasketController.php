@@ -122,7 +122,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      */
     public function render()
     {
-        if ($this->getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
+        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
             $this->getSession()->getBasketReservations()->renewExpiration();
         }
 
@@ -215,7 +215,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      */
     public function showBackToShop()
     {
-        $iNewBasketItemMessage = $this->getConfig()->getConfigParam('iNewBasketItemMessage');
+        $iNewBasketItemMessage = Registry::getConfig()->getConfigParam('iNewBasketItemMessage');
         $sBackToShop = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('_backtoshop');
 
         return ($iNewBasketItemMessage == 3 && $sBackToShop);
@@ -272,7 +272,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      */
     public function backToShop()
     {
-        if ($this->getConfig()->getConfigParam('iNewBasketItemMessage') == 3) {
+        if (Registry::getConfig()->getConfigParam('iNewBasketItemMessage') == 3) {
             $oSession = \OxidEsales\Eshop\Core\Registry::getSession();
             if ($sBackLink = $oSession->getVariable('_backtoshop')) {
                 $oSession->deleteVariable('_backtoshop');

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 
@@ -78,7 +79,7 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function getDownloadUrl()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         // override cause of admin dir
         $sUrl = $myConfig->getConfigParam('sShopURL') . $myConfig->getConfigParam('sAdminDir');
@@ -116,7 +117,7 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     protected function _getExportFilePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getConfig()->getConfigParam('sShopDir') . "/export/" . $this->_getExportFileName();
+        return Registry::getConfig()->getConfigParam('sShopDir') . "/export/" . $this->_getExportFileName();
     }
 
     /**

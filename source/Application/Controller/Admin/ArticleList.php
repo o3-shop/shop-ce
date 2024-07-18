@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 
@@ -91,12 +92,12 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $sPwrSearchFld = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("pwrsearchfld");
         $sPwrSearchFld = $sPwrSearchFld ? strtolower($sPwrSearchFld) : "oxtitle";
 
         $sDateTime = $this->getServerDateTime();
-        $blUseTimeCheck = $this->getConfig()->getConfigParam('blUseTimeCheck');
+        $blUseTimeCheck = Registry::getConfig()->getConfigParam('blUseTimeCheck');
         $oArticle = null;
         $oList = $this->getItemList();
         if ($oList) {

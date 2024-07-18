@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 
 /**
@@ -79,7 +80,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      */
     public function getCustomers()
     {
-        $aCustomersConf = $this->getConfig()->getShopConfVar("aRDFaCustomers");
+        $aCustomersConf = Registry::getConfig()->getShopConfVar("aRDFaCustomers");
         if (isset($aCustomersConf)) {
             foreach ($this->_aCustomers as $sCustomer => $iValue) {
                 $aCustomers[$sCustomer] = (in_array($sCustomer, $aCustomersConf)) ? 1 : 0;

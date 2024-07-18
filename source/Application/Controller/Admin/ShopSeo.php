@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 
@@ -175,7 +176,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
      */
     public function dropSeoIds()
     {
-        $this->resetSeoData($this->getConfig()->getShopId());
+        $this->resetSeoData(Registry::getConfig()->getShopId());
     }
 
     /**

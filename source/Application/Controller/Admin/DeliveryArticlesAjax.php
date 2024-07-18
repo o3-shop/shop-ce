@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -69,15 +70,15 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         // looking for table/view
         $sArtTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
 
-        $sDelId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchDelId = $this->getConfig()->getRequestParameter('synchoxid');
+        $sDelId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchDelId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDelId) {
@@ -118,7 +119,7 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         $sQ = parent::_addFilter( $sQ );
 
         // display variants or not ?
-        $sQ .= $this->getConfig()->getConfigParam( 'blVariantsSelection' ) ? ' group by '.$sArtTable.'.oxid ' : '';
+        $sQ .= Registry::getConfig()->getConfigParam( 'blVariantsSelection' ) ? ' group by '.$sArtTable.'.oxid ' : '';
         return $sQ;
     }*/
 
@@ -129,7 +130,7 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $aChosenArt = $this->_getActionIds('oxobject2delivery.oxid');
         // removing all
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = parent::_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -144,10 +145,10 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     public function addArtToDel()
     {
         $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aChosenArt = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }

@@ -96,7 +96,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         if ($this->getIsOrderStep()) {
             if ($config->getConfigParam('blPsBasketReservationEnabled')) {
@@ -126,7 +126,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     public function getShowNoRegOption()
     {
         if ($this->_blShowNoRegOpt === null) {
-            $this->_blShowNoRegOpt = !$this->getConfig()->getConfigParam('blOrderDisWithoutReg');
+            $this->_blShowNoRegOpt = !Registry::getConfig()->getConfigParam('blOrderDisWithoutReg');
         }
 
         return $this->_blShowNoRegOpt;
@@ -246,7 +246,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     public function isDownloadableProductWarning()
     {
         $basket = $this->getSession()->getBasket();
-        if ($basket && $this->getConfig()->getConfigParam("blEnableDownloads")) {
+        if ($basket && Registry::getConfig()->getConfigParam("blEnableDownloads")) {
             if ($basket->hasDownloadableProducts()) {
                 return true;
             }

@@ -128,6 +128,6 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
      */
     public function getDownloadError()
     {
-        return $this->getConfig()->getRequestParameter('download_error');
+        return Registry::getConfig()->getRequestParameter('download_error');
     }
 }

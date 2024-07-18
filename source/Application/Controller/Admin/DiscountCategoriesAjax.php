@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -63,7 +64,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $sId = $oConfig->getRequestParameter('oxid');
         $sSynchId = $oConfig->getRequestParameter('synchoxid');
 
@@ -101,7 +102,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function removeDiscCat()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $categoryIds = $this->_getActionIds('oxobject2discount.oxid');
 
         if ($config->getRequestParameter('all')) {
@@ -119,7 +120,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function addDiscCat()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $categoryIds = $this->_getActionIds('oxcategories.oxid');
         $discountId = $config->getRequestParameter('synchoxid');
 

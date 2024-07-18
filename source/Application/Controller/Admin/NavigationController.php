@@ -103,7 +103,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     public function logout()
     {
         $mySession = $this->getSession();
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $oUser->logout();
@@ -144,7 +144,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $messages = [];
 
-        if ($this->getConfig()->getConfigParam('blCheckSysReq') !== false) {
+        if (Registry::getConfig()->getConfigParam('blCheckSysReq') !== false) {
             // check if system requirements are ok
             $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
             if (!$oSysReq->getSysReqStatus()) {
@@ -159,25 +159,25 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         }
 
         // version check
-        if ($this->getConfig()->getConfigParam('blCheckForUpdates')) {
+        if (Registry::getConfig()->getConfigParam('blCheckForUpdates')) {
             if ($sVersionNotice = $this->_checkVersion()) {
                 $messages['message'] .= $sVersionNotice;
             }
         }
 
         // check if setup dir is deleted
-        if (file_exists($this->getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
+        if (file_exists(Registry::getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
             $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('SETUP_DIRNOTDELETED_WARNING');
         }
 
         // check if updateApp dir is deleted or empty
-        $sUpdateDir = $this->getConfig()->getConfigParam('sShopDir') . '/updateApp/';
+        $sUpdateDir = Registry::getConfig()->getConfigParam('sShopDir') . '/updateApp/';
         if (file_exists($sUpdateDir) && !(count(glob("$sUpdateDir/*")) === 0)) {
             $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('UPDATEAPP_DIRNOTDELETED_WARNING');
         }
 
         // check if config file is writable
-        $sConfPath = $this->getConfig()->getConfigParam('sShopDir') . "/config.inc.php";
+        $sConfPath = Registry::getConfig()->getConfigParam('sShopDir') . "/config.inc.php";
         if (!is_readable($sConfPath) || is_writable($sConfPath)) {
             $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('SETUP_CONFIGPERMISSIONS_WARNING');
         }
@@ -193,11 +193,11 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $edition = $this->getConfig()->getEdition();
+        $edition = Registry::getConfig()->getEdition();
         $query = 'http://admin.oxid-esales.com/' . $edition . '/onlinecheck.php?getlatestversion';
         $latestVersion = Registry::getUtilsFile()->readRemoteFileAsString($query);
         if ($latestVersion) {
-            $currentVersion = $this->getConfig()->getVersion();
+            $currentVersion = Registry::getConfig()->getVersion();
             if (version_compare($currentVersion, $latestVersion, '<')) {
                 return sprintf(
                     Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use stdClass;
@@ -133,7 +134,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         parent::__construct();
 
         // set generic frame template
-        $this->_sFilePath = $this->getConfig()->getConfigParam('sShopDir') . "/" . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
+        $this->_sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . "/" . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
     }
 
     /**
@@ -153,7 +154,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         }
 
         $this->_aViewData['sOutputFile'] = $this->_sFilePath;
-        $this->_aViewData['sDownloadFile'] = $this->getConfig()->getConfigParam('sShopURL') . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
+        $this->_aViewData['sDownloadFile'] = Registry::getConfig()->getConfigParam('sShopURL') . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
 
         return $this->_sThisTemplate;
     }
@@ -512,7 +513,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     public function getOneArticle($iCnt, &$blContinue)
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         //[Alfonsas 2006-05-31] setting specific parameter
         //to be checked in oxarticle.php init() method
@@ -702,7 +703,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         }
 
         // add minimum stock value
-        if ($this->getConfig()->getConfigParam('blUseStock') && ($dMinStock = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportMinStock"))) {
+        if (Registry::getConfig()->getConfigParam('blUseStock') && ($dMinStock = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportMinStock"))) {
             $dMinStock = str_replace([";", " ", "/", "'"], "", $dMinStock);
             $insertQuery .= " and {$sArticleTable}.oxstock >= " . $oDB->quote($dMinStock);
         }

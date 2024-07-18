@@ -57,7 +57,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         parent::render();
 
@@ -148,7 +148,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     public function saveConfVars()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $this->resetContentCache();
 
@@ -206,7 +206,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
      */
     public function loadConfVars($shopId, $moduleId)
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $configurationVariables = [
             "bool"   => [],
             "str"    => [],
@@ -482,7 +482,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     {
         $editId = parent::getEditObjectId();
         if (!$editId) {
-            return $this->getConfig()->getShopId();
+            return Registry::getConfig()->getShopId();
         }
 
         return $editId;
@@ -497,7 +497,7 @@ class ShopConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\A
     {
         $shopId = $this->getEditObjectId();
         $module = $this->_getModuleForConfigVars();
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $preparedConfigValue = $this->_serializeConfVar($existingConfigType, $configName, $configValue);
         if (strpos($module, 'module:') !== false) {
             $moduleId = explode(':', $module)[1];

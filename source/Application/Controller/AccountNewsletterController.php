@@ -26,8 +26,8 @@ use oxRegistry;
 
 /**
  * Current user newsletter manager.
- * When user is logged in in this manager window he can modify
- * his newletter subscription status - simply register or
+ * When user is logged-in in this manager window he can modify
+ * his newsletter subscription status - simply register or
  * unregister from newsletter. O3-Shop -> MY ACCOUNT -> Newsletter.
  */
 class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controller\AccountController
@@ -107,8 +107,8 @@ class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controll
             return false;
         }
 
-        $iStatus = $this->getConfig()->getRequestParameter('status');
-        if ($oUser->setNewsSubscription($iStatus, $this->getConfig()->getConfigParam('blOrderOptInEmail'))) {
+        $iStatus = Registry::getConfig()->getRequestParameter('status');
+        if ($oUser->setNewsSubscription($iStatus, Registry::getConfig()->getConfigParam('blOrderOptInEmail'))) {
             $this->_iSubscriptionStatus = ($iStatus == 0 && $iStatus !== null) ? -1 : 1;
         }
     }

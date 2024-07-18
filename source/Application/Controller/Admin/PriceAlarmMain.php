@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use oxField;
@@ -42,7 +43,7 @@ class PriceAlarmMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $this->_aViewData['iAllCnt'] = $this->getActivePriceAlarmsCount();
 

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 use Exception;
@@ -58,8 +59,8 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchId = $this->getConfig()->getRequestParameter('synchoxid');
+        $sId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         $sPayTable = $this->_getViewName('oxpayments');
 
@@ -85,7 +86,7 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     public function removePayFromSet()
     {
         $aChosenCntr = $this->_getActionIds('oxobject2payment.oxid');
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2payment.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
@@ -102,10 +103,10 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     public function addPayToSet()
     {
         $aChosenSets = $this->_getActionIds('oxpayments.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sPayTable = $this->_getViewName('oxpayments');
             $aChosenSets = $this->_getAll($this->_addFilter("select $sPayTable.oxid " . $this->_getQuery()));
         }

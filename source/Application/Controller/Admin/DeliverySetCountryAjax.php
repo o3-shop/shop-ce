@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -59,8 +60,8 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchId = $this->getConfig()->getRequestParameter('synchoxid');
+        $sId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         $sCountryTable = $this->_getViewName('oxcountry');
 
@@ -92,7 +93,7 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     {
         $aChosenCntr = $this->_getActionIds('oxobject2delivery.oxid');
         // removing all
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
@@ -108,10 +109,10 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     public function addCountryToSet()
     {
         $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sCountryTable = $this->_getViewName('oxcountry');
             $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->_getQuery()));
         }

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxUBase;
 
@@ -127,7 +128,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             return 'message/exception.tpl';
         }
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $oRss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
         if ($myConfig->getConfigParam('iTop5Mode') && $myConfig->getConfigParam('bl_rssTopShop')) {
@@ -161,7 +162,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         if (
             !$sMeta &&
-            $this->getConfig()->getConfigParam('bl_perfLoadAktion') &&
+            Registry::getConfig()->getConfigParam('bl_perfLoadAktion') &&
             $oArt = $this->getFirstArticle()
         ) {
             $oDescField = $oArt->getLongDescription();
@@ -186,7 +187,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         if (
             !$sKeywords &&
-            $this->getConfig()->getConfigParam('bl_perfLoadAktion') &&
+            Registry::getConfig()->getConfigParam('bl_perfLoadAktion') &&
             $oArt = $this->getFirstArticle()
         ) {
             $oDescField = $oArt->getLongDescription();
@@ -206,7 +207,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         if ($this->_blLoadActions === null) {
             $this->_blLoadActions = false;
-            if ($this->getConfig()->getConfigParam('bl_perfLoadAktion')) {
+            if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
                 $this->_blLoadActions = true;
             }
         }
@@ -350,7 +351,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function getTitleSuffix()
     {
-        return $this->getConfig()->getActiveShop()->oxshops__oxstarttitle->value;
+        return Registry::getConfig()->getActiveShop()->oxshops__oxstarttitle->value;
     }
 
     /**
@@ -375,7 +376,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         $oBannerList = null;
 
-        if ($this->getConfig()->getConfigParam('bl_perfLoadAktion')) {
+        if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
             $oBannerList = oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class);
             $oBannerList->loadBanners();
         }
@@ -392,7 +393,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         $oList = null;
 
-        if ($this->getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
+        if (Registry::getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
             $oList = $this->getManufacturerlist();
         }
 

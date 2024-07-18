@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxFileCheckerResult;
 use OxidEsales\Eshop\Core\Module\Module;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
 
@@ -105,7 +106,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     {
         parent::__construct();
 
-        $this->_sShopDir = $this->getConfig()->getConfigParam('sShopDir');
+        $this->_sShopDir = Registry::getConfig()->getConfigParam('sShopDir');
         $this->_oOutput = oxNew(\OxidEsales\Eshop\Application\Model\DiagnosticsOutput::class);
         $this->_oRenderer = oxNew(\OxidEsales\Eshop\Application\Model\SmartyRenderer::class);
     }
@@ -166,9 +167,9 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     {
         $oFileChecker = oxNew(\OxidEsales\Eshop\Application\Model\FileChecker::class);
         $oFileChecker->setBaseDirectory($this->_sShopDir);
-        $oFileChecker->setVersion($this->getConfig()->getVersion());
-        $oFileChecker->setEdition($this->getConfig()->getEdition());
-        $oFileChecker->setRevision($this->getConfig()->getRevision());
+        $oFileChecker->setVersion(Registry::getConfig()->getVersion());
+        $oFileChecker->setEdition(Registry::getConfig()->getEdition());
+        $oFileChecker->setRevision(Registry::getConfig()->getRevision());
 
         if (!$oFileChecker->init()) {
             $this->_blError = true;
@@ -202,9 +203,9 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     protected function _getFileCheckReport($oFileCheckerResult) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aViewData = [
-            "sVersion"       => $this->getConfig()->getVersion(),
-            "sEdition"       => $this->getConfig()->getEdition(),
-            "sRevision"      => $this->getConfig()->getRevision(),
+            "sVersion"       => Registry::getConfig()->getVersion(),
+            "sEdition"       => Registry::getConfig()->getEdition(),
+            "sRevision"      => Registry::getConfig()->getRevision(),
             "aResultSummary" => $oFileCheckerResult->getResultSummary(),
             "aResultOutput"  => $oFileCheckerResult->getResult(),
         ];
@@ -358,7 +359,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     public function getParam($sParam)
     {
-        return $this->getConfig()->getRequestParameter($sParam);
+        return Registry::getConfig()->getRequestParameter($sParam);
     }
 
     /**

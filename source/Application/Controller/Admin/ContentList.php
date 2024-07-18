@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 
@@ -67,7 +68,7 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $sFolder = $sFolder ? $sFolder : -1;
 
         $this->_aViewData["folder"] = $sFolder;
-        $this->_aViewData["afolder"] = $this->getConfig()->getConfigParam('aCMSfolder');
+        $this->_aViewData["afolder"] = Registry::getConfig()->getConfigParam('aCMSfolder');
 
         return $this->_sThisTemplate;
     }

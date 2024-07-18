@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 
 /**
@@ -119,7 +120,7 @@ class AccountPasswordController extends \OxidEsales\Eshop\Application\Controller
         if ($oUser->save()) {
             $this->_blPasswordChanged = true;
             // deleting user autologin cookies.
-            \OxidEsales\Eshop\Core\Registry::getUtilsServer()->deleteUserCookie($this->getConfig()->getShopId());
+            \OxidEsales\Eshop\Core\Registry::getUtilsServer()->deleteUserCookie(Registry::getConfig()->getShopId());
         }
     }
 

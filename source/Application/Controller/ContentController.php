@@ -146,7 +146,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         $oContent = $this->getContent();
         if ($oContent && !$this->_canShowContent($oContent->oxcontents__oxloadid->value)) {
-            Registry::getUtils()->redirect($this->getConfig()->getShopHomeUrl() . 'cl=account');
+            Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl() . 'cl=account');
         }
 
         $sTpl = false;
@@ -409,7 +409,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function showRdfa()
     {
-        return $this->getConfig()->getConfigParam('blRDFaEmbedding');
+        return Registry::getConfig()->getConfigParam('blRDFaEmbedding');
     }
 
     /**
@@ -422,7 +422,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $aTemplate = [];
         $sContentId = $this->getContent()->oxcontents__oxloadid->value;
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         if ($sContentId == $myConfig->getConfigParam('sRDFaBusinessEntityLoc')) {
             $aTemplate[] = $this->_sBusinessTemplate;
         }
@@ -443,7 +443,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getBusinessEntityExtends()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $aExtends = [];
 
         foreach ($this->_aBusinessEntityExtends as $sExtend) {
@@ -526,7 +526,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getRdfaVAT()
     {
-        return $this->getConfig()->getConfigParam('iRDFaVAT');
+        return Registry::getConfig()->getConfigParam('iRDFaVAT');
     }
 
     /**
@@ -536,7 +536,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getRdfaPriceValidity()
     {
-        $iDays = $this->getConfig()->getConfigParam('iRDFaPriceValidity');
+        $iDays = Registry::getConfig()->getConfigParam('iRDFaPriceValidity');
         $iFrom = Registry::getUtilsDate()->getTime();
         $iThrough = $iFrom + ($iDays * 24 * 60 * 60);
         $oPriceValidity = [];

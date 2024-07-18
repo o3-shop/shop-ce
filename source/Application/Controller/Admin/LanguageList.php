@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxDb;
 use Exception;
@@ -51,7 +52,7 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
      */
     public function deleteEntry()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $sOxId = $this->getEditObjectId();
 
         $aLangData['params'] = $myConfig->getConfigParam('aLanguageParams');
@@ -110,9 +111,9 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
      */
     protected function _getLanguagesList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aLangParams = $this->getConfig()->getConfigParam('aLanguageParams');
+        $aLangParams = Registry::getConfig()->getConfigParam('aLanguageParams');
         $aLanguages = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageArray();
-        $sDefaultLang = $this->getConfig()->getConfigParam('sDefaultLang');
+        $sDefaultLang = Registry::getConfig()->getConfigParam('sDefaultLang');
 
         foreach ($aLanguages as $sKey => $sValue) {
             $sOxId = $sValue->oxid;

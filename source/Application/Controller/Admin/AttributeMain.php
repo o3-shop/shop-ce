@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use stdClass;
 
@@ -42,7 +43,7 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     {
         parent::render();
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $oAttr = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
