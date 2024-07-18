@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Article;
+
 /**
  * Class reserved for extending (for customization - you can add you own fields, etc.).
  */
@@ -36,7 +38,7 @@ class ArticleUserdef extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     {
         parent::render();
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         $this->_aViewData["edit"] = $oArticle;
 
         $soxId = $this->getEditObjectId();

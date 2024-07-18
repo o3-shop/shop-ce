@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin article categories order manager.
  * There is possibility to change category sorting.
@@ -38,10 +41,10 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $this->_aViewData['edit'] = $oCategory = oxNew(Category::class);
 
         // resetting
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
+        Registry::getSession()->setVariable('neworder_sess', null);
 
         $soxId = $this->getEditObjectId();
 
@@ -54,7 +57,7 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 $this->_aViewData['readonly'] = true;
             }
         }
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getConfig()->getRequestParameter("aoc")) {
             $oCategoryOrderAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
 

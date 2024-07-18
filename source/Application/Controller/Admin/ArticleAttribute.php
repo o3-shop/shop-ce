@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin article attributes/selections lists manager.
  * Collects available attributes/selections lists for chosen article, may add
@@ -39,7 +42,7 @@ class ArticleAttribute extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
@@ -51,7 +54,7 @@ class ArticleAttribute extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             }
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = Registry::getConfig()->getRequestParameter("aoc");
         if ($iAoc == 1) {
             $oArticleAttributeAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class);
             $this->_aViewData['oxajax'] = $oArticleAttributeAjax->getColumns();

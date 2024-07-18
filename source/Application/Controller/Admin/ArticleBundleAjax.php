@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
@@ -61,12 +62,12 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sArticleTable = $this->_getViewName('oxarticles');
         $sView = $this->_getViewName('oxobject2category');
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchSelId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // category selected or not ?
         if (!$sSelId) {
@@ -118,12 +119,12 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function removeArticleBundle()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sQ = "update oxarticles set oxarticles.oxbundleid = '' where oxarticles.oxid = :oxid ";
         $oDb->Execute(
             $sQ,
-            [':oxid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid')]
+            [':oxid' => Registry::getConfig()->getRequestParameter('oxid')]
         );
     }
 
@@ -132,15 +133,15 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function addArticleBundle()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sQ = "update oxarticles set oxarticles.oxbundleid = :oxbundleid " .
               "where oxarticles.oxid  = :oxid ";
         $oDb->Execute(
             $sQ,
             [
-                ':oxbundleid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxbundleid'),
-                ':oxid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid')
+                ':oxbundleid' => Registry::getConfig()->getRequestParameter('oxbundleid'),
+                ':oxid' => Registry::getConfig()->getRequestParameter('oxid')
             ]
         );
     }

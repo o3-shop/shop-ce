@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Object2Category;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use Exception;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
@@ -43,23 +46,23 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
-                                 ]
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1]
+        ],
+         'container2' => [
+             ['oxartnum', 'oxarticles', 1, 0, 0],
+             ['oxtitle', 'oxarticles', 1, 1, 0],
+             ['oxean', 'oxarticles', 1, 0, 0],
+             ['oxmpn', 'oxarticles', 0, 0, 0],
+             ['oxprice', 'oxarticles', 0, 0, 0],
+             ['oxstock', 'oxarticles', 0, 0, 0],
+             ['oxid', 'oxarticles', 0, 0, 1]
+         ]
     ];
 
     /**
@@ -75,9 +78,9 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
 
-        $sOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sOxid = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchOxid = Registry::getConfig()->getRequestParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
         if (!$sOxid && $sSynchOxid) {
@@ -138,20 +141,20 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $sCategoryID = $myConfig->getRequestParameter('synchoxid');
         $sShopID = $myConfig->getShopId();
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->startTransaction();
+        DatabaseProvider::getDb()->startTransaction();
         try {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $database = DatabaseProvider::getDb();
             $sArticleTable = $this->_getViewName('oxarticles');
 
             // adding
-            if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+            if (Registry::getConfig()->getRequestParameter('all')) {
                 $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
             }
 
             if (is_array($aArticles)) {
                 $sO2CView = $this->_getViewName('oxobject2category');
 
-                $oNew = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
+                $oNew = oxNew(Object2Category::class);
                 $sProdIds = "";
                 foreach ($aArticles as $sAdd) {
                     // check, if it's already in, then don't add it again
@@ -162,10 +165,10 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                         continue;
                     }
 
-                    $oNew->oxobject2category__oxid = new \OxidEsales\Eshop\Core\Field($oNew->setId(md5($sAdd . $sCategoryID . $sShopID)));
-                    $oNew->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($sAdd);
-                    $oNew->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sCategoryID);
-                    $oNew->oxobject2category__oxtime = new \OxidEsales\Eshop\Core\Field(time());
+                    $oNew->oxobject2category__oxid = new Field($oNew->setId(md5($sAdd . $sCategoryID . $sShopID)));
+                    $oNew->oxobject2category__oxobjectid = new Field($sAdd);
+                    $oNew->oxobject2category__oxcatnid = new Field($sCategoryID);
+                    $oNew->oxobject2category__oxtime = new Field(time());
 
                     $oNew->save();
 
@@ -182,11 +185,11 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                 $this->resetCounter("catArticle", $sCategoryID);
             }
         } catch (Exception $exception) {
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->rollbackTransaction();
+            DatabaseProvider::getDb()->rollbackTransaction();
             throw $exception;
         }
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->commitTransaction();
+        DatabaseProvider::getDb()->commitTransaction();
     }
 
     /**
@@ -213,7 +216,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                       ) as _tmp
                    ) {$sSqlShopFilter}";
 
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
+            DatabaseProvider::getDb()->execute($sQ);
         }
     }
 
@@ -242,10 +245,10 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     public function removeArticle()
     {
         $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $sCategoryID = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $sCategoryID = Registry::getConfig()->getRequestParameter('oxid');
 
         // adding
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sArticleTable = $this->_getViewName('oxarticles');
             $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
         }
@@ -259,7 +262,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $this->resetCounter("catArticle", $sCategoryID);
 
         //notify services
-        $relation = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
+        $relation = oxNew(Object2Category::class);
         $relation->setCategoryId($sCategoryID);
         $this->dispatchEvent(new AfterModelUpdateEvent($relation));
     }
@@ -272,8 +275,8 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     protected function removeCategoryArticles($articles, $categoryID)
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $prodIds = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articles));
+        $db = DatabaseProvider::getDb();
+        $prodIds = implode(", ", DatabaseProvider::getDb()->quoteArray($articles));
 
         $delete = "delete from oxobject2category ";
         $where = $this->getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds);
@@ -296,7 +299,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     protected function getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds)
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $db = DatabaseProvider::getDb();
         $where = "where oxcatnid=" . $db->quote($categoryID);
 
         $whereProductIdIn = " oxobjectid in ( {$prodIds} )";

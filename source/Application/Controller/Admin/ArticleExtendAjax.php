@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Object2Category;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -62,10 +65,10 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $categoriesTable = $this->_getViewName('oxcategories');
         $objectToCategoryView = $this->_getViewName('oxobject2category');
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
-        $oxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $synchOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $oxId = Registry::getConfig()->getRequestParameter('oxid');
+        $synchOxid = Registry::getConfig()->getRequestParameter('synchoxid');
 
         if ($oxId) {
             // all categories article is in
@@ -94,7 +97,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $dataFields = parent::_getDataFields($sQ);
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid') && is_array($dataFields) && count($dataFields)) {
+        if (Registry::getConfig()->getRequestParameter('oxid') && is_array($dataFields) && count($dataFields)) {
             // looking for smallest time value to mark record as main category ..
             $minimalPosition = null;
             $minimalValue = null;
@@ -130,11 +133,11 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $categoriesToRemove = $this->_getActionIds('oxcategories.oxid');
 
-        $oxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $dataBase = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oxId = Registry::getConfig()->getRequestParameter('oxid');
+        $dataBase = DatabaseProvider::getDb();
 
         // adding
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $categoriesTable = $this->_getViewName('oxcategories');
             $categoriesToRemove = $this->_getAll($this->_addFilter("select {$categoriesTable}.oxid " . $this->_getQuery()));
         }
@@ -143,7 +146,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         if (is_array($categoriesToRemove) && count($categoriesToRemove)) {
             $query = "delete from oxobject2category where oxobject2category.oxobjectid = :oxobjectid and ";
             $query = $this->updateQueryForRemovingArticleFromCategory($query);
-            $query .= " oxcatnid in (" . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($categoriesToRemove)) . ')';
+            $query .= " oxcatnid in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($categoriesToRemove)) . ')';
             $dataBase->Execute($query, [
                 ':oxobjectid' => $oxId
             ]);
@@ -167,21 +170,21 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $config = Registry::getConfig();
         $categoriesToAdd = $this->_getActionIds('oxcategories.oxid');
-        $oxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $oxId = Registry::getConfig()->getRequestParameter('synchoxid');
         $shopId = $config->getShopId();
         $objectToCategoryView = $this->_getViewName('oxobject2category');
 
         // adding
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $categoriesTable = $this->_getViewName('oxcategories');
             $categoriesToAdd = $this->_getAll($this->_addFilter("select $categoriesTable.oxid " . $this->_getQuery()));
         }
 
         if (isset($categoriesToAdd) && is_array($categoriesToAdd)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+            $database = DatabaseProvider::getMaster();
 
-            $objectToCategory = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
+            $objectToCategory = oxNew(Object2Category::class);
 
             foreach ($categoriesToAdd as $sAdd) {
                 // check, if it's already in, then don't add it again
@@ -193,9 +196,9 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                 }
 
                 $objectToCategory->setId(md5($oxId . $sAdd . $shopId));
-                $objectToCategory->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($oxId);
-                $objectToCategory->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sAdd);
-                $objectToCategory->oxobject2category__oxtime = new \OxidEsales\Eshop\Core\Field(time());
+                $objectToCategory->oxobject2category__oxobjectid = new Field($oxId);
+                $objectToCategory->oxobject2category__oxcatnid = new Field($sAdd);
+                $objectToCategory->oxobject2category__oxtime = new Field(time());
 
                 $objectToCategory->save();
             }
@@ -216,7 +219,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     protected function _updateOxTime($oxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $objectToCategoryView = $this->_getViewName('oxobject2category');
         $queryToEmbed = $this->formQueryToEmbedForUpdatingTime();
 
@@ -235,26 +238,26 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function setAsDefault()
     {
-        $defCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("defcat");
-        $oxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid");
+        $defCat = Registry::getConfig()->getRequestParameter("defcat");
+        $oxId = Registry::getConfig()->getRequestParameter("oxid");
 
         $queryToEmbed = $this->formQueryToEmbedForSettingCategoryAsDefault();
 
         // #0003650: increment all product references independent to active shop
         $query = "update oxobject2category set oxtime = oxtime + 10 where oxobjectid = :oxobjectid {$queryToEmbed}";
-        \OxidEsales\Eshop\Core\DatabaseProvider::getInstance()->getDb()->execute($query, [':oxobjectid' => $oxId]);
+        DatabaseProvider::getInstance()->getDb()->execute($query, [':oxobjectid' => $oxId]);
 
         // set main category for active shop
         $query = "update oxobject2category set oxtime = 0
                   where oxobjectid = :oxobjectid and oxcatnid = :oxcatnid {$queryToEmbed}";
-        \OxidEsales\Eshop\Core\DatabaseProvider::getInstance()->getDb()->execute($query, [
+        DatabaseProvider::getInstance()->getDb()->execute($query, [
             ':oxobjectid' => $oxId,
             ':oxcatnid' => $defCat
         ]);
         //echo "\n$sQ\n";
 
         // #0003366: invalidate article SEO for all shops
-        \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->markAsExpired($oxId, null, 1, null, "oxtype='oxarticle'");
+        Registry::getSeoEncoder()->markAsExpired($oxId, null, 1, null, "oxtype='oxarticle'");
         $this->resetContentCache();
     }
 

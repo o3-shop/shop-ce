@@ -22,7 +22,9 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\TextEditorHandler;
+use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 
@@ -45,7 +47,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function getDocumentationLanguageId()
     {
-        $language = \OxidEsales\Eshop\Core\Registry::getLang();
+        $language = Registry::getLang();
         $languageAbbr = $language->getLanguageAbbr($language->getTplLanguage());
 
         return $languageAbbr === "de" ? 0 : 1;
@@ -54,7 +56,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Returns string which must be edited by editor.
      *
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $oObject object used for editing
+     * @param BaseModel $oObject object used for editing
      * @param string                                 $sField  name of editable field
      *
      * @return string
@@ -103,7 +105,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width  editor width
      * @param int                                    $height editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object object passed to editor
+     * @param BaseModel $object object passed to editor
      * @param string                                 $field  object field which content is passed to editor
      *
      * @deprecated since v6.0 (2017-06-29); Please use TextEditorHandler::renderPlainTextEditor() method.
@@ -124,7 +126,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width      editor width
      * @param int                                    $height     editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object     object passed to editor
+     * @param BaseModel $object     object passed to editor
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
@@ -142,7 +144,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width      editor width
      * @param int                                    $height     editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object     object passed to editor
+     * @param BaseModel $object     object passed to editor
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
@@ -218,7 +220,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         }
 
         // add first fake category for not assigned articles
-        $oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oRoot = oxNew(Category::class);
         $oRoot->oxcategories__oxtitle = new Field('--');
 
         $oCatTree->assign(array_merge(['' => $oRoot], $oCatTree->getArray()));
@@ -280,8 +282,8 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function changeFolder()
     {
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('setfolder');
-        $sFolderClass = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folderclass');
+        $sFolder = Registry::getConfig()->getRequestParameter('setfolder');
+        $sFolderClass = Registry::getConfig()->getRequestParameter('folderclass');
 
         if ($sFolderClass == 'oxcontent' && $sFolder == 'CMSFOLDER_NONE') {
             $sFolder = '';

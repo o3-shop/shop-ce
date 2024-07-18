@@ -23,6 +23,11 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxDb;
 use oxField;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article assignment to attributes
@@ -54,9 +59,9 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sArtId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchArtId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
+        $sArtId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchArtId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         $sAttrViewName = $this->_getViewName('oxattribute');
         $sO2AViewName = $this->_getViewName('oxobject2attribute');
@@ -81,15 +86,15 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     public function removeAttr()
     {
         $aChosenArt = $this->_getActionIds('oxobject2attribute.oxid');
-        $sOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        $sOxid = Registry::getConfig()->getRequestParameter('oxid');
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sO2AViewName = $this->_getViewName('oxobject2attribute');
             $sQ = $this->_addFilter("delete $sO2AViewName.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
             $sQ = "delete from oxobject2attribute where oxobject2attribute.oxid in ({$sChosenArticles}) ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
 
         $this->onArticleAttributeRelationChange($sOxid);
@@ -101,19 +106,19 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     public function addAttr()
     {
         $aAddCat = $this->_getActionIds('oxattribute.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sAttrViewName = $this->_getViewName('oxattribute');
             $aAddCat = $this->_getAll($this->_addFilter("select $sAttrViewName.oxid " . $this->_getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aAddCat)) {
             foreach ($aAddCat as $sAdd) {
-                $oNew = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oNew = oxNew(BaseModel::class);
                 $oNew->init("oxobject2attribute");
-                $oNew->oxobject2attribute__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNew->oxobject2attribute__oxattrid = new \OxidEsales\Eshop\Core\Field($sAdd);
+                $oNew->oxobject2attribute__oxobjectid = new Field($soxId);
+                $oNew->oxobject2attribute__oxattrid = new Field($sAdd);
                 $oNew->save();
             }
 
@@ -128,14 +133,14 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function saveAttributeValue()
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $this->resetContentCache();
 
-        $articleId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid");
-        $attributeId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("attr_oxid");
-        $attributeValue = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("attr_value");
+        $articleId = Registry::getConfig()->getRequestParameter("oxid");
+        $attributeId = Registry::getConfig()->getRequestParameter("attr_oxid");
+        $attributeValue = Registry::getConfig()->getRequestParameter("attr_value");
 
-        $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $article = oxNew(Article::class);
         if ($article->load($articleId)) {
             if ($article->isDerived()) {
                 return;
@@ -149,7 +154,7 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
                 $select = "select * from {$viewName} where {$viewName}.oxobjectid= {$quotedArticleId} and
                             {$viewName}.oxattrid= " . $database->quote($attributeId);
                 $objectToAttribute = oxNew(\OxidEsales\Eshop\Core\Model\MultiLanguageModel::class);
-                $objectToAttribute->setLanguage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('editlanguage'));
+                $objectToAttribute->setLanguage(Registry::getConfig()->getRequestParameter('editlanguage'));
                 $objectToAttribute->init("oxobject2attribute");
                 if ($objectToAttribute->assignRecord($select)) {
                     $objectToAttribute->oxobject2attribute__oxvalue->setValue($attributeValue);
@@ -171,7 +176,7 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Method is used to bind to attribute value change.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param Article $article
      */
     protected function onAttributeValueChange($article)
     {

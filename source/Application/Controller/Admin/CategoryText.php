@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
@@ -40,12 +42,12 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $this->_aViewData['edit'] = $oCategory = oxNew(Category::class);
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $iCatLang = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("catlang");
+            $iCatLang = Registry::getConfig()->getRequestParameter("catlang");
 
             if (!isset($iCatLang)) {
                 $iCatLang = $this->_iEditLang;
@@ -60,7 +62,7 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
                 $this->_aViewData['readonly'] = true;
             }
 
-            foreach (\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames() as $id => $language) {
+            foreach (Registry::getLang()->getLanguageNames() as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
@@ -83,10 +85,10 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getConfig()->getRequestParameter("editval");
 
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $iCatLang = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("catlang");
+        $oCategory = oxNew(Category::class);
+        $iCatLang = Registry::getConfig()->getRequestParameter("catlang");
         $iCatLang = $iCatLang ? $iCatLang : 0;
 
         if ($soxId != "-1") {

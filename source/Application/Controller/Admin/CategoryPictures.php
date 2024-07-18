@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Category;
+
 /**
  * Admin article categories thumbnail manager.
  * Category thumbnail manager (Previews assigned pictures).
@@ -38,7 +40,7 @@ class CategoryPictures extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $this->_aViewData['edit'] = $oCategory = oxNew(Category::class);
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != '-1') {

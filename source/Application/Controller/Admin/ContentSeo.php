@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Application\Model\SeoEncoderContent;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Content seo config class
  */
@@ -45,7 +49,7 @@ class ContentSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class);
+        return Registry::get(SeoEncoderContent::class);
     }
 
     /**
@@ -55,7 +59,7 @@ class ContentSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function getEntryUri()
     {
-        $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oContent = oxNew(Content::class);
         if ($oContent->load($this->getEditObjectId())) {
             return $this->_getEncoder()->getContentUri($oContent, $this->getEditLang());
         }

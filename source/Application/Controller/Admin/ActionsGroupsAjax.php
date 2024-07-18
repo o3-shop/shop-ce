@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -59,10 +62,10 @@ class ActionsGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         // active AJAX component
         $sGroupTable = $this->_getViewName('oxgroups');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
-        $sId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -91,11 +94,11 @@ class ActionsGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $aRemoveGroups = $this->_getActionIds('oxobject2action.oxid');
         if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2action.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sRemoveGroups = implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
             $sQ = "delete from oxobject2action where oxobject2action.oxid in (" . $sRemoveGroups . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -117,11 +120,11 @@ class ActionsGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $promotionAdded = false;
         if ($soxId && $soxId != "-1" && is_array($aChosenGroup)) {
             foreach ($aChosenGroup as $sChosenGroup) {
-                $oObject2Promotion = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Promotion = oxNew(BaseModel::class);
                 $oObject2Promotion->init('oxobject2action');
-                $oObject2Promotion->oxobject2action__oxactionid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Promotion->oxobject2action__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenGroup);
-                $oObject2Promotion->oxobject2action__oxclass = new \OxidEsales\Eshop\Core\Field("oxgroups");
+                $oObject2Promotion->oxobject2action__oxactionid = new Field($soxId);
+                $oObject2Promotion->oxobject2action__oxobjectid = new Field($sChosenGroup);
+                $oObject2Promotion->oxobject2action__oxclass = new Field("oxgroups");
                 $oObject2Promotion->save();
             }
 

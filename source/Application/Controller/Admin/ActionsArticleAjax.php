@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -62,12 +65,12 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sArticleTable = $this->_getViewName('oxarticles');
         $sViewName = $this->_getViewName('oxobject2category');
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchSelId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // category selected or not ?
         if (!$sSelId) {
@@ -118,10 +121,10 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function removeActionArticle()
     {
-        $sActionId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $sActionId = Registry::getConfig()->getRequestParameter('oxid');
         //$sActionId = Registry::getConfig()->getConfigParam( 'oxid' );
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $oDb->Execute(
             'delete from oxobject2action '
@@ -136,9 +139,9 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function setActionArticle()
     {
-        $sArticleId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxarticleid');
-        $sActionId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sArticleId = Registry::getConfig()->getRequestParameter('oxarticleid');
+        $sActionId = Registry::getConfig()->getRequestParameter('oxid');
+        $oDb = DatabaseProvider::getDb();
 
         $oDb->Execute(
             'delete from oxobject2action '
@@ -147,11 +150,11 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             [':oxactionid' => $sActionId]
         );
 
-        $oObject2Promotion = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oObject2Promotion = oxNew(BaseModel::class);
         $oObject2Promotion->init('oxobject2action');
-        $oObject2Promotion->oxobject2action__oxactionid = new \OxidEsales\Eshop\Core\Field($sActionId);
-        $oObject2Promotion->oxobject2action__oxobjectid = new \OxidEsales\Eshop\Core\Field($sArticleId);
-        $oObject2Promotion->oxobject2action__oxclass = new \OxidEsales\Eshop\Core\Field("oxarticle");
+        $oObject2Promotion->oxobject2action__oxactionid = new Field($sActionId);
+        $oObject2Promotion->oxobject2action__oxobjectid = new Field($sArticleId);
+        $oObject2Promotion->oxobject2action__oxclass = new Field("oxarticle");
         $oObject2Promotion->save();
     }
 }

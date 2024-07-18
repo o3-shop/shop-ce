@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -73,13 +78,13 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         // looking for table/view
         $sArtTable = $this->_getViewName('oxarticles');
         $sView = $this->_getViewName('oxobject2category');
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchSelId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         // category selected or not ?
         if (!$sSelId) {
@@ -145,8 +150,8 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sOxIdParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchOxidParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sOxIdParameter = Registry::getConfig()->getRequestParameter('oxid');
+        $sSynchOxidParameter = Registry::getConfig()->getRequestParameter('synchoxid');
         if ($sOxIdParameter && !$sSynchOxidParameter) {
             return 'order by oxactions2article.oxsort ';
         }
@@ -160,17 +165,17 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     public function removeArtFromAct()
     {
         $aChosenArt = $this->_getActionIds('oxactions2article.oxid');
-        $sOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $sOxid = Registry::getConfig()->getRequestParameter('oxid');
 
         $this->_getOxRssFeed()->removeCacheFile($sOxid);
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sQ = parent::_addFilter("delete oxactions2article.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
             $sQ = "delete from oxactions2article where oxactions2article.oxid in (" . $sChosenArticles . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -185,17 +190,17 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     {
         $myConfig = Registry::getConfig();
         $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
 
         $this->_getOxRssFeed()->removeCacheFile($soxId);
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getConfig()->getRequestParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aArticles = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $database = DatabaseProvider::getMaster();
         $sArtTable = $this->_getViewName('oxarticles');
         $sQ = "select max(oxactions2article.oxsort) from oxactions2article join {$sArtTable} " .
               "on {$sArtTable}.oxid=oxactions2article.oxartid " .
@@ -214,12 +219,12 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
         if ($soxId && $soxId != "-1" && is_array($aArticles)) {
             $sShopId = $myConfig->getShopId();
             foreach ($aArticles as $sAdd) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oNewGroup = oxNew(BaseModel::class);
                 $oNewGroup->init('oxactions2article');
-                $oNewGroup->oxactions2article__oxshopid = new \OxidEsales\Eshop\Core\Field($sShopId);
-                $oNewGroup->oxactions2article__oxactionid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNewGroup->oxactions2article__oxartid = new \OxidEsales\Eshop\Core\Field($sAdd);
-                $oNewGroup->oxactions2article__oxsort = new \OxidEsales\Eshop\Core\Field($iSort++);
+                $oNewGroup->oxactions2article__oxshopid = new Field($sShopId);
+                $oNewGroup->oxactions2article__oxactionid = new Field($soxId);
+                $oNewGroup->oxactions2article__oxartid = new Field($sAdd);
+                $oNewGroup->oxactions2article__oxsort = new Field($iSort++);
                 $oNewGroup->save();
             }
             $articleAdded = true;
@@ -235,12 +240,12 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     {
         $myConfig = Registry::getConfig();
         $sArtTable = $this->_getViewName('oxarticles');
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
         $sSelect = "select * from $sArtTable left join oxactions2article on $sArtTable.oxid=oxactions2article.oxartid ";
         $sSelect .= "where oxactions2article.oxactionid = :oxactionid " .
                     "and oxactions2article.oxshopid = :oxshopid " . $this->_getSorting();
 
-        $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oList = oxNew(ListModel::class);
         $oList->init("oxbase", "oxactions2article");
         $oList->selectString($sSelect, [
             ':oxactionid' => $sSelId,
@@ -262,8 +267,8 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
         }
 
         //
-        if (($iKey = array_search(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('sortoxid'), $aIdx2Id)) !== false) {
-            $iDir = (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
+        if (($iKey = array_search(Registry::getConfig()->getRequestParameter('sortoxid'), $aIdx2Id)) !== false) {
+            $iDir = (Registry::getConfig()->getRequestParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
             if (isset($aIdx2Id[$iDir])) {
                 // exchanging indexes
                 $oDir1 = $oList->offsetGet($aIdx2Id[$iDir]);
@@ -289,11 +294,11 @@ class ActionsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Lis
     /**
      * Getter for the rss feed handler.
      *
-     * @return \OxidEsales\Eshop\Application\Model\RssFeed The rss feed handler.
+     * @return RssFeed The rss feed handler.
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOxRssFeed" in next major
      */
     protected function _getOxRssFeed() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+        return oxNew(RssFeed::class);
     }
 }

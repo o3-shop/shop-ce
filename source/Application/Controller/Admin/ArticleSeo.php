@@ -21,6 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\SeoEncoderArticle;
+use OxidEsales\Eshop\Application\Model\Vendor;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -52,7 +59,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     public function getActCatType()
     {
         $sType = false;
-        $aData = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aSeoData");
+        $aData = Registry::getConfig()->getRequestParameter("aSeoData");
         if ($aData && isset($aData["oxparams"])) {
             $oStr = getStr();
             $iEndPos = $oStr->strpos($aData["oxparams"], "#");
@@ -72,12 +79,12 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function getActCatLang()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editlanguage") !== null) {
+        if (Registry::getConfig()->getRequestParameter("editlanguage") !== null) {
             return $this->_iEditLang;
         }
 
         $iLang = false;
-        $aData = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aSeoData");
+        $aData = Registry::getConfig()->getRequestParameter("aSeoData");
         if ($aData && isset($aData["oxparams"])) {
             $oStr = getStr();
             $iStartPos = $oStr->strpos($aData["oxparams"], "#");
@@ -99,7 +106,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     public function getActCatId()
     {
         $sId = false;
-        $aData = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aSeoData");
+        $aData = Registry::getConfig()->getRequestParameter("aSeoData");
         if ($aData && isset($aData["oxparams"])) {
             $oStr = getStr();
             $iStartPos = $oStr->strpos($aData["oxparams"], "#");
@@ -126,7 +133,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
         if ($this->_aSelectionList === null) {
             $this->_aSelectionList = [];
 
-            $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oProduct = oxNew(Article::class);
             $oProduct->load($this->getEditObjectId());
 
             if ($oCatList = $this->_getCategoryList($oProduct)) {
@@ -148,7 +155,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     /**
      * Returns array of product categories
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article object
+     * @param Article $oArticle Article object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
@@ -165,7 +172,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
 
         // adding categories
         $sView = getViewName('oxobject2category');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+        $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $sSqlForPriceCategories = $oArticle->getSqlForPriceCategories('oxid');
         $sQ = "select oxobject2category.oxcatnid as oxid from {$sView} as oxobject2category " .
               "where oxobject2category.oxobjectid = :oxobjectid union " . $sSqlForPriceCategories;
@@ -175,13 +182,13 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
         ]);
         if ($oRs != false && $oRs->count() > 0) {
             while (!$oRs->EOF) {
-                $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+                $oCat = oxNew(Category::class);
                 if ($oCat->loadInLang($iLang, current($oRs->fields))) {
                     if ($sMainCatId == $oCat->getId()) {
-                        $sSuffix = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('(main category)', $this->getEditLang());
+                        $sSuffix = Registry::getLang()->translateString('(main category)', $this->getEditLang());
                         $sTitleField = 'oxcategories__oxtitle';
                         $sTitle = $oCat->$sTitleField->getRawValue() . " " . $sSuffix;
-                        $oCat->$sTitleField = new \OxidEsales\Eshop\Core\Field($sTitle, \OxidEsales\Eshop\Core\Field::T_RAW);
+                        $oCat->$sTitleField = new Field($sTitle, Field::T_RAW);
                     }
                     $aCatList[] = $oCat;
                 }
@@ -195,7 +202,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     /**
      * Returns array containing product vendor object
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article object
+     * @param Article $oArticle Article object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVendorList" in next major
@@ -203,7 +210,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     protected function _getVendorList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($oArticle->oxarticles__oxvendorid->value) {
-            $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+            $oVendor = oxNew(Vendor::class);
             if ($oVendor->loadInLang($this->getEditLang(), $oArticle->oxarticles__oxvendorid->value)) {
                 return [$oVendor];
             }
@@ -213,7 +220,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     /**
      * Returns array containing product manufacturer object
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article object
+     * @param Article $oArticle Article object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturerList" in next major
@@ -221,7 +228,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     protected function _getManufacturerList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($oArticle->oxarticles__oxmanufacturerid->value) {
-            $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+            $oManufacturer = oxNew(Manufacturer::class);
             if ($oManufacturer->loadInLang($this->getEditLang(), $oArticle->oxarticles__oxmanufacturerid->value)) {
                 return [$oManufacturer];
             }
@@ -231,11 +238,11 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     /**
      * Returns active category object, used for seo url getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\Category | null
+     * @return Category | null
      */
     public function getActCategory()
     {
-        $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCat = oxNew(Category::class);
 
         return ($oCat->load($this->getActCatId())) ? $oCat : null;
     }
@@ -243,11 +250,11 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     /**
      * Returns active vendor object if available
      *
-     * @return \OxidEsales\Eshop\Application\Model\Vendor | null
+     * @return Vendor | null
      */
     public function getActVendor()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $oVendor = oxNew(Vendor::class);
 
         return ($this->getActCatType() == 'oxvendor' && $oVendor->load($this->getActCatId())) ? $oVendor : null;
     }
@@ -255,11 +262,11 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     /**
      * Returns active manufacturer object if available
      *
-     * @return \OxidEsales\Eshop\Application\Model\Manufacturer | null
+     * @return Manufacturer | null
      */
     public function getActManufacturer()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $oManufacturer = oxNew(Manufacturer::class);
         $blLoaded = $this->getActCatType() == 'oxmanufacturer' && $oManufacturer->load($this->getActCatId());
 
         return ($blLoaded) ? $oManufacturer : null;
@@ -332,7 +339,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class);
+        return Registry::get(SeoEncoderArticle::class);
     }
 
     /**
@@ -342,7 +349,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function getEntryUri()
     {
-        $product = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $product = oxNew(Article::class);
 
         if ($product->load($this->getEditObjectId())) {
             $seoEncoder = $this->_getEncoder();
@@ -391,7 +398,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function isEntryFixed()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sId = $this->_getSaveObjectId();
         $iLang = (int) $this->getEditLang();
@@ -403,7 +410,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
                    oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = :oxparams";
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ, [
+        return (bool) DatabaseProvider::getMaster()->getOne($sQ, [
             ':oxobjectid' => $sId,
             ':oxshopid' => $iShopId,
             ':oxlang' => $iLang,

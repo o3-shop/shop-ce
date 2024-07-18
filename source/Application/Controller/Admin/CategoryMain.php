@@ -21,8 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxField;
+use OxidEsales\Eshop\Core\UtilsFile;
+use OxidEsales\Eshop\Core\UtilsPic;
+use OxidEsales\Eshop\Core\UtilsView;
 use stdClass;
 use oxCategory;
 use oxUtilsPic;
@@ -54,7 +61,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         parent::render();
 
-        /** @var \OxidEsales\Eshop\Application\Model\Category $oCategory */
+        /** @var Category $oCategory */
         $oCategory = $this->createCategory();
 
         $categoryId = $this->getEditObjectId();
@@ -81,7 +88,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             }
 
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
                 $this->_aViewData["posslang"] = $aLang;
             }
@@ -106,7 +113,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         $this->_aViewData["sortableFields"] = $this->getSortableFields();
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getConfig()->getRequestParameter("aoc")) {
             /** @var \OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax $oCategoryMainAjax */
             $oCategoryMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryMainAjax->getColumns();
@@ -136,8 +143,8 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         , "OXUPDATEPRICE", "OXUPDATEPRICEA", "OXUPDATEPRICEB", "OXUPDATEPRICEC", "OXUPDATEPRICETIME", "OXISDOWNLOADABLE"
         , "OXVARMAXPRICE", "OXSHOWCUSTOMAGREEMENT"
         ];
-        /** @var \OxidEsales\Eshop\Core\DbMetaDataHandler $oDbHandler */
-        $oDbHandler = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
+        /** @var DbMetaDataHandler $oDbHandler */
+        $oDbHandler = oxNew(DbMetaDataHandler::class);
         $aFields = array_merge($oDbHandler->getMultilangFields('oxarticles'), array_keys($oDbHandler->getSinglelangFields('oxarticles', 0)));
         $aFields = array_diff($aFields, $aSkipFields);
         $aFields = array_unique($aFields);
@@ -162,7 +169,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             $myConfig->getRequestParameter("editval")
         );
 
-        /** @var \OxidEsales\Eshop\Application\Model\Category $oCategory */
+        /** @var Category $oCategory */
         $oCategory = $this->createCategory();
 
         if ($soxId != self::NEW_CATEGORY_ID) {
@@ -215,11 +222,11 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         if ($myConfig->isDemoShop()) {
             // disabling uploading pictures if this is demo shop
-            $oEx = new \OxidEsales\Eshop\Core\Exception\ExceptionToDisplay();
+            $oEx = new ExceptionToDisplay();
             $oEx->setMessage('CATEGORY_PICTURES_UPLOADISDISABLED');
 
-            /** @var \OxidEsales\Eshop\Core\UtilsView $oUtilsView */
-            $oUtilsView = \OxidEsales\Eshop\Core\Registry::getUtilsView();
+            /** @var UtilsView $oUtilsView */
+            $oUtilsView = Registry::getUtilsView();
 
             $oUtilsView->addErrorToDisplay($oEx, false);
 
@@ -227,13 +234,13 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         }
 
         $sOxId = $this->getEditObjectId();
-        $sField = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('masterPicField');
+        $sField = Registry::getConfig()->getRequestParameter('masterPicField');
         if (empty($sField)) {
             return;
         }
 
-        /** @var \OxidEsales\Eshop\Application\Model\Category $oItem */
-        $oItem = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        /** @var Category $oItem */
+        $oItem = oxNew(Category::class);
         $oItem->load($sOxId);
         $this->_deleteCatPicture($oItem, $sField);
     }
@@ -241,7 +248,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     /**
      * Delete category picture, specified in $sField parameter
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $item  active category object
+     * @param Category $item  active category object
      * @param string                                       $field picture field name
      *
      * @return null
@@ -274,15 +281,15 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         }
 
         if ($sImgType !== false) {
-            /** @var \OxidEsales\Eshop\Core\UtilsPic $myUtilsPic */
-            $myUtilsPic = \OxidEsales\Eshop\Core\Registry::getUtilsPic();
-            /** @var \OxidEsales\Eshop\Core\UtilsFile $oUtilsFile */
-            $oUtilsFile = \OxidEsales\Eshop\Core\Registry::getUtilsFile();
+            /** @var UtilsPic $myUtilsPic */
+            $myUtilsPic = Registry::getUtilsPic();
+            /** @var UtilsFile $oUtilsFile */
+            $oUtilsFile = Registry::getUtilsFile();
 
             $sDir = $myConfig->getPictureDir(false);
             $myUtilsPic->safePictureDelete($item->$sItemKey->value, $sDir . $oUtilsFile->getImageDirByType($sImgType), 'oxcategories', $field);
 
-            $item->$sItemKey = new \OxidEsales\Eshop\Core\Field();
+            $item->$sItemKey = new Field();
             $item->save();
         }
     }
@@ -337,7 +344,7 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     /**
      * Set parameters, language and files to category object.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $category
+     * @param Category $category
      * @param array                                        $params
      * @param string                                       $categoryId
      */
@@ -347,8 +354,8 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $category->load($categoryId);
         $category->loadInLang($this->_iEditLang, $categoryId);
 
-        /** @var \OxidEsales\Eshop\Core\UtilsPic $utilsPic */
-        $utilsPic = \OxidEsales\Eshop\Core\Registry::getUtilsPic();
+        /** @var UtilsPic $utilsPic */
+        $utilsPic = Registry::getUtilsPic();
 
         // #1173M - not all pic are deleted, after article is removed
         $utilsPic->overwritePic($category, 'oxcategories', 'oxthumb', 'TC', '0', $params, $config->getPictureDir(false));
@@ -359,27 +366,27 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     /**
      * Set parameters, language and files to category object.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $category
+     * @param Category $category
      * @param array                                        $params
      *
-     * @return \OxidEsales\Eshop\Application\Model\Category
+     * @return Category
      */
     protected function updateCategoryOnSave($category, $params)
     {
         $category->assign($params);
         $category->setLanguage($this->_iEditLang);
 
-        $utilsFile = \OxidEsales\Eshop\Core\Registry::getUtilsFile();
+        $utilsFile = Registry::getUtilsFile();
 
         return $utilsFile->processFiles($category);
     }
 
     /**
-     * @return \OxidEsales\Eshop\Application\Model\Category
+     * @return Category
      */
     protected function createCategory()
     {
-        $category = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $category = oxNew(Category::class);
 
         return $category;
     }
