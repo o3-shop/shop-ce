@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use oxDb;
 use oxField;
 use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -32,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Class controls article assignment to selection lists
  */
-class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleSelectionAjax extends ListComponentAjax
 {
     /**
      * Columns array

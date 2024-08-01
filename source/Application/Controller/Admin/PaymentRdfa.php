@@ -21,9 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use oxDb;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 use oxField;
 
@@ -32,7 +36,7 @@ use oxField;
  * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Shop Settings -> Payment Methods -> RDFa.
  */
-class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class PaymentRdfa extends AdminDetailsController
 {
     /**
      * Current class template name.
@@ -79,21 +83,21 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function save()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
-        $aRDFaPayments = (array) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('ardfapayments');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aRDFaPayments = (array) Registry::getRequest()->getRequestEscapedParameter('ardfapayments');
 
         // Delete old mappings
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("DELETE FROM oxobject2payment WHERE oxpaymentid = :oxpaymentid AND OXTYPE = 'rdfapayment'", [
-            ':oxpaymentid' => \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid')
+            ':oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
         ]);
 
         // Save new mappings
         foreach ($aRDFaPayments as $sPayment) {
-            $oMapping = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+            $oMapping = oxNew(BaseModel::class);
             $oMapping->init("oxobject2payment");
             $oMapping->assign($aParams);
-            $oMapping->oxobject2payment__oxobjectid = new \OxidEsales\Eshop\Core\Field($sPayment);
+            $oMapping->oxobject2payment__oxobjectid = new Field($sPayment);
             $oMapping->save();
         }
     }
@@ -129,7 +133,7 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $aRDFaPayments = [];
         $sSelect = 'select oxobjectid from oxobject2payment where oxpaymentid = :oxpaymentid and oxtype = "rdfapayment" ';
         $rs = $oDb->select($sSelect, [
-            ':oxpaymentid' => \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid')
+            ':oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
         ]);
         if ($rs && $rs->count()) {
             while (!$rs->EOF) {

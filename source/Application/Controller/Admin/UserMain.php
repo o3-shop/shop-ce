@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 use Exception;
 
@@ -29,7 +32,7 @@ use Exception;
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: User Administration -> Users -> Main.
  */
-class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class UserMain extends AdminDetailsController
 {
     private $_sSaveError = null;
 
@@ -45,13 +48,13 @@ class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         parent::render();
 
         // malladmin stuff
-        $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
         $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == "malladmin";
 
         // User rights
         $aUserRights = [];
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $iTplLang = $oLang->getTplLanguage();
 
         $iPos = count($aUserRights);
@@ -71,7 +74,7 @@ class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser = oxNew(User::class);
             $oUser->load($soxId);
             $this->_aViewData["edit"] = $oUser;
 
@@ -102,7 +105,7 @@ class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         if (!$this->_allowAdminEdit($soxId)) {
             $this->_aViewData['readonly'] = true;
         }
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oUserMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\UserMainAjax::class);
             $this->_aViewData['oxajax'] = $oUserMainAjax->getColumns();
 
@@ -124,14 +127,14 @@ class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         //allow admin information edit only for MALL admins
         $soxId = $this->getEditObjectId();
         if ($this->_allowAdminEdit($soxId)) {
-            $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+            $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
             // checkbox handling
             if (!isset($aParams['oxuser__oxactive'])) {
                 $aParams['oxuser__oxactive'] = 0;
             }
 
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser = oxNew(User::class);
             if ($soxId != "-1") {
                 $oUser->load($soxId);
             } else {
@@ -139,7 +142,7 @@ class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
             }
 
             //setting new password
-            if (($sNewPass = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('newPassword'))) {
+            if (($sNewPass = Registry::getRequest()->getRequestEscapedParameter('newPassword'))) {
                 $oUser->setPassword($sNewPass);
             }
 
@@ -187,9 +190,9 @@ class UserMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
     /**
      * Additional actions on user creation.
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $user
+     * @param User $user
      *
-     * @return \OxidEsales\Eshop\Application\Model\User
+     * @return User
      */
     protected function onUserCreation($user)
     {

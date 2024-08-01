@@ -21,13 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Discount;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin article main discount manager.
  * There is possibility to change discount name, article, user
  * and etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
-class DiscountArticles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class DiscountArticles extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates discount category tree,
@@ -42,7 +46,7 @@ class DiscountArticles extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != '-1') {
             // load object
-            $oDiscount = oxNew(\OxidEsales\Eshop\Application\Model\Discount::class);
+            $oDiscount = oxNew(Discount::class);
             $oDiscount->load($soxId);
             $this->_aViewData['edit'] = $oDiscount;
 
@@ -55,7 +59,7 @@ class DiscountArticles extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             $this->_createCategoryTree("artcattree");
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDiscountArticlesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountArticlesAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountArticlesAjax->getColumns();

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\NavigationTree;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -541,7 +542,7 @@ class AdminController extends BaseController
     public function getNavigation()
     {
         if (self::$_oNaviTree == null) {
-            self::$_oNaviTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
+            self::$_oNaviTree = oxNew(NavigationTree::class);
         }
 
         return self::$_oNaviTree;

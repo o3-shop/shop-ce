@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Registry;
 use oxUBase;
 use oxBasket;
@@ -30,7 +34,7 @@ use oxOrder;
  * Thankyou page.
  * Arranges Thankyou page, sets ordering status, other parameters
  */
-class ThankYouController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ThankYouController extends FrontendController
 {
     /**
      * User basket object
@@ -104,8 +108,8 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
 
     /**
      * Executes parent::init(), loads basket from session
-     * (thankyou::_oBasket = \OxidEsales\Eshop\Core\Session::getBasket()) then destroys
-     * it (\OxidEsales\Eshop\Core\Session::delBasket()), unsets user session ID, if
+     * (thankyou::_oBasket = Session::getBasket()) then destroys
+     * it (Session::delBasket()), unsets user session ID, if
      * this user didn't entered password while ordering.
      */
     public function init()
@@ -156,7 +160,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
         // loading order sometimes needed in template
         if ($this->_oBasket->getOrderId()) {
             // owners stock reminder
-            $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+            $oEmail = oxNew(Email::class);
             $oEmail->sendStockReminder($this->_oBasket->getContents());
         }
 
@@ -295,7 +299,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     public function getOrder()
     {
         if ($this->_oOrder === null) {
-            $this->_oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+            $this->_oOrder = oxNew(Order::class);
             // loading order sometimes needed in template
             if ($sOrderId = $this->getBasket()->getOrderId()) {
                 $this->_oOrder->load($sOrderId);
@@ -314,7 +318,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         $oOrder = $this->getOrder();
         if ($oOrder) {
-            $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
+            $oCountry = oxNew(Country::class);
             $oCountry->load($oOrder->oxorder__oxbillcountryid->value);
 
             return $oCountry->oxcountry__oxisoalpha3->value;

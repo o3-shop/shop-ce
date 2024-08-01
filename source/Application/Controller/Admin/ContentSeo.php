@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Application\Model\SeoEncoderContent;
 use OxidEsales\Eshop\Core\Registry;
@@ -28,7 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Content seo config class
  */
-class ContentSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class ContentSeo extends ObjectSeo
 {
     /**
      * Returns url type

@@ -22,13 +22,16 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxArticleList;
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Application\Model\OrderFileList;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\SeoEncoder;
 use oxOrderFileList;
 
 /**
  * Account article file download page.
  */
-class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountDownloadsController extends AccountController
 {
     /**
      * Current class template name.
@@ -45,7 +48,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
     protected $_iViewIndexState = VIEW_INDEXSTATE_NOINDEXNOFOLLOW;
 
     /**
-     * @var \OxidEsales\Eshop\Application\Model\OrderFileList
+     * @var OrderFileList
      */
     protected $_oOrderFilesList = null;
 
@@ -61,7 +64,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
         $aPath = [];
 
         $iBaseLanguage = Registry::getLang()->getBaseLanguage();
-        /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
+        /** @var SeoEncoder $oSeoEncoder */
         $oSeoEncoder = Registry::getSeoEncoder();
         $aPath['title'] = Registry::getLang()->translateString('MY_ACCOUNT', $iBaseLanguage, false);
         $aPath['link'] = $oSeoEncoder->getStaticUrl($this->getViewConfig()->getSelfLink() . "cl=account");
@@ -85,7 +88,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
             return $this->_oOrderFilesList;
         }
 
-        $oOrderFileList = oxNew(\OxidEsales\Eshop\Application\Model\OrderFileList::class);
+        $oOrderFileList = oxNew(OrderFileList::class);
         $oOrderFileList->loadUserFiles($this->getUser()->getId());
 
         $this->_oOrderFilesList = $this->_prepareForTemplate($oOrderFileList);
@@ -96,7 +99,7 @@ class AccountDownloadsController extends \OxidEsales\Eshop\Application\Controlle
     /**
      * Returns prepared orders files list
      *
-     * @param \OxidEsales\Eshop\Application\Model\OrderFileList $oOrderFileList - list or orderfiles
+     * @param OrderFileList $oOrderFileList - list or orderfiles
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareForTemplate" in next major

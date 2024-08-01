@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsUrl;
+
 /**
  * Admin dynscreen manager.
  * Returns template, that arranges two other templates ("dynscreen_list.tpl"
@@ -31,7 +35,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
  *
  */
-class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class DynamicScreenController extends AdminListController
 {
     /**
      * Current class template name.
@@ -49,10 +53,10 @@ class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\A
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myAdminNavig = $this->getNavigation();
-        $sNode = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('menu');
+        $sNode = Registry::getRequest()->getRequestEscapedParameter('menu');
 
         // active tab
-        $iActTab = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('actedit');
+        $iActTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
         $iActTab = $iActTab ? $iActTab : $this->_iDefEdit;
 
         $sActTab = $iActTab ? "&actedit=$iActTab" : '';
@@ -64,8 +68,8 @@ class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\A
         $sEditUrl = $myAdminNavig->getEditUrl($sNode, $iActTab) . $sActTab;
         if (!getStr()->preg_match("/^http(s)?:\/\//", $sEditUrl)) {
             //internal link, adding path
-            /** @var \OxidEsales\Eshop\Core\UtilsUrl $oUtilsUrl */
-            $oUtilsUrl = \OxidEsales\Eshop\Core\Registry::getUtilsUrl();
+            /** @var UtilsUrl $oUtilsUrl */
+            $oUtilsUrl = Registry::getUtilsUrl();
             $sSelfLinkParameter = $this->getViewConfig()->getViewConfigParam('selflink');
             $sEditUrl = $oUtilsUrl->appendParamSeparator($sSelfLinkParameter) . $sEditUrl;
         }

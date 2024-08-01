@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -30,7 +31,7 @@ use OxidEsales\Eshop\Core\Registry;
  *
  * @deprecated v5.3 (2016-05-10); Econda will be moved to own module.
  */
-class DynEconda extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class DynEconda extends ShopConfiguration
 {
     /**
      * Creates shop object, passes shop data to Smarty engine and returns name of

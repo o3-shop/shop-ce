@@ -22,6 +22,10 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxField;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
@@ -34,7 +38,7 @@ use OxidEsales\Eshop\Core\Registry;
  * email.
  * O3-Shop -> pricealarm.
  */
-class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class PriceAlarmController extends FrontendController
 {
     /**
      * Current class template name.
@@ -89,7 +93,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
         // convert currency to default
         $dPrice = $myUtils->currency2Float($aParams['price']);
 
-        $oAlarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
+        $oAlarm = oxNew(PriceAlarm::class);
         $oAlarm->oxpricealarm__oxuserid = new Field(Registry::getSession()->getVariable('usr'));
         $oAlarm->oxpricealarm__oxemail = new Field($aParams['email']);
         $oAlarm->oxpricealarm__oxartid = new Field($aParams['aid']);
@@ -102,7 +106,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
         $oAlarm->save();
 
         // Send Email
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
         $this->_iPriceAlarmStatus = (int) $oEmail->sendPricealarmNotification($aParams, $oAlarm);
     }
 
@@ -135,7 +139,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
         if ($this->_oArticle === null) {
             $this->_oArticle = false;
             $aParams = $this->_getParams();
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->load($aParams['aid']);
             $this->_oArticle = $oArticle;
         }

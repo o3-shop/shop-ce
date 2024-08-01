@@ -21,8 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Application\Model\File;
+use OxidEsales\Eshop\Application\Model\ManufacturerList;
+use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -38,7 +42,7 @@ use stdClass;
  * title, article No., short Description and etc.).
  * Admin Menu: Manage Products -> Articles -> Main.
  */
-class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleMain extends AdminDetailsController
 {
     /**
      * Loads article parameters and passes them to Smarty engine, returns
@@ -711,7 +715,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function getCategoryList()
     {
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
 
         return $oCatTree;
@@ -724,7 +728,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function getVendorList()
     {
-        $oVendorlist = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
+        $oVendorlist = oxNew(VendorList::class);
         $oVendorlist->loadVendorList();
 
         return $oVendorlist;
@@ -737,7 +741,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function getManufacturerList()
     {
-        $oManufacturerList = oxNew(\OxidEsales\Eshop\Application\Model\ManufacturerList::class);
+        $oManufacturerList = oxNew(ManufacturerList::class);
         $oManufacturerList->loadManufacturerList();
 
         return $oManufacturerList;

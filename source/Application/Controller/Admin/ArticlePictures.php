@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
@@ -33,7 +34,7 @@ use oxField;
  * upload any other picture, etc.
  * Admin Menu: Manage Products -> Articles -> Pictures.
  */
-class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticlePictures extends AdminDetailsController
 {
     /**
      * Loads article information - pictures, passes data to Smarty

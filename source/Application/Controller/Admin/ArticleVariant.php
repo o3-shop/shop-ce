@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\VariantHandler;
 use OxidEsales\Eshop\Core\Field;
@@ -34,7 +35,7 @@ use stdClass;
  * Collects and updates article variants data.
  * Admin Menu: Manage Products -> Articles -> Variants.
  */
-class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleVariant extends AdminDetailsController
 {
     /**
      * Variant parent product object

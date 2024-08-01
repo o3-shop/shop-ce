@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\NewsList;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -28,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Arranges news texts. O3-Shop -> (click on News box on left side).
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class NewsController extends FrontendController
 {
     /**
      * Newslist
@@ -78,7 +80,7 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
             $iPerPage = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
             $iPerPage = $iPerPage ? $iPerPage : 10;
 
-            $oActNews = oxNew(\OxidEsales\Eshop\Application\Model\NewsList::class);
+            $oActNews = oxNew(NewsList::class);
 
             if ($iCnt = $oActNews->getCount()) {
                 $this->_iCntPages = ceil($iCnt / $iPerPage);
@@ -101,7 +103,7 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
         $aPaths = [];
         $aPath = [];
 
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $iBaseLanguage = $oLang->getBaseLanguage();
         $sTranslatedString = $oLang->translateString('LATEST_NEWS_AND_UPDATES_AT', $iBaseLanguage, false);
 
@@ -135,7 +137,7 @@ class NewsController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      */
     public function getTitle()
     {
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $iBaseLanguage = $oLang->getBaseLanguage();
         $sTranslatedString = $oLang->translateString('LATEST_NEWS_AND_UPDATES_AT', $iBaseLanguage, false);
 

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use oxField;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
@@ -30,7 +31,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Category seo config class
  */
-class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class CategorySeo extends ObjectSeo
 {
     /**
      * Updating showsuffix field

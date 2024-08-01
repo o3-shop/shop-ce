@@ -21,18 +21,25 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\DisplayError;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
+use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
 use Doctrine\DBAL\Exception\ConnectionException;
 use oxDb;
 use oxNoJsValidator;
 use Exception;
+use PDOException;
 use PHPUnit\Framework\Constraint\IsInstanceOf;
 
 /**
  * Admin article main selectlist manager.
  * Performs collection and updatind (on user submit) main item information.
  */
-class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class LanguageMain extends AdminDetailsController
 {
     /**
      * Current shop base languages
@@ -62,7 +69,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected $_aLanguagesSslUrls = null;
 
-    /** @var \OxidEsales\Eshop\Core\NoJsValidator */
+    /** @var NoJsValidator */
     private $noJsValidator;
 
     /**
@@ -99,7 +106,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $sOxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['active'])) {
             $aParams['active'] = 0;
@@ -126,9 +133,9 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         if ($sOxId != -1 && $sOxId != $aParams['abbr']) {
             // #0004850 preventing changing abbr for main language with base id = 0
             if ((int) $this->_aLangData['params'][$sOxId]['baseId'] == 0) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('LANGUAGE_ABBRCHANGEMAINLANG_WARNING');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
                 $aParams['abbr'] = $sOxId;
             } else {
                 $this->_updateAbbervation($sOxId, $aParams['abbr']);
@@ -186,9 +193,9 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
             }
             // show message for user to generate views
             if ($blViewError) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('LANGUAGE_ERRORGENERATEVIEWS');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
     }
@@ -378,9 +385,9 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $sDir = dirname($myConfig->getTranslationsDir('lang.php', $sOxId));
 
         if (empty($sDir)) {
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            $oEx = oxNew(ExceptionToDisplay::class);
             $oEx->setMessage('LANGUAGE_NOTRANSLATIONS_WARNING');
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
         }
     }
 
@@ -396,9 +403,9 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     {
         $iBaseId = $this->_aLangData['params'][$sOxId]['baseId'];
         $sTable = getLangTableName('oxarticles', $iBaseId);
-        $sColumn = 'oxtitle' . \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageTag($iBaseId);
+        $sColumn = 'oxtitle' . Registry::getLang()->getLanguageTag($iBaseId);
 
-        $oDbMetadata = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
+        $oDbMetadata = oxNew(DbMetaDataHandler::class);
 
         return $oDbMetadata->tableExists($sTable) && $oDbMetadata->fieldExists($sColumn, $sTable);
     }
@@ -413,21 +420,21 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     protected function _addNewMultilangFieldsToDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         //creating new multilingual fields with new id over whole DB
-        $oDbMeta = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
+        $oDbMeta = oxNew(DbMetaDataHandler::class);
 
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $db = DatabaseProvider::getDb();
         $db->startTransaction();
         try {
             $oDbMeta->addNewLangToDb();
             $db->commitTransaction();
         } catch (Exception $oEx) {
-            if (!$oEx instanceof \PDOException) {
+            if (!$oEx instanceof PDOException) {
                 $db->rollbackTransaction();
             }
             //show warning
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            $oEx = oxNew(ExceptionToDisplay::class);
             $oEx->setMessage('LANGUAGE_ERROR_ADDING_MULTILANG_FIELDS');
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
         }
     }
 
@@ -472,7 +479,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $result = true;
 
         $oxid = $this->getEditObjectId();
-        $parameters = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $parameters = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // if creating new language, checking if language already exists with
         // entered language abbreviation
@@ -513,7 +520,7 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $pattern = '/^[a-zA-Z0-9_]*$/';
         $result = preg_match($pattern, $abbreviation);
         if ($result === false) {
-            throw new \Exception(preg_last_error(), $pattern, $abbreviation);
+            throw new Exception(preg_last_error(), $pattern, $abbreviation);
         }
 
         return (bool) $result;
@@ -526,9 +533,9 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     protected function addDisplayException($message)
     {
-        $exception = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+        $exception = oxNew(ExceptionToDisplay::class);
         $exception->setMessage($message);
-        \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($exception);
+        Registry::getUtilsView()->addErrorToDisplay($exception);
     }
 
     /**
@@ -549,10 +556,10 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
                 $blValid = $blDeepResult === false ? $blDeepResult : $blValid;
             } elseif (!$configValidator->isValid($mLanguageDataParameters)) {
                 $blValid = false;
-                $error = oxNew(\OxidEsales\Eshop\Core\DisplayError::class);
+                $error = oxNew(DisplayError::class);
                 $error->setFormatParameters(htmlspecialchars($mLanguageDataParameters));
                 $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($error);
+                Registry::getUtilsView()->addErrorToDisplay($error);
             }
         }
 
@@ -560,12 +567,12 @@ class LanguageMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     }
 
     /**
-     * @return \OxidEsales\Eshop\Core\NoJsValidator
+     * @return NoJsValidator
      */
     protected function getNoJsValidator()
     {
         if (is_null($this->noJsValidator)) {
-            $this->noJsValidator = oxNew(\OxidEsales\Eshop\Core\NoJsValidator::class);
+            $this->noJsValidator = oxNew(NoJsValidator::class);
         }
 
         return $this->noJsValidator;

@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -30,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
  * sends suggestion mail to user.
  * @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely
  */
-class SuggestController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class SuggestController extends FrontendController
 {
     /**
      * Current class template name.
@@ -154,7 +158,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
         }
 
         // sending suggest email
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
         $oProduct = $this->getProduct();
         if ($oProduct && $oEmail->sendSuggestMail($oParams, $oProduct)) {
             return 'details?anid=' . $oProduct->getId() . $sReturn;
@@ -174,7 +178,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
             $this->_oProduct = false;
 
             if ($sProductId = Registry::getRequest()->getRequestEscapedParameter('anid')) {
-                $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+                $oProduct = oxNew(Article::class);
                 $oProduct->load($sProductId);
                 $this->_oProduct = $oProduct;
             }
@@ -233,7 +237,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_oRecommList === null) {
             $this->_oRecommList = false;
             if ($oProduct = $this->getProduct()) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+                $oRecommList = oxNew(RecommendationList::class);
                 $this->_oRecommList = $oRecommList->getRecommListsByIds([$oProduct->getId()]);
             }
         }

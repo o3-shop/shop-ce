@@ -21,6 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Application\Model\UserBasket;
+use OxidEsales\Eshop\Application\Model\UserList;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxField;
 
@@ -33,7 +39,7 @@ use oxField;
  * login name in special field. O3-Shop -> MY ACCOUNT
  *  -> Newsletter.
  */
-class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountWishlistController extends AccountController
 {
     /**
      * Current class template name.
@@ -87,7 +93,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     /**
      * List of users which were found according to search condition
      *
-     * @var \OxidEsales\Eshop\Core\Model\ListModel
+     * @var ListModel
      */
     protected $_oWishListUsers = false;
 
@@ -121,9 +127,9 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
 
     /**
      * If user is logged in loads his wishlist articles (articles may be accessed by
-     * \OxidEsales\Eshop\Application\Model\User::GetBasket()), loads similar articles (is available) for
-     * the last article in list loaded by \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts() and returns
-     * name of template to render \OxidEsales\Eshop\Application\Controller\AccountWishlistController::_sThisTemplate
+     * User::GetBasket()), loads similar articles (is available) for
+     * the last article in list loaded by Article::GetSimilarProducts() and returns
+     * name of template to render AccountWishlistController::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
      */
@@ -157,7 +163,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     /**
      * Show the Wishlist
      *
-     * @return \OxidEsales\Eshop\Application\Model\UserBasket | bool
+     * @return UserBasket | bool
      */
     public function getWishList()
     {
@@ -245,7 +251,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
                     $oParams->$sSendName = $oUser->$sFirstName->getRawValue() . ' ' . $oUser->$sLastName->getRawValue();
                     $oParams->$sSendId = $oUser->getId();
 
-                    $this->_blEmailSent = oxNew(\OxidEsales\Eshop\Core\Email::class)->sendWishlistMail($oParams);
+                    $this->_blEmailSent = oxNew(Email::class)->sendWishlistMail($oParams);
                     if (!$this->_blEmailSent) {
                         return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_CHECK_EMAIL', false, true);
                     }
@@ -299,7 +305,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
         if ($oUser = $this->getUser()) {
             $blPublic = (int) Registry::getRequest()->getRequestEscapedParameter('blpublic');
             $oBasket = $oUser->getBasket('wishlist');
-            $oBasket->oxuserbaskets__oxpublic = new \OxidEsales\Eshop\Core\Field(($blPublic == 1) ? $blPublic : 0);
+            $oBasket->oxuserbaskets__oxpublic = new Field(($blPublic == 1) ? $blPublic : 0);
             $oBasket->save();
         }
     }
@@ -312,7 +318,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     {
         if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('search')) {
             // search for baskets
-            $oUserList = oxNew(\OxidEsales\Eshop\Application\Model\UserList::class);
+            $oUserList = oxNew(UserList::class);
             $oUserList->loadWishlistUsers($sSearch);
             if ($oUserList->count()) {
                 $this->_oWishListUsers = $oUserList;
@@ -326,7 +332,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      * Returns a list of users which were found according to search condition.
      * If no users were found - false is returned
      *
-     * @return \OxidEsales\Eshop\Core\Model\ListModel | bool
+     * @return ListModel | bool
      */
     public function getWishListUsers()
     {

@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Admin wrapping list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: User Administration -> Users.
  */
-class WrappingList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class WrappingList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
@@ -30,7 +31,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ClassExtens
  * Extensions sorting list handler.
  * Admin Menu: Extensions -> Module -> Installed Shop Modules.
  */
-class ModuleSortList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ModuleSortList extends AdminDetailsController
 {
     /**
      * It is unsave to use a backslash as HTML id in conjunction with UI.sortable, so it will be replaced in the
@@ -64,7 +65,7 @@ class ModuleSortList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         $this->_aViewData["aDisabledModules"] = $oModuleList->getDisabledModuleClasses();
 
         // checking if there are any deleted extensions
-        if (\OxidEsales\Eshop\Core\Registry::getSession()->getVariable("blSkipDeletedExtChecking") == false) {
+        if (Registry::getSession()->getVariable("blSkipDeletedExtChecking") == false) {
             $aDeletedExt = $oModuleList->getDeletedExtensions();
 
             if (!empty($aDeletedExt)) {
@@ -111,8 +112,8 @@ class ModuleSortList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     public function remove()
     {
         //if user selected not to update modules, skipping all updates
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('noButton')) {
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("blSkipDeletedExtChecking", true);
+        if (Registry::getRequest()->getRequestEscapedParameter('noButton')) {
+            Registry::getSession()->setVariable("blSkipDeletedExtChecking", true);
 
             return;
         }

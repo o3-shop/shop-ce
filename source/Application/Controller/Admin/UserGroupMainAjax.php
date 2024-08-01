@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Object2Group;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages users assignment to groups
  */
-class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class UserGroupMainAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -36,29 +40,29 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxusername', 'oxuser', 1, 0, 0],
-        ['oxlname', 'oxuser', 0, 0, 0],
-        ['oxfname', 'oxuser', 0, 0, 0],
-        ['oxstreet', 'oxuser', 0, 0, 0],
-        ['oxstreetnr', 'oxuser', 0, 0, 0],
-        ['oxcity', 'oxuser', 0, 0, 0],
-        ['oxzip', 'oxuser', 0, 0, 0],
-        ['oxfon', 'oxuser', 0, 0, 0],
-        ['oxbirthdate', 'oxuser', 0, 0, 0],
-        ['oxid', 'oxuser', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxusername', 'oxuser', 1, 0, 0],
-                                     ['oxlname', 'oxuser', 0, 0, 0],
-                                     ['oxfname', 'oxuser', 0, 0, 0],
-                                     ['oxstreet', 'oxuser', 0, 0, 0],
-                                     ['oxstreetnr', 'oxuser', 0, 0, 0],
-                                     ['oxcity', 'oxuser', 0, 0, 0],
-                                     ['oxzip', 'oxuser', 0, 0, 0],
-                                     ['oxfon', 'oxuser', 0, 0, 0],
-                                     ['oxbirthdate', 'oxuser', 0, 0, 0],
-                                     ['oxid', 'oxobject2group', 0, 0, 1],
-                                 ]
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxuser', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxobject2group', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -73,9 +77,9 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
 
         // looking for table/view
         $sUserTable = $this->_getViewName('oxuser');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sRoleId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchRoleId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
+        $sRoleId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchRoleId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sRoleId) {
@@ -108,12 +112,12 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -123,17 +127,17 @@ class UserGroupMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function addUserToUGroup()
     {
         $aAddUsers = $this->_getActionIds('oxuser.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sUserTable = $this->_getViewName('oxuser');
             $aAddUsers = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aAddUsers)) {
             foreach ($aAddUsers as $sAdduser) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
-                $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($sAdduser);
-                $oNewGroup->oxobject2group__oxgroupsid = new \OxidEsales\Eshop\Core\Field($soxId);
+                $oNewGroup = oxNew(Object2Group::class);
+                $oNewGroup->oxobject2group__oxobjectid = new Field($sAdduser);
+                $oNewGroup->oxobject2group__oxgroupsid = new Field($soxId);
                 $oNewGroup->save();
             }
         }

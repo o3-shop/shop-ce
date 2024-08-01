@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use oxSysRequirements;
 
 /**
  * Collects System information.
  * Admin Menu: Service -> System Requirements -> Main.
  */
-class SystemRequirementsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class SystemRequirementsMain extends AdminDetailsController
 {
     /**
      * Loads article Mercators info, passes it to Smarty engine and

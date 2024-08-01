@@ -21,12 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 
 /**
  * Class reserved for extending (for customization - you can add you own fields, etc.).
  */
-class ArticleUserdef extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleUserdef extends AdminDetailsController
 {
     /**
      * Loads article data from DB, passes it to Smarty engine, returns name

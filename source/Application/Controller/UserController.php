@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * User details.
  * Collects and arranges user object data (information, like shipping address, etc.).
  */
-class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class UserController extends FrontendController
 {
     /**
      * Current class template.
@@ -86,7 +87,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     protected $_sWishId = null;
 
     /**
-     * Loads customer basket object form session (\OxidEsales\Eshop\Core\Session::getBasket()),
+     * Loads customer basket object form session (Session::getBasket()),
      * passes action article/basket/country list to template engine. If
      * available - loads user delivery address data (oxAddress). Returns
      * name template file to render user::_sThisTemplate.

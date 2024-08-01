@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
@@ -34,7 +36,7 @@ use stdClass;
  * There is possibility to change content description, enter page text etc.
  * Admin Menu: Customerinformations -> Content.
  */
-class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ContentMain extends AdminDetailsController
 {
     /**
      * Loads contents info, passes it to Smarty engine and
@@ -51,7 +53,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
 
         // categorie tree
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
 
         $oContent = oxNew(Content::class);

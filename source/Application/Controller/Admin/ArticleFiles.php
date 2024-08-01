@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\File;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
@@ -34,7 +35,7 @@ use Exception;
  * Collects and updates (on user submit) files.
  * Admin Menu: Manage Products -> Articles -> Files.
  */
-class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleFiles extends AdminDetailsController
 {
     /**
      * Template name

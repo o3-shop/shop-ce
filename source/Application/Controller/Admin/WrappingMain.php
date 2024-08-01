@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -30,7 +31,7 @@ use stdClass;
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: System Administration -> Wrapping -> Main.
  */
-class WrappingMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class WrappingMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxwrapping, oxshops and oxlist

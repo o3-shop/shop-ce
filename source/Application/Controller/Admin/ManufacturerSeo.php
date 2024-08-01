@@ -21,12 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use oxField;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Manufacturer seo config class
  */
-class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class ManufacturerSeo extends ObjectSeo
 {
     /**
      * Updating showsuffix field
@@ -35,12 +41,12 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
      */
     public function save()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oManufacturer = oxNew(BaseModel::class);
         $oManufacturer->init('oxmanufacturers');
         if ($oManufacturer->load($this->getEditObjectId())) {
             $sShowSuffixField = 'oxmanufacturers__oxshowsuffix';
-            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
-            $oManufacturer->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
+            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
+            $oManufacturer->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oManufacturer->save();
         }
 
@@ -55,7 +61,7 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class);
+        return Registry::get(SeoEncoderManufacturer::class);
     }
 
     /**
@@ -86,7 +92,7 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
      */
     public function isEntrySuffixed()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $oManufacturer = oxNew(Manufacturer::class);
         if ($oManufacturer->load($this->getEditObjectId())) {
             return (bool) $oManufacturer->oxmanufacturers__oxshowsuffix->value;
         }
@@ -99,7 +105,7 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
      */
     public function getEntryUri()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $oManufacturer = oxNew(Manufacturer::class);
         if ($oManufacturer->load($this->getEditObjectId())) {
             return $this->_getEncoder()->getManufacturerUri($oManufacturer, $this->getEditLang());
         }

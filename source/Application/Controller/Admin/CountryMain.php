@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -29,7 +30,7 @@ use stdClass;
  * Admin article main selectlist manager.
  * Performs collection and updatind (on user submit) main item information.
  */
-class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CountryMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxCategoryList object,

@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Object2Group;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -29,7 +33,7 @@ use oxField;
  * @deprecated Functionality for Newsletter management will be removed.
  * Class manages newsletter user groups rights
  */
-class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class NewsletterSelectionAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -37,15 +41,15 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxtitle', 'oxgroups', 1, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxgroups', 1, 0, 0],
-                                     ['oxid', 'oxgroups', 0, 0, 0],
-                                     ['oxid', 'oxobject2group', 0, 0, 1],
-                                 ]
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxobject2group', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -58,7 +62,7 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
     {
         // active AJAX component
         $sGroupTable = $this->_getViewName('oxgroups');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sDiscountId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchDiscountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
@@ -88,10 +92,10 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -109,9 +113,9 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
         }
         if ($soxId && $soxId != "-1" && is_array($aAddGroups)) {
             foreach ($aAddGroups as $sAddgroup) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
-                $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNewGroup->oxobject2group__oxgroupsid = new \OxidEsales\Eshop\Core\Field($sAddgroup);
+                $oNewGroup = oxNew(Object2Group::class);
+                $oNewGroup->oxobject2group__oxobjectid = new Field($soxId);
+                $oNewGroup->oxobject2group__oxgroupsid = new Field($sAddgroup);
                 $oNewGroup->save();
             }
         }

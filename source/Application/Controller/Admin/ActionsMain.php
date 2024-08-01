@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use stdClass;
+use OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Actions;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -32,7 +34,7 @@ use OxidEsales\Eshop\Core\Request;
  * this actions, etc.
  * Admin Menu: Manage Products -> actions -> Main.
  */
-class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ActionsMain extends AdminDetailsController
 {
     /**
      * Loads article actionss info, passes it to Smarty engine and
@@ -76,7 +78,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             // generating category tree for select list
             $this->_createCategoryTree("artcattree", $soxId);
 
-            $oActionsMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class);
+            $oActionsMainAjax = oxNew(ActionsMainAjax::class);
             $this->_aViewData['oxajax'] = $oActionsMainAjax->getColumns();
 
             return "popups/actions_main.tpl";

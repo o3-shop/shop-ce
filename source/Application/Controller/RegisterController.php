@@ -22,13 +22,16 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxField;
+use OxidEsales\Eshop\Application\Controller\UserController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * User registration window.
  * Collects and arranges user object data (information, like shipping address, etc.).
  */
-class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserController
+class RegisterController extends UserController
 {
     /**
      * Current class template.
@@ -128,13 +131,13 @@ class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserCo
      */
     public function confirmRegistration()
     {
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
         if ($oUser->loadUserByUpdateId($this->getUpdateId())) {
             // resetting update key parameter
             $oUser->setUpdateKey(true);
 
             // saving ..
-            $oUser->oxuser__oxactive = new \OxidEsales\Eshop\Core\Field(1);
+            $oUser->oxuser__oxactive = new Field(1);
             $oUser->save();
 
             // forcing user login

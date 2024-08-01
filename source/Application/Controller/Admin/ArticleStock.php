@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
@@ -37,7 +38,7 @@ use stdClass;
  * stock message, etc; Updates information (on user submit).
  * Admin Menu: Manage Products -> Articles -> Inventory.
  */
-class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleStock extends AdminDetailsController
 {
     /**
      * Loads article Inventory information and

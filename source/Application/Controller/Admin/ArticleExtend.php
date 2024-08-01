@@ -22,6 +22,9 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxArticle;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleBundleAjax;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\MediaUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -40,7 +43,7 @@ use Exception;
  * to any chosen article group.
  * Admin Menu: Manage Products -> Articles -> Extended.
  */
-class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleExtend extends AdminDetailsController
 {
     /**
      * Unit array
@@ -98,12 +101,12 @@ class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
 
         $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
-            $oArticleExtendAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax::class);
+            $oArticleExtendAjax = oxNew(ArticleExtendAjax::class);
             $this->_aViewData['oxajax'] = $oArticleExtendAjax->getColumns();
 
             return "popups/article_extend.tpl";
         } elseif ($iAoc == 2) {
-            $oArticleBundleAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleBundleAjax::class);
+            $oArticleBundleAjax = oxNew(ArticleBundleAjax::class);
             $this->_aViewData['oxajax'] = $oArticleBundleAjax->getColumns();
 
             return "popups/article_bundle.tpl";

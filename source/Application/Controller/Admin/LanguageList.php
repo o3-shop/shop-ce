@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use Exception;
@@ -28,7 +32,7 @@ use Exception;
 /**
  * Admin selectlist list manager.
  */
-class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class LanguageList extends AdminListController
 {
     /**
      * Default sorting parameter.
@@ -63,9 +67,9 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
         // preventing deleting main language with base id = 0
         if ($iBaseId == 0) {
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+            $oEx = oxNew(ExceptionToDisplay::class);
             $oEx->setMessage('LANGUAGE_DELETINGMAINLANG_WARNING');
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
 
             return;
         }
@@ -111,7 +115,7 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
     protected function _getLanguagesList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aLangParams = Registry::getConfig()->getConfigParam('aLanguageParams');
-        $aLanguages = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageArray();
+        $aLanguages = Registry::getLang()->getLanguageArray();
         $sDefaultLang = Registry::getConfig()->getConfigParam('sDefaultLang');
 
         foreach ($aLanguages as $sKey => $sValue) {
@@ -181,21 +185,21 @@ class LanguageList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
 
         //skipping reseting language with id = 0
         if ($iLangId) {
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->startTransaction();
+            DatabaseProvider::getDb()->startTransaction();
 
             try {
-                $oDbMeta = oxNew(\OxidEsales\Eshop\Core\DbMetaDataHandler::class);
+                $oDbMeta = oxNew(DbMetaDataHandler::class);
                 $oDbMeta->resetLanguage($iLangId);
 
-                \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->commitTransaction();
+                DatabaseProvider::getDb()->commitTransaction();
             } catch (Exception $oEx) {
                 // if exception, rollBack everything
-                \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->rollbackTransaction();
+                DatabaseProvider::getDb()->rollbackTransaction();
 
                 //show warning
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ExceptionToDisplay::class);
+                $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('LANGUAGE_ERROR_RESETING_MULTILANG_FIELDS');
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
     }

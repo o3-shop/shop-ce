@@ -21,11 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Collects System information.
  * Admin Menu: Service -> System Requirements.
  */
-class SystemRequirementsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class SystemRequirementsList extends AdminListController
 {
     /**
      * Current class template name.

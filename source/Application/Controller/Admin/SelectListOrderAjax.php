@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages article select lists sorting
  */
-class SelectListOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class SelectListOrderAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -34,12 +37,12 @@ class SelectListOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin
      * @var array
      */
     protected $_aColumns = ['container1' => [
-        ['oxtitle', 'oxselectlist', 1, 1, 0],
-        ['oxsort', 'oxobject2selectlist', 1, 0, 0],
-        ['oxident', 'oxselectlist', 0, 0, 0],
-        ['oxvaldesc', 'oxselectlist', 0, 0, 0],
-        ['oxid', 'oxobject2selectlist', 0, 0, 1]
-    ]
+            ['oxtitle', 'oxselectlist', 1, 1, 0],
+            ['oxsort', 'oxobject2selectlist', 1, 0, 0],
+            ['oxident', 'oxselectlist', 0, 0, 0],
+            ['oxvaldesc', 'oxselectlist', 0, 0, 0],
+            ['oxid', 'oxobject2selectlist', 0, 0, 1]
+        ],
     ];
 
     /**
@@ -51,7 +54,7 @@ class SelectListOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSelTable = $this->_getViewName('oxselectlist');
-        $sArtId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         return " from $sSelTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sSelTable.oxid " .
                  "where oxobjectid = " . DatabaseProvider::getDb()->quote($sArtId) . " ";
@@ -73,10 +76,10 @@ class SelectListOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     public function setSorting()
     {
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSelect = "select * from oxobject2selectlist where oxobjectid = :oxobjectid order by oxsort";
 
-        $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oList = oxNew(ListModel::class);
         $oList->init("oxbase", "oxobject2selectlist");
         $oList->selectString($sSelect, [
             ':oxobjectid' => $sSelId
@@ -97,8 +100,8 @@ class SelectListOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin
         }
 
         //
-        if (($iKey = array_search(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
-            $iDir = (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
+        if (($iKey = array_search(Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
+            $iDir = (Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
             if (isset($aIdx2Id[$iDir])) {
                 // exchanging indexes
                 $oDir1 = $oList->offsetGet($aIdx2Id[$iDir]);

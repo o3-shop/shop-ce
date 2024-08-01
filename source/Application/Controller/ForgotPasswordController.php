@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\InputValidator;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -30,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
  * information and submits "Request Password" button mail is sent to users email.
  * O3-Shop -> MY ACCOUNT -> "Forgot your password? - click here."
  */
-class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ForgotPasswordController extends FrontendController
 {
     /**
      * Current class template name.
@@ -78,7 +82,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
     {
         $sEmail = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
         $this->_sForgotEmail = $sEmail;
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
 
         // problems sending passwd reminder ?
         $iSuccess = false;
@@ -103,9 +107,9 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
         $sNewPass = Registry::getRequest()->getRequestEscapedParameter('password_new', true);
         $sConfPass = Registry::getRequest()->getRequestEscapedParameter('password_new_confirm', true);
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
 
-        /** @var \OxidEsales\Eshop\Core\InputValidator $oInputValidator */
+        /** @var InputValidator $oInputValidator */
         $oInputValidator = Registry::getInputValidator();
         if (($oExcp = $oInputValidator->checkPassword($oUser, $sNewPass, $sConfPass, true))) {
             return Registry::getUtilsView()->addErrorToDisplay($oExcp->getMessage(), false, true);
@@ -172,7 +176,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
     public function isExpiredLink()
     {
         if (($sKey = $this->getUpdateId())) {
-            $blExpired = oxNew(\OxidEsales\Eshop\Application\Model\User::class)->isExpiredUpdateId($sKey);
+            $blExpired = oxNew(User::class)->isExpiredUpdateId($sKey);
         }
 
         return $blExpired;

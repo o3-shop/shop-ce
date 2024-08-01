@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use InvalidArgumentException;
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
+use Throwable;
 
 /**
  * Admin article main deliveryset manager.
@@ -34,7 +38,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActiv
  * and etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
-class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ModuleConfiguration extends ShopConfiguration
 {
     /** @var string Template name. */
     protected $_sModule = 'shop_config.tpl';
@@ -71,7 +75,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
                     $this->_aViewData[$sParam] = $formatModuleSettings['vars'][$sType];
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Registry::getUtilsView()->addErrorToDisplay($throwable);
             Registry::getLogger()->error($throwable->getMessage());
         }
@@ -93,7 +97,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Config::OXMODULE_MODULE_PREFIX . $this->_sModuleId;
+        return Config::OXMODULE_MODULE_PREFIX . $this->_sModuleId;
     }
 
     /**
@@ -203,7 +207,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             if ($moduleWasActiveBeforeSaving) {
                 $this->getContainer()->get(ModuleActivationBridgeInterface::class)->activate($moduleId, $shopId);
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Registry::getUtilsView()->addErrorToDisplay($throwable);
             Registry::getLogger()->error($throwable->getMessage());
         }
@@ -219,7 +223,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             ?? Registry::getSession()->getVariable('saved_oxid');
 
         if ($moduleId === null) {
-            throw new \InvalidArgumentException('Module id not found.');
+            throw new InvalidArgumentException('Module id not found.');
         }
 
         return $moduleId;
@@ -266,7 +270,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
         foreach ($this->_aConfParams as $requestParameterKey) {
             $settingsFromRequest = Registry::getRequest()->getRequestEscapedParameter($requestParameterKey);
 
-            if (\is_array($settingsFromRequest)) {
+            if (is_array($settingsFromRequest)) {
                 foreach ($settingsFromRequest as $name => $value) {
                     $settings[$name] = $value;
                 }

@@ -22,6 +22,12 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxField;
+use OxidEsales\Eshop\Application\Controller\ArticleDetailsController;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Rating;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use oxUBase;
@@ -31,7 +37,7 @@ use oxUser;
  * Review of chosen article.
  * Collects article review data, saves new review to DB.
  */
-class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleDetailsController
+class ReviewController extends ArticleDetailsController
 {
     /**
      * Review user object
@@ -142,7 +148,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
      */
     public function generateViewId()
     {
-        return \OxidEsales\Eshop\Application\Controller\FrontendController::generateViewId();
+        return FrontendController::generateViewId();
     }
 
     /**
@@ -156,14 +162,14 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
         }
         // END deprecated
 
-        \OxidEsales\Eshop\Application\Controller\FrontendController::init();
+        FrontendController::init();
     }
 
     /**
      * Executes parent::render, loads article reviews and additional data
-     * (\OxidEsales\Eshop\Application\Model\Article::getReviews(),
-     * \OxidEsales\Eshop\Application\Model\Article::getCrossSelling(),
-     * \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts()). Returns name of template file to
+     * (Article::getReviews(),
+     * Article::getCrossSelling(),
+     * Article::GetSimilarProducts()). Returns name of template file to
      * render review::_sThisTemplate.
      *
      * @return  string  current template file name
@@ -176,7 +182,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
         }
 
-        \OxidEsales\Eshop\Application\Controller\FrontendController::render();
+        FrontendController::render();
         if (!($this->getReviewUser())) {
             $this->_sThisTemplate = $this->_sThisLoginTemplate;
         } else {
@@ -222,7 +228,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
 
                 //save rating
                 if ($dRating !== null && $dRating >= 1 && $dRating <= 5) {
-                    $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
+                    $oRating = oxNew(Rating::class);
                     if ($oRating->allowRating($oRevUser->getId(), $sType, $oActObject->getId())) {
                         $oRating->oxratings__oxuserid = new Field($oRevUser->getId());
                         $oRating->oxratings__oxtype = new Field($sType);
@@ -237,7 +243,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
                 }
 
                 if (($sReviewText = trim((string) Registry::getRequest()->getRequestEscapedParameter('rvw_txt', true)))) {
-                    $oReview = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
+                    $oReview = oxNew(Review::class);
                     $oReview->oxreviews__oxobjectid = new Field($oActObject->getId());
                     $oReview->oxreviews__oxtype = new Field($sType);
                     $oReview->oxreviews__oxtext = new Field($sReviewText, Field::T_RAW);
@@ -261,7 +267,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
     {
         if ($this->_oRevUser === null) {
             $this->_oRevUser = false;
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser = oxNew(User::class);
 
             if ($sUserId = $oUser->getReviewUserId($this->getReviewUserHash())) {
                 // review user, by link or other source?
@@ -344,7 +350,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
             $this->_oActiveRecommList = false;
 
             if ($sRecommId = Registry::getRequest()->getRequestEscapedParameter('recommid')) {
-                $oActiveRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+                $oActiveRecommList = oxNew(RecommendationList::class);
                 if ($oActiveRecommList->load($sRecommId)) {
                     $this->_oActiveRecommList = $oActiveRecommList;
                 }
@@ -364,7 +370,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
         if ($this->_blRate === null) {
             $this->_blRate = false;
             if (($oActObject = $this->_getActiveObject()) && ($oRevUser = $this->getReviewUser())) {
-                $oRating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
+                $oRating = oxNew(Rating::class);
                 $this->_blRate = $oRating->allowRating(
                     $oRevUser->getId(),
                     $this->_getActiveType(),
@@ -405,7 +411,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
         if ($this->_oRecommList === null) {
             $this->_oRecommList = false;
             if ($oProduct = $this->getProduct()) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+                $oRecommList = oxNew(RecommendationList::class);
                 $this->_oRecommList = $oRecommList->getRecommListsByIds([$oProduct->getId()]);
             }
         }
@@ -483,7 +489,7 @@ class ReviewController extends \OxidEsales\Eshop\Application\Controller\ArticleD
      */
     public function getAdditionalParams()
     {
-        $sAddParams = \OxidEsales\Eshop\Application\Controller\FrontendController::getAdditionalParams();
+        $sAddParams = FrontendController::getAdditionalParams();
         // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
         if ($oActRecommList = $this->getActiveRecommList()) {
             $sAddParams .= '&amp;recommid=' . $oActRecommList->getId();

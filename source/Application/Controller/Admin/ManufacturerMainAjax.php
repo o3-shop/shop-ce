@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
  * Class manages manufacturer assignment to articles
  */
-class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ManufacturerMainAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -50,7 +52,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
         'container2' => [
             ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -59,8 +61,8 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
-        ]
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -77,7 +79,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         // looking for table/view
         $articlesViewName = $this->_getViewName('oxarticles');
         $objectToCategoryViewName = $this->_getViewName('oxobject2category');
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
         $manufacturerId = $oRequest->getRequestEscapedParameter('oxid');
         $syncedManufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -136,7 +138,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
 
         if (is_array($articleIds) && !empty($articleIds)) {
             $query = $this->formManufacturerRemovalQuery($articleIds);
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query);
+            DatabaseProvider::getDb()->execute($query);
 
             $this->resetCounter("manufacturerArticle", $manufacturerId);
         }
@@ -154,7 +156,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         return "
           UPDATE oxarticles
           SET oxmanufacturerid = null
-          WHERE oxid IN ( " . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ") ";
+          WHERE oxid IN ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ") ";
     }
 
     /**
@@ -173,7 +175,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         }
 
         if ($manufacturerId && $manufacturerId != "-1" && is_array($articleIds)) {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $database = DatabaseProvider::getDb();
 
             $query = $this->formArticleToManufacturerAdditionQuery($manufacturerId, $articleIds);
             $database->execute($query);
@@ -191,7 +193,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     protected function formArticleToManufacturerAdditionQuery($manufacturerId, $articlesToAdd)
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
         return "
             UPDATE oxarticles

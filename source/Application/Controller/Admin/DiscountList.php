@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Admin discount list manager.
  * Collects delivery base information (description), there is ability to
  * filter them by description, title or delete them.
  * Admin Menu: Shop Settings -> Discounts.
  */
-class DiscountList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class DiscountList extends AdminListController
 {
     /**
      * Current class template name.

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Manufacturer;
@@ -35,7 +36,7 @@ use oxField;
 /**
  * Article seo config class
  */
-class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class ArticleSeo extends ObjectSeo
 {
     /**
      * Chosen category id

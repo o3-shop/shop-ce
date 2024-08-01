@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -28,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Performs export function according to user chosen categories.
  * Admin Menu: Maine Menu -> Im/Export -> Export.
  */
-class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ToolsMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), passes data to Smarty engine
@@ -39,12 +41,12 @@ class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     public function render()
     {
         if (Registry::getConfig()->isDemoShop()) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Access denied !");
+            Registry::getUtils()->showMessageAndExit("Access denied !");
         }
 
         parent::render();
 
-        $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
         $this->_aViewData["blIsMallAdmin"] = $oAuthUser->oxuser__oxrights->value == "malladmin";
 

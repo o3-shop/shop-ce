@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\ArticleDetailsController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Article images gallery popup window.
  * If chosen article has more pictures there is ability to create
  * gallery of pictures.
  */
-class MoreDetailsController extends \OxidEsales\Eshop\Application\Controller\ArticleDetailsController
+class MoreDetailsController extends ArticleDetailsController
 {
     /**
      * Current class template name.
@@ -89,7 +93,7 @@ class MoreDetailsController extends \OxidEsales\Eshop\Application\Controller\Art
             $aPicGallery = $this->getProduct()->getPictureGallery();
 
             if ($aPicGallery['ZoomPic']) {
-                $sActPicId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('actpicid');
+                $sActPicId = Registry::getRequest()->getRequestEscapedParameter('actpicid');
                 $this->_sActPicId = $sActPicId ? $sActPicId : 1;
             }
         }
@@ -127,8 +131,8 @@ class MoreDetailsController extends \OxidEsales\Eshop\Application\Controller\Art
     public function getProduct()
     {
         if ($this->_oProduct === null) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            $oArticle->load(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('anid'));
+            $oArticle = oxNew(Article::class);
+            $oArticle->load(Registry::getRequest()->getRequestEscapedParameter('anid'));
             $this->_oProduct = $oArticle;
         }
 

@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Admin shop system setting manager.
  * Collects shop system settings, updates it on user submit, etc.
@@ -28,7 +30,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  *
  * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
  */
-class DynamicScreenLocal extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class DynamicScreenLocal extends AdminController
 {
     /**
      * Current class template name.

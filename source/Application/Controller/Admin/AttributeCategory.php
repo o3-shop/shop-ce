@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax;
 use OxidEsales\Eshop\Application\Model\Attribute;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -30,7 +32,7 @@ use OxidEsales\Eshop\Core\Registry;
  * this attribute, etc.
  * Admin Menu: Manage Products -> Attributes -> Gruppen.
  */
-class AttributeCategory extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AttributeCategory extends AdminDetailsController
 {
     /**
      * Loads Attribute categories info, passes it to Smarty engine and
@@ -52,7 +54,7 @@ class AttributeCategory extends \OxidEsales\Eshop\Application\Controller\Admin\A
         }
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            $oAttributeCategoryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class);
+            $oAttributeCategoryAjax = oxNew(AttributeCategoryAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeCategoryAjax->getColumns();
 
             return "popups/attribute_category.tpl";

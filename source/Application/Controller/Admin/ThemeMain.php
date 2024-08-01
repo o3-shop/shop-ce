@@ -21,7 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Theme;
 use oxTheme;
 use oxException;
 
@@ -31,7 +34,7 @@ use oxException;
  * and etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
-class ThemeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ThemeMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates deliveryset category tree,
@@ -43,7 +46,7 @@ class ThemeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     {
         $soxId = $this->getEditObjectId();
 
-        $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
+        $oTheme = oxNew(Theme::class);
 
         if (!$soxId) {
             $soxId = $oTheme->getActiveThemeId();
@@ -52,13 +55,13 @@ class ThemeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         if ($oTheme->load($soxId)) {
             $this->_aViewData["oTheme"] = $oTheme;
         } else {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(oxNew(\OxidEsales\Eshop\Core\Exception\StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
+            Registry::getUtilsView()->addErrorToDisplay(oxNew(StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
         }
 
         parent::render();
 
         if ($this->themeInConfigFile()) {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('EXCEPTION_THEME_SHOULD_BE_ONLY_IN_DATABASE');
+            Registry::getUtilsView()->addErrorToDisplay('EXCEPTION_THEME_SHOULD_BE_ONLY_IN_DATABASE');
         }
 
         return 'theme_main.tpl';
@@ -86,18 +89,18 @@ class ThemeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     public function setTheme()
     {
         $sTheme = $this->getEditObjectId();
-        /** @var \OxidEsales\Eshop\Core\Theme $oTheme */
-        $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
+        /** @var Theme $oTheme */
+        $oTheme = oxNew(Theme::class);
         if (!$oTheme->load($sTheme)) {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(oxNew(\OxidEsales\Eshop\Core\Exception\StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
+            Registry::getUtilsView()->addErrorToDisplay(oxNew(StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
 
             return;
         }
         try {
             $oTheme->activate();
             $this->resetContentCache();
-        } catch (\OxidEsales\Eshop\Core\Exception\StandardException $oEx) {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+        } catch (StandardException $oEx) {
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
             $oEx->debugOut();
         }
     }

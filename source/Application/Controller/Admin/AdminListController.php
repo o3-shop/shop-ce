@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
@@ -35,7 +36,7 @@ use oxI18n;
 /**
  * Admin selectlist list manager.
  */
-class AdminListController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminListController extends AdminController
 {
     /**
      * Name of chosen object class (default null).

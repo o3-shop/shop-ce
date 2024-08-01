@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -29,7 +33,7 @@ use Exception;
 /**
  * Class manages deliveryset and delivery configuration
  */
-class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliverySetMainAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -37,17 +41,17 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxdelivery', 1, 1, 0],
-        ['oxaddsum', 'oxdelivery', 1, 0, 0],
-        ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
-        ['oxid', 'oxdelivery', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxdelivery', 1, 1, 0],
-                                     ['oxaddsum', 'oxdelivery', 1, 0, 0],
-                                     ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
-                                     ['oxid', 'oxdel2delset', 0, 0, 1]
-                                 ]
+            ['oxtitle', 'oxdelivery', 1, 1, 0],
+            ['oxaddsum', 'oxdelivery', 1, 0, 0],
+            ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
+            ['oxid', 'oxdelivery', 0, 0, 1],
+         ],
+         'container2' => [
+             ['oxtitle', 'oxdelivery', 1, 1, 0],
+             ['oxaddsum', 'oxdelivery', 1, 0, 0],
+             ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
+             ['oxid', 'oxdel2delset', 0, 0, 1],
+         ],
     ];
 
     /**
@@ -60,7 +64,7 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
     {
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sDeliveryViewName = $this->_getViewName('oxdelivery');
 
@@ -88,10 +92,10 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
         $aRemoveGroups = $this->_getActionIds('oxdel2delset.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxdel2delset.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxdel2delset where oxdel2delset.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxdel2delset where oxdel2delset.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -103,7 +107,7 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
     public function addToSet()
     {
         $aChosenSets = $this->_getActionIds('oxdelivery.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
@@ -112,7 +116,7 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
         }
         if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+            $database = DatabaseProvider::getMaster();
             foreach ($aChosenSets as $sChosenSet) {
                 // check if we have this entry already in
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -121,10 +125,10 @@ class DeliverySetMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin
                     ':oxdelsetid' => $soxId
                 ]);
                 if (!isset($sID) || !$sID) {
-                    $oDel2delset = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                    $oDel2delset = oxNew(BaseModel::class);
                     $oDel2delset->init('oxdel2delset');
-                    $oDel2delset->oxdel2delset__oxdelid = new \OxidEsales\Eshop\Core\Field($sChosenSet);
-                    $oDel2delset->oxdel2delset__oxdelsetid = new \OxidEsales\Eshop\Core\Field($soxId);
+                    $oDel2delset->oxdel2delset__oxdelid = new Field($sChosenSet);
+                    $oDel2delset->oxdel2delset__oxdelsetid = new Field($soxId);
                     $oDel2delset->save();
                 }
             }

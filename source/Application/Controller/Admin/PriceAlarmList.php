@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -28,7 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Customer Info -> pricealarm.
  */
-class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class PriceAlarmList extends AdminListController
 {
     /**
      * Current class template name.

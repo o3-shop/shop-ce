@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
@@ -29,7 +32,7 @@ use oxDb;
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Orders -> Display Orders.
  */
-class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class OrderList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -63,7 +66,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         parent::render();
 
         $folders = Registry::getConfig()->getConfigParam('aOrderfolder');
-        $folder = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('folder');
+        $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // first display new orders
         if (!$folder && is_array($folders)) {
             $names = array_keys($folders);
@@ -71,8 +74,8 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         }
 
         $search = ['oxorderarticles' => 'ARTID', 'oxpayments' => 'PAYMENT'];
-        $searchQuery = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearch');
-        $searchField = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
+        $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
+        $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         $this->_aViewData["folder"] = $folder ? $folder : -1;
         $this->_aViewData["addsearchfld"] = $searchField ? $searchField : -1;
@@ -99,7 +102,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      */
     public function cancelOrder()
     {
-        $order = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+        $order = oxNew(Order::class);
         if ($order->load($this->getEditObjectId())) {
             $order->cancelOrder();
         }
@@ -135,11 +138,11 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $query = parent::_prepareWhereQuery($whereQuery, $fullQuery);
         $config = Registry::getConfig();
         $folders = $config->getConfigParam('aOrderfolder');
-        $folder = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('folder');
+        $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder != '-1') {
             $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
@@ -162,11 +165,11 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $query = parent::_buildSelectString($listObject);
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
-        $searchQuery = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearch');
+        $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
         $searchQuery = trim($searchQuery);
-        $searchField = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
+        $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         if ($searchQuery) {
             switch ($searchField) {

@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\News;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
  * Admin Menu: Customer Info -> News -> Text.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class NewsText extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxnews object and
@@ -40,10 +43,10 @@ class NewsText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         parent::render();
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        $oNews = oxNew(\OxidEsales\Eshop\Application\Model\News::class);
+        $oNews = oxNew(News::class);
 
         if (isset($soxId) && $soxId != "-1") {
-            $iNewsLang = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('newslang');
+            $iNewsLang = Registry::getRequest()->getRequestEscapedParameter('newslang');
 
             if (!isset($iNewsLang)) {
                 $iNewsLang = $this->_iEditLang;
@@ -52,7 +55,7 @@ class NewsText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
             $this->_aViewData["newslang"] = $iNewsLang;
             $oNews->loadInLang($iNewsLang, $soxId);
 
-            foreach (\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames() as $id => $language) {
+            foreach (Registry::getLang()->getLanguageNames() as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
@@ -80,11 +83,11 @@ class NewsText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
     {
         parent::save();
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        $oNews = oxNew(\OxidEsales\Eshop\Application\Model\News::class);
+        $oNews = oxNew(News::class);
 
-        $iNewsLang = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('newslang');
+        $iNewsLang = Registry::getRequest()->getRequestEscapedParameter('newslang');
 
         if (!isset($iNewsLang)) {
             $iNewsLang = $this->_iEditLang;

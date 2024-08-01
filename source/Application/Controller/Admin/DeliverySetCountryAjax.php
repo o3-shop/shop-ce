@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages deliveryset countries
  */
-class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliverySetCountryAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -36,19 +40,19 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxcountry', 1, 1, 0],
-        ['oxisoalpha2', 'oxcountry', 1, 0, 0],
-        ['oxisoalpha3', 'oxcountry', 0, 0, 0],
-        ['oxunnum3', 'oxcountry', 0, 0, 0],
-        ['oxid', 'oxcountry', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxcountry', 1, 1, 0],
-                                     ['oxisoalpha2', 'oxcountry', 1, 0, 0],
-                                     ['oxisoalpha3', 'oxcountry', 0, 0, 0],
-                                     ['oxunnum3', 'oxcountry', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1]
-                                 ]
+            ['oxtitle', 'oxcountry', 1, 1, 0],
+            ['oxisoalpha2', 'oxcountry', 1, 0, 0],
+            ['oxisoalpha3', 'oxcountry', 0, 0, 0],
+            ['oxunnum3', 'oxcountry', 0, 0, 0],
+            ['oxid', 'oxcountry', 0, 0, 1],
+        ],
+         'container2' => [
+             ['oxtitle', 'oxcountry', 1, 1, 0],
+             ['oxisoalpha2', 'oxcountry', 1, 0, 0],
+             ['oxisoalpha3', 'oxcountry', 0, 0, 0],
+             ['oxunnum3', 'oxcountry', 0, 0, 0],
+             ['oxid', 'oxobject2delivery', 0, 0, 1],
+         ],
     ];
 
     /**
@@ -59,7 +63,7 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
@@ -95,11 +99,11 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sChosenCountries = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr));
+            $sChosenCountries = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr));
             $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sChosenCountries . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -119,11 +123,11 @@ class DeliverySetCountryAjax extends \OxidEsales\Eshop\Application\Controller\Ad
 
         if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCntr);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxdelset");
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenCntr);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxdelset");
                 $oObject2Delivery->save();
             }
         }

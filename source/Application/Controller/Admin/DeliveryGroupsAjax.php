@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages delivery groups
  */
-class DeliveryGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliveryGroupsAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -56,7 +60,7 @@ class DeliveryGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oRequest = Registry::getRequest();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         // active AJAX component
         $sGroupTable = $this->_getViewName('oxgroups');
@@ -93,11 +97,11 @@ class DeliveryGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sRemoveGroups = implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
             $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sRemoveGroups . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -117,11 +121,11 @@ class DeliveryGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
 
         if ($soxId && $soxId != "-1" && is_array($aChosenCat)) {
             foreach ($aChosenCat as $sChosenCat) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCat);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field('oxgroups');
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenCat);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxgroups');
                 $oObject2Delivery->save();
             }
         }

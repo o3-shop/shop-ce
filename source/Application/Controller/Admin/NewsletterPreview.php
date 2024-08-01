@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Newsletter;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -29,7 +31,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Creates plaintext and HTML format newsletter preview.
  * Admin Menu: Customer Info -> Newsletter -> Preview.
  */
-class NewsletterPreview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class NewsletterPreview extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxnewsletter object
@@ -45,12 +47,12 @@ class NewsletterPreview extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $soxId = $this->getEditObjectId();
         if ($soxId != "-1" && isset($soxId)) {
             // load object
-            $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+            $oNewsletter = oxNew(Newsletter::class);
             $oNewsletter->load($soxId);
             $this->_aViewData["edit"] = $oNewsletter;
 
             // user
-            $sUserID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("auth");
+            $sUserID = Registry::getSession()->getVariable("auth");
 
             // assign values to the newsletter and show it
             $oNewsletter->prepare($sUserID, Registry::getConfig()->getConfigParam('bl_perfLoadAktion'));

@@ -22,14 +22,19 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxBasket;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\DeliverySetList;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Model\UserPayment;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Payment manager.
  * Customer payment manager class. Performs payment validation function, etc.
  */
-class PaymentController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class PaymentController extends FrontendController
 {
     /**
      * Paymentlist
@@ -200,7 +205,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         // no shipping method there !!
         if (Registry::getConfig()->getConfigParam('blOtherCountryOrder')) {
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+            $oPayment = oxNew(Payment::class);
             if ($oPayment->load('oxempty')) {
                 $this->_oEmptyPayment = $oPayment;
             } else {
@@ -299,7 +304,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         $oBasket = $oSession->getBasket();
         $oBasket->setPayment(null);
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
         $oPayment->load($sPaymentId);
 
         // getting basket price for payment calculation
@@ -397,7 +402,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Calculate payment cost for each payment. Sould be removed later
      *
      * @param array                                      $aPaymentList payments array
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket      basket object
+     * @param Basket $oBasket      basket object
      * @deprecated underscore prefix violates PSR12, will be renamed to "setValues" in next major
      */
     protected function _setValues(&$aPaymentList, $oBasket = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -489,7 +494,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     protected function _assignDebitNoteParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // #701A
-        $oUserPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
+        $oUserPayment = oxNew(UserPayment::class);
         //such info available ?
         if ($oUserPayment->getPaymentByPaymentType($this->getUser(), 'oxiddebitnote')) {
             $sUserPaymentField = 'oxuserpayments__oxvalue';
@@ -526,7 +531,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             } else {
                 // #1010A.
                 if ($oUser = $this->getUser()) {
-                    $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+                    $oOrder = oxNew(Order::class);
                     if (($sLastPaymentId = $oOrder->getLastUserPaymentType($oUser->getId()))) {
                         $sCheckedId = $sLastPaymentId;
                     }

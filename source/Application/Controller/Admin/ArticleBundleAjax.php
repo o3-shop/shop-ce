@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
@@ -28,7 +29,7 @@ use oxDb;
 /**
  * Class controls article assignment to attributes
  */
-class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleBundleAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build

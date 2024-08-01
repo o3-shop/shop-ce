@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -30,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
  * or remove any of them to article, etc.
  * Admin Menu: Manage Products -> Articles -> Selection.
  */
-class ArticleAttribute extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleAttribute extends AdminDetailsController
 {
     /**
      * Collects article attributes and selection lists, passes them to Smarty engine,
@@ -56,12 +59,12 @@ class ArticleAttribute extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
         $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
-            $oArticleAttributeAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class);
+            $oArticleAttributeAjax = oxNew(ArticleAttributeAjax::class);
             $this->_aViewData['oxajax'] = $oArticleAttributeAjax->getColumns();
 
             return "popups/article_attribute.tpl";
         } elseif ($iAoc == 2) {
-            $oArticleSelectionAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax::class);
+            $oArticleSelectionAjax = oxNew(ArticleSelectionAjax::class);
             $this->_aViewData['oxajax'] = $oArticleSelectionAjax->getColumns();
 
             return "popups/article_selection.tpl";

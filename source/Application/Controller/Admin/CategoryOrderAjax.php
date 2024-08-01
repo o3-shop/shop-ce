@@ -21,15 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages category articles order
  */
-class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class CategoryOrderAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -209,7 +211,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
             if (is_array($aNewOrder) && count($aNewOrder)) {
                 $sO2CView = $this->_getViewName('oxobject2category');
                 $sSelect = "select * from $sO2CView where $sO2CView.oxcatnid = :oxcatnid and $sO2CView.oxobjectid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aNewOrder)) . " )";
-                $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+                $oList = oxNew(ListModel::class);
                 $oList->init($this->getObject2CategoryClass(), 'oxobject2category');
                 $oList->selectString($sSelect, [
                     ':oxcatnid' => $oCategory->getId()

@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\SeoEncoder;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterAdminAjaxRequestProcessedEvent;
 
 /**
  * AJAX call processor class
  */
-class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
+class ListComponentAjax extends Base
 {
     /**
      * Possible sort keys
@@ -100,7 +103,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $aColumns = $this->_getColNames();
         foreach ($aColumns as $iPos => $aCol) {
             if (isset($aCol[4]) && $aCol[4] == 1 && $sId == $aCol[1] . '.' . $aCol[0]) {
-                return \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('_' . $iPos);
+                return Registry::getRequest()->getRequestEscapedParameter('_' . $iPos);
             }
         }
     }
@@ -182,7 +185,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _getSortCol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aVisibleNames = $this->_getVisibleColNames();
-        $iCol = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('sort');
+        $iCol = Registry::getRequest()->getRequestEscapedParameter('sort');
         $iCol = $iCol ? ((int) str_replace('_', '', $iCol)) : 0;
         $iCol = (!isset($aVisibleNames[$iCol])) ? 0 : $iCol;
 
@@ -202,7 +205,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _getColNames($sId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($sId === null) {
-            $sId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('cmpid');
+            $sId = Registry::getRequest()->getRequestEscapedParameter('cmpid');
         }
 
         if ($sId && isset($this->_aColumns[$sId])) {
@@ -242,7 +245,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _getVisibleColNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aColNames = $this->_getColNames();
-        $aUserCols = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aCols');
+        $aUserCols = Registry::getRequest()->getRequestEscapedParameter('aCols');
         $aVisibleCols = [];
 
         // user defined some cols to load ?
@@ -322,7 +325,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _isExtendedColumn($sColumn) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blVariantsSelectionParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantsSelection');
+        $blVariantsSelectionParameter = Registry::getConfig()->getConfigParam('blVariantsSelection');
 
         return $this->_blAllowExtColumns && $blVariantsSelectionParameter && $sColumn == 'oxtitle';
     }
@@ -369,7 +372,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getLimit($iStart) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iLimit = (int) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('results');
+        $iLimit = (int) Registry::getRequest()->getRequestEscapedParameter('results');
         $iLimit = $iLimit ? $iLimit : $this->_iSqlLimit;
 
         return " limit $iStart, $iLimit ";
@@ -387,7 +390,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $aFilter = Registry::getRequest()->getRequestEscapedParameter('aFilter');
         if (is_array($aFilter) && count($aFilter)) {
             $aCols = $this->_getVisibleColNames();
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $oStr = getStr();
 
             foreach ($aFilter as $sCol => $sValue) {
@@ -445,7 +448,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _getAll($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aReturn = [];
-        $rs = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select($sQ);
+        $rs = DatabaseProvider::getDb()->select($sQ);
         if ($rs != false && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $aReturn[] = $rs->fields[0];
@@ -464,7 +467,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getSortDir() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDir = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('dir');
+        $sDir = Registry::getRequest()->getRequestEscapedParameter('dir');
         if (!in_array($sDir, $this->_aPosDir)) {
             $sDir = $this->_aPosDir[0];
         }
@@ -480,7 +483,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getStartIndex() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (int) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('startIndex');
+        return (int) Registry::getRequest()->getRequestEscapedParameter('startIndex');
     }
 
     /**
@@ -500,7 +503,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         // $sCountCacheKey = md5( $sQ );
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (int) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ);
+        return (int) DatabaseProvider::getMaster()->getOne($sQ);
     }
 
     /**
@@ -514,7 +517,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getMaster(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
+        return DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
     }
 
     /**
@@ -549,7 +552,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getViewName($sTable) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return getViewName($sTable, \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
+        return getViewName($sTable, Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
     }
 
     /**
@@ -614,8 +617,8 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
 
         $sShopId = Registry::getConfig()->getShopId();
         foreach ($aArtIds as $sArtId) {
-            /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
-            \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
+            /** @var SeoEncoder $oSeoEncoder */
+            Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
         }
     }
 
@@ -629,7 +632,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         if (!$blDeleteCacheOnLogout) {
             $this->_resetCaches();
 
-            \OxidEsales\Eshop\Core\Registry::getUtils()->oxResetFileCache();
+            Registry::getUtils()->oxResetFileCache();
         }
     }
 
@@ -645,7 +648,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
-            $myUtilsCount = \OxidEsales\Eshop\Core\Registry::getUtilsCount();
+            $myUtilsCount = Registry::getUtilsCount();
             switch ($sCounterType) {
                 case 'priceCatArticle':
                     $myUtilsCount->resetPriceCatArticleCount($sValue);

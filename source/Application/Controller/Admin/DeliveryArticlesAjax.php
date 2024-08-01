@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages delivery articles
  */
-class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliveryArticlesAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -71,7 +75,7 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         // looking for table/view
         $sArtTable = $this->_getViewName('oxarticles');
@@ -132,10 +136,10 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = parent::_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -155,11 +159,11 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
 
         if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
             foreach ($aChosenArt as $sChosenArt) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenArt);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxarticles");
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenArt);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxarticles");
                 $oObject2Delivery->save();
             }
         }

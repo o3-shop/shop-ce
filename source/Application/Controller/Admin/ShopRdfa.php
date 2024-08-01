@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -30,7 +31,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Admin Menu: Main Menu -> Core Settings -> RDFa.
  *
  */
-class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ShopRdfa extends ShopConfiguration
 {
     /**
      * Template name
@@ -44,10 +45,12 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      *
      * @var array
      */
-    protected $_aCustomers = ["Enduser"           => 0,
-                                   "Reseller"          => 0,
-                                   "Business"          => 0,
-                                   "PublicInstitution" => 0];
+    protected $_aCustomers = [
+        "Enduser"           => 0,
+        "Reseller"          => 0,
+        "Business"          => 0,
+        "PublicInstitution" => 0,
+    ];
 
     /**
      * Gets list of content pages which could be used for embedding
@@ -66,7 +69,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
                 AND OXLOADID IN ('oxagb', 'oxdeliveryinfo', 'oximpressum', 'oxrightofwithdrawal')
                 AND OXSHOPID = :OXSHOPID
              ORDER BY OXLOADID ASC",
-            [':OXSHOPID' => \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid')]
+            [':OXSHOPID' => Registry::getRequest()->getRequestEscapedParameter('oxid')]
         );
 
         return $oContentList;
@@ -98,7 +101,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      */
     public function submitUrl()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aSubmitUrl');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('aSubmitUrl');
         if ($aParams['url']) {
             $sNotificationUrl = "http://gr-notify.appspot.com/submit?uri=" . urlencode($aParams['url']) . "&agent=oxid";
             if ($aParams['email']) {
@@ -108,10 +111,10 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
             if (substr($aHeaders[2], -4) === "True") {
                 $this->_aViewData["submitMessage"] = 'SHOP_RDFA_SUBMITED_SUCCESSFULLY';
             } else {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(substr($aHeaders[3], strpos($aHeaders[3], ":") + 2));
+                Registry::getUtilsView()->addErrorToDisplay(substr($aHeaders[3], strpos($aHeaders[3], ":") + 2));
             }
         } else {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('SHOP_RDFA_MESSAGE_NOURL');
+            Registry::getUtilsView()->addErrorToDisplay('SHOP_RDFA_MESSAGE_NOURL');
         }
     }
 

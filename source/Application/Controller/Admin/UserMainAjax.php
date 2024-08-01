@@ -21,13 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use oxDb;
 use oxField;
+use OxidEsales\Eshop\Application\Model\Object2Group;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages user assignment to groups
  */
-class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class UserMainAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -35,15 +40,15 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxtitle', 'oxgroups', 1, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxgroups', 1, 0, 0],
-                                     ['oxid', 'oxgroups', 0, 0, 0],
-                                     ['oxid', 'oxobject2group', 0, 0, 1],
-                                 ]
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxobject2group', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -56,9 +61,9 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     {
         // looking for table/view
         $sGroupTable = $this->_getViewName('oxgroups');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDeldId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSynchDelId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
+        $sDeldId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDeldId) {
@@ -82,12 +87,12 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     public function removeUserFromGroup()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -97,17 +102,17 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     public function addUserToGroup()
     {
         $aAddGroups = $this->_getActionIds('oxgroups.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sGroupTable = $this->_getViewName('oxgroups');
             $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aAddGroups)) {
             foreach ($aAddGroups as $sAddgroup) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Application\Model\Object2Group::class);
-                $oNewGroup->oxobject2group__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oNewGroup->oxobject2group__oxgroupsid = new \OxidEsales\Eshop\Core\Field($sAddgroup);
+                $oNewGroup = oxNew(Object2Group::class);
+                $oNewGroup->oxobject2group__oxobjectid = new Field($soxId);
+                $oNewGroup->oxobject2group__oxgroupsid = new Field($sAddgroup);
                 $oNewGroup->save();
             }
         }

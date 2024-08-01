@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -28,7 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Returns template, that arranges two other templates ("delivery_list.tpl"
  * and "delivery_main.tpl") to frame.
  */
-class ToolsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class ToolsController extends AdminController
 {
     /**
      * Executes parent method parent::render(), prints shop and
@@ -39,7 +40,7 @@ class ToolsController extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     public function render()
     {
         if (Registry::getConfig()->isDemoShop()) {
-            return \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Access denied !");
+            return Registry::getUtils()->showMessageAndExit("Access denied !");
         }
 
         parent::render();

@@ -20,12 +20,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\NavigationTree;
 use OxidEsales\EshopCommunity\Application\Model\RightsRoles;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 use OxidEsales\EshopCommunity\Core\Registry;
 use stdClass;
 
-class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AdminRightsMain extends AdminDetailsController
 {
     public function render()
     {
@@ -118,7 +120,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
     public function getMenuTree()
     {
-        $navTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
+        $navTree = oxNew(NavigationTree::class);
         return $navTree->getDomXml()->documentElement->childNodes;
     }
 }

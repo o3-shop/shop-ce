@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
@@ -32,7 +33,7 @@ use Exception;
 /**
  * Class controls article assignment to category.
  */
-class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleExtendAjax extends ListComponentAjax
 {
     /**
      * Columns array

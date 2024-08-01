@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Application\Model\Search;
 use OxidEsales\Eshop\Core\Registry;
 use oxUBase;
 use oxSearch;
@@ -29,7 +32,7 @@ use oxSearch;
  * Articles searching class.
  * Performs searching through articles in database.
  */
-class SearchController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class SearchController extends FrontendController
 {
     /**
      * Count of all found articles.
@@ -190,8 +193,8 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         }
 
         // searching ..
-        /** @var \OxidEsales\Eshop\Application\Model\Search $oSearchHandler */
-        $oSearchHandler = oxNew(\OxidEsales\Eshop\Application\Model\Search::class);
+        /** @var Search $oSearchHandler */
+        $oSearchHandler = oxNew(Search::class);
         $oSearchList = $oSearchHandler->getSearchArticles(
             $sSearchParamForQuery,
             $sInitialSearchCat,
@@ -230,8 +233,8 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         parent::render();
 
         $oRequest = Registry::getRequest();;
-        if (Registry::getConfig->getConfigParam('bl_rssSearch')) {
-            $oRss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+        if (Registry::getConfig()->getConfigParam('bl_rssSearch')) {
+            $oRss = oxNew(RssFeed::class);
             $sSearch = $oRequest->getRequestEscapedParameter('searchparam', true);
             $sCnid = $oRequest->getRequestEscapedParameter('searchcnid', true);
             $sVendor = $oRequest->getRequestEscapedParameter('searchvendor', true);
@@ -256,7 +259,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
     {
         $sAddDynParams = $this->getAddUrlParams();
         if ($sAddDynParams && ($aArtList = $this->getArticleList())) {
-            $blSeo = \OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive();
+            $blSeo = Registry::getUtils()->seoIsActive();
             foreach ($aArtList as $oArticle) {
                 // appending std and dynamic urls
                 if (!$blSeo) {
@@ -481,8 +484,8 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         $aPaths = [];
         $aPath = [];
 
-        $iBaseLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('SEARCH', $iBaseLanguage, false);
+        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
+        $aPath['title'] = Registry::getLang()->translateString('SEARCH', $iBaseLanguage, false);
         $aPath['link'] = $this->getLink();
         $aPaths[] = $aPath;
 
@@ -529,8 +532,8 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
     {
         $sTitle = '';
         $sTitle .= $this->getArticleCount();
-        $iBaseLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-        $sTitle .= ' ' . \OxidEsales\Eshop\Core\Registry::getLang()->translateString('HITS_FOR', $iBaseLanguage, false);
+        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
+        $sTitle .= ' ' . Registry::getLang()->translateString('HITS_FOR', $iBaseLanguage, false);
         $sTitle .= ' "' . $this->getSearchParamForHtml() . '"';
 
         return $sTitle;

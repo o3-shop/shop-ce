@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -29,7 +31,7 @@ use OxidEsales\Eshop\Core\Registry;
  * There is possibility to change category sorting.
  * Admin Menu: Manage Products -> Categories -> Order.
  */
-class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CategoryOrder extends AdminDetailsController
 {
     /**
      * Loads article category ordering info, passes it to Smarty
@@ -58,7 +60,7 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
             }
         }
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            $oCategoryOrderAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax::class);
+            $oCategoryOrderAjax = oxNew(CategoryOrderAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
 
             return "popups/category_order.tpl";

@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages discount groups
  */
-class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountGroupsAjax extends ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
     const NEW_DISCOUNT_ID = "-1";
@@ -45,11 +49,11 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             ['oxid', 'oxgroups', 0, 0, 0],
             ['oxid', 'oxgroups', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxtitle', 'oxgroups', 1, 0, 0],
-             ['oxid', 'oxgroups', 0, 0, 0],
-             ['oxid', 'oxobject2discount', 0, 0, 1],
-         ]
+        'container2' => [
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxobject2discount', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -63,7 +67,7 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $oRequest = Registry::getRequest();
         // active AJAX component
         $sGroupTable = $this->_getViewName('oxgroups');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
@@ -94,11 +98,11 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $groupIds = $this->_getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $query = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
+            DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
-            $groupIdsQuoted = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($groupIds));
+            $groupIdsQuoted = implode(", ", DatabaseProvider::getDb()->quoteArray($groupIds));
             $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $groupIdsQuoted . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
+            DatabaseProvider::getDb()->Execute($query);
         }
     }
 
@@ -117,11 +121,11 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         }
         if ($discountId && $discountId != self::NEW_DISCOUNT_ID && is_array($groupIds)) {
             foreach ($groupIds as $groupId) {
-                $object2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $object2Discount = oxNew(BaseModel::class);
                 $object2Discount->init('oxobject2discount');
-                $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountId);
-                $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($groupId);
-                $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxgroups");
+                $object2Discount->oxobject2discount__oxdiscountid = new Field($discountId);
+                $object2Discount->oxobject2discount__oxobjectid = new Field($groupId);
+                $object2Discount->oxobject2discount__oxtype = new Field("oxgroups");
                 $object2Discount->save();
             }
         }

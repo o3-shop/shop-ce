@@ -21,10 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\ContentController;
+use OxidEsales\Eshop\Application\Model\Content;
+
 /**
  * Special page for Credits
  */
-class CreditsController extends \OxidEsales\Eshop\Application\Controller\ContentController
+class CreditsController extends ContentController
 {
     /**
      * Content id.
@@ -53,7 +56,7 @@ class CreditsController extends \OxidEsales\Eshop\Application\Controller\Content
     {
         if ($this->_oContent === null) {
             $this->_oContent = false;
-            $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+            $oContent = oxNew(Content::class);
             if ($oContent->loadByIdent($this->getContentId())) {
                 $this->_oContent = $oContent;
             }

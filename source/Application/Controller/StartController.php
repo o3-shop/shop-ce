@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\ActionList;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Core\Registry;
 use oxUBase;
 
@@ -28,7 +32,7 @@ use oxUBase;
  * Starting shop page.
  * Shop starter, manages starting visible articles, etc.
  */
-class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class StartController extends FrontendController
 {
     /**
      * List display type
@@ -123,13 +127,13 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function render()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('showexceptionpage') == '1') {
+        if (Registry::getRequest()->getRequestEscapedParameter('showexceptionpage') == '1') {
             return 'message/exception.tpl';
         }
 
         $myConfig = Registry::getConfig();
 
-        $oRss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+        $oRss = oxNew(RssFeed::class);
         if ($myConfig->getConfigParam('iTop5Mode') && $myConfig->getConfigParam('bl_rssTopShop')) {
             $this->addRssFeed($oRss->getTopInShopTitle(), $oRss->getTopInShopUrl(), 'topArticles');
         }
@@ -226,7 +230,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_aArticleList = [];
             if ($this->_getLoadActionsParam()) {
                 // start list
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXSTART');
                 if ($oArtList->count()) {
                     $this->_aArticleList = $oArtList;
@@ -248,7 +252,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_aTopArticleList = false;
             if ($this->_getLoadActionsParam()) {
                 // start list
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXTOPSTART');
                 if ($oArtList->count()) {
                     $this->_aTopArticleList = $oArtList;
@@ -271,7 +275,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_aNewArticleList = [];
             if ($this->_getLoadActionsParam()) {
                 // newest articles
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadNewestArticles();
                 if ($oArtList->count()) {
                     $this->_aNewArticleList = $oArtList;
@@ -293,7 +297,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_oFirstArticle = false;
             if ($this->_getLoadActionsParam()) {
                 // top articles ( big one )
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXFIRSTSTART');
                 if ($oArtList->count()) {
                     $this->_oFirstArticle = $oArtList->current();
@@ -332,7 +336,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_oCatOfferArtList = [];
             if ($this->_getLoadActionsParam()) {
                 // "category offer" articles
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXCATOFFER');
                 if ($oArtList->count()) {
                     $this->_oCatOfferArtList = $oArtList;
@@ -360,8 +364,8 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function getCanonicalUrl()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oViewConf = $this->getViewConfig())) {
-            return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->prepareCanonicalUrl($oViewConf->getHomeLink());
+        if (Registry::getUtils()->seoIsActive() && ($oViewConf = $this->getViewConfig())) {
+            return Registry::getUtilsUrl()->prepareCanonicalUrl($oViewConf->getHomeLink());
         }
     }
 
@@ -376,7 +380,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
         $oBannerList = null;
 
         if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
-            $oBannerList = oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class);
+            $oBannerList = oxNew(ActionList::class);
             $oBannerList->loadBanners();
         }
 

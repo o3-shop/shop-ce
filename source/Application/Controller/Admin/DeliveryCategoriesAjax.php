@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages delivery categories
  */
-class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliveryCategoriesAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -60,7 +64,7 @@ class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     {
         // looking for table/view
         $sCatTable = $this->_getViewName('oxcategories');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
@@ -101,11 +105,11 @@ class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
-            $sChosenCategoriess = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCat));
+            $sChosenCategoriess = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
             $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sChosenCategoriess . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -125,11 +129,11 @@ class DeliveryCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
 
         if (isset($soxId) && $soxId != "-1" && isset($aChosenCat) && $aChosenCat) {
             foreach ($aChosenCat as $sChosenCat) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenCat);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxcategories");
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenCat);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxcategories");
                 $oObject2Delivery->save();
             }
         }

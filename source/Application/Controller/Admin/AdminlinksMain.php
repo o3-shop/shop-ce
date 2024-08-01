@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Links;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -30,7 +31,7 @@ use stdClass;
  * Creates form for submitting new admin links or modifying old ones.
  * Admin Menu: Customer Info -> Links.
  */
-class AdminlinksMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AdminlinksMain extends AdminDetailsController
 {
     /**
      * Sets link information data (or leaves empty), returns name of template

@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Template preparation class.
  * Used only in some specific cases (usually when you need to outpt just template
  * having text information).
  */
-class TemplateController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class TemplateController extends FrontendController
 {
     /**
      * Executes parent method parent::render(), returns name of template file.
@@ -38,7 +41,7 @@ class TemplateController extends \OxidEsales\Eshop\Application\Controller\Fronte
         parent::render();
 
         // security fix so that you cant access files from outside template dir
-        $sTplName = basename((string) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('tpl'));
+        $sTplName = basename((string) Registry::getRequest()->getRequestEscapedParameter('tpl'));
         if ($sTplName) {
             $sTplName = 'custom/' . $sTplName;
         }

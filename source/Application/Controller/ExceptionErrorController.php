@@ -21,10 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Displays exception errors
  */
-class ExceptionErrorController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ExceptionErrorController extends FrontendController
 {
     /**
      * Current class template name.
@@ -47,13 +50,13 @@ class ExceptionErrorController extends \OxidEsales\Eshop\Application\Controller\
         $aErrors = $this->_getErrors();
 
         if (is_array($aErrors) && count($aErrors)) {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->passAllErrorsToView($aViewData, $aErrors);
+            Registry::getUtilsView()->passAllErrorsToView($aViewData, $aErrors);
         }
 
         $this->addTplParam('Errors', $aViewData['Errors']);
 
         // resetting errors from session
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('Errors', []);
+        Registry::getSession()->setVariable('Errors', []);
     }
 
     /**
@@ -64,7 +67,7 @@ class ExceptionErrorController extends \OxidEsales\Eshop\Application\Controller\
      */
     protected function _getErrors() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aErrors = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('Errors');
+        $aErrors = Registry::getSession()->getVariable('Errors');
 
         if (null === $aErrors) {
             $aErrors = [];

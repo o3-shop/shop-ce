@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin order address manager.
  * Collects order addressing information, updates it on user submit, etc.
  * Admin Menu: Orders -> Display Orders -> Address.
  */
-class OrderAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class OrderAddress extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxorder object
@@ -42,14 +46,14 @@ class OrderAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+            $oOrder = oxNew(Order::class);
             $oOrder->load($soxId);
 
             $this->_aViewData["edit"] = $oOrder;
         }
 
         $oCountryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
-        $oCountryList->loadActiveCountries(\OxidEsales\Eshop\Core\Registry::getLang()->getObjectTplLanguage());
+        $oCountryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
 
         $this->_aViewData["countrylist"] = $oCountryList;
 
@@ -108,9 +112,9 @@ class OrderAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = (array) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aParams = (array) Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+        $oOrder = oxNew(Order::class);
         if ($soxId != "-1") {
             $oOrder->load($soxId);
         } else {

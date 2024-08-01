@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -29,7 +33,7 @@ use Exception;
 /**
  * Class manages deliveryset payment
  */
-class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliverySetPaymentAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -37,17 +41,17 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxdesc', 'oxpayments', 1, 1, 0],
-        ['oxaddsum', 'oxpayments', 1, 0, 0],
-        ['oxaddsumtype', 'oxpayments', 0, 0, 0],
-        ['oxid', 'oxpayments', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxdesc', 'oxpayments', 1, 1, 0],
-                                     ['oxaddsum', 'oxpayments', 1, 0, 0],
-                                     ['oxaddsumtype', 'oxpayments', 0, 0, 0],
-                                     ['oxid', 'oxobject2payment', 0, 0, 1]
-                                 ]
+            ['oxdesc', 'oxpayments', 1, 1, 0],
+            ['oxaddsum', 'oxpayments', 1, 0, 0],
+            ['oxaddsumtype', 'oxpayments', 0, 0, 0],
+            ['oxid', 'oxpayments', 0, 0, 1],
+         ],
+         'container2' => [
+             ['oxdesc', 'oxpayments', 1, 1, 0],
+             ['oxaddsum', 'oxpayments', 1, 0, 0],
+             ['oxaddsumtype', 'oxpayments', 0, 0, 0],
+             ['oxid', 'oxobject2payment', 0, 0, 1],
+         ],
     ];
 
     /**
@@ -58,7 +62,7 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
@@ -88,10 +92,10 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         $aChosenCntr = $this->_getActionIds('oxobject2payment.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2payment.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2payment where oxobject2payment.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2payment where oxobject2payment.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -112,7 +116,7 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         }
         if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+            $database = DatabaseProvider::getMaster();
             foreach ($aChosenSets as $sChosenSet) {
                 // check if we have this entry already in
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -121,11 +125,11 @@ class DeliverySetPaymentAjax extends \OxidEsales\Eshop\Application\Controller\Ad
                     ':oxobjectid' => $soxId
                 ]);
                 if (!isset($sID) || !$sID) {
-                    $oObject = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                    $oObject = oxNew(BaseModel::class);
                     $oObject->init('oxobject2payment');
-                    $oObject->oxobject2payment__oxpaymentid = new \OxidEsales\Eshop\Core\Field($sChosenSet);
-                    $oObject->oxobject2payment__oxobjectid = new \OxidEsales\Eshop\Core\Field($soxId);
-                    $oObject->oxobject2payment__oxtype = new \OxidEsales\Eshop\Core\Field("oxdelset");
+                    $oObject->oxobject2payment__oxpaymentid = new Field($sChosenSet);
+                    $oObject->oxobject2payment__oxobjectid = new Field($soxId);
+                    $oObject->oxobject2payment__oxtype = new Field("oxdelset");
                     $oObject->save();
                 }
             }

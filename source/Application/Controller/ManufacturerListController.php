@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\ArticleListController;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
 use OxidEsales\Eshop\Core\Registry;
 use oxManufacturer;
 use oxUBase;
@@ -31,7 +35,7 @@ use oxUBase;
  * metatags (for search engines). Result - "manufacturerlist.tpl" template.
  * O3-Shop -> (Any selected shop product category).
  */
-class ManufacturerListController extends \OxidEsales\Eshop\Application\Controller\ArticleListController
+class ManufacturerListController extends ArticleListController
 {
     /**
      * List type
@@ -103,14 +107,14 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
      * list sorting rules. Loads list of articles which belong to this Manufacturer
      * Generates page navigation data
      * such as previous/next window URL, number of available pages, generates
-     * metatags info (\OxidEsales\Eshop\Application\Controller\FrontendController::_convertForMetaTags()) and returns
+     * metatags info (FrontendController::_convertForMetaTags()) and returns
      * name of template to render.
      *
      * @return  string  $this->_sThisTemplate   current template file name
      */
     public function render()
     {
-        \OxidEsales\Eshop\Application\Controller\FrontendController::render();
+        FrontendController::render();
 
         // load Manufacturer
         if ($this->getManufacturerTree()) {
@@ -145,7 +149,7 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
     /**
      * Loads and returns article list of active Manufacturer.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer Manufacturer object
+     * @param Manufacturer $oManufacturer Manufacturer object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadArticles" in next major
@@ -158,7 +162,7 @@ class ManufacturerListController extends \OxidEsales\Eshop\Application\Controlle
         $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $oArtList = oxNew(ArticleList::class);
         $oArtList->setSqlLimit($iNrofCatArticles * $this->_getRequestPageNr(), $iNrofCatArticles);
         $oArtList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
 

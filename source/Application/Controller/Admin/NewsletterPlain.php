@@ -21,13 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Newsletter;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * @deprecated Functionality for Newsletter management will be removed.
  * Newsletter plain manager.
  * Performs newsletter creation (plain text format, collects neccessary information).
  * Admin Menu: Customer Info -> Newsletter -> Text.
  */
-class NewsletterPlain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class NewsletterPlain extends AdminDetailsController
 {
     /**
      * Executes prent method parent::render(), creates oxnewsletter object
@@ -43,7 +47,7 @@ class NewsletterPlain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+            $oNewsletter = oxNew(Newsletter::class);
             $oNewsletter->load($soxId);
             $this->_aViewData["edit"] = $oNewsletter;
         }
@@ -57,13 +61,13 @@ class NewsletterPlain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     public function save()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // shopid
-        $sShopID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("actshop");
+        $sShopID = Registry::getSession()->getVariable("actshop");
         $aParams['oxnewsletter__oxshopid'] = $sShopID;
 
-        $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+        $oNewsletter = oxNew(Newsletter::class);
         if ($soxId != "-1") {
             $oNewsletter->load($soxId);
         } else {

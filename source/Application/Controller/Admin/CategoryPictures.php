@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Category;
 
 /**
@@ -28,7 +29,7 @@ use OxidEsales\Eshop\Application\Model\Category;
  * Category thumbnail manager (Previews assigned pictures).
  * Admin Menu: Manage Products -> Categories -> Thumbnail.
  */
-class CategoryPictures extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CategoryPictures extends AdminDetailsController
 {
     /**
      * Loads category object, passes it to Smarty engine and returns name

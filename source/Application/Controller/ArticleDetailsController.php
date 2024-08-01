@@ -26,7 +26,19 @@ use oxArticleList;
 use oxCategory;
 use oxDeliveryList;
 use oxDeliverySetList;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\DeliveryList;
+use OxidEsales\Eshop\Application\Model\DeliverySetList;
+use OxidEsales\Eshop\Application\Model\PaymentList;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Application\Model\Rating;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Application\Model\Vendor;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
@@ -40,7 +52,7 @@ use oxVariantSelectList;
  * as crosselling, similarlist, picture gallery list, etc.
  * O3-Shop -> (Any chosen product).
  */
-class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ArticleDetailsController extends FrontendController
 {
     /**
      * Current class default template name.
@@ -52,7 +64,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Current product parent article object
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oParentProd = null;
 
@@ -184,14 +196,14 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @param string $parentId parent product id
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      * @deprecated underscore prefix violates PSR12, will be renamed to "getParentProduct" in next major
      */
     protected function _getParentProduct($parentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($parentId && $this->_oParentProd === null) {
             $this->_oParentProd = false;
-            $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $article = oxNew(Article::class);
             if (($article->load($parentId))) {
                 $this->_processProduct($article);
                 $this->_oParentProd = $article;
@@ -251,7 +263,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Processes product by setting link type and in case list type is search adds search parameters to details link
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article Product to process
+     * @param Article $article Product to process
      * @deprecated underscore prefix violates PSR12, will be renamed to "processProduct" in next major
      */
     protected function _processProduct($article) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -273,11 +285,11 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     }
 
     /**
-     * If possible loads additional article info (\OxidEsales\Eshop\Application\Model\Article::getCrossSelling(),
-     * \OxidEsales\Eshop\Application\Model\Article::getAccessoires(), \OxidEsales\Eshop\Application\Model\Article::getReviews(), \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts(),
-     * \OxidEsales\Eshop\Application\Model\Article::GetCustomerAlsoBoughtThisProducts()), forms variants details
+     * If possible loads additional article info (Article::getCrossSelling(),
+     * Article::getAccessoires(), Article::getReviews(), Article::GetSimilarProducts(),
+     * Article::GetCustomerAlsoBoughtThisProducts()), forms variants details
      * navigation URLs
-     * loads select lists (\OxidEsales\Eshop\Application\Model\Article::GetSelectLists()), prepares HTML meta data
+     * loads select lists (Article::GetSelectLists()), prepares HTML meta data
      * (details::_convertForMetaTags()). Returns name of template file
      * details::_sThisTemplate
      *
@@ -317,7 +329,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
 
                 // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
                 if ($config->getConfigParam('bl_rssRecommLists') && $this->getSimilarRecommListIds()) {
-                    $rssFeeds = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+                    $rssFeeds = oxNew(RssFeed::class);
                     $title = $rssFeeds->getRecommListsTitle($article);
                     $url = $rssFeeds->getRecommListsUrl($article);
                     $this->addRssFeed($title, $url, 'recommlists');
@@ -415,7 +427,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
 
             //save rating
             if ($articleRating !== null && $articleRating >= 1 && $articleRating <= 5) {
-                $rating = oxNew(\OxidEsales\Eshop\Application\Model\Rating::class);
+                $rating = oxNew(Rating::class);
                 if ($rating->allowRating($user->getId(), 'oxarticle', $article->getId())) {
                     $rating->oxratings__oxuserid = new Field($user->getId());
                     $rating->oxratings__oxtype = new Field('oxarticle');
@@ -427,7 +439,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
             }
 
             if (($reviewText = trim((string) Registry::getRequest()->getRequestEscapedParameter('rvw_txt', true)))) {
-                $review = oxNew(\OxidEsales\Eshop\Application\Model\Review::class);
+                $review = oxNew(Review::class);
                 $review->oxreviews__oxobjectid = new Field($article->getId());
                 $review->oxreviews__oxtype = new Field('oxarticle');
                 $review->oxreviews__oxtext = new Field($reviewText, Field::T_RAW);
@@ -461,7 +473,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
         $articleId = $this->getProduct()->getId();
 
         if ($articleId) {
-            $recommendationList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+            $recommendationList = oxNew(RecommendationList::class);
             $recommendationList->load($recommendationListId);
             $recommendationList->addArticle($articleId, $recommendationText);
         }
@@ -483,7 +495,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Returns current product
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     public function getProduct()
     {
@@ -498,7 +510,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
             $articleId = Registry::getRequest()->getRequestEscapedParameter('anid');
 
             // object is not yet loaded
-            $this->_oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $this->_oProduct = oxNew(Article::class);
 
             if (!$this->_oProduct->load($articleId)) {
                 $utils->redirect($config->getShopHomeUrl());
@@ -784,7 +796,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      *
      * @param int $languageId language id
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
     protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -925,7 +937,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
         // convert currency to default
         $price = $utils->currency2Float($parameters['price']);
 
-        $priceAlarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
+        $priceAlarm = oxNew(PriceAlarm::class);
         $priceAlarm->oxpricealarm__oxuserid = new Field(Registry::getSession()->getVariable('usr'));
         $priceAlarm->oxpricealarm__oxemail = new Field($parameters['email']);
         $priceAlarm->oxpricealarm__oxartid = new Field($parameters['aid']);
@@ -938,7 +950,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
         $priceAlarm->save();
 
         // Send Email
-        $email = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $email = oxNew(Email::class);
         $this->_iPriceAlarmStatus = (int) $email->sendPricealarmNotification($parameters, $priceAlarm);
     }
 
@@ -990,7 +1002,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Returns pictures product object
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     public function getPicturesProduct()
     {
@@ -1118,13 +1130,13 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     /**
      * Returns bundle product
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article|false
+     * @return Article|false
      */
     public function getBundleArticle()
     {
         $article = $this->getProduct();
         if ($article && $article->oxarticles__oxbundleid->value) {
-            $bundle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $bundle = oxNew(Article::class);
             $bundle->load($article->oxarticles__oxbundleid->value);
 
             return $bundle;
@@ -1141,7 +1153,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     public function getRDFaPaymentMethods()
     {
         $price = $this->getProduct()->getPrice()->getBruttoPrice();
-        $paymentList = oxNew(\OxidEsales\Eshop\Application\Model\PaymentList::class);
+        $paymentList = oxNew(PaymentList::class);
         $paymentList->loadRDFaPaymentList($price);
 
         return $paymentList;
@@ -1154,7 +1166,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function getRDFaDeliverySetMethods()
     {
-        $deliverySetList = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
+        $deliverySetList = oxNew(DeliverySetList::class);
         $deliverySetList->loadRDFaDeliverySetList();
 
         return $deliverySetList;
@@ -1168,7 +1180,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
     public function getProductsDeliveryList()
     {
         $article = $this->getProduct();
-        $deliveryList = oxNew(\OxidEsales\Eshop\Application\Model\DeliveryList::class);
+        $deliveryList = oxNew(DeliveryList::class);
         $deliveryList->loadDeliveryListForProduct($article);
 
         return $deliveryList;
@@ -1280,7 +1292,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
         $paths = [];
         $vendorPath = [];
 
-        $vendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $vendor = oxNew(Vendor::class);
         $vendor->load('root');
 
         $vendorPath['link'] = $vendor->getLink();
@@ -1288,7 +1300,7 @@ class ArticleDetailsController extends \OxidEsales\Eshop\Application\Controller\
         $paths[] = $vendorPath;
 
         $vendor = $this->getActVendor();
-        if ($vendor instanceof \OxidEsales\Eshop\Application\Model\Vendor) {
+        if ($vendor instanceof Vendor) {
             $vendorPath['link'] = $vendor->getLink();
             $vendorPath['title'] = $vendor->oxvendor__oxtitle->value;
             $paths[] = $vendorPath;

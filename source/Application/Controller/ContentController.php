@@ -21,12 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Application\Model\DeliveryList;
+use OxidEsales\Eshop\Application\Model\DeliverySetList;
+use OxidEsales\Eshop\Application\Model\PaymentList;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsView;
 
 /**
  * CMS - loads pages and displays it
  */
-class ContentController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ContentController extends FrontendController
 {
     /**
      * Content id.
@@ -291,7 +297,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             $sLoadId = Registry::getRequest()->getRequestEscapedParameter('oxloadid');
 
             $this->_sContentId = false;
-            $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+            $oContent = oxNew(Content::class);
 
             if ($sLoadId) {
                 $blRes = $oContent->loadByIdent($sLoadId);
@@ -462,7 +468,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getNotMappedToRDFaPayments()
     {
-        $oPayments = oxNew(\OxidEsales\Eshop\Application\Model\PaymentList::class);
+        $oPayments = oxNew(PaymentList::class);
         $oPayments->loadNonRDFaPaymentList();
 
         return $oPayments;
@@ -477,7 +483,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getNotMappedToRDFaDeliverySets()
     {
-        $oDelSets = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
+        $oDelSets = oxNew(DeliverySetList::class);
         $oDelSets->loadNonRDFaDeliverySetList();
 
         return $oDelSets;
@@ -494,7 +500,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $oDeliveryChargeSpecs = $this->getDeliveryList();
         foreach ($oDeliveryChargeSpecs as $oDeliveryChargeSpec) {
             if ($oDeliveryChargeSpec->oxdelivery__oxaddsumtype->value == "abs") {
-                $oDelSets = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
+                $oDelSets = oxNew(DeliverySetList::class);
                 $oDelSets->loadRDFaDeliverySetList($oDeliveryChargeSpec->getId());
                 $oDeliveryChargeSpec->deliverysetmethods = $oDelSets;
                 $aDeliveryChargeSpecs[] = $oDeliveryChargeSpec;
@@ -512,7 +518,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     public function getDeliveryList()
     {
         if ($this->_oDelList === null) {
-            $this->_oDelList = oxNew(\OxidEsales\Eshop\Application\Model\DeliveryList::class);
+            $this->_oDelList = oxNew(DeliveryList::class);
             $this->_oDelList->getList();
         }
 
@@ -553,7 +559,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getParsedContent()
     {
-        /** @var \OxidEsales\Eshop\Core\UtilsView $oUtilsView */
+        /** @var UtilsView $oUtilsView */
         $oUtilsView = Registry::getUtilsView();
         return $oUtilsView->parseThroughSmarty(
             $this->getContent()->oxcontents__oxcontent->value,

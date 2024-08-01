@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -31,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
  * ordered articles information, button to add article to basket.
  * O3-Shop -> MY ACCOUNT -> Newsletter.
  */
-class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountOrderController extends AccountController
 {
     /**
      * Count of all articles in list.
@@ -115,7 +117,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
     /**
      * Template variable getter. Returns ordered articles
      *
-     * @return \OxidEsales\Eshop\Application\Model\ArticleList | false
+     * @return ArticleList | false
      */
     public function getOrderArticleList()
     {
@@ -124,7 +126,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
             $this->_aArticlesList = false;
             $oOrdersList = $this->getOrderList();
             if ($oOrdersList && $oOrdersList->count()) {
-                $this->_aArticlesList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $this->_aArticlesList = oxNew(ArticleList::class);
                 $this->_aArticlesList->loadOrderArticles($oOrdersList);
             }
         }

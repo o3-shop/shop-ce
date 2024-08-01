@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages discount articles
  */
-class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountItemAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -42,17 +44,17 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxartnum', 'oxarticles', 1, 0, 0],
-             ['oxtitle', 'oxarticles', 1, 1, 0],
-             ['oxean', 'oxarticles', 1, 0, 0],
-             ['oxmpn', 'oxarticles', 0, 0, 0],
-             ['oxprice', 'oxarticles', 0, 0, 0],
-             ['oxstock', 'oxarticles', 0, 0, 0],
-             ['oxitmartid', 'oxdiscount', 0, 0, 1]
-         ]
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxitmartid', 'oxdiscount', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -69,7 +71,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
         $sDiscTable = $this->_getViewName('oxdiscount');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sOxid = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchOxid = $oRequest->getRequestEscapedParameter('synchoxid');
 
@@ -124,7 +126,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $aChosenArt = $this->_getActionIds('oxdiscount.oxitmartid');
         if (is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = '' where oxid = :oxid and oxitmartid = :oxitmartid";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ, [
+            DatabaseProvider::getDb()->execute($sQ, [
                 ':oxid' => $soxId,
                 ':oxitmartid' => reset($aChosenArt)
             ]);
@@ -140,7 +142,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = :oxitmartid where oxid = :oxid";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ, [
+            DatabaseProvider::getDb()->execute($sQ, [
                 ':oxitmartid' => reset($aChosenArt),
                 ':oxid' => $soxId
             ]);

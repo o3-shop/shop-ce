@@ -22,6 +22,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
@@ -29,7 +32,7 @@ use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 /**
  * Administrator GUI navigation manager class.
  */
-class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class NavigationController extends AdminController
 {
     /**
      * Executes parent method parent::render(), generates menu HTML code,
@@ -72,7 +75,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         if (!$blisMallAdmin) {
             // we only allow to see our shop
             $iShopId = Registry::getSession()->getVariable("actshop");
-            $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+            $oShop = oxNew(Shop::class);
             $oShop->load($iShopId);
             $oShoplist->add($oShop);
         } else {
@@ -105,7 +108,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         $mySession = $this->getSession();
         $myConfig = Registry::getConfig();
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
         $oUser->logout();
 
         // kill session

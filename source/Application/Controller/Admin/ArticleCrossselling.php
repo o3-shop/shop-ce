@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -30,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
  * assigning of article to crosselling/accesories with other products.
  * Admin Menu: Manage Products -> Articles -> Crosssell.
  */
-class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleCrossselling extends AdminDetailsController
 {
     /**
      * Collects article crosselling and attributes information, passes
@@ -63,12 +66,12 @@ class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin
 
         $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
-            $oArticleCrossellingAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax::class);
+            $oArticleCrossellingAjax = oxNew(ArticleCrosssellingAjax::class);
             $this->_aViewData['oxajax'] = $oArticleCrossellingAjax->getColumns();
 
             return "popups/article_crossselling.tpl";
         } elseif ($iAoc == 2) {
-            $oArticleAccessoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class);
+            $oArticleAccessoriesAjax = oxNew(ArticleAccessoriesAjax::class);
             $this->_aViewData['oxajax'] = $oArticleAccessoriesAjax->getColumns();
 
             return "popups/article_accessories.tpl";

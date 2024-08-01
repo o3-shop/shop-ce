@@ -23,6 +23,12 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxField;
 use oxGroups;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\DeliverySet;
+use OxidEsales\Eshop\Application\Model\Groups;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin deliveryset User manager.
@@ -30,7 +36,7 @@ use oxGroups;
  * and etc.
  * Admin Menu: Shop settings -> Shipping & Handling Sets -> Users.
  */
-class DeliverySetUsers extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class DeliverySetUsers extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates delivery category tree,
@@ -45,27 +51,27 @@ class DeliverySetUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
         $soxId = $this->getEditObjectId();
 
         // all usergroups
-        $oGroups = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
         $oGroups->selectString("select * from " . getViewName("oxgroups", $this->_iEditLang));
 
-        $oRoot = new \OxidEsales\Eshop\Application\Model\Groups();
-        $oRoot->oxgroups__oxid = new \OxidEsales\Eshop\Core\Field("");
-        $oRoot->oxgroups__oxtitle = new \OxidEsales\Eshop\Core\Field("-- ");
+        $oRoot = new Groups();
+        $oRoot->oxgroups__oxid = new Field("");
+        $oRoot->oxgroups__oxtitle = new Field("-- ");
         // rebuild list as we need the "no value" entry at the first position
         $aNewList = [];
         $aNewList[] = $oRoot;
 
         foreach ($oGroups as $val) {
-            $aNewList[$val->oxgroups__oxid->value] = new \OxidEsales\Eshop\Application\Model\Groups();
-            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxid = new \OxidEsales\Eshop\Core\Field($val->oxgroups__oxid->value);
-            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxtitle = new \OxidEsales\Eshop\Core\Field($val->oxgroups__oxtitle->value);
+            $aNewList[$val->oxgroups__oxid->value] = new Groups();
+            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxid = new Field($val->oxgroups__oxid->value);
+            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxtitle = new Field($val->oxgroups__oxtitle->value);
         }
 
         $oGroups = $aNewList;
 
         if (isset($soxId) && $soxId != "-1") {
-            $oDelivery = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySet::class);
+            $oDelivery = oxNew(DeliverySet::class);
             $oDelivery->load($soxId);
 
             //Disable editing for derived articles
@@ -76,7 +82,7 @@ class DeliverySetUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
 
         $this->_aViewData["allgroups2"] = $oGroups;
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDeliverysetGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetGroupsAjax->getColumns();

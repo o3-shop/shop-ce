@@ -21,7 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+use OxidEsales\Eshop\Application\Model\ManufacturerList;
+use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
@@ -32,7 +36,7 @@ use oxDb;
  * deletion of articles, etc.
  * Admin Menu: Manage Products -> Articles.
  */
-class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ArticleList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -182,12 +186,12 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * @param string $sType  active list type
      * @param string $sValue active list item id
      *
-     * @return \OxidEsales\Eshop\Application\Model\CategoryList
+     * @return CategoryList
      */
     public function getCategoryList($sType, $sValue)
     {
-        /** @var \OxidEsales\Eshop\Application\Model\CategoryList $oCatTree parent category tree */
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        /** @var CategoryList $oCatTree parent category tree */
+        $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
         if ($sType === 'cat') {
             foreach ($oCatTree as $oCategory) {
@@ -211,7 +215,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      */
     public function getManufacturerList($sType, $sValue)
     {
-        $oMnfTree = oxNew(\OxidEsales\Eshop\Application\Model\ManufacturerList::class);
+        $oMnfTree = oxNew(ManufacturerList::class);
         $oMnfTree->loadManufacturerList();
         if ($sType === 'mnf') {
             foreach ($oMnfTree as $oManufacturer) {
@@ -235,7 +239,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      */
     public function getVendorList($sType, $sValue)
     {
-        $oVndTree = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
+        $oVndTree = oxNew(VendorList::class);
         $oVndTree->loadVendorList();
         if ($sType === 'vnd') {
             foreach ($oVndTree as $oVendor) {

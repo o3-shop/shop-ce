@@ -23,16 +23,18 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxDb;
 use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article assignment to attributes
  */
-class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleAttributeAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -153,7 +155,7 @@ class ArticleAttributeAjax extends \OxidEsales\Eshop\Application\Controller\Admi
                 $quotedArticleId = $database->quote($article->oxarticles__oxid->value);
                 $select = "select * from {$viewName} where {$viewName}.oxobjectid= {$quotedArticleId} and
                             {$viewName}.oxattrid= " . $database->quote($attributeId);
-                $objectToAttribute = oxNew(\OxidEsales\Eshop\Core\Model\MultiLanguageModel::class);
+                $objectToAttribute = oxNew(MultiLanguageModel::class);
                 $objectToAttribute->setLanguage(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
                 $objectToAttribute->init("oxobject2attribute");
                 if ($objectToAttribute->assignRecord($select)) {

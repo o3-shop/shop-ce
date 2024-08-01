@@ -22,7 +22,11 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use oxArticleList;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -33,7 +37,7 @@ use OxidEsales\Eshop\Core\Request;
  * meta tags (for search engines). Result - "list.tpl" template.
  * O3-Shop -> (Any selected shop product category).
  */
-class ArticleListController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ArticleListController extends FrontendController
 {
     /**
      * Count of all articles in list.
@@ -176,7 +180,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * articles - regular (oxArticleList::LoadCategoryArticles()) or price
      * dependent (oxArticleList::LoadPriceArticles()). Generates page navigation data
      * such as previous/next window URL, number of available pages, generates
-     * meta tags info (\OxidEsales\Eshop\Application\Controller\FrontendController::_convertForMetaTags()) and returns
+     * meta tags info (FrontendController::_convertForMetaTags()) and returns
      * name of template to render. Also checks if actual pages count does not exceed real
      * articles page count. If yes - calls error_404_handler().
      *
@@ -195,7 +199,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
 
         $activeCategory = $this->getActiveCategory();
         if ($activeCategory && $config->getConfigParam('bl_rssCategories')) {
-            $rss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+            $rss = oxNew(RssFeed::class);
             $this->addRssFeed(
                 $rss->getCategoryArticlesTitle($activeCategory),
                 $rss->getCategoryArticlesUrl($activeCategory),
@@ -279,7 +283,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
             $seoParameters = $this->getAddSeoUrlParams();
 
             foreach ($articleList as $article) {
-                /** @var \OxidEsales\Eshop\Application\Model\Article $article */
+                /** @var Article $article */
                 $article->setLinkType($linkType);
 
                 if ($dynamicParameters) {
@@ -390,7 +394,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         $numberOfCategoryArticles = $numberOfCategoryArticles ? $numberOfCategoryArticles : 1;
 
         // load only articles which we show on screen
-        $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $articleList = oxNew(ArticleList::class);
         $articleList->setSqlLimit($numberOfCategoryArticles * $this->_getRequestPageNr(), $numberOfCategoryArticles);
         $articleList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
 
@@ -653,7 +657,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         if (count($articleList = $this->getArticleList())) {
             $stringModifier = getStr();
             foreach ($articleList as $article) {
-                /** @var \OxidEsales\Eshop\Application\Model\Article $article */
+                /** @var Article $article */
                 $description = $stringModifier->strip_tags(
                     trim($stringModifier->strtolower($article->getLongDescription()->value))
                 );
@@ -1034,7 +1038,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         if ($this->_aBargainArticleList === null) {
             $this->_aBargainArticleList = [];
             if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion') && $this->_isActCategory()) {
-                $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $articleList = oxNew(ArticleList::class);
                 $articleList->loadActionArticles('OXBARGAIN');
                 if ($articleList->count()) {
                     $this->_aBargainArticleList = $articleList;

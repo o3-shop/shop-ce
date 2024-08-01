@@ -22,7 +22,12 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxField;
+use OxidEsales\Eshop\Application\Model\Discount;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 
 /**
  * Admin article main discount manager.
@@ -30,7 +35,7 @@ use stdClass;
  * and etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
-class DiscountUsers extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class DiscountUsers extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates discount category tree,
@@ -45,27 +50,27 @@ class DiscountUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $soxId = $this->getEditObjectId();
 
         // all usergroups
-        $oGroups = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
         $oGroups->selectString("select * from " . getViewName("oxgroups", $this->_iEditLang));
 
         $oRoot = new stdClass();
-        $oRoot->oxgroups__oxid = new \OxidEsales\Eshop\Core\Field("");
-        $oRoot->oxgroups__oxtitle = new \OxidEsales\Eshop\Core\Field("-- ");
+        $oRoot->oxgroups__oxid = new Field("");
+        $oRoot->oxgroups__oxtitle = new Field("-- ");
         // rebuild list as we need the "no value" entry at the first position
         $aNewList = [];
         $aNewList[] = $oRoot;
 
         foreach ($oGroups as $val) {
             $aNewList[$val->oxgroups__oxid->value] = new stdClass();
-            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxid = new \OxidEsales\Eshop\Core\Field($val->oxgroups__oxid->value);
-            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxtitle = new \OxidEsales\Eshop\Core\Field($val->oxgroups__oxtitle->value);
+            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxid = new Field($val->oxgroups__oxid->value);
+            $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxtitle = new Field($val->oxgroups__oxtitle->value);
         }
 
         $this->_aViewData["allgroups2"] = $aNewList;
 
         if (isset($soxId) && $soxId != "-1") {
-            $oDiscount = oxNew(\OxidEsales\Eshop\Application\Model\Discount::class);
+            $oDiscount = oxNew(Discount::class);
             $oDiscount->load($soxId);
 
             if ($oDiscount->isDerived()) {
@@ -73,7 +78,7 @@ class DiscountUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
             }
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDiscountGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountGroupsAjax->getColumns();

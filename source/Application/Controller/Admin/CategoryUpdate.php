@@ -21,10 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+
 /**
  * Class for updating category tree structure in DB.
  */
-class CategoryUpdate extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class CategoryUpdate extends AdminController
 {
     /**
      * Current class template name.
@@ -49,7 +52,7 @@ class CategoryUpdate extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     protected function _getCategoryList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->_oCatList == null) {
-            $this->_oCatList = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+            $this->_oCatList = oxNew(CategoryList::class);
             $this->_oCatList->updateCategoryTree(false);
         }
 

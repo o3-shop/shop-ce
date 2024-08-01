@@ -20,6 +20,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Object2Role;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -30,7 +31,7 @@ use oxField;
 /**
  * Class manages users assignment to groups
  */
-class AdminRightsMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class AdminRightsMainAjax extends ListComponentAjax
 {
     /**
      * Columns array

@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -32,7 +33,7 @@ use stdClass;
  * filter them by sorting, title or delete them.
  * Admin Menu: Manage Products -> Categories.
  */
-class CategoryList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class CategoryList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).

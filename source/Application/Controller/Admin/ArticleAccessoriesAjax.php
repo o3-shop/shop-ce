@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -32,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Class controls article assignment to accessories
  */
-class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleAccessoriesAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build

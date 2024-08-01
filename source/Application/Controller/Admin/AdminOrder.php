@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Admin order manager.
  * Returns template, that arranges two other templates ("order_list.tpl"
  * and "order_overview.tpl") to frame.
  * Admin Menu: Orders -> Display Orders.
  */
-class AdminOrder extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminOrder extends AdminController
 {
     /**
      * Current class template name.

@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
@@ -45,7 +47,7 @@ use category_main_ajax;
  * and etc.
  * Admin Menu: Manage Products -> Categories -> Main.
  */
-class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CategoryMain extends AdminDetailsController
 {
     const NEW_CATEGORY_ID = "-1";
 
@@ -114,8 +116,8 @@ class CategoryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $this->_aViewData["sortableFields"] = $this->getSortableFields();
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            /** @var \OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax $oCategoryMainAjax */
-            $oCategoryMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class);
+            /** @var CategoryMainAjax $oCategoryMainAjax */
+            $oCategoryMainAjax = oxNew(CategoryMainAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryMainAjax->getColumns();
 
             return "popups/category_main.tpl";

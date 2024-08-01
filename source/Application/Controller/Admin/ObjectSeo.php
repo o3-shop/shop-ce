@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use stdClass;
@@ -28,7 +30,7 @@ use stdClass;
 /**
  * Base seo config class.
  */
-class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ObjectSeo extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(),
@@ -58,7 +60,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         }
 
         $iLang = $this->getEditLang();
-        $aLangs = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames();
+        $aLangs = Registry::getLang()->getLanguageNames();
         foreach ($aLangs as $sLangId => $sLanguage) {
             $oLang = new stdClass();
             $oLang->sLangDesc = $sLanguage;
@@ -76,7 +78,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     {
         // saving/updating seo params
         if (($sOxid = $this->_getSaveObjectId())) {
-            $aSeoData = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aSeoData');
+            $aSeoData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
             $iShopId = Registry::getConfig()->getShopId();
             $iLang = $this->getEditLang();
 
@@ -122,7 +124,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         $sParams = null;
         if (isset($aSeoData['oxparams'])) {
             if (preg_match('/([a-z]*#)?(?<objectseo>[a-z0-9]+)(#[0-9])?/i', $aSeoData['oxparams'], $aMatches)) {
-                $sQuotedObjectSeoId = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($aMatches['objectseo']);
+                $sQuotedObjectSeoId = DatabaseProvider::getDb()->quote($aMatches['objectseo']);
                 $sParams = "oxparams = {$sQuotedObjectSeoId}";
             }
         }
@@ -167,7 +169,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
                    oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = '' ";
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ, [
+        return (bool) DatabaseProvider::getMaster()->getOne($sQ, [
             ':oxobjectid' => $this->getEditObjectId(),
             ':oxshopid' => $iShopId,
             ':oxlang' => $iLang

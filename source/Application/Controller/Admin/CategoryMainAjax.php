@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
@@ -31,7 +32,7 @@ use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEve
 /**
  * Class manages category articles
  */
-class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class CategoryMainAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build

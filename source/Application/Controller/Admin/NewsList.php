@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Admin news list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Customer Info -> News.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class NewsList extends AdminListController
 {
     /**
      * Current class template name.

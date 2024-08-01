@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
@@ -32,7 +33,7 @@ use oxField;
 /**
  * Class controls article crossselling configuration
  */
-class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleCrosssellingAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build

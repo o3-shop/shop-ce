@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Application\Controller\TextEditorHandler;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -31,7 +33,7 @@ use OxidEsales\Eshop\Core\ShopVersion;
 /**
  * Admin selectlist list manager.
  */
-class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminDetailsController extends AdminController
 {
     /**
      * Global editor object.
@@ -202,7 +204,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     {
         // caching category tree, to load it once, not many times
         if (!isset($this->oCatTree) || $blForceNonCache) {
-            $this->oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+            $this->oCatTree = oxNew(CategoryList::class);
             $this->oCatTree->setShopID($iTreeShopId);
 
             // setting language
@@ -345,7 +347,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param TextEditorHandler $textEditorHandler
      * @param mixed             $editedObject      The object we want to edit, either type of
-     *                                             \OxidEsales\Eshop\Core\BaseModel if you want to persist or anything
+     *                                             BaseModel if you want to persist or anything
      *                                             else
      * @param string            $field             The input field we want to edit
      * @param string            $stylesheet        The name of the CSS file

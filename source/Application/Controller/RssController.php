@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
 use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
@@ -29,7 +33,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInte
 /**
  * Shop RSS page.
  */
-class RssController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class RssController extends FrontendController
 {
     /**
      * current rss object
@@ -94,9 +98,9 @@ class RssController extends \OxidEsales\Eshop\Application\Controller\FrontendCon
 
         $this->_aViewData['oxEngineTemplateId'] = $this->getViewId();
         // return rss xml, no further processing
-        $sCharset = \OxidEsales\Eshop\Core\Registry::getLang()->translateString("charset");
-        \OxidEsales\Eshop\Core\Registry::getUtils()->setHeader("Content-Type: text/xml; charset=" . $sCharset);
-        \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit(
+        $sCharset = Registry::getLang()->translateString("charset");
+        Registry::getUtils()->setHeader("Content-Type: text/xml; charset=" . $sCharset);
+        Registry::getUtils()->showMessageAndExit(
             $this->_processOutput(
                 $renderer->renderTemplate($this->_sThisTemplate, $this->_aViewData)
             )
@@ -164,8 +168,8 @@ class RssController extends \OxidEsales\Eshop\Application\Controller\FrontendCon
     public function catarts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssCategories')) {
-            $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-            if ($oCat->load(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('cat'))) {
+            $oCat = oxNew(Category::class);
+            if ($oCat->load(Registry::getRequest()->getRequestEscapedParameter('cat'))) {
                 $this->_getRssFeed()->loadCategoryArticles($oCat);
             }
         } else {
@@ -181,10 +185,10 @@ class RssController extends \OxidEsales\Eshop\Application\Controller\FrontendCon
     public function searcharts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssSearch')) {
-            $sSearchParameter = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('searchparam', true);
-            $sCatId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('searchcnid');
-            $sVendorId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('searchvendor');
-            $sManufacturerId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
+            $sSearchParameter = Registry::getRequest()->getRequestEscapedParameter('searchparam', true);
+            $sCatId = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
+            $sVendorId = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
+            $sManufacturerId = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
 
             $this->_getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
         } else {
@@ -203,8 +207,8 @@ class RssController extends \OxidEsales\Eshop\Application\Controller\FrontendCon
     public function recommlists()
     {
         if ($this->getViewConfig()->getShowListmania() && Registry::getConfig()->getConfigParam('bl_rssRecommLists')) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
-            if ($oArticle->load(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('anid'))) {
+            $oArticle = oxNew(Article::class);
+            if ($oArticle->load(Registry::getRequest()->getRequestEscapedParameter('anid'))) {
                 $this->_getRssFeed()->loadRecommLists($oArticle);
 
                 return;
@@ -224,8 +228,8 @@ class RssController extends \OxidEsales\Eshop\Application\Controller\FrontendCon
     public function recommlistarts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssRecommListArts')) {
-            $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
-            if ($oRecommList->load(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('recommid'))) {
+            $oRecommList = oxNew(RecommendationList::class);
+            if ($oRecommList->load(Registry::getRequest()->getRequestEscapedParameter('recommid'))) {
                 $this->_getRssFeed()->loadRecommListArticles($oRecommList);
 
                 return;

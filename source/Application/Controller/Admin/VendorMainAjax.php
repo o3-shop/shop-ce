@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
  * Class manages vendor assignment to articles
  */
-class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class VendorMainAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -42,23 +44,23 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,       visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
-                                 ]
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -72,7 +74,7 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         // looking for table/view
         $sArtTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
         
@@ -134,7 +136,7 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         if (is_array($aRemoveArt)) {
             $sSelect = "update oxarticles set oxvendorid = null where "
                 . $this->onVendorActionArticleUpdateConditions($aRemoveArt);
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sSelect);
+            DatabaseProvider::getDb()->Execute($sSelect);
 
             $this->resetCounter("vendorArticle", $oRequest->getRequestEscapedParameter('oxid'));
 
@@ -158,7 +160,7 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         }
 
         if ($soxId && $soxId != "-1" && is_array($aAddArticle)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $sSelect = "update oxarticles set oxvendorid = " . $oDb->quote($soxId) . " where "
                 . $this->onVendorActionArticleUpdateConditions($aAddArticle);
 
@@ -178,7 +180,7 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      */
     protected function onVendorActionArticleUpdateConditions($articleIds)
     {
-        return 'oxid in (' . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articleIds)) . ')';
+        return 'oxid in (' . implode(", ", DatabaseProvider::getDb()->quoteArray($articleIds)) . ')';
     }
 
     /**

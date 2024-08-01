@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 use oxField;
 
@@ -29,7 +33,7 @@ use oxField;
  * Performs collection and updatind (on user submit) main item information.
  * Admin Menu: Shop Settings -> Payment Methods -> Main.
  */
-class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class PaymentMain extends AdminDetailsController
 {
     /**
      * Keeps all act. fields to store
@@ -51,7 +55,7 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         unset($this->_aViewData["sumtype"][2]);
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
 
         if (isset($soxId) && $soxId != "-1") {
             $oPayment->loadInLang($this->_iEditLang, $soxId);
@@ -64,7 +68,7 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $this->_aViewData["edit"] = $oPayment;
 
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
                 $this->_aViewData["posslang"] = $aLang;
             }
@@ -77,10 +81,10 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             }
 
             // #708
-            $this->_aViewData['aFieldNames'] = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
+            $this->_aViewData['aFieldNames'] = Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
         }
 
-        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oPaymentMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\PaymentMainAjax::class);
             $this->_aViewData['oxajax'] = $oPaymentMainAjax->getColumns();
 
@@ -100,7 +104,7 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (!isset($aParams['oxpayments__oxactive'])) {
             $aParams['oxpayments__oxactive'] = 0;
@@ -109,7 +113,7 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $aParams['oxpayments__oxchecked'] = 0;
         }
 
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
 
         if ($soxId != "-1") {
             $oPayment->loadInLang($this->_iEditLang, $soxId);
@@ -122,17 +126,17 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oPayment->assign($aParams);
 
         // setting add sum calculation rules
-        $aRules = (array) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxpayments__oxaddsumrules');
+        $aRules = (array) Registry::getRequest()->getRequestEscapedParameter('oxpayments__oxaddsumrules');
         // if sum eqals 0, show notice, that default value will be used.
         if (empty($aRules)) {
             $this->_aViewData["noticeoxaddsumrules"] = 1;
         }
-        $oPayment->oxpayments__oxaddsumrules = new \OxidEsales\Eshop\Core\Field(array_sum($aRules));
+        $oPayment->oxpayments__oxaddsumrules = new Field(array_sum($aRules));
 
 
         //#708
         if (!is_array($this->_aFieldArray)) {
-            $this->_aFieldArray = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
+            $this->_aFieldArray = Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
         }
 
         // build value
@@ -141,7 +145,7 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $sValdesc .= $oField->name . "__@@";
         }
 
-        $oPayment->oxpayments__oxvaldesc = new \OxidEsales\Eshop\Core\Field($sValdesc, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $oPayment->oxpayments__oxvaldesc = new Field($sValdesc, Field::T_RAW);
         $oPayment->setLanguage($this->_iEditLang);
         $oPayment->save();
 
@@ -155,9 +159,9 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        $oObj = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oObj = oxNew(Payment::class);
 
         if ($soxId != "-1") {
             $oObj->loadInLang($this->_iEditLang, $soxId);
@@ -170,7 +174,7 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oObj->assign($aParams);
 
         // apply new language
-        $oObj->setLanguage(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('new_lang'));
+        $oObj->setLanguage(Registry::getRequest()->getRequestEscapedParameter('new_lang'));
         $oObj->save();
 
         // set oxid if inserted
@@ -182,10 +186,10 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function delFields()
     {
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
         if ($oPayment->loadInLang($this->_iEditLang, $this->getEditObjectId())) {
-            $aDelFields = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aFields');
-            $this->_aFieldArray = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
+            $aDelFields = Registry::getRequest()->getRequestEscapedParameter('aFields');
+            $this->_aFieldArray = Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
 
             if (is_array($aDelFields) && count($aDelFields)) {
                 foreach ($aDelFields as $sDelField) {
@@ -206,12 +210,12 @@ class PaymentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function addField()
     {
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
         if ($oPayment->loadInLang($this->_iEditLang, $this->getEditObjectId())) {
-            $this->_aFieldArray = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
+            $this->_aFieldArray = Registry::getUtils()->assignValuesFromText($oPayment->oxpayments__oxvaldesc->value);
 
             $oField = new stdClass();
-            $oField->name = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('sAddField');
+            $oField->name = Registry::getRequest()->getRequestEscapedParameter('sAddField');
 
             if (!empty($oField->name)) {
                 $this->_aFieldArray[] = $oField;

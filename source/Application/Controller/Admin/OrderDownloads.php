@@ -21,12 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\OrderFile;
+use OxidEsales\Eshop\Application\Model\OrderFileList;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin order article manager.
  * Collects order articles information, updates it on user submit, etc.
  * Admin Menu: Orders -> Display Orders -> Articles.
  */
-class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class OrderDownloads extends AdminDetailsController
 {
     /**
      * Active order object
@@ -61,7 +66,7 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     {
         $soxId = $this->getEditObjectId();
         if ($this->_oEditObject === null && isset($soxId) && $soxId != "-1") {
-            $this->_oEditObject = oxNew(\OxidEsales\Eshop\Application\Model\OrderFileList::class);
+            $this->_oEditObject = oxNew(OrderFileList::class);
             $this->_oEditObject->loadOrderFiles($soxId);
         }
 
@@ -73,8 +78,8 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     public function resetDownloadLink()
     {
-        $sOrderFileId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxorderfileid');
-        $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);
+        $sOrderFileId = Registry::getRequest()->getRequestEscapedParameter('oxorderfileid');
+        $oOrderFile = oxNew(OrderFile::class);
         if ($oOrderFile->load($sOrderFileId)) {
             $oOrderFile->reset();
             $oOrderFile->save();

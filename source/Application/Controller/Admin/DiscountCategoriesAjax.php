@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages discount categories
  */
-class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountCategoriesAjax extends ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
     const NEW_DISCOUNT_ID = "-1";
@@ -44,15 +48,15 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
             ['oxtitle', 'oxcategories', 1, 1, 0],
             ['oxdesc', 'oxcategories', 1, 1, 0],
             ['oxid', 'oxcategories', 0, 0, 0],
-            ['oxid', 'oxcategories', 0, 0, 1]
+            ['oxid', 'oxcategories', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxtitle', 'oxcategories', 1, 1, 0],
-             ['oxdesc', 'oxcategories', 1, 1, 0],
-             ['oxid', 'oxcategories', 0, 0, 0],
-             ['oxid', 'oxobject2discount', 0, 0, 1],
-             ['oxid', 'oxcategories', 0, 0, 1]
-         ],
+        'container2' => [
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxobject2discount', 0, 0, 1],
+            ['oxid', 'oxcategories', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -63,7 +67,7 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oRequest = Registry::getRequest();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -106,11 +110,11 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $query = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
+            DatabaseProvider::getDb()->Execute($query);
         } elseif (is_array($categoryIds)) {
-            $chosenCategories = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($categoryIds));
+            $chosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($categoryIds));
             $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $chosenCategories . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
+            DatabaseProvider::getDb()->Execute($query);
         }
     }
 
@@ -142,11 +146,11 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function addCategoryToDiscount($discountId, $categoryId)
     {
-        $object2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $object2Discount = oxNew(BaseModel::class);
         $object2Discount->init('oxobject2discount');
-        $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountId);
-        $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($categoryId);
-        $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxcategories");
+        $object2Discount->oxobject2discount__oxdiscountid = new Field($discountId);
+        $object2Discount->oxobject2discount__oxobjectid = new Field($categoryId);
+        $object2Discount->oxobject2discount__oxtype = new Field("oxcategories");
 
         $object2Discount->save();
     }

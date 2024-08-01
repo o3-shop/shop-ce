@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AttributeMainAjax;
 use OxidEsales\Eshop\Application\Model\Attribute;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -31,7 +33,7 @@ use stdClass;
  * this attribute, etc.
  * Admin Menu: Manage Products -> Attributes -> Main.
  */
-class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AttributeMain extends AdminDetailsController
 {
     /**
      * Loads article Attributes info, passes it to Smarty engine and
@@ -81,7 +83,7 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $this->_aViewData["edit"] = $oAttr;
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
-            $oAttributeMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AttributeMainAjax::class);
+            $oAttributeMainAjax = oxNew(AttributeMainAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeMainAjax->getColumns();
 
             return "popups/attribute_main.tpl";

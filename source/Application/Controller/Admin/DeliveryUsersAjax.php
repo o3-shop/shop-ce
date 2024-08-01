@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
@@ -28,7 +32,7 @@ use oxField;
 /**
  * Class manages delivery users
  */
-class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliveryUsersAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -36,29 +40,29 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxusername', 'oxuser', 1, 0, 0],
-        ['oxlname', 'oxuser', 0, 0, 0],
-        ['oxfname', 'oxuser', 0, 0, 0],
-        ['oxstreet', 'oxuser', 0, 0, 0],
-        ['oxstreetnr', 'oxuser', 0, 0, 0],
-        ['oxcity', 'oxuser', 0, 0, 0],
-        ['oxzip', 'oxuser', 0, 0, 0],
-        ['oxfon', 'oxuser', 0, 0, 0],
-        ['oxbirthdate', 'oxuser', 0, 0, 0],
-        ['oxid', 'oxuser', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxusername', 'oxuser', 1, 0, 0],
-                                     ['oxlname', 'oxuser', 0, 0, 0],
-                                     ['oxfname', 'oxuser', 0, 0, 0],
-                                     ['oxstreet', 'oxuser', 0, 0, 0],
-                                     ['oxstreetnr', 'oxuser', 0, 0, 0],
-                                     ['oxcity', 'oxuser', 0, 0, 0],
-                                     ['oxzip', 'oxuser', 0, 0, 0],
-                                     ['oxfon', 'oxuser', 0, 0, 0],
-                                     ['oxbirthdate', 'oxuser', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ]
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxuser', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxobject2delivery', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -73,7 +77,7 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $oRequest = Registry::getRequest();
 
         $sUserTable = $this->_getViewName('oxuser');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
@@ -111,10 +115,10 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -134,11 +138,11 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
 
         if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenUsr);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field('oxuser');
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenUsr);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxuser');
                 $oObject2Delivery->save();
             }
         }

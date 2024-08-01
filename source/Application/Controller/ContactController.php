@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
@@ -33,7 +34,7 @@ use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInte
  * fulfils all required fields all information is sent to shop owner by
  * email. O3-Shop -> CONTACT.
  */
-class ContactController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ContactController extends FrontendController
 {
     /**
      * Entered user data.

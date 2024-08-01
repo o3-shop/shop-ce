@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
@@ -32,7 +33,7 @@ use oxDb;
  * last modification date, sales rating and etc.
  * Admin Menu: Manage Products -> Articles -> Overview.
  */
-class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleOverview extends AdminDetailsController
 {
     /**
      * Loads article overview data, passes to Smarty engine and returns name

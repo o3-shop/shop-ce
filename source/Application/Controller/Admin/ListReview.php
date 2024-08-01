@@ -21,12 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleList;
 use oxAdminList;
 
 /**
  * user list "view" class.
  */
-class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleList
+class ListReview extends ArticleList
 {
     /**
      * Type of list.

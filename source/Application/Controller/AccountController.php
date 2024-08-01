@@ -21,7 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Controller\CompareController;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsUrl;
 
 /**
  * Current user "My account" window.
@@ -30,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
  * is a link for logging out. Template includes Topoffer , bargain
  * boxes. O3-Shop -> MY ACCOUNT.
  */
-class AccountController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class AccountController extends FrontendController
 {
     /**
      * Number of user's orders.
@@ -230,7 +233,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
                 }
             }
 
-            /** @var \OxidEsales\Eshop\Core\UtilsUrl $utilsUrl */
+            /** @var UtilsUrl $utilsUrl */
             $utilsUrl = Registry::getUtilsUrl();
             return Registry::getUtils()->redirect($utilsUrl->processUrl($redirectUrl), true, 302);
         }
@@ -352,7 +355,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getCompareItemsCnt()
     {
-        $compare = oxNew(\OxidEsales\Eshop\Application\Controller\CompareController::class);
+        $compare = oxNew(CompareController::class);
 
         return $compare->getCompareItemsCnt();
     }

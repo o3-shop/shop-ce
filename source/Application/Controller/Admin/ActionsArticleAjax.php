@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -31,7 +32,7 @@ use oxField;
 /**
  * Class controls article assignment to attributes
  */
-class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ActionsArticleAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build

@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\Eshop\Core\AdminNaviRights;
+use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -36,7 +37,7 @@ use stdClass;
 /**
  * Navigation tree control class
  */
-class NavigationTree extends \OxidEsales\Eshop\Core\Base
+class NavigationTree extends Base
 {
     /**
      * stores DOM object for all navigation tree
@@ -159,7 +160,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _addDynLinks($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsFile = \OxidEsales\Eshop\Core\Registry::getUtilsFile();
+        $myUtilsFile = Registry::getUtilsFile();
 
         $url = 'index.php?'; // session parameters will be included later (after cache processor)
 
@@ -568,7 +569,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     protected function _getInitialDom() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->_oInitialDom === null) {
-            $myOxUtlis = \OxidEsales\Eshop\Core\Registry::getUtils();
+            $myOxUtlis = Registry::getUtils();
 
             if (is_array($filesToLoad = $this->_getMenuFiles())) {
                 // now checking if xml files are newer than cached file
@@ -753,7 +754,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             $url = trim($myConfig->getConfigParam('sShopURL'), '/') . '/admin';
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl("{$url}/index.php", false);
+        return Registry::getUtilsUrl()->processUrl("{$url}/index.php", false);
     }
 
     /**
@@ -833,7 +834,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     protected function _getDynMenuLang() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
-        $lang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $lang = Registry::getLang();
 
         $dynLang = $myConfig->getConfigParam('iDynInterfaceLanguage');
         $dynLang = isset($dynLang) ? $dynLang : ($lang->getTplLanguage());

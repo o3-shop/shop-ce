@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -30,7 +31,7 @@ use stdClass;
  * Category text/description manager, enables editing of text.
  * Admin Menu: Manage Products -> Categories -> Text.
  */
-class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CategoryText extends AdminDetailsController
 {
     /**
      * Loads category object data, pases it to Smarty engine and returns

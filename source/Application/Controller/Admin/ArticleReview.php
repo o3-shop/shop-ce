@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Rating;
 use OxidEsales\Eshop\Application\Model\Review;
@@ -36,7 +37,7 @@ use oxDb;
  * review text or delete it.
  * Admin Menu: Manage Products -> Articles -> Review.
  */
-class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleReview extends AdminDetailsController
 {
     /**
      * Loads selected article review information, returns name of template
@@ -114,7 +115,7 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
             }
         }
 
-        //$sSelect .= "and oxreviews.oxtext".\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageTag($this->_iEditLang)." != ''";
+        //$sSelect .= "and oxreviews.oxtext".Registry::getLang()->getLanguageTag($this->_iEditLang)." != ''";
         $query .= "and oxreviews.oxlang = '" . $this->_iEditLang . "'";
         $query .= "and oxreviews.oxtext != '' ";
 

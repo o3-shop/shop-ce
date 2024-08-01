@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+
 /**
  * Admin shop system setting manager.
  * Collects shop system settings, updates it on user submit, etc.
  * Admin Menu: Main Menu -> Core Settings -> System.
  */
-class ShopSystem extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ShopSystem extends ShopConfiguration
 {
     /**
      * Current class template name.

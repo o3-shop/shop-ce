@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -29,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
  * his newsletter subscription status - simply register or
  * unregister from newsletter. O3-Shop -> MY ACCOUNT -> Newsletter.
  */
-class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountNewsletterController extends AccountController
 {
     /**
      * Current class template name.

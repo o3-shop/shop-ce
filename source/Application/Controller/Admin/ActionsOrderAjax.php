@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -29,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Class manages article select lists sorting
  */
-class ActionsOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ActionsOrderAjax extends ListComponentAjax
 {
     /**
      * Columns array
