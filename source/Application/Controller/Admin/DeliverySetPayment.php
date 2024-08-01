@@ -62,7 +62,7 @@ class DeliverySetPayment extends \OxidEsales\Eshop\Application\Controller\Admin\
             }
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDeliverysetPaymentAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetPaymentAjax->getColumns();

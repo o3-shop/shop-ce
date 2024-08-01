@@ -55,7 +55,7 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
     {
         parent::render();
 
-        $errorNumber = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('execerror');
+        $errorNumber = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('execerror');
         $templates = $this->getErrorTemplates();
 
         if (array_key_exists($errorNumber, $templates)) {
@@ -101,7 +101,7 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
      */
     public function getErrorNumber()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('errornr');
+        return \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('errornr');
     }
 
     /**

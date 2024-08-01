@@ -88,7 +88,7 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxcountry__oxactive'])) {
             $aParams['oxcountry__oxactive'] = 0;
@@ -119,7 +119,7 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxcountry__oxactive'])) {
             $aParams['oxcountry__oxactive'] = 0;

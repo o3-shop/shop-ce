@@ -150,7 +150,7 @@ class VoucherSerieExport extends \OxidEsales\Eshop\Application\Controller\Admin\
             $this->stop(ERR_FILEIO);
         } else {
             // file is open
-            $iStart = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iStart");
+            $iStart = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('iStart');
             if (!$iStart) {
                 ftruncate($this->fpFile, 0);
             }

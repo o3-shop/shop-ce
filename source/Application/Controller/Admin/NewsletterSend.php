@@ -54,7 +54,7 @@ class NewsletterSend extends \OxidEsales\Eshop\Application\Controller\Admin\News
         // calculating
         $iUserCount = $this->getUserCount();
 
-        $iStart = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iStart");
+        $iStart = (int) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('iStart');
 
         $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
         $oNewsletter->load($this->getEditObjectId());

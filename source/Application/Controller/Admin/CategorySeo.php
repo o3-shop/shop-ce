@@ -42,7 +42,7 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
         $sOxid = $this->getEditObjectId();
         $oCategory = oxNew(Category::class);
         if ($oCategory->load($sOxid)) {
-            $blShowSuffixParameter = Registry::getConfig()->getRequestParameter('blShowSuffix');
+            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
             $sShowSuffixField = 'oxcategories__oxshowsuffix';
             $oCategory->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oCategory->save();

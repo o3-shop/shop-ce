@@ -122,7 +122,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function moveLeft() //#777C
     {
-        $sArticleId = Registry::getConfig()->getRequestParameter('aid');
+        $sArticleId = Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sArticleId && ($aItems = $this->getCompareItems())) {
             $sPrevArticleId = null;
 
@@ -158,7 +158,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function moveRight() //#777C
     {
-        $sArticleId = Registry::getConfig()->getRequestParameter('aid');
+        $sArticleId = Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sArticleId && ($aItems = $this->getCompareItems())) {
             $sNextArticleId = 0;
 

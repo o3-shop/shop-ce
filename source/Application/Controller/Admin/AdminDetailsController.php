@@ -282,8 +282,8 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function changeFolder()
     {
-        $sFolder = Registry::getConfig()->getRequestParameter('setfolder');
-        $sFolderClass = Registry::getConfig()->getRequestParameter('folderclass');
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('setfolder');
+        $sFolderClass = Registry::getRequest()->getRequestEscapedParameter('folderclass');
 
         if ($sFolderClass == 'oxcontent' && $sFolder == 'CMSFOLDER_NONE') {
             $sFolder = '';

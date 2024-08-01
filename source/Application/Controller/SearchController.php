@@ -160,19 +160,19 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         parent::init();
 
         $myConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         // #1184M - special char search
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $sSearchParamForQuery = trim($oConfig->getRequestParameter('searchparam', true));
+        $sSearchParamForQuery = trim($oRequest->getRequestEscapedParameter('searchparam', true));
 
         // searching in category ?
-        $sInitialSearchCat = $this->_sSearchCatId = rawurldecode($oConfig->getRequestParameter('searchcnid'));
+        $sInitialSearchCat = $this->_sSearchCatId = rawurldecode($oRequest->getRequestEscapedParameter('searchcnid'));
 
         // searching in vendor #671
-        $sInitialSearchVendor = rawurldecode($oConfig->getRequestParameter('searchvendor'));
+        $sInitialSearchVendor = rawurldecode($oRequest->getRequestEscapedParameter('searchvendor'));
 
         // searching in Manufacturer #671
-        $sManufacturerParameter = $oConfig->getRequestParameter('searchmanufacturer');
+        $sManufacturerParameter = $oRequest->getRequestEscapedParameter('searchmanufacturer');
         $sInitialSearchManufacturer = $this->_sSearchManufacturer = rawurldecode($sManufacturerParameter);
 
         $this->_blEmptySearch = false;
@@ -229,13 +229,13 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
     {
         parent::render();
 
-        $oConfig = Registry::getConfig();
-        if ($oConfig->getConfigParam('bl_rssSearch')) {
+        $oRequest = Registry::getRequest();;
+        if (Registry::getConfig->getConfigParam('bl_rssSearch')) {
             $oRss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
-            $sSearch = $oConfig->getRequestParameter('searchparam', true);
-            $sCnid = $oConfig->getRequestParameter('searchcnid', true);
-            $sVendor = $oConfig->getRequestParameter('searchvendor', true);
-            $sManufacturer = $oConfig->getRequestParameter('searchmanufacturer', true);
+            $sSearch = $oRequest->getRequestEscapedParameter('searchparam', true);
+            $sCnid = $oRequest->getRequestEscapedParameter('searchcnid', true);
+            $sVendor = $oRequest->getRequestEscapedParameter('searchvendor', true);
+            $sManufacturer = $oRequest->getRequestEscapedParameter('searchmanufacturer', true);
             $sSearchArticlesTitle = $oRss->getSearchArticlesTitle($sSearch, $sCnid, $sVendor, $sManufacturer);
             $sSearchArticlesUrl = $oRss->getSearchArticlesUrl($sSearch, $sCnid, $sVendor, $sManufacturer);
             $this->addRssFeed($sSearchArticlesTitle, $sSearchArticlesUrl, 'searchArticles');
@@ -277,21 +277,21 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
     {
         $sAddParams = parent::getAddUrlParams();
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
-        if ($sParam = $oConfig->getRequestParameter('searchparam', true)) {
+        if ($sParam = $oRequest->getRequestEscapedParameter('searchparam', true)) {
             $sAddParams .= "&amp;searchparam=" . rawurlencode($sParam);
         }
 
-        if ($sParam = $oConfig->getRequestParameter('searchcnid')) {
+        if ($sParam = $oRequest->getRequestEscapedParameter('searchcnid')) {
             $sAddParams .= "&amp;searchcnid=$sParam";
         }
 
-        if ($sParam = rawurldecode($oConfig->getRequestParameter('searchvendor'))) {
+        if ($sParam = rawurldecode($oRequest->getRequestEscapedParameter('searchvendor'))) {
             $sAddParams .= "&amp;searchvendor=$sParam";
         }
 
-        if ($sParam = rawurldecode($oConfig->getRequestParameter('searchmanufacturer'))) {
+        if ($sParam = rawurldecode($oRequest->getRequestEscapedParameter('searchmanufacturer'))) {
             $sAddParams .= "&amp;searchmanufacturer=$sParam";
         }
 
@@ -367,7 +367,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         if ($this->_sSearchParamForHtml === null) {
             $this->_sSearchParamForHtml = false;
             if ($this->_isSearchClass()) {
-                $this->_sSearchParamForHtml = Registry::getConfig()->getRequestParameter('searchparam');
+                $this->_sSearchParamForHtml = Registry::getRequest()->getRequestEscapedParameter('searchparam');
             }
         }
 
@@ -384,7 +384,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         if ($this->_sSearchParam === null) {
             $this->_sSearchParam = false;
             if ($this->_isSearchClass()) {
-                $this->_sSearchParam = rawurlencode(Registry::getConfig()->getRequestParameter('searchparam', true));
+                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
             }
         }
 
@@ -401,7 +401,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
         if ($this->_sSearchCatId === null) {
             $this->_sSearchCatId = false;
             if ($this->_isSearchClass()) {
-                $this->_sSearchCatId = rawurldecode(Registry::getConfig()->getRequestParameter('searchcnid'));
+                $this->_sSearchCatId = rawurldecode(Registry::getRequest()->getRequestEscapedParameter('searchcnid'));
             }
         }
 
@@ -419,7 +419,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $this->_sSearchVendor = false;
             if ($this->_isSearchClass()) {
                 // searching in vendor #671
-                $this->_sSearchVendor = rawurldecode(Registry::getConfig()->getRequestParameter('searchvendor'));
+                $this->_sSearchVendor = rawurldecode(Registry::getRequest()->getRequestEscapedParameter('searchvendor'));
             }
         }
 
@@ -437,7 +437,7 @@ class SearchController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $this->_sSearchManufacturer = false;
             if ($this->_isSearchClass()) {
                 // searching in Manufacturer #671
-                $sManufacturerParameter = Registry::getConfig()->getRequestParameter('searchmanufacturer');
+                $sManufacturerParameter = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
                 $this->_sSearchManufacturer = rawurldecode($sManufacturerParameter);
             }
         }

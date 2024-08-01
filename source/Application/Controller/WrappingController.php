@@ -128,7 +128,7 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
      */
     public function changeWrapping()
     {
-        $aWrapping = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('wrapping');
+        $aWrapping = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('wrapping');
 
         if ($this->getViewConfig()->getShowGiftWrapping()) {
             $oBasket = $this->getSession()->getBasket();
@@ -142,8 +142,8 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
                 }
             }
 
-            $oBasket->setCardMessage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('giftmessage'));
-            $oBasket->setCardId(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('chosencard'));
+            $oBasket->setCardMessage(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('giftmessage'));
+            $oBasket->setCardId(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('chosencard'));
             $oBasket->onUpdate();
         }
 

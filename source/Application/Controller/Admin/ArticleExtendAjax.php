@@ -67,8 +67,8 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $objectToCategoryView = $this->_getViewName('oxobject2category');
         $database = DatabaseProvider::getDb();
 
-        $oxId = Registry::getConfig()->getRequestParameter('oxid');
-        $synchOxid = Registry::getConfig()->getRequestParameter('synchoxid');
+        $oxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $synchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         if ($oxId) {
             // all categories article is in
@@ -97,7 +97,7 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $dataFields = parent::_getDataFields($sQ);
-        if (Registry::getConfig()->getRequestParameter('oxid') && is_array($dataFields) && count($dataFields)) {
+        if (Registry::getRequest()->getRequestEscapedParameter('oxid') && is_array($dataFields) && count($dataFields)) {
             // looking for smallest time value to mark record as main category ..
             $minimalPosition = null;
             $minimalValue = null;
@@ -133,11 +133,11 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $categoriesToRemove = $this->_getActionIds('oxcategories.oxid');
 
-        $oxId = Registry::getConfig()->getRequestParameter('oxid');
+        $oxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $dataBase = DatabaseProvider::getDb();
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $categoriesTable = $this->_getViewName('oxcategories');
             $categoriesToRemove = $this->_getAll($this->_addFilter("select {$categoriesTable}.oxid " . $this->_getQuery()));
         }
@@ -170,12 +170,12 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $config = Registry::getConfig();
         $categoriesToAdd = $this->_getActionIds('oxcategories.oxid');
-        $oxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $oxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $shopId = $config->getShopId();
         $objectToCategoryView = $this->_getViewName('oxobject2category');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $categoriesTable = $this->_getViewName('oxcategories');
             $categoriesToAdd = $this->_getAll($this->_addFilter("select $categoriesTable.oxid " . $this->_getQuery()));
         }
@@ -238,8 +238,8 @@ class ArticleExtendAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function setAsDefault()
     {
-        $defCat = Registry::getConfig()->getRequestParameter("defcat");
-        $oxId = Registry::getConfig()->getRequestParameter("oxid");
+        $defCat = Registry::getRequest()->getRequestEscapedParameter('defcat');
+        $oxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         $queryToEmbed = $this->formQueryToEmbedForSettingCategoryAsDefault();
 

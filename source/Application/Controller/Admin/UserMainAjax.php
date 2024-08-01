@@ -57,8 +57,8 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
         // looking for table/view
         $sGroupTable = $this->_getViewName('oxgroups');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDeldId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchDelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sDeldId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDelId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDeldId) {
@@ -82,7 +82,7 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     public function removeUserFromGroup()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -97,9 +97,9 @@ class UserMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListCo
     public function addUserToGroup()
     {
         $aAddGroups = $this->_getActionIds('oxgroups.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sGroupTable = $this->_getViewName('oxgroups');
             $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }

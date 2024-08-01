@@ -62,8 +62,8 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         // looking for table/view
         $sCountryTable = $this->_getViewName('oxcountry');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sCountryId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchCountryId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sCountryId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchCountryId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sCountryId) {
@@ -89,9 +89,9 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     public function addPayCountry()
     {
         $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sCountryTable = $this->_getViewName('oxcountry');
             $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->_getQuery()));
         }
@@ -113,7 +113,7 @@ class PaymentCountryAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     public function removePayCountry()
     {
         $aChosenCntr = $this->_getActionIds('oxobject2payment.oxid');
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2payment.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {

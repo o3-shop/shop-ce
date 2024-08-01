@@ -59,11 +59,11 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $sCountryTable = $this->_getViewName('oxcountry');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $oConfig->getRequestParameter('oxid');
-        $sSynchId = $oConfig->getRequestParameter('synchoxid');
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -86,9 +86,8 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function removeDiscCountry()
     {
-        $oConfig = Registry::getConfig();
         $aChosenCntr = $this->_getActionIds('oxobject2discount.oxid');
-        if ($oConfig->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
@@ -102,11 +101,11 @@ class DiscountMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function addDiscCountry()
     {
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
-        $soxId = $oConfig->getRequestParameter('synchoxid');
+        $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($oConfig->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $sCountryTable = $this->_getViewName('oxcountry');
             $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->_getQuery()));
         }

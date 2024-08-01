@@ -54,7 +54,7 @@ class ArticleAttribute extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             }
         }
 
-        $iAoc = Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oArticleAttributeAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class);
             $this->_aViewData['oxajax'] = $oArticleAttributeAjax->getColumns();

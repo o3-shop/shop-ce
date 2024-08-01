@@ -111,9 +111,9 @@ class LoginController extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         $myUtilsServer = \OxidEsales\Eshop\Core\Registry::getUtilsServer();
         $myUtilsView = \OxidEsales\Eshop\Core\Registry::getUtilsView();
 
-        $sUser = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('user', true);
-        $sPass = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('pwd', true);
-        $sProfile = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('profile');
+        $sUser = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('user', true);
+        $sPass = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('pwd', true);
+        $sProfile = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('profile');
 
         try { // trying to login
             $session = \OxidEsales\Eshop\Core\Registry::getSession();
@@ -165,7 +165,7 @@ class LoginController extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         }
 
         // languages
-        $iLang = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("chlanguage");
+        $iLang = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('chlanguage');
         $aLanguages = \OxidEsales\Eshop\Core\Registry::getLang()->getAdminTplLanguageArray();
         if (!isset($aLanguages[$iLang])) {
             $iLang = key($aLanguages);

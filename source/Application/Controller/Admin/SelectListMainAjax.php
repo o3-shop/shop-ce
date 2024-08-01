@@ -85,8 +85,8 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $sArtTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sSelId) {
@@ -121,7 +121,7 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     {
         $aChosenArt = $this->_getActionIds('oxobject2selectlist.oxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = parent::_addFilter("delete oxobject2selectlist.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -138,9 +138,9 @@ class SelectListMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     public function addArtToSel()
     {
         $aAddArticle = $this->_getActionIds('oxarticles.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aAddArticle = $this->_getAll(parent::_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }

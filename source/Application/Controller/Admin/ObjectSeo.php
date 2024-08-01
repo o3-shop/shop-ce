@@ -76,7 +76,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     {
         // saving/updating seo params
         if (($sOxid = $this->_getSaveObjectId())) {
-            $aSeoData = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aSeoData');
+            $aSeoData = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aSeoData');
             $iShopId = Registry::getConfig()->getShopId();
             $iLang = $this->getEditLang();
 

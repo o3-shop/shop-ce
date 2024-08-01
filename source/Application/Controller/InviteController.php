@@ -120,7 +120,7 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
         }
 
-        $aParams = Registry::getConfig()->getRequestParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
         $oUser = $this->getUser();
         if (!is_array($aParams) || !$oUser) {
             return;
@@ -128,7 +128,7 @@ class InviteController extends \OxidEsales\Eshop\Application\Controller\AccountC
 
         // storing used written values
         $oParams = (object) $aParams;
-        $this->setInviteData((object) Registry::getConfig()->getRequestParameter('editval'));
+        $this->setInviteData((object) Registry::getRequest()->getRequestEscapedParameter('editval'));
 
         $oUtilsView = Registry::getUtilsView();
 

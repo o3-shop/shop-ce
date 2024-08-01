@@ -81,7 +81,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
         $sActObject = null;
         if ($this->_sActSeoObject) {
             $sActObject = $this->_sActSeoObject;
-        } elseif (is_array($aStatUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aStaticUrl'))) {
+        } elseif (is_array($aStatUrl = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aStaticUrl'))) {
             $sActObject = $aStatUrl['oxseo__oxobjectid'];
         }
 
@@ -116,12 +116,12 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
         if ($oShop->loadInLang($this->_iEditLang, $this->getEditObjectId())) {
             //assigning values
             $oShop->setLanguage(0);
-            $oShop->assign(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('editval'));
+            $oShop->assign(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval'));
             $oShop->setLanguage($this->_iEditLang);
             $oShop->save();
 
             // saving static url changes
-            if (is_array($aStaticUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aStaticUrl'))) {
+            if (is_array($aStaticUrl = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aStaticUrl'))) {
                 $this->_sActSeoObject = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->encodeStaticUrls($this->_processUrls($aStaticUrl), $oShop->getId(), $this->_iEditLang);
             }
         }
@@ -183,7 +183,7 @@ class ShopSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfigu
      */
     public function deleteStaticUrl()
     {
-        $aStaticUrl = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aStaticUrl');
+        $aStaticUrl = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aStaticUrl');
         if (is_array($aStaticUrl)) {
             $sObjectid = $aStaticUrl['oxseo__oxobjectid'];
             if ($sObjectid && $sObjectid != '-1') {

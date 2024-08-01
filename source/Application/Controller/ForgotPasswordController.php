@@ -76,7 +76,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function forgotPassword()
     {
-        $sEmail = Registry::getConfig()->getRequestParameter('lgn_usr');
+        $sEmail = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
         $this->_sForgotEmail = $sEmail;
         $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
 
@@ -100,8 +100,8 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function updatePassword()
     {
-        $sNewPass = Registry::getConfig()->getRequestParameter('password_new', true);
-        $sConfPass = Registry::getConfig()->getRequestParameter('password_new_confirm', true);
+        $sNewPass = Registry::getRequest()->getRequestEscapedParameter('password_new', true);
+        $sConfPass = Registry::getRequest()->getRequestEscapedParameter('password_new_confirm', true);
 
         $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
 
@@ -141,7 +141,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function updateSuccess()
     {
-        return (bool) Registry::getConfig()->getRequestParameter('success');
+        return (bool) Registry::getRequest()->getRequestEscapedParameter('success');
     }
 
     /**
@@ -161,7 +161,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function getUpdateId()
     {
-        return Registry::getConfig()->getRequestParameter('uid');
+        return Registry::getRequest()->getRequestEscapedParameter('uid');
     }
 
     /**

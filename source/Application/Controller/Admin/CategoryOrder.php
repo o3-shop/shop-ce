@@ -57,7 +57,7 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 $this->_aViewData['readonly'] = true;
             }
         }
-        if (Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oCategoryOrderAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
 

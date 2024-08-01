@@ -152,7 +152,7 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     {
         $aChosenArt = $this->_getActionIds('oxaccessoire2article.oxid');
         // removing all
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxaccessoire2article.* " . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -169,10 +169,10 @@ class ArticleAccessoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     {
         $oArticle = oxNew(Article::class);
         $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aChosenArt = $this->_getAll(parent::_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }

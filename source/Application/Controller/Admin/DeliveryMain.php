@@ -91,7 +91,7 @@ class DeliveryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         $this->_aViewData["deltypes"] = $aDelTypes;
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oDeliveryMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryMainAjax->getColumns();
 
@@ -111,7 +111,7 @@ class DeliveryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oDelivery = oxNew(\OxidEsales\Eshop\Application\Model\Delivery::class);
 
@@ -161,7 +161,7 @@ class DeliveryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oDelivery = oxNew(\OxidEsales\Eshop\Application\Model\Delivery::class);
 

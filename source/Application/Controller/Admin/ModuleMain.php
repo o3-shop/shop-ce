@@ -40,8 +40,8 @@ class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
      */
     public function render()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("moduleId")) {
-            $sModuleId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("moduleId");
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('moduleId')) {
+            $sModuleId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('moduleId');
         } else {
             $sModuleId = $this->getEditObjectId();
         }

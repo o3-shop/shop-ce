@@ -466,7 +466,7 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function getAddressError()
     {
-        return Registry::getConfig()->getRequestParameter('iAddressError');
+        return Registry::getRequest()->getRequestEscapedParameter('iAddressError');
     }
 
     /**
@@ -563,20 +563,21 @@ class OrderController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         $blValid = true;
         $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
-        if ($oConfig->getConfigParam('blConfirmAGB') && !$oConfig->getRequestParameter('ord_agb')) {
+        if ($oConfig->getConfigParam('blConfirmAGB') && !$oRequest->getRequestEscapedParameter('ord_agb')) {
             $blValid = false;
         }
 
         if ($oConfig->getConfigParam('blEnableIntangibleProdAgreement')) {
             $oBasket = $this->getBasket();
 
-            $blDownloadableProductsAgreement = $oConfig->getRequestParameter('oxdownloadableproductsagreement');
+            $blDownloadableProductsAgreement = $oRequest->getRequestEscapedParameter('oxdownloadableproductsagreement');
             if ($blValid && $oBasket->hasArticlesWithDownloadableAgreement() && !$blDownloadableProductsAgreement) {
                 $blValid = false;
             }
 
-            $blServiceProductsAgreement = $oConfig->getRequestParameter('oxserviceproductsagreement');
+            $blServiceProductsAgreement = $oRequest->getRequestEscapedParameter('oxserviceproductsagreement');
             if ($blValid && $oBasket->hasArticlesWithIntangibleAgreement() && !$blServiceProductsAgreement) {
                 $blValid = false;
             }

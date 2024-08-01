@@ -56,8 +56,8 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $sgroupTable = $this->_getViewName('oxgroups');
 
@@ -88,7 +88,7 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     public function removeGroupFromSet()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -104,10 +104,10 @@ class DeliverySetGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     public function addGroupToSet()
     {
         $aChosenCat = $this->_getActionIds('oxgroups.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sGroupTable = $this->_getViewName('oxgroups');
             $aChosenCat = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }

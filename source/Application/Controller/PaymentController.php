@@ -148,7 +148,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         //but first checking maybe there were redirection already to prevent infinite redirections
         //due to possible buggy ssl detection on server
-        $blAlreadyRedirected = Registry::getConfig()->getRequestParameter('sslredirect') == 'forced';
+        $blAlreadyRedirected = Registry::getRequest()->getRequestEscapedParameter('sslredirect') == 'forced';
 
         if ($this->getIsOrderStep()) {
             //additional check if we really really have a user now
@@ -167,10 +167,10 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             }
         }
 
-        $sFncParameter = Registry::getConfig()->getRequestParameter('fnc');
+        $sFncParameter = Registry::getRequest()->getRequestEscapedParameter('fnc');
         if ($myConfig->getCurrentShopURL() != $myConfig->getSSLShopURL() && !$blAlreadyRedirected && !$sFncParameter) {
-            $sPayErrorParameter = Registry::getConfig()->getRequestParameter('payerror');
-            $sPayErrorTextParameter = Registry::getConfig()->getRequestParameter('payerrortext');
+            $sPayErrorParameter = Registry::getRequest()->getRequestEscapedParameter('payerror');
+            $sPayErrorTextParameter = Registry::getRequest()->getRequestEscapedParameter('payerrortext');
             $shopSecureHomeURL = $myConfig->getShopSecureHomeURL();
 
             $sPayError = $sPayErrorParameter ? 'payerror=' . $sPayErrorParameter : '';
@@ -218,8 +218,8 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     protected function _unsetPaymentErrors() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iPayError = Registry::getConfig()->getRequestParameter('payerror');
-        $sPayErrorText = Registry::getConfig()->getRequestParameter('payerrortext');
+        $iPayError = Registry::getRequest()->getRequestEscapedParameter('payerror');
+        $sPayErrorText = Registry::getRequest()->getRequestEscapedParameter('payerrortext');
 
         if (!($iPayError || $sPayErrorText)) {
             $iPayError = Registry::getSession()->getVariable('payerror');
@@ -247,7 +247,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $oBasket = $oSession->getBasket();
         $oBasket->setShipping(null);
         $oBasket->onUpdate();
-        $oSession->setVariable('sShipSet', Registry::getConfig()->getRequestParameter('sShipSet'));
+        $oSession->setVariable('sShipSet', Registry::getRequest()->getRequestEscapedParameter('sShipSet'));
     }
 
     /**
@@ -275,13 +275,13 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             return;
         }
 
-        if (!($sShipSetId = Registry::getConfig()->getRequestParameter('sShipSet'))) {
+        if (!($sShipSetId = Registry::getRequest()->getRequestEscapedParameter('sShipSet'))) {
             $sShipSetId = $oSession->getVariable('sShipSet');
         }
-        if (!($sPaymentId = Registry::getConfig()->getRequestParameter('paymentid'))) {
+        if (!($sPaymentId = Registry::getRequest()->getRequestEscapedParameter('paymentid'))) {
             $sPaymentId = $oSession->getVariable('paymentid');
         }
-        if (!($aDynvalue = Registry::getConfig()->getRequestParameter('dynvalue'))) {
+        if (!($aDynvalue = Registry::getRequest()->getRequestEscapedParameter('dynvalue'))) {
             $aDynvalue = $oSession->getVariable('dynvalue');
         }
 
@@ -335,7 +335,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_oPaymentList === null) {
             $this->_oPaymentList = false;
 
-            $sActShipSet = Registry::getConfig()->getRequestParameter('sShipSet');
+            $sActShipSet = Registry::getRequest()->getRequestEscapedParameter('sShipSet');
             if (!$sActShipSet) {
                 $sActShipSet = Registry::getSession()->getVariable('sShipSet');
             }
@@ -467,7 +467,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             if (($aDynValue = Registry::getSession()->getVariable('dynvalue'))) {
                 $this->_aDynValue = $aDynValue;
             } else {
-                $this->_aDynValue = Registry::getConfig()->getRequestParameter("dynvalue");
+                $this->_aDynValue = Registry::getRequest()->getRequestEscapedParameter('dynvalue');
             }
 
             // #701A
@@ -516,7 +516,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     public function getCheckedPaymentId()
     {
         if ($this->_sCheckedPaymentId === null) {
-            if (!($sPaymentID = Registry::getConfig()->getRequestParameter('paymentid'))) {
+            if (!($sPaymentID = Registry::getRequest()->getRequestEscapedParameter('paymentid'))) {
                 $sPaymentID = Registry::getSession()->getVariable('paymentid');
             }
             if ($sPaymentID) {

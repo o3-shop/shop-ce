@@ -98,14 +98,14 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function send()
     {
-        $aParams = Registry::getConfig()->getRequestParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
         if (!is_array($aParams)) {
             return;
         }
 
         // storing used written values
         $oParams = (object) $aParams;
-        $this->setSuggestData((object) Registry::getConfig()->getRequestParameter('editval'));
+        $this->setSuggestData((object) Registry::getRequest()->getRequestEscapedParameter('editval'));
 
         $oUtilsView = Registry::getUtilsView();
 
@@ -129,26 +129,26 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         $sReturn = "";
         // #1834M - specialchar search
-        $sSearchParamForLink = rawurlencode(Registry::getConfig()->getRequestParameter('searchparam', true));
+        $sSearchParamForLink = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
         if ($sSearchParamForLink) {
             $sReturn .= "&searchparam=$sSearchParamForLink";
         }
 
-        $sSearchCatId = Registry::getConfig()->getRequestParameter('searchcnid');
+        $sSearchCatId = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
         if ($sSearchCatId) {
             $sReturn .= "&searchcnid=$sSearchCatId";
         }
 
-        $sSearchVendor = Registry::getConfig()->getRequestParameter('searchvendor');
+        $sSearchVendor = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
         if ($sSearchVendor) {
             $sReturn .= "&searchvendor=$sSearchVendor";
         }
 
-        if (($sSearchManufacturer = Registry::getConfig()->getRequestParameter('searchmanufacturer'))) {
+        if (($sSearchManufacturer = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer'))) {
             $sReturn .= "&searchmanufacturer=$sSearchManufacturer";
         }
 
-        $sListType = Registry::getConfig()->getRequestParameter('listtype');
+        $sListType = Registry::getRequest()->getRequestEscapedParameter('listtype');
         if ($sListType) {
             $sReturn .= "&listtype=$sListType";
         }
@@ -173,7 +173,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_oProduct === null) {
             $this->_oProduct = false;
 
-            if ($sProductId = Registry::getConfig()->getRequestParameter('anid')) {
+            if ($sProductId = Registry::getRequest()->getRequestEscapedParameter('anid')) {
                 $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
                 $oProduct->load($sProductId);
                 $this->_oProduct = $oProduct;
@@ -273,12 +273,12 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $sLink = parent::getLink($iLang);
 
         // active category
-        if ($sVal = Registry::getConfig()->getRequestParameter('cnid')) {
+        if ($sVal = Registry::getRequest()->getRequestEscapedParameter('cnid')) {
             $sLink .= ((strpos($sLink, '?') === false) ? '?' : '&amp;') . "cnid={$sVal}";
         }
 
         // active article
-        if ($sVal = Registry::getConfig()->getRequestParameter('anid')) {
+        if ($sVal = Registry::getRequest()->getRequestEscapedParameter('anid')) {
             $sLink .= ((strpos($sLink, '?') === false) ? '?' : '&amp;') . "anid={$sVal}";
         }
 

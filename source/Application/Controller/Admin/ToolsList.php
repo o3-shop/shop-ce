@@ -59,7 +59,7 @@ class ToolsList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $oAuthUser->loadAdminUser();
         if ($oAuthUser->oxuser__oxrights->value === "malladmin") {
-            $sUpdateSQL = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("updatesql");
+            $sUpdateSQL = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('updatesql');
             $sUpdateSQLFile = $this->_processFiles();
 
             if ($sUpdateSQLFile && strlen($sUpdateSQLFile) > 0) {

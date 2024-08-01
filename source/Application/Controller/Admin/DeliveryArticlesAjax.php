@@ -77,8 +77,8 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         $sArtTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
 
-        $sDelId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchDelId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDelId) {
@@ -130,7 +130,7 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $aChosenArt = $this->_getActionIds('oxobject2delivery.oxid');
         // removing all
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = parent::_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -145,10 +145,10 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     public function addArtToDel()
     {
         $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aChosenArt = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }

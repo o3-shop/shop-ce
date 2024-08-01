@@ -68,7 +68,7 @@ class AdminNavigation extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         $rightsRole = oxNew(RightsRoles::class);
         $rightsRole->setLanguage(0);
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if ($soxId != "-1") {
             $rightsRole->loadInLang($this->_iEditLang, $soxId);

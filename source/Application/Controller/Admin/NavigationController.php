@@ -42,7 +42,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         parent::render();
         $myUtilsServer = Registry::getUtilsServer();
 
-        $sItem = Registry::getConfig()->getRequestParameter("item");
+        $sItem = Registry::getRequest()->getRequestEscapedParameter('item');
         $sItem = $sItem ? basename($sItem) : false;
         if (!$sItem) {
             $sItem = "nav_frame.tpl";
@@ -56,7 +56,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
             $this->_aViewData["sVersion"] = $this->_sShopVersion;
 
             //checking requirements if this is not nav frame reload
-            if (!Registry::getConfig()->getRequestParameter("navReload")) {
+            if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
                     $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
@@ -92,9 +92,9 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
 
         // informing about basefrm parameters
         $this->_aViewData['loadbasefrm'] = true;
-        $this->_aViewData['listview'] = Registry::getConfig()->getRequestParameter('listview');
-        $this->_aViewData['editview'] = Registry::getConfig()->getRequestParameter('editview');
-        $this->_aViewData['actedit'] = Registry::getConfig()->getRequestParameter('actedit');
+        $this->_aViewData['listview'] = Registry::getRequest()->getRequestEscapedParameter('listview');
+        $this->_aViewData['editview'] = Registry::getRequest()->getRequestEscapedParameter('editview');
+        $this->_aViewData['actedit'] = Registry::getRequest()->getRequestEscapedParameter('actedit');
     }
 
     /**
@@ -125,7 +125,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     public function exturl()
     {
         $myUtils = Registry::getUtils();
-        if ($sUrl = Registry::getConfig()->getRequestParameter("url")) {
+        if ($sUrl = Registry::getRequest()->getRequestEscapedParameter('url')) {
             // Caching not allowed, redirecting
             $myUtils->redirect($sUrl, true, 302);
         }

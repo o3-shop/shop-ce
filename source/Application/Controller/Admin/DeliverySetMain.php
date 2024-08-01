@@ -73,7 +73,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             }
         }
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oDeliverysetMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetMainAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetMainAjax->getColumns();
 
@@ -93,7 +93,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oDelSet = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySet::class);
 
@@ -132,7 +132,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (!isset($aParams['oxdeliveryset__oxactive'])) {
             $aParams['oxdeliveryset__oxactive'] = 0;
@@ -156,7 +156,7 @@ class DeliverySetMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         }
 
         // apply new language
-        $oDelSet->setLanguage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("new_lang"));
+        $oDelSet->setLanguage(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('new_lang'));
         $oDelSet->save();
 
         // set oxid if inserted

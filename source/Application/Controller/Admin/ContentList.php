@@ -64,7 +64,7 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     {
         parent::render();
 
-        $sFolder = Registry::getConfig()->getRequestParameter("folder");
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sFolder = $sFolder ? $sFolder : -1;
 
         $this->_aViewData["folder"] = $sFolder;
@@ -85,7 +85,7 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     protected function _prepareWhereQuery($aWhere, $sqlFull) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sQ = parent::_prepareWhereQuery($aWhere, $sqlFull);
-        $sFolder = Registry::getConfig()->getRequestParameter('folder');
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sViewName = getviewName("oxcontents");
 
         //searchong for empty oxfolder fields

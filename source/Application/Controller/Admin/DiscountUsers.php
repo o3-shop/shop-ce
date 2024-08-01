@@ -73,7 +73,7 @@ class DiscountUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
             }
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDiscountGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountGroupsAjax->getColumns();

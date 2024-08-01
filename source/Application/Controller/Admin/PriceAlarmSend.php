@@ -49,13 +49,13 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     {
         parent::render();
 
-        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         ini_set("session.gc_maxlifetime", 36000);
 
-        $start = (int) $config->getRequestParameter("iStart");
-        $limit = $config->getConfigParam('iCntofMails');
-        $activeAlertsAmount = $config->getRequestParameter("iAllCnt");
+        $start = (int)$oRequest->getRequestEscapedParameter('iStart');
+        $limit = Registry::getConfig->getConfigParam('iCntofMails');
+        $activeAlertsAmount = $oRequest->getRequestEscapedParameter('iAllCnt');
         if (!isset($activeAlertsAmount)) {
             $activeAlertsAmount = $this->countActivePriceAlerts();
         }

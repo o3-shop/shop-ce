@@ -60,12 +60,12 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         // active AJAX component
         $sGroupTable = $this->_getViewName('oxgroups');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $oConfig->getRequestParameter('oxid');
-        $sSynchId = $oConfig->getRequestParameter('synchoxid');
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -91,10 +91,8 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function removeDiscGroup()
     {
-        $config = Registry::getConfig();
-
         $groupIds = $this->_getActionIds('oxobject2discount.oxid');
-        if ($config->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $query = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
@@ -109,11 +107,11 @@ class DiscountGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function addDiscGroup()
     {
-        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $groupIds = $this->_getActionIds('oxgroups.oxid');
-        $discountId = $config->getRequestParameter('synchoxid');
+        $discountId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($config->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $groupTable = $this->_getViewName('oxgroups');
             $groupIds = $this->_getAll($this->_addFilter("select $groupTable.oxid " . $this->_getQuery()));
         }

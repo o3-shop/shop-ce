@@ -49,10 +49,10 @@ class DynamicScreenController extends \OxidEsales\Eshop\Application\Controller\A
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myAdminNavig = $this->getNavigation();
-        $sNode = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("menu");
+        $sNode = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('menu');
 
         // active tab
-        $iActTab = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('actedit');
+        $iActTab = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('actedit');
         $iActTab = $iActTab ? $iActTab : $this->_iDefEdit;
 
         $sActTab = $iActTab ? "&actedit=$iActTab" : '';

@@ -359,7 +359,7 @@ class DiagnosticsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     public function getParam($sParam)
     {
-        return Registry::getConfig()->getRequestParameter($sParam);
+        return Registry::getRequest()->getRequestEscapedParameter($sParam);
     }
 
     /**

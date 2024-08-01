@@ -96,7 +96,7 @@ class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
 
         $this->prepareBundledArticlesDataForView($article);
 
-        $iAoc = Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oArticleExtendAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax::class);
             $this->_aViewData['oxajax'] = $oArticleExtendAjax->getColumns();
@@ -138,7 +138,7 @@ class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         }
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (!isset($aParams['oxarticles__oxissearch'])) {
             $aParams['oxarticles__oxissearch'] = 0;
@@ -170,8 +170,8 @@ class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $oArticle->save();
 
         //saving media file
-        $sMediaUrl = Registry::getConfig()->getRequestParameter("mediaUrl");
-        $sMediaDesc = Registry::getConfig()->getRequestParameter("mediaDesc");
+        $sMediaUrl = Registry::getRequest()->getRequestEscapedParameter('mediaUrl');
+        $sMediaDesc = Registry::getRequest()->getRequestEscapedParameter('mediaDesc');
 
         if (($sMediaUrl && $sMediaUrl != 'http://') || $aMediaFile['name'] || $sMediaDesc) {
             if (!$sMediaDesc) {
@@ -213,7 +213,7 @@ class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     public function deletemedia()
     {
         $soxId = $this->getEditObjectId();
-        $sMediaId = Registry::getConfig()->getRequestParameter("mediaid");
+        $sMediaId = Registry::getRequest()->getRequestEscapedParameter('mediaid');
         if ($sMediaId && $soxId) {
             $oMediaUrl = oxNew(MediaUrl::class);
             $oMediaUrl->load($sMediaId);
@@ -239,7 +239,7 @@ class ArticleExtend extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
      */
     public function updateMedia()
     {
-        $aMediaUrls = Registry::getConfig()->getRequestParameter('aMediaUrls');
+        $aMediaUrls = Registry::getRequest()->getRequestEscapedParameter('aMediaUrls');
         if (is_array($aMediaUrls)) {
             foreach ($aMediaUrls as $sMediaId => $aMediaParams) {
                 $oMedia = oxNew(MediaUrl::class);

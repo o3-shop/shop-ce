@@ -64,8 +64,8 @@ class ActionsGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $sGroupTable = $this->_getViewName('oxgroups');
         $oDb = DatabaseProvider::getDb();
 
-        $sId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -92,7 +92,7 @@ class ActionsGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function removePromotionGroup()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2action.oxid');
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2action.* " . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -110,9 +110,9 @@ class ActionsGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function addPromotionGroup()
     {
         $aChosenGroup = $this->_getActionIds('oxgroups.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sGroupTable = $this->_getViewName('oxgroups');
             $aChosenGroup = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }

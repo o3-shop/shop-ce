@@ -71,7 +71,7 @@ class NewsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
                 $this->_aViewData["otherlang"][$id] = clone $oLang;
             }
         }
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oNewsMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NewsMainAjax::class);
             $this->_aViewData['oxajax'] = $oNewsMainAjax->getColumns();
 
@@ -91,7 +91,7 @@ class NewsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (!isset($aParams['oxnews__oxactive'])) {
             $aParams['oxnews__oxactive'] = 0;
@@ -139,7 +139,7 @@ class NewsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (!isset($aParams['oxnews__oxactive'])) {
             $aParams['oxnews__oxactive'] = 0;
@@ -176,7 +176,7 @@ class NewsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         $oNews->assign($aParams);
 
         // apply new language
-        $oNews->setLanguage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("new_lang"));
+        $oNews->setLanguage(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('new_lang'));
         $oNews->save();
 
         // set oxid if inserted

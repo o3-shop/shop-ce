@@ -120,7 +120,7 @@ class VoucherSerieGenerate extends \OxidEsales\Eshop\Application\Controller\Admi
         $iExportedItems = 0;
 
         // file is open
-        $iStart = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iStart");
+        $iStart = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('iStart');
 
         for ($i = $iStart; $i < $iStart + $this->iGeneratePerTick; $i++) {
             if (($iExportedItems = $this->nextTick($i)) === false) {

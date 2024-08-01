@@ -63,7 +63,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         parent::render();
 
         $folders = Registry::getConfig()->getConfigParam('aOrderfolder');
-        $folder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("folder");
+        $folder = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('folder');
         // first display new orders
         if (!$folder && is_array($folders)) {
             $names = array_keys($folders);
@@ -71,8 +71,8 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         }
 
         $search = ['oxorderarticles' => 'ARTID', 'oxpayments' => 'PAYMENT'];
-        $searchQuery = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("addsearch");
-        $searchField = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("addsearchfld");
+        $searchQuery = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearch');
+        $searchField = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         $this->_aViewData["folder"] = $folder ? $folder : -1;
         $this->_aViewData["addsearchfld"] = $searchField ? $searchField : -1;
@@ -139,7 +139,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         $query = parent::_prepareWhereQuery($whereQuery, $fullQuery);
         $config = Registry::getConfig();
         $folders = $config->getConfigParam('aOrderfolder');
-        $folder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folder');
+        $folder = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder != '-1') {
             $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
@@ -164,9 +164,9 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         $query = parent::_buildSelectString($listObject);
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        $searchQuery = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('addsearch');
+        $searchQuery = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearch');
         $searchQuery = trim($searchQuery);
-        $searchField = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('addsearchfld');
+        $searchField = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         if ($searchQuery) {
             switch ($searchField) {

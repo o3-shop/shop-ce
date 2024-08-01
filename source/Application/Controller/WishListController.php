@@ -82,7 +82,7 @@ class WishListController extends \OxidEsales\Eshop\Application\Controller\Fronte
         if ($this->_oWishUser === null) {
             $this->_oWishUser = false;
 
-            $sWishIdParameter = Registry::getConfig()->getRequestParameter('wishid');
+            $sWishIdParameter = Registry::getRequest()->getRequestEscapedParameter('wishid');
             $sUserId = $sWishIdParameter ? $sWishIdParameter : Registry::getSession()->getVariable('wishid');
             if ($sUserId) {
                 $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
@@ -133,7 +133,7 @@ class WishListController extends \OxidEsales\Eshop\Application\Controller\Fronte
      */
     public function searchForWishList()
     {
-        if ($sSearch = Registry::getConfig()->getRequestParameter('search')) {
+        if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('search')) {
             // search for baskets
             $oUserList = oxNew(\OxidEsales\Eshop\Application\Model\UserList::class);
             $oUserList->loadWishlistUsers($sSearch);

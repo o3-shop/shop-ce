@@ -78,8 +78,8 @@ class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\A
         $sArticleTable = $this->_getViewName('oxarticles');
         $sView = $this->_getViewName('oxobject2category');
 
-        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
@@ -143,7 +143,7 @@ class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\A
     {
         $aChosenArt = $this->_getActionIds('oxobject2article.oxid');
         // removing all
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2article.* " . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -159,10 +159,10 @@ class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\A
     public function addArticleCross()
     {
         $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aChosenArt = $this->_getAll(parent::_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }

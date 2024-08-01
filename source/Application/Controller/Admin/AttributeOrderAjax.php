@@ -52,7 +52,7 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSelTable = $this->_getViewName('oxattribute');
-        $sArtId = Registry::getConfig()->getRequestParameter('oxid');
+        $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         return " from $sSelTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sSelTable.oxid " .
                  "where oxobjectid = " . DatabaseProvider::getDb()->quote($sArtId) . " ";
@@ -74,7 +74,7 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function setSorting()
     {
-        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSelect = "select * from oxcategory2attribute where oxobjectid = :oxobjectid order by oxsort";
 
         $oList = oxNew(ListModel::class);
@@ -96,8 +96,8 @@ class AttributeOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             $iSelCnt++;
         }
         //
-        if (($iKey = array_search(Registry::getConfig()->getRequestParameter('sortoxid'), $aIdx2Id)) !== false) {
-            $iDir = (Registry::getConfig()->getRequestParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
+        if (($iKey = array_search(Registry::getRequest()->getRequestEscapedParameter('sortoxid'), $aIdx2Id)) !== false) {
+            $iDir = (Registry::getRequest()->getRequestEscapedParameter('direction') == 'up') ? ($iKey - 1) : ($iKey + 1);
             if (isset($aIdx2Id[$iDir])) {
                 // exchanging indexes
                 $oDir1 = $oList->offsetGet($aIdx2Id[$iDir]);

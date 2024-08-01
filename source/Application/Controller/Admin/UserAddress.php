@@ -53,7 +53,7 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $oUser->load($soxId);
 
             // load adress
-            $sAddressIdParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxaddressid");
+            $sAddressIdParameter = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
             $soxAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
             if ($soxAddressId != "-1" && isset($soxAddressId)) {
                 $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
@@ -95,7 +95,7 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
-            $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+            $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
             $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
             if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] == "-1") {
                 $aParams['oxaddress__oxid'] = null;
@@ -117,7 +117,7 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $this->_blDelete = false;
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
-            $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+            $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
             if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] != "-1") {
                 $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
                 $this->_blDelete = $oAdress->delete($aParams['oxaddress__oxid']);

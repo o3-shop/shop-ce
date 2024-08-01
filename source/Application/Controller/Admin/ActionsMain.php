@@ -72,7 +72,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             }
         }
 
-        if (Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             // generating category tree for select list
             $this->_createCategoryTree("artcattree", $soxId);
 
@@ -85,7 +85,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
         if (($oPromotion = $this->getViewDataElement("edit"))) {
             if (($oPromotion->oxactions__oxtype->value == 2) || ($oPromotion->oxactions__oxtype->value == 3)) {
-                if ($iAoc = Registry::getConfig()->getRequestParameter("oxpromotionaoc")) {
+                if ($iAoc = Registry::getRequest()->getRequestEscapedParameter('oxpromotionaoc')) {
                     $sPopup = false;
                     switch ($iAoc) {
                         case 'article':
@@ -178,7 +178,7 @@ class ActionsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     private function getActionFormData()
     {
         $request    = oxNew(Request::class);
-        $formData   = $request->getRequestEscapedParameter("editval");
+        $formData   = $request->getRequestEscapedParameter('editval');
         $formData   = $this->normalizeActionFormData($formData);
 
         return $formData;

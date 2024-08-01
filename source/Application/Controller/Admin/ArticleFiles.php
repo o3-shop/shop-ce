@@ -82,13 +82,13 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     public function save()
     {
         // save article changes
-        $aArticleChanges = Registry::getConfig()->getRequestParameter('editval');
+        $aArticleChanges = Registry::getRequest()->getRequestEscapedParameter('editval');
         $oArticle = $this->getArticle();
         $oArticle->assign($aArticleChanges);
         $oArticle->save();
 
         //update article files
-        $aArticleFiles = Registry::getConfig()->getRequestParameter('article_files');
+        $aArticleFiles = Registry::getRequest()->getRequestEscapedParameter('article_files');
         if (is_array($aArticleFiles)) {
             foreach ($aArticleFiles as $sArticleFileId => $aArticleFileUpdate) {
                 $oArticleFile = oxNew(File::class);
@@ -144,7 +144,7 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
 
         $soxId = $this->getEditObjectId();
 
-        $aParams = Registry::getConfig()->getRequestParameter("newfile");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('newfile');
         $aParams = $this->_processOptions($aParams);
         $aNewFile = Registry::getConfig()->getUploadedFile("newArticleFile");
 
@@ -192,7 +192,7 @@ class ArticleFiles extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         }
 
         $sArticleId = $this->getEditObjectId();
-        $sArticleFileId = Registry::getConfig()->getRequestParameter('fileid');
+        $sArticleFileId = Registry::getRequest()->getRequestEscapedParameter('fileid');
         $oArticleFile = oxNew(File::class);
         $oArticleFile->load($sArticleFileId);
         if ($oArticleFile->hasValidDownloads()) {

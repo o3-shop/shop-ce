@@ -58,8 +58,8 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $this->_aViewData['edit'] = $oArticle;
 
         $sOxId = $this->getEditObjectId();
-        $sVoxId = Registry::getConfig()->getRequestParameter("voxid");
-        $sOxParentId = Registry::getConfig()->getRequestParameter("oxparentid");
+        $sVoxId = Registry::getRequest()->getRequestEscapedParameter('voxid');
+        $sOxParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
 
         // new variant ?
         if (isset($sVoxId) && $sVoxId == "-1" && isset($sOxParentId) && $sOxParentId && $sOxParentId != "-1") {
@@ -150,9 +150,9 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         $oDb = DatabaseProvider::getDb();
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getResquest();
         $soxId = $this->getEditObjectId();
-        $aParams = $oConfig->getRequestParameter("editval");
+        $aParams = $oRequest->getRequestEscapedParameter('editval');
 
         // default values
         $aParams = $this->addDefaultValues($aParams);
@@ -163,7 +163,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         }
 
         // varianthandling
-        $soxparentId = $oConfig->getRequestParameter("oxparentid");
+        $soxparentId = $oRequest->getRequestEscapedParameter('oxparentid');
         if (isset($soxparentId) && $soxparentId && $soxparentId != "-1") {
             $aParams['oxarticles__oxparentid'] = $soxparentId;
         } else {
@@ -191,7 +191,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         //article number handling, warns for artnum duplicates
         if (
             isset($aParams['oxarticles__oxartnum']) && strlen($aParams['oxarticles__oxartnum']) > 0 &&
-            $oConfig->getConfigParam('blWarnOnSameArtNums') &&
+            Registry::getConfig()->getConfigParam('blWarnOnSameArtNums') &&
             $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
         ) {
             $sSelect = "select oxid from " . getViewName('oxarticles');
@@ -216,7 +216,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
 
         // set oxid if inserted
         if ($soxId == "-1") {
-            $sFastCat = $oConfig->getRequestParameter("art_category");
+            $sFastCat = $oRequest->getRequestEscapedParameter('art_category');
             if ($sFastCat != "-1") {
                 $this->addToCategory($sFastCat, $oArticle->getId());
             }
@@ -374,7 +374,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
                 $this->setEditObjectId($oArticle->getId());
 
                 //article number handling, warns for artnum duplicates
-                $sFncParameter = Registry::getConfig()->getRequestParameter('fnc');
+                $sFncParameter = Registry::getRequest()->getRequestEscapedParameter('fnc');
                 $sArtNumField = 'oxarticles__oxartnum';
                 if (
                     $myConfig->getConfigParam('blWarnOnSameArtNums') &&
@@ -656,7 +656,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $sOxIdField = 'oxarticles__oxid';
         if (isset($oParentArticle)) {
             $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->_getTitle($oParentArticle)];
-            $sEditLanguageParameter = Registry::getConfig()->getRequestParameter("editlanguage");
+            $sEditLanguageParameter = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
             $oParentVariants = $oParentArticle->getAdminVariants($sEditLanguageParameter);
             if ($oParentVariants->count()) {
                 foreach ($oParentVariants as $oVar) {
@@ -674,7 +674,7 @@ class ArticleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         } else {
             $aJumpList[] = [$oArticle->$sOxIdField->value, $this->_getTitle($oArticle)];
             //fetching this article variants data
-            $oVariants = $oArticle->getAdminVariants(Registry::getConfig()->getRequestParameter("editlanguage"));
+            $oVariants = $oArticle->getAdminVariants(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
             if ($oVariants && $oVariants->count()) {
                 foreach ($oVariants as $oVar) {
                     $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->_getTitle($oVar)];

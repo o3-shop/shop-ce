@@ -64,9 +64,9 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oConfig = Registry::getConfig();
-        $sId = $oConfig->getRequestParameter('oxid');
-        $sSynchId = $oConfig->getRequestParameter('synchoxid');
+        $oRequest = Registry::getRequest();
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         $sCategoryTable = $this->_getViewName('oxcategories');
 
@@ -102,10 +102,9 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function removeDiscCat()
     {
-        $config = Registry::getConfig();
         $categoryIds = $this->_getActionIds('oxobject2discount.oxid');
 
-        if ($config->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $query = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($query);
         } elseif (is_array($categoryIds)) {
@@ -120,11 +119,11 @@ class DiscountCategoriesAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function addDiscCat()
     {
-        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $categoryIds = $this->_getActionIds('oxcategories.oxid');
-        $discountId = $config->getRequestParameter('synchoxid');
+        $discountId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($config->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $categoryTable = $this->_getViewName('oxcategories');
             $categoryIds = $this->_getAll($this->_addFilter("select $categoryTable.oxid " . $this->_getQuery()));
         }

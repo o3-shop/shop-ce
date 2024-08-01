@@ -113,7 +113,7 @@ class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oArticle = oxNew(Article::class);
         $oArticle->loadInLang($this->_iEditLang, $soxId);
@@ -155,7 +155,7 @@ class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $sOxArtId = $this->getEditObjectId();
         $this->onArticleAmountPriceChange($sOxArtId);
 
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!is_array($aParams)) {
             return;
@@ -228,7 +228,7 @@ class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
      */
     public function updateprices()
     {
-        $aParams = Registry::getConfig()->getRequestParameter("updateval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('updateval');
         if (is_array($aParams)) {
             foreach ($aParams as $soxId => $aStockParams) {
                 $this->addprice($soxId, $aStockParams);
@@ -250,7 +250,7 @@ class ArticleStock extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $oDb = DatabaseProvider::getDb();
         $articleId = $this->getEditObjectId();
         $oDb->execute("delete from oxprice2article where oxid = :oxid and oxartid = :oxartid", [
-            ':oxid' => Registry::getConfig()->getRequestParameter("priceid"),
+            ':oxid' => Registry::getRequest()->getRequestEscapedParameter('priceid'),
             ':oxartid' => $articleId
         ]);
 

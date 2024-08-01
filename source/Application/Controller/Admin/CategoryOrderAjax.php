@@ -71,7 +71,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
-        if ($sSynchOxid = Registry::getConfig()->getRequestParameter('synchoxid')) {
+        if ($sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
             $sQAdd = " from $sArtTable left join $sO2CView on $sArtTable.oxid=$sO2CView.oxobjectid where $sO2CView.oxcatnid = " . $oDb->quote($sSynchOxid);
             if ($aSkipArt = Registry::getSession()->getVariable('neworder_sess')) {
                 $sQAdd .= " and $sArtTable.oxid not in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aSkipArt)) . " ) ";
@@ -98,7 +98,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sOrder = '';
-        if (Registry::getConfig()->getRequestParameter('synchoxid')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
             $sOrder = parent::_getSorting();
         } elseif (($aSkipArt = Registry::getSession()->getVariable('neworder_sess'))) {
             $sOrderBy = '';
@@ -120,7 +120,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function removeCatOrderArticle()
     {
         $aRemoveArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $aSkipArt = Registry::getSession()->getVariable('neworder_sess');
 
         if (is_array($aRemoveArt) && is_array($aSkipArt)) {
@@ -156,7 +156,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function addCatOrderArticle()
     {
         $aAddArticle = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $aOrdArt = Registry::getSession()->getVariable('neworder_sess');
         if (!is_array($aOrdArt)) {
@@ -196,7 +196,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function saveNewOrder()
     {
         $oCategory = oxNew(Category::class);
-        $sId = Registry::getConfig()->getRequestParameter("oxid");
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         if ($oCategory->load($sId)) {
             //Disable editing for derived items
             if ($oCategory->isDerived()) {
@@ -238,7 +238,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function remNewOrder()
     {
         $oCategory = oxNew(Category::class);
-        $sId = Registry::getConfig()->getRequestParameter("oxid");
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         if ($oCategory->load($sId)) {
             //Disable editing for derived items
             if ($oCategory->isDerived()) {

@@ -108,7 +108,7 @@ class OrderAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = (array) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = (array) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         if ($soxId != "-1") {

@@ -65,8 +65,8 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         $sArtViewName = $this->_getViewName('oxarticles');
         $oDb = DatabaseProvider::getDb();
 
-        $sArtId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchArtId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchArtId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $sOxid = ($sArtId) ? $sArtId : $sSynchArtId;
         $sQ = "select oxparentid from {$sArtViewName} where oxid = :oxid and oxparentid != '' ";
@@ -100,7 +100,7 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     public function removeSel()
     {
         $aChosenArt = $this->_getActionIds('oxobject2selectlist.oxid');
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2selectlist.* " . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -110,7 +110,7 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             DatabaseProvider::getDb()->Execute($sQ);
         }
 
-        $articleId = Registry::getConfig()->getRequestParameter('oxid');
+        $articleId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $this->onArticleSelectionListChange($articleId);
     }
 
@@ -122,10 +122,10 @@ class ArticleSelectionAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     public function addSel()
     {
         $aAddSel = $this->_getActionIds('oxselectlist.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sSLViewName = $this->_getViewName('oxselectlist');
             $aAddSel = $this->_getAll($this->_addFilter("select $sSLViewName.oxid " . $this->_getQuery()));
         }

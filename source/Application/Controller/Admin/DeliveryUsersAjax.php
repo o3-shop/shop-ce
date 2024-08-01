@@ -70,11 +70,12 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $sUserTable = $this->_getViewName('oxuser');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $myConfig->getRequestParameter('oxid');
-        $sSynchId = $myConfig->getRequestParameter('synchoxid');
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -108,7 +109,7 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function removeUserFromDel()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -123,10 +124,10 @@ class DeliveryUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function addUserToDel()
     {
         $aChosenUsr = $this->_getActionIds('oxuser.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sUserTable = $this->_getViewName('oxuser');
             $aChosenUsr = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
         }

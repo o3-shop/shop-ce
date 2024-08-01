@@ -76,13 +76,14 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sOxid = $oConfig->getRequestParameter('oxid');
-        $sSynchOxid = $oConfig->getRequestParameter('synchoxid');
+        $sOxid = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchOxid = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sOxid && $sSynchOxid) {
@@ -126,7 +127,7 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     {
         $aChosenArt = $this->_getActionIds('oxobject2discount.oxid');
 
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = parent::_addFilter("delete oxobject2discount.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
         } elseif (is_array($aChosenArt)) {
@@ -140,12 +141,12 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addDiscArt()
     {
-        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $articleIds = $this->_getActionIds('oxarticles.oxid');
-        $discountListId = $config->getRequestParameter('synchoxid');
+        $discountListId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if ($config->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $articleTable = $this->_getViewName('oxarticles');
             $articleIds = $this->_getAll(parent::_addFilter("select $articleTable.oxid " . $this->_getQuery()));
         }

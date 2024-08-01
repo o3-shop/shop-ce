@@ -88,7 +88,7 @@ class WrappingMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // checkbox handling
         if (!isset($aParams['oxwrapping__oxactive'])) {
@@ -130,7 +130,7 @@ class WrappingMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // checkbox handling
         if (!isset($aParams['oxwrapping__oxactive'])) {

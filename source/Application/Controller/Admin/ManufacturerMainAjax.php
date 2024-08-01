@@ -72,14 +72,15 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         // looking for table/view
         $articlesViewName = $this->_getViewName('oxarticles');
         $objectToCategoryViewName = $this->_getViewName('oxobject2category');
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        $manufacturerId = $config->getRequestParameter('oxid');
-        $syncedManufacturerId = $config->getRequestParameter('synchoxid');
+        $manufacturerId = $oRequest->getRequestEscapedParameter('oxid');
+        $syncedManufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // Manufacturer selected or not ?
         if (!$manufacturerId) {
@@ -125,11 +126,10 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function removeManufacturer()
     {
-        $config = Registry::getConfig();
         $articleIds = $this->_getActionIds('oxarticles.oxid');
-        $manufacturerId = $config->getRequestParameter('oxid');
+        $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
-        if (Registry::getConfig()->getRequestParameter("all")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $articleViewTable = $this->_getViewName('oxarticles');
             $articleIds = $this->_getAll($this->_addFilter("select $articleViewTable.oxid " . $this->_getQuery()));
         }
@@ -162,12 +162,12 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addManufacturer()
     {
-        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $articleIds = $this->_getActionIds('oxarticles.oxid');
-        $manufacturerId = $config->getRequestParameter('synchoxid');
+        $manufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($config->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $articleViewName = $this->_getViewName('oxarticles');
             $articleIds = $this->_getAll($this->_addFilter("select $articleViewName.oxid " . $this->_getQuery()));
         }

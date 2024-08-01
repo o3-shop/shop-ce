@@ -77,7 +77,7 @@ class DeliveryUsers extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
 
         $this->_aViewData["allgroups2"] = $oGroups;
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDeliveryUsersAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryUsersAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryUsersAjax->getColumns();

@@ -43,7 +43,7 @@ class NewsText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
         $oNews = oxNew(\OxidEsales\Eshop\Application\Model\News::class);
 
         if (isset($soxId) && $soxId != "-1") {
-            $iNewsLang = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("newslang");
+            $iNewsLang = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('newslang');
 
             if (!isset($iNewsLang)) {
                 $iNewsLang = $this->_iEditLang;
@@ -80,11 +80,11 @@ class NewsText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetai
     {
         parent::save();
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oNews = oxNew(\OxidEsales\Eshop\Application\Model\News::class);
 
-        $iNewsLang = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("newslang");
+        $iNewsLang = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('newslang');
 
         if (!isset($iNewsLang)) {
             $iNewsLang = $this->_iEditLang;

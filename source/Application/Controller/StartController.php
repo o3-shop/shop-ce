@@ -123,7 +123,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function render()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('showexceptionpage') == '1') {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('showexceptionpage') == '1') {
             return 'message/exception.tpl';
         }
 

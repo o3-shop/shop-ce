@@ -59,8 +59,8 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
         // active AJAX component
         $sGroupTable = $this->_getViewName('oxgroups');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sDiscountId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchDiscountId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sDiscountId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDiscountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDiscountId) {
@@ -86,7 +86,7 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
     public function removeGroupFromNewsletter()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -101,9 +101,9 @@ class NewsletterSelectionAjax extends \OxidEsales\Eshop\Application\Controller\A
     public function addGroupToNewsletter()
     {
         $aAddGroups = $this->_getActionIds('oxgroups.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sGroupTable = $this->_getViewName('oxgroups');
             $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }

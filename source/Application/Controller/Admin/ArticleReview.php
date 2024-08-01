@@ -54,7 +54,7 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $this->_aViewData["edit"] = $article;
 
         $articleId = $this->getEditObjectId();
-        $reviewId = Registry::getConfig()->getRequestParameter('rev_oxid');
+        $reviewId = Registry::getRequest()->getRequestEscapedParameter('rev_oxid');
         if (isset($articleId) && $articleId != "-1") {
             // load object
             $article->load($articleId);
@@ -72,7 +72,7 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 }
             }
             $this->_aViewData["allreviews"] = $reviewList;
-            $this->_aViewData["editlanguage"] = $this->_iEditLang;
+            $this->_aViewData['editlanguage'] = $this->_iEditLang;
 
             if (isset($reviewId)) {
                 $reviewForEditing = oxNew(Review::class);
@@ -133,14 +133,14 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     {
         parent::save();
 
-        $parameters = Registry::getConfig()->getRequestParameter("editval");
+        $parameters = Registry::getRequest()->getRequestEscapedParameter('editval');
         // checkbox handling
         if (Registry::getConfig()->getConfigParam('blGBModerate') && !isset($parameters['oxreviews__oxactive'])) {
             $parameters['oxreviews__oxactive'] = 0;
         }
 
         $review = oxNew(Review::class);
-        $review->load(Registry::getConfig()->getRequestParameter("rev_oxid"));
+        $review->load(Registry::getRequest()->getRequestEscapedParameter('rev_oxid'));
         $review->assign($parameters);
         $review->save();
     }
@@ -152,7 +152,7 @@ class ArticleReview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     {
         $this->resetContentCache();
 
-        $reviewId = Registry::getConfig()->getRequestParameter("rev_oxid");
+        $reviewId = Registry::getRequest()->getRequestEscapedParameter('rev_oxid');
         $review = oxNew(Review::class);
         $review->load($reviewId);
         $review->delete();

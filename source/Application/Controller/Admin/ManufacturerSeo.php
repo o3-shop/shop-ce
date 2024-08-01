@@ -39,7 +39,7 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
         $oManufacturer->init('oxmanufacturers');
         if ($oManufacturer->load($this->getEditObjectId())) {
             $sShowSuffixField = 'oxmanufacturers__oxshowsuffix';
-            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('blShowSuffix');
+            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
             $oManufacturer->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
             $oManufacturer->save();
         }

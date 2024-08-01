@@ -78,8 +78,8 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
 
-        $sOxid = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchOxid = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
@@ -135,11 +135,9 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function addArticle()
     {
-        $myConfig = Registry::getConfig();
-
         $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $sCategoryID = $myConfig->getRequestParameter('synchoxid');
-        $sShopID = $myConfig->getShopId();
+        $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $sShopID = Registry::getConfig()->getShopId();
 
         DatabaseProvider::getDb()->startTransaction();
         try {
@@ -147,7 +145,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
             $sArticleTable = $this->_getViewName('oxarticles');
 
             // adding
-            if (Registry::getConfig()->getRequestParameter('all')) {
+            if (Registry::getRequest()->getRequestEscapedParameter('all')) {
                 $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
             }
 
@@ -245,10 +243,10 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     public function removeArticle()
     {
         $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $sCategoryID = Registry::getConfig()->getRequestParameter('oxid');
+        $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArticleTable = $this->_getViewName('oxarticles');
             $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
         }

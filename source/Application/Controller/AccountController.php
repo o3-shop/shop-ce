@@ -169,7 +169,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function confirmTerms()
     {
-        $termsConfirmation = Registry::getConfig()->getRequestParameter("term");
+        $termsConfirmation = Registry::getRequest()->getRequestEscapedParameter('term');
         if (!$termsConfirmation && $this->isEnabledPrivateSales()) {
             $user = $this->getUser();
             if ($user && !$user->isTermsAccepted()) {
@@ -192,11 +192,11 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $parameters = parent::getNavigationParams();
 
-        if ($sourceClass = Registry::getConfig()->getRequestParameter("sourcecl")) {
+        if ($sourceClass = Registry::getRequest()->getRequestEscapedParameter('sourcecl')) {
             $parameters['sourcecl'] = $sourceClass;
         }
 
-        if ($articleId = Registry::getConfig()->getRequestParameter("anid")) {
+        if ($articleId = Registry::getRequest()->getRequestEscapedParameter('anid')) {
             $parameters['anid'] = $articleId;
         }
 
@@ -218,7 +218,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         // in case source class is provided - redirecting back to it with all default parameters
         if (
-            ($sourceClass = Registry::getConfig()->getRequestParameter("sourcecl")) &&
+            ($sourceClass = Registry::getRequest()->getRequestEscapedParameter('sourcecl')) &&
             $this->_oaComponents['oxcmp_user']->getLoginStatus() === USER_LOGIN_SUCCESS
         ) {
             $redirectUrl = Registry::getConfig()->getShopUrl() . 'index.php?cl=' . rawurlencode($sourceClass);
@@ -262,7 +262,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         if ($this->_sArticleId === null) {
             // passing wishlist information
-            if ($articleId = Registry::getConfig()->getRequestParameter('aid')) {
+            if ($articleId = Registry::getRequest()->getRequestEscapedParameter('aid')) {
                 $this->_sArticleId = $articleId;
             }
         }
@@ -280,7 +280,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_sSearchParamForHtml === null) {
             $this->_sSearchParamForHtml = false;
             if ($this->getArticleId()) {
-                $this->_sSearchParamForHtml = Registry::getConfig()->getRequestParameter('searchparam');
+                $this->_sSearchParamForHtml = Registry::getRequest()->getRequestEscapedParameter('searchparam');
             }
         }
 
@@ -297,7 +297,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_sSearchParam === null) {
             $this->_sSearchParam = false;
             if ($this->getArticleId()) {
-                $this->_sSearchParam = rawurlencode(Registry::getConfig()->getRequestParameter('searchparam', true));
+                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
             }
         }
 
@@ -315,7 +315,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
             $this->_sListType = false;
             if ($this->getArticleId()) {
                 // searching in vendor #671
-                $this->_sListType = Registry::getConfig()->getRequestParameter('listtype');
+                $this->_sListType = Registry::getRequest()->getRequestEscapedParameter('listtype');
             }
         }
 

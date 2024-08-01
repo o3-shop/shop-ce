@@ -70,11 +70,12 @@ class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $sUserTable = $this->_getViewName('oxuser');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $oConfig->getRequestParameter('oxid');
-        $sSynchId = $oConfig->getRequestParameter('synchoxid');
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -108,9 +109,8 @@ class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function removeDiscUser()
     {
-        $oConfig = Registry::getConfig();
         $aRemoveGroups = $this->_getActionIds('oxobject2discount.oxid');
-        if ($oConfig->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -124,11 +124,11 @@ class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function addDiscUser()
     {
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $aChosenUsr = $this->_getActionIds('oxuser.oxid');
-        $soxId = $oConfig->getRequestParameter('synchoxid');
+        $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($oConfig->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $sUserTable = $this->_getViewName('oxuser');
             $aChosenUsr = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
         }

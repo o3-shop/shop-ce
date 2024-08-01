@@ -317,7 +317,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      */
     protected function _getVendorId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('cnid');
+        return \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('cnid');
     }
 
     /**

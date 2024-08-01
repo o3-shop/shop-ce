@@ -47,7 +47,7 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $iCatLang = Registry::getConfig()->getRequestParameter("catlang");
+            $iCatLang = Registry::getRequest()->getRequestEscapedParameter('catlang');
 
             if (!isset($iCatLang)) {
                 $iCatLang = $this->_iEditLang;
@@ -85,10 +85,10 @@ class CategoryText extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oCategory = oxNew(Category::class);
-        $iCatLang = Registry::getConfig()->getRequestParameter("catlang");
+        $iCatLang = Registry::getRequest()->getRequestEscapedParameter('catlang');
         $iCatLang = $iCatLang ? $iCatLang : 0;
 
         if ($soxId != "-1") {

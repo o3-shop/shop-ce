@@ -55,7 +55,7 @@ class DiscountArticles extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             $this->_createCategoryTree("artcattree");
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDiscountArticlesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountArticlesAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountArticlesAjax->getColumns();

@@ -79,13 +79,13 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function save()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
-        $aRDFaPayments = (array) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("ardfapayments");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
+        $aRDFaPayments = (array) \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('ardfapayments');
 
         // Delete old mappings
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("DELETE FROM oxobject2payment WHERE oxpaymentid = :oxpaymentid AND OXTYPE = 'rdfapayment'", [
-            ':oxpaymentid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid")
+            ':oxpaymentid' => \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid')
         ]);
 
         // Save new mappings
@@ -129,7 +129,7 @@ class PaymentRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $aRDFaPayments = [];
         $sSelect = 'select oxobjectid from oxobject2payment where oxpaymentid = :oxpaymentid and oxtype = "rdfapayment" ';
         $rs = $oDb->select($sSelect, [
-            ':oxpaymentid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid")
+            ':oxpaymentid' => \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid')
         ]);
         if ($rs && $rs->count()) {
             while (!$rs->EOF) {

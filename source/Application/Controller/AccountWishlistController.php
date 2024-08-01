@@ -148,7 +148,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     public function showSuggest()
     {
         if ($this->_blShowSuggest === null) {
-            $this->_blShowSuggest = (bool) Registry::getConfig()->getRequestParameter('blshowsuggest');
+            $this->_blShowSuggest = (bool) Registry::getRequest()->getRequestEscapedParameter('blshowsuggest');
         }
 
         return $this->_blShowSuggest;
@@ -221,11 +221,11 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
             return false;
         }
 
-        $aParams = Registry::getConfig()->getRequestParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
         if (is_array($aParams)) {
             $oUtilsView = Registry::getUtilsView();
             $oParams = (object) $aParams;
-            $this->setEnteredData((object) Registry::getConfig()->getRequestParameter('editval'));
+            $this->setEnteredData((object) Registry::getRequest()->getRequestEscapedParameter('editval'));
 
             if (
                 !isset($aParams['rec_name']) || !isset($aParams['rec_email']) ||
@@ -297,7 +297,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
         }
 
         if ($oUser = $this->getUser()) {
-            $blPublic = (int) Registry::getConfig()->getRequestParameter('blpublic');
+            $blPublic = (int) Registry::getRequest()->getRequestEscapedParameter('blpublic');
             $oBasket = $oUser->getBasket('wishlist');
             $oBasket->oxuserbaskets__oxpublic = new \OxidEsales\Eshop\Core\Field(($blPublic == 1) ? $blPublic : 0);
             $oBasket->save();
@@ -310,7 +310,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      */
     public function searchForWishList()
     {
-        if ($sSearch = Registry::getConfig()->getRequestParameter('search')) {
+        if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('search')) {
             // search for baskets
             $oUserList = oxNew(\OxidEsales\Eshop\Application\Model\UserList::class);
             $oUserList->loadWishlistUsers($sSearch);

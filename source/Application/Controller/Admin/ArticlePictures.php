@@ -89,7 +89,7 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         $oArticle = oxNew(Article::class);
         if ($oArticle->load($this->getEditObjectId())) {
-            $oArticle->assign(Registry::getConfig()->getRequestParameter("editval"));
+            $oArticle->assign(Registry::getRequest()->getRequestEscapedParameter('editval'));
             Registry::getUtilsFile()->processFiles($oArticle);
 
             // Show that no new image added
@@ -124,7 +124,7 @@ class ArticlePictures extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
         }
 
         $sOxId = $this->getEditObjectId();
-        $iIndex = Registry::getConfig()->getRequestParameter("masterPicIndex");
+        $iIndex = Registry::getRequest()->getRequestEscapedParameter('masterPicIndex');
 
         $oArticle = oxNew(Article::class);
         $oArticle->load($sOxId);

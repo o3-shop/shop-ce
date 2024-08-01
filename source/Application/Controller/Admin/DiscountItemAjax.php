@@ -64,13 +64,14 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
         $sDiscTable = $this->_getViewName('oxdiscount');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sOxid = $oConfig->getRequestParameter('oxid');
-        $sSynchOxid = $oConfig->getRequestParameter('synchoxid');
+        $sOxid = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchOxid = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sOxid && $sSynchOxid) {
@@ -119,7 +120,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function removeDiscArt()
     {
-        $soxId = Registry::getConfig()->getRequestParameter('oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $aChosenArt = $this->_getActionIds('oxdiscount.oxitmartid');
         if (is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = '' where oxid = :oxid and oxitmartid = :oxitmartid";
@@ -136,7 +137,7 @@ class DiscountItemAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     public function addDiscArt()
     {
         $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = :oxitmartid where oxid = :oxid";
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ, [

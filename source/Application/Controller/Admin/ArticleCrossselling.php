@@ -61,7 +61,7 @@ class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin
             }
         }
 
-        $iAoc = Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oArticleCrossellingAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax::class);
             $this->_aViewData['oxajax'] = $oArticleCrossellingAjax->getColumns();

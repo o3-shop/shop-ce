@@ -73,7 +73,7 @@ class OrderDownloads extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     public function resetDownloadLink()
     {
-        $sOrderFileId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxorderfileid');
+        $sOrderFileId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxorderfileid');
         $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);
         if ($oOrderFile->load($sOrderFileId)) {
             $oOrderFile->reset();

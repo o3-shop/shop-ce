@@ -73,9 +73,11 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
         $sArtTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $sVendorId = $oConfig->getRequestParameter('oxid');
-        $sSynchVendorId = $oConfig->getRequestParameter('synchoxid');
+        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
+        
+        $sVendorId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchVendorId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // vendor selected or not ?
         if (!$sVendorId) {
@@ -121,10 +123,10 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      */
     public function removeVendor()
     {
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
         $aRemoveArt = $this->_getActionIds('oxarticles.oxid');
 
-        if ($oConfig->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aRemoveArt = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }
@@ -134,9 +136,9 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
                 . $this->onVendorActionArticleUpdateConditions($aRemoveArt);
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sSelect);
 
-            $this->resetCounter("vendorArticle", $oConfig->getRequestParameter('oxid'));
+            $this->resetCounter("vendorArticle", $oRequest->getRequestEscapedParameter('oxid'));
 
-            $this->onVendorAction($oConfig->getRequestParameter('oxid'));
+            $this->onVendorAction($oRequest->getRequestEscapedParameter('oxid'));
         }
     }
 
@@ -145,12 +147,12 @@ class VendorMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\List
      */
     public function addVendor()
     {
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         $aAddArticle = $this->_getActionIds('oxarticles.oxid');
-        $soxId = $oConfig->getRequestParameter('synchoxid');
+        $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($oConfig->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $sArtTable = $this->_getViewName('oxarticles');
             $aAddArticle = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }

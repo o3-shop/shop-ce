@@ -106,7 +106,7 @@ class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controll
             return false;
         }
 
-        $iStatus = Registry::getConfig()->getRequestParameter('status');
+        $iStatus = Registry::getRequest()->getRequestEscapedParameter('status');
         if ($oUser->setNewsSubscription($iStatus, Registry::getConfig()->getConfigParam('blOrderOptInEmail'))) {
             $this->_iSubscriptionStatus = ($iStatus == 0 && $iStatus !== null) ? -1 : 1;
         }

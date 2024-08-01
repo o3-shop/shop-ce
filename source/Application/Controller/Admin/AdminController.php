@@ -302,7 +302,7 @@ class AdminController extends BaseController
             $myAdminNavig = $this->getNavigation();
 
             // active tab
-            $iActTab = Registry::getConfig()->getRequestParameter('actedit');
+            $iActTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
             $iActTab = $iActTab ? $iActTab : $this->_iDefEdit;
 
             $sActTab = $iActTab ? "&actedit=$iActTab" : '';
@@ -357,7 +357,7 @@ class AdminController extends BaseController
 
         // "save-on-tab"
         if (!isset($this->_aViewData['updatelist'])) {
-            $this->_aViewData['updatelist'] = Registry::getConfig()->getRequestParameter('updatelist');
+            $this->_aViewData['updatelist'] = Registry::getRequest()->getRequestEscapedParameter('updatelist');
         }
 
         return $sReturn;
@@ -563,7 +563,7 @@ class AdminController extends BaseController
      */
     public function chshp()
     {
-        $sActShop = Registry::getConfig()->getRequestParameter('shp');
+        $sActShop = Registry::getRequest()->getRequestEscapedParameter('shp');
         Registry::getSession()->setVariable("shp", $sActShop);
         Registry::getSession()->setVariable('currentadminshop', $sActShop);
     }
@@ -600,7 +600,7 @@ class AdminController extends BaseController
     public function getEditObjectId()
     {
         if (null === ($sId = $this->_sEditObjectId)) {
-            if (null === ($sId = Registry::getConfig()->getRequestParameter("oxid"))) {
+            if (null === ($sId = Registry::getRequest()->getRequestEscapedParameter('oxid'))) {
                 $sId = Registry::getSession()->getVariable("saved_oxid");
             }
         }

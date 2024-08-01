@@ -67,7 +67,7 @@ class NewsletterMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     public function save()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // shopid
         $sShopID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("actshop");

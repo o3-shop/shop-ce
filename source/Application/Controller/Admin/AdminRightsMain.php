@@ -31,7 +31,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     {
         parent::render();
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $rightsUserAjax = oxNew(AdminRightsMainAjax::class);
             $this->addTplParam('oxajax', $rightsUserAjax->getColumns());
 
@@ -76,7 +76,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         $rightsRole = oxNew(RightsRoles::class);
         $rightsRole->setLanguage(0);
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if ($soxId != "-1") {
             $rightsRole->loadInLang($this->_iEditLang, $soxId);

@@ -74,7 +74,7 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
             }
         }
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oManufacturerMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class);
             $this->_aViewData['oxajax'] = $oManufacturerMainAjax->getColumns();
 
@@ -94,7 +94,7 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxmanufacturers__oxactive'])) {
             $aParams['oxmanufacturers__oxactive'] = 0;
@@ -132,7 +132,7 @@ class ManufacturerMain extends \OxidEsales\Eshop\Application\Controller\Admin\Ad
     public function saveInnLang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxmanufacturers__oxactive'])) {
             $aParams['oxmanufacturers__oxactive'] = 0;

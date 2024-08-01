@@ -69,8 +69,8 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
         $sArticleTable = $this->_getViewName('oxarticles');
         $sViewName = $this->_getViewName('oxobject2category');
 
-        $sSelId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sSelId) {
@@ -121,7 +121,7 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function removeActionArticle()
     {
-        $sActionId = Registry::getConfig()->getRequestParameter('oxid');
+        $sActionId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         //$sActionId = Registry::getConfig()->getConfigParam( 'oxid' );
 
         $oDb = DatabaseProvider::getDb();
@@ -139,8 +139,8 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function setActionArticle()
     {
-        $sArticleId = Registry::getConfig()->getRequestParameter('oxarticleid');
-        $sActionId = Registry::getConfig()->getRequestParameter('oxid');
+        $sArticleId = Registry::getRequest()->getRequestEscapedParameter('oxarticleid');
+        $sActionId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $oDb = DatabaseProvider::getDb();
 
         $oDb->Execute(

@@ -72,8 +72,8 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
         $oDb = DatabaseProvider::getDb();
 
         $sCatTable = $this->_getViewName('oxcategories');
-        $sDiscountId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchDiscountId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sDiscountId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDiscountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDiscountId) {
@@ -106,7 +106,7 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     {
         $aChosenCat = $this->_getActionIds('oxcategory2attribute.oxid');
 
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxcategory2attribute.* " . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
@@ -126,11 +126,11 @@ class AttributeCategoryAjax extends \OxidEsales\Eshop\Application\Controller\Adm
     public function addCatToAttr()
     {
         $aAddCategory = $this->_getActionIds('oxcategories.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $oAttribute = oxNew(Attribute::class);
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sCatTable = $this->_getViewName('oxcategories');
             $aAddCategory = $this->_getAll($this->_addFilter("select $sCatTable.oxid " . $this->_getQuery()));
         }

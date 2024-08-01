@@ -53,7 +53,7 @@ class VoucherSerieGroups extends \OxidEsales\Eshop\Application\Controller\Admin\
                 $this->_aViewData['readonly'] = true;
             }
         }
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oVoucherSerieGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oVoucherSerieGroupsAjax->getColumns();
 

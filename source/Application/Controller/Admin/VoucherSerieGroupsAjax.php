@@ -57,9 +57,9 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
         // looking for table/view
         $sGroupTable = $this->_getViewName('oxgroups');
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $sVoucherId = $oConfig->getRequestParameter('oxid');
-        $sSynchVoucherId = $oConfig->getRequestParameter('synchoxid');
+        $oRequest = \OxidEsales\Eshop\Core\Registry::getRequest();
+        $sVoucherId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchVoucherId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sVoucherId) {
@@ -83,7 +83,7 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
     public function removeGroupFromVoucher()
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
+        if (\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
             \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
@@ -97,11 +97,11 @@ class VoucherSerieGroupsAjax extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function addGroupToVoucher()
     {
-        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        $oRequest = \OxidEsales\Eshop\Core\Registry::getRequest();
         $aChosenCat = $this->_getActionIds('oxgroups.oxid');
-        $soxId = $oConfig->getRequestParameter('synchoxid');
+        $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($oConfig->getRequestParameter('all')) {
+        if ($oRequest->getRequestEscapedParameter('all')) {
             $sGroupTable = $this->_getViewName('oxgroups');
             $aChosenCat = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }

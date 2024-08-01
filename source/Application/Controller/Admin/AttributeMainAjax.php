@@ -81,8 +81,8 @@ class AttributeMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         $sOCatView = $this->_getViewName('oxobject2category');
         $sOAttrView = $this->_getViewName('oxobject2attribute');
 
-        $sDelId = Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchDelId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDelId) {
@@ -145,7 +145,7 @@ class AttributeMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     {
         $aChosenCat = $this->_getActionIds('oxobject2attribute.oxid');
 
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sO2AttributeView = $this->_getViewName('oxobject2attribute');
 
             $sQ = parent::_addFilter("delete $sO2AttributeView.* " . $this->_getQuery());
@@ -163,10 +163,10 @@ class AttributeMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     public function addAttrArticle()
     {
         $aAddArticle = $this->_getActionIds('oxarticles.oxid');
-        $soxId = Registry::getConfig()->getRequestParameter('synchoxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (Registry::getConfig()->getRequestParameter('all')) {
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArticleTable = $this->_getViewName('oxarticles');
             $aAddArticle = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
         }

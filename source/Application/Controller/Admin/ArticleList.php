@@ -93,7 +93,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     public function render()
     {
         $myConfig = Registry::getConfig();
-        $sPwrSearchFld = Registry::getConfig()->getRequestParameter("pwrsearchfld");
+        $sPwrSearchFld = Registry::getRequest()->getRequestEscapedParameter('pwrsearchfld');
         $sPwrSearchFld = $sPwrSearchFld ? strtolower($sPwrSearchFld) : "oxtitle";
 
         $sDateTime = $this->getServerDateTime();
@@ -138,7 +138,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $sType = '';
         $sValue = '';
 
-        $sArtCat = Registry::getConfig()->getRequestParameter("art_category");
+        $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
         if ($sArtCat && strstr($sArtCat, "@@") !== false) {
             list($sType, $sValue) = explode("@@", $sArtCat);
         }
@@ -265,7 +265,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
             $sQ .= " and $sTable.oxparentid = '' ";
 
             $sType = false;
-            $sArtCat = Registry::getConfig()->getRequestParameter("art_category");
+            $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
             if ($sArtCat && strstr($sArtCat, "@@") !== false) {
                 list($sType, $sValue) = explode("@@", $sArtCat);
             }
@@ -304,7 +304,7 @@ class ArticleList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
         $this->_aWhere = parent::buildWhere();
 
         // adding folder check
-        $sFolder = Registry::getConfig()->getRequestParameter('folder');
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         if ($sFolder && $sFolder != '-1') {
             $this->_aWhere[getViewName("oxarticles") . ".oxfolder"] = $sFolder;
         }

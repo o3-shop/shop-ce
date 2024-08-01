@@ -138,7 +138,7 @@ class OrderOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 }
             }
 
-            if (($blMail = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sendmail"))) {
+            if (($blMail = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('sendmail'))) {
                 // send eMail
                 $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
                 $oEmail->sendSendedNowMail($oOrder);

@@ -59,7 +59,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     public function getActCatType()
     {
         $sType = false;
-        $aData = Registry::getConfig()->getRequestParameter("aSeoData");
+        $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
         if ($aData && isset($aData["oxparams"])) {
             $oStr = getStr();
             $iEndPos = $oStr->strpos($aData["oxparams"], "#");
@@ -79,12 +79,12 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     public function getActCatLang()
     {
-        if (Registry::getConfig()->getRequestParameter("editlanguage") !== null) {
+        if (Registry::getRequest()->getRequestEscapedParameter('editlanguage') !== null) {
             return $this->_iEditLang;
         }
 
         $iLang = false;
-        $aData = Registry::getConfig()->getRequestParameter("aSeoData");
+        $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
         if ($aData && isset($aData["oxparams"])) {
             $oStr = getStr();
             $iStartPos = $oStr->strpos($aData["oxparams"], "#");
@@ -106,7 +106,7 @@ class ArticleSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
     public function getActCatId()
     {
         $sId = false;
-        $aData = Registry::getConfig()->getRequestParameter("aSeoData");
+        $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
         if ($aData && isset($aData["oxparams"])) {
             $oStr = getStr();
             $iStartPos = $oStr->strpos($aData["oxparams"], "#");

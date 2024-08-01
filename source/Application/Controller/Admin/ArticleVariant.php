@@ -100,7 +100,7 @@ class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
                 // A. disable variant information editing for variant
                 $this->_aViewData["readonly"] = 1;
             }
-            $this->_aViewData["editlanguage"] = $this->_iEditLang;
+            $this->_aViewData['editlanguage'] = $this->_iEditLang;
 
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
@@ -129,8 +129,8 @@ class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     public function savevariant($sOXID = null, $aParams = null)
     {
         if (!isset($sOXID) && !isset($aParams)) {
-            $sOXID = Registry::getConfig()->getRequestParameter("voxid");
-            $aParams = Registry::getConfig()->getRequestParameter("editval");
+            $sOXID = Registry::getRequest()->getRequestEscapedParameter('voxid');
+            $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         }
 
         // varianthandling
@@ -227,7 +227,7 @@ class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      */
     public function savevariants()
     {
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         if (is_array($aParams)) {
             foreach ($aParams as $soxId => $aVarParams) {
                 $this->savevariant($soxId, $aVarParams);
@@ -253,7 +253,7 @@ class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
 
         $this->resetContentCache();
 
-        $variantOxid = Registry::getConfig()->getRequestRawParameter("voxid");
+        $variantOxid = Registry::getConfig()->getRequestRawParameter('voxid');
         $variant = oxNew(Article::class);
         $variant->delete($variantOxid);
     }
@@ -264,7 +264,7 @@ class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     public function changename()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $this->resetContentCache();
 
@@ -296,7 +296,7 @@ class ArticleVariant extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
 
             $this->resetContentCache();
 
-            if ($aSels = Registry::getConfig()->getRequestParameter("allsel")) {
+            if ($aSels = Registry::getRequest()->getRequestEscapedParameter('allsel')) {
                 $oVariantHandler = oxNew(VariantHandler::class);
                 $oVariantHandler->genVariantFromSell($aSels, $oArticle);
             }

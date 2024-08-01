@@ -43,7 +43,7 @@ class OrderRemark extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        $sRemoxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("rem_oxid");
+        $sRemoxId = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('rem_oxid');
         if (isset($soxId) && $soxId != "-1") {
             $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
             $oOrder->load($soxId);
@@ -87,10 +87,10 @@ class OrderRemark extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
             $oRemark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
-            $oRemark->load(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("rem_oxid"));
+            $oRemark->load(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('rem_oxid'));
 
-            $oRemark->oxremark__oxtext = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("remarktext"));
-            $oRemark->oxremark__oxheader = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("remarkheader"));
+            $oRemark->oxremark__oxtext = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('remarktext'));
+            $oRemark->oxremark__oxheader = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('remarkheader'));
             $oRemark->oxremark__oxtype = new \OxidEsales\Eshop\Core\Field("r");
             $oRemark->oxremark__oxparentid = new \OxidEsales\Eshop\Core\Field($oOrder->oxorder__oxuserid->value);
             $oRemark->save();
@@ -103,6 +103,6 @@ class OrderRemark extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     public function delete()
     {
         $oRemark = oxNew(\OxidEsales\Eshop\Application\Model\Remark::class);
-        $oRemark->delete(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("rem_oxid"));
+        $oRemark->delete(\OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('rem_oxid'));
     }
 }

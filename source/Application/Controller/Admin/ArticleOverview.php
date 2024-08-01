@@ -159,7 +159,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      */
     protected function updateArticle($article, $oxId)
     {
-        $article->loadInLang(Registry::getConfig()->getRequestParameter("editlanguage"), $oxId);
+        $article->loadInLang(Registry::getRequest()->getRequestEscapedParameter('editlanguage'), $oxId);
 
         return $article;
     }

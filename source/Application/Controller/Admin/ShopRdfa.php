@@ -66,7 +66,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
                 AND OXLOADID IN ('oxagb', 'oxdeliveryinfo', 'oximpressum', 'oxrightofwithdrawal')
                 AND OXSHOPID = :OXSHOPID
              ORDER BY OXLOADID ASC",
-            [':OXSHOPID' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid")]
+            [':OXSHOPID' => \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('oxid')]
         );
 
         return $oContentList;
@@ -98,7 +98,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      */
     public function submitUrl()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aSubmitUrl");
+        $aParams = \OxidEsales\Eshop\Core\Registry::getRequest()->getRequestEscapedParameter('aSubmitUrl');
         if ($aParams['url']) {
             $sNotificationUrl = "http://gr-notify.appspot.com/submit?uri=" . urlencode($aParams['url']) . "&agent=oxid";
             if ($aParams['email']) {
