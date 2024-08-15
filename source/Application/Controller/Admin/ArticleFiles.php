@@ -27,7 +27,6 @@ use OxidEsales\Eshop\Application\Model\File;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
 use Exception;
 
 /**
@@ -40,14 +39,14 @@ class ArticleFiles extends AdminDetailsController
     /**
      * Template name
      *
-     * @var unknown_type
+     * @var string
      */
     protected $_sThisTemplate = 'article_files.tpl';
 
     /**
      * Stores editing article
      *
-     * @var oxArticle
+     * @var Article
      */
     protected $_oArticle = null;
 
@@ -111,7 +110,7 @@ class ArticleFiles extends AdminDetailsController
      *
      * @param bool $blReset Load article again
      *
-     * @return oxFile
+     * @return File
      */
     public function getArticle($blReset = false)
     {

@@ -21,12 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxArticleList;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\OrderFileList;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SeoEncoder;
-use oxOrderFileList;
 
 /**
  * Account article file download page.
@@ -80,7 +78,7 @@ class AccountDownloadsController extends AccountController
     /**
      * Returns article list which was ordered and has downloadable files
      *
-     * @return null|oxArticleList
+     * @return null|OrderFileList
      */
     public function getOrderFilesList()
     {

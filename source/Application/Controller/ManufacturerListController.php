@@ -26,8 +26,6 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Manufacturer;
 use OxidEsales\Eshop\Core\Registry;
-use oxManufacturer;
-use oxUBase;
 
 /**
  * List of articles for a selected Manufacturer.

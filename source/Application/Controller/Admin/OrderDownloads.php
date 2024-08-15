@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\OrderFile;
 use OxidEsales\Eshop\Application\Model\OrderFileList;
 use OxidEsales\Eshop\Core\Registry;
@@ -36,7 +37,7 @@ class OrderDownloads extends AdminDetailsController
     /**
      * Active order object
      *
-     * @var oxorder
+     * @var Order
      */
     protected $_oEditObject = null;
 
@@ -60,7 +61,7 @@ class OrderDownloads extends AdminDetailsController
     /**
      * Returns editable order object
      *
-     * @return oxorder
+     * @return Order
      */
     public function getEditObject()
     {

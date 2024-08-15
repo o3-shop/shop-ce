@@ -89,7 +89,7 @@ class UserController extends FrontendController
     /**
      * Loads customer basket object form session (Session::getBasket()),
      * passes action article/basket/country list to template engine. If
-     * available - loads user delivery address data (oxAddress). Returns
+     * available - loads user delivery address data (Address). Returns
      * name template file to render user::_sThisTemplate.
      *
      * @return  string  $this->_sThisTemplate   current template file name

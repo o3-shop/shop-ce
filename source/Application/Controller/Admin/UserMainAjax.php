@@ -22,8 +22,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
-use oxDb;
-use oxField;
 use OxidEsales\Eshop\Application\Model\Object2Group;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;

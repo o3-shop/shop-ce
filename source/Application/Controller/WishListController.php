@@ -26,8 +26,6 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\UserList;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxUBase;
-use oxList;
 
 /**
  * The wishlist of someone else is displayed.

@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxException;
-use oxExceptionToDisplay;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\File;
 use OxidEsales\Eshop\Application\Model\OrderFile;

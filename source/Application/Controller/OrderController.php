@@ -21,12 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxAddress;
-use oxArticleInputException;
-use oxBasket;
-use oxBasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Model\DeliverySet;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment;
@@ -36,10 +33,6 @@ use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
-use oxNoArticleException;
-use oxOrder;
-use oxOutOfStockException;
-use oxUtilsObject;
 
 /**
  * Order manager. Arranges user ordering data, checks/validates
@@ -57,7 +50,7 @@ class OrderController extends FrontendController
     /**
      * Active basket
      *
-     * @var oxBasket
+     * @var Basket
      */
     protected $_oBasket = null;
 
@@ -85,7 +78,7 @@ class OrderController extends FrontendController
     /**
      * Delivery address
      *
-     * @var oxAddress|null
+     * @var Address
      */
     protected $_oDelAddress = null;
 
@@ -293,7 +286,7 @@ class OrderController extends FrontendController
     /**
      * Template variable getter. Returns active basket
      *
-     * @return oxBasket
+     * @return Basket
      */
     public function getBasket()
     {
@@ -503,11 +496,11 @@ class OrderController extends FrontendController
     /**
      * Method returns object with explanation marks for articles in basket.
      *
-     * @return oxBasketContentMarkGenerator
+     * @return BasketContentMarkGenerator
      */
     public function getBasketContentMarkGenerator()
     {
-        return oxNew('oxBasketContentMarkGenerator', $this->getBasket());
+        return oxNew(BasketContentMarkGenerator::class, $this->getBasket());
     }
 
     /**

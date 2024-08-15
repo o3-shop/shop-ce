@@ -65,7 +65,7 @@ class ContentController extends FrontendController
     /**
      * Current view content category (if available)
      *
-     * @var oxcontent
+     * @var Content
      */
     protected $_oContentCat = null;
 
@@ -79,7 +79,7 @@ class ContentController extends FrontendController
     /**
      * Current view content title
      *
-     * @var sting
+     * @var string
      */
     protected $_sContentTitle = null;
 
@@ -236,7 +236,7 @@ class ContentController extends FrontendController
     /**
      * If current content is assigned to category returns its object
      *
-     * @return oxcontent
+     * @return Content
      */
     public function getContentCategory()
     {

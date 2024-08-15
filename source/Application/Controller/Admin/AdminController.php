@@ -29,9 +29,6 @@ use OxidEsales\Eshop\Core\Edition\EditionSelector;
 use OxidEsales\Eshop\Core\NamespaceInformationProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
-use oxDb;
-use oxNavigationTree;
-use oxShop;
 
 /**
  * Main Controller class for admin area.
@@ -67,7 +64,7 @@ class AdminController extends BaseController
     /**
      * Navigation tree object
      *
-     * @var oxnavigationtree
+     * @var NavigationTree
      */
     protected static $_oNaviTree = null;
 
@@ -152,7 +149,7 @@ class AdminController extends BaseController
      *
      * @param object $sShopId shop id
      *
-     * @return oxshop
+     * @return Shop
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEditShop" in next major
      */
     protected function _getEditShop($sShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -537,7 +534,7 @@ class AdminController extends BaseController
     /**
      * Returns navigation object
      *
-     * @return oxnavigationtree
+     * @return NavigationTree
      */
     public function getNavigation()
     {

@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxUBase;
 use OxidEsales\Eshop\Application\Controller\ArticleDetailsController;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 

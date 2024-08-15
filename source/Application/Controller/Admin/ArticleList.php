@@ -28,7 +28,6 @@ use OxidEsales\Eshop\Application\Model\ManufacturerList;
 use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 
 /**
  * Admin article list manager.
@@ -211,7 +210,7 @@ class ArticleList extends AdminListController
      * @param string $sType  active list type
      * @param string $sValue active list item id
      *
-     * @return oxManufacturerList
+     * @return ManufacturerList
      */
     public function getManufacturerList($sType, $sValue)
     {
@@ -235,7 +234,7 @@ class ArticleList extends AdminListController
      * @param string $sType  active list type
      * @param string $sValue active list item id
      *
-     * @return oxVendorList
+     * @return VendorList
      */
     public function getVendorList($sType, $sValue)
     {

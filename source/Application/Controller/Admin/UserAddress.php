@@ -59,19 +59,19 @@ class UserAddress extends AdminDetailsController
 
             // load adress
             $sAddressIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
-            $soxAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
-            if ($soxAddressId != "-1" && isset($soxAddressId)) {
+            $sAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
+            if ($sAddressId != "-1" && isset($sAddressId)) {
                 $oAdress = oxNew(Address::class);
-                $oAdress->load($soxAddressId);
+                $oAdress->load($sAddressId);
                 $this->_aViewData["edit"] = $oAdress;
             }
 
-            $this->_aViewData["oxaddressid"] = $soxAddressId;
+            $this->_aViewData["oxaddressid"] = $sAddressId;
 
             // generate selected
             $oAddressList = $oUser->getUserAddresses();
             foreach ($oAddressList as $oAddress) {
-                if ($oAddress->oxaddress__oxid->value == $soxAddressId) {
+                if ($oAddress->oxaddress__oxid->value == $sAddressId) {
                     $oAddress->selected = 1;
                     break;
                 }

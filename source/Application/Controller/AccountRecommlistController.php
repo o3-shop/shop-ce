@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\RecommendationList;
 use OxidEsales\Eshop\Core\Exception\ObjectException;

@@ -22,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
-use oxField;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
 use OxidEsales\Eshop\Core\Field;
@@ -57,7 +56,7 @@ class CategorySeo extends ObjectSeo
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderCategory
+     * @return SeoEncoderCategory
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

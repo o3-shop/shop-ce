@@ -26,8 +26,6 @@ use OxidEsales\Eshop\Application\Model\Object2Group;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
 
 /**
  * Class manages payment user groups

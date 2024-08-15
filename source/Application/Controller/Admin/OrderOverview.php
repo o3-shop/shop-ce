@@ -27,8 +27,6 @@ use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
-use oxDb;
 
 /**
  * Admin order overview manager.
@@ -38,7 +36,7 @@ use oxDb;
 class OrderOverview extends AdminDetailsController
 {
     /**
-     * Executes parent method parent::render(), creates oxOrder, passes
+     * Executes parent method parent::render(), creates Order, passes
      * it's data to Smarty engine and returns name of template file
      * "order_overview.tpl".
      *
@@ -92,7 +90,7 @@ class OrderOverview extends AdminDetailsController
      *
      * @param object $oOrder Order object
      *
-     * @return oxUserPayment
+     * @return UserPayment
      * @deprecated underscore prefix violates PSR12, will be renamed to "getPaymentType" in next major
      */
     protected function _getPaymentType($oOrder) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

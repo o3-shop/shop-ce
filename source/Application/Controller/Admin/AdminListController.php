@@ -22,16 +22,13 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
 use stdClass;
-use oxList;
-use oxBase;
-use oxI18n;
 
 /**
  * Admin selectlist list manager.
@@ -55,7 +52,7 @@ class AdminListController extends AdminController
     /**
      * List of objects (default null).
      *
-     * @var oxList
+     * @var ListModel
      */
     protected $_oList = null;
 
@@ -788,7 +785,7 @@ class AdminListController extends AdminController
     /**
      * Returns items list
      *
-     * @return oxList
+     * @return ListModel
      */
     public function getItemList()
     {
@@ -846,7 +843,7 @@ class AdminListController extends AdminController
     /**
      * Returns item list base object
      *
-     * @return oxBase|null
+     * @return Base|null
      */
     public function getItemListBaseObject()
     {

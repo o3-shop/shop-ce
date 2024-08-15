@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxFileCheckerResult;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Diagnostics;
 use OxidEsales\Eshop\Application\Model\DiagnosticsOutput;
@@ -168,7 +167,7 @@ class DiagnosticsMain extends AdminDetailsController
      *
      * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
      *
-     * @return null|oxFileCheckerResult
+     * @return null|FileCheckerResult
      */
     protected function _checkOxidFiles($aFileList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {

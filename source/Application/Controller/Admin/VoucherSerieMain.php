@@ -44,7 +44,7 @@ class VoucherSerieMain extends DynamicExportBaseController
     /**
      * Voucher serie object
      *
-     * @var oxvoucherserie
+     * @var VoucherSerie
      */
     protected $_oVoucherSerie = null;
 
@@ -147,7 +147,7 @@ class VoucherSerieMain extends DynamicExportBaseController
     /**
      * Returns voucher serie object
      *
-     * @return oxvoucherserie
+     * @return VoucherSerie
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVoucherSerie" in next major
      */
     protected function _getVoucherSerie() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

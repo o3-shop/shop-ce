@@ -25,8 +25,6 @@ use OxidEsales\Eshop\Application\Model\Object2Role;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
 
 /**
  * Class manages users assignment to groups

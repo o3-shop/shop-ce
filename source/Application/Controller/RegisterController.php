@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
 use OxidEsales\Eshop\Application\Controller\UserController;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;

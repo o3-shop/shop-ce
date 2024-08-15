@@ -25,7 +25,6 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Newsletter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 
 /**
  * @deprecated Functionality for Newsletter management will be removed.

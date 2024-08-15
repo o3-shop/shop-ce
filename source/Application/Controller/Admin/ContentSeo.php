@@ -45,7 +45,7 @@ class ContentSeo extends ObjectSeo
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderContent
+     * @return SeoEncoderContent
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

@@ -22,13 +22,11 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Registry;
-use oxUBase;
-use oxBasket;
-use oxOrder;
 
 /**
  * Thankyou page.
@@ -173,7 +171,7 @@ class ThankYouController extends FrontendController
     /**
      * Template variable getter. Returns active basket
      *
-     * @return oxBasket
+     * @return Basket
      */
     public function getBasket()
     {
@@ -294,7 +292,7 @@ class ThankYouController extends FrontendController
     /**
      * Template variable getter. Returns order
      *
-     * @return oxOrder
+     * @return Order
      */
     public function getOrder()
     {

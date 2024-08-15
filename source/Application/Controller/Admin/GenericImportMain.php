@@ -27,8 +27,6 @@ use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
-use oxStr;
-use oxAdminDetails;
 
 /**
  * Admin general export manager.

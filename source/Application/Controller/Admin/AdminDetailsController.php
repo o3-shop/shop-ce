@@ -28,7 +28,6 @@ use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\ShopVersion;
 
 /**
  * Admin selectlist list manager.

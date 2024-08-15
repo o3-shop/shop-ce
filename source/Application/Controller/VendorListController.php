@@ -26,8 +26,6 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\Registry;
-use oxUBase;
-use oxVendorList;
 
 /**
  * List of articles for a selected vendor.

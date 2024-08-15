@@ -22,8 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain;
-use oxField;
 use OxidEsales\Eshop\Application\Model\Voucher;
+use OxidEsales\Eshop\Application\Model\VoucherSerie;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -57,7 +57,7 @@ class VoucherSerieGenerate extends VoucherSerieMain
     /**
      * Voucher serie object
      *
-     * @var oxvoucherserie
+     * @var VoucherSerie
      */
     protected $_oVoucherSerie = null;
 

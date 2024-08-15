@@ -22,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -56,7 +55,7 @@ class ShopRdfa extends ShopConfiguration
      * Gets list of content pages which could be used for embedding
      * business entity, price specification, and delivery specification data
      *
-     * @return oxContentList
+     * @return ContentList
      */
     public function getContentList()
     {

@@ -26,12 +26,11 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Manufacturer;
 use OxidEsales\Eshop\Application\Model\SeoEncoderArticle;
+use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
 use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
 
 /**
  * Article seo config class
@@ -335,7 +334,7 @@ class ArticleSeo extends ObjectSeo
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderCategory
+     * @return SeoEncoderCategory
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

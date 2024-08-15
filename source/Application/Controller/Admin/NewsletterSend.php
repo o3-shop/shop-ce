@@ -28,9 +28,6 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
-use oxAdminDetails;
 
 /**
  * @deprecated Functionality for Newsletter management will be removed.
@@ -55,7 +52,7 @@ class NewsletterSend extends NewsletterSelection
      */
     public function render()
     {
-        oxAdminDetails::render();
+        AdminDetailsController::render();
 
         // calculating
         $iUserCount = $this->getUserCount();

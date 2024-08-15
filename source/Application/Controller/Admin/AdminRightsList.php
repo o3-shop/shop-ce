@@ -21,7 +21,6 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
-use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\RightsRoles;
 use OxidEsales\Eshop\Core\Model\ListModel;
 

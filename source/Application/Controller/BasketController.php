@@ -21,16 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxArticle;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxList;
-use oxBasketContentMarkGenerator;
-use oxBasket;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -82,7 +78,7 @@ class BasketController extends FrontendController
      * First basket product object. It is used to load
      * recommendation list info and similar product list
      *
-     * @var oxArticle
+     * @var Article
      */
     protected $_oFirstBasketProduct = null;
 
@@ -96,14 +92,14 @@ class BasketController extends FrontendController
     /**
      * Wrapping objects list
      *
-     * @var oxList
+     * @var ListModel
      */
     protected $_oWrappings = null;
 
     /**
      * Card objects list
      *
-     * @var oxList
+     * @var ListModel
      */
     protected $_oCards = null;
 
@@ -410,7 +406,7 @@ class BasketController extends FrontendController
     public function getBasketContentMarkGenerator()
     {
         /** @var BasketContentMarkGenerator $oBasketContentMarkGenerator */
-        return oxNew('oxBasketContentMarkGenerator', $this->getSession()->getBasket());
+        return oxNew(BasketContentMarkGenerator::class, $this->getSession()->getBasket());
     }
 
     /**

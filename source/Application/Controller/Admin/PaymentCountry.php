@@ -27,7 +27,6 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
-use oxField;
 
 /**
  * Admin article main payment manager.

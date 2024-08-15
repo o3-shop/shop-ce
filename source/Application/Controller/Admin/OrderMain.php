@@ -28,9 +28,6 @@ use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
-use oxUtilsDate;
-use oxField;
-use oxPaymentList;
 
 /**
  * Admin article main order manager.

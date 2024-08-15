@@ -27,7 +27,6 @@ use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 use stdClass;
 
 /**
@@ -411,7 +410,7 @@ class DynamicExportBaseController extends AdminDetailsController
      *
      * @param Article $oArticle Article object
      *
-     * @return record set
+     * @return array
      */
     public function getDefaultCategoryString($oArticle)
     {

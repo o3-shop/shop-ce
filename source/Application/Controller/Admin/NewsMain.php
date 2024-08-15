@@ -26,7 +26,6 @@ use OxidEsales\Eshop\Application\Model\News;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
-use oxField;
 
 /**
  * Admin article main news manager.

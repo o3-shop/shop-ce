@@ -30,10 +30,6 @@ use OxidEsales\Eshop\Application\Model\Review;
 use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxrecommlist;
-use oxUBase;
-use oxRssFeed;
-use oxField;
 
 /**
  * Article suggestion page.
@@ -61,7 +57,7 @@ class RecommListController extends ArticleListController
     /**
      * Other recommendations list
      *
-     * @var oxrecommlist
+     * @var RecommendationList
      */
     protected $_oOtherRecommList = null;
 

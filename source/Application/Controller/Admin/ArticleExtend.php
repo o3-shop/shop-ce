@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxArticle;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleBundleAjax;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax;
@@ -31,8 +30,6 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
 use stdClass;
 use Exception;
 
@@ -273,9 +270,9 @@ class ArticleExtend extends AdminDetailsController
     /**
      * Method used to overload and update article.
      *
-     * @param oxArticle $article
+     * @param Article $article
      *
-     * @return oxArticle
+     * @return Article
      */
     protected function updateArticle($article)
     {

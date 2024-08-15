@@ -28,8 +28,6 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxException;
 
 /**
  * Admin article main shop manager.

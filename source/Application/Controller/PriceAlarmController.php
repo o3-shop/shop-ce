@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\PriceAlarm;

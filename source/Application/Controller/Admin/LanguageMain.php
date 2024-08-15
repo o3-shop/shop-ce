@@ -28,12 +28,8 @@ use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
-use Doctrine\DBAL\Exception\ConnectionException;
-use oxDb;
-use oxNoJsValidator;
 use Exception;
 use PDOException;
-use PHPUnit\Framework\Constraint\IsInstanceOf;
 
 /**
  * Admin article main selectlist manager.

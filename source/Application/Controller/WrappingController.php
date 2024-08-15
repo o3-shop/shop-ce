@@ -25,8 +25,6 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxList;
-use oxUBase;
 
 /**
  * Managing Gift Wrapping
@@ -50,14 +48,14 @@ class WrappingController extends FrontendController
     /**
      * Wrapping objects list
      *
-     * @var oxlist
+     * @var ListModel
      */
     protected $_oWrappings = null;
 
     /**
      * Card objects list
      *
-     * @var oxlist
+     * @var ListModel
      */
     protected $_oCards = null;
 
@@ -83,7 +81,7 @@ class WrappingController extends FrontendController
     /**
      * Return basket wrappings list if available
      *
-     * @return oxlist
+     * @return ListModel
      */
     public function getWrappingList()
     {
@@ -102,7 +100,7 @@ class WrappingController extends FrontendController
     /**
      * Returns greeting cards list if available
      *
-     * @return oxlist
+     * @return ListModel
      */
     public function getCardList()
     {

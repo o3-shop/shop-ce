@@ -126,7 +126,7 @@ class MoreDetailsController extends ArticleDetailsController
     /**
      * Template variable getter. Returns active product
      *
-     * @return oxArticle
+     * @return Article
      */
     public function getProduct()
     {

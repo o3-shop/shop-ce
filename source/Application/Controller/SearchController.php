@@ -25,8 +25,6 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Application\Model\Search;
 use OxidEsales\Eshop\Core\Registry;
-use oxUBase;
-use oxSearch;
 
 /**
  * Articles searching class.

@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
 use OxidEsales\Eshop\Application\Controller\ArticleDetailsController;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Rating;
@@ -30,8 +29,6 @@ use OxidEsales\Eshop\Application\Model\Review;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxUBase;
-use oxUser;
 
 /**
  * Review of chosen article.
@@ -42,7 +39,7 @@ class ReviewController extends ArticleDetailsController
     /**
      * Review user object
      *
-     * @var oxuser
+     * @var User
      */
     protected $_oRevUser = null;
 
@@ -338,7 +335,7 @@ class ReviewController extends ArticleDetailsController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return oxRecommList
+     * @return RecommendationList
      */
     public function getActiveRecommList()
     {

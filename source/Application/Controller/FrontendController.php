@@ -21,13 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxActionList;
-use oxAddress;
-use oxArticle;
-use oxCategory;
-use oxCategoryList;
-use oxContent;
-use oxDb;
 use OxidEsales\Eshop\Application\Controller\CompareController;
 use OxidEsales\Eshop\Application\Model\ActionList;
 use OxidEsales\Eshop\Application\Model\Address;
@@ -48,17 +41,9 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
-use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\ViewConfig;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Core\SortingValidator;
-use oxManufacturer;
-use oxManufacturerList;
-use oxPrice;
-use oxRecommList;
-use oxShop;
-use oxVendor;
-use oxViewConfig;
 use stdClass;
 
 // view indexing state for search engines:
@@ -148,7 +133,7 @@ class FrontendController extends BaseController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @var oxRecommList
+     * @var RecommendationList
      */
     protected $_oActiveRecommList = null;
 
@@ -1867,7 +1852,7 @@ class FrontendController extends BaseController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return oxRecommList
+     * @return RecommendationList
      */
     public function getActiveRecommList()
     {
@@ -2412,7 +2397,7 @@ class FrontendController extends BaseController
      * Template variable getter. Returns if order price is lower than
      * minimum order price setup (config param "iMinOrderPrice")
      *
-     * @deprecated in v4.8/5.1 on 2013-10-14; use oxBasket method
+     * @deprecated in v4.8/5.1 on 2013-10-14; use Basket method
      *
      * @return bool
      */
@@ -2428,7 +2413,7 @@ class FrontendController extends BaseController
     /**
      * Template variable getter. Returns formatted min order price value
      *
-     * @deprecated in v4.8/5.1 on 2013-10-14; use oxBasket method
+     * @deprecated in v4.8/5.1 on 2013-10-14; use Basket method
      *
      * @return string
      */
@@ -2692,7 +2677,7 @@ class FrontendController extends BaseController
     /**
      * return last finished promotion list
      *
-     * @return oxActionList
+     * @return ActionList
      */
     public function getPromoFinishedList()
     {
@@ -2708,7 +2693,7 @@ class FrontendController extends BaseController
     /**
      * return current promotion list
      *
-     * @return oxActionList
+     * @return ActionList
      */
     public function getPromoCurrentList()
     {
@@ -2724,7 +2709,7 @@ class FrontendController extends BaseController
     /**
      * return future promotion list
      *
-     * @return oxActionList
+     * @return ActionList
      */
     public function getPromoFutureList()
     {

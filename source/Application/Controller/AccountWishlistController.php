@@ -28,7 +28,6 @@ use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
 
 /**
  * Current user wishlist manager.
@@ -58,21 +57,21 @@ class AccountWishlistController extends AccountController
     /**
      * Wheter the var is false the wishlist will be shown
      *
-     * @var wishlist
+     * @var UserBasket
      */
     protected $_oWishList = null;
 
     /**
      * list the wishlist items
      *
-     * @var wishlist
+     * @var UserBasket
      */
     protected $_aRecommList = null;
 
     /**
      * Wheter the var is false the productlist will not be list
      *
-     * @var wishlist
+     * @var UserBasket
      */
     protected $_oEditval = null;
 

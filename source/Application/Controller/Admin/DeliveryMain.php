@@ -27,7 +27,6 @@ use OxidEsales\Eshop\Application\Model\Delivery;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
-use oxField;
 
 /**
  * Admin article main delivery manager.

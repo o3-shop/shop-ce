@@ -21,11 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxArticle;
-use oxArticleList;
-use oxCategory;
-use oxDeliveryList;
-use oxDeliverySetList;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
@@ -42,9 +37,6 @@ use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
-use oxPaymentList;
-use oxField;
-use oxVariantSelectList;
 
 /**
  * Article details information page.
@@ -766,7 +758,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Template variable getter. Returns list of customer also bought these products
      *
-     * @return oxArticleList|null
+     * @return object|null
      */
     public function getAlsoBoughtTheseProducts()
     {
@@ -986,7 +978,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Returns variant selection
      *
-     * @return oxVariantSelectList
+     * @return array
      */
     public function getVariantSelections()
     {
@@ -1148,7 +1140,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Gets accepted payment methods
      *
-     * @return oxPaymentList
+     * @return PaymentList
      */
     public function getRDFaPaymentMethods()
     {
@@ -1162,7 +1154,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Returns delivery methods with assigned delivery sets.
      *
-     * @return oxDeliverySetList
+     * @return DeliverySetList
      */
     public function getRDFaDeliverySetMethods()
     {
@@ -1175,7 +1167,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Template variable getter. Returns delivery list for current product
      *
-     * @return oxDeliveryList
+     * @return DeliveryList
      */
     public function getProductsDeliveryList()
     {

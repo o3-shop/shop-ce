@@ -28,18 +28,10 @@ use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
 use OxidEsales\Eshop\Core\UtilsFile;
 use OxidEsales\Eshop\Core\UtilsPic;
 use OxidEsales\Eshop\Core\UtilsView;
 use stdClass;
-use oxCategory;
-use oxUtilsPic;
-use oxUtilsFile;
-use oxExceptionToDisplay;
-use oxDbMetaDataHandler;
-use oxUtilsView;
-use category_main_ajax;
 
 /**
  * Admin article main categories manager.

@@ -29,7 +29,6 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 
 /**
  * Admin article review manager.
@@ -96,7 +95,7 @@ class ArticleReview extends AdminDetailsController
      *
      * @param Article $article Article object
      *
-     * @return oxList
+     * @return ListModel
      * @deprecated underscore prefix violates PSR12, will be renamed to "getReviewList" in next major
      */
     protected function _getReviewList($article) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

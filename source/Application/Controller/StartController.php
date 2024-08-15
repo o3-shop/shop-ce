@@ -26,7 +26,6 @@ use OxidEsales\Eshop\Application\Model\ActionList;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Core\Registry;
-use oxUBase;
 
 /**
  * Starting shop page.

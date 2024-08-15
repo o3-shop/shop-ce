@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxArticleList;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\ArticleList;
@@ -29,7 +28,6 @@ use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\RssFeed;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 
 /**
  * List of articles for a selected product group.
@@ -177,8 +175,8 @@ class ArticleListController extends FrontendController
     /**
      * Executes parent::render(), loads active category, prepares article
      * list sorting rules. According to category type loads list of
-     * articles - regular (oxArticleList::LoadCategoryArticles()) or price
-     * dependent (oxArticleList::LoadPriceArticles()). Generates page navigation data
+     * articles - regular (ArticleList::LoadCategoryArticles()) or price
+     * dependent (ArticleList::LoadPriceArticles()). Generates page navigation data
      * such as previous/next window URL, number of available pages, generates
      * meta tags info (FrontendController::_convertForMetaTags()) and returns
      * name of template to render. Also checks if actual pages count does not exceed real
@@ -383,7 +381,7 @@ class ArticleListController extends FrontendController
      *
      * @param Category $category category object
      *
-     * @return oxArticleList
+     * @return ArticleList
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadArticles" in next major
      */
     protected function _loadArticles($category) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -843,7 +841,7 @@ class ArticleListController extends FrontendController
     /**
      * Template variable getter. Returns category's article list
      *
-     * @return oxArticleList|null
+     * @return ArticleList|null
      */
     public function getArticleList()
     {

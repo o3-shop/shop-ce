@@ -25,9 +25,6 @@ use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use oxConfig;
-use oxAdminDetails;
-use oxException;
 use OxidEsales\Eshop\Core\Theme;
 
 /**
@@ -101,7 +98,7 @@ class ThemeConfiguration extends ShopConfiguration
     {
         $myConfig = Registry::getConfig();
 
-        oxAdminDetails::save();
+        AdminDetailsController::save();
 
         $sShopId = $myConfig->getShopId();
 

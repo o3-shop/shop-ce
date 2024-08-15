@@ -146,7 +146,7 @@ class UserPayment extends AdminDetailsController
     /**
      * Returns selected user
      *
-     * @return oxUser
+     * @return User
      */
     public function getUser()
     {
