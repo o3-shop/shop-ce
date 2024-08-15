@@ -50,7 +50,7 @@ class RecommendationAddController extends ArticleDetailsController
     /**
      * Renders the view
      *
-     * @return unknown
+     * @return string
      */
     public function render()
     {

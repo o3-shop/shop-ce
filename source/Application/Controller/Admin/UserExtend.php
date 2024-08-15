@@ -68,7 +68,7 @@ class UserExtend extends AdminDetailsController
     /**
      * Saves user extended information.
      *
-     * @return mixed
+     * @return bool|void
      */
     public function save()
     {

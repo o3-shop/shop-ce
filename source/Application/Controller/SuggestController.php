@@ -78,7 +78,7 @@ class SuggestController extends FrontendController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @var object
+     * @var array
      */
     protected $_aSuggestData = null;
 
@@ -98,7 +98,7 @@ class SuggestController extends FrontendController
      * Template variables:
      * <b>editval</b>, <b>error</b>
      *
-     * @return  null
+     * @return string|void
      */
     public function send()
     {
@@ -226,7 +226,7 @@ class SuggestController extends FrontendController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
+     * @return array|bool
      */
     public function getRecommList()
     {
@@ -268,13 +268,13 @@ class SuggestController extends FrontendController
     /**
      * get link of current view
      *
-     * @param int $iLang requested language
+     * @param int $languageId requested language
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function getLink($languageId = null)
     {
-        $sLink = parent::getLink($iLang);
+        $sLink = parent::getLink($languageId);
 
         // active category
         if ($sVal = Registry::getRequest()->getRequestEscapedParameter('cnid')) {

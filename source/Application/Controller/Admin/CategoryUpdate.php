@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Application\Model\CategoryList;
 
@@ -47,6 +48,7 @@ class CategoryUpdate extends AdminController
      * Returns category list object
      *
      * @return CategoryList
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
      */
     protected function _getCategoryList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -63,6 +65,7 @@ class CategoryUpdate extends AdminController
      * Returns category list object
      *
      * @return array
+     * @throws Exception
      */
     public function getCatListUpdateInfo()
     {

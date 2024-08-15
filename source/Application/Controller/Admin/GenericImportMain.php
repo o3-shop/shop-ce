@@ -302,7 +302,7 @@ class GenericImportMain extends AdminDetailsController
      * Checks if CSV file was uploaded. If uploaded - moves it to temp dir
      * and stores path to file in session. Return path to uploaded file.
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUploadedCsvFilePath" in next major
      */
     protected function _getUploadedCsvFilePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

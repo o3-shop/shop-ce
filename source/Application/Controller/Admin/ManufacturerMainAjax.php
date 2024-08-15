@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -68,6 +69,7 @@ class ManufacturerMainAjax extends ListComponentAjax
      * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -105,16 +107,16 @@ class ManufacturerMainAjax extends ListComponentAjax
     /**
      * Adds filter SQL to current query
      *
-     * @param string $query query to add filter condition
+     * @param string $sQ query to add filter condition
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
-    protected function _addFilter($query) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $config = Registry::getConfig();
         $articleViewName = $this->_getViewName('oxarticles');
-        $query = parent::_addFilter($query);
+        $query = parent::_addFilter($sQ);
 
         // display variants or not ?
         $query .= $config->getConfigParam('blVariantsSelection') ? ' group by ' . $articleViewName . '.oxid ' : '';
@@ -149,6 +151,7 @@ class ManufacturerMainAjax extends ListComponentAjax
      * @param array $articlesToRemove Ids of manufacturers which should be removed.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formManufacturerRemovalQuery($articlesToRemove)
     {
@@ -186,9 +189,10 @@ class ManufacturerMainAjax extends ListComponentAjax
      * Forms and returns query for articles addition to manufacturer.
      *
      * @param string $manufacturerId Manufacturer id.
-     * @param array  $articlesToAdd  Array of article ids to be added to manufacturer.
+     * @param array $articlesToAdd Array of article ids to be added to manufacturer.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formArticleToManufacturerAdditionQuery($manufacturerId, $articlesToAdd)
     {

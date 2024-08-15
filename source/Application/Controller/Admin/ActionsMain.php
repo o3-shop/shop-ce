@@ -179,11 +179,9 @@ class ActionsMain extends AdminDetailsController
      */
     private function getActionFormData()
     {
-        $request    = oxNew(Request::class);
-        $formData   = $request->getRequestEscapedParameter('editval');
-        $formData   = $this->normalizeActionFormData($formData);
-
-        return $formData;
+        $request = oxNew(Request::class);
+        $formData = $request->getRequestEscapedParameter('editval');
+        return $this->normalizeActionFormData($formData);
     }
 
     /**

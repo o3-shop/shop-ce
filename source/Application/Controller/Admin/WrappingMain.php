@@ -82,7 +82,7 @@ class WrappingMain extends AdminDetailsController
     /**
      * Saves main wrapping parameters.
      *
-     * @return null
+     * @return void
      */
     public function save()
     {
@@ -126,7 +126,7 @@ class WrappingMain extends AdminDetailsController
     /**
      * Saves main wrapping parameters.
      *
-     * @return null
+     * @return void
      */
     public function saveinnlang()
     {

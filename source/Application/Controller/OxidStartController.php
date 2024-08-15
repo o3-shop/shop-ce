@@ -33,7 +33,7 @@ class OxidStartController extends FrontendController
     /**
      * Initializes globals and environment vars
      *
-     * @return null
+     * @return void
      */
     public function appInit()
     {

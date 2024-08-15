@@ -269,7 +269,7 @@ class RssController extends FrontendController
     /**
      * Returns if view should be cached
      *
-     * @return bool
+     * @return int
      */
     public function getCacheLifeTime()
     {

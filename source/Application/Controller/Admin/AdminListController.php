@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
@@ -137,6 +138,7 @@ class AdminListController extends AdminController
      * Returns sorting fields array
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {
@@ -227,6 +229,7 @@ class AdminListController extends AdminController
      * Executes parent::render(), sets back search keys to view, sets navigation params
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -244,7 +247,7 @@ class AdminListController extends AdminController
     /**
      * Deletes this entry from the database
      *
-     * @return null
+     * @return void
      */
     public function deleteEntry()
     {
@@ -271,6 +274,7 @@ class AdminListController extends AdminController
      * Calculates list items count
      *
      * @param string $sql SQL query used co select list items
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcListItemsCount" in next major
      */
     protected function _calcListItemsCount($sql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -317,9 +321,10 @@ class AdminListController extends AdminController
     /**
      * Adds order by to SQL query string.
      *
-     * @param string $query sql string
+     * @param null $query sql string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareOrderByQuery" in next major
      */
     protected function _prepareOrderByQuery($query = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -396,10 +401,11 @@ class AdminListController extends AdminController
     /**
      * Builds part of SQL query
      *
-     * @param string $value         filter value
-     * @param bool   $isSearchValue filter value type, true means surround search key with '%'
+     * @param string $value filter value
+     * @param bool $isSearchValue filter value type, true means surround search key with '%'
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildFilter" in next major
      */
     protected function _buildFilter($value, $isSearchValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -433,10 +439,11 @@ class AdminListController extends AdminController
      * For each search value if german umlauts exist, adds them
      * and replaced by spec. char to query
      *
-     * @param array  $whereQuery SQL condition array
-     * @param string $fullQuery  SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -508,10 +515,11 @@ class AdminListController extends AdminController
      * Builds and returns array of SQL WHERE conditions.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {
-        if ($this->_aWhere === null && ($list = $this->getItemList())) {
+        if ($this->_aWhere === null && ($this->getItemList())) {
             $this->_aWhere = [];
             $filter = $this->getListFilter();
             if (is_array($filter)) {
@@ -684,11 +692,11 @@ class AdminListController extends AdminController
 
             $position = $this->_iCurrListPos + $adminListSize;
             if ($position < $this->_iListSize) {
-                $pageNavigation->nextlink = $position = $this->_iCurrListPos + $adminListSize;
+                $pageNavigation->nextlink = $this->_iCurrListPos + $adminListSize;
             }
 
             if (($this->_iCurrListPos - $adminListSize) >= 0) {
-                $pageNavigation->backlink = $position = $this->_iCurrListPos - $adminListSize;
+                $pageNavigation->backlink = $this->_iCurrListPos - $adminListSize;
             }
 
             // calculating list start position
@@ -748,13 +756,13 @@ class AdminListController extends AdminController
     /**
      * Sets-up navigation parameters
      *
-     * @param string $node active view id
+     * @param string $sNode active view id
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
-    protected function _setupNavigation($node) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // navigation according to class
-        if ($node) {
+        if ($sNode) {
             $adminNavigation = $this->getNavigation();
 
             $objectId = $this->getEditObjectId();
@@ -769,13 +777,13 @@ class AdminListController extends AdminController
             }
 
             // tabs
-            $this->_aViewData['editnavi'] = $adminNavigation->getTabs($node, $activeTab);
+            $this->_aViewData['editnavi'] = $adminNavigation->getTabs($sNode, $activeTab);
 
             // active tab
-            $this->_aViewData['actlocation'] = $adminNavigation->getActiveTab($node, $activeTab);
+            $this->_aViewData['actlocation'] = $adminNavigation->getActiveTab($sNode, $activeTab);
 
             // default tab
-            $this->_aViewData['default_edit'] = $adminNavigation->getActiveTab($node, $this->_iDefEdit);
+            $this->_aViewData['default_edit'] = $adminNavigation->getActiveTab($sNode, $this->_iDefEdit);
 
             // assign active tab number
             $this->_aViewData['actedit'] = $activeTab;
@@ -786,6 +794,7 @@ class AdminListController extends AdminController
      * Returns items list
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getItemList()
     {
@@ -844,6 +853,7 @@ class AdminListController extends AdminController
      * Returns item list base object
      *
      * @return Base|null
+     * @throws DatabaseConnectionException
      */
     public function getItemListBaseObject()
     {

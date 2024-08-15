@@ -86,7 +86,7 @@ class LoginController extends AdminController
 
         // setting templates language to selected language id
         foreach ($aLanguages as $iKey => $oLang) {
-            if ($aLanguages[$iKey]->selected) {
+            if ($oLang->selected) {
                 Registry::getLang()->setTplLanguage($iKey);
                 break;
             }
@@ -110,7 +110,7 @@ class LoginController extends AdminController
     /**
      * Checks user login data, on success returns "admin_start".
      *
-     * @return mixed
+     * @return string|void
      */
     public function checklogin()
     {
@@ -155,7 +155,7 @@ class LoginController extends AdminController
 
         //execute onAdminLogin() event
         $oEvenHandler = oxNew(SystemEventHandler::class);
-        $oEvenHandler->onAdminLogin(Registry::getConfig()->getShopId());
+        $oEvenHandler->onAdminLogin();
 
         // #533
         if (isset($sProfile)) {

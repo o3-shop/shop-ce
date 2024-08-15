@@ -29,6 +29,8 @@ use OxidEsales\Eshop\Application\Model\SeoEncoderArticle;
 use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
 use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -55,6 +57,8 @@ class ArticleSeo extends ObjectSeo
      * Returns active selection type - oxcategory, oxmanufacturer, oxvendor
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActCatType()
     {
@@ -76,6 +80,8 @@ class ArticleSeo extends ObjectSeo
      * Returns active category (manufacturer/vendor) language id
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActCatLang()
     {
@@ -102,6 +108,8 @@ class ArticleSeo extends ObjectSeo
      * Returns active category (manufacturer/vendor) id
      *
      * @return false|string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActCatId()
     {
@@ -127,6 +135,8 @@ class ArticleSeo extends ObjectSeo
      * Returns product selections array [type][language] (categories, vendors etc. assigned)
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getSelectionList()
     {
@@ -158,6 +168,8 @@ class ArticleSeo extends ObjectSeo
      * @param Article $oArticle Article object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
      */
     protected function _getCategoryList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -180,7 +192,7 @@ class ArticleSeo extends ObjectSeo
         $oRs = $oDb->select($sQ, [
             ':oxobjectid' => $oArticle->getId()
         ]);
-        if ($oRs != false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $oCat = oxNew(Category::class);
                 if ($oCat->loadInLang($iLang, current($oRs->fields))) {
@@ -204,7 +216,9 @@ class ArticleSeo extends ObjectSeo
      *
      * @param Article $oArticle Article object
      *
-     * @return array
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVendorList" in next major
      */
     protected function _getVendorList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -222,7 +236,9 @@ class ArticleSeo extends ObjectSeo
      *
      * @param Article $oArticle Article object
      *
-     * @return array
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturerList" in next major
      */
     protected function _getManufacturerList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -239,6 +255,8 @@ class ArticleSeo extends ObjectSeo
      * Returns active category object, used for seo url getter
      *
      * @return Category | null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActCategory()
     {
@@ -251,6 +269,8 @@ class ArticleSeo extends ObjectSeo
      * Returns active vendor object if available
      *
      * @return Vendor | null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActVendor()
     {
@@ -263,6 +283,8 @@ class ArticleSeo extends ObjectSeo
      * Returns active manufacturer object if available
      *
      * @return Manufacturer | null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActManufacturer()
     {
@@ -275,7 +297,9 @@ class ArticleSeo extends ObjectSeo
     /**
      * Returns list type for current seo url
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getListType()
     {
@@ -291,6 +315,8 @@ class ArticleSeo extends ObjectSeo
      * Returns editable object language id
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getEditLang()
     {
@@ -325,6 +351,8 @@ class ArticleSeo extends ObjectSeo
      * @param string $sParam parameter to process
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function processParam($sParam)
     {
@@ -345,7 +373,9 @@ class ArticleSeo extends ObjectSeo
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getEntryUri()
     {
@@ -395,11 +425,11 @@ class ArticleSeo extends ObjectSeo
      * Returns TRUE if current seo entry has fixed state
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function isEntryFixed()
     {
-        $oDb = DatabaseProvider::getDb();
-
         $sId = $this->_getSaveObjectId();
         $iLang = (int) $this->getEditLang();
         $iShopId = Registry::getConfig()->getShopId();

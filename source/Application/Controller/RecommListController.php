@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\ArticleListController;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Category;
@@ -211,7 +212,8 @@ class RecommListController extends ArticleListController
     /**
      * Saves user ratings and review text (oxreview object)
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveReview()
     {
@@ -498,25 +500,25 @@ class RecommListController extends ArticleListController
     /**
      * Adds page number parameter to current Url and returns formatted url
      *
-     * @param string $sUrl  url to append page numbers
-     * @param int    $iPage current page number
-     * @param int    $iLang requested language
+     * @param string $url  url to append page numbers
+     * @param int    $currentPage current page number
+     * @param int    $languageId requested language
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
-    protected function _addPageNrParam($sUrl, $iPage, $iLang = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addPageNrParam($url, $currentPage, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (Registry::getUtils()->seoIsActive() && ($oRecomm = $this->getActiveRecommList())) {
-            if ($iPage) {
+            if ($currentPage) {
                 // only if page number > 0
-                $sUrl = $oRecomm->getBaseSeoLink($iLang, $iPage);
+                $url = $oRecomm->getBaseSeoLink($languageId, $currentPage);
             }
         } else {
-            $sUrl = FrontendController::_addPageNrParam($sUrl, $iPage, $iLang);
+            $url = FrontendController::_addPageNrParam($url, $currentPage, $languageId);
         }
 
-        return $sUrl;
+        return $url;
     }
 
     /**
@@ -542,16 +544,16 @@ class RecommListController extends ArticleListController
     /**
      * get link of current view
      *
-     * @param int $iLang requested language
+     * @param int $languageId requested language
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function getLink($languageId = null)
     {
         if ($oRecomm = $this->getActiveRecommList()) {
-            $sLink = $oRecomm->getLink($iLang);
+            $sLink = $oRecomm->getLink($languageId);
         } else {
-            $sLink = FrontendController::getLink($iLang);
+            $sLink = FrontendController::getLink($languageId);
         }
         $sSearch = Registry::getRequest()->getRequestEscapedParameter('searchrecomm');
         if ($sSearch) {

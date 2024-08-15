@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Links;
 use OxidEsales\Eshop\Core\Registry;
@@ -87,7 +88,8 @@ class AdminlinksMain extends AdminDetailsController
     /**
      * Saves information about link (active, date, URL, description, etc.) to DB.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -146,7 +148,8 @@ class AdminlinksMain extends AdminDetailsController
     /**
      * Saves link description in different languages (eg. english).
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveinnlang()
     {

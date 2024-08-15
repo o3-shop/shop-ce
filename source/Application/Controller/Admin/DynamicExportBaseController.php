@@ -25,6 +25,8 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -82,7 +84,7 @@ class DynamicExportBaseController extends AdminDetailsController
     /**
      * Export file resource
      *
-     * @var object
+     * @var resource
      */
     public $fpFile = null;
 
@@ -205,6 +207,8 @@ class DynamicExportBaseController extends AdminDetailsController
      * Stops Export
      *
      * @param integer $iError error number
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function stop($iError = 0)
     {
@@ -356,10 +360,12 @@ class DynamicExportBaseController extends AdminDetailsController
     /**
      * Loads all article parent categories and returns titles separated by "/"
      *
-     * @param object $oArticle   Article object
+     * @param object $oArticle Article object
      * @param string $sSeparator separator (default "/")
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryString($oArticle, $sSeparator = "/")
     {
@@ -378,7 +384,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $oRs = $oDB->select($sQ, [
             ':oxobjectid' => $oArticle->getId()
         ]);
-        if ($oRs != false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             $sLeft = $oRs->fields[0];
             $sRight = $oRs->fields[1];
             $sRootId = $oRs->fields[2];
@@ -391,7 +397,7 @@ class DynamicExportBaseController extends AdminDetailsController
                 ':oxleft' => $sLeft,
                 ':oxrootid' => $sRootId
             ]);
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     if ($sCatStr) {
                         $sCatStr .= $sSeparator;
@@ -410,7 +416,8 @@ class DynamicExportBaseController extends AdminDetailsController
      *
      * @param Article $oArticle Article object
      *
-     * @return array
+     * @return string
+     * @throws DatabaseConnectionException
      */
     public function getDefaultCategoryString($oArticle)
     {
@@ -467,6 +474,8 @@ class DynamicExportBaseController extends AdminDetailsController
      * @param Article $oArticle article object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDeepestCategoryPath($oArticle)
     {
@@ -476,7 +485,9 @@ class DynamicExportBaseController extends AdminDetailsController
     /**
      * create export resultset
      *
-     * @return int
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function prepareExport()
     {
@@ -509,10 +520,12 @@ class DynamicExportBaseController extends AdminDetailsController
     /**
      * gets one oxid for exporting
      *
-     * @param integer $iCnt       counter
-     * @param bool    $blContinue false is used to stop exporting
+     * @param integer $iCnt counter
+     * @param bool $blContinue false is used to stop exporting
      *
-     * @return mixed
+     * @return Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getOneArticle($iCnt, &$blContinue)
     {
@@ -590,6 +603,8 @@ class DynamicExportBaseController extends AdminDetailsController
      * @param string $sMysqlVersion MySql version
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateTableCharSet" in next major
      */
     protected function _generateTableCharSet($sMysqlVersion) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -614,10 +629,12 @@ class DynamicExportBaseController extends AdminDetailsController
     /**
      * creates heap-table
      *
-     * @param string $sHeapTable    table name
+     * @param string $sHeapTable table name
      * @param string $sTableCharset table charset
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createHeapTable" in next major
      */
     protected function _createHeapTable($sHeapTable, $sTableCharset) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -639,6 +656,7 @@ class DynamicExportBaseController extends AdminDetailsController
      * @param array $aChosenCat Selected category array
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCatAdd" in next major
      */
     protected function _getCatAdd($aChosenCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -665,9 +683,11 @@ class DynamicExportBaseController extends AdminDetailsController
      * inserts articles into heap-table
      *
      * @param string $sHeapTable heap table name
-     * @param string $sCatAdd    category id filter (part of sql)
+     * @param string $sCatAdd category id filter (part of sql)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "insertArticles" in next major
      */
     protected function _insertArticles($sHeapTable, $sCatAdd) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -713,13 +733,15 @@ class DynamicExportBaseController extends AdminDetailsController
 
         $insertQuery .= " group by {$sArticleTable}.oxid";
 
-        return $oDB->execute($insertQuery) ? true : false;
+        return (bool)$oDB->execute($insertQuery);
     }
 
     /**
      * removes parent articles so that we only have variants itself
      *
      * @param string $sHeapTable table name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "removeParentArticles" in next major
      */
     protected function _removeParentArticles($sHeapTable) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -735,7 +757,7 @@ class DynamicExportBaseController extends AdminDetailsController
             $oRs = $oDB->select($sQ);
             $sDel = "delete from $sHeapTable where oxid in ( ";
             $blSep = false;
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     if ($blSep) {
                         $sDel .= ",";
@@ -801,6 +823,8 @@ class DynamicExportBaseController extends AdminDetailsController
      * Load all root cat's == all trees
      *
      * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadRootCats" in next major
      */
     protected function _loadRootCats() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -814,7 +838,7 @@ class DynamicExportBaseController extends AdminDetailsController
             // Load all root cat's == all trees
             $sSQL = "select oxid from $sCatView where oxparentid = 'oxrootid'";
             $oRs = $oDb->select($sSQL);
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     // now load each tree
                     $sSQL = "SELECT s.oxid, s.oxtitle,
@@ -826,7 +850,7 @@ class DynamicExportBaseController extends AdminDetailsController
                     $oRs2 = $oDb->select($sSQL, [
                         ':oxrootid' => $oRs->fields[0]
                     ]);
-                    if ($oRs2 != false && $oRs2->count() > 0) {
+                    if ($oRs2 && $oRs2->count() > 0) {
                         while (!$oRs2->EOF) {
                             // store it
                             $oCat = new stdClass();
@@ -853,6 +877,8 @@ class DynamicExportBaseController extends AdminDetailsController
      * @param Article $oArticle article object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "findDeepestCatPath" in next major
      */
     protected function _findDeepestCatPath($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -891,16 +917,18 @@ class DynamicExportBaseController extends AdminDetailsController
      * initialize article
      *
      * @param string $sHeapTable heap table name
-     * @param int    $iCnt       record number
-     * @param bool   $blContinue false is used to stop exporting
+     * @param int $iCnt record number
+     * @param bool $blContinue false is used to stop exporting
      *
-     * @return object
+     * @return Article|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "initArticle" in next major
      */
     protected function _initArticle($sHeapTable, $iCnt, &$blContinue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oRs = $this->getDb()->selectLimit("select oxid from $sHeapTable", 1, $iCnt);
-        if ($oRs != false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             $oArticle = oxNew(Article::class);
             $oArticle->setLoadParentData(true);
 
@@ -911,14 +939,12 @@ class DynamicExportBaseController extends AdminDetailsController
                 $blContinue = true;
                 // check price
                 $dMinPrice = Registry::getRequest()->getRequestEscapedParameter('sExportMinPrice');
-                if (!isset($dMinPrice) || (isset($dMinPrice) && ($oArticle->getPrice()->getBruttoPrice() >= $dMinPrice))) {
+                if (!isset($dMinPrice) || ($oArticle->getPrice()->getBruttoPrice() >= $dMinPrice)) {
                     //Saulius: variant title added
                     $sTitle = $oArticle->oxarticles__oxvarselect->value ? " " . $oArticle->oxarticles__oxvarselect->value : "";
                     $oArticle->oxarticles__oxtitle->setValue($oArticle->oxarticles__oxtitle->value . $sTitle);
 
-                    $oArticle = $this->updateArticle($oArticle);
-
-                    return $oArticle;
+                    return $this->updateArticle($oArticle);
                 }
             }
         }
@@ -930,6 +956,8 @@ class DynamicExportBaseController extends AdminDetailsController
      * @param Article $oArticle article object
      *
      * @return Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setCampaignDetailLink" in next major
      */
     protected function _setCampaignDetailLink($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -977,6 +1005,7 @@ class DynamicExportBaseController extends AdminDetailsController
      * Get the actual database.
      *
      * @return DatabaseInterface The database.
+     * @throws DatabaseConnectionException
      */
     protected function getDb()
     {

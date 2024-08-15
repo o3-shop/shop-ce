@@ -25,6 +25,8 @@ use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -63,6 +65,7 @@ class CategoryOrderAjax extends ListComponentAjax
      * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -95,6 +98,7 @@ class CategoryOrderAjax extends ListComponentAjax
      * Returns SQL query addon for sorting
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -168,7 +172,7 @@ class CategoryOrderAjax extends ListComponentAjax
         if (is_array($aAddArticle)) {
             // storing newly ordered article seq.
             foreach ($aAddArticle as $sAdd) {
-                if (array_search($sAdd, $aOrdArt) === false) {
+                if (!in_array($sAdd, $aOrdArt)) {
                     $aOrdArt[] = $sAdd;
                 }
             }
@@ -193,7 +197,8 @@ class CategoryOrderAjax extends ListComponentAjax
     /**
      * Saves category articles ordering.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
      */
     public function saveNewOrder()
     {
@@ -235,7 +240,9 @@ class CategoryOrderAjax extends ListComponentAjax
     /**
      * Removes category articles ordering set by saveneworder() method.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function remNewOrder()
     {

@@ -196,7 +196,7 @@ class AdminDetailsController extends AdminController
      * @param bool   $blForceNonCache Set to true to disable caching
      * @param int    $iTreeShopId     tree shop id
      *
-     * @return string
+     * @return object
      * @deprecated underscore prefix violates PSR12, will be renamed to "createCategoryTree" in next major
      */
     protected function _createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -368,8 +368,6 @@ class AdminDetailsController extends AdminController
      */
     protected function createTextEditorHandler()
     {
-        $textEditorHandler = oxNew(TextEditorHandler::class);
-
-        return $textEditorHandler;
+        return oxNew(TextEditorHandler::class);
     }
 }

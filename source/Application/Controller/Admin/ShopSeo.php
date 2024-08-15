@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -44,6 +46,8 @@ class ShopSeo extends ShopConfiguration
      * file "shop_system.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -77,6 +81,8 @@ class ShopSeo extends ShopConfiguration
      * Loads and sets active url info to view
      *
      * @param int $iShopId active shop id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadActiveUrl" in next major
      */
     protected function _loadActiveUrl($iShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -97,7 +103,7 @@ class ShopSeo extends ShopConfiguration
                 ':oxobjectid' => $sActObject,
                 ':oxshopid' => $iShopId
             ]);
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     $aSeoUrls[$oRs->fields['oxlang']] = [$sActObject, $oRs->fields['oxseourl']];
                     $oRs->fetchRow();
@@ -199,6 +205,8 @@ class ShopSeo extends ShopConfiguration
      * Deletes static url from DB.
      *
      * @param string $staticUrlId
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function deleteStaticUrlFromDb($staticUrlId)
     {

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain;
 use OxidEsales\Eshop\Application\Model\Voucher;
 use OxidEsales\Eshop\Application\Model\VoucherSerie;
@@ -74,6 +75,7 @@ class VoucherSerieGenerate extends VoucherSerieMain
      * @param integer $iCnt voucher offset
      *
      * @return bool
+     * @throws Exception
      */
     public function nextTick($iCnt)
     {
@@ -90,6 +92,7 @@ class VoucherSerieGenerate extends VoucherSerieMain
      * @param int $iCnt voucher counter offset
      *
      * @return int saved record count
+     * @throws Exception
      */
     public function generateVoucher($iCnt)
     {

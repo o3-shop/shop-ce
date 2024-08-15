@@ -65,7 +65,7 @@ class ModuleSortList extends AdminDetailsController
         $this->_aViewData["aDisabledModules"] = $oModuleList->getDisabledModuleClasses();
 
         // checking if there are any deleted extensions
-        if (Registry::getSession()->getVariable("blSkipDeletedExtChecking") == false) {
+        if (!Registry::getSession()->getVariable("blSkipDeletedExtChecking")) {
             $aDeletedExt = $oModuleList->getDeletedExtensions();
 
             if (!empty($aDeletedExt)) {
@@ -107,7 +107,7 @@ class ModuleSortList extends AdminDetailsController
     /**
      * Removes extension metadata from Shop
      *
-     * @return null
+     * @return void
      */
     public function remove()
     {

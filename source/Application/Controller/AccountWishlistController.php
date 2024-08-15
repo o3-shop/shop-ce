@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\UserBasket;
 use OxidEsales\Eshop\Application\Model\UserList;
@@ -218,7 +219,7 @@ class AccountWishlistController extends AccountController
     /**
      * Sends wishlist mail to recipient. On errors returns false.
      *
-     * @return bool
+     * @return bool|void
      */
     public function sendWishList()
     {
@@ -293,7 +294,8 @@ class AccountWishlistController extends AccountController
      * Changes wishlist status - public/non-public. Returns false on
      * error (if user is not logged in).
      *
-     * @return bool
+     * @return bool|void
+     * @throws Exception
      */
     public function togglePublic()
     {

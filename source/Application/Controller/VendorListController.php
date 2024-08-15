@@ -174,7 +174,7 @@ class VendorListController extends ArticleListController
     /**
      * Returns active product id to load its seo meta info
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -188,25 +188,25 @@ class VendorListController extends ArticleListController
      * Modifies url by adding page parameters. When seo is on, url is additionally
      * formatted by SEO engine
      *
-     * @param string $sUrl  current url
-     * @param int    $iPage page number
-     * @param int    $iLang active language id
+     * @param string $url  current url
+     * @param int    $currentPage page number
+     * @param int    $languageId active language id
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
-    protected function _addPageNrParam($sUrl, $iPage, $iLang = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addPageNrParam($url, $currentPage, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor())) {
-            if ($iPage) {
+            if ($currentPage) {
                 // only if page number > 0
-                $sUrl = $oVendor->getBaseSeoLink($iLang, $iPage);
+                $url = $oVendor->getBaseSeoLink($languageId, $currentPage);
             }
         } else {
-            $sUrl = FrontendController::_addPageNrParam($sUrl, $iPage, $iLang);
+            $url = FrontendController::_addPageNrParam($url, $currentPage, $languageId);
         }
 
-        return $sUrl;
+        return $url;
     }
 
     /**
@@ -302,7 +302,7 @@ class VendorListController extends ArticleListController
     /**
      * Template variable getter. Returns category path array
      *
-     * @return array
+     * @return array|void
      */
     public function getTreePath()
     {
@@ -331,7 +331,7 @@ class VendorListController extends ArticleListController
     {
         if ($this->_oActCategory === null) {
             $this->_oActCategory = false;
-            if (($this->_getVendorId() && $oVendorTree = $this->getVendorTree())) {
+            if (($this->_getVendorId() && $this->getVendorTree())) {
                 if ($oVendor = $this->getActVendor()) {
                     $this->_oActCategory = $oVendor;
                 }
@@ -361,7 +361,7 @@ class VendorListController extends ArticleListController
     /**
      * Returns title suffix used in template
      *
-     * @return string
+     * @return string|void
      */
     public function getTitleSuffix()
     {
@@ -374,43 +374,43 @@ class VendorListController extends ArticleListController
      * Returns current view keywords separated by comma
      * (calls parent::_collectMetaKeyword())
      *
-     * @param string $sKeywords               data to use as keywords
-     * @param bool   $blRemoveDuplicatedWords remove duplicated words
+     * @param string $keywords               data to use as keywords
+     * @param bool   $removeDuplicatedWords remove duplicated words
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return parent::_collectMetaKeyword($sKeywords);
+        return parent::_collectMetaKeyword($keywords);
     }
 
     /**
      * Returns current view meta description data
      * (calls parent::_collectMetaDescription())
      *
-     * @param string $sMeta     category path
-     * @param int    $iLength   max length of result, -1 for no truncation
-     * @param bool   $blDescTag if true - performs additional duplicate cleaning
+     * @param string $meta     category path
+     * @param int    $length   max length of result, -1 for no truncation
+     * @param bool   $descriptionTag if true - performs additional duplicate cleaning
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($sMeta, $iLength = 1024, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return parent::_collectMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::_collectMetaDescription($meta, $length, $descriptionTag);
     }
 
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
-     * @param int $iLang language id
+     * @param int $languageId language id
      *
      * @return object
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
-    protected function _getSubject($iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getActVendor();
     }
@@ -491,7 +491,7 @@ class VendorListController extends ArticleListController
      * Template variable getter. Returns array of attribute values
      * we do have here in this category
      *
-     * @return array
+     * @return array|null
      */
     public function getAttributes()
     {

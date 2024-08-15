@@ -93,7 +93,7 @@ class AccountNewsletterController extends AccountController
      * Removes or adds user to newsletter group according to
      * current subscription status. Returns true on success.
      *
-     * @return bool
+     * @return bool|void
      */
     public function subscribe()
     {

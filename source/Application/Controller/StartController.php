@@ -150,59 +150,59 @@ class StartController extends FrontendController
 
     /**
      * Returns current view metadata
-     * If $sMeta parameter comes empty, sets to it article title and description.
+     * If $meta parameter comes empty, sets to it article title and description.
      * It happens if current view has no metadata defined in oxcontent table
      *
-     * @param string $sMeta     category path
-     * @param int    $iLength   max length of result, -1 for no truncation
-     * @param bool   $blDescTag if true - performs additional duplicate cleaning
+     * @param string $meta     category path
+     * @param int    $length   max length of result, -1 for no truncation
+     * @param bool   $removeDuplicatedWords if true - performs additional duplicate cleaning
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($sMeta, $iLength = 1024, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (
-            !$sMeta &&
+            !$meta &&
             Registry::getConfig()->getConfigParam('bl_perfLoadAktion') &&
             $oArt = $this->getFirstArticle()
         ) {
             $oDescField = $oArt->getLongDescription();
-            $sMeta = $oArt->oxarticles__oxtitle->value . ' - ' . $oDescField->value;
+            $meta = $oArt->oxarticles__oxtitle->value . ' - ' . $oDescField->value;
         }
 
-        return parent::_prepareMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::_prepareMetaDescription($meta, $length, $removeDuplicatedWords);
     }
 
     /**
      * Returns current view keywords seperated by comma
-     * If $sKeywords parameter comes empty, sets to it article title and description.
+     * If $keywords parameter comes empty, sets to it article title and description.
      * It happens if current view has no metadata defined in oxcontent table
      *
-     * @param string $sKeywords               data to use as keywords
-     * @param bool   $blRemoveDuplicatedWords remove duplicated words
+     * @param string $keywords               data to use as keywords
+     * @param bool   $removeDuplicatedWords remove duplicated words
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (
-            !$sKeywords &&
+            !$keywords &&
             Registry::getConfig()->getConfigParam('bl_perfLoadAktion') &&
             $oArt = $this->getFirstArticle()
         ) {
             $oDescField = $oArt->getLongDescription();
-            $sKeywords = $oDescField->value;
+            $keywords = $oDescField->value;
         }
 
-        return parent::_prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords);
+        return parent::_prepareMetaKeyword($keywords, $removeDuplicatedWords);
     }
 
     /**
      * Template variable getter. Returns if actions are ON
      *
-     * @return string
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "getLoadActionsParam" in next major
      */
     protected function _getLoadActionsParam() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -359,7 +359,7 @@ class StartController extends FrontendController
     /**
      * Returns view canonical url
      *
-     * @return string
+     * @return string|void
      */
     public function getCanonicalUrl()
     {
@@ -372,7 +372,7 @@ class StartController extends FrontendController
     /**
      * Returns active banner list
      *
-     * @return objects
+     * @return ActionList
      */
     public function getBanners()
     {
@@ -389,7 +389,7 @@ class StartController extends FrontendController
     /**
      * Returns manufacturer list for manufacturer slider
      *
-     * @return objects
+     * @return array
      */
     public function getManufacturerForSlider()
     {

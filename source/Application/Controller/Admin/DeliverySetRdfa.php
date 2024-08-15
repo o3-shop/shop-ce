@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\PaymentRdfa;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -88,6 +90,8 @@ class DeliverySetRdfa extends PaymentRdfa
      * Returns an array including all available RDFa deliveries.
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAllRDFaDeliveries()
     {
@@ -108,6 +112,8 @@ class DeliverySetRdfa extends PaymentRdfa
      * Returns array of RDFa deliveries which are assigned to current delivery
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAssignedRDFaDeliveries()
     {

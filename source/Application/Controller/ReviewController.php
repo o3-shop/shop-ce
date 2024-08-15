@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\ArticleDetailsController;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Rating;
@@ -205,7 +206,8 @@ class ReviewController extends ArticleDetailsController
     /**
      * Saves user review text (oxreview object)
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveReview()
     {
@@ -258,7 +260,7 @@ class ReviewController extends ArticleDetailsController
     /**
      * Returns review user object
      *
-     * @return oxuser
+     * @return User
      */
     public function getReviewUser()
     {
@@ -316,7 +318,7 @@ class ReviewController extends ArticleDetailsController
     /**
      * Template variable getter. Returns active type (oxarticle or oxrecommlist)
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActiveType" in next major
      */
     protected function _getActiveType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -335,7 +337,7 @@ class ReviewController extends ArticleDetailsController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return RecommendationList
+     * @return RecommendationList|bool
      */
     public function getActiveRecommList()
     {

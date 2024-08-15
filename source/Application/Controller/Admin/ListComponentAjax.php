@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SeoEncoder;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterAdminAjaxRequestProcessedEvent;
@@ -95,7 +97,7 @@ class ListComponentAjax extends Base
      *
      * @param string $sId "table_name.col_name"
      *
-     * @return array
+     * @return array|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActionIds" in next major
      */
     protected function _getActionIds($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -158,7 +160,9 @@ class ListComponentAjax extends Base
     /**
      * AJAX call processor function
      *
-     * @param string $function name of action to execute (optional)
+     * @param null $function name of action to execute (optional)
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function processRequest($function = null)
     {
@@ -250,7 +254,7 @@ class ListComponentAjax extends Base
 
         // user defined some cols to load ?
         if (is_array($aUserCols)) {
-            foreach ($aUserCols as $iKey => $sCol) {
+            foreach ($aUserCols as $sCol) {
                 $iCol = (int) str_replace('_', '', $sCol);
                 if (isset($aColNames[$iCol]) && !$aColNames[$iCol][4]) {
                     $aVisibleCols[$iCol] = $aColNames[$iCol];
@@ -262,7 +266,7 @@ class ListComponentAjax extends Base
         if (!count($aVisibleCols)) {
             foreach ($aColNames as $sName => $aCol) {
                 // visible ?
-                if ($aCol[1] && !$aColNames[$sName][4]) {
+                if ($aCol[1] && !$aCol[4]) {
                     $aVisibleCols[$sName] = $aCol;
                 }
             }
@@ -382,6 +386,7 @@ class ListComponentAjax extends Base
      * Returns part of SQL query for filtering DB data
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilter" in next major
      */
     protected function _getFilter() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -426,6 +431,7 @@ class ListComponentAjax extends Base
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -443,13 +449,15 @@ class ListComponentAjax extends Base
      * @param string $sQ SQL query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAll" in next major
      */
     protected function _getAll($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aReturn = [];
         $rs = DatabaseProvider::getDb()->select($sQ);
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $aReturn[] = $rs->fields[0];
                 $rs->fetchRow();
@@ -492,6 +500,7 @@ class ListComponentAjax extends Base
      * @param string $sQ SQL query
      *
      * @return int
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getTotalCount" in next major
      */
     protected function _getTotalCount($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -512,6 +521,8 @@ class ListComponentAjax extends Base
      * @param string $sQ SQL query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDataFields" in next major
      */
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -559,9 +570,11 @@ class ListComponentAjax extends Base
      * Formats data array which later will be processed by _outputResponse method
      *
      * @param string $sCountQ count query
-     * @param string $sQ      data load query
+     * @param string $sQ data load query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getData" in next major
      */
     protected function _getData($sCountQ, $sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -603,7 +616,7 @@ class ListComponentAjax extends Base
      * @param array $aArtIds article id's
      * @param array $aCatIds ids if categories, which must be removed from oxseo
      *
-     * @return null
+     * @return void
      */
     public function resetArtSeoUrl($aArtIds, $aCatIds = null)
     {

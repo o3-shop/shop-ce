@@ -147,14 +147,14 @@ class ManufacturerListController extends ArticleListController
     /**
      * Loads and returns article list of active Manufacturer.
      *
-     * @param Manufacturer $oManufacturer Manufacturer object
+     * @param Manufacturer $category Manufacturer object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadArticles" in next major
      */
-    protected function _loadArticles($oManufacturer) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _loadArticles($category) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sManufacturerId = $oManufacturer->getId();
+        $sManufacturerId = $category->getId();
 
         // load only articles which we show on screen
         $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
@@ -165,7 +165,7 @@ class ManufacturerListController extends ArticleListController
         $oArtList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
 
         // load the articles
-        $this->_iAllArtCnt = $oArtList->loadManufacturerArticles($sManufacturerId, $oManufacturer);
+        $this->_iAllArtCnt = $oArtList->loadManufacturerArticles($sManufacturerId, $category);
 
         // counting pages
         $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
@@ -176,7 +176,7 @@ class ManufacturerListController extends ArticleListController
     /**
      * Returns active product id to load its seo meta info
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -190,23 +190,23 @@ class ManufacturerListController extends ArticleListController
      * Modifies url by adding page parameters. When seo is on, url is additionally
      * formatted by SEO engine
      *
-     * @param string $sUrl  current url
-     * @param int    $iPage page number
-     * @param int    $iLang active language id
+     * @param string $url  current url
+     * @param int    $currentPage page number
+     * @param int    $languageId active language id
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
-    protected function _addPageNrParam($sUrl, $iPage, $iLang = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addPageNrParam($url, $currentPage, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (Registry::getUtils()->seoIsActive() && ($oManufacturer = $this->getActManufacturer())) {
-            if ($iPage) {
+            if ($currentPage) {
                 // only if page number > 0
-                return $oManufacturer->getBaseSeoLink($iLang, $iPage);
+                return $oManufacturer->getBaseSeoLink($languageId, $currentPage);
             }
         }
 
-        return parent::_addPageNrParam($sUrl, $iPage, $iLang);
+        return parent::_addPageNrParam($url, $currentPage, $languageId);
     }
 
     /**
@@ -226,7 +226,7 @@ class ManufacturerListController extends ArticleListController
     /**
      * Template variable getter. Returns active object's reviews
      *
-     * @return array
+     * @return bool
      */
     public function hasVisibleSubCats()
     {
@@ -268,7 +268,7 @@ class ManufacturerListController extends ArticleListController
     {
         if ($this->_aArticleList === null) {
             $this->_aArticleList = [];
-            if (($oManufacturerTree = $this->getManufacturerTree())) {
+            if ($this->getManufacturerTree()) {
                 $oManufacturer = $this->getActManufacturer();
                 if ($oManufacturer && ($oManufacturer->getId() != 'root') && $oManufacturer->getIsVisible()) {
                     list($aArticleList, $iAllArtCnt) = $this->_loadArticles($oManufacturer);
@@ -291,7 +291,7 @@ class ManufacturerListController extends ArticleListController
     {
         if ($this->_sCatTitle === null) {
             $this->_sCatTitle = '';
-            if ($oManufacturerTree = $this->getManufacturerTree()) {
+            if ($this->getManufacturerTree()) {
                 if ($oManufacturer = $this->getActManufacturer()) {
                     $this->_sCatTitle = $oManufacturer->oxmanufacturers__oxtitle->value;
                 }
@@ -304,7 +304,7 @@ class ManufacturerListController extends ArticleListController
     /**
      * Template variable getter. Returns category path array
      *
-     * @return array
+     * @return array|void
      */
     public function getTreePath()
     {
@@ -322,7 +322,7 @@ class ManufacturerListController extends ArticleListController
     {
         if ($this->_oActCategory === null) {
             $this->_oActCategory = false;
-            if (($oManufacturerTree = $this->getManufacturerTree())) {
+            if ($this->getManufacturerTree()) {
                 if ($oManufacturer = $this->getActManufacturer()) {
                     $this->_oActCategory = $oManufacturer;
                 }
@@ -352,7 +352,7 @@ class ManufacturerListController extends ArticleListController
     /**
      * Returns title suffix used in template
      *
-     * @return string
+     * @return string|void
      */
     public function getTitleSuffix()
     {
@@ -364,15 +364,15 @@ class ManufacturerListController extends ArticleListController
     /**
      * Calls and returns result of parent:: _collectMetaKeyword();
      *
-     * @param mixed $aCatPath                category path
-     * @param bool  $blRemoveDuplicatedWords remove duplicated words
+     * @param mixed $keywords                category path
+     * @param bool  $removeDuplicatedWords remove duplicated words
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($aCatPath, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return parent::_collectMetaKeyword($aCatPath);
+        return parent::_collectMetaKeyword($keywords);
     }
 
     /**
@@ -381,28 +381,28 @@ class ManufacturerListController extends ArticleListController
      * string duplicates, special chars. Also removes strings defined
      * in $myConfig->aSkipTags (Admin area).
      *
-     * @param mixed $aCatPath  category path
-     * @param int   $iLength   max length of result, -1 for no truncation
-     * @param bool  $blDescTag if true - performs additional duplicate cleaning
+     * @param mixed $meta  category path
+     * @param int   $length   max length of result, -1 for no truncation
+     * @param bool  $descriptionTag if true - performs additional duplicate cleaning
      *
      * @return  string  $sString    converted string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($aCatPath, $iLength = 1024, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return parent::_collectMetaDescription($aCatPath, $iLength, $blDescTag);
+        return parent::_collectMetaDescription($meta, $length, $descriptionTag);
     }
 
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
-     * @param int $iLang language id
+     * @param int $languageId language id
      *
      * @return object
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
-    protected function _getSubject($iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getActManufacturer();
     }
@@ -451,7 +451,7 @@ class ManufacturerListController extends ArticleListController
      * Template variable getter. Returns array of attribute values
      * we do have here in this category
      *
-     * @return array
+     * @return array|null
      */
     public function getAttributes()
     {

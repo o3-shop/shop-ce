@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use Exception;
@@ -70,12 +72,11 @@ class CategoryMainAjax extends ListComponentAjax
      * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = Registry::getConfig();
-
         $sArticleTable = $this->_getViewName('oxarticles');
         $sO2CView = $this->_getViewName('oxobject2category');
 
@@ -195,6 +196,8 @@ class CategoryMainAjax extends ListComponentAjax
      * Updates oxtime value for products
      *
      * @param string $sProdIds product ids: "id1", "id2", "id3"
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateOxTime" in next major
      */
     protected function _updateOxTime($sProdIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -269,8 +272,10 @@ class CategoryMainAjax extends ListComponentAjax
     /**
      * Delete articles from category (from oxobject2category).
      *
-     * @param array  $articles
+     * @param array $articles
      * @param string $categoryID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function removeCategoryArticles($articles, $categoryID)
     {
@@ -295,6 +300,7 @@ class CategoryMainAjax extends ListComponentAjax
      * @param string $prodIds
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds)
     {

@@ -196,41 +196,41 @@ class ContentController extends FrontendController
 
     /**
      * Returns current view meta data
-     * If $sMeta parameter comes empty, sets to it current content title
+     * If $meta parameter comes empty, sets to it current content title
      *
-     * @param string $sMeta     category path
-     * @param int    $iLength   max length of result, -1 for no truncation
-     * @param bool   $blDescTag if true - performs additional duplicate cleaning
+     * @param string $meta      category path
+     * @param int    $length    max length of result, -1 for no truncation
+     * @param bool   $removeDuplicatedWords if true - performs additional duplicate cleaning
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($sMeta, $iLength = 200, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 200, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$sMeta) {
-            $sMeta = $this->getContent()->oxcontents__oxtitle->value;
+        if (!$meta) {
+            $meta = $this->getContent()->oxcontents__oxtitle->value;
         }
 
-        return parent::_prepareMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::_prepareMetaDescription($meta, $length, $removeDuplicatedWords);
     }
 
     /**
      * Returns current view keywords seperated by comma
-     * If $sKeywords parameter comes empty, sets to it current content title
+     * If $keywords parameter comes empty, sets to it current content title
      *
-     * @param string $sKeywords               data to use as keywords
-     * @param bool   $blRemoveDuplicatedWords remove duplicated words
+     * @param string $keywords               data to use as keywords
+     * @param bool   $removeDuplicatedWords remove duplicated words
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$sKeywords) {
-            $sKeywords = $this->getContent()->oxcontents__oxtitle->value;
+        if (!$keywords) {
+            $keywords = $this->getContent()->oxcontents__oxtitle->value;
         }
 
-        return parent::_prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords);
+        return parent::_prepareMetaKeyword($keywords, $removeDuplicatedWords);
     }
 
     /**
@@ -264,7 +264,7 @@ class ContentController extends FrontendController
             $oUser = $this->getUser();
             if (
                 $this->isEnabledPrivateSales() &&
-                (!$oUser || ($oUser && !$oUser->isTermsAccepted()))
+                (!$oUser || !$oUser->isTermsAccepted())
             ) {
                 $blPlain = true;
             }
@@ -338,12 +338,12 @@ class ContentController extends FrontendController
      * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
-     * @param int $iLang language id
+     * @param int $languageId language id
      *
      * @return object
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
-    protected function _getSubject($iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getContent();
     }
@@ -445,7 +445,7 @@ class ContentController extends FrontendController
     /**
      * Gets extended business entity data
      *
-     * @return object
+     * @return array
      */
     public function getBusinessEntityExtends()
     {
@@ -492,7 +492,7 @@ class ContentController extends FrontendController
     /**
      * Returns delivery methods with assigned deliverysets.
      *
-     * @return object
+     * @return array
      */
     public function getDeliveryChargeSpecs()
     {
@@ -538,18 +538,18 @@ class ContentController extends FrontendController
     /**
      * Returns rdfa VAT
      *
-     * @return bool
+     * @return array
      */
     public function getRdfaPriceValidity()
     {
         $iDays = Registry::getConfig()->getConfigParam('iRDFaPriceValidity');
         $iFrom = Registry::getUtilsDate()->getTime();
         $iThrough = $iFrom + ($iDays * 24 * 60 * 60);
-        $oPriceValidity = [];
-        $oPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . "Z";
-        $oPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . "Z";
+        $aPriceValidity = [];
+        $aPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . "Z";
+        $aPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . "Z";
 
-        return $oPriceValidity;
+        return $aPriceValidity;
     }
 
     /**

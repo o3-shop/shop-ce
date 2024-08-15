@@ -25,6 +25,8 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -40,6 +42,8 @@ class ArticleOverview extends AdminDetailsController
      * of template file "article_overview.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -79,7 +83,7 @@ class ArticleOverview extends AdminDetailsController
             ]);
             $iTopPos = 0;
             $iPos = 0;
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     $iPos++;
                     if ($rs->fields[0] == $soxId) {
@@ -101,6 +105,7 @@ class ArticleOverview extends AdminDetailsController
 
     /**
      * @return DatabaseInterface
+     * @throws DatabaseConnectionException
      */
     protected function getDatabase()
     {
@@ -113,6 +118,7 @@ class ArticleOverview extends AdminDetailsController
      * @param string $oxId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formOrderAmountQuery($oxId)
     {
@@ -128,6 +134,7 @@ class ArticleOverview extends AdminDetailsController
      * @param string $oxId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formSoldOutAmountQuery($oxId)
     {
@@ -143,6 +150,7 @@ class ArticleOverview extends AdminDetailsController
      * @param string $soxId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formCanceledAmountQuery($soxId)
     {

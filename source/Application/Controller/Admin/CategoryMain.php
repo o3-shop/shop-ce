@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax;
 use OxidEsales\Eshop\Application\Model\Category;
@@ -54,9 +55,7 @@ class CategoryMain extends AdminDetailsController
 
         parent::render();
 
-        /** @var Category $oCategory */
         $oCategory = $this->createCategory();
-
         $categoryId = $this->getEditObjectId();
 
         $this->_aViewData["edit"] = $oCategory;
@@ -148,7 +147,8 @@ class CategoryMain extends AdminDetailsController
     /**
      * Saves article category data.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -160,7 +160,6 @@ class CategoryMain extends AdminDetailsController
             Registry::getRequest()->getRequestEscapedParameter('editval')
         );
 
-        /** @var Category $oCategory */
         $oCategory = $this->createCategory();
 
         if ($soxId != self::NEW_CATEGORY_ID) {
@@ -205,7 +204,8 @@ class CategoryMain extends AdminDetailsController
     /**
      * Deletes selected master picture.
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function deletePicture()
     {
@@ -239,10 +239,11 @@ class CategoryMain extends AdminDetailsController
     /**
      * Delete category picture, specified in $sField parameter
      *
-     * @param Category $item  active category object
-     * @param string                                       $field picture field name
+     * @param Category $item active category object
+     * @param string $field picture field name
      *
-     * @return null
+     * @return void
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteCatPicture" in next major
      */
     protected function _deleteCatPicture($item, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -360,7 +361,7 @@ class CategoryMain extends AdminDetailsController
      * @param Category $category
      * @param array                                        $params
      *
-     * @return Category
+     * @return object
      */
     protected function updateCategoryOnSave($category, $params)
     {
@@ -377,8 +378,6 @@ class CategoryMain extends AdminDetailsController
      */
     protected function createCategory()
     {
-        $category = oxNew(Category::class);
-
-        return $category;
+        return oxNew(Category::class);
     }
 }

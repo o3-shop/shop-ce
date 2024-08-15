@@ -91,7 +91,7 @@ class VendorMain extends AdminDetailsController
     /**
      * Saves selection list parameters changes.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
@@ -129,7 +129,7 @@ class VendorMain extends AdminDetailsController
     /**
      * Saves selection list parameters changes in different language (e.g. english).
      *
-     * @return mixed
+     * @return void
      */
     public function saveinnlang()
     {

@@ -71,7 +71,7 @@ class ModuleMain extends AdminDetailsController
     /**
      * Activate module
      *
-     * @return null
+     * @return void
      */
     public function activateModule()
     {
@@ -97,7 +97,7 @@ class ModuleMain extends AdminDetailsController
     /**
      * Deactivate module
      *
-     * @return null
+     * @return void
      */
     public function deactivateModule()
     {

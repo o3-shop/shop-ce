@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\CategoryList;
@@ -28,6 +29,8 @@ use OxidEsales\Eshop\Application\Model\File;
 use OxidEsales\Eshop\Application\Model\ManufacturerList;
 use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
@@ -152,7 +155,7 @@ class ArticleMain extends AdminDetailsController
         parent::save();
 
         $oDb = DatabaseProvider::getDb();
-        $oRequest = Registry::getResquest();
+        $oRequest = Registry::getRequest();
         $soxId = $this->getEditObjectId();
         $aParams = $oRequest->getRequestEscapedParameter('editval');
 
@@ -197,8 +200,8 @@ class ArticleMain extends AdminDetailsController
             $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
         ) {
             $sSelect = "select oxid from " . getViewName('oxarticles');
-            $sSelect .= " where oxartnum = " . $oDb->quote($aParams['oxarticles__oxartnum']) . "";
-            $sSelect .= " and oxid != " . $oDb->quote($aParams['oxarticles__oxid']) . "";
+            $sSelect .= " where oxartnum = " . $oDb->quote($aParams['oxarticles__oxartnum']);
+            $sSelect .= " and oxid != " . $oDb->quote($aParams['oxarticles__oxid']);
             if ($oArticle->assignRecord($sSelect)) {
                 $this->_aViewData["errorsavingatricle"] = 1;
             }
@@ -255,6 +258,8 @@ class ArticleMain extends AdminDetailsController
      * Resets article categories counters
      *
      * @param string $sArticleId Article id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetCategoriesCounter" in next major
      */
     protected function _resetCategoriesCounter($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -276,7 +281,8 @@ class ArticleMain extends AdminDetailsController
      * Add article to category.
      *
      * @param string $sCatID Category id
-     * @param string $sOXID  Article id
+     * @param string $sOXID Article id
+     * @throws Exception
      */
     public function addToCategory($sCatID, $sOXID)
     {
@@ -294,9 +300,11 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copies article (with all parameters) to new articles.
      *
-     * @param string $sOldId    old product id (default null)
-     * @param string $sNewId    new product id (default null)
-     * @param string $sParentId product parent id
+     * @param null $sOldId old product id (default null)
+     * @param null $sNewId new product id (default null)
+     * @param null $sParentId product parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function copyArticle($sOldId = null, $sNewId = null, $sParentId = null)
     {
@@ -397,8 +405,10 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying category assignments
      *
-     * @param string $sOldId       ID from old article
+     * @param string $sOldId ID from old article
      * @param string $newArticleId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyCategories" in next major
      */
     protected function _copyCategories($sOldId, $newArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -428,6 +438,8 @@ class ArticleMain extends AdminDetailsController
      *
      * @param string $sOldId ID from old article
      * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAttributes" in next major
      */
     protected function _copyAttributes($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -458,6 +470,8 @@ class ArticleMain extends AdminDetailsController
      *
      * @param string $sOldId ID from old article
      * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyFiles" in next major
      */
     protected function _copyFiles($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -489,6 +503,8 @@ class ArticleMain extends AdminDetailsController
      *
      * @param string $sOldId ID from old article
      * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copySelectlists" in next major
      */
     protected function _copySelectlists($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -521,6 +537,8 @@ class ArticleMain extends AdminDetailsController
      *
      * @param string $sOldId ID from old article
      * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyCrossseling" in next major
      */
     protected function _copyCrossseling($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -553,6 +571,8 @@ class ArticleMain extends AdminDetailsController
      *
      * @param string $sOldId ID from old article
      * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAccessoires" in next major
      */
     protected function _copyAccessoires($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -612,6 +632,7 @@ class ArticleMain extends AdminDetailsController
      *
      * @param string $sOldId - ID from old article
      * @param string $sNewId - ID from new article
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyArtExtends" in next major
      */
     protected function _copyArtExtends($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -769,6 +790,7 @@ class ArticleMain extends AdminDetailsController
      * @param string $sTime
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formQueryForCopyingToCategory($newArticleId, $sUid, $sCatId, $sTime)
     {
@@ -820,8 +842,6 @@ class ArticleMain extends AdminDetailsController
      */
     protected function createArticle()
     {
-        $oArticle = oxNew(Article::class);
-
-        return $oArticle;
+        return oxNew(Article::class);
     }
 }

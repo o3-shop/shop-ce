@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Model\Discount;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Registry;
@@ -104,6 +105,7 @@ class DiscountMain extends AdminDetailsController
      * Returns item discount product title
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getItemDiscountProductTitle()
     {
@@ -127,7 +129,7 @@ class DiscountMain extends AdminDetailsController
     /**
      * Saves changed selected discount parameters.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
@@ -182,7 +184,7 @@ class DiscountMain extends AdminDetailsController
     /**
      * Saves changed selected discount parameters in different language.
      *
-     * @return null
+     * @return void
      */
     public function saveinnlang()
     {
@@ -226,8 +228,6 @@ class DiscountMain extends AdminDetailsController
     public function getNextOxsort()
     {
         $shopId = Registry::getConfig()->getShopId();
-        $nextSort = oxNew(Discount::class)->getNextOxsort($shopId);
-
-        return $nextSort;
+        return oxNew(Discount::class)->getNextOxsort($shopId);
     }
 }

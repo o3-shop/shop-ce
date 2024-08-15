@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Model\DeliverySet;
 use OxidEsales\Eshop\Application\Model\Order;
@@ -165,7 +166,7 @@ class OrderController extends FrontendController
 
             if ($myConfig->getConfigParam('blPsBasketReservationEnabled')) {
                 $this->getSession()->getBasketReservations()->renewExpiration();
-                if (!$oBasket || ($oBasket && !$oBasket->getProductsCount())) {
+                if (!$oBasket || !$oBasket->getProductsCount()) {
                     Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
                 }
             }
@@ -174,7 +175,7 @@ class OrderController extends FrontendController
             $oUser = $this->getUser();
             if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-            } elseif (!$oBasket || !$oUser || ($oBasket && !$oBasket->getProductsCount())) {
+            } elseif (!$oBasket || !$oUser || !$oBasket->getProductsCount()) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl(), false, 302);
             }
 
@@ -204,7 +205,7 @@ class OrderController extends FrontendController
      * user to special user group (User::onOrderExecute(); if this option is not
      * disabled in admin). Finally, you will be redirected to next page (order::_getNextStep()).
      *
-     * @return string|null
+     * @return string|void
      */
     public function execute()
     {

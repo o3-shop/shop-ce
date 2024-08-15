@@ -143,8 +143,8 @@ class AccountController extends FrontendController
         $user = $this->getUser();
         $passwordField = 'oxuser__oxpassword';
         if (
-            !$user || ($user && !$user->$passwordField->value) ||
-            ($this->isEnabledPrivateSales() && $user && (!$user->isTermsAccepted() || $this->confirmTerms()))
+            !$user || !$user->$passwordField->value ||
+            ($this->isEnabledPrivateSales() && (!$user->isTermsAccepted() || $this->confirmTerms()))
         ) {
             $this->_sThisTemplate = $this->_getLoginTemplate();
         }
@@ -215,7 +215,7 @@ class AccountController extends FrontendController
      * USER_LOGIN_SUCCESS (means user has just logged in) then user is
      * redirected back to source view.
      *
-     * @return null
+     * @return void
      */
     public function redirectAfterLogin()
     {

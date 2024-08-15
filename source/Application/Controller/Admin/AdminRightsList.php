@@ -55,7 +55,7 @@ class AdminRightsList extends AdminListController
      * Collects articles base data and passes them according to filtering rules,
      * returns name of template file "article_list.tpl".
      *
-     * @return string
+     * @return string|null
      */
     public function render()
     {
@@ -70,8 +70,8 @@ class AdminRightsList extends AdminListController
         $tpl = parent::render();
 
         // load fields
-        if (!$oArticle && $oList) {
-            $oArticle = $oList->getBaseObject();
+        if ($oList) {
+            $oList->getBaseObject();
         }
 
         return $tpl;

@@ -138,7 +138,7 @@ class ToolsList extends AdminListController
     /**
      * Processes files containing SQL queries
      *
-     * @return mixed
+     * @return false|string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "processFiles" in next major
      */
     protected function _processFiles() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -173,8 +173,6 @@ class ToolsList extends AdminListController
                 return;
             }
         }
-
-        return;
     }
 
     /**
@@ -183,7 +181,7 @@ class ToolsList extends AdminListController
      * @param string  $sSQL    SQL queries
      * @param integer $iSQLlen query length
      *
-     * @return mixed
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareSQL" in next major
      */
     protected function _prepareSQL($sSQL, $iSQLlen) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

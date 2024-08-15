@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Edition\EditionSelector;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\NamespaceInformationProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
@@ -147,7 +148,7 @@ class AdminController extends BaseController
     /**
      * Returns (cached) shop object
      *
-     * @param object $sShopId shop id
+     * @param string $sShopId shop id
      *
      * @return Shop
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEditShop" in next major
@@ -364,8 +365,8 @@ class AdminController extends BaseController
     /**
      * Returns maximum allowed size of upload file and formatted size equivalent
      *
-     * @param int  $iMaxFileSize recommended maximum size of file (normal value is taken from php ini, otherwise sets 2MB)
-     * @param bool $blFormatted  Return formatted
+     * @param int  $maxFileSize recommended maximum size of file (normal value is taken from php ini, otherwise sets 2MB)
+     * @param bool $isFormatted  Return formatted
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMaxUploadFileInfo" in next major
@@ -481,7 +482,8 @@ class AdminController extends BaseController
      *
      * @param string $sCountryCode Country code
      *
-     * @return boolean
+     * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCountryByCode" in next major
      */
     protected function _getCountryByCode($sCountryCode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

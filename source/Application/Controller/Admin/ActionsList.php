@@ -71,15 +71,15 @@ class ActionsList extends AdminListController
     /**
      * Adds active promotion check
      *
-     * @param array  $aWhere  SQL condition array
-     * @param string $sqlFull SQL query string
+     * @param array  $whereQuery  SQL condition array
+     * @param string $fullQuery SQL query string
      *
-     * @return $sQ
+     * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
-    protected function _prepareWhereQuery($aWhere, $sqlFull) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_prepareWhereQuery($aWhere, $sqlFull);
+        $sQ = parent::_prepareWhereQuery($whereQuery, $fullQuery);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
         $sTable = getViewName("oxactions");
 

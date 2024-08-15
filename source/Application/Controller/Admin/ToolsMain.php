@@ -51,7 +51,7 @@ class ToolsMain extends AdminDetailsController
         $this->_aViewData["blIsMallAdmin"] = $oAuthUser->oxuser__oxrights->value == "malladmin";
 
         $blShowUpdateViews = Registry::getConfig()->getConfigParam('blShowUpdateViews');
-        $this->_aViewData['showViewUpdate'] = (isset($blShowUpdateViews) && !$blShowUpdateViews) ? false : true;
+        $this->_aViewData['showViewUpdate'] = !(isset($blShowUpdateViews) && !$blShowUpdateViews);
 
         return "tools_main.tpl";
     }

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
@@ -208,7 +209,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * In case list type is "search" returns search parameters which will be added to product details link
      *
-     * @return string|null
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAddDynUrlParams" in next major
      */
     protected function _getAddUrlParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -310,10 +311,8 @@ class ArticleDetailsController extends FrontendController
         switch ($renderPartial) {
             case "productInfo":
                 return 'page/details/ajax/fullproductinfo.tpl';
-                break;
             case "detailsMain":
                 return 'page/details/ajax/productmain.tpl';
-                break;
             default:
                 // can not be removed, as it is used for breadcrumb loading
                 $locator = oxNew('oxLocator', $this->getListType());
@@ -339,12 +338,12 @@ class ArticleDetailsController extends FrontendController
      *
      * @param string $meta           User defined description, description content or empty value
      * @param int    $length         Max length of result, -1 for no truncation
-     * @param bool   $descriptionTag If true - performs additional duplicate cleaning
+     * @param bool   $removeDuplicatedWords If true - performs additional duplicate cleaning
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($meta, $length = 200, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 200, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$meta) {
             $article = $this->getProduct();
@@ -360,7 +359,7 @@ class ArticleDetailsController extends FrontendController
             $meta = $article->oxarticles__oxtitle->value . ' - ' . $meta;
         }
 
-        return parent::_prepareMetaDescription($meta, $length, $descriptionTag);
+        return parent::_prepareMetaDescription($meta, $length, $removeDuplicatedWords);
     }
 
     /**
@@ -400,7 +399,8 @@ class ArticleDetailsController extends FrontendController
     /**
      * Saves user ratings and review text (oxReview object)
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveReview()
     {
@@ -446,9 +446,10 @@ class ArticleDetailsController extends FrontendController
     /**
      * Adds article to selected recommendation list
      *
+     * @return void
+     * @throws Exception
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return null
      */
     public function addToRecomm()
     {
@@ -474,7 +475,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Returns active product id to load its seo meta info
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -845,7 +846,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Returns current view title. Default is null
      *
-     * @return null
+     * @return string|void
      */
     public function getTitle()
     {
@@ -862,7 +863,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Returns view canonical url
      *
-     * @return string
+     * @return string|void
      */
     public function getCanonicalUrl()
     {
@@ -910,7 +911,8 @@ class ArticleDetailsController extends FrontendController
      * If email is wrong - returns false.
      * Sends price alarm notification mail to shop owner.
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function addMe()
     {
@@ -1033,7 +1035,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Sets normalized rating
      *
-     * @return array
+     * @return bool|array
      */
     public function getRDFaNormalizedRating()
     {
@@ -1060,7 +1062,7 @@ class ArticleDetailsController extends FrontendController
      *
      * @param string $configVariableName object name
      *
-     * @return array
+     * @return array|bool
      */
     public function getRDFaValidityPeriod($configVariableName)
     {

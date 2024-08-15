@@ -112,13 +112,13 @@ class RegisterController extends UserController
     /**
      * Check if field is required.
      *
-     * @param string $sField required field to check
+     * @param string $field required field to check
      *
      * @return bool
      */
-    public function isFieldRequired($sField)
+    public function isFieldRequired($field)
     {
-        return isset($this->getMustFillFields()[$sField]);
+        return isset($this->getMustFillFields()[$field]);
     }
 
     /**
@@ -126,7 +126,7 @@ class RegisterController extends UserController
      * succeeded - redirects to success page, if not - returns
      * exception informing about expired confirmation link
      *
-     * @return mixed
+     * @return string
      */
     public function confirmRegistration()
     {
@@ -166,7 +166,7 @@ class RegisterController extends UserController
     /**
      * Returns confirmation state: "1" - success, "-1" - error
      *
-     * @return int
+     * @return bool
      */
     public function isConfirmed()
     {

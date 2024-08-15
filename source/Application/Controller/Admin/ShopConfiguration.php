@@ -26,6 +26,8 @@ use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DisplayError;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -60,6 +62,8 @@ class ShopConfiguration extends AdminDetailsController
      * to Smarty and returns name of template file "shop_config.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -120,7 +124,7 @@ class ShopConfiguration extends AdminDetailsController
         $this->_aViewData["countrylist"] = $countryList;
 
         // checking if cUrl is enabled
-        $this->_aViewData["blCurlIsActive"] = (!function_exists('curl_init')) ? false : true;
+        $this->_aViewData["blCurlIsActive"] = function_exists('curl_init');
 
         /** @var ContactFormBridgeInterface $contactFormBridge */
         $contactFormBridge = $this->getContainer()->get(ContactFormBridgeInterface::class);
@@ -208,10 +212,11 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $moduleId module to load (empty string is for base values)
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadConfVars($shopId, $moduleId)
     {
-        $config = Registry::getConfig();
         $configurationVariables = [
             "bool"   => [],
             "str"    => [],
@@ -240,7 +245,7 @@ class ShopConfiguration extends AdminDetailsController
             ]
         );
 
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 list($name, $type, $value, $constraint, $grouping) = $rs->fields;
                 $configurationVariables[$type][$name] = $this->_unserializeConfVar($type, $name, $value);
@@ -269,15 +274,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $type       variable type
      * @param string $constraint serialized constraint
      *
-     * @return mixed
+     * @return array|null
      * @deprecated underscore prefix violates PSR12, will be renamed to "parseConstraint" in next major
      */
     protected function _parseConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        switch ($type) {
-            case "select":
-                return array_map('trim', explode('|', $constraint));
-                break;
+        if ($type == "select") {
+            return array_map('trim', explode('|', $constraint));
         }
         return null;
     }
@@ -293,10 +296,8 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _serializeConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        switch ($type) {
-            case "select":
-                return implode('|', array_map('trim', $constraint));
-                break;
+        if ($type == "select") {
+            return implode('|', array_map('trim', $constraint));
         }
         return '';
     }
@@ -410,7 +411,7 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @param string $multiline Multiline text
      *
-     * @return array
+     * @return array|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToArray" in next major
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -433,7 +434,7 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @param array $input Array to convert
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "aarrayToMultiline" in next major
      */
     protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

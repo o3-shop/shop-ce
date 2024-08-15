@@ -26,6 +26,8 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\ListObject;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -116,6 +118,8 @@ class OrderArticle extends AdminDetailsController
      * If possible returns searched/found oxarticle object
      *
      * @return Article | false
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getSearchProduct()
     {
@@ -138,12 +142,13 @@ class OrderArticle extends AdminDetailsController
      * Returns product found by search. If product is variant - returns parent object
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getMainProduct()
     {
         if ($this->_oMainSearchProduct === null && ($sArtNum = $this->getSearchProductArtNr())) {
             $this->_oMainSearchProduct = false;
-            $sArtId = null;
 
             //get article id
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
@@ -153,7 +158,7 @@ class OrderArticle extends AdminDetailsController
             $rs = $oDb->select($sQ, [
                 ':oxartnum' => $sArtNum
             ]);
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 $sArtId = $rs->fields['OXPARENTID'] ? $rs->fields['OXPARENTID'] : $rs->fields['OXID'];
 
                 $oProduct = oxNew(Article::class);
@@ -170,6 +175,8 @@ class OrderArticle extends AdminDetailsController
      * Returns product list containing searchable product or its parent and its variants
      *
      * @return ListObject
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getProductList()
     {
@@ -268,7 +275,7 @@ class OrderArticle extends AdminDetailsController
         //get article id
         $sQ = "select oxartid from oxorderarticles where oxid = :oxid";
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        if (($sArtId = DatabaseProvider::getMaster()->getOne($sQ, [':oxid' => $sOrderArtId]))) {
+        if ((DatabaseProvider::getMaster()->getOne($sQ, [':oxid' => $sOrderArtId]))) {
             $oOrder = oxNew(Order::class);
             if ($oOrder->load($this->getEditObjectId())) {
                 $oOrder->recalculateOrder();

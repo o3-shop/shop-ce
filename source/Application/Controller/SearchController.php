@@ -154,7 +154,7 @@ class SearchController extends FrontendController
      * found articles. Article list is stored at search::_aArticleList
      * array.
      *
-     * @return null
+     * @return bool|void
      */
     public function init()
     {
@@ -230,7 +230,7 @@ class SearchController extends FrontendController
     {
         parent::render();
 
-        $oRequest = Registry::getRequest();;
+        $oRequest = Registry::getRequest();
         if (Registry::getConfig()->getConfigParam('bl_rssSearch')) {
             $oRss = oxNew(RssFeed::class);
             $sSearch = $oRequest->getRequestEscapedParameter('searchparam', true);
@@ -302,7 +302,7 @@ class SearchController extends FrontendController
     /**
      * Template variable getter. Returns similar recommendation lists
      *
-     * @return object
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "isSearchClass" in next major
      */
     protected function _isSearchClass() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

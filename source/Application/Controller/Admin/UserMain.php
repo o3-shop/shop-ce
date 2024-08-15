@@ -57,7 +57,7 @@ class UserMain extends AdminDetailsController
         $oLang = Registry::getLang();
         $iTplLang = $oLang->getTplLanguage();
 
-        $iPos = count($aUserRights);
+        $iPos = 0;
         $aUserRights[$iPos] = new stdClass();
         $aUserRights[$iPos]->name = $oLang->translateString("user", $iTplLang);
         $aUserRights[$iPos]->id = "user";
@@ -80,7 +80,6 @@ class UserMain extends AdminDetailsController
 
             if (!($oUser->oxuser__oxrights->value == "malladmin" && !$blisMallAdmin)) {
                 // generate selected right
-                reset($aUserRights);
                 foreach ($aUserRights as $val) {
                     if ($val->id == $oUser->oxuser__oxrights->value) {
                         $val->selected = 1;
@@ -118,7 +117,7 @@ class UserMain extends AdminDetailsController
     /**
      * Saves main user parameters.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {

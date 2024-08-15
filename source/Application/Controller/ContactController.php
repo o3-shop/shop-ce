@@ -103,7 +103,7 @@ class ContactController extends FrontendController
      * Composes and sends user written message, returns false if some parameters
      * are missing.
      *
-     * @return bool
+     * @return bool|void
      */
     public function send()
     {

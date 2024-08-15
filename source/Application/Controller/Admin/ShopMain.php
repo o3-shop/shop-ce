@@ -21,11 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -99,7 +102,8 @@ class ShopMain extends AdminDetailsController
     /**
      * Saves changed main shop configuration parameters.
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -115,8 +119,8 @@ class ShopMain extends AdminDetailsController
 
         //  #918 S
         // checkbox handling
-        $parameters['oxshops__oxactive'] = (isset($parameters['oxshops__oxactive']) && $parameters['oxshops__oxactive'] == true) ? 1 : 0;
-        $parameters['oxshops__oxproductive'] = (isset($parameters['oxshops__oxproductive']) && $parameters['oxshops__oxproductive'] == true) ? 1 : 0;
+        $parameters['oxshops__oxactive'] = (isset($parameters['oxshops__oxactive']) && $parameters['oxshops__oxactive']) ? 1 : 0;
+        $parameters['oxshops__oxproductive'] = (isset($parameters['oxshops__oxproductive']) && $parameters['oxshops__oxproductive']) ? 1 : 0;
 
         $subjLang = Registry::getRequest()->getRequestEscapedParameter('subjlang');
         $shopLanguageId = ($subjLang && $subjLang > 0) ? $subjLang : 0;
@@ -140,7 +144,7 @@ class ShopMain extends AdminDetailsController
             $shop->oxshops__oxsmtppwd->setValue($newSMPTPass == '-' ? "" : $newSMPTPass);
         }
 
-        $canCreateShop = $this->canCreateShop($shopId, $shop, $config);
+        $canCreateShop = $this->canCreateShop($shopId, $shop);
         if (!$canCreateShop) {
             return;
         }
@@ -199,6 +203,8 @@ class ShopMain extends AdminDetailsController
      * Copies base shop config variables to current
      *
      * @param Shop $shop new shop object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyConfigVars" in next major
      */
     protected function _copyConfigVars($shop) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -214,7 +220,7 @@ class ShopMain extends AdminDetailsController
             oxvarvalue as oxvarvalue, oxmodule
             from oxconfig where oxshopid = '1'";
         $shopConfiguration = $db->select($selectShopConfigurationQuery);
-        if ($shopConfiguration != false && $shopConfiguration->count() > 0) {
+        if ($shopConfiguration && $shopConfiguration->count() > 0) {
             while (!$shopConfiguration->EOF) {
                 $configName = $shopConfiguration->fields[0];
                 if (!in_array($configName, $nonCopyVars)) {

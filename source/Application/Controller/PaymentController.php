@@ -159,14 +159,14 @@ class PaymentController extends FrontendController
             //and the basket is not empty
             $oBasket = $this->getSession()->getBasket();
             $blPsBasketReservationEnabled = $myConfig->getConfigParam('blPsBasketReservationEnabled');
-            if ($blPsBasketReservationEnabled && (!$oBasket || ($oBasket && !$oBasket->getProductsCount()))) {
+            if ($blPsBasketReservationEnabled && (!$oBasket || !$oBasket->getProductsCount())) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
             }
 
             $oUser = $this->getUser();
             if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-            } elseif (!$oBasket || !$oUser || ($oBasket && !$oBasket->getProductsCount())) {
+            } elseif (!$oBasket || !$oUser || !$oBasket->getProductsCount()) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=start', false, 302);
             }
         }
@@ -263,7 +263,7 @@ class PaymentController extends FrontendController
      * Session variables:
      * <b>paymentid</b>, <b>dynvalue</b>, <b>payerror</b>
      *
-     * @return  mixed
+     * @return string|void
      */
     public function validatePayment()
     {
@@ -324,15 +324,13 @@ class PaymentController extends FrontendController
             //#1308C - delete paymentid from session, and save selected it just for view
             $oSession->deleteVariable('paymentid');
             $oSession->setVariable('_selected_paymentid', $sPaymentId);
-
-            return;
         }
     }
 
     /**
      * Template variable getter. Returns payment-list
      *
-     * @return object
+     * @return PaymentList
      */
     public function getPaymentList()
     {

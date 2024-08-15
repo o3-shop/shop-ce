@@ -26,7 +26,6 @@ use OxidEsales\Eshop\Application\Model\RecommendationList;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxObjectException;
 
 /**
  * Current user recommlist manager.
@@ -226,7 +225,7 @@ class AccountRecommlistController extends AccountController
     /**
      * add new recommlist
      *
-     * @return null
+     * @return void
      */
     public function saveRecommList()
     {
@@ -279,7 +278,7 @@ class AccountRecommlistController extends AccountController
     /**
      * Delete recommlist
      *
-     * @return null
+     * @return void
      */
     public function editList()
     {
@@ -293,7 +292,7 @@ class AccountRecommlistController extends AccountController
 
         // deleting on demand
         if (
-            ($sAction = Registry::getRequest()->getRequestEscapedParameter('deleteList')) &&
+            (Registry::getRequest()->getRequestEscapedParameter('deleteList')) &&
             ($oRecommList = $this->getActiveRecommList())
         ) {
             $oRecommList->delete();
@@ -306,7 +305,7 @@ class AccountRecommlistController extends AccountController
     /**
      * Delete recommlist
      *
-     * @return null
+     * @return void
      */
     public function removeArticle()
     {

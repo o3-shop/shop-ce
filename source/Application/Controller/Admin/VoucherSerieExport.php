@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -178,6 +180,8 @@ class VoucherSerieExport extends VoucherSerieMain
      * @param int $iStart start exporting from
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function exportVouchers($iStart)
     {

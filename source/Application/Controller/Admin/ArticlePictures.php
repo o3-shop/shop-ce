@@ -70,7 +70,7 @@ class ArticlePictures extends AdminDetailsController
     /**
      * Saves (uploads) pictures to server.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
@@ -108,7 +108,7 @@ class ArticlePictures extends AdminDetailsController
      * where master picture index is higher than currently deleted index.
      * Also deletes custom icon and thumbnail.
      *
-     * @return null
+     * @return void
      */
     public function deletePicture()
     {

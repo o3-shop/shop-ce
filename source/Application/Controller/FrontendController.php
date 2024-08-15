@@ -38,6 +38,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -358,7 +359,7 @@ class FrontendController extends BaseController
     /** @var string Min order price. */
     protected $_sMinOrderPrice = null;
 
-    /** @var string Real newsletter status. */
+    /** @var int Real newsletter status. */
     protected $_iNewsRealStatus = null;
 
     /** @return array Url parameters which block redirection. */
@@ -385,7 +386,7 @@ class FrontendController extends BaseController
     /** @var Address Delivery address. */
     protected $_oDelAddress = null;
 
-    /** @var array Category tree path. */
+    /** @var string Category tree path. */
     protected $_sCatTreePath = null;
 
     /** @var array Loaded contents array (cache). */
@@ -672,7 +673,7 @@ class FrontendController extends BaseController
      *
      * @param string $name name of component object
      *
-     * @return object
+     * @return object|void
      */
     public function getComponent($name)
     {
@@ -937,7 +938,7 @@ class FrontendController extends BaseController
     /**
      * Returns default category sorting for selected category
      *
-     * @return array
+     * @return array|void
      */
     public function getUserSelectedSorting()
     {
@@ -955,7 +956,7 @@ class FrontendController extends BaseController
      *
      * @param string $sortIdent sorting indent
      *
-     * @return array
+     * @return array|void
      */
     public function getSavedSorting($sortIdent)
     {
@@ -988,7 +989,7 @@ class FrontendController extends BaseController
     /**
      * Template variable getter. Returns string after the list is ordered by
      *
-     * @return array
+     * @return string
      */
     public function getListOrderBy()
     {
@@ -1005,7 +1006,7 @@ class FrontendController extends BaseController
     /**
      * Template variable getter. Returns list order direction
      *
-     * @return array
+     * @return string
      */
     public function getListOrderDirection()
     {
@@ -1041,7 +1042,7 @@ class FrontendController extends BaseController
      *
      * @param string $dataType data type "oxkeywords" or "oxdescription"
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMetaFromSeo" in next major
      */
     protected function _getMetaFromSeo($dataType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1063,7 +1064,7 @@ class FrontendController extends BaseController
      *
      * @param string $metaIdent meta content ident
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMetaFromContent" in next major
      */
     protected function _getMetaFromContent($metaIdent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1286,7 +1287,7 @@ class FrontendController extends BaseController
      * @param int    $length                Max length of result, -1 for no truncation
      * @param bool   $removeDuplicatedWords If true - performs additional duplicate cleaning
      *
-     * @return  string  $string    converted string
+     * @return  string|void  $string    converted string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
     protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1445,8 +1446,6 @@ class FrontendController extends BaseController
      */
     public function getSorting($sortIdent)
     {
-        $sorting = null;
-
         if ($sorting = $this->getUserSelectedSorting()) {
             $this->setItemSorting($sortIdent, $sorting['sortby'], $sorting['sortdir']);
         } elseif (!$sorting = $this->getSavedSorting($sortIdent)) {
@@ -1466,7 +1465,8 @@ class FrontendController extends BaseController
      *
      * @param string $ident sortable item id
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getSortingSql($ident)
     {
@@ -1637,7 +1637,7 @@ class FrontendController extends BaseController
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
+     * @return bool
      */
     public function getSimilarRecommListIds()
     {
@@ -1948,13 +1948,13 @@ class FrontendController extends BaseController
     /**
      * Sets and caches default parameters for shop object and returns it.
      *
-     * @param Shop $shop current shop object
+     * @param Shop $oShop current shop object
      *
      * @return ViewConfig Current shop object
      */
-    public function addGlobalParams($shop = null)
+    public function addGlobalParams($oShop = null)
     {
-        $viewConfig = parent::addGlobalParams($shop);
+        $viewConfig = parent::addGlobalParams($oShop);
 
         $this->_setNrOfArtPerPage();
 
@@ -2167,7 +2167,7 @@ class FrontendController extends BaseController
     /**
      * Returns current view product object (if it is loaded)
      *
-     * @return Article
+     * @return Article|null
      */
     public function getViewProduct()
     {
@@ -2430,7 +2430,7 @@ class FrontendController extends BaseController
     /**
      * Template variable getter. Returns if newsletter is really active (for user.tpl)
      *
-     * @return integer
+     * @return int|null
      */
     public function getNewsRealStatus()
     {
@@ -2558,7 +2558,7 @@ class FrontendController extends BaseController
     /**
      * Template variable getter. Returns more category
      *
-     * @return object
+     * @return string
      */
     public function getCatMoreUrl()
     {
@@ -2627,7 +2627,7 @@ class FrontendController extends BaseController
      *
      * @param string $field required field to check
      *
-     * @return array | bool
+     * @return bool
      */
     public function isFieldRequired($field)
     {
@@ -3062,7 +3062,7 @@ class FrontendController extends BaseController
     /**
      * @param string $sortOrder
      *
-     * @return array
+     * @return bool
      */
     private function isAllowedSortingOrder($sortOrder)
     {

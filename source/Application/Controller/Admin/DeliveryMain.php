@@ -107,7 +107,7 @@ class DeliveryMain extends AdminDetailsController
     /**
      * Saves delivery information changes.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
@@ -159,7 +159,7 @@ class DeliveryMain extends AdminDetailsController
     /**
      * Saves delivery information changes.
      *
-     * @return null
+     * @return void
      */
     public function saveinnlang()
     {

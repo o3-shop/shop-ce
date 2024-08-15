@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\Registry;
@@ -79,7 +80,8 @@ class CategoryText extends AdminDetailsController
     /**
      * Saves category description text to DB.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {

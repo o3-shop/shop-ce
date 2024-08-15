@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Application\Model\Rating;
 use OxidEsales\Eshop\Application\Model\Review;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -43,6 +44,7 @@ class ArticleReview extends AdminDetailsController
      * file "article_review.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -96,6 +98,7 @@ class ArticleReview extends AdminDetailsController
      * @param Article $article Article object
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getReviewList" in next major
      */
     protected function _getReviewList($article) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

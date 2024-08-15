@@ -84,7 +84,7 @@ class UserList extends AdminListController
     /**
      * Admin user is allowed to be deleted only by mall admin
      *
-     * @return null
+     * @return null|void
      */
     public function deleteEntry()
     {

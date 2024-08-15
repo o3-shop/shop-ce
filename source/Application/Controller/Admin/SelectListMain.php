@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\SelectList;
 use OxidEsales\Eshop\Core\Field;
@@ -76,7 +77,7 @@ class SelectListMain extends AdminDetailsController
 
             $aFieldList = $oAttr->getFieldList();
             if (is_array($aFieldList)) {
-                foreach ($aFieldList as $key => $oField) {
+                foreach ($aFieldList as $oField) {
                     if ($oField->priceUnit == '%') {
                         $oField->price = $oField->fprice;
                     }
@@ -130,7 +131,8 @@ class SelectListMain extends AdminDetailsController
     /**
      * Saves selection list parameters changes.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -183,7 +185,8 @@ class SelectListMain extends AdminDetailsController
     /**
      * Saves selection list parameters changes in different language (e.g. english).
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveinnlang()
     {
@@ -220,7 +223,8 @@ class SelectListMain extends AdminDetailsController
     /**
      * Deletes field from field array and stores object
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function delFields()
     {
@@ -252,7 +256,8 @@ class SelectListMain extends AdminDetailsController
     /**
      * Adds a field to field array and stores object
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function addField()
     {
@@ -291,7 +296,8 @@ class SelectListMain extends AdminDetailsController
     /**
      * Modifies field from field array's first elem. and stores object
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function changeField()
     {
@@ -371,17 +377,13 @@ class SelectListMain extends AdminDetailsController
             for ($i = $iCurrentPos; $i < $iPos; $i++) {
                 $this->aFieldArray[$i] = $this->aFieldArray[$i + 1];
             }
-            $this->aFieldArray[$iPos] = $sField;
-
-            return false;
         } else {
             for ($i = $iCurrentPos; $i > $iPos; $i--) {
                 $this->aFieldArray[$i] = $this->aFieldArray[$i - 1];
             }
-            $this->aFieldArray[$iPos] = $sField;
-
-            return false;
         }
+        $this->aFieldArray[$iPos] = $sField;
+        return false;
     }
 
     /**

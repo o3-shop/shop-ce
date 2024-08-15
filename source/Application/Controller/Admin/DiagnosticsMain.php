@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Diagnostics;
 use OxidEsales\Eshop\Application\Model\DiagnosticsOutput;
@@ -84,7 +85,7 @@ class DiagnosticsMain extends AdminDetailsController
     /**
      * Error status getter
      *
-     * @return string
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "hasError" in next major
      */
     protected function _hasError() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -136,9 +137,10 @@ class DiagnosticsMain extends AdminDetailsController
     /**
      * Gets list of files to be checked
      *
+     * @return array list of shop files to be checked
+     * @throws Exception
      * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
      *
-     * @return array list of shop files to be checked
      */
     protected function _getFilesToCheck() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -223,6 +225,7 @@ class DiagnosticsMain extends AdminDetailsController
      * Checks system file versions
      *
      * @return void
+     * @throws Exception
      */
     public function startDiagnostics()
     {

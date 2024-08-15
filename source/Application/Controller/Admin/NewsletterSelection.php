@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Newsletter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -75,6 +76,7 @@ class NewsletterSelection extends AdminDetailsController
      * Returns count of users assigned to active newsletter receiver group
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getUserCount()
     {

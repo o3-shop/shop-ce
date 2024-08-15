@@ -74,7 +74,7 @@ class AccountPasswordController extends AccountController
     /**
      * changes current user password
      *
-     * @return null
+     * @return void
      */
     public function changePassword()
     {

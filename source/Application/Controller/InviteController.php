@@ -80,7 +80,7 @@ class InviteController extends AccountController
     /**
      * Invitation data
      *
-     * @var object
+     * @var array
      */
     protected $_aInviteData = null;
 
@@ -94,7 +94,7 @@ class InviteController extends AccountController
     /**
      * Executes parent::render(), if invitation is disabled - redirects to main page
      *
-     * @return string
+     * @return string|void
      */
     public function render()
     {
@@ -113,7 +113,7 @@ class InviteController extends AccountController
      * Sends product suggestion mail and returns a URL according to
      * URL formatting rules.
      *
-     * @return  null
+     * @return void
      */
     public function send()
     {
@@ -198,7 +198,7 @@ class InviteController extends AccountController
     /**
      * Template variable getter. Return if mail was send successfully
      *
-     * @return array
+     * @return bool
      */
     public function getInviteSendStatus()
     {

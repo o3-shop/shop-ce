@@ -27,6 +27,8 @@ use OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\MediaUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -54,6 +56,8 @@ class ArticleExtend extends AdminDetailsController
      * Smarty engine and returns template file name "article_extend.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -118,7 +122,8 @@ class ArticleExtend extends AdminDetailsController
     /**
      * Saves modified extended article parameters.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -283,6 +288,8 @@ class ArticleExtend extends AdminDetailsController
      * Adds data to _aViewData for later use in templates.
      *
      * @param Article $article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function prepareBundledArticlesDataForView($article)
     {
@@ -301,7 +308,7 @@ class ArticleExtend extends AdminDetailsController
         $resultFromDatabase = $database->select($query, [
             ':oxid' => $article->$bundleIdField->value
         ]);
-        if ($resultFromDatabase != false && $resultFromDatabase->count() > 0) {
+        if ($resultFromDatabase && $resultFromDatabase->count() > 0) {
             while (!$resultFromDatabase->EOF) {
                 $articleNumber = new Field($resultFromDatabase->fields[1]);
                 $articleTitle = new Field($resultFromDatabase->fields[0] . " " . $resultFromDatabase->fields[2]);

@@ -77,7 +77,8 @@ class NewsText extends AdminDetailsController
     /**
      * Saves news text.
      *
-     * @return mixed
+     * @return void
+     * @throws \Exception
      */
     public function save()
     {

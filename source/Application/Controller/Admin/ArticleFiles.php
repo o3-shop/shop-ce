@@ -110,7 +110,7 @@ class ArticleFiles extends AdminDetailsController
      *
      * @param bool $blReset Load article again
      *
-     * @return File
+     * @return Article
      */
     public function getArticle($blReset = false)
     {
@@ -128,7 +128,8 @@ class ArticleFiles extends AdminDetailsController
     /**
      * Creates new oxFile object and stores newly uploaded file
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function upload()
     {

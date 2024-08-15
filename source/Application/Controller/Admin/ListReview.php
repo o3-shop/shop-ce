@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 
 /**
  * user list "view" class.
@@ -58,6 +59,7 @@ class ListReview extends ArticleList
      * and returns name of template file "list_review.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -72,12 +74,12 @@ class ListReview extends ArticleList
     /**
      * Returns select query string
      *
-     * @param object $oObject list item object
+     * @param object $oListObject list item object
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
      */
-    protected function _buildSelectString($oObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _buildSelectString($oListObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sArtTable = getViewName('oxarticles', $this->_iEditLang);
 
@@ -98,15 +100,15 @@ class ListReview extends ArticleList
     /**
      * Adds filtering conditions to query string
      *
-     * @param array  $aWhere filter conditions
-     * @param string $sSql   query string
+     * @param array  $whereQuery filter conditions
+     * @param string $fullQuery   query string
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
-    protected function _prepareWhereQuery($aWhere, $sSql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSql = parent::_prepareWhereQuery($aWhere, $sSql);
+        $sSql = parent::_prepareWhereQuery($whereQuery, $fullQuery);
 
         $sArtTable = getViewName('oxarticles', $this->_iEditLang);
         $sArtTitleField = "{$sArtTable}.oxtitle";

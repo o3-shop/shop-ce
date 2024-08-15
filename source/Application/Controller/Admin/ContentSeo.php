@@ -56,7 +56,7 @@ class ContentSeo extends ObjectSeo
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
      */
     public function getEntryUri()
     {

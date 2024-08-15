@@ -25,8 +25,6 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Theme;
-use oxTheme;
-use oxException;
 
 /**
  * Admin article main deliveryset manager.
@@ -83,7 +81,7 @@ class ThemeMain extends AdminDetailsController
     /**
      * Set theme
      *
-     * @return null
+     * @return void
      */
     public function setTheme()
     {

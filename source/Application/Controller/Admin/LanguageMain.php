@@ -25,6 +25,8 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\DisplayError;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
@@ -95,7 +97,9 @@ class LanguageMain extends AdminDetailsController
     /**
      * Saves selection list parameters changes.
      *
-     * @return mixed
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function save()
     {
@@ -213,7 +217,7 @@ class LanguageMain extends AdminDetailsController
         $aLangData['desc'] = $this->_aLangData['lang'][$sOxId];
         $aLangData['baseurl'] = $this->_aLangData['urls'][$aLangData['baseId']];
         $aLangData['basesslurl'] = $this->_aLangData['sslUrls'][$aLangData['baseId']];
-        $aLangData['default'] = ($this->_aLangData['params'][$sOxId]["baseId"] == $sDefaultLang) ? true : false;
+        $aLangData['default'] = (bool)($this->_aLangData['params'][$sOxId]["baseId"] == $sDefaultLang);
 
         return $aLangData;
     }
@@ -410,7 +414,9 @@ class LanguageMain extends AdminDetailsController
      * Adding new language to DB - creating new multilanguage fields with new
      * language ID (e.g. oxtitle_4)
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addNewMultilangFieldsToDb" in next major
      */
     protected function _addNewMultilangFieldsToDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -456,7 +462,7 @@ class LanguageMain extends AdminDetailsController
      * @param object $oLang1 language array
      * @param object $oLang2 language array
      *
-     * @return bool
+     * @return int
      * @deprecated underscore prefix violates PSR12, will be renamed to "sortLangParamsByBaseIdCallback" in next major
      */
     protected function _sortLangParamsByBaseIdCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -468,6 +474,7 @@ class LanguageMain extends AdminDetailsController
      * Check language input errors
      *
      * @return bool
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "validateInput" in next major
      */
     protected function _validateInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -507,7 +514,7 @@ class LanguageMain extends AdminDetailsController
      *
      * @param string $abbreviation language abbreviation
      *
-     * @throws RegExException if pattern does not match
+     * @throws Exception if pattern does not match
      *
      * @return bool
      */
@@ -549,7 +556,7 @@ class LanguageMain extends AdminDetailsController
             if (is_array($mLanguageDataParameters)) {
                 // Recursion till we are going to have a string.
                 $blDeepResult = $this->isValidLanguageData($mLanguageDataParameters);
-                $blValid = $blDeepResult === false ? $blDeepResult : $blValid;
+                $blValid = $blDeepResult === false ? false : $blValid;
             } elseif (!$configValidator->isValid($mLanguageDataParameters)) {
                 $blValid = false;
                 $error = oxNew(DisplayError::class);

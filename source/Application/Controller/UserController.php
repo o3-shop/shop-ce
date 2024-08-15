@@ -107,7 +107,7 @@ class UserController extends FrontendController
             $isPsBasketReservationsEnabled = $config->getConfigParam('blPsBasketReservationEnabled');
             if (
                 $this->_blIsOrderStep && $isPsBasketReservationsEnabled &&
-                (!$basket || ($basket && !$basket->getProductsCount()))
+                (!$basket || !$basket->getProductsCount())
             ) {
                 Registry::getUtils()->redirect($config->getShopHomeUrl() . 'cl=basket', true, 302);
             }

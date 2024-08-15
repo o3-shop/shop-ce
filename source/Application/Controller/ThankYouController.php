@@ -37,7 +37,7 @@ class ThankYouController extends FrontendController
     /**
      * User basket object
      *
-     * @var object
+     * @var Basket
      */
     protected $_oBasket = null;
 
@@ -202,7 +202,7 @@ class ThankYouController extends FrontendController
     /**
      * Template variable getter. Returns currency conversion index value
      *
-     * @return object
+     * @return float
      */
     public function getCurrencyCovIndex()
     {
@@ -310,7 +310,7 @@ class ThankYouController extends FrontendController
     /**
      * Template variable getter. Returns country ISO 3
      *
-     * @return string
+     * @return string|void
      */
     public function getCountryISO3()
     {

@@ -25,6 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -105,7 +106,8 @@ class ContentMain extends AdminDetailsController
     /**
      * Saves content contents.
      *
-     * @return mixed
+     * @return void
+     * @throws DatabaseConnectionException
      */
     public function save()
     {
@@ -212,7 +214,7 @@ class ContentMain extends AdminDetailsController
      *
      * @param string $sIdent ident to filter
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareIdent" in next major
      */
     protected function _prepareIdent($sIdent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -226,9 +228,10 @@ class ContentMain extends AdminDetailsController
      * Check if ident is unique
      *
      * @param string $sIdent ident
-     * @param string $sOxId  Object id
+     * @param string $sOxId Object id
      *
      * @return null
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkIdent" in next major
      */
     protected function _checkIdent($sIdent, $sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

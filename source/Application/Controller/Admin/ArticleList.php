@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Application\Model\ManufacturerList;
 use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -57,9 +58,7 @@ class ArticleList extends AdminListController
     private function getServerDateTime()
     {
         $sDateTimeAsTimestamp = Registry::getUtilsDate()->getTime();
-        $sDateTime = Registry::getUtilsDate()->formatDBTimestamp($sDateTimeAsTimestamp);
-
-        return $sDateTime;
+        return Registry::getUtilsDate()->formatDBTimestamp($sDateTimeAsTimestamp);
     }
 
     /**
@@ -255,14 +254,15 @@ class ArticleList extends AdminListController
     /**
      * Builds and returns SQL query string.
      *
-     * @param object $oListObject list main object
+     * @param null $listObject list main object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
      */
-    protected function _buildSelectString($oListObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_buildSelectString($oListObject);
+        $sQ = parent::_buildSelectString($listObject);
         if ($sQ) {
             $sTable = getViewName("oxarticles");
             $sQ .= " and $sTable.oxparentid = '' ";

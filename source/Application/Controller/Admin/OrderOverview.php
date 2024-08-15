@@ -141,7 +141,7 @@ class OrderOverview extends AdminDetailsController
                 }
             }
 
-            if (($blMail = Registry::getRequest()->getRequestEscapedParameter('sendmail'))) {
+            if ((Registry::getRequest()->getRequestEscapedParameter('sendmail'))) {
                 // send eMail
                 $oEmail = oxNew(Email::class);
                 $oEmail->sendSendedNowMail($oOrder);

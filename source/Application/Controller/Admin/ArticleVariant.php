@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\VariantHandler;
@@ -124,7 +125,7 @@ class ArticleVariant extends AdminDetailsController
      * @param string $sOXID   Object ID
      * @param array  $aParams Parameters
      *
-     * @return null
+     * @return void
      */
     public function savevariant($sOXID = null, $aParams = null)
     {
@@ -190,7 +191,7 @@ class ArticleVariant extends AdminDetailsController
             return true;
         }
         foreach ($aData as $sKey => $sValue) {
-            if (isset($oProduct->$sKey) && $oProduct->$sKey->value != $aData[$sKey]) {
+            if (isset($oProduct->$sKey) && $oProduct->$sKey->value != $sValue) {
                 return true;
             }
         }
@@ -240,7 +241,8 @@ class ArticleVariant extends AdminDetailsController
     /**
      * Deletes article variant.
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function deleteVariant()
     {
@@ -283,7 +285,7 @@ class ArticleVariant extends AdminDetailsController
     /**
      * Add selection list
      *
-     * @return null
+     * @return void
      */
     public function addsel()
     {

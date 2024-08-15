@@ -117,7 +117,7 @@ class AccountOrderController extends AccountController
     /**
      * Template variable getter. Returns ordered articles
      *
-     * @return ArticleList | false
+     * @return ArticleList|false
      */
     public function getOrderArticleList()
     {

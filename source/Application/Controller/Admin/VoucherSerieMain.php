@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController;
-use oxAdminView;
 use OxidEsales\Eshop\Application\Model\VoucherSerie;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -90,7 +90,8 @@ class VoucherSerieMain extends DynamicExportBaseController
     /**
      * Saves main Voucherserie parameters changes.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -126,7 +127,7 @@ class VoucherSerieMain extends DynamicExportBaseController
     /**
      * Returns voucher status information array
      *
-     * @return array
+     * @return array|void
      */
     public function getStatus()
     {
@@ -165,7 +166,7 @@ class VoucherSerieMain extends DynamicExportBaseController
     /**
      * Prepares Export
      *
-     * @return null
+     * @return void
      */
     public function start()
     {

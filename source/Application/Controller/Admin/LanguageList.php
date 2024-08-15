@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Registry;
 use Exception;
@@ -50,7 +52,7 @@ class LanguageList extends AdminListController
     /**
      * Checks for Malladmin rights
      *
-     * @return null
+     * @return void
      */
     public function deleteEntry()
     {
@@ -120,7 +122,7 @@ class LanguageList extends AdminListController
         foreach ($aLanguages as $sKey => $sValue) {
             $sOxId = $sValue->oxid;
             $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]["active"])) ? 1 : $aLangParams[$sOxId]["active"];
-            $aLanguages[$sKey]->default = ($aLangParams[$sOxId]["baseId"] == $sDefaultLang) ? true : false;
+            $aLanguages[$sKey]->default = (bool)($aLangParams[$sOxId]["baseId"] == $sDefaultLang);
             $aLanguages[$sKey]->sort = $aLangParams[$sOxId]["sort"];
         }
 
@@ -155,7 +157,7 @@ class LanguageList extends AdminListController
      * @param object $oLang1 language object
      * @param object $oLang2 language object
      *
-     * @return bool
+     * @return int
      * @deprecated underscore prefix violates PSR12, will be renamed to "sortLanguagesCallback" in next major
      */
     protected function _sortLanguagesCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -176,6 +178,8 @@ class LanguageList extends AdminListController
      * to default value in all tables.
      *
      * @param string $iLangId language ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetMultiLangDbFields" in next major
      */
     protected function _resetMultiLangDbFields($iLangId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

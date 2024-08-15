@@ -217,7 +217,7 @@ class AccountReviewController extends AccountController
     /**
      * Returns pages count.
      *
-     * @return int
+     * @return false|float
      */
     private function getPagesCount()
     {

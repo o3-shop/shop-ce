@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
@@ -116,6 +117,7 @@ class ObjectSeo extends AdminDetailsController
      * @param array $aSeoData Seo data array
      *
      * @return null|string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAdditionalParamsFromSeoData" in next major
      */
     protected function _getAdditionalParams($aSeoData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -157,6 +159,7 @@ class ObjectSeo extends AdminDetailsController
      * Returns TRUE if current seo entry has fixed state
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isEntryFixed()
     {
@@ -188,7 +191,7 @@ class ObjectSeo extends AdminDetailsController
      *
      * @param string $sOxid object id
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getStdUrl" in next major
      */
     protected function _getStdUrl($sOxid) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -222,7 +225,7 @@ class ObjectSeo extends AdminDetailsController
     /**
      * Returns seo entry type
      *
-     * @return string
+     * @return string|null
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoEntryType" in next major
      */
     protected function _getSeoEntryType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

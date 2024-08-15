@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
@@ -74,7 +75,8 @@ class PriceAlarmController extends FrontendController
      * (oxpricealarm::save()). Sends pricealarm notification mail
      * to shop owner.
      *
-     * @return  bool    false on error
+     * @return void
+     * @throws Exception
      */
     public function addme()
     {

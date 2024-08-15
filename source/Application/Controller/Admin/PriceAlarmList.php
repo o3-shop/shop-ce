@@ -55,12 +55,12 @@ class PriceAlarmList extends AdminListController
     /**
      * Modifying SQL query to load additional article and customer data
      *
-     * @param object $oListObject list main object
+     * @param object $listObject list main object
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
      */
-    protected function _buildSelectString($oListObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sViewName = getViewName("oxarticles", (int) Registry::getConfig()->getConfigParam("sDefaultLang"));
         $sSql = "select oxpricealarm.*, {$sViewName}.oxtitle AS articletitle, ";

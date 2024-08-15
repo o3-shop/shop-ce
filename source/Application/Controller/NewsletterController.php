@@ -67,7 +67,7 @@ class NewsletterController extends FrontendController
     /**
      * User newsletter registration data.
      *
-     * @var object
+     * @var array
      */
     protected $_aRegParams = null;
 
@@ -105,7 +105,7 @@ class NewsletterController extends FrontendController
      * Template variables:
      * <b>success</b>, <b>error</b>, <b>aRegParams</b>
      *
-     * @return bool
+     * @return void
      */
     public function send()
     {

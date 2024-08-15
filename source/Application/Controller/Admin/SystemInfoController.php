@@ -37,7 +37,7 @@ class SystemInfoController extends AdminController
      * Executes parent method parent::render(), prints shop and
      * PHP configuration information.
      *
-     * @return null
+     * @return void
      */
     public function render()
     {

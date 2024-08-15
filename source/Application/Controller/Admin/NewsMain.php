@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\News;
 use OxidEsales\Eshop\Core\Field;
@@ -87,7 +88,8 @@ class NewsMain extends AdminDetailsController
     /**
      * Saves news parameters changes.
      *
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
     public function save()
     {
@@ -137,7 +139,8 @@ class NewsMain extends AdminDetailsController
     /**
      * Saves news parameters in different language.
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveinnlang()
     {

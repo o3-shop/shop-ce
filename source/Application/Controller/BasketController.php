@@ -22,8 +22,10 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
+use OxidEsales\Eshop\Application\Model\ListObject;
 use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -223,7 +225,7 @@ class BasketController extends FrontendController
     /**
      * Assigns voucher to current basket
      *
-     * @return null
+     * @return void
      */
     public function addVoucher()
     {
@@ -244,7 +246,7 @@ class BasketController extends FrontendController
     /**
      * Removes voucher from basket (calls Basket::removeVoucher())
      *
-     * @return null
+     * @return void
      */
     public function removeVoucher()
     {
@@ -267,7 +269,7 @@ class BasketController extends FrontendController
      * Used with option "Display Message when Product is added to Cart" set to "Open Basket"
      * ($myConfig->iNewBasketItemMessage == 3)
      *
-     * @return string   $sBackLink  back link
+     * @return string|void   $sBackLink  back link
      */
     public function backToShop()
     {
@@ -316,7 +318,7 @@ class BasketController extends FrontendController
     /**
      * Return basket wrappings list if available
      *
-     * @return oxlist
+     * @return ListObject
      */
     public function getWrappingList()
     {
@@ -335,7 +337,7 @@ class BasketController extends FrontendController
     /**
      * Returns greeting cards list if available
      *
-     * @return oxlist
+     * @return ListObject
      */
     public function getCardList()
     {

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -140,10 +141,11 @@ class ArticleStock extends AdminDetailsController
     /**
      * Adds or updates amount price to article
      *
-     * @param string $sOXID         Object ID
-     * @param array  $aUpdateParams Parameters
+     * @param null $sOXID Object ID
+     * @param null $aUpdateParams Parameters
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function addprice($sOXID = null, $aUpdateParams = null)
     {

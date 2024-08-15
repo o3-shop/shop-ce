@@ -26,6 +26,8 @@ use OxidEsales\Eshop\Application\Model\Newsletter;
 use OxidEsales\Eshop\Application\Model\Remark;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -49,6 +51,8 @@ class NewsletterSend extends NewsletterSelection
      * file "newsletter_send.tpl"/"newsletter_done.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -127,7 +131,7 @@ class NewsletterSend extends NewsletterSelection
                         $oNewsletter->prepare($sUserId, $blLoadAction);
                     }
 
-                    if ($oNewsletter->send($iSendCnt)) {
+                    if ($oNewsletter->send()) {
                         // add user history
                         $oRemark = oxNew(Remark::class);
                         $oRemark->oxremark__oxtext = new Field($oNewsletter->getPlainText());
@@ -146,7 +150,7 @@ class NewsletterSend extends NewsletterSelection
         }
 
         $iSend = $iSendCnt + (ceil($iStart / $iMaxCnt) - 1) * $iMaxCnt;
-        $iSend = $iSend > $iUserCount ? $iUserCount : $iSend;
+        $iSend = min($iSend, $iUserCount);
 
         $this->_aViewData["iStart"] = $iStart;
         $this->_aViewData["iSend"] = $iSend;

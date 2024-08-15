@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\DeliverySetMainAjax;
 use OxidEsales\Eshop\Application\Model\DeliverySet;
@@ -89,7 +90,7 @@ class DeliverySetMain extends AdminDetailsController
     /**
      * Saves deliveryset information changes.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
@@ -130,7 +131,8 @@ class DeliverySetMain extends AdminDetailsController
     /**
      * Saves deliveryset data to different language (eg. english).
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveinnlang()
     {

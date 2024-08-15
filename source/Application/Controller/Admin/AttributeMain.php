@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\AttributeMainAjax;
 use OxidEsales\Eshop\Application\Model\Attribute;
@@ -95,7 +96,7 @@ class AttributeMain extends AdminDetailsController
     /**
      * Saves article attributes.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
@@ -130,7 +131,8 @@ class AttributeMain extends AdminDetailsController
     /**
      * Saves attribute data to different language (eg. english).
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveinnlang()
     {

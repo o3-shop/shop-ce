@@ -43,7 +43,6 @@ class NavigationController extends AdminController
     public function render()
     {
         parent::render();
-        $myUtilsServer = Registry::getUtilsServer();
 
         $sItem = Registry::getRequest()->getRequestEscapedParameter('item');
         $sItem = $sItem ? basename($sItem) : false;
@@ -191,7 +190,7 @@ class NavigationController extends AdminController
     /**
      * Checks if newer shop version available. If true - returns message
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkVersion" in next major
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

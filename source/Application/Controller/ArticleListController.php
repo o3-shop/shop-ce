@@ -190,7 +190,7 @@ class ArticleListController extends FrontendController
 
         $category = $this->getCategoryToRender();
 
-        $isCategoryActive = $category && (bool) $category->oxcategories__oxactive->value;
+        $isCategoryActive = $category && $category->oxcategories__oxactive->value;
         if (!$isCategoryActive) {
             Registry::getUtils()->redirect($config->getShopURL() . 'index.php', true, 302);
         }
@@ -462,7 +462,7 @@ class ArticleListController extends FrontendController
     /**
      * Returns active product id to load its seo meta info
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -505,12 +505,12 @@ class ArticleListController extends FrontendController
      *
      * @param string $meta           Category path.
      * @param int    $length         Max length of result, -1 for no truncation.
-     * @param bool   $descriptionTag If true - performs additional duplicate cleaning.
+     * @param bool   $removeDuplicatedWords If true - performs additional duplicate cleaning.
      *
      * @return  string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $description = '';
         // appending parent title
@@ -712,21 +712,21 @@ class ArticleListController extends FrontendController
      * Adds page number parameter to current Url and returns formatted url
      *
      * @param string $url         Url to append page numbers
-     * @param int    $currentPage Current page number
+     * @param int    $page Current page number
      * @param int    $languageId  Requested language
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
-    protected function _addPageNrParam($url, $currentPage, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addPageNrParam($url, $page, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (Registry::getUtils()->seoIsActive() && ($category = $this->getActiveCategory())) {
-            if ($currentPage) {
+            if ($page) {
                 // only if page number > 0
-                $url = $category->getBaseSeoLink($languageId, $currentPage);
+                $url = $category->getBaseSeoLink($languageId, $page);
             }
         } else {
-            $url = parent::_addPageNrParam($url, $currentPage, $languageId);
+            $url = parent::_addPageNrParam($url, $page, $languageId);
         }
 
         return $url;
@@ -767,7 +767,7 @@ class ArticleListController extends FrontendController
         $sorting = parent::getDefaultSorting();
 
         $category = $this->getActiveCategory();
-        if ($category && $category instanceof Category) {
+        if ($category instanceof Category) {
             if ($defaultSorting = $category->getDefaultSorting()) {
                 $articleViewName = getViewName('oxarticles');
                 $sortBy = $articleViewName . '.' . $defaultSorting;
@@ -783,7 +783,7 @@ class ArticleListController extends FrontendController
     /**
      * Returns title suffix used in template
      *
-     * @return string
+     * @return string|void
      */
     public function getTitleSuffix()
     {
@@ -795,7 +795,7 @@ class ArticleListController extends FrontendController
     /**
      * Returns title page suffix used in template
      *
-     * @return string
+     * @return string|void
      */
     public function getTitlePageSuffix()
     {
@@ -908,7 +908,7 @@ class ArticleListController extends FrontendController
     /**
      * Template variable getter. Returns category path array
      *
-     * @return array
+     * @return array|void
      */
     public function getTreePath()
     {
@@ -1068,7 +1068,7 @@ class ArticleListController extends FrontendController
     /**
      * Returns view canonical url
      *
-     * @return string
+     * @return string|void
      */
     public function getCanonicalUrl()
     {

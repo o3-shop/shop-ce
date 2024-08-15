@@ -63,7 +63,7 @@ class NavigationTree extends Base
     /**
      * clean empty nodes from tree
      *
-     * @param object $dom         dom object
+     * @param DOMDocument $dom         dom object
      * @param string $parentXPath parent xpath
      * @param string $childXPath  child xpath from parent
      * @deprecated underscore prefix violates PSR12, will be renamed to "cleanEmptyParents" in next major
@@ -151,7 +151,7 @@ class NavigationTree extends Base
      *
      * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
      *
-     * @param object $dom dom element to add links
+     * @param DOMDocument $dom dom element to add links
      */
     protected function _addDynLinks($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -220,7 +220,7 @@ class NavigationTree extends Base
     /**
      * add session parameters to local urls
      *
-     * @param object $dom dom element to add links
+     * @param DOMDocument $dom dom element to add links
      * @deprecated underscore prefix violates PSR12, will be renamed to "sessionizeLocalUrls" in next major
      */
     protected function _sessionizeLocalUrls($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -242,7 +242,7 @@ class NavigationTree extends Base
     /**
      * Removes form tree elements which does not have required user rights
      *
-     * @param object $dom DOMDocument
+     * @param DOMDocument $dom DOMDocument
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkRights" in next major
      */
     protected function _checkRights($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -308,7 +308,7 @@ class NavigationTree extends Base
      *
      * @param DOMDocument $dom document to check group
      *
-     * @return null
+     * @return void
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkDemoShopDenials" in next major
      */
     protected function _checkDemoShopDenials($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -443,7 +443,7 @@ class NavigationTree extends Base
      * @param string $id  class name
      * @param int    $act active tab number
      *
-     * @return string
+     * @return string|void
      */
     public function getActiveTab($id, $act)
     {
@@ -459,7 +459,7 @@ class NavigationTree extends Base
      *
      * @param string $class class name
      *
-     * @return mixed
+     * @return stdClass
      */
     public function getBtn($class)
     {
@@ -512,17 +512,16 @@ class NavigationTree extends Base
     /**
      * Checks if dyn file is valid for inclusion
      *
-     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
-     *
      * @param string $dynFilePath dyn file path
      *
-     * @return bool
+     * @return string|null
+     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
+     *
      */
     protected function _checkDynFile($dynFilePath) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $dynFile = null;
         if (file_exists($dynFilePath)) {
-            $line = null;
             if (($handle = @fopen($dynFilePath, 'r'))) {
                 $line = stream_get_line($handle, 100, "?>");
                 fclose($handle);
@@ -687,7 +686,7 @@ class NavigationTree extends Base
      *
      * @param string $id tab related class
      *
-     * @return string
+     * @return string|void
      */
     public function getListUrl($id)
     {
@@ -710,7 +709,7 @@ class NavigationTree extends Base
      * @param string $id     tab related class
      * @param int    $actTab active tab
      *
-     * @return string
+     * @return string|void
      */
     public function getEditUrl($id, $actTab)
     {
@@ -783,7 +782,7 @@ class NavigationTree extends Base
      *
      * @param string $className active class name
      *
-     * @return string
+     * @return string|void
      */
     public function getClassId($className)
     {

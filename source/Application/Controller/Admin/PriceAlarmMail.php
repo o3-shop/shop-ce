@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -39,6 +41,8 @@ class PriceAlarmMail extends AdminDetailsController
      * "pricealarm_main.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -56,7 +60,7 @@ class PriceAlarmMail extends AdminDetailsController
         $result = DatabaseProvider::getDb()->select($query, [
             ':oxshopid' => $shopId
         ]);
-        if ($result != false && $result->count() > 0) {
+        if ($result && $result->count() > 0) {
             $simpleCache = [];
             while (!$result->EOF) {
                 $price = $result->fields[0];

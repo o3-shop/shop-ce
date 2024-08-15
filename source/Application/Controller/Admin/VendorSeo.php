@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use OxidEsales\Eshop\Application\Model\SeoEncoderVendor;
 use OxidEsales\Eshop\Application\Model\Vendor;
@@ -37,6 +38,7 @@ class VendorSeo extends ObjectSeo
      * Updating oxshowsuffix field
      *
      * @return null
+     * @throws Exception
      */
     public function save()
     {
@@ -76,7 +78,7 @@ class VendorSeo extends ObjectSeo
     /**
      * Returns true if SEO object id has suffix enabled
      *
-     * @return bool
+     * @return bool|void
      */
     public function isEntrySuffixed()
     {
@@ -100,7 +102,7 @@ class VendorSeo extends ObjectSeo
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
      */
     public function getEntryUri()
     {

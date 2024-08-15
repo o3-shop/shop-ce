@@ -28,6 +28,8 @@ use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -45,6 +47,8 @@ class PriceAlarmMain extends AdminDetailsController
      * "pricealarm_main.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -59,7 +63,6 @@ class PriceAlarmMain extends AdminDetailsController
             $oPricealarm->load($soxId);
 
             // customer info
-            $oUser = null;
             if ($oPricealarm->oxpricealarm__oxuserid->value) {
                 $oUser = oxNew(User::class);
                 $oUser->load($oPricealarm->oxpricealarm__oxuserid->value);
@@ -145,6 +148,8 @@ class PriceAlarmMain extends AdminDetailsController
      * Returns number of active price alarms.
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function getActivePriceAlarmsCount()
     {
@@ -156,7 +161,7 @@ class PriceAlarmMain extends AdminDetailsController
         $result = DatabaseProvider::getDb()->select($query);
         $count = 0;
 
-        if ($result != false && $result->count() > 0) {
+        if ($result && $result->count() > 0) {
             while (!$result->EOF) {
                 $article = oxNew(Article::class);
                 $article->load($result->fields[0]);

@@ -125,7 +125,6 @@ class OrderMain extends AdminDetailsController
                 $orderField = $oOrder->$parameter;
                 if (($value != $orderField->value) && !in_array($parameter, $this->fieldsTriggerNoOrderRecalculation)) {
                     $needOrderRecalculate = true;
-                    continue;
                 }
             }
         }

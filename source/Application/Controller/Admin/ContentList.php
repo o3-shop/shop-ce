@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -76,15 +77,16 @@ class ContentList extends AdminListController
     /**
      * Adding folder check and empty folder field check.
      *
-     * @param array  $aWhere  SQL condition array
-     * @param string $sqlFull SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
-    protected function _prepareWhereQuery($aWhere, $sqlFull) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_prepareWhereQuery($aWhere, $sqlFull);
+        $sQ = parent::_prepareWhereQuery($whereQuery, $fullQuery);
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sViewName = getviewName("oxcontents");
 

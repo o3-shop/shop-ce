@@ -21,11 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\PriceAlarm;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -48,6 +51,8 @@ class PriceAlarmSend extends AdminListController
      * file "pricealarm_send.tpl"/"pricealarm_done.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -85,10 +90,10 @@ class PriceAlarmSend extends AdminListController
     /**
      * Overrides parent method to pass referred id.
      *
-     * @param string $sId Class name
+     * @param string $node Class name
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
-    protected function _setupNavigation($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setupNavigation($node) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         parent::_setupNavigation('pricealarm_list');
     }
@@ -97,6 +102,8 @@ class PriceAlarmSend extends AdminListController
      * Counts active price alerts and returns this number.
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function countActivePriceAlerts()
     {
@@ -129,6 +136,8 @@ class PriceAlarmSend extends AdminListController
      *
      * @param int $start How much price alerts was already sent.
      * @param int $limit How much price alerts to send.
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function sendPriceChangeNotifications($start, $limit)
     {
@@ -161,9 +170,10 @@ class PriceAlarmSend extends AdminListController
      * Creates and sends email with price alarm information.
      *
      * @param string $emailAddress Email address
-     * @param string $productID    Product id
+     * @param string $productID Product id
      * @param string $priceAlarmId Price alarm id
-     * @param string $bidPrice     Bid price
+     * @param string $bidPrice Bid price
+     * @throws Exception
      */
     public function sendeMail($emailAddress, $productID, $priceAlarmId, $bidPrice)
     {
