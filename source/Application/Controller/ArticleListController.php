@@ -420,7 +420,7 @@ class ArticleListController extends FrontendController
      */
     public function getActPage()
     {
-        //Fake oxmore category has no subpages so we can set the page number to zero
+        // Fake oxmore category has no subpages, so we can set the page number to zero
         if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
             return 0;
         }
@@ -431,7 +431,7 @@ class ArticleListController extends FrontendController
     /**
      * Calls parent::getActPage();
      *
-     * @todo this function is a temporary solution and should be rmeoved as
+     * @todo this function is a temporary solution and should be removed as
      * soon product list loading is refactored
      *
      * @return int
@@ -523,7 +523,7 @@ class ArticleListController extends FrontendController
             $description .= " {$activeCategory->oxcategories__oxtitle->value}.";
         }
 
-        // and final component ..
+        // and final component ...
         //changed for #2776
         if (($suffix = Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value)) {
             $description .= " {$suffix}";

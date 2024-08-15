@@ -30,8 +30,7 @@ use stdClass;
 
 /**
  * Admin article main delivery manager.
- * There is possibility to change delivery name, article, user
- * and etc.
+ * There is possibility to change delivery name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
 class DeliveryMain extends AdminDetailsController
@@ -51,7 +50,7 @@ class DeliveryMain extends AdminDetailsController
         // remove itm from list
         unset($this->_aViewData["sumtype"][2]);
 
-        // Deliverytypes
+        // delivery-types
         $aDelTypes = $this->getDeliveryTypes();
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();

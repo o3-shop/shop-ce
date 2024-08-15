@@ -178,10 +178,10 @@ class ToolsList extends AdminListController
     }
 
     /**
-     * Method parses givent SQL queries string and returns array on success
+     * Methode parses given SQL queries string and returns array on success
      *
      * @param string  $sSQL    SQL queries
-     * @param integer $iSQLlen query lenght
+     * @param integer $iSQLlen query length
      *
      * @return mixed
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareSQL" in next major

@@ -25,7 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Admin actionss manager.
+ * Admin actions' manager.
  * Sets list template, list object class ('oxactions') and default sorting
  * field ('oxactions.oxtitle').
  * Admin Menu: Manage Products -> Actions.

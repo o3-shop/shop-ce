@@ -130,7 +130,7 @@ class DynamicExportBaseController extends AdminDetailsController
     protected $_aCatLvlCache = null;
 
     /**
-     * Calls parent costructor and initializes $this->_sFilePath parameter
+     * Calls parent constructor and initializes $this->_sFilePath parameter
      */
     public function __construct()
     {
@@ -167,7 +167,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     public function createMainExportView()
     {
-        // parent categorie tree
+        // parent category-tree
         $this->_aViewData["cattree"] = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
         $this->_aViewData["cattree"]->loadList();
 
@@ -184,7 +184,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     public function start()
     {
-        // delete file, if its already there
+        // delete file, if it's already there
         $this->fpFile = @fopen($this->_sFilePath, "w");
         if (!isset($this->fpFile) || !$this->fpFile) {
             // we do have an error !
@@ -462,7 +462,7 @@ class DynamicExportBaseController extends AdminDetailsController
     }
 
     /**
-     * Searches for deepest path to a categorie this article is assigned to
+     * Searches for deepest path to a category this article is assigned to
      *
      * @param Article $oArticle article object
      *
@@ -507,7 +507,7 @@ class DynamicExportBaseController extends AdminDetailsController
     }
 
     /**
-     * get's one oxid for exporting
+     * gets one oxid for exporting
      *
      * @param integer $iCnt       counter
      * @param bool    $blContinue false is used to stop exporting
@@ -612,7 +612,7 @@ class DynamicExportBaseController extends AdminDetailsController
     }
 
     /**
-     * creates heaptable
+     * creates heap-table
      *
      * @param string $sHeapTable    table name
      * @param string $sTableCharset table charset
@@ -662,7 +662,7 @@ class DynamicExportBaseController extends AdminDetailsController
     }
 
     /**
-     * inserts articles into heaptable
+     * inserts articles into heap-table
      *
      * @param string $sHeapTable heap table name
      * @param string $sCatAdd    category id filter (part of sql)
@@ -936,7 +936,7 @@ class DynamicExportBaseController extends AdminDetailsController
     {
         // #827
         if ($sCampaign = Registry::getRequest()->getRequestEscapedParameter('sExportCampaign')) {
-            // modify detaillink
+            // modify detail-link
             //#1166R - pangora - campaign
             $oArticle->appendLink("campaign={$sCampaign}");
 

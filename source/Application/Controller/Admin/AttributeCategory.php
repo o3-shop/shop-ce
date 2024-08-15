@@ -27,10 +27,10 @@ use OxidEsales\Eshop\Application\Model\Attribute;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Admin category main attributes manager.
+ * Admin category main attributes' manager.
  * There is possibility to change attribute description, assign categories to
  * this attribute, etc.
- * Admin Menu: Manage Products -> Attributes -> Gruppen.
+ * Admin Menu: Manage Products -> Attributes -> Groups.
  */
 class AttributeCategory extends AdminDetailsController
 {

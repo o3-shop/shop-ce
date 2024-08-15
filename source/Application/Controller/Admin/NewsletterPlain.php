@@ -28,14 +28,14 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * @deprecated Functionality for Newsletter management will be removed.
  * Newsletter plain manager.
- * Performs newsletter creation (plain text format, collects neccessary information).
+ * Performs newsletter creation (plain text format, collects necessary information).
  * Admin Menu: Customer Info -> Newsletter -> Text.
  */
 class NewsletterPlain extends AdminDetailsController
 {
     /**
      * Executes prent method parent::render(), creates oxnewsletter object
-     * and passes it's data to smarty. Returns name of template file
+     * and passes its data to smarty. Returns name of template file
      * "newsletter_plain.tpl".
      *
      * @return string

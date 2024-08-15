@@ -85,7 +85,7 @@ class AdminListController extends AdminController
     protected $_blDesc = false;
 
     /**
-     * Set to true to enable multi language
+     * Set to true to enable multilanguage
      *
      * @var bool
      */
@@ -397,7 +397,7 @@ class AdminListController extends AdminController
      * Builds part of SQL query
      *
      * @param string $value         filter value
-     * @param bool   $isSearchValue filter value type, true means surrount search key with '%'
+     * @param bool   $isSearchValue filter value type, true means surround search key with '%'
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildFilter" in next major
@@ -700,7 +700,7 @@ class AdminListController extends AdminController
             $end = ($end < $start + 10) ? $start + 10 : $end;
             $end = ($end > $pageNavigation->pages) ? $pageNavigation->pages : $end;
 
-            // once again adjusting start pos ..
+            // once again adjusting start pos ...
             $start = ($end - 10 > 0) ? $end - 10 : $start;
             $start = ($pageNavigation->pages <= 11) ? 1 : $start;
 

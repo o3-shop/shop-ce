@@ -90,7 +90,7 @@ class RssController extends FrontendController
 
         $renderer = $this->getRenderer();
         // TODO: can we move it?
-        // #2873: In demoshop for RSS we set php_handling to SMARTY_PHP_PASSTHRU
+        // #2873: In demo-shop for RSS we set php_handling to SMARTY_PHP_PASSTHRU
         // as SMARTY_PHP_REMOVE removes not only php tags, but also xml
         if (Registry::getConfig()->isDemoShop()) {
             $renderer->php_handling = SMARTY_PHP_PASSTHRU;

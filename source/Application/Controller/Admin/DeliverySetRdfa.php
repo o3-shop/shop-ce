@@ -30,7 +30,7 @@ use stdClass;
 
 /**
  * Admin article RDFa deliveryset manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Shop Settings -> Shipping & Handling -> RDFa.
  */
 class DeliverySetRdfa extends PaymentRdfa

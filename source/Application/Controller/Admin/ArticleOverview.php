@@ -30,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Admin article overview manager.
  * Collects and previews such article information as article creation date,
- * last modification date, sales rating and etc.
+ * last modification date, sales rating etc.
  * Admin Menu: Manage Products -> Articles -> Overview.
  */
 class ArticleOverview extends AdminDetailsController

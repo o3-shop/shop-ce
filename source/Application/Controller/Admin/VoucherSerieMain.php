@@ -28,8 +28,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main voucherserie manager.
- * There is possibility to change voucherserie name, description, valid terms
- * and etc.
+ * There is possibility to change voucherserie name, description, valid terms etc.
  * Admin Menu: Shop Settings -> Vouchers -> Main.
  */
 class VoucherSerieMain extends DynamicExportBaseController

@@ -29,8 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main delivery manager.
- * There is possibility to change delivery name, article, user
- * and etc.
+ * There is possibility to change delivery name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
 class DeliveryArticles extends AdminDetailsController

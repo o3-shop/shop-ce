@@ -29,15 +29,15 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 
 /**
- * Admin article main actions manager.
+ * Admin article main actions' manager.
  * There is possibility to change actions description, assign articles to
- * this actions, etc.
+ * this action, etc.
  * Admin Menu: Manage Products -> actions -> Main.
  */
 class ActionsMain extends AdminDetailsController
 {
     /**
-     * Loads article actionss info, passes it to Smarty engine and
+     * Loads article actions' info, passes it to Smarty engine and
      * returns name of template file "actions_main.tpl".
      *
      * @return string

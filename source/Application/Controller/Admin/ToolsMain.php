@@ -28,7 +28,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * CVS export manager.
  * Performs export function according to user chosen categories.
- * Admin Menu: Maine Menu -> Im/Export -> Export.
+ * Admin Menu: Maine Menu -> In-/Export -> Export.
  */
 class ToolsMain extends AdminDetailsController
 {

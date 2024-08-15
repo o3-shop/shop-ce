@@ -60,7 +60,7 @@ class ReviewController extends ArticleDetailsController
     protected $_oActiveRecommList = null;
 
     /**
-     * Active recommlist's items
+     * Active recommlists items
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
@@ -417,7 +417,7 @@ class ReviewController extends ArticleDetailsController
     }
 
     /**
-     * Template variable getter. Returns active recommlist's items
+     * Template variable getter. Returns active recommlists items
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *

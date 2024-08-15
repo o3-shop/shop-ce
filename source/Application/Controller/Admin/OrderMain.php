@@ -31,7 +31,7 @@ use OxidEsales\Eshop\Core\UtilsDate;
 
 /**
  * Admin article main order manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Orders -> Display Orders -> Main.
  */
 class OrderMain extends AdminDetailsController
@@ -47,8 +47,8 @@ class OrderMain extends AdminDetailsController
                                                          'oxorder__oxpaid'];
 
     /**
-     * Executes parent method parent::render(), creates oxorder and
-     * oxuserpayment objects, passes data to Smarty engine and returns
+     * Executes parent method parent::render(), creates Order and
+     * UserPayment objects, passes data to Smarty engine and returns
      * name of template file "order_main.tpl".
      *
      * @return string

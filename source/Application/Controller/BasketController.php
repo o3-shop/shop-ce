@@ -115,7 +115,7 @@ class BasketController extends FrontendController
     /**
      * Executes parent::render(), creates list with basket articles
      * Returns name of template file basket::_sThisTemplate (for Search
-     * engines return "content.tpl" template to avoid fake orders etc).
+     * engines return "content.tpl" template to avoid fake orders etc.).
      *
      * @return  string   $this->_sThisTemplate  current template file name
      */

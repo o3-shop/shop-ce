@@ -30,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * List of articles for a selected Manufacturer.
  * Collects list of articles, according to it generates links for list gallery,
- * metatags (for search engines). Result - "manufacturerlist.tpl" template.
+ * meta-tags (for search engines). Result - "manufacturerlist.tpl" template.
  * O3-Shop -> (Any selected shop product category).
  */
 class ManufacturerListController extends ArticleListController
@@ -105,7 +105,7 @@ class ManufacturerListController extends ArticleListController
      * list sorting rules. Loads list of articles which belong to this Manufacturer
      * Generates page navigation data
      * such as previous/next window URL, number of available pages, generates
-     * metatags info (FrontendController::_convertForMetaTags()) and returns
+     * meta-tags info (FrontendController::_convertForMetaTags()) and returns
      * name of template to render.
      *
      * @return  string  $this->_sThisTemplate   current template file name
@@ -394,7 +394,7 @@ class ManufacturerListController extends ArticleListController
     }
 
     /**
-     * returns object, assosiated with current view.
+     * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
      * @param int $iLang language id

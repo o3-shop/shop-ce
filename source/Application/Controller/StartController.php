@@ -122,7 +122,7 @@ class StartController extends FrontendController
      * (oxarticlelist::loadActionArticles()). Returns name of
      * template file to render.
      *
-     * @return  string  cuurent template file name
+     * @return  string  current template file name
      */
     public function render()
     {
@@ -149,9 +149,9 @@ class StartController extends FrontendController
     }
 
     /**
-     * Returns current view meta data
+     * Returns current view metadata
      * If $sMeta parameter comes empty, sets to it article title and description.
-     * It happens if current view has no meta data defined in oxcontent table
+     * It happens if current view has no metadata defined in oxcontent table
      *
      * @param string $sMeta     category path
      * @param int    $iLength   max length of result, -1 for no truncation
@@ -177,7 +177,7 @@ class StartController extends FrontendController
     /**
      * Returns current view keywords seperated by comma
      * If $sKeywords parameter comes empty, sets to it article title and description.
-     * It happens if current view has no meta data defined in oxcontent table
+     * It happens if current view has no metadata defined in oxcontent table
      *
      * @param string $sKeywords               data to use as keywords
      * @param bool   $blRemoveDuplicatedWords remove duplicated words

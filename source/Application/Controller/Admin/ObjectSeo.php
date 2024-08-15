@@ -144,7 +144,7 @@ class ObjectSeo extends AdminDetailsController
     /**
      * Returns object seo data
      *
-     * @param string $sMetaType meta data type (oxkeywords/oxdescription)
+     * @param string $sMetaType metadata type (oxkeywords/oxdescription)
      *
      * @return string
      */

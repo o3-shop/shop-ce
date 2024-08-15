@@ -87,7 +87,7 @@ class CountryList extends AdminListController
     }
 
     /**
-     * Getter for the second sort field name (for getting the expected oreder out of the databse).
+     * Getter for the second sort field name (for getting the expected order out of the database).
      *
      * @return string The name of the field we want to be the second order by argument.
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSecondSortFieldName" in next major

@@ -30,8 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main delivery manager.
- * There is possibility to change delivery name, article, user
- * and etc.
+ * There is possibility to change delivery name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
 class DeliveryUsers extends AdminDetailsController
@@ -49,7 +48,7 @@ class DeliveryUsers extends AdminDetailsController
         $soxId = $this->getEditObjectId();
 
         $sViewName = getViewName("oxgroups", $this->_iEditLang);
-        // all usergroups
+        // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
         $oGroups->selectString("select * from {$sViewName}");

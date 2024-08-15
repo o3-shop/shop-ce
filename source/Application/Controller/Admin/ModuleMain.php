@@ -30,8 +30,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActiv
 
 /**
  * Admin article main deliveryset manager.
- * There is possibility to change deliveryset name, article, user
- * and etc.
+ * There is possibility to change deliveryset name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
 class ModuleMain extends AdminDetailsController

@@ -105,7 +105,7 @@ class DiagnosticsMain extends AdminDetailsController
 
 
     /**
-     * Calls parent costructor and initializes checker object
+     * Calls parent constructor and initializes checker object
      *
      */
     public function __construct()
@@ -118,7 +118,7 @@ class DiagnosticsMain extends AdminDetailsController
     }
 
     /**
-     * Loads oxversioncheck class.
+     * Loads version-check class.
      *
      * @return string
      */
@@ -296,7 +296,7 @@ class DiagnosticsMain extends AdminDetailsController
 
         /**
          * PHP info
-         * Fetches a hand full of php configuration parameters and collects their values.
+         * Fetches a handful of php configuration parameters and collects their values.
          */
         if ($this->getParam('oxdiag_frm_php')) {
             $aViewData['oxdiag_frm_php'] = true;

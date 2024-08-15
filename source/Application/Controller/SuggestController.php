@@ -188,7 +188,7 @@ class SuggestController extends FrontendController
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @return array
      */
@@ -205,7 +205,7 @@ class SuggestController extends FrontendController
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @return array
      */
@@ -222,7 +222,7 @@ class SuggestController extends FrontendController
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *

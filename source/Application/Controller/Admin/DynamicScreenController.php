@@ -85,7 +85,7 @@ class DynamicScreenController extends AdminListController
         // default tab
         $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($sNode, $this->_iDefEdit);
 
-        // passign active tab number
+        // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
 
         // buttons

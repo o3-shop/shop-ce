@@ -27,7 +27,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main newsletter manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Customer Info -> Newsletter -> Main.
  *
  * @deprecated Will be removed in next major
@@ -36,7 +36,7 @@ class NewsletterMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxnewsletter object
-     * and passes it's data to Smarty engine. Returns name of template file
+     * and passes its data to Smarty engine. Returns name of template file
      * "newsletter_main.tpl".
      *
      * @return string

@@ -43,7 +43,7 @@ class NewsletterSelection extends AdminDetailsController
 
     /**
      * Executes parent method parent::render(), creates oxlist object and
-     * collects user groups information, passes it's data to Smarty engine
+     * collects user groups information, passes its data to Smarty engine
      * and returns name of template file "newsletter_selection.tpl".
      *
      * @return string
@@ -85,7 +85,7 @@ class NewsletterSelection extends AdminDetailsController
             $oNewsletter = oxNew(Newsletter::class);
             if ($oNewsletter->load($this->getEditObjectId())) {
                 // get nr. of users in these groups
-                // we do not use lists here as we dont need this overhead right now
+                // we do not use lists here as we don't need this overhead right now
                 $oDB = DatabaseProvider::getDb();
                 $blSep = false;
                 $sSelectGroups = " ( oxobject2group.oxgroupsid in ( ";

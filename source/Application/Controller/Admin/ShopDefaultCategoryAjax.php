@@ -38,15 +38,15 @@ class ShopDefaultCategoryAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxcategories', 1, 1, 0],
-        ['oxdesc', 'oxcategories', 1, 1, 0],
-        ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
-    ]
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxcategories', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
@@ -62,7 +62,7 @@ class ShopDefaultCategoryAjax extends ListComponentAjax
     }
 
     /**
-     * Removing article from corssselling list
+     * Removing article from cross-selling list
      */
     public function unassignCat()
     {
@@ -75,7 +75,7 @@ class ShopDefaultCategoryAjax extends ListComponentAjax
     }
 
     /**
-     * Adding article to corssselling list
+     * Adding article to cross-selling list
      */
     public function assignCat()
     {

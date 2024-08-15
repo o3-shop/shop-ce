@@ -70,7 +70,7 @@ class PriceAlarmController extends FrontendController
     /**
      * Validates email
      * address. If email is wrong - returns false and exits. If email
-     * address is OK - creates prcealarm object and saves it
+     * address is OK - creates pricealarm object and saves it
      * (oxpricealarm::save()). Sends pricealarm notification mail
      * to shop owner.
      *
@@ -157,7 +157,7 @@ class PriceAlarmController extends FrontendController
     }
 
     /**
-     * Return pricealarm status (if it was send)
+     * Return pricealarm status (if it was sent)
      *
      * @return integer
      */

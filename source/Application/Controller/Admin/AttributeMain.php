@@ -28,7 +28,7 @@ use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
- * Admin article main attributes manager.
+ * Admin article main attributes' manager.
  * There is possibility to change attribute description, assign articles to
  * this attribute, etc.
  * Admin Menu: Manage Products -> Attributes -> Main.

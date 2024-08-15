@@ -28,10 +28,10 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Admin article crosselling/accesories manager.
+ * Admin article crosselling/accessoires manager.
  * Creates list of available articles, there is ability to assign or remove
- * assigning of article to crosselling/accesories with other products.
- * Admin Menu: Manage Products -> Articles -> Crosssell.
+ * assigning of article to crosselling/accessoires with other products.
+ * Admin Menu: Manage Products -> Articles -> Cross-selling
  */
 class ArticleCrossselling extends AdminDetailsController
 {
@@ -48,7 +48,7 @@ class ArticleCrossselling extends AdminDetailsController
 
         $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
-        // crossselling
+        // cross-selling
         $this->_createCategoryTree("artcattree");
 
         // accessoires
@@ -71,8 +71,8 @@ class ArticleCrossselling extends AdminDetailsController
 
             return "popups/article_crossselling.tpl";
         } elseif ($iAoc == 2) {
-            $oArticleAccessoriesAjax = oxNew(ArticleAccessoriesAjax::class);
-            $this->_aViewData['oxajax'] = $oArticleAccessoriesAjax->getColumns();
+            $oArticleAccessoiresAjax = oxNew(ArticleAccessoriesAjax::class);
+            $this->_aViewData['oxajax'] = $oArticleAccessoiresAjax->getColumns();
 
             return "popups/article_accessories.tpl";
         }

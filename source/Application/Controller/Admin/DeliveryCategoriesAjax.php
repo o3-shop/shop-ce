@@ -53,7 +53,7 @@ class DeliveryCategoriesAjax extends ListComponentAjax
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
@@ -105,8 +105,8 @@ class DeliveryCategoriesAjax extends ListComponentAjax
             $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
-            $sChosenCategoriess = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sChosenCategoriess . ") ";
+            $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
+            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sChosenCategories . ") ";
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }

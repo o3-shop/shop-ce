@@ -25,7 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 
 /**
  * Admins links manager.
- * Sets template, that arranges two other templates ("adminlinks_lis.tpl"
+ * Sets template, that arranges two other templates ("adminlinks_list.tpl"
  * and "adminlinks_main.tpl") to frame.
  * Admin Menu: Customer Info -> Links.
  */

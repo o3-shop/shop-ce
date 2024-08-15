@@ -29,7 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
  * Admin Contents manager.
  * Collects Content base information (Description), there is ability to filter
  * them by Description or delete them.
- * Admin Menu: Customerinformations -> Content.
+ * Admin Menu: Customer-Information -> Content.
  */
 class ContentList extends AdminListController
 {
@@ -88,7 +88,7 @@ class ContentList extends AdminListController
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sViewName = getviewName("oxcontents");
 
-        //searchong for empty oxfolder fields
+        // searching for empty oxfolder fields
         if ($sFolder == 'CMSFOLDER_NONE' || $sFolder == 'CMSFOLDER_NONE_RR') {
             $sQ .= " and {$sViewName}.oxfolder = '' ";
         } elseif ($sFolder && $sFolder != '-1') {

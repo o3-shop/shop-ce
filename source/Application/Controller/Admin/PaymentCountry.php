@@ -30,14 +30,14 @@ use stdClass;
 
 /**
  * Admin article main payment manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Shop Settings -> Payment Methods -> Main.
  */
 class PaymentCountry extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxlist object,
-     * passes it's data to Smarty engine and retutns name of template
+     * passes its data to Smarty engine and returns name of template
      * file "payment_main.tpl".
      *
      * @return string

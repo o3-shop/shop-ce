@@ -127,7 +127,7 @@ class VendorMain extends AdminDetailsController
     }
 
     /**
-     * Saves selection list parameters changes in different language (eg. english).
+     * Saves selection list parameters changes in different language (e.g. english).
      *
      * @return mixed
      */

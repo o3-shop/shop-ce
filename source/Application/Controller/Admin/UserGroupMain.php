@@ -28,7 +28,7 @@ use stdClass;
 
 /**
  * Admin article main usergroup manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: User Administration -> User Groups -> Main.
  */
 class UserGroupMain extends AdminDetailsController

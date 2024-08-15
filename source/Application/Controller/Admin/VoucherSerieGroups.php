@@ -35,7 +35,7 @@ class VoucherSerieGroups extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxlist and oxvoucherserie
-     * objects, passes it's data to Smarty engine and returns name of template
+     * objects, passes its data to Smarty engine and returns name of template
      * file "voucherserie_groups.tpl".
      *
      * @return string

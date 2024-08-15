@@ -30,8 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin deliveryset User manager.
- * There is possibility to add User, groups
- * and etc.
+ * There is possibility to add User, groups etc.
  * Admin Menu: Shop settings -> Shipping & Handling Sets -> Users.
  */
 class DeliverySetUsers extends AdminDetailsController
@@ -48,7 +47,7 @@ class DeliverySetUsers extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        // all usergroups
+        // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
         $oGroups->selectString("select * from " . getViewName("oxgroups", $this->_iEditLang));

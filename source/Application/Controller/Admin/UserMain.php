@@ -29,7 +29,7 @@ use Exception;
 
 /**
  * Admin article main user manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: User Administration -> Users -> Main.
  */
 class UserMain extends AdminDetailsController
@@ -156,12 +156,12 @@ class UserMain extends AdminDetailsController
 
             $oUser->assign($aParams);
 
-            //seting shop id for ONLY for new created user
+            // setting shop id for ONLY for new created user
             if ($soxId == "-1") {
                 $this->onUserCreation($oUser);
             }
 
-            // A. changing field type to save birth date correctly
+            // A. changing field type to save birthdate correctly
             $oUser->oxuser__oxbirthdate->fldtype = 'char';
 
             try {

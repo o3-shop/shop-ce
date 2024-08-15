@@ -33,7 +33,7 @@ use stdClass;
 /**
  * Admin article inventory manager.
  * Collects such information about article as stock quantity, delivery status,
- * stock message, etc; Updates information (on user submit).
+ * stock message, etc.; Updates information (on user submit).
  * Admin Menu: Manage Products -> Articles -> Inventory.
  */
 class ArticleStock extends AdminDetailsController
@@ -105,7 +105,7 @@ class ArticleStock extends AdminDetailsController
     }
 
     /**
-     * Saves article Inventori information changes.
+     * Saves article inventory information changes.
      */
     public function save()
     {

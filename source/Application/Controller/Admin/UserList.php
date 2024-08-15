@@ -61,7 +61,7 @@ class UserList extends AdminListController
     protected $_sThisTemplate = 'user_list.tpl';
 
     /**
-     * Executes parent::render(), sets blacklist and preventdelete flag
+     * Executes parent::render(), sets blacklist and prevent delete flag
      *
      * @return null
      */
@@ -110,7 +110,7 @@ class UserList extends AdminListController
     {
         $nameWhere = null;
         if (isset($whereQuery['oxuser.oxlname']) && ($name = $whereQuery['oxuser.oxlname'])) {
-            // check if this is search string (contains % sign at begining and end of string)
+            // check if this is search string (contains % sign at beginning and end of string)
             $isSearchValue = $this->_isSearchValue($name);
             $name = $this->_processFilter($name);
             $nameWhere['oxuser.oxfname'] = $nameWhere['oxuser.oxlname'] = $name;

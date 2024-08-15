@@ -36,8 +36,8 @@ use stdClass;
 
 /**
  * Admin article main manager.
- * Collects and updates (on user submit) article base parameters data ( such as
- * title, article No., short Description and etc.).
+ * Collects and updates (on user submit) article base parameters data (such as
+ * title, article No., short Description etc.).
  * Admin Menu: Manage Products -> Articles -> Main.
  */
 class ArticleMain extends AdminDetailsController
@@ -61,14 +61,14 @@ class ArticleMain extends AdminDetailsController
 
         $sOxId = $this->getEditObjectId();
         $sVoxId = Registry::getRequest()->getRequestEscapedParameter('voxid');
-        $sOxParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
+        $sParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
 
         // new variant ?
-        if (isset($sVoxId) && $sVoxId == "-1" && isset($sOxParentId) && $sOxParentId && $sOxParentId != "-1") {
+        if (isset($sVoxId) && $sVoxId == "-1" && isset($sParentId) && $sParentId && $sParentId != "-1") {
             $oParentArticle = oxNew(Article::class);
-            $oParentArticle->load($sOxParentId);
+            $oParentArticle->load($sParentId);
             $this->_aViewData["parentarticle"] = $oParentArticle;
-            $this->_aViewData["oxparentid"] = $sOxParentId;
+            $this->_aViewData["oxparentid"] = $sParentId;
 
             $this->_aViewData["oxid"] = $sOxId = "-1";
         }
@@ -164,10 +164,10 @@ class ArticleMain extends AdminDetailsController
             $aParams['oxarticles__oxvat'] = null;
         }
 
-        // varianthandling
-        $soxparentId = $oRequest->getRequestEscapedParameter('oxparentid');
-        if (isset($soxparentId) && $soxparentId && $soxparentId != "-1") {
-            $aParams['oxarticles__oxparentid'] = $soxparentId;
+        // variant-handling
+        $sParentId = $oRequest->getRequestEscapedParameter('oxparentid');
+        if (isset($sParentId) && $sParentId && $sParentId != "-1") {
+            $aParams['oxarticles__oxparentid'] = $sParentId;
         } else {
             unset($aParams['oxarticles__oxparentid']);
         }
@@ -205,7 +205,7 @@ class ArticleMain extends AdminDetailsController
         }
 
         $oArticle->setLanguage(0);
-        //triming spaces from article title (M:876)
+        // trimming spaces from article title (M:876)
         if (isset($aParams['oxarticles__oxtitle'])) {
             $aParams['oxarticles__oxtitle'] = trim($aParams['oxarticles__oxtitle']);
         }
@@ -240,7 +240,7 @@ class ArticleMain extends AdminDetailsController
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // TODO: the code below is redundant, optimize it, assignments should go smooth without conversions
-        // hack, if editor screws up text, htmledit tends to do so
+        // hack, if editor screws up text (htmledit tends to do so)
         $sValue = str_replace('&amp;nbsp;', '&nbsp;', $sValue);
         $sValue = str_replace('&amp;', '&', $sValue);
         $sValue = str_replace('&quot;', '"', $sValue);
@@ -333,13 +333,13 @@ class ArticleMain extends AdminDetailsController
             //copy categories
             $this->_copyCategories($sOldId, $sNewId);
 
-            //atributes
+            //attributes
             $this->_copyAttributes($sOldId, $sNewId);
 
-            //sellist
+            //select-list
             $this->_copySelectlists($sOldId, $sNewId);
 
-            //crossseling
+            //cross-selling
             $this->_copyCrossseling($sOldId, $sNewId);
 
             //accessoire
@@ -348,7 +348,7 @@ class ArticleMain extends AdminDetailsController
             // #983A copying staffelpreis info
             $this->_copyStaffelpreis($sOldId, $sNewId);
 
-            //copy article extends (longdescription)
+            //copy article extends (long-description)
             $this->_copyArtExtends($sOldId, $sNewId);
 
             //files
@@ -397,8 +397,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying category assignments
      *
-     * @param string $sOldId       Id from old article
-     * @param string $newArticleId Id from new article
+     * @param string $sOldId       ID from old article
+     * @param string $newArticleId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyCategories" in next major
      */
     protected function _copyCategories($sOldId, $newArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -426,8 +426,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying attributes assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAttributes" in next major
      */
     protected function _copyAttributes($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -456,8 +456,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying files
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyFiles" in next major
      */
     protected function _copyFiles($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -487,8 +487,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying selectlists assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copySelectlists" in next major
      */
     protected function _copySelectlists($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -517,10 +517,10 @@ class ArticleMain extends AdminDetailsController
     }
 
     /**
-     * Copying crossseling assignments
+     * Copying cross-selling assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyCrossseling" in next major
      */
     protected function _copyCrossseling($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -551,8 +551,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying accessoires assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAccessoires" in next major
      */
     protected function _copyAccessoires($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -583,8 +583,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying staffelpreis assignments
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyStaffelpreis" in next major
      */
     protected function _copyStaffelpreis($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -610,8 +610,8 @@ class ArticleMain extends AdminDetailsController
     /**
      * Copying article extends
      *
-     * @param string $sOldId Id from old article
-     * @param string $sNewId Id from new article
+     * @param string $sOldId - ID from old article
+     * @param string $sNewId - ID from new article
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyArtExtends" in next major
      */
     protected function _copyArtExtends($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -802,7 +802,7 @@ class ArticleMain extends AdminDetailsController
     }
 
     /**
-     * Save non standard article information if needed.
+     * Save non-standard article information if needed.
      * Intended to be used by modules.
      *
      * @param Article $article

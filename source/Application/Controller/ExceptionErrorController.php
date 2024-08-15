@@ -40,7 +40,7 @@ class ExceptionErrorController extends FrontendController
     protected $_aComponentNames = [];
 
     /**
-     * Sets exception errros to template
+     * Sets exception errors to template
      */
     public function displayExceptionError()
     {

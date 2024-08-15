@@ -29,7 +29,7 @@ use stdClass;
 
 /**
  * Admin article main news manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Customer Info -> News -> Main.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */

@@ -121,7 +121,7 @@ class LoginController extends AdminController
         $sPass = Registry::getRequest()->getRequestEscapedParameter('pwd', true);
         $sProfile = Registry::getRequest()->getRequestEscapedParameter('profile');
 
-        try { // trying to login
+        try { // trying to log in
             $session = Registry::getSession();
             $adminProfiles = $session->getVariable("aAdminProfiles");
             $session->initNewSession();
@@ -228,7 +228,7 @@ class LoginController extends AdminController
     }
 
     /**
-     * Get detected user browser language abbervation
+     * Get detected user browser language abbreviation
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBrowserLanguage" in next major

@@ -322,7 +322,7 @@ class RecommListController extends ArticleListController
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @return array
      */

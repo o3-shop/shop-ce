@@ -34,7 +34,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ClassExtens
 class ModuleSortList extends AdminDetailsController
 {
     /**
-     * It is unsave to use a backslash as HTML id in conjunction with UI.sortable, so it will be replaced in the
+     * It is unsafe to use a backslash as HTML id in conjunction with UI.sortable, so it will be replaced in the
      * view and restored in the controller
      */
     const BACKSLASH_REPLACEMENT = '---';

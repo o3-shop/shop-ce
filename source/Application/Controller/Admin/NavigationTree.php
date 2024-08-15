@@ -45,7 +45,7 @@ class NavigationTree extends Base
     protected $_oInitialDom = null;
 
     /**
-     * Dynamix XML path
+     * Dynamic XML path
      *
      * @deprecated 6.6.0 dynpages will be removed on the next major
      *
@@ -124,7 +124,7 @@ class NavigationTree extends Base
         if (!@$domFile->load($menuFile)) {
             $merge = true;
         } elseif (is_readable($menuFile) && ($xml = @file_get_contents($menuFile))) {
-            // looking for non supported character encoding
+            // looking for non-supported character encoding
             if (getStr()->preg_match("/encoding\=(.*)\?\>/", $xml, $matches) !== 0) {
                 if (isset($matches[1])) {
                     $currEncoding = trim($matches[1], "\"");
@@ -344,7 +344,7 @@ class NavigationTree extends Base
     }
 
     /**
-     * Copys attributes form one element to another
+     * Copies attributes form one element to another
      *
      * @param object $domElemTo   DOMElement
      * @param object $domElemFrom DOMElement
@@ -384,7 +384,7 @@ class NavigationTree extends Base
                 } else {
                     $curNode = $curNode->item(0);
 
-                    // if found copy all attributes and check childnodes
+                    // if found copy all attributes and check child-nodes
                     $this->_copyAttributes($curNode, $fromNode);
 
                     if ($fromNode->childNodes->length) {
@@ -396,7 +396,7 @@ class NavigationTree extends Base
     }
 
     /**
-     * If oDomXML exist meges nodes
+     * If oDomXML exists merges nodes
      *
      * @param DomDocument $domNew what to merge
      * @param DomDocument $dom    where to merge
@@ -564,7 +564,7 @@ class NavigationTree extends Base
     protected function _getInitialDom() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->_oInitialDom === null) {
-            $myOxUtlis = Registry::getUtils();
+            $oUtils = Registry::getUtils();
 
             if (is_array($filesToLoad = $this->_getMenuFiles())) {
                 // now checking if xml files are newer than cached file
@@ -573,8 +573,8 @@ class NavigationTree extends Base
 
                 $shopId = Registry::getConfig()->getActiveShop()->getShopId();
                 $cacheName = 'menu_' . $dynLang . $shopId . '_xml';
-                $cacheFile = $myOxUtlis->getCacheFilePath($cacheName);
-                $cacheContents = $myOxUtlis->fromFileCache($cacheName);
+                $cacheFile = $oUtils->getCacheFilePath($cacheName);
+                $cacheContents = $oUtils->fromFileCache($cacheName);
                 if ($cacheContents && file_exists($cacheFile) && ($cacheModTime = filemtime($cacheFile))) {
                     foreach ($filesToLoad as $dynPath) {
                         if ($cacheModTime < filemtime($dynPath)) {
@@ -587,7 +587,7 @@ class NavigationTree extends Base
 
                 $this->_oInitialDom = new DOMDocument();
                 if ($reload) {
-                    // fully reloading and building pathes
+                    // fully reloading and building paths
                     $this->_oInitialDom->appendChild(new DOMElement('OX'));
 
                     foreach ($filesToLoad as $dynPath) {
@@ -603,7 +603,7 @@ class NavigationTree extends Base
                     // END deprecated
 
                     // writing to cache
-                    $myOxUtlis->toFileCache($cacheName, $this->_oInitialDom->saveXML());
+                    $oUtils->toFileCache($cacheName, $this->_oInitialDom->saveXML());
                 } else {
                     $cacheContents = $this->_processCachedFile($cacheContents);
                     // loading from cached file

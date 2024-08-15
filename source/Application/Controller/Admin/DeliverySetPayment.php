@@ -29,8 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin deliveryset payment manager.
- * There is possibility to assign set to payment method
- * and etc.
+ * There is possibility to assign set to payment method etc.
  * Admin Menu: Shop settings -> Shipping & Handling Set -> Payment
  */
 class DeliverySetPayment extends AdminDetailsController

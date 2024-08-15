@@ -53,7 +53,7 @@ class ArticleSelectionAjax extends ListComponentAjax
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
@@ -136,11 +136,11 @@ class ArticleSelectionAjax extends ListComponentAjax
                 $oNew = oxNew(BaseModel::class);
                 $oNew->init("oxobject2selectlist");
                 $sObjectIdField = 'oxobject2selectlist__oxobjectid';
-                $sSelectetionIdField = 'oxobject2selectlist__oxselnid';
+                $sSelectionIdField = 'oxobject2selectlist__oxselnid';
                 $sOxSortField = 'oxobject2selectlist__oxsort';
 
                 $oNew->$sObjectIdField = new Field($soxId);
-                $oNew->$sSelectetionIdField = new Field($sAdd);
+                $oNew->$sSelectionIdField = new Field($sAdd);
 
                 $sSql = "select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid";
 

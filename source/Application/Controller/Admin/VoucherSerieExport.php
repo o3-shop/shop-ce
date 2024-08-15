@@ -59,7 +59,7 @@ class VoucherSerieExport extends VoucherSerieMain
     public $iExportPerTick = 1000;
 
     /**
-     * Calls parent costructor and initializes $this->_sFilePath parameter
+     * Calls parent constructor and initializes $this->_sFilePath parameter
      */
     public function __construct()
     {

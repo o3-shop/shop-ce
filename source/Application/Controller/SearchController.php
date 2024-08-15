@@ -261,7 +261,7 @@ class SearchController extends FrontendController
             foreach ($aArtList as $oArticle) {
                 // appending std and dynamic urls
                 if (!$blSeo) {
-                    // only if seo is off..
+                    // only if seo is off ...
                     $oArticle->appendStdLink($sAddDynParams);
                 }
                 $oArticle->appendLink($sAddDynParams);

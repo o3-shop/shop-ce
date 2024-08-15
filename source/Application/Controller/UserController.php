@@ -164,7 +164,7 @@ class UserController extends FrontendController
             if ($this->getUser()) {
                 $orderRemark = Registry::getSession()->getVariable('ordrem');
             } else {
-                // not connected so nowhere to save, we're gonna use what we get from post
+                // not connected so nowhere to save, we're going to use what we get from post
                 $orderRemark = Registry::getRequest()->getRequestEscapedParameter('order_remark', true);
             }
 

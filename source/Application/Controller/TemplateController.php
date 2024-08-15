@@ -26,7 +26,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Template preparation class.
- * Used only in some specific cases (usually when you need to outpt just template
+ * Used only in some specific cases (usually when you need to output just template
  * having text information).
  */
 class TemplateController extends FrontendController

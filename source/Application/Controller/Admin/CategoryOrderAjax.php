@@ -46,7 +46,7 @@ class CategoryOrderAjax extends ListComponentAjax
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
          'container2' => [
              ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -55,12 +55,12 @@ class CategoryOrderAjax extends ListComponentAjax
              ['oxmpn', 'oxarticles', 0, 0, 0],
              ['oxprice', 'oxarticles', 0, 0, 0],
              ['oxstock', 'oxarticles', 0, 0, 0],
-             ['oxid', 'oxarticles', 0, 0, 1]
-         ]
+             ['oxid', 'oxarticles', 0, 0, 1],
+         ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major

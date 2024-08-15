@@ -28,7 +28,7 @@ use stdClass;
 
 /**
  * Admin wrapping main manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: System Administration -> Wrapping -> Main.
  */
 class WrappingMain extends AdminDetailsController

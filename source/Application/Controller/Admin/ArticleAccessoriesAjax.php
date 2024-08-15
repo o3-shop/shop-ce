@@ -31,7 +31,7 @@ use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Class controls article assignment to accessories
+ * Class controls article assignment to accessoires
  */
 class ArticleAccessoriesAjax extends ListComponentAjax
 {
@@ -76,7 +76,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @throws DatabaseConnectionException
@@ -132,7 +132,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
 
 
     /**
-     * overide default sorting and replace it with OXSORT field
+     * override default sorting and replace it with OXSORT field
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
@@ -147,7 +147,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
     }
 
     /**
-     * Removing article form accessories article list
+     * Removing article form accessoires article list
      */
     public function removeArticleAcc()
     {
@@ -164,7 +164,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
     }
 
     /**
-     * Adding article to accessories article list
+     * Adding article to accessoires article list
      */
     public function addArticleAcc()
     {
@@ -193,7 +193,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
     }
 
     /**
-     * Method is used to bind to accessory addition to article action.
+     * Method is used to bind to accessoire addition to article action.
      *
      * @param Article $article
      */
@@ -203,7 +203,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
 
 
     /**
-     * Applies sorting for Accessories list
+     * Applies sorting for Accessoires list
      */
     public function sortAccessoriesList()
     {
@@ -211,18 +211,18 @@ class ArticleAccessoriesAjax extends ListComponentAjax
         $selectedIdForSort = Registry::getConfig()->getRequestEscapedParameter('sortoxid');
         $sortDirection = Registry::getConfig()->getRequestEscapedParameter('direction');
 
-        $accessoriesList = oxNew(ListModel::class);
-        $accessoriesList->init("oxbase", "oxaccessoire2article");
+        $accessoiresList = oxNew(ListModel::class);
+        $accessoiresList->init("oxbase", "oxaccessoire2article");
         $sortQuery = "select * from  oxaccessoire2article where OXARTICLENID = :OXARTICLENID order by oxsort,oxid";
-        $accessoriesList->selectString($sortQuery, [
+        $accessoiresList->selectString($sortQuery, [
             ':OXARTICLENID' => $oxidRelationId
         ]);
 
 
-        $rebuildList = $this->rebuildAccessoriesSortIndexes($accessoriesList);
+        $rebuildList = $this->rebuildAccessoriesSortIndexes($accessoiresList);
 
         if (($selectedPosition = array_search($selectedIdForSort, $rebuildList)) !== false) {
-            $selectedSortRecord = $accessoriesList->offsetGet($rebuildList[$selectedPosition]);
+            $selectedSortRecord = $accessoiresList->offsetGet($rebuildList[$selectedPosition]);
             $currentPosition = $selectedSortRecord->oxaccessoire2article__oxsort->value;
 
             // get current selected row sort position
@@ -231,8 +231,8 @@ class ArticleAccessoriesAjax extends ListComponentAjax
                 $newPosition = ($sortDirection == 'up') ? ($currentPosition - 1) : ($currentPosition + 1);
 
                 // exchanging indexes
-                $currentRecord = $accessoriesList->offsetGet($rebuildList[$currentPosition]);
-                $newRecord = $accessoriesList->offsetGet($rebuildList[$newPosition]);
+                $currentRecord = $accessoiresList->offsetGet($rebuildList[$currentPosition]);
+                $newRecord = $accessoiresList->offsetGet($rebuildList[$newPosition]);
 
                 $currentRecord->oxaccessoire2article__oxsort = new Field($newPosition);
                 $newRecord->oxaccessoire2article__oxsort = new Field($currentPosition);
@@ -251,7 +251,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
 
 
     /**
-     * rebuild Accessories sort indexes
+     * rebuild Accessoires sort indexes
      *
      * @param ListModel $inputList
      *

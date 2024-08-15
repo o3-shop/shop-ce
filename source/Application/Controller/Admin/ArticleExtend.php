@@ -34,9 +34,9 @@ use stdClass;
 use Exception;
 
 /**
- * Admin article extended parameters manager.
+ * Admin article extended parameters' manager.
  * Collects and updates (on user submit) extended article properties ( such as
- * weight, dimensions, purchase Price and etc.). There is ability to assign article
+ * weight, dimensions, purchase Price etc.). There is ability to assign article
  * to any chosen article group.
  * Admin Menu: Manage Products -> Articles -> Extended.
  */
@@ -160,7 +160,7 @@ class ArticleExtend extends AdminDetailsController
         $sPriceField = 'oxarticles__oxprice';
         $dTPrice = $aParams['oxarticles__oxtprice'];
         if ($dTPrice && $dTPrice != $oArticle->$sTPriceField->value && $dTPrice <= $oArticle->$sPriceField->value) {
-            $this->_aViewData["errorsavingtprice"] = 1;
+            $this->_aViewData['errorsavingtprice'] = 1;
         }
 
         $oArticle->setLanguage(0);

@@ -30,7 +30,7 @@ use oxObjectException;
 
 /**
  * Current user recommlist manager.
- * When user is logged in in this manager window he can modify his
+ * When user is logged-in in this manager window he can modify his
  * own recommlists status - remove articles from list or store
  * them to shopping basket, view detail information.
  *
@@ -60,7 +60,7 @@ class AccountRecommlistController extends AccountController
     protected $_oActRecommListArticles = null;
 
     /**
-     * returns the recomm list article. Whether the variable is empty, it list nothing
+     * returns the recomm list article. When the variable is empty it lists nothing
      *
      * @var array
      */
@@ -185,7 +185,7 @@ class AccountRecommlistController extends AccountController
     }
 
     /**
-     * return the active entrys
+     * return the active entries
      *
      * @return null
      */

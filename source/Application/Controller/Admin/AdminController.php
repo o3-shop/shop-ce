@@ -218,7 +218,7 @@ class AdminController extends BaseController
         $oViewConf->setViewConfigParam('ajaxlink', str_replace('&amp;', '&', Registry::getUtilsUrl()->processUrl($sURL . 'oxajax.php?editlanguage=' . $this->_iEditLang, false)));
         $oViewConf->setViewConfigParam('sServiceUrl', $this->getServiceUrl());
 
-        // set langugae in admin
+        // set language in admin
         $iDynInterfaceLanguage = $myConfig->getConfigParam('iDynInterfaceLanguage');
         //$this->_aViewData['adminlang'] = isset( $iDynInterfaceLanguage )?$iDynInterfaceLanguage:$myConfig->getConfigParam( 'iAdminLanguage' );
         $this->_aViewData['adminlang'] = isset($iDynInterfaceLanguage) ? $iDynInterfaceLanguage : $oLang->getTplLanguage();
@@ -364,8 +364,8 @@ class AdminController extends BaseController
     /**
      * Returns maximum allowed size of upload file and formatted size equivalent
      *
-     * @param int  $iMaxFileSize recommended maximum size of file (normalu value is taken from php ini, otherwise sets 2MB)
-     * @param bool $blFormatted  Return formated
+     * @param int  $iMaxFileSize recommended maximum size of file (normal value is taken from php ini, otherwise sets 2MB)
+     * @param bool $blFormatted  Return formatted
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMaxUploadFileInfo" in next major
@@ -463,7 +463,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * Checks if current $sUserId user is not an admin and checks if user is able to be edited by logged in user.
+     * Checks if current $sUserId user is not an admin and checks if user can be edited by logged-in user.
      * This method does not perform full rights check.
      *
      * @param string $sUserId user id
@@ -567,7 +567,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * Marks seo entires as expired.
+     * Marks seo entries as expired.
      *
      * @param string $sShopId Shop id
      */

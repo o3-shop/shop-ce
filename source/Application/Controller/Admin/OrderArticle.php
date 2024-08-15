@@ -47,7 +47,7 @@ class OrderArticle extends AdminDetailsController
     /**
      * Product list:
      *  - if product is not variant - list contains only product which was found by search;
-     *  - if product is variant - list consist with variant paret and its variants
+     *  - if product is variant - list consist with variant parent and its variants
      *
      * @var ListObject
      */
@@ -68,8 +68,8 @@ class OrderArticle extends AdminDetailsController
     protected $_oEditObject = null;
 
     /**
-     * Executes parent method parent::render(), creates oxorder and oxvoucherlist
-     * objects, appends voucherlist information to order object and passes data
+     * Executes parent method parent::render(), creates Order and VoucherList
+     * objects, appends VoucherList information to order object and passes data
      * to Smarty engine, returns name of template file "order_article.tpl".
      *
      * @return string

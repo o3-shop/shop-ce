@@ -34,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
 class VendorSeo extends ObjectSeo
 {
     /**
-     * Updating showsuffix field
+     * Updating oxshowsuffix field
      *
      * @return null
      */

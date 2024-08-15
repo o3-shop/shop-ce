@@ -78,7 +78,7 @@ class InviteController extends AccountController
     protected $_oRecommList = null;
 
     /**
-     * Invition data
+     * Invitation data
      *
      * @var object
      */

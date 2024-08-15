@@ -58,7 +58,7 @@ class NewsletterController extends FrontendController
     protected $_sHomeCountryId = null;
 
     /**
-     * Newletter status.
+     * Newsletter status.
      *
      * @var integer
      */
@@ -187,7 +187,7 @@ class NewsletterController extends FrontendController
         $oUser = oxNew(User::class);
         if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {
             $sConfirmCode = md5($oUser->oxuser__oxusername->value . $oUser->oxuser__oxpasssalt->value);
-            // is confirm code ok?
+            // is confirmed code ok?
             if (Registry::getRequest()->getRequestEscapedParameter('confirm') == $sConfirmCode) {
                 $oUser->getNewsSubscription()->setOptInStatus(1);
                 $oUser->addToGroup('oxidnewsletter');
@@ -206,7 +206,7 @@ class NewsletterController extends FrontendController
         if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {
             $oUser->getNewsSubscription()->setOptInStatus(0);
 
-            // removing from group ..
+            // removing from group ...
             $oUser->removeFromGroup('oxidnewsletter');
 
             $this->_iNewsletterStatus = 3;
@@ -214,7 +214,7 @@ class NewsletterController extends FrontendController
     }
 
     /**
-     * simlink to function removeme bug fix #0002894
+     * symlink to function removeme bug fix #0002894
      */
     public function rmvm()
     {

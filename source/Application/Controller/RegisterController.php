@@ -123,7 +123,7 @@ class RegisterController extends UserController
 
     /**
      * Registration confirmation functionality. If registration
-     * succeded - redirects to success page, if not - returns
+     * succeeded - redirects to success page, if not - returns
      * exception informing about expired confirmation link
      *
      * @return mixed

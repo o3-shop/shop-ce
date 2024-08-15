@@ -33,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
 class CategorySeo extends ObjectSeo
 {
     /**
-     * Updating showsuffix field
+     * Updating oxshowsuffix field
      *
      * @return null
      */

@@ -29,7 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Password reminder page.
- * Collects toparticle, bargain article list. There is a form with entry
+ * Collects top-article-list, bargain article list. There is a form with entry
  * field to enter login name (usually email). After user enters required
  * information and submits "Request Password" button mail is sent to users email.
  * O3-Shop -> MY ACCOUNT -> "Forgot your password? - click here."
@@ -115,9 +115,9 @@ class ForgotPasswordController extends FrontendController
             return Registry::getUtilsView()->addErrorToDisplay($oExcp->getMessage(), false, true);
         }
 
-        // passwords are fine - updating and loggin user in
+        // passwords are fine - updating and login user in
         if ($oUser->loadUserByUpdateId($this->getUpdateId())) {
-            // setting new pass ..
+            // setting new pass ...
             $oUser->setPassword($sNewPass);
 
             // resetting update pass params
@@ -139,7 +139,7 @@ class ForgotPasswordController extends FrontendController
     }
 
     /**
-     * If user password update was successfull - setting success status
+     * If user password update was successful - setting success status
      *
      * @return bool
      */

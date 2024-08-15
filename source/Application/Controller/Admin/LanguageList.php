@@ -85,7 +85,7 @@ class LanguageList extends AdminListController
         $myConfig->saveShopConfVar('arr', 'aLanguageURLs', $aLangData['urls']);
         $myConfig->saveShopConfVar('arr', 'aLanguageSSLURLs', $aLangData['sslUrls']);
 
-        //if deleted language was default, setting defalt lang to 0
+        //if deleted language was default, setting default lang to 0
         if ($iBaseId == $myConfig->getConfigParam('sDefaultLang')) {
             $myConfig->saveShopConfVar('str', 'sDefaultLang', 0);
         }

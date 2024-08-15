@@ -123,7 +123,7 @@ class NavigationController extends AdminController
     }
 
     /**
-     * Caches external url file locally, adds <base> tag with original url to load images and other links correcly
+     * Caches external url file locally, adds <base> tag with original url to load images and other links correctly
      */
     public function exturl()
     {

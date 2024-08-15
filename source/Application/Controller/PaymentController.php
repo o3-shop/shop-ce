@@ -36,14 +36,14 @@ use OxidEsales\Eshop\Core\Registry;
 class PaymentController extends FrontendController
 {
     /**
-     * Paymentlist
+     * Payment-list
      *
      * @var object
      */
     protected $_oPaymentList = null;
 
     /**
-     * Paymentlist count
+     * Payment-list count
      *
      * @var integer
      */
@@ -129,7 +129,7 @@ class PaymentController extends FrontendController
     /**
      * Executes parent::render(), checks if this connection secure
      * (if not - redirects to secure payment page), loads user object
-     * (if user object loading was not successfull - redirects to start
+     * (if user object loading was not successful - redirects to start
      * page), loads user delivery/shipping information. According
      * to configuration in admin, user profile data loads delivery sets,
      * and possible payment methods. Returns name of template to render
@@ -155,7 +155,7 @@ class PaymentController extends FrontendController
         $blAlreadyRedirected = Registry::getRequest()->getRequestEscapedParameter('sslredirect') == 'forced';
 
         if ($this->getIsOrderStep()) {
-            //additional check if we really really have a user now
+            //additional check if we really have a user now
             //and the basket is not empty
             $oBasket = $this->getSession()->getBasket();
             $blPsBasketReservationEnabled = $myConfig->getConfigParam('blPsBasketReservationEnabled');
@@ -256,7 +256,7 @@ class PaymentController extends FrontendController
 
     /**
      * Validates oxiddebitnote user payment data.
-     * Returns null if problems on validating occured. If everything
+     * Returns null if problems on validating occurred. If everything
      * is OK - returns "order" and redirects to payment confirmation
      * page.
      *
@@ -330,7 +330,7 @@ class PaymentController extends FrontendController
     }
 
     /**
-     * Template variable getter. Returns paymentlist
+     * Template variable getter. Returns payment-list
      *
      * @return object
      */
@@ -352,7 +352,7 @@ class PaymentController extends FrontendController
 
             $oBasket->setShipping($sActShipSet);
 
-            // calculating payment expences for preview for each payment
+            // calculating payment expenses for preview for each payment
             $this->_setValues($aPaymentList, $oBasket);
             $this->_oPaymentList = $aPaymentList;
             $this->_aAllSets = $aAllSets;
@@ -398,7 +398,7 @@ class PaymentController extends FrontendController
     }
 
     /**
-     * Calculate payment cost for each payment. Sould be removed later
+     * Calculate payment cost for each payment. Should be removed later
      *
      * @param array                                      $aPaymentList payments array
      * @param Basket $oBasket      basket object
@@ -499,7 +499,7 @@ class PaymentController extends FrontendController
             $sUserPaymentField = 'oxuserpayments__oxvalue';
             $aAddPaymentData = Registry::getUtils()->assignValuesFromText($oUserPayment->$sUserPaymentField->value);
 
-            //checking if some of values is allready set in session - leave it
+            //checking if some of the values is already set in session - leave it
             foreach ($aAddPaymentData as $oData) {
                 if (
                     !isset($this->_aDynValue[$oData->name]) ||
@@ -573,7 +573,7 @@ class PaymentController extends FrontendController
     }
 
     /**
-     * Function to check if array values are empty againts given array keys
+     * Function to check if array values are empty against given array keys
      *
      * @param array $aData array of data to check
      * @param array $aKeys array of array indexes
@@ -617,7 +617,7 @@ class PaymentController extends FrontendController
     }
 
     /**
-     * Retuns config true if Vat is splitted
+     * Returns config true if Vat is split
      *
      * @return array
      */

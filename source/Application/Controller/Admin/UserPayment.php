@@ -120,9 +120,9 @@ class UserPayment extends AdminDetailsController
                 $aParams['oxuserpayments__oxid'] = null;
             }
 
-            $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
-            $oAdress->assign($aParams);
-            $oAdress->save();
+            $oAddress = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
+            $oAddress->assign($aParams);
+            $oAddress->save();
         }
     }
 
@@ -135,9 +135,9 @@ class UserPayment extends AdminDetailsController
         $soxId = $this->getEditObjectId();
         if ($this->_allowAdminEdit($soxId)) {
             if ($aParams['oxuserpayments__oxid'] != "-1") {
-                $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
-                if ($oAdress->load($aParams['oxuserpayments__oxid'])) {
-                    $this->_blDelete = (bool) $oAdress->delete();
+                $oAddress = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
+                if ($oAddress->load($aParams['oxuserpayments__oxid'])) {
+                    $this->_blDelete = (bool) $oAddress->delete();
                 }
             }
         }
@@ -164,7 +164,7 @@ class UserPayment extends AdminDetailsController
     }
 
     /**
-     * Returns selected Payment Id
+     * Returns selected Payment ID
      *
      * @return object
      */
@@ -189,7 +189,7 @@ class UserPayment extends AdminDetailsController
     }
 
     /**
-     * Returns selected Payment Id
+     * Returns selected Payment ID
      *
      * @return object
      */
@@ -222,12 +222,12 @@ class UserPayment extends AdminDetailsController
                 $this->_oUserPayment->load($sPaymentId);
                 $sTemplate = $this->_oUserPayment->oxuserpayments__oxvalue->value;
 
-                // generate selected paymenttype
+                // generate selected payment-type
                 $oPaymentTypes = $this->getPaymentTypes();
                 foreach ($oPaymentTypes as $oPayment) {
                     if ($oPayment->oxpayments__oxid->value == $this->_oUserPayment->oxuserpayments__oxpaymentsid->value) {
                         $oPayment->selected = 1;
-                        // if there are no values assigned we set default from paymenttype
+                        // if there are no values assigned we set default from payment-type
                         if (!$sTemplate) {
                             $sTemplate = $oPayment->oxpayments__oxvaldesc->value;
                         }
@@ -242,7 +242,7 @@ class UserPayment extends AdminDetailsController
     }
 
     /**
-     * Returns selected Payment Id
+     * Returns selected Payment ID
      *
      * @return object
      */

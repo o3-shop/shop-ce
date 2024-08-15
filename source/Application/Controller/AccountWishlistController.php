@@ -31,9 +31,9 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Current user wishlist manager.
- * When user is logged in in this manager window he can modify his
+ * When user is logged-in in this manager window he can modify his
  * own wishlist status - remove articles from wishlist or store
- * them to shopping basket, view detail information. Additionally
+ * them to shopping basket, view detail information. Additionally,
  * user can view wishlist of some other user by entering users
  * login name in special field. O3-Shop -> MY ACCOUNT
  *  -> Newsletter.
@@ -55,7 +55,7 @@ class AccountWishlistController extends AccountController
     protected $_blShowSuggest = null;
 
     /**
-     * Wheter the var is false the wishlist will be shown
+     * Whether the var is false the wishlist will be shown
      *
      * @var UserBasket
      */
@@ -69,7 +69,7 @@ class AccountWishlistController extends AccountController
     protected $_aRecommList = null;
 
     /**
-     * Wheter the var is false the productlist will not be list
+     * Whether the var is false the product-list will not be list
      *
      * @var UserBasket
      */
@@ -180,7 +180,7 @@ class AccountWishlistController extends AccountController
     }
 
     /**
-     * Returns array of producst assigned to user wish list
+     * Returns array of products assigned to user wish list
      *
      * @return array | bool
      */
@@ -280,7 +280,7 @@ class AccountWishlistController extends AccountController
     }
 
     /**
-     * Terurns user entered values for sending email.
+     * Returns user entered values for sending email.
      *
      * @return array
      */
@@ -290,7 +290,7 @@ class AccountWishlistController extends AccountController
     }
 
     /**
-     * Changes wishlist status - public/non public. Returns false on
+     * Changes wishlist status - public/non-public. Returns false on
      * error (if user is not logged in).
      *
      * @return bool

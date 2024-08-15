@@ -32,7 +32,7 @@ use stdClass;
 /**
  * Admin content manager.
  * There is possibility to change content description, enter page text etc.
- * Admin Menu: Customerinformations -> Content.
+ * Admin Menu: Customer-Information -> Content.
  */
 class ContentMain extends AdminDetailsController
 {
@@ -50,7 +50,7 @@ class ContentMain extends AdminDetailsController
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
 
-        // categorie tree
+        // category-tree
         $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
 
@@ -208,7 +208,7 @@ class ContentMain extends AdminDetailsController
     }
 
     /**
-     * Prepares ident (removes bad chars, leaves only thoose that fits in a-zA-Z0-9_ range)
+     * Prepares ident (removes bad chars, leaves only those that fits in a-zA-Z0-9_ range)
      *
      * @param string $sIdent ident to filter
      *

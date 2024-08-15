@@ -41,7 +41,7 @@ use OxidEsales\Eshop\Core\Registry;
 /**
  * Article details information page.
  * Collects detailed article information, possible variants, such information
- * as crosselling, similarlist, picture gallery list, etc.
+ * as cross-selling, similar-list, picture gallery list, etc.
  * O3-Shop -> (Any chosen product).
  */
 class ArticleDetailsController extends FrontendController
@@ -110,7 +110,7 @@ class ArticleDetailsController extends FrontendController
     protected $_oSimilarProducts = null;
 
     /**
-     * Accessories of current article
+     * Accessoires of current article
      *
      * @var object
      */
@@ -281,7 +281,7 @@ class ArticleDetailsController extends FrontendController
      * Article::getAccessoires(), Article::getReviews(), Article::GetSimilarProducts(),
      * Article::GetCustomerAlsoBoughtThisProducts()), forms variants details
      * navigation URLs
-     * loads select lists (Article::GetSelectLists()), prepares HTML meta data
+     * loads select lists (Article::GetSelectLists()), prepares HTML metadata
      * (details::_convertForMetaTags()). Returns name of template file
      * details::_sThisTemplate
      *
@@ -333,9 +333,9 @@ class ArticleDetailsController extends FrontendController
     }
 
     /**
-     * Returns current view meta data
+     * Returns current view metadata
      * If $meta parameter comes empty, sets to it article title and description.
-     * It happens if current view has no meta data defined in oxcontent table
+     * It happens if current view has no metadata defined in oxcontent table
      *
      * @param string $meta           User defined description, description content or empty value
      * @param int    $length         Max length of result, -1 for no truncation
@@ -366,7 +366,7 @@ class ArticleDetailsController extends FrontendController
     /**
      * Returns current view keywords seperated by comma
      * If $keywords parameter comes empty, sets to it article title and description.
-     * It happens if current view has no meta data defined in oxcontent table
+     * It happens if current view has no metadata defined in oxcontent table
      *
      * @param string $keywords              User defined keywords, keywords content or empty value
      * @param bool   $removeDuplicatedWords Remove duplicated words
@@ -495,8 +495,8 @@ class ArticleDetailsController extends FrontendController
         $utils = Registry::getUtils();
 
         if ($this->_oProduct === null) {
-            //this option is only for lists and we must reset value
-            //as blLoadVariants = false affect "ab price" functionality
+            // this option is only for lists. We must reset value
+            // as blLoadVariants = false affect "ab price" functionality
             $config->setConfigParam('blLoadVariants', true);
 
             $articleId = Registry::getRequest()->getRequestEscapedParameter('anid');
@@ -572,7 +572,7 @@ class ArticleDetailsController extends FrontendController
             } else {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_CATEGORY;
 
-                // price category has own type..
+                // price category has own type ...
                 $activeCategory = $this->getActiveCategory();
                 if ($activeCategory && $activeCategory->isPriceCategory()) {
                     $this->_iLinkType = OXARTICLE_LINKTYPE_PRICECATEGORY;
@@ -739,7 +739,7 @@ class ArticleDetailsController extends FrontendController
     }
 
     /**
-     * Template variable getter. Returns accessories of article
+     * Template variable getter. Returns accessoires of article
      *
      * @return object
      */
@@ -947,7 +947,7 @@ class ArticleDetailsController extends FrontendController
     }
 
     /**
-     * Return price alarm status (if it was send)
+     * Return price alarm status (if it was sent)
      *
      * @return integer
      */

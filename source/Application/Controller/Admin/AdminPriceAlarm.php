@@ -25,7 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 
 /**
  * Admin admin_pricealarm manager.
- * Returns template, that arranges two other templates ("apricealarm_list.tpl"
+ * Returns template, that arranges two other templates ("pricealarm_list.tpl"
  * and "pricealarm_main.tpl") to frame.
  * Admin Menu: Customer Info -> admin_pricealarm.
  */

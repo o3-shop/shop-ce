@@ -28,13 +28,13 @@ use stdClass;
 
 /**
  * Admin article main selectlist manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  */
 class CountryMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxCategoryList object,
-     * passes it's data to Smarty engine and returns name of template file
+     * passes its data to Smarty engine and returns name of template file
      * "selectlist_main.tpl".
      *
      * @return string
@@ -115,7 +115,7 @@ class CountryMain extends AdminDetailsController
     }
 
     /**
-     * Saves selection list parameters changes in different language (eg. english).
+     * Saves selection list parameters changes in different language (e.g. english).
      */
     public function saveinnlang()
     {

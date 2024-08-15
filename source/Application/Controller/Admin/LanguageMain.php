@@ -33,7 +33,7 @@ use PDOException;
 
 /**
  * Admin article main selectlist manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  */
 class LanguageMain extends AdminDetailsController
 {
@@ -70,7 +70,7 @@ class LanguageMain extends AdminDetailsController
 
     /**
      * Executes parent method parent::render(), creates oxCategoryList object,
-     * passes it's data to Smarty engine and returns name of template file
+     * passes its data to Smarty engine and returns name of template file
      * "selectlist_main.tpl".
      *
      * @return string
@@ -125,7 +125,7 @@ class LanguageMain extends AdminDetailsController
 
         $blViewError = false;
 
-        // if changed language abbervation, updating it for all arrays related with languages
+        // if changed language abbreviation, updating it for all arrays related with languages
         if ($sOxId != -1 && $sOxId != $aParams['abbr']) {
             // #0004850 preventing changing abbr for main language with base id = 0
             if ((int) $this->_aLangData['params'][$sOxId]['baseId'] == 0) {
@@ -142,7 +142,7 @@ class LanguageMain extends AdminDetailsController
             }
         }
 
-        // if adding new language, setting lang id to abbervation
+        // if adding new language, setting lang id to abbreviation
         if ($blNewLanguage = ($sOxId == -1)) {
             $sOxId = $aParams['abbr'];
             $this->_aLangData['params'][$sOxId]['baseId'] = $this->_getAvailableLangBaseId();
@@ -199,7 +199,7 @@ class LanguageMain extends AdminDetailsController
     /**
      * Get selected language info
      *
-     * @param string $sOxId language abbervation
+     * @param string $sOxId language abbreviation
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getLanguageInfo" in next major
@@ -304,7 +304,7 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Assign default values for eache language
+     * Assign default values for each language
      *
      * @param array $aLanguages language array
      *
@@ -330,7 +330,7 @@ class LanguageMain extends AdminDetailsController
     /**
      * Sets default language base ID to config var 'sDefaultLang'
      *
-     * @param string $sOxId language abbervation
+     * @param string $sOxId language abbreviation
      * @deprecated underscore prefix violates PSR12, will be renamed to "setDefaultLang" in next major
      */
     protected function _setDefaultLang($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -340,7 +340,7 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Get availabale language base ID
+     * Get available language base ID
      *
      * @return int
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAvailableLangBaseId" in next major
@@ -371,7 +371,7 @@ class LanguageMain extends AdminDetailsController
      * Check selected language has translation file lang.php
      * If not - displays warning
      *
-     * @param string $sOxId language abbervation
+     * @param string $sOxId language abbreviation
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkLangTranslations" in next major
      */
     protected function _checkLangTranslations($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -390,7 +390,7 @@ class LanguageMain extends AdminDetailsController
     /**
      * Check if selected language already has multilanguage fields in DB
      *
-     * @param string $sOxId language abbervation
+     * @param string $sOxId language abbreviation
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkMultilangFieldsExistsInDb" in next major
@@ -407,7 +407,7 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Adding new language to DB - creating new multilangue fields with new
+     * Adding new language to DB - creating new multilanguage fields with new
      * language ID (e.g. oxtitle_4)
      *
      * @return null
@@ -437,7 +437,7 @@ class LanguageMain extends AdminDetailsController
     /**
      * Check if language already exists
      *
-     * @param string $sAbbr language abbervation
+     * @param string $sAbbr language abbreviation
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkLangExists" in next major
@@ -450,7 +450,7 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Callback function for sorting languages arraty. Sorts array according
+     * Callback function for sorting languages already. Sorts array according
      * 'baseId' parameter
      *
      * @param object $oLang1 language array
@@ -547,7 +547,7 @@ class LanguageMain extends AdminDetailsController
         $configValidator = $this->getNoJsValidator();
         foreach ($aLanguageData as $mLanguageDataParameters) {
             if (is_array($mLanguageDataParameters)) {
-                // Recursion till we gonna have a string.
+                // Recursion till we are going to have a string.
                 $blDeepResult = $this->isValidLanguageData($mLanguageDataParameters);
                 $blValid = $blDeepResult === false ? $blDeepResult : $blValid;
             } elseif (!$configValidator->isValid($mLanguageDataParameters)) {

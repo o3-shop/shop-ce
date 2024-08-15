@@ -73,7 +73,7 @@ class ShopConfiguration extends AdminDetailsController
             $this->_aViewData["edit"] = $shop = $this->_getEditShop($soxId);
 
             try {
-                // category choosen as default
+                // category chosen as default
                 $this->_aViewData["defcat"] = null;
                 if ($shop->oxshops__oxdefcat->value) {
                     $category = oxNew(Category::class);
@@ -83,7 +83,7 @@ class ShopConfiguration extends AdminDetailsController
                 }
             } catch (Exception $exception) {
                 // on most cases this means that views are broken, so just
-                // outputting notice and keeping functionality flow ..
+                // outputting notice and keeping functionality flow ...
                 $this->_aViewData["updateViews"] = 1;
             }
 
@@ -353,7 +353,7 @@ class ShopConfiguration extends AdminDetailsController
 
     /**
      * Prepares data for storing to database.
-     * Example: $sType='aarr', $sName='aModules', $mValue='key1=>val1\nkey2=>val2'
+     * Example: $sType='aarr', $sName='aModules', $mValue='key1=>val1\key2=>val2'
      *
      * @param string $type  var type
      * @param string $name  var name

@@ -133,10 +133,10 @@ class ArticleVariant extends AdminDetailsController
             $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         }
 
-        // varianthandling
-        $soxparentId = $this->getEditObjectId();
-        if (isset($soxparentId) && $soxparentId && $soxparentId != "-1") {
-            $aParams['oxarticles__oxparentid'] = $soxparentId;
+        // variant-handling
+        $sParentId = $this->getEditObjectId();
+        if (isset($sParentId) && $sParentId && $sParentId != "-1") {
+            $aParams['oxarticles__oxparentid'] = $sParentId;
         } else {
             unset($aParams['oxarticles__oxparentid']);
         }

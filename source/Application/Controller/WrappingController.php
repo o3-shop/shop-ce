@@ -123,7 +123,7 @@ class WrappingController extends FrontendController
      * gift message and chosen card ( takes from GET/POST/session;
      * oBasket::giftmessage, oBasket::chosencard). Then sets
      * basket back to session (Session::setBasket()). Returns
-     * "order" to redirect to order confirmation secreen.
+     * "order" to redirect to order confirmation screen.
      *
      * @return string
      */

@@ -180,7 +180,7 @@ class OrderController extends FrontendController
 
             // payment is set ?
             if (!$this->getPayment()) {
-                // redirecting to payment step on error ..
+                // redirecting to payment step on error ...
                 Registry::getUtils()->redirect($myConfig->getShopCurrentURL() . '&cl=payment', true, 302);
             }
         }
@@ -202,7 +202,7 @@ class OrderController extends FrontendController
      * data is set - returns to user login page). Stores order info to database
      * (Order::finalizeOrder()). According to sum for items automatically assigns
      * user to special user group (User::onOrderExecute(); if this option is not
-     * disabled in admin). Finally you will be redirected to next page (order::_getNextStep()).
+     * disabled in admin). Finally, you will be redirected to next page (order::_getNextStep()).
      *
      * @return string|null
      */
@@ -218,7 +218,7 @@ class OrderController extends FrontendController
             return;
         }
 
-        // additional check if we really really have a user now
+        // additional check if we really have a user now
         $oUser = $this->getUser();
         if (!$oUser) {
             return 'user';
@@ -472,7 +472,7 @@ class OrderController extends FrontendController
     }
 
     /**
-     * Return users setted delivery address md5
+     * Return users set delivery address md5
      *
      * @return string
      */
@@ -484,10 +484,10 @@ class OrderController extends FrontendController
 
         // delivery address
         if (Registry::getSession()->getVariable('deladrid')) {
-            $oDelAdress = oxNew(Address::class);
-            $oDelAdress->load(Registry::getSession()->getVariable('deladrid'));
+            $oDelAddress = oxNew(Address::class);
+            $oDelAddress->load(Registry::getSession()->getVariable('deladrid'));
 
-            $sDelAddress .= $oDelAdress->getEncodedDeliveryAddress();
+            $sDelAddress .= $oDelAddress->getEncodedDeliveryAddress();
         }
 
         return $sDelAddress;
@@ -504,7 +504,7 @@ class OrderController extends FrontendController
     }
 
     /**
-     * Returns next order step. If ordering was sucessfull - returns string "thankyou" (possible
+     * Returns next order step. If ordering was successful - returns string "thankyou" (possible
      * additional parameters), otherwise - returns string "payment" with additional
      * error parameters.
      *
@@ -537,7 +537,7 @@ class OrderController extends FrontendController
                 $sNextStep = 'payment?payerror=2';
                 break;
             case ($iSuccess === Order::ORDER_STATE_ORDEREXISTS):
-                break; // reload blocker activ
+                break; // reload blocker active
             case (is_numeric($iSuccess) && $iSuccess > 3):
                 Registry::getSession()->setVariable('payerror', $iSuccess);
                 $sNextStep = 'payment?payerror=' . $iSuccess;

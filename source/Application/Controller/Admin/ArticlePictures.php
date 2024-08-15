@@ -29,7 +29,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article picture manager.
- * Collects information about article's used pictures, there is posibility to
+ * Collects information about article's used pictures, there is possibility to
  * upload any other picture, etc.
  * Admin Menu: Manage Products -> Articles -> Pictures.
  */

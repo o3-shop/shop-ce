@@ -38,19 +38,19 @@ class DeliveryGroupsAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxtitle', 'oxgroups', 1, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 0],
-        ['oxid', 'oxgroups', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxgroups', 1, 0, 0],
-                                     ['oxid', 'oxgroups', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                 ]
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxtitle', 'oxgroups', 1, 0, 0],
+            ['oxid', 'oxgroups', 0, 0, 0],
+            ['oxid', 'oxobject2delivery', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major

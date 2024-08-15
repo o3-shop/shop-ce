@@ -31,7 +31,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main shop manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Main Menu -> Core Settings -> Main.
  */
 class ShopMain extends AdminDetailsController
@@ -186,7 +186,7 @@ class ShopMain extends AdminDetailsController
             'moduleSmartyPluginDirectories',
             'activeModules',
         ];
-        //adding non copable multishop field options
+        //adding non-copyable multishop field options
         $multiShopTables = Registry::getConfig()->getConfigParam('aMultiShopTables');
         foreach ($multiShopTables as $multishopTable) {
             $nonCopyVars[] = 'blMallInherit_' . strtolower($multishopTable);
@@ -253,11 +253,11 @@ class ShopMain extends AdminDetailsController
     }
 
     /**
-     * Check user rights and change userId if need.
+     * Check user rights and change userId if needed.
      *
      * @param User $user
      * @param string                                   $shopId
-     * @param bool                                     $updateViewData If needs to update view data when shop Id changes.
+     * @param bool                                     $updateViewData If needing to update view data when shop ID changes.
      *
      * @return string
      */

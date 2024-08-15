@@ -57,13 +57,13 @@ class UserAddress extends AdminDetailsController
             $oUser = oxNew(User::class);
             $oUser->load($soxId);
 
-            // load adress
+            // load address
             $sAddressIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
             $sAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
             if ($sAddressId != "-1" && isset($sAddressId)) {
-                $oAdress = oxNew(Address::class);
-                $oAdress->load($sAddressId);
-                $this->_aViewData["edit"] = $oAdress;
+                $oAddress = oxNew(Address::class);
+                $oAddress->load($sAddressId);
+                $this->_aViewData["edit"] = $oAddress;
             }
 
             $this->_aViewData["oxaddressid"] = $sAddressId;
@@ -101,17 +101,17 @@ class UserAddress extends AdminDetailsController
 
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
             $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-            $oAdress = oxNew(Address::class);
+            $oAddress = oxNew(Address::class);
             if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] == "-1") {
                 $aParams['oxaddress__oxid'] = null;
             } else {
-                $oAdress->load($aParams['oxaddress__oxid']);
+                $oAddress->load($aParams['oxaddress__oxid']);
             }
 
-            $oAdress->assign($aParams);
-            $oAdress->save();
+            $oAddress->assign($aParams);
+            $oAddress->save();
 
-            $this->sSavedOxid = $oAdress->getId();
+            $this->sSavedOxid = $oAddress->getId();
         }
     }
 
@@ -124,8 +124,8 @@ class UserAddress extends AdminDetailsController
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
             $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
             if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] != "-1") {
-                $oAdress = oxNew(Address::class);
-                $this->_blDelete = $oAdress->delete($aParams['oxaddress__oxid']);
+                $oAddress = oxNew(Address::class);
+                $this->_blDelete = $oAddress->delete($aParams['oxaddress__oxid']);
             }
         }
     }

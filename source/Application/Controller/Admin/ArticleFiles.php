@@ -51,8 +51,8 @@ class ArticleFiles extends AdminDetailsController
     protected $_oArticle = null;
 
     /**
-     * Collects available article axtended parameters, passes them to
-     * Smarty engine and returns tamplate file name "article_extend.tpl".
+     * Collects available article extended parameters, passes them to
+     * Smarty engine and returns template file name "article_extend.tpl".
      *
      * @return string
      */
@@ -146,7 +146,7 @@ class ArticleFiles extends AdminDetailsController
 
         $aParams = Registry::getRequest()->getRequestEscapedParameter('newfile');
         $aParams = $this->_processOptions($aParams);
-        $aNewFile = Registry::getConfig()->getUploadedFile("newArticleFile");
+        $aNewFile = Registry::getConfig()->getUploadedFile('newArticleFile');
 
         //uploading and processing supplied file
         $oArticleFile = oxNew(File::class);
@@ -175,7 +175,7 @@ class ArticleFiles extends AdminDetailsController
     }
 
     /**
-     * Deletes article file from fileid parameter and checks if this file belongs to current article.
+     * Deletes article file from file-id parameter and checks if this file belongs to current article.
      *
      * @return void
      */

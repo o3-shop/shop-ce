@@ -34,9 +34,8 @@ use OxidEsales\Eshop\Core\UtilsView;
 use stdClass;
 
 /**
- * Admin article main categories manager.
- * There is possibility to change categories description, sorting, range of price
- * and etc.
+ * Admin article main categories' manager.
+ * There is possibility to change categories description, sorting, range of price etc.
  * Admin Menu: Manage Products -> Categories -> Main.
  */
 class CategoryMain extends AdminDetailsController
@@ -119,7 +118,7 @@ class CategoryMain extends AdminDetailsController
     }
 
     /**
-     * Returns an array of article object DB fields, without multi language and unsortible fields.
+     * Returns an array of article object DB fields, without multi-language and unsortable fields.
      *
      * @return array
      */
@@ -313,7 +312,7 @@ class CategoryMain extends AdminDetailsController
         }
 
         if ($this->getEditObjectId() == self::NEW_CATEGORY_ID) {
-            //#550A - if new category is made then is must be default activ
+            //#550A - if new category is made then is must be default active
             //#4051: Impossible to create inactive category
             //$aReqParams['oxcategories__oxactive'] = 1;
             $aReqParams['oxcategories__oxid'] = null;

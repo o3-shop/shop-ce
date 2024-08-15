@@ -29,7 +29,7 @@ use stdClass;
 
 /**
  * Admin article main payment manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Shop Settings -> Payment Methods -> Main.
  */
 class PaymentMain extends AdminDetailsController
@@ -41,7 +41,7 @@ class PaymentMain extends AdminDetailsController
 
     /**
      * Executes parent method parent::render(), creates oxlist object,
-     * passes it's data to Smarty engine and retutns name of template
+     * passes its data to Smarty engine and returns name of template
      * file "payment_main.tpl".
      *
      * @return string
@@ -126,7 +126,7 @@ class PaymentMain extends AdminDetailsController
 
         // setting add sum calculation rules
         $aRules = (array) Registry::getRequest()->getRequestEscapedParameter('oxpayments__oxaddsumrules');
-        // if sum eqals 0, show notice, that default value will be used.
+        // if sum equals 0, show notice, that default value will be used.
         if (empty($aRules)) {
             $this->_aViewData["noticeoxaddsumrules"] = 1;
         }
@@ -153,7 +153,7 @@ class PaymentMain extends AdminDetailsController
     }
 
     /**
-     * Saves payment parameters data in dofferent language (eg. english).
+     * Saves payment parameters data in different language (eg. english).
      */
     public function saveinnlang()
     {

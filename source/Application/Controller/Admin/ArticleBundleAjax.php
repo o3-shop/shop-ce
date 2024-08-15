@@ -54,7 +54,7 @@ class ArticleBundleAjax extends ListComponentAjax
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
@@ -115,7 +115,7 @@ class ArticleBundleAjax extends ListComponentAjax
     }
 
     /**
-     * Removing article from corssselling list
+     * Removing article from cross-selling list
      */
     public function removeArticleBundle()
     {
@@ -129,7 +129,7 @@ class ArticleBundleAjax extends ListComponentAjax
     }
 
     /**
-     * Adding article to corssselling list
+     * Adding article to cross-selling list
      */
     public function addArticleBundle()
     {

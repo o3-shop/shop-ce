@@ -58,7 +58,7 @@ class DiscountItemAjax extends ListComponentAjax
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
@@ -81,7 +81,7 @@ class DiscountItemAjax extends ListComponentAjax
             $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? '' : "and $sArticleTable.oxparentid = '' ";
 
             //#6027
-            //if we have variants then depending on config option the parent may be non buyable
+            //if we have variants then depending on config option the parent may be non-buyable
             //when the checkbox is checked, blVariantParentBuyable is true.
             $sQAdd .= $oConfig->getConfigParam('blVariantParentBuyable') ?  '' : "and $sArticleTable.oxvarcount = 0";
         } else {
@@ -151,7 +151,7 @@ class DiscountItemAjax extends ListComponentAjax
 
     /**
      * Formats and returns chunk of SQL query string with definition of
-     * fields to load from DB. Adds subselect to get variant title from parent article
+     * fields to load from DB. Adds sub-select to get variant title from parent article
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQueryCols" in next major

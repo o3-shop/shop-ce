@@ -91,7 +91,7 @@ class ListComponentAjax extends Base
     /**
      * Required data fields are returned by indexes/position in _aColumns array. This method
      * translates "table_name.col_name" into index definition and fetches request data according
-     * to it. This is usefull while using AJAX across versions.
+     * to it. This is useful while using AJAX across versions.
      *
      * @param string $sId "table_name.col_name"
      *
@@ -194,7 +194,7 @@ class ListComponentAjax extends Base
 
 
     /**
-     * Returns array of cotainer DB cols which must be loaded. If id is not
+     * Returns array of container DB cols which must be loaded. If id is not
      * passed - all possible containers cols will be returned
      *
      * @param string $sId container id (optional)
@@ -258,7 +258,7 @@ class ListComponentAjax extends Base
             }
         }
 
-        // no user defined valid cols ? setting defauls ..
+        // no user defined valid cols ? setting defaults ..
         if (!count($aVisibleCols)) {
             foreach ($aColNames as $sName => $aCol) {
                 // visible ?
@@ -408,7 +408,7 @@ class ListComponentAjax extends Base
                     // escaping special characters
                     $sValue = str_replace(['%', '_'], ['\%', '\_'], $sValue);
 
-                    // possibility to search in the middle ..
+                    // possibility to search in the middle ...
                     $sValue = $oStr->preg_replace('/^\*/', '%', $sValue);
 
                     $sQ .= $this->_getViewName($aCols[$iCol][1]) . '.' . $aCols[$iCol][0];

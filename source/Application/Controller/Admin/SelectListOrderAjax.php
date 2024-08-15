@@ -41,12 +41,12 @@ class SelectListOrderAjax extends ListComponentAjax
             ['oxsort', 'oxobject2selectlist', 1, 0, 0],
             ['oxident', 'oxselectlist', 0, 0, 0],
             ['oxvaldesc', 'oxselectlist', 0, 0, 0],
-            ['oxid', 'oxobject2selectlist', 0, 0, 1]
+            ['oxid', 'oxobject2selectlist', 0, 0, 1],
         ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major

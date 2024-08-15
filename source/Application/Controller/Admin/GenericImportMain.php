@@ -157,13 +157,13 @@ class GenericImportMain extends AdminDetailsController
             $genericImport->importFile($this->_getUploadedCsvFilePath());
             $this->_aViewData['iTotalRows'] = $genericImport->getImportedRowCount();
 
-            //checking if errors occured during import
+            //checking if errors occurred during import
             $this->_checkImportErrors($genericImport);
 
             //deleting uploaded csv file from temp dir
             $this->_deleteCsvFile();
 
-            //check if repeating import - then forsing first step
+            //check if repeating import - then forcing first step
             if ($oRequest->getRequestEscapedParameter('iRepeatImport')) {
                 $this->_aViewData['iRepeatImport'] = 1;
                 $navigationStep = 1;
@@ -195,7 +195,7 @@ class GenericImportMain extends AdminDetailsController
 
     /**
      * Get columns names from CSV file header. If file has no header
-     * returns default columns names Column 1, Column 2..
+     * returns default columns names Column 1, Column 2 ...
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsNames" in next major
@@ -257,7 +257,7 @@ class GenericImportMain extends AdminDetailsController
 
     /**
      * Checks current import navigation step errors.
-     * Returns step id in which error occured.
+     * Returns step id in which error occurred.
      *
      * @param int $iNavStep Navigation step id
      *
@@ -326,7 +326,7 @@ class GenericImportMain extends AdminDetailsController
     }
 
     /**
-     * Checks if any error occured during import and displays them
+     * Checks if any error occurred during import and displays them
      *
      * @param object $oErpImport Import object
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkImportErrors" in next major

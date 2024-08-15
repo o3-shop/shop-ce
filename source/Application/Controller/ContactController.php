@@ -51,7 +51,7 @@ class ContactController extends FrontendController
     protected $_sContactSubject = null;
 
     /**
-     * Entered conatct message.
+     * Entered contact message.
      *
      * @var string
      */
@@ -170,7 +170,7 @@ class ContactController extends FrontendController
     }
 
     /**
-     * Template variable getter. Returns status if email was send succesfull
+     * Template variable getter. Returns status if email was send successfully
      *
      * @return null|int
      */

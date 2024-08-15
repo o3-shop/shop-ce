@@ -220,7 +220,7 @@ class NewsletterSend extends NewsletterSelection
         // default tab
         $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($sNode, $this->_iDefEdit);
 
-        // passign active tab number
+        // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
     }
 

@@ -41,7 +41,7 @@ class OrderList extends AdminListController
     protected $_sListClass = 'oxorder';
 
     /**
-     * Enable/disable sorting by DESC (SQL) (defaultfalse - disable).
+     * Enable/disable sorting by DESC (SQL) (default false - disable).
      *
      * @var bool
      */

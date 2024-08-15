@@ -147,7 +147,7 @@ class ArticleList extends AdminListController
         }
         $this->_aViewData["art_category"] = $sArtCat;
 
-        // parent categorie tree
+        // parent category tree
         $this->_aViewData["cattree"] = $this->getCategoryList($sType, $sValue);
 
         // manufacturer list

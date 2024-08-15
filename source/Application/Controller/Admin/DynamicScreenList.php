@@ -26,7 +26,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin dynscreen list manager.
- * Arranges controll tabs and sets title.
+ * Arranges control tabs and sets title.
  *
  * @subpackage dyn
  *
@@ -35,7 +35,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DynamicScreenList extends DynamicScreenController
 {
     /**
-     * Executes marent method parent::render() and returns mane of template
+     * Executes parent method parent::render() and returns mane of template
      * file "dynscreen_list.tpl".
      *
      * @return string

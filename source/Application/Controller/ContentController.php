@@ -335,7 +335,7 @@ class ContentController extends FrontendController
     }
 
     /**
-     * returns object, assosiated with current view.
+     * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
      * @param int $iLang language id
@@ -419,7 +419,7 @@ class ContentController extends FrontendController
     }
 
     /**
-     * Returns template name wich content page to specify:
+     * Returns template name which content page to specify:
      * business entity data, payment charge specifications or delivery charge
      *
      * @return array

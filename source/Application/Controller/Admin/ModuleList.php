@@ -27,7 +27,7 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
 
 /**
- * Admin actionss manager.
+ * Admin actions' manager.
  * Sets list template, list object class ('oxactions') and default sorting
  * field ('oxactions.oxtitle').
  * Admin Menu: Manage Products -> Actions.

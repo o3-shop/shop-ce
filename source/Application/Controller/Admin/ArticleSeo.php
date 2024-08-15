@@ -124,7 +124,7 @@ class ArticleSeo extends ObjectSeo
     }
 
     /**
-     * Returns product selections array [type][language] (categories, vendors etc assigned)
+     * Returns product selections array [type][language] (categories, vendors etc. assigned)
      *
      * @return array
      */

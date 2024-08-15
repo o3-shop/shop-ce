@@ -37,14 +37,14 @@ class AttributeOrderAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = ['container1' => [
-        ['oxtitle', 'oxattribute', 1, 1, 0],
-        ['oxsort', 'oxcategory2attribute', 1, 0, 0],
-        ['oxid', 'oxcategory2attribute', 0, 0, 1]
-    ]
+            ['oxtitle', 'oxattribute', 1, 1, 0],
+            ['oxsort', 'oxcategory2attribute', 1, 0, 0],
+            ['oxid', 'oxcategory2attribute', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major

@@ -33,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
 class NewsController extends FrontendController
 {
     /**
-     * Newslist
+     * NewsList
      *
      * @var object
      */
@@ -68,7 +68,7 @@ class NewsController extends FrontendController
     protected $_iCntPages = null;
 
     /**
-     * Template variable getter. Returns newslist
+     * Template variable getter. Returns newsList
      *
      * @return object
      */

@@ -39,23 +39,23 @@ class ArticleExtendAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxcategories', 1, 1, 0],
-        ['oxdesc', 'oxcategories', 1, 1, 0],
-        ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxcategories', 1, 1, 0],
-                                     ['oxdesc', 'oxcategories', 1, 1, 0],
-                                     ['oxid', 'oxcategories', 0, 0, 0],
-                                     ['oxid', 'oxobject2category', 0, 0, 1],
-                                     ['oxtime', 'oxobject2category', 0, 0, 1],
-                                     ['oxid', 'oxcategories', 0, 0, 1]
-                                 ],
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxcategories', 0, 0, 1]
+        ],
+        'container2' => [
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxobject2category', 0, 0, 1],
+            ['oxtime', 'oxobject2category', 0, 0, 1],
+            ['oxid', 'oxcategories', 0, 0, 1]
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
@@ -97,7 +97,7 @@ class ArticleExtendAjax extends ListComponentAjax
     {
         $dataFields = parent::_getDataFields($sQ);
         if (Registry::getRequest()->getRequestEscapedParameter('oxid') && is_array($dataFields) && count($dataFields)) {
-            // looking for smallest time value to mark record as main category ..
+            // looking for smallest time value to mark record as main category ...
             $minimalPosition = null;
             $minimalValue = null;
             reset($dataFields);

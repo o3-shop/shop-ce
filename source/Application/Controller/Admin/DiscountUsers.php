@@ -30,8 +30,7 @@ use stdClass;
 
 /**
  * Admin article main discount manager.
- * There is possibility to change discount name, article, user
- * and etc.
+ * There is possibility to change discount name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
 class DiscountUsers extends AdminDetailsController
@@ -48,7 +47,7 @@ class DiscountUsers extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        // all usergroups
+        // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
         $oGroups->selectString("select * from " . getViewName("oxgroups", $this->_iEditLang));

@@ -35,7 +35,7 @@ class NewsletterPreview extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxnewsletter object
-     * and passes it's data to Smarty engine, returns name of template file
+     * and passes its data to Smarty engine, returns name of template file
      * "newsletter_preview.tpl".
      *
      * @return string

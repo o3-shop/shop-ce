@@ -34,7 +34,7 @@ class OrderAddress extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxorder object
-     * and passes it's data to Smarty engine. Returns name of template
+     * and passes its data to Smarty engine. Returns name of template
      * file "order_address.tpl".
      *
      * @return string
@@ -80,14 +80,14 @@ class OrderAddress extends AdminDetailsController
         $aFields = [];
 
         foreach ($aData as $sName => $sValue) {
-            // if field type matches..
+            // if field type matches ...
             if (strpos($sName, $sTypeToProcess) !== false) {
-                // storing which fields must be unset..
+                // storing which fields must be unset ...
                 $aFields[] = $sName;
 
-                // ignoring whats need to be ignored and testing values
+                // ignoring what's need to be ignored and testing values
                 if (!in_array($sName, $aIgnore) && $sValue) {
-                    // something was found - means leaving as is..
+                    // something was found - means leaving as is ...
                     $blEmpty = false;
                     break;
                 }

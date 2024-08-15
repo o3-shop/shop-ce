@@ -311,7 +311,7 @@ class FrontendController extends BaseController
      * @var array
      */
     protected $_aComponentNames = [
-        'oxcmp_user'       => 1, // 0 means dont init if cached
+        'oxcmp_user'       => 1, // 0 means don't init if cached
         'oxcmp_lang'       => 0,
         'oxcmp_cur'        => 1,
         'oxcmp_shop'       => 1,
@@ -418,7 +418,7 @@ class FrontendController extends BaseController
     /** @var array Components which needs to be initialized/rendered (depending on cache and its cache status). */
     protected static $_aCollectedComponentNames = null;
 
-    /** @var array If active load components. By default active. */
+    /** @var array If active load components. By default, active. */
     protected $_blLoadComponents = true;
 
     /** @var array Sorting columns list. */
@@ -1037,7 +1037,7 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Fetches meta data (description or keywords) from seo table
+     * Fetches metadata (description or keywords) from seo table
      *
      * @param string $dataType data type "oxkeywords" or "oxdescription"
      *
@@ -1059,7 +1059,7 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Fetches meta data (description or keywords) from content table
+     * Fetches metadata (description or keywords) from content table
      *
      * @param string $metaIdent meta content ident
      *
@@ -1161,7 +1161,7 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Forces output no index meta data for current view
+     * Forces output no index metadata for current view
      * @deprecated underscore prefix violates PSR12, will be renamed to "forceNoIndex" in next major
      */
     protected function _forceNoIndex() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1348,7 +1348,7 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Removes duplicated words (not case sensitive)
+     * Removes duplicated words (not case-sensitive)
      *
      * @param mixed $input    array of string or string
      * @param array $skipTags in admin defined strings
@@ -1363,7 +1363,7 @@ class FrontendController extends BaseController
             $input = implode(" ", $input);
         }
 
-        // removing some usually met characters..
+        // removing some usually met characters ...
         $input = $stringModifier->preg_replace("/[" . preg_quote($this->_sRemoveMetaChars, "/") . "]/", " ", $input);
 
         // splitting by word
@@ -1633,7 +1633,7 @@ class FrontendController extends BaseController
 
     /**
      * Return array of id to form recommend list.
-     * Should be overridden if need.
+     * Should be overridden if needed.
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
@@ -1875,7 +1875,7 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Template variable getter. Returns crosssellings
+     * Template variable getter. Returns cross-selling
      */
     public function getCrossSelling()
     {
@@ -1918,8 +1918,8 @@ class FrontendController extends BaseController
 
     /**
      * Returns active lang suffix
-     * usally it used in html lang attr to allow the browser to interpret the page in the right language
-     * e.g. to support hyphons
+     * usually it used in html lang attr to allow the browser to interpret the page in the right language
+     * e.g. to support hyphens
      * @return string
      */
     public function getActiveLangAbbr()
@@ -2219,8 +2219,8 @@ class FrontendController extends BaseController
     public function getActVendor()
     {
         // if active vendor is not set yet - trying to load it from request params
-        // this may be useful when category component was unable to load active vendor
-        // and we still need some object to mount navigation info
+        // this may be useful when category component was unable to load active vendor.
+        // We still need some object to mount navigation info
         if ($this->_oActVendor === null) {
             $this->_oActVendor = false;
             $vendorId = Registry::getRequest()->getRequestEscapedParameter('cnid');
@@ -2244,8 +2244,8 @@ class FrontendController extends BaseController
     public function getActManufacturer()
     {
         // if active Manufacturer is not set yet - trying to load it from request params
-        // this may be useful when category component was unable to load active Manufacturer
-        // and we still need some object to mount navigation info
+        // this may be useful when category component was unable to load active Manufacturer.
+        // We still need some object to mount navigation info
         if ($this->_oActManufacturer === null) {
             $this->_oActManufacturer = false;
             $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('mnid');
@@ -3017,7 +3017,7 @@ class FrontendController extends BaseController
     }
 
     /**
-     * Template variable getter. Returns user name of searched wishlist
+     * Template variable getter. Returns username of searched wishlist
      *
      * @return string
      */

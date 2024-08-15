@@ -70,7 +70,7 @@ class ThankYouController extends FrontendController
     protected $_sIPaymentAccount = null;
 
     /**
-     * IPayment user name
+     * IPayment username
      *
      * @var string
      */
@@ -108,7 +108,7 @@ class ThankYouController extends FrontendController
      * Executes parent::init(), loads basket from session
      * (thankyou::_oBasket = Session::getBasket()) then destroys
      * it (Session::delBasket()), unsets user session ID, if
-     * this user didn't entered password while ordering.
+     * this user didn't enter password while ordering.
      */
     public function init()
     {

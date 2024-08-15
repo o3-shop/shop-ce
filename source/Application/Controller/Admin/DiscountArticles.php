@@ -27,8 +27,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main discount manager.
- * There is possibility to change discount name, article, user
- * and etc.
+ * There is possibility to change discount name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main.
  */
 class DiscountArticles extends AdminDetailsController

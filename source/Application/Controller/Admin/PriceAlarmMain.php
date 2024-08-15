@@ -34,14 +34,14 @@ use stdClass;
 
 /**
  * Admin article main pricealarm manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Customer Info -> pricealarm -> Main.
  */
 class PriceAlarmMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxpricealarm object
-     * and passes it's data to Smarty engine. Returns name of template file
+     * and passes its data to Smarty engine. Returns name of template file
      * "pricealarm_main.tpl".
      *
      * @return string
