@@ -21,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use stdClass;
-use oxRegistry;
 use oxField;
 
 /**
@@ -252,7 +252,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _isAvailablePrice($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oSeries = $this->getSerie();
-        $oCur = $this->getConfig()->getActShopCurrencyObject();
+        $oCur = Registry::getConfig()->getActShopCurrencyObject();
         if ($oSeries->oxvoucherseries__oxminimumvalue->value && $dPrice < ($oSeries->oxvoucherseries__oxminimumvalue->value * $oCur->rate)) {
             $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
             $oEx->setMessage('ERROR_MESSAGE_VOUCHER_INCORRECTPRICE');
@@ -719,7 +719,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $oSeries = $this->getSerie();
         if ($oSeries->oxvoucherseries__oxdiscounttype->value == 'absolute') {
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
             $dDiscount = $oSeries->oxvoucherseries__oxdiscount->value * $oCur->rate;
         } else {
             $dDiscount = $oSeries->oxvoucherseries__oxdiscount->value / 100 * $dPrice;

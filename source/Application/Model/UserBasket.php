@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxField;
 use oxDb;
 
@@ -363,7 +363,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function isVisible()
     {
-        $oActivUser = $this->getConfig()->getUser();
+        $oActivUser = Registry::getConfig()->getUser();
         $sActivUserId = null;
         if ($oActivUser) {
             $sActivUserId = $oActivUser->getId();

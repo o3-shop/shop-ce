@@ -708,7 +708,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sShopSelect = '';
         if (!$this->_blMallUsers && $this->oxuser__oxrights->value != 'malladmin') {
             $sShopSelect = ' AND oxshopid = :oxshopid ';
-            $params[':oxshopid'] = $this->getConfig()->getShopId();
+            $params[':oxshopid'] = Registry::getConfig()->getShopId();
         }
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -785,7 +785,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
             $iCnt = (int) $oDb->getOne($sQ, [
                 ':oxuserid' => $this->getId(),
                 ':oxorderdate' => $this->oxuser__oxregister->value,
-                ':oxshopid' => $this->getConfig()->getShopId()
+                ':oxshopid' => Registry::getConfig()->getShopId()
             ]);
         }
 
@@ -872,7 +872,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function createUser()
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sShopID = $this->getConfig()->getShopId();
+        $sShopID = Registry::getConfig()->getShopId();
 
         // check if user exists AND there is no password - in this case we update otherwise we try to insert
         $sSelect = "select oxid from oxuser 
@@ -997,7 +997,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         if (is_numeric($iSuccess) && $iSuccess != 2 && $iSuccess <= 3) {
             //adding user to particular customer groups
-            $myConfig = $this->getConfig();
+            $myConfig = Registry::getConfig();
             $dMidlleCustPrice = (float) $myConfig->getConfigParam('sMidlleCustPrice');
             $dLargeCustPrice = (float) $myConfig->getConfigParam('sLargeCustPrice');
 
@@ -1111,7 +1111,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function getBoni()
     {
-        if (!$iBoni = $this->getConfig()->getConfigParam('iCreditRating')) {
+        if (!$iBoni = Registry::getConfig()->getConfigParam('iCreditRating')) {
             $iBoni = 1000;
         }
 
@@ -1286,7 +1286,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _assignAddress($aDelAddress) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($aDelAddress) && count($aDelAddress)) {
-            $sAddressId = $this->getConfig()->getRequestParameter('oxaddressid');
+            $sAddressId = Registry::getConfig()->getRequestParameter('oxaddressid');
             $sAddressId = ($sAddressId === null || $sAddressId == -1 || $sAddressId == -2) ? null : $sAddressId;
 
             $oAddress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
@@ -1547,7 +1547,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         // Registry::getSession()->deleteVariable( 'deladrid' );
 
         // delete cookie
-        Registry::getUtilsServer()->deleteUserCookie($this->getConfig()->getShopID());
+        Registry::getUtilsServer()->deleteUserCookie(Registry::getConfig()->getShopID());
 
         // unsetting global user
         $this->setUser(null);
@@ -1576,7 +1576,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function loadActiveUser($blForceAdmin = false)
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
         $blAdmin = $this->isAdmin() || $blForceAdmin;
 
@@ -1626,7 +1626,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _getCookieUserId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sUserID = null;
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $sShopID = $oConfig->getShopId();
         if (($sSet = Registry::getUtilsServer()->getUserCookie($sShopID))) {
             $passwordServiceBridge = $this->getContainer()->get(PasswordServiceBridgeInterface::class);
@@ -1670,7 +1670,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _ldapLogin($sUser, $sPassword, $sShopID, $sShopSelect) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aLDAPParams = $this->getConfig()->getConfigParam('aLDAPParams');
+        $aLDAPParams = Registry::getConfig()->getConfigParam('aLDAPParams');
         $oLDAP = oxNew(\OxidEsales\Eshop\Core\LDAP::class, $aLDAPParams['HOST'], $aLDAPParams['PORT']);
 
         // maybe this is LDAP user but supplied email Address instead of LDAP login
@@ -1744,7 +1744,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         }
 
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $sAuthRights = null;
 
         // choosing possible user rights index
@@ -1839,7 +1839,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function checkIfEmailExists($sEmail)
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
         $iShopId = $myConfig->getShopId();
@@ -1902,14 +1902,14 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         $iActPage = ($iActPage < 0) ? 0 : $iActPage;
 
         // load only lists which we show on screen
-        $iNrofCatArticles = $this->getConfig()->getConfigParam('iNrofCatArticles');
+        $iNrofCatArticles = Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
 
 
         $oRecommList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
         $oRecommList->init('oxrecommlist');
         $oRecommList->setSqlLimit($iNrofCatArticles * $iActPage, $iNrofCatArticles);
-        $iShopId = $this->getConfig()->getShopId();
+        $iShopId = Registry::getConfig()->getShopId();
         $sSelect = 'select * from oxrecommlists 
             where oxuserid = :oxuserid 
                 and oxshopid = :oxshopid';
@@ -1939,7 +1939,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         if ($this->_iCntRecommLists === null || $sOx) {
             $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
             $this->_iCntRecommLists = 0;
-            $iShopId = $this->getConfig()->getShopId();
+            $iShopId = Registry::getConfig()->getShopId();
             $sSelect = 'select count(oxid) from oxrecommlists 
                 where oxuserid = :oxuserid and oxshopid = :oxshopid';
             $this->_iCntRecommLists = $oDb->getOne($sSelect, [
@@ -1965,7 +1965,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         $blForeignGroupExists = false;
         $blInlandGroupExists = false;
 
-        $aHomeCountry = $this->getConfig()->getConfigParam('aHomeCountry');
+        $aHomeCountry = Registry::getConfig()->getConfigParam('aHomeCountry');
         // foreigner ?
         if (is_array($aHomeCountry)) {
             if (in_array($sCountryId, $aHomeCountry)) {
@@ -2224,7 +2224,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
         $termsSql = "select 1 from oxacceptedterms where oxuserid = :oxuserid and oxshopid = :oxshopid";
         return (bool) $oDb->getOne($termsSql, [
             ':oxuserid' => $this->getId(),
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ]);
     }
 
@@ -2235,7 +2235,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $sUserId = $oDb->quote($this->getId());
-        $sShopId = $this->getConfig()->getShopId();
+        $sShopId = Registry::getConfig()->getShopId();
         $sVersion = oxNew(\OxidEsales\Eshop\Application\Model\Content::class)->getTermsVersion();
 
         $oDb->execute("replace oxacceptedterms set oxuserid={$sUserId}, oxshopid='{$sShopId}', oxtermversion='{$sVersion}'");
@@ -2253,7 +2253,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function setCreditPointsForRegistrant($sUserId, $sRecEmail)
     {
         $blSet = false;
-        $iPoints = $this->getConfig()->getConfigParam('dPointsForRegistration');
+        $iPoints = Registry::getConfig()->getConfigParam('dPointsForRegistration');
         // check if this invitation is still not accepted
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
@@ -2301,7 +2301,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function setCreditPointsForInviter()
     {
         $blSet = false;
-        $iPoints = $this->getConfig()->getConfigParam('dPointsForInvitation');
+        $iPoints = Registry::getConfig()->getConfigParam('dPointsForInvitation');
         if ($iPoints) {
             $iNewPoints = $this->oxuser__oxpoints->value + $iPoints;
             $this->oxuser__oxpoints = new Field($iNewPoints, Field::T_RAW);
@@ -2373,7 +2373,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function isPriceViewModeNetto()
     {
-        return (bool) $this->getConfig()->getConfigParam('blShowNetPrice');
+        return (bool) Registry::getConfig()->getConfigParam('blShowNetPrice');
     }
 
     /**
@@ -2456,7 +2456,7 @@ class User extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $blDemoMode = false;
 
-        if ($this->getConfig()->isDemoShop()) {
+        if (Registry::getConfig()->isDemoShop()) {
             $blDemoMode = true;
         }
 

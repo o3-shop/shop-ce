@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxView;
-use oxRegistry;
 use oxUBase;
 use oxDb;
 use oxCategory;
@@ -131,7 +131,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
     protected function _getRecomm($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oList = null;
-        $oView = $this->getConfig()->getActiveView();
+        $oView = Registry::getConfig()->getActiveView();
         if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController) {
             $oList = $oView->getActiveRecommList();
         }
@@ -147,7 +147,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      */
     protected function _getListType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getConfig()->getActiveView()->getListType();
+        return Registry::getConfig()->getActiveView()->getListType();
     }
 
     /**
@@ -247,7 +247,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
     protected function _getCategory($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oCat = null;
-        $oView = $this->getConfig()->getActiveView();
+        $oView = Registry::getConfig()->getActiveView();
         if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController) {
             $oCat = $oView->getActiveCategory();
         } elseif ($oView instanceof \OxidEsales\Eshop\Core\Controller\BaseController) {
@@ -441,7 +441,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
      */
     protected function _getVendor($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oView = $this->getConfig()->getActiveView();
+        $oView = Registry::getConfig()->getActiveView();
 
         $oVendor = null;
         if ($sActVendorId = $oArticle->oxarticles__oxvendorid->value) {
@@ -521,7 +521,7 @@ class SeoEncoderArticle extends \OxidEsales\Eshop\Core\SeoEncoder
     {
         $oManufacturer = null;
         if ($sActManufacturerId = $oArticle->oxarticles__oxmanufacturerid->value) {
-            $oView = $this->getConfig()->getActiveView();
+            $oView = Registry::getConfig()->getActiveView();
 
             if ($oView instanceof \OxidEsales\Eshop\Application\Controller\FrontendController && ($oActManufacturer = $oView->getActManufacturer())) {
                 $oManufacturer = $oActManufacturer;

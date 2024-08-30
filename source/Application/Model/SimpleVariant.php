@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxPrice;
 
 /**
@@ -135,7 +135,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
         }
 
         // #1437/1436C - added config option, and check for zero A,B,C price values
-        if ($this->getConfig()->getConfigParam('blOverrideZeroABCPrices') && (double) $dPrice == 0) {
+        if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (double) $dPrice == 0) {
             $dPrice = $this->oxarticles__oxprice->value;
         }
 
@@ -149,7 +149,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     public function getPrice()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         // 0002030 No need to return price if it disabled for better performance.
         if (!$myConfig->getConfigParam('bl_perfLoadPrice')) {
             return;
@@ -194,7 +194,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     protected function _applyCurrency(\OxidEsales\Eshop\Core\Price $oPrice, $oCur = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$oCur) {
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
         }
 
         $oPrice->multiply($oCur->rate);
@@ -221,7 +221,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
      */
     protected function _applyParentVat($oPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (($oParent = $this->getParent()) && !$this->getConfig()->getConfigParam('bl_perfCalcVatOnlyForBasketOrder')) {
+        if (($oParent = $this->getParent()) && !Registry::getConfig()->getConfigParam('bl_perfCalcVatOnlyForBasketOrder')) {
             $oParent->applyVats($oPrice);
         }
     }

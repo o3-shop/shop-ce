@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxObjectException;
 
@@ -175,7 +176,7 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
 
         stopProfile("_assignPriceInternal");
 
-        return $this->getConfig()->getConfigParam('dDefaultVAT');
+        return Registry::getConfig()->getConfigParam('dDefaultVAT');
     }
 
     /**
@@ -221,7 +222,7 @@ class VatSelector extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getVatCountry(\OxidEsales\Eshop\Application\Model\User $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blUseShippingCountry = $this->getConfig()->getConfigParam("blShippingCountryVat");
+        $blUseShippingCountry = Registry::getConfig()->getConfigParam("blShippingCountryVat");
 
         if ($blUseShippingCountry) {
             $aAddresses = $oUser->getUserAddresses($oUser->getId());

@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -82,7 +82,7 @@ class VariantHandler extends \OxidEsales\Eshop\Core\Base
             $oMdVariants->addNames(
                 $sKey,
                 $aNames,
-                ($this->getConfig()->getConfigParam('bl_perfLoadPrice')) ? $oVariant->getPrice()->getPrice() : null,
+                (Registry::getConfig()->getConfigParam('bl_perfLoadPrice')) ? $oVariant->getPrice()->getPrice() : null,
                 $oVariant->getLink()
             );
         }
@@ -99,7 +99,7 @@ class VariantHandler extends \OxidEsales\Eshop\Core\Base
     public function genVariantFromSell($aSels, $oArticle)
     {
         $oVariants = $oArticle->getAdminVariants();
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $myUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
         $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
         $aConfLanguages = $myLang->getLanguageIds();
@@ -146,7 +146,7 @@ class VariantHandler extends \OxidEsales\Eshop\Core\Base
      */
     protected function _assignValues($aValues, $oVariants, $oArticle, $aConfLanguages) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
         $iCounter = 0;
         $aVarselect = []; //multilanguage names of existing variants
@@ -233,7 +233,7 @@ class VariantHandler extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getValuePrice($oValue, $dParentPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $dPriceMod = 0;
         if ($myConfig->getConfigParam('bl_perfLoadSelectLists') && $myConfig->getConfigParam('bl_perfUseSelectlistPrice')) {
             if ($oValue->priceUnit == 'abs') {
@@ -303,7 +303,7 @@ class VariantHandler extends \OxidEsales\Eshop\Core\Base
      */
     public function isMdVariant($oArticle)
     {
-        if ($this->getConfig()->getConfigParam('blUseMultidimensionVariants')) {
+        if (Registry::getConfig()->getConfigParam('blUseMultidimensionVariants')) {
             if (strpos($oArticle->oxarticles__oxvarselect->value, trim($this->_sMdSeparator)) !== false) {
                 return true;
             }
@@ -460,7 +460,7 @@ class VariantHandler extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getSelections($sTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($this->getConfig()->getConfigParam('blUseMultidimensionVariants')) {
+        if (Registry::getConfig()->getConfigParam('blUseMultidimensionVariants')) {
             $aSelections = explode($this->_sMdSeparator, $sTitle);
         } else {
             $aSelections = [$sTitle];

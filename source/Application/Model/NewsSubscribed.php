@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
 
@@ -128,7 +129,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $params = [
             ':oxuserid' => $sOxUserId,
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ];
 
         $sOxId = $oDb->getOne("select oxid from oxnewssubscribed 

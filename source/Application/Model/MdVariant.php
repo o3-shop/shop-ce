@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Defines an element of multidimentional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
@@ -282,7 +282,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      */
     public function getFPrice()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         // 0002030 No need to return price if it disabled for better performance.
         if (!$myConfig->getConfigParam('bl_perfLoadPrice')) {
             return;
@@ -300,7 +300,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
 
         $dMinPrice = $this->getMinDPrice();
         $sFMinPrice = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dMinPrice);
-        $sCurrency = ' ' . $this->getConfig()->getActShopCurrencyObject()->sign;
+        $sCurrency = ' ' . Registry::getConfig()->getActShopCurrencyObject()->sign;
         $this->_sFPrice = $sFromPrefix . $sFMinPrice . $sCurrency;
 
         return $this->_sFPrice;

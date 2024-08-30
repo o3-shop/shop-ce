@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxField;
 
 /**
@@ -64,7 +64,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct()
     {
-        $this->setShowVendorArticleCnt($this->getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
+        $this->setShowVendorArticleCnt(Registry::getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
         parent::__construct('oxvendor');
     }
 

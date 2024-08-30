@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -97,7 +98,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
         $sArticleId = $this->getArticle()->getId();
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
 
-        if ($this->getConfig()->getConfigParam('blVariantInheritAmountPrice') && $this->getArticle()->getParentId()) {
+        if (Registry::getConfig()->getConfigParam('blVariantInheritAmountPrice') && $this->getArticle()->getParentId()) {
             $sArticleId = $this->getArticle()->getParentId();
         }
 
@@ -105,11 +106,11 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
             ':oxartid' => $sArticleId
         ];
 
-        if ($this->getConfig()->getConfigParam('blMallInterchangeArticles')) {
+        if (Registry::getConfig()->getConfigParam('blMallInterchangeArticles')) {
             $sShopSelect = '1';
         } else {
             $sShopSelect = " `oxshopid` = :oxshopid ";
-            $params[':oxshopid'] = $this->getConfig()->getShopId();
+            $params[':oxshopid'] = Registry::getConfig()->getShopId();
         }
 
         $sSql = "SELECT * FROM `oxprice2article` 

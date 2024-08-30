@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 
 /**
@@ -146,7 +147,7 @@ class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
             $sSelect .= ' and oxreviews.oxtext != "" ';
         }
 
-        if ($this->getConfig()->getConfigParam('blGBModerate')) {
+        if (Registry::getConfig()->getConfigParam('blGBModerate')) {
             $sSelect .= ' and ( oxreviews.oxactive = "1" ';
 
             if ($oUser = $this->getUser()) {

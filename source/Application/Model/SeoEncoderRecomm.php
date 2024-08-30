@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Seo encoder base
@@ -41,7 +41,7 @@ class SeoEncoderRecomm extends \OxidEsales\Eshop\Core\SeoEncoder
     public function getRecommUri($oRecomm, $iLang = null)
     {
         if (!($sSeoUrl = $this->_loadFromDb('dynamic', $oRecomm->getId(), $iLang))) {
-            $myConfig = $this->getConfig();
+            $myConfig = Registry::getConfig();
 
             // fetching part of base url
             $sSeoUrl = $this->_getStaticUri(

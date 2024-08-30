@@ -21,10 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
 use oxField;
 use oxDb;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * @deprecated Functionality for Newsletter management will be removed.
@@ -202,7 +202,7 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _setParams($blPerfLoadAktion = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
         $oShop->load($myConfig->getShopId());

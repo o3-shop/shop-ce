@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxField;
 
 /**
@@ -70,7 +71,7 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function __construct()
     {
-        $this->setVariantParentBuyable($this->getConfig()->getConfigParam('blVariantParentBuyable'));
+        $this->setVariantParentBuyable(Registry::getConfig()->getConfigParam('blVariantParentBuyable'));
         parent::__construct();
         $this->init('oxuserbasketitems');
     }

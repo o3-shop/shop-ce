@@ -22,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use oxDb;
-use oxRegistry;
 use stdClass;
 
 /**

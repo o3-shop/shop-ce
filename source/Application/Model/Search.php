@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -78,7 +78,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
 
         // load only articles which we show on screen
         //setting default values to avoid possible errors showing article list
-        $iNrofCatArticles = $this->getConfig()->getConfigParam('iNrofCatArticles');
+        $iNrofCatArticles = Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
 
         $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
@@ -259,7 +259,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
     protected function _getWhere($sSearchString) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $blSep = false;
         $sArticleTable = getViewName('oxarticles', $this->_iLanguage);
 
@@ -322,7 +322,7 @@ class Search extends \OxidEsales\Eshop\Core\Base
     protected function getDescriptionJoin($table)
     {
         $descriptionJoin = '';
-        $searchColumns = $this->getConfig()->getConfigParam('aSearchCols');
+        $searchColumns = Registry::getConfig()->getConfigParam('aSearchCols');
 
         if (is_array($searchColumns) && in_array('oxlongdesc', $searchColumns)) {
             $viewName = getViewName('oxartextends', $this->_iLanguage);

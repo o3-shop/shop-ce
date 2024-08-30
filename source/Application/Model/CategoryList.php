@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use Exception;
 
@@ -88,7 +89,7 @@ class CategoryList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct($sObjectsInListName = 'oxcategory')
     {
-        $this->_blHideEmpty = $this->getConfig()->getConfigParam('blDontShowEmptyCategories');
+        $this->_blHideEmpty = Registry::getConfig()->getConfigParam('blDontShowEmptyCategories');
         parent::__construct($sObjectsInListName);
     }
 

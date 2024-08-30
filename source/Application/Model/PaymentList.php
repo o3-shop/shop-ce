@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -41,7 +42,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct()
     {
-        $this->setHomeCountry($this->getConfig()->getConfigParam('aHomeCountry'));
+        $this->setHomeCountry(Registry::getConfig()->getConfigParam('aHomeCountry'));
         parent::__construct('oxpayment');
     }
 

@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxField;
 
 /**
@@ -204,7 +204,7 @@ class PriceAlarm extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         if ($this->_oCurrency == null) {
             $this->_oCurrency = false;
-            $myConfig = $this->getConfig();
+            $myConfig = Registry::getConfig();
             $oThisCurr = $myConfig->getCurrencyObject($this->oxpricealarm__oxcurrency->value);
 
             // #869A we should perform currency conversion

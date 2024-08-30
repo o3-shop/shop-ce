@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-
 /**
  * Defines and returns delivery and billing required fields.
  */

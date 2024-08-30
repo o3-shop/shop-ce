@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Article file link manager.
  *
@@ -68,7 +70,7 @@ class OrderFileList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         $this->selectString($sSql, [
             ':oxuserid' => $sUserId,
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ]);
     }
 
@@ -97,7 +99,7 @@ class OrderFileList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         $this->selectString($sSql, [
             ':oxorderid' => $sOrderId,
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ]);
     }
 }

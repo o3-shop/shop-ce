@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeInterface;
 
 /**
@@ -65,7 +66,7 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function allowRating($sUserId, $sType, $sObjectId)
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if ($iRatingLogsTimeout = $myConfig->getConfigParam('iRatingLogsTimeout')) {
             $sExpDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() - $iRatingLogsTimeout * 24 * 60 * 60);

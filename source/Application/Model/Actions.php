@@ -21,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 use oxField;
-use oxRegistry;
 use oxUtilsUrl;
 use oxUtilsView;
 use oxUtilsFile;
@@ -276,7 +276,7 @@ class Actions extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         if (isset($this->oxactions__oxpic) && $this->oxactions__oxpic->value) {
             $sPromoDir = \OxidEsales\Eshop\Core\Registry::getUtilsFile()->normalizeDir(\OxidEsales\Eshop\Core\UtilsFile::PROMO_PICTURE_DIR);
 
-            return $this->getConfig()->getPictureUrl($sPromoDir . $this->oxactions__oxpic->value, false);
+            return Registry::getConfig()->getPictureUrl($sPromoDir . $this->oxactions__oxpic->value, false);
         }
     }
 

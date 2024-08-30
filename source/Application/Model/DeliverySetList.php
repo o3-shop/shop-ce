@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 use oxDb;
 
 /**
@@ -63,7 +63,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct()
     {
-        $this->setHomeCountry($this->getConfig()->getConfigParam('aHomeCountry'));
+        $this->setHomeCountry(Registry::getConfig()->getConfigParam('aHomeCountry'));
         parent::__construct('oxdeliveryset');
     }
 
@@ -253,7 +253,7 @@ class DeliverySetList extends \OxidEsales\Eshop\Core\Model\ListModel
             $oPayList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\PaymentList::class);
             $oDelList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliveryList::class);
 
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
             $dBasketPrice = $oBasket->getPriceForPayment() / $oCur->rate;
 
             // checking if these ship sets available (number of possible payment methods > 0)

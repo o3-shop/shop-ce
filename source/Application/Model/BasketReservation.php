@@ -25,7 +25,6 @@ use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
-use oxRegistry;
 use oxField;
 use oxDb;
 use oxuserbasket;
@@ -191,7 +190,7 @@ class BasketReservation extends \OxidEsales\Eshop\Core\Base
      */
     protected function _reserveArticles($aBasketDiff) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blAllowNegativeStock = $this->getConfig()->getConfigParam('blAllowNegativeStock');
+        $blAllowNegativeStock = Registry::getConfig()->getConfigParam('blAllowNegativeStock');
 
         $oReserved = $this->getReservations();
         foreach ($aBasketDiff as $sId => $dAmount) {
@@ -291,7 +290,7 @@ class BasketReservation extends \OxidEsales\Eshop\Core\Base
     {
         $database = DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC);
 
-        $psBasketReservationTimeout = (int)$this->getConfig()->getConfigParam('iPsBasketReservationTimeout');
+        $psBasketReservationTimeout = (int)Registry::getConfig()->getConfigParam('iPsBasketReservationTimeout');
         $startTime = Registry::getUtilsDate()->getTime() - $psBasketReservationTimeout;
 
         $parameters = [
@@ -369,7 +368,7 @@ class BasketReservation extends \OxidEsales\Eshop\Core\Base
      */
     public function getTimeLeft()
     {
-        $iTimeout = $this->getConfig()->getConfigParam('iPsBasketReservationTimeout');
+        $iTimeout = Registry::getConfig()->getConfigParam('iPsBasketReservationTimeout');
         if ($iTimeout > 0) {
             $oRev = $this->getReservations();
             if ($oRev && $oRev->getId()) {

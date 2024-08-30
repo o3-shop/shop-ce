@@ -273,7 +273,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         $this->init('oxorder');
 
         // set usage of separate orders numbering for different shops
-        $this->setSeparateNumbering($this->getConfig()->getConfigParam('blSeparateNumbering'));
+        $this->setSeparateNumbering(Registry::getConfig()->getConfigParam('blSeparateNumbering'));
     }
 
     /**
@@ -664,7 +664,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _loadFromBasket(\OxidEsales\Eshop\Application\Model\Basket $oBasket) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         // store IP Address - default must be FALSE as it is illegal to store
         if ($myConfig->getConfigParam('blStoreIPs') && $this->oxorder__oxip->value === null) {
@@ -1048,7 +1048,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _setFolder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $this->oxorder__oxfolder = new \OxidEsales\Eshop\Core\Field(key($myConfig->getShopConfVar('aOrderfolder', $myConfig->getShopId())), \OxidEsales\Eshop\Core\Field::T_RAW);
     }
 
@@ -1267,7 +1267,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oUtilsDate = \OxidEsales\Eshop\Core\Registry::getUtilsDate();
 
         //V #M525 orderdate must be the same as it was
@@ -1303,7 +1303,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _getCounterIdent() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sCounterIdent = ($this->_blSeparateNumbering) ? 'oxOrder_' . $this->getConfig()->getShopId() : 'oxOrder';
+        $sCounterIdent = ($this->_blSeparateNumbering) ? 'oxOrder_' . Registry::getConfig()->getShopId() : 'oxOrder';
 
         return $sCounterIdent;
     }
@@ -1451,7 +1451,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         $this->_oOrderBasket->setOrderId($this->getId());
 
         // setting basket currency order uses
-        $aCurrencies = $this->getConfig()->getCurrencyArray();
+        $aCurrencies = Registry::getConfig()->getCurrencyArray();
         foreach ($aCurrencies as $oCur) {
             if ($oCur->name == $this->oxorder__oxcurrency->value) {
                 $oBasketCur = $oCur;
@@ -1595,7 +1595,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sQ = 'select max(oxorder.oxinvoicenr) from oxorder 
             where oxorder.oxshopid = :oxshopid ';
         $params = [
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ];
 
         return ((int) \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, $params) + 1);
@@ -1611,7 +1611,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sQ = 'select max(cast(oxorder.oxbillnr as unsigned)) from oxorder 
             where oxorder.oxshopid = :oxshopid ';
         $params = [
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ];
 
         return ((int) \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, $params) + 1);
@@ -1693,7 +1693,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         }
 
         $params = [
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ];
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -1717,7 +1717,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         }
 
         $params = [
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ];
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -1890,7 +1890,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
             order by oxorder.oxorderdate desc ';
 
         $sLastPaymentId = $masterDb->getOne($sQ, [
-            ':oxshopid' => $this->getConfig()->getShopId(),
+            ':oxshopid' => Registry::getConfig()->getShopId(),
             ':oxuserid' => $sUserId
         ]);
 
@@ -1947,7 +1947,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function getTotalOrderSum()
     {
-        $oCur = $this->getConfig()->getActShopCurrencyObject();
+        $oCur = Registry::getConfig()->getActShopCurrencyObject();
 
         return number_format((double) $this->oxorder__oxtotalordersum->value, $oCur->decimal, '.', '');
     }
@@ -1971,7 +1971,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         if ($blFormatCurrency) {
             $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
             foreach ($aVats as $sKey => $dVat) {
                 $aVats[$sKey] = $oLang->formatCurrency($dVat, $oCur);
             }
@@ -2052,7 +2052,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         if ($this->_oOrderCurrency === null) {
             // setting default in case unrecognized currency was set during order
-            $aCurrencies = $this->getConfig()->getCurrencyArray();
+            $aCurrencies = Registry::getConfig()->getCurrencyArray();
             $this->_oOrderCurrency = current($aCurrencies);
 
             foreach ($aCurrencies as $oCurr) {
@@ -2142,7 +2142,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function validateDeliveryAddress($oUser)
     {
-        $sDelAddressMD5 = $this->getConfig()->getRequestParameter('sDeliveryAddressMD5');
+        $sDelAddressMD5 = Registry::getConfig()->getRequestParameter('sDeliveryAddressMD5');
 
         $sDeliveryAddress = $oUser->getEncodedDeliveryAddress();
 
@@ -2399,7 +2399,7 @@ class Order extends \OxidEsales\Eshop\Core\Model\BaseModel
         $paymentModel->load($paymentId);
 
         $dynamicValues = $this->getDynamicValues();
-        $shopId = $this->getConfig()->getShopId();
+        $shopId = Registry::getConfig()->getShopId();
 
         if (!$oUser) {
             $oUser = $this->getUser();

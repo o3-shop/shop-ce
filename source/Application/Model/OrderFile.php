@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
 use oxField;
 
 /**
