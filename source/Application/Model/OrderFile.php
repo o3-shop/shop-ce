@@ -49,7 +49,7 @@ class OrderFile extends BaseModel
     /**
      * Initialises the instance
      *
-     * @return OrderFile
+     * @return void
      */
     public function __construct()
     {
@@ -227,7 +227,6 @@ class OrderFile extends BaseModel
     /**
      * Checks if download link is valid, changes count, if first download changes valid until
      *
-     * @return bool
      */
     public function processOrderFile()
     {

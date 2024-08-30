@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -42,6 +43,7 @@ class ActionList extends ListModel
      * Loads x last finished promotions
      *
      * @param int $iCount count to load
+     * @throws DatabaseConnectionException
      */
     public function loadFinishedByCount($iCount)
     {
@@ -60,6 +62,7 @@ class ActionList extends ListModel
      * Loads last finished promotions after given timespan
      *
      * @param int $iTimespan timespan to load
+     * @throws DatabaseConnectionException
      */
     public function loadFinishedByTimespan($iTimespan)
     {
@@ -91,6 +94,7 @@ class ActionList extends ListModel
      * Loads next not yet started promotions by cound
      *
      * @param int $iCount count to load
+     * @throws DatabaseConnectionException
      */
     public function loadFutureByCount($iCount)
     {
@@ -107,6 +111,7 @@ class ActionList extends ListModel
      * Loads next not yet started promotions before the given timespan
      *
      * @param int $iTimespan timespan to load
+     * @throws DatabaseConnectionException
      */
     public function loadFutureByTimespan($iTimespan)
     {
@@ -123,9 +128,10 @@ class ActionList extends ListModel
     /**
      * Returns part of user group filter query
      *
-     * @param User $oUser user object
+     * @param null $oUser user object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUserGroupFilter" in next major
      */
     protected function _getUserGroupFilter($oUser = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -154,6 +160,7 @@ class ActionList extends ListModel
      * return true if there are any active promotions
      *
      * @return boolean
+     * @throws DatabaseConnectionException
      */
     public function areAnyActivePromotions()
     {
@@ -165,6 +172,7 @@ class ActionList extends ListModel
      * Fetch the information, if there is an active promotion.
      *
      * @return string One, if there is an active promotion.
+     * @throws DatabaseConnectionException
      */
     protected function fetchExistsActivePromotion()
     {

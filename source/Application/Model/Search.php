@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -63,13 +64,14 @@ class Search extends Base
     /**
      * Returns a list of articles according to search parameters. Returns matched
      *
-     * @param string $sSearchParamForQuery       query parameter
-     * @param string $sInitialSearchCat          initial category to seearch in
-     * @param string $sInitialSearchVendor       initial vendor to seearch for
-     * @param string $sInitialSearchManufacturer initial Manufacturer to seearch for
-     * @param string $sSortBy                    sort by
+     * @param bool $sSearchParamForQuery query parameter
+     * @param bool $sInitialSearchCat initial category to seearch in
+     * @param bool $sInitialSearchVendor initial vendor to seearch for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to seearch for
+     * @param bool $sSortBy sort by
      *
      * @return ArticleList
+     * @throws DatabaseConnectionException
      */
     public function getSearchArticles($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false, $sSortBy = false)
     {
@@ -96,12 +98,13 @@ class Search extends Base
     /**
      * Returns the amount of articles according to search parameters.
      *
-     * @param string $sSearchParamForQuery       query parameter
-     * @param string $sInitialSearchCat          initial category to seearch in
-     * @param string $sInitialSearchVendor       initial vendor to seearch for
-     * @param string $sInitialSearchManufacturer initial Manufacturer to seearch for
+     * @param bool $sSearchParamForQuery query parameter
+     * @param bool $sInitialSearchCat initial category to seearch in
+     * @param bool $sInitialSearchVendor initial vendor to seearch for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to seearch for
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getSearchArticleCount($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false)
     {
@@ -120,13 +123,14 @@ class Search extends Base
     /**
      * Returns the appropriate SQL select for a search according to search parameters
      *
-     * @param string $sSearchParamForQuery       query parameter
-     * @param string $sInitialSearchCat          initial category to search in
-     * @param string $sInitialSearchVendor       initial vendor to search for
-     * @param string $sInitialSearchManufacturer initial Manufacturer to search for
-     * @param string $sSortBy                    sort by
+     * @param bool $sSearchParamForQuery query parameter
+     * @param bool $sInitialSearchCat initial category to search in
+     * @param bool $sInitialSearchVendor initial vendor to search for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
+     * @param bool $sSortBy sort by
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSearchSelect" in next major
      */
     protected function _getSearchSelect($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false, $sSortBy = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -255,6 +259,7 @@ class Search extends Base
      * @param string $sSearchString searching string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getWhere" in next major
      */
     protected function _getWhere($sSearchString) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

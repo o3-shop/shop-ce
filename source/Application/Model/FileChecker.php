@@ -217,7 +217,7 @@ class FileChecker
     /**
      * Error status getter
      *
-     * @return string
+     * @return bool
      */
     public function hasError()
     {
@@ -238,6 +238,7 @@ class FileChecker
      * Initializes object and checks web service availability
      *
      * @return boolean
+     * @throws Exception
      */
     public function init()
     {
@@ -258,6 +259,7 @@ class FileChecker
      * Checks system requirements and builds error messages if there are some
      *
      * @return boolean
+     * @throws Exception
      */
     public function checkSystemRequirements()
     {
@@ -267,7 +269,7 @@ class FileChecker
     /**
      * in case if a general error is thrown by webservice
      *
-     * @return string error
+     * @return bool error
      * @deprecated underscore prefix violates PSR12, will be renamed to "isWebServiceOnline" in next major
      */
     protected function _isWebServiceOnline() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -308,6 +310,7 @@ class FileChecker
      * asks the webservice, if the shop version is known.
      *
      * @return boolean
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isShopVersionIsKnown" in next major
      */
     protected function _isShopVersionIsKnown() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -349,7 +352,7 @@ class FileChecker
      *
      * @param string $sFile File
      *
-     * @return mixed
+     * @return array
      */
     public function checkFile($sFile)
     {

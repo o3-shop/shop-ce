@@ -28,6 +28,8 @@ use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Exception\ConnectionException;
 use OxidEsales\Eshop\Core\Exception\CookieException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\InputValidator;
@@ -40,6 +42,7 @@ use OxidEsales\Eshop\Core\PasswordSaltGenerator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Sha512Hasher;
 use OxidEsales\Eshop\Core\UtilsObject;
+use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use Psr\Log\LoggerInterface;
 
@@ -250,6 +253,7 @@ class User extends BaseModel
      * @param string $sParamName name of parameter to get value
      *
      * @return mixed
+     * @throws DatabaseConnectionException
      */
     public function __get($sParamName)
     {
@@ -291,6 +295,7 @@ class User extends BaseModel
      * Returns user newsletter subscription controller object
      *
      * @return object oxnewssubscribed
+     * @throws DatabaseConnectionException
      */
     public function getNewsSubscription()
     {
@@ -319,10 +324,11 @@ class User extends BaseModel
      * Returns user country (object) according to passed parameters or they
      * are taken from user object ( oxid, country id) and session (language)
      *
-     * @param string $sCountryId country id (optional)
-     * @param int    $iLang      active language (optional)
+     * @param null $sCountryId country id (optional)
+     * @param null $iLang active language (optional)
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getUserCountry($sCountryId = null, $iLang = null)
     {
@@ -349,9 +355,10 @@ class User extends BaseModel
     /**
      * Returns user countryid according to passed name
      *
-     * @param string $sCountry country
+     * @param null $sCountry country
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getUserCountryId($sCountry = null)
     {
@@ -548,6 +555,7 @@ class User extends BaseModel
      * Saves (updates) user object data information in DB. Return true on success.
      *
      * @return bool
+     * @throws Exception
      */
     public function save()
     {
@@ -623,9 +631,11 @@ class User extends BaseModel
      * Removes user data stored in some DB tables (such as oxuserpayments, oxaddress
      * oxobject2group, oxremark, etc). Return true on success.
      *
-     * @param string $oxid object ID (default null)
+     * @param null $oxid object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($oxid = null)
     {
@@ -696,9 +706,10 @@ class User extends BaseModel
     /**
      * Checks if user exists in database.
      *
-     * @param string $sOXID object ID (default null)
+     * @param null $sOXID object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function exists($sOXID = null)
     {
@@ -786,6 +797,7 @@ class User extends BaseModel
      * Caclulates amount of orders made by user
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getOrderCount()
     {
@@ -855,6 +867,8 @@ class User extends BaseModel
      * delivery country.
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getActiveCountry()
     {
@@ -879,9 +893,10 @@ class User extends BaseModel
     /**
      * Inserts new or updates existing user
      *
-     * @throws UserException exception
-     *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws UserException exception
      */
     public function createUser()
     {
@@ -955,6 +970,7 @@ class User extends BaseModel
      * @param string $sGroupID group id
      *
      * @return bool
+     * @throws DatabaseErrorException
      */
     public function addToGroup($sGroupID)
     {
@@ -1004,8 +1020,9 @@ class User extends BaseModel
     /**
      * Called after saving an order.
      *
-     * @param object $oBasket  Shopping basket object
-     * @param int    $iSuccess order success status
+     * @param object $oBasket Shopping basket object
+     * @param int $iSuccess order success status
+     * @throws DatabaseErrorException
      */
     public function onOrderExecute($oBasket, $iSuccess)
     {
@@ -1136,13 +1153,13 @@ class User extends BaseModel
      * Performs bunch of checks if user profile data is correct; on any
      * error exception is thrown
      *
-     * @param string $sLogin      user login name
-     * @param string $sPassword   user password
-     * @param string $sPassword2  user password to compare
-     * @param array  $aInvAddress array of user profile data
-     * @param array  $aDelAddress array of user profile data
+     * @param string $sLogin user login name
+     * @param string $sPassword user password
+     * @param string $sPassword2 user password to compare
+     * @param array $aInvAddress array of user profile data
+     * @param array $aDelAddress array of user profile data
      *
-     * @throws UserException, oxInputException
+     * @throws StandardException
      */
     public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress)
     {
@@ -1182,11 +1199,13 @@ class User extends BaseModel
     /**
      * Sets newsletter subscription status to user
      *
-     * @param bool $blSubscribe       subscribes/unsubscribes user from newsletter
-     * @param bool $blSendOptIn       if to send confirmation email
+     * @param bool $blSubscribe subscribes/unsubscribes user from newsletter
+     * @param bool $blSendOptIn if to send confirmation email
      * @param bool $blForceCheckOptIn forces to check subscription even when it is set to 1
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setNewsSubscription($blSubscribe, $blSendOptIn, $blForceCheckOptIn = false)
     {
@@ -1234,13 +1253,14 @@ class User extends BaseModel
      * groups assignment and returns newsletter subscription status. If some action
      * fails - exception is thrown.
      *
-     * @param string $sUser       user login name
-     * @param string $sPassword   user password
-     * @param string $sPassword2  user confirmation password
-     * @param array  $aInvAddress user billing address
-     * @param array  $aDelAddress delivery address
+     * @param string $sUser user login name
+     * @param string $sPassword user password
+     * @param string $sPassword2 user confirmation password
+     * @param array $aInvAddress user billing address
+     * @param array $aDelAddress delivery address
      *
-     * @throws UserException, oxInputException, oxConnectionException
+     * @throws StandardException
+     * @throws UserException , oxInputException, oxConnectionException
      */
     public function changeUserData($sUser, $sPassword, $sPassword2, $aInvAddress, $aDelAddress)
     {
@@ -1295,6 +1315,7 @@ class User extends BaseModel
      * creates new address entry or updates existing
      *
      * @param array $aDelAddress address data array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignAddress" in next major
      */
     protected function _assignAddress($aDelAddress) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1330,16 +1351,17 @@ class User extends BaseModel
      *
      * @param string $userName login name
      * @param string $password login password
-     * @param string $shopId   shopid
-     * @param bool   $isAdmin  admin/non admin mode
+     * @param string $shopId shopid
+     * @param bool $isAdmin admin/non admin mode
      *
+     * @return string
+     * @throws DatabaseConnectionException
      * @deprecated since v6.4.0 (2019-03-15); `\OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface`
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
      *                                        compatible with the current passhword hash any more.
      *
-     * @return string
      */
     protected function _getLoginQueryHashedWithMD5($userName, $password, $shopId, $isAdmin) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -1367,16 +1389,17 @@ class User extends BaseModel
      *
      * @param string $userName
      * @param string $password
-     * @param int    $shopId
-     * @param bool   $isAdmin
+     * @param int $shopId
+     * @param bool $isAdmin
      *
+     * @return string
+     * @throws DatabaseConnectionException
      * @deprecated since v6.4.0 (2019-03-15); `\OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface`
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
      *                                        compatible with the current passhword hash any more.
      *
-     * @return string
      */
     protected function _getLoginQuery($userName, $password, $shopId, $isAdmin) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -1508,9 +1531,9 @@ class User extends BaseModel
 
     /**
      * @param string $userName
-     * @param int    $shopId
+     * @param int $shopId
      *
-     * @throws UserException
+     * @throws DatabaseConnectionException
      */
     private function loadAuthenticatedUser(string $userName, int $shopId)
     {
@@ -1523,10 +1546,11 @@ class User extends BaseModel
 
     /**
      * @param string $userName
-     * @param int    $shopId
-     * @param bool   $isLoginToAdminBackend
+     * @param int $shopId
+     * @param bool $isLoginToAdminBackend
      *
      * @return false|string
+     * @throws DatabaseConnectionException
      */
     private function getAuthenticatedUserId(string $userName, int $shopId, bool $isLoginToAdminBackend)
     {
@@ -1574,6 +1598,8 @@ class User extends BaseModel
      * user is not available - returns false.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAdminUser()
     {
@@ -1587,6 +1613,8 @@ class User extends BaseModel
      * @param bool $blForceAdmin (default false)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadActiveUser($blForceAdmin = false)
     {
@@ -1635,6 +1663,8 @@ class User extends BaseModel
      * Checks if user is connected via cookies and if so, returns user id.
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCookieUserId" in next major
      */
     protected function _getCookieUserId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1748,6 +1778,7 @@ class User extends BaseModel
      * user rights index.
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUserRights" in next major
      */
     protected function _getUserRights() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1820,6 +1851,9 @@ class User extends BaseModel
      * Updates changed user object data to DB. Returns true on success.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseException
+     * @throws \oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1850,6 +1884,8 @@ class User extends BaseModel
      * @param string $sEmail user email/login
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function checkIfEmailExists($sEmail)
     {
@@ -1938,11 +1974,12 @@ class User extends BaseModel
     /**
      * Returns recommlist count
      *
-     * @param string $sOx object ID (default is null)
-     *
-     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+     * @param null $sOx object ID (default is null)
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+     *
      */
     public function getRecommListsCount($sOx = null)
     {
@@ -1970,6 +2007,7 @@ class User extends BaseModel
      * according to users country information
      *
      * @param string $sCountryId users country id
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setAutoGroups" in next major
      */
     protected function _setAutoGroups($sCountryId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -2017,7 +2055,8 @@ class User extends BaseModel
      *
      * @param string $sUid update id
      *
-     * @return User
+     * @return bool
+     * @throws DatabaseConnectionException
      */
     public function loadUserByUpdateId($sUid)
     {
@@ -2034,6 +2073,7 @@ class User extends BaseModel
      * Generates or resets and saves users update key
      *
      * @param bool $reset marker to reset update info
+     * @throws Exception
      */
     public function setUpdateKey($reset = false)
     {
@@ -2061,6 +2101,7 @@ class User extends BaseModel
      * @param string $sKey key
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isExpiredUpdateId($sKey)
     {
@@ -2076,6 +2117,7 @@ class User extends BaseModel
      * Returns user passwords update id
      *
      * @return string
+     * @throws Exception
      */
     public function getUpdateId()
     {
@@ -2168,6 +2210,7 @@ class User extends BaseModel
      * @param string $sUserId userid
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getReviewUserHash($sUserId)
     {
@@ -2187,6 +2230,7 @@ class User extends BaseModel
      * @param string $sReviewUserHash review user hash
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getReviewUserId($sReviewUserHash)
     {
@@ -2212,9 +2256,10 @@ class User extends BaseModel
     /**
      * Get state title by id
      *
-     * @param string $sId state ID
+     * @param null $sId state ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getStateTitle($sId = null)
     {
@@ -2231,6 +2276,7 @@ class User extends BaseModel
      * Checks if user accepted latest shopping terms and conditions version
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isTermsAccepted()
     {
@@ -2259,10 +2305,12 @@ class User extends BaseModel
      * Assigns registration points for invited user and
      * its inviter (calls User::setInvitationCreditPoints())
      *
-     * @param string $sUserId   inviter user id
+     * @param string $sUserId inviter user id
      * @param string $sRecEmail recipient (registrant) email
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setCreditPointsForRegistrant($sUserId, $sRecEmail)
     {
@@ -2311,6 +2359,7 @@ class User extends BaseModel
      * Assigns credit points to inviter
      *
      * @return bool
+     * @throws Exception
      */
     public function setCreditPointsForInviter()
     {
@@ -2329,6 +2378,8 @@ class User extends BaseModel
      * Updating invitations statistics
      *
      * @param array $aRecEmail array of recipients emails
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function updateInvitationStatistics($aRecEmail)
     {
@@ -2355,6 +2406,7 @@ class User extends BaseModel
      * @param string $userName
      *
      * @return false|string
+     * @throws DatabaseConnectionException
      */
     public function getIdByUserName($userName)
     {
@@ -2405,17 +2457,17 @@ class User extends BaseModel
      *
      * @param string $userName User
      * @param string $password Password
-     * @param string $shopID   Shop id
+     * @param string $shopID Shop id
      *
+     * @return void
+     * @throws DatabaseConnectionException
      * @throws UserException
-     *
      * @deprecated since v6.4.0 (2019-03-15); `\OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface`
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
      *                                        compatible with the current passhword hash any more.
      *
-     * @return void
      */
     protected function _dbLogin(string $userName, $password, $shopID) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -2537,6 +2589,7 @@ class User extends BaseModel
      *
      * @param string $userName
      * @param string $password
+     * @throws DatabaseConnectionException
      */
     protected function onLogin($userName, $password)
     {
@@ -2562,6 +2615,7 @@ class User extends BaseModel
      * Deletes User from groups.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteUserFromGroups(DatabaseInterface $database)
     {
@@ -2574,6 +2628,7 @@ class User extends BaseModel
      * Deletes deliveries.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteDeliveries(DatabaseInterface $database)
     {
@@ -2586,6 +2641,7 @@ class User extends BaseModel
      * Deletes discounts.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteDiscounts(DatabaseInterface $database)
     {
@@ -2598,6 +2654,7 @@ class User extends BaseModel
      * Deletes user accepted terms.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteAcceptedTerms(DatabaseInterface $database)
     {
@@ -2610,6 +2667,7 @@ class User extends BaseModel
      * Deletes User addresses.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteAddresses(DatabaseInterface $database)
     {
@@ -2623,6 +2681,7 @@ class User extends BaseModel
      * Deletes noticelists, wishlists or saved baskets
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteBaskets(DatabaseInterface $database)
     {
@@ -2636,6 +2695,7 @@ class User extends BaseModel
      * Deletes not Order related remarks.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteNotOrderRelatedRemarks(DatabaseInterface $database)
     {
@@ -2651,6 +2711,7 @@ class User extends BaseModel
      * Deletes recommendation lists.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteRecommendationLists(DatabaseInterface $database)
     {
@@ -2664,6 +2725,7 @@ class User extends BaseModel
      * Deletes newsletter subscriptions.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteNewsletterSubscriptions(DatabaseInterface $database)
     {
@@ -2678,6 +2740,7 @@ class User extends BaseModel
      * Deletes User reviews.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteReviews(DatabaseInterface $database)
     {
@@ -2691,6 +2754,7 @@ class User extends BaseModel
      * Deletes User ratings.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deleteRatings(DatabaseInterface $database)
     {
@@ -2704,6 +2768,7 @@ class User extends BaseModel
      * Deletes price alarms.
      *
      * @param DatabaseInterface $database
+     * @throws DatabaseErrorException
      */
     private function deletePriceAlarms(DatabaseInterface $database)
     {
@@ -2830,6 +2895,7 @@ class User extends BaseModel
      * @param string $shopId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formUserCookieQuery($user, $shopId)
     {

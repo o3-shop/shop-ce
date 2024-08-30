@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -105,6 +106,7 @@ class File extends BaseModel
      *
      * @param int $sFileIndex File index
      *
+     * @throws StandardException
      * @throws oxException Throws exception if file wasn't moved or if rights wasn't changed.
      */
     public function processFile($sFileIndex)
@@ -127,7 +129,7 @@ class File extends BaseModel
      *
      * @param array $aFileInfo File info array
      *
-     * @throws oxException Throws exception if file wasn't uploaded successfully.
+     * @throws StandardException
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkArticleFile" in next major
      */
     protected function _checkArticleFile($aFileInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -310,9 +312,10 @@ class File extends BaseModel
     /**
      * Deletes oxFile record from DB, removes orphan files.
      *
-     * @param string $sOxId default null
+     * @param null $sOxId default null
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function delete($sOxId = null)
     {
@@ -332,6 +335,7 @@ class File extends BaseModel
      * If not used, unlink the file.
      *
      * @return null|false
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteFile" in next major
      */
     protected function _deleteFile() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -403,6 +407,7 @@ class File extends BaseModel
      * Checks if this file has valid ordered downloads
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function hasValidDownloads()
     {

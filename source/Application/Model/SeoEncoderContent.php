@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SeoEncoder;
 
@@ -45,11 +47,12 @@ class SeoEncoderContent extends SeoEncoder
      * Returns SEO uri for content object. Includes parent category path info if
      * content is assigned to it
      *
-     * @param Content $oCont        content category object
-     * @param int                                         $iLang        language
-     * @param bool                                        $blRegenerate if TRUE forces seo url regeneration
+     * @param Content $oCont content category object
+     * @param null $iLang language
+     * @param bool $blRegenerate if TRUE forces seo url regeneration
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getContentUri($oCont, $iLang = null, $blRegenerate = false)
     {
@@ -91,9 +94,10 @@ class SeoEncoderContent extends SeoEncoder
      * encodeContentUrl encodes content link
      *
      * @param Content $oCont category object
-     * @param int                                         $iLang language
+     * @param null $iLang language
      *
      * @return string|bool
+     * @throws DatabaseConnectionException
      */
     public function getContentUrl($oCont, $iLang = null)
     {
@@ -108,6 +112,8 @@ class SeoEncoderContent extends SeoEncoder
      * deletes content seo entries
      *
      * @param string $sId content ids
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteContent($sId)
     {
@@ -127,9 +133,10 @@ class SeoEncoderContent extends SeoEncoder
      * Returns alternative uri used while updating seo
      *
      * @param string $sObjectId object id
-     * @param int    $iLang     language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

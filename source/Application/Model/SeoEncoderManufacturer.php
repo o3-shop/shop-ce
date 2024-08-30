@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\SeoEncoder;
 
 /**
@@ -138,6 +140,8 @@ class SeoEncoderManufacturer extends SeoEncoder
      * Deletes manufacturer seo entry
      *
      * @param Manufacturer $oManufacturer Manufacturer object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteManufacturer($oManufacturer)
     {

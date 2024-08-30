@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
@@ -64,7 +65,8 @@ class Review extends BaseModel
      *
      * @param array $dbRecord database record
      *
-     * @return bool
+     * @return bool|null
+     * @throws DatabaseConnectionException
      */
     public function assign($dbRecord)
     {
@@ -120,12 +122,13 @@ class Review extends BaseModel
     /**
      * get oxList of reviews for given object ids and type
      *
-     * @param string  $sType       type of given ids
-     * @param mixed   $aIds        given object ids to load, can be array or just one id, given as string
+     * @param string $sType type of given ids
+     * @param mixed $aIds given object ids to load, can be array or just one id, given as string
      * @param boolean $blLoadEmpty true if want to load empty text reviews
-     * @param int     $iLoadInLang language to select for loading
+     * @param null $iLoadInLang language to select for loading
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function loadList($sType, $aIds, $blLoadEmpty = false, $iLoadInLang = null)
     {

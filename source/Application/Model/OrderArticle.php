@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Price;
@@ -145,8 +147,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * executes changeable article onChange/updateSoldAmount methods to
      * update chained data
      *
-     * @param double $dAddAmount           amount which will be substracled from value in db
-     * @param bool   $blAllowNegativeStock amount allow or not negative stock value
+     * @param double $dAddAmount amount which will be substracled from value in db
+     * @param bool $blAllowNegativeStock amount allow or not negative stock value
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function updateArticleStock($dAddAmount, $blAllowNegativeStock = false)
     {
@@ -176,10 +180,11 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Adds or substracts defined amount passed by param from arcticle stock
      *
-     * @param double $dAddAmount           amount which will be added/substracled from value in db
-     * @param bool   $blAllowNegativeStock allow/disallow negative stock value
+     * @param int $dAddAmount amount which will be added/substracled from value in db
+     * @param bool $blAllowNegativeStock allow/disallow negative stock value
      *
      * @return double
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getArtStock" in next major
      */
     protected function _getArtStock($dAddAmount = 0, $blAllowNegativeStock = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -289,6 +294,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * Returns product parent id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getParentId()
     {
@@ -581,6 +587,8 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * to it
      *
      * @param int $iNewAmount new ordered items amount
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setNewAmount($iNewAmount)
     {
@@ -635,9 +643,11 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * Deletes order article object. If deletion succeded - updates
      * article stock information. Returns deletion status
      *
-     * @param string $sOXID Article id
+     * @param null $sOXID Article id
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -657,6 +667,8 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * returns TRUE. Returns saving status
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function save()
     {

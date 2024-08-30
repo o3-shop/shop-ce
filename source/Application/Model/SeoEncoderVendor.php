@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\SeoEncoder;
 
 /**
@@ -139,6 +141,8 @@ class SeoEncoderVendor extends SeoEncoder
      * Deletes Vendor seo entry
      *
      * @param Vendor $vendor Vendor object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteVendor($vendor)
     {

@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
@@ -121,7 +123,8 @@ class ArticleList extends ListModel
      * Returns article id array.
      *
      * @param string $sArtId Article ID
-     * @param int    $iCnt   product count
+     * @param int $iCnt product count
+     * @throws DatabaseConnectionException
      */
     public function loadHistoryArticles($sArtId, $iCnt = 4)
     {
@@ -406,8 +409,10 @@ class ArticleList extends ListModel
     /**
      * Loads only ID's and create Fake objects for cmp_categories.
      *
-     * @param string $sCatId         Category tree ID
-     * @param array  $aSessionFilter Like array ( catid => array( attrid => value,...))
+     * @param string $sCatId Category tree ID
+     * @param array $aSessionFilter Like array ( catid => array( attrid => value,...))
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadCategoryIds($sCatId, $aSessionFilter)
     {
@@ -420,11 +425,13 @@ class ArticleList extends ListModel
     /**
      * Loads articles for the give Category
      *
-     * @param string $sCatId         Category tree ID
-     * @param array  $aSessionFilter Like array ( catid => array( attrid => value,...))
-     * @param int    $iLimit         Limit
+     * @param string $sCatId Category tree ID
+     * @param array|null $aSessionFilter Like array ( catid => array( attrid => value,...))
+     * @param int|null $iLimit Limit
      *
      * @return integer total Count of Articles in this Category
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadCategoryArticles($sCatId, $aSessionFilter, $iLimit = null)
     {
@@ -456,10 +463,11 @@ class ArticleList extends ListModel
     /**
      * Loads articles for the recommlist
      *
+     * @param string $sRecommId Recommlist ID
+     * @param null $sArticlesFilter Additional filter for recommlist's items
+     * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @param string $sRecommId       Recommlist ID
-     * @param string $sArticlesFilter Additional filter for recommlist's items
      */
     public function loadRecommArticles($sRecommId, $sArticlesFilter = null)
     {
@@ -470,10 +478,11 @@ class ArticleList extends ListModel
     /**
      * Loads only ID's and create Fake objects.
      *
-     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-     *
-     * @param string $sRecommId       Recommlist ID
+     * @param string $sRecommId Recommlist ID
      * @param string $sArticlesFilter Additional filter for recommlist's items
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      */
     public function loadRecommArticleIds($sRecommId, $sArticlesFilter)
     {
@@ -489,12 +498,13 @@ class ArticleList extends ListModel
     /**
      * Returns the appropriate SQL select
      *
-     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-     *
-     * @param string $sRecommId       Recommlist ID
-     * @param string $sArticlesFilter Additional filter for recommlist's items
+     * @param string $sRecommId Recommlist ID
+     * @param null $sArticlesFilter Additional filter for recommlist's items
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+     *
      */
     protected function _getArticleSelect($sRecommId, $sArticlesFilter = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -511,10 +521,12 @@ class ArticleList extends ListModel
     /**
      * Loads only ID's and create Fake objects for cmp_categories.
      *
-     * @param string $sSearchStr          Search string
-     * @param string $sSearchCat          Search within category
-     * @param string $sSearchVendor       Search within vendor
+     * @param string $sSearchStr Search string
+     * @param string $sSearchCat Search within category
+     * @param string $sSearchVendor Search within vendor
      * @param string $sSearchManufacturer Search within manufacturer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadSearchIds($sSearchStr = '', $sSearchCat = '', $sSearchVendor = '', $sSearchManufacturer = '')
     {
@@ -567,7 +579,9 @@ class ArticleList extends ListModel
      * Loads Id list of appropriate price products
      *
      * @param float $dPriceFrom Starting price
-     * @param float $dPriceTo   Max price
+     * @param float $dPriceTo Max price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadPriceIds($dPriceFrom, $dPriceTo)
     {
@@ -604,6 +618,8 @@ class ArticleList extends ListModel
      * Loads Products for specified vendor
      *
      * @param string $sVendorId Vendor id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadVendorIDs($sVendorId)
     {
@@ -615,6 +631,8 @@ class ArticleList extends ListModel
      * Loads Products for specified Manufacturer
      *
      * @param string $sManufacturerId Manufacturer id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadManufacturerIDs($sManufacturerId)
     {
@@ -627,9 +645,10 @@ class ArticleList extends ListModel
      * Returns count of selected articles.
      *
      * @param string $sVendorId Vendor ID
-     * @param object $oVendor   Active vendor object
+     * @param null $oVendor Active vendor object
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function loadVendorArticles($sVendorId, $oVendor = null)
     {
@@ -644,9 +663,10 @@ class ArticleList extends ListModel
      * Returns count of selected articles.
      *
      * @param string $sManufacturerId Manufacturer ID
-     * @param object $oManufacturer   Active Manufacturer object
+     * @param null $oManufacturer Active Manufacturer object
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function loadManufacturerArticles($sManufacturerId, $oManufacturer = null)
     {
@@ -662,6 +682,7 @@ class ArticleList extends ListModel
      * @param array $aIds Article ID array
      *
      * @return null;
+     * @throws DatabaseConnectionException
      */
     public function loadIds($aIds)
     {
@@ -734,6 +755,8 @@ class ArticleList extends ListModel
      * Loads list of low stock state products
      *
      * @param array $aBasketContents product ids array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadStockRemindProducts($aBasketContents)
     {
@@ -766,6 +789,7 @@ class ArticleList extends ListModel
      * Calculates, updates and returns next price renew time
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function renewPriceUpdateTime()
     {
@@ -848,6 +872,8 @@ class ArticleList extends ListModel
      * fills the list simply with keys of the oxid and the position as value for the given sql
      *
      * @param string $sSql SQL select
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createIdListFromSql" in next major
      */
     protected function _createIdListFromSql($sSql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -865,10 +891,11 @@ class ArticleList extends ListModel
     /**
      * Returns sql to fetch ids of articles fitting current filter
      *
-     * @param string $sCatId  category id
-     * @param array  $aFilter filters for this category
+     * @param string $sCatId category id
+     * @param array $aFilter filters for this category
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterIdsSql" in next major
      */
     protected function _getFilterIdsSql($sCatId, $aFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -906,10 +933,12 @@ class ArticleList extends ListModel
     /**
      * Returns filtered articles sql "oxid in (filtered ids)" part
      *
-     * @param string $sCatId  category id
-     * @param array  $aFilter filters for this category
+     * @param string $sCatId category id
+     * @param array $aFilter filters for this category
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSql" in next major
      */
     protected function _getFilterSql($sCatId, $aFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -940,11 +969,13 @@ class ArticleList extends ListModel
     /**
      * Creates SQL Statement to load Articles, etc.
      *
-     * @param string $sFields        Fields which are loaded e.g. "oxid" or "*" etc.
-     * @param string $sCatId         Category tree ID
-     * @param array  $aSessionFilter Like array ( catid => array( attrid => value,...))
+     * @param string $sFields Fields which are loaded e.g. "oxid" or "*" etc.
+     * @param string $sCatId Category tree ID
+     * @param array $aSessionFilter Like array ( catid => array( attrid => value,...))
      *
      * @return string SQL
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategorySelect" in next major
      */
     protected function _getCategorySelect($sFields, $sCatId, $aSessionFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -980,10 +1011,12 @@ class ArticleList extends ListModel
     /**
      * Creates SQL Statement to load Articles Count, etc.
      *
-     * @param string $sCatId         Category tree ID
-     * @param array  $aSessionFilter Like array ( catid => array( attrid => value,...))
+     * @param string $sCatId Category tree ID
+     * @param array $aSessionFilter Like array ( catid => array( attrid => value,...))
      *
      * @return string SQL
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryCountSelect" in next major
      */
     protected function _getCategoryCountSelect($sCatId, $aSessionFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1016,6 +1049,7 @@ class ArticleList extends ListModel
      * @param string $sSearchString searching string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSearchSelect" in next major
      */
     protected function _getSearchSelect($sSearchString) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1113,6 +1147,7 @@ class ArticleList extends ListModel
      * @param string $sVendorId Vendor ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVendorSelect" in next major
      */
     protected function _getVendorSelect($sVendorId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1137,6 +1172,7 @@ class ArticleList extends ListModel
      * @param string $sManufacturerId Manufacturer ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturerSelect" in next major
      */
     protected function _getManufacturerSelect($sManufacturerId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1181,6 +1217,7 @@ class ArticleList extends ListModel
      * Method fetches next update time for renewing price update time.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function fetchNextUpdateTime()
     {
@@ -1209,10 +1246,11 @@ class ArticleList extends ListModel
     /**
      * Updates article.
      *
-     * @param string            $sCurrUpdateTime
+     * @param string $sCurrUpdateTime
      * @param DatabaseInterface $oDb
      *
      * @return mixed
+     * @throws DatabaseErrorException
      */
     protected function updateOxArticles($sCurrUpdateTime, $oDb)
     {

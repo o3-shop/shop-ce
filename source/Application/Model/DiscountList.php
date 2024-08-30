@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
@@ -66,9 +67,10 @@ class DiscountList extends ListModel
      * For iterating through the list, use getArray() on the list,
      * as iterating on object itself can cause concurrency problems.
      *
-     * @param User $oUser user object (optional)
+     * @param null $oUser user object (optional)
      *
-     * @return array
+     * @return DiscountList
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDiscountList" in next major
      */
     protected function _getList($oUser = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -121,6 +123,7 @@ class DiscountList extends ListModel
      * @param User $oUser user object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -181,9 +184,10 @@ class DiscountList extends ListModel
      * Returns array of discounts that can be globally (transparently) applied
      *
      * @param Article $oArticle article object
-     * @param User    $oUser    oxuser object (optional)
+     * @param null $oUser oxuser object (optional)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getArticleDiscounts($oArticle, $oUser = null)
     {
@@ -201,11 +205,12 @@ class DiscountList extends ListModel
     /**
      * Returns array of discounts that can be applied for individual basket item
      *
-     * @param mixed                                      $oArticle article object or article id (according to needs)
-     * @param Basket $oBasket  array of basket items containing article id, amount and price
-     * @param User   $oUser    user object (optional)
+     * @param mixed $oArticle article object or article id (according to needs)
+     * @param Basket $oBasket array of basket items containing article id, amount and price
+     * @param null $oUser user object (optional)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getBasketItemDiscounts($oArticle, $oBasket, $oUser = null)
     {
@@ -225,9 +230,10 @@ class DiscountList extends ListModel
      * Returns array of discounts that can be applied for whole basket
      *
      * @param Basket $oBasket basket
-     * @param User   $oUser   user object (optional)
+     * @param null $oUser user object (optional)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getBasketDiscounts($oBasket, $oUser = null)
     {
@@ -247,10 +253,11 @@ class DiscountList extends ListModel
      * Returns array of bundle discounts that can be applied for whole basket
      *
      * @param Article $oArticle article object
-     * @param Basket  $oBasket  basket
-     * @param User    $oUser    user object (optional)
+     * @param Basket $oBasket basket
+     * @param null $oUser user object (optional)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getBasketItemBundleDiscounts($oArticle, $oBasket, $oUser = null)
     {
@@ -270,9 +277,10 @@ class DiscountList extends ListModel
      * Returns array of basket bundle discounts
      *
      * @param Basket $oBasket oxbasket object
-     * @param User   $oUser   oxuser object (optional)
+     * @param null $oUser oxuser object (optional)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getBasketBundleDiscounts($oBasket, $oUser = null)
     {
@@ -292,6 +300,7 @@ class DiscountList extends ListModel
      * Checks if any category has "skip discounts" status
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function hasSkipDiscountCategories()
     {

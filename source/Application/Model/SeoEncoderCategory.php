@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\SeoEncoder;
 
 /**
@@ -201,6 +203,8 @@ class SeoEncoderCategory extends SeoEncoder
      * Marks related to category objects as expired
      *
      * @param Category $oCategory Category object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function markRelatedAsExpired($oCategory)
     {
@@ -240,6 +244,8 @@ class SeoEncoderCategory extends SeoEncoder
 
     /**
      * @param Category $category
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteCategory($category)
     {

@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Edition\EditionSelector;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -164,7 +166,7 @@ class RssFeed extends Base
      * @param string $name Rss data Id
      *
      * @access protected
-     * @return array
+     * @return array|bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromCache" in next major
      */
     protected function _loadFromCache($name) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -214,7 +216,7 @@ class RssFeed extends Base
      * @param array  $aContent data to be saved
      *
      * @access protected
-     * @return void
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "saveToCache" in next major
      */
     protected function _saveToCache($name, $aContent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -506,9 +508,10 @@ class RssFeed extends Base
      *
      * @param Category $oCat category object
      *
+     * @return string
+     * @throws DatabaseConnectionException
      * @access public
      *
-     * @return string
      */
     public function getCategoryArticlesTitle(Category $oCat)
     {
@@ -525,6 +528,7 @@ class RssFeed extends Base
      * @param Category $oCat category object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCatPath" in next major
      */
     protected function _getCatPath($oCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -566,9 +570,11 @@ class RssFeed extends Base
      *
      * @param Category $oCat category object
      *
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @access public
      *
-     * @return void
      */
     public function loadCategoryArticles(Category $oCat)
     {
@@ -831,9 +837,10 @@ class RssFeed extends Base
      *
      * @param Article $oArticle load lists for this article
      *
+     * @return null
+     * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return null
      */
     public function loadRecommLists(Article $oArticle)
     {
@@ -900,11 +907,12 @@ class RssFeed extends Base
     /**
      * loads 'Recommendation lists' rss data
      *
-     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-     *
      * @param RecommendationList $oRecommList recomm list to load articles from
      *
      * @return null
+     * @throws DatabaseConnectionException
+     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+     *
      */
     public function loadRecommListArticles(RecommendationList $oRecommList)
     {

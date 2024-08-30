@@ -63,14 +63,14 @@ class Manufacturer extends MultiLanguageModel implements IUrl
     /**
      * Visibility of a manufacturer
      *
-     * @var int
+     * @var bool
      */
     protected $_blIsVisible;
 
     /**
      * has visible endors state of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blHasVisibleSubCats;
 
@@ -156,7 +156,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
      *
      * @param string $sOxid object id
      *
-     * @return Manufacturer
+     * @return bool
      */
     public function load($sOxid)
     {

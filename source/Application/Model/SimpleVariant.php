@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
@@ -147,7 +148,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     /**
      * Implementing (faking) performance friendly method from oxArticle
      *
-     * @return Price
+     * @return Price|void
      */
     public function getPrice()
     {
@@ -241,7 +242,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     /**
      * Returns formated product price.
      *
-     * @return double
+     * @return string|null
      */
     public function getFPrice()
     {
@@ -376,6 +377,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getBaseSeoLink($iLang)
     {
@@ -387,9 +389,10 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     /**
      * Gets article link
      *
-     * @param int $iLang required language id [optional]
+     * @param null $iLang required language id [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getLink($iLang = null)
     {

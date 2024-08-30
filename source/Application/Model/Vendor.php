@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -63,14 +65,14 @@ class Vendor extends MultiLanguageModel implements IUrl
     /**
      * Visibility of a vendor
      *
-     * @var int
+     * @var bool
      */
     protected $_blIsVisible;
 
     /**
      * has visible endors state of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blHasVisibleSubCats;
 
@@ -306,9 +308,11 @@ class Vendor extends MultiLanguageModel implements IUrl
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $oxid Object ID(default null)
+     * @param null $oxid Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($oxid = null)
     {
@@ -349,7 +353,7 @@ class Vendor extends MultiLanguageModel implements IUrl
     /**
      * Returns category thumbnail picture url if exist, false - if not
      *
-     * @return mixed
+     * @return false
      */
     public function getThumbUrl()
     {

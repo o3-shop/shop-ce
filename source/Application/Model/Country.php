@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -104,6 +105,7 @@ class Country extends MultiLanguageModel
      * @param string $sCode country code
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByCode($sCode)
     {

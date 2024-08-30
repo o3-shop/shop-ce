@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 
 /**
@@ -49,9 +51,11 @@ class DeliverySet extends MultiLanguageModel
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $sOxId Object ID(default null)
+     * @param null $sOxId Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOxId = null)
     {
@@ -83,6 +87,7 @@ class DeliverySet extends MultiLanguageModel
      * @param string $sTitle delivery name
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByName($sTitle)
     {

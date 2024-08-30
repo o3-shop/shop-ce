@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
@@ -151,6 +152,7 @@ class Wrapping extends MultiLanguageModel
      * @param string $sWrapType type - wrapping paper (WRAP) or card (CARD)
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getWrappingCount($sWrapType)
     {

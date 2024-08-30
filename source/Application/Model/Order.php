@@ -25,7 +25,10 @@ use Exception;
 use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Field;
@@ -35,6 +38,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Price as ShopPrice;
 use OxidEsales\Eshop\Application\Model\Payment as EshopPayment;
 use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
+use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use stdClass;
 
 /**
@@ -286,7 +290,7 @@ class Order extends BaseModel
      *
      * @param string $sName parameter name
      *
-     * @return mixed
+     * @return DeliverySet|Field|void
      */
     public function __get($sName)
     {
@@ -497,11 +501,12 @@ class Order extends BaseModel
      * and sending order by email to shop owner and user
      * Mailing status (1 if OK, 0 on error) is returned.
      *
-     * @param Basket $oBasket              Basket object
-     * @param object                                     $oUser                Current User object
-     * @param bool                                       $blRecalculatingOrder Order recalculation
+     * @param Basket $oBasket Basket object
+     * @param User $oUser Current User object
+     * @param bool $blRecalculatingOrder Order recalculation
      *
      * @return integer
+     * @throws Exception
      */
     public function finalizeOrder(Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
@@ -612,6 +617,8 @@ class Order extends BaseModel
      * Updates order transaction status. Faster than saving whole object
      *
      * @param string $sStatus order transaction status
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setOrderStatus" in next major
      */
     protected function _setOrderStatus($sStatus) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -998,6 +1005,7 @@ class Order extends BaseModel
      * @param string $sPaymentid used payment id
      *
      * @return UserPayment
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "setPayment" in next major
      */
     protected function _setPayment($sPaymentid) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1178,6 +1186,7 @@ class Order extends BaseModel
      * Updates/inserts order object and related info to DB
      *
      * @return null
+     * @throws Exception
      */
     public function save()
     {
@@ -1318,6 +1327,8 @@ class Order extends BaseModel
      * Tries to fetch and set next record number in DB. Returns true on success
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setNumber" in next major
      */
     protected function _setNumber() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1342,6 +1353,8 @@ class Order extends BaseModel
      * Updates object parameters to DB.
      *
      * @return null
+     * @throws DatabaseException
+     * @throws \oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1437,6 +1450,8 @@ class Order extends BaseModel
      * @param bool $blStockCheck perform stock check or not (default true)
      *
      * @return Basket
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOrderBasket" in next major
      */
     protected function _getOrderBasket($blStockCheck = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1595,6 +1610,7 @@ class Order extends BaseModel
      * Returns order invoice number.
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function getInvoiceNum()
     {
@@ -1611,6 +1627,7 @@ class Order extends BaseModel
      * Returns next possible (free) order bill number.
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function getNextBillNum()
     {
@@ -1627,6 +1644,12 @@ class Order extends BaseModel
      * Loads possible shipping sets for this order
      *
      * @return Deliverysetlist
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function getShippingSetList()
     {
@@ -1662,6 +1685,8 @@ class Order extends BaseModel
      * Get vouchers numbers list which were used with this order
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getVoucherNrList()
     {
@@ -1688,6 +1713,7 @@ class Order extends BaseModel
      * @param bool $blToday if true calculates only current day orders
      *
      * @return double
+     * @throws DatabaseConnectionException
      */
     public function getOrderSum($blToday = false)
     {
@@ -1712,6 +1738,7 @@ class Order extends BaseModel
      * @param bool $blToday if true calculates only current day orders
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getOrderCnt($blToday = false)
     {
@@ -1734,9 +1761,10 @@ class Order extends BaseModel
     /**
      * Checking if this order is already stored.
      *
-     * @param string $sOxId order ID
+     * @param null $sOxId order ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkOrderExist" in next major
      */
     protected function _checkOrderExist($sOxId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1885,6 +1913,7 @@ class Order extends BaseModel
      * @param string $sUserId order user id
      *
      * @return string $sLastPaymentId payment id
+     * @throws DatabaseConnectionException
      */
     public function getLastUserPaymentType($sUserId)
     {
@@ -1906,8 +1935,12 @@ class Order extends BaseModel
     /**
      * Adds order articles back to virtual basket. Needed for recalculating order.
      *
-     * @param Basket $oBasket        basket object
-     * @param array                                      $aOrderArticles order articles
+     * @param Basket $oBasket basket object
+     * @param ListModel $aOrderArticles order articles
+     * @throws ArticleInputException
+     * @throws NoArticleException
+     * @throws OutOfStockException
+     * @throws ArticleException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addOrderArticlesToBasket" in next major
      */
     protected function _addOrderArticlesToBasket($oBasket, $aOrderArticles) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1924,8 +1957,13 @@ class Order extends BaseModel
     /**
      * Adds new products to basket/order
      *
-     * @param Basket $oBasket   basket to add articles
-     * @param array                                      $aArticles article array
+     * @param Basket $oBasket basket to add articles
+     * @param array $aArticles article array
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addArticlesToBasket" in next major
      */
     protected function _addArticlesToBasket($oBasket, $aArticles) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -2077,9 +2115,13 @@ class Order extends BaseModel
      * parameters
      *
      * @param Basket $oBasket basket object
-     * @param User   $oUser   order user
+     * @param User $oUser order user
      *
      * @return null
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function validateOrder($oBasket, $oUser)
     {
@@ -2131,7 +2173,7 @@ class Order extends BaseModel
      *
      * @param Basket $oBasket basket object
      *
-     * @return bool
+     * @return int|null
      */
     public function validateBasket($oBasket)
     {
@@ -2185,6 +2227,7 @@ class Order extends BaseModel
      * @param Basket $oBasket basket object
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function validateDelivery($oBasket)
     {
@@ -2215,10 +2258,11 @@ class Order extends BaseModel
      * Checks if payment used for current order is available and active.
      * Throws exception if not available
      *
-     * @param Basket    $oBasket basket object
-     * @param User|null $oUser   user object
+     * @param Basket $oBasket basket object
+     * @param User|null $oUser user object
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function validatePayment($oBasket, $oUser = null)
     {
@@ -2366,6 +2410,7 @@ class Order extends BaseModel
      * @param int $paymentId
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     private function isValidPaymentId($paymentId)
     {
@@ -2439,7 +2484,7 @@ class Order extends BaseModel
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     private function getDynamicValuesFromPaymentType()
     {

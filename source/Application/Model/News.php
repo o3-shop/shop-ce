@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -76,7 +78,7 @@ class News extends MultiLanguageModel
     /**
      * Returns list of user groups assigned to current news object
      *
-     * @return oxlist
+     * @return object
      */
     public function getGroups()
     {
@@ -119,9 +121,11 @@ class News extends MultiLanguageModel
     /**
      * Deletes object information from DB, returns true on success.
      *
-     * @param string $sOxid Object ID (default null)
+     * @param null $sOxid Object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOxid = null)
     {

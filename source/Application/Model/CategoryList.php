@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use Exception;
@@ -188,11 +190,12 @@ class CategoryList extends ListModel
     /**
      * constructs the sql string to get the category list
      *
-     * @param bool   $blReverse list loading order, true for tree, false for simple list (optional, default false)
-     * @param array  $aColumns  required column names (optional)
-     * @param string $sOrder    order by string (optional)
+     * @param bool $blReverse list loading order, true for tree, false for simple list (optional, default false)
+     * @param null $aColumns required column names (optional)
+     * @param null $sOrder order by string (optional)
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSelectString" in next major
      */
     protected function _getSelectString($blReverse = false, $aColumns = null, $sOrder = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -230,6 +233,7 @@ class CategoryList extends ListModel
      * @param Category $oCat selected category
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDepthSqlSnippet" in next major
      */
     protected function _getDepthSqlSnippet($oCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -263,10 +267,11 @@ class CategoryList extends ListModel
      * siblings of the same root (siblings of the category, and parents and
      * grandparents etc)
      *
-     * @param Category $oCat     current category object
-     * @param array                                        $aColumns required column names (optional)
+     * @param Category $oCat current category object
+     * @param null $aColumns required column names (optional)
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDepthSqlUnion" in next major
      */
     protected function _getDepthSqlUnion($oCat, $aColumns = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -289,6 +294,8 @@ class CategoryList extends ListModel
      * Get data from db
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -314,6 +321,7 @@ class CategoryList extends ListModel
      * adding content categories and building tree structure.
      *
      * @param string $sActCat Active category (default null)
+     * @throws DatabaseConnectionException
      */
     public function buildTree($sActCat)
     {
@@ -347,6 +355,7 @@ class CategoryList extends ListModel
      * set full category object in tree
      *
      * @param string $sId category id
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "ppLoadFullCategory" in next major
      */
     protected function _ppLoadFullCategory($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -576,8 +585,10 @@ class CategoryList extends ListModel
     /**
      * Rebuilds nested sets information by updating oxLeft and oxRight category attributes, from oxParentId
      *
-     * @param bool   $blVerbose Set to true for output the update status for user,
-     * @param string $sShopID   the shop id
+     * @param bool $blVerbose Set to true for output the update status for user,
+     * @param null $sShopID the shop id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function updateCategoryTree($blVerbose = true, $sShopID = null)
     {
@@ -647,8 +658,10 @@ class CategoryList extends ListModel
      * Recursively updates root nodes, this method is used (only) in updateCategoryTree()
      *
      * @param string $oxRootId rootid of tree
-     * @param bool   $isRoot   is the current node root?
+     * @param bool $isRoot is the current node root?
      * @param string $thisRoot the id of the root
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateNodes" in next major
      */
     protected function _updateNodes($oxRootId, $isRoot, $thisRoot) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

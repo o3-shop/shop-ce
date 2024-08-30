@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
@@ -77,7 +79,7 @@ class UserBasket extends BaseModel
     /**
      * Inserts object data to DB, returns true on success.
      *
-     * @return mixed
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "insert" in next major
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -199,7 +201,7 @@ class UserBasket extends BaseModel
      *
      * @param string $sProductId  Product Id
      * @param array  $aSelList    product select lists
-     * @param string $aPersParams persistent parameters
+     * @param array $aPersParams persistent parameters
      *
      * @return UserBasketItem
      * @deprecated underscore prefix violates PSR12, will be renamed to "createItem" in next major
@@ -289,13 +291,14 @@ class UserBasket extends BaseModel
      * Method adds/removes user chosen article to/from his noticelist or wishlist. Returns total amount
      * of articles in list.
      *
-     * @param string $sProductId Article ID
-     * @param double $dAmount    Product amount
-     * @param array  $aSel       product select lists
-     * @param bool   $blOverride if true overrides $dAmount, else sums previous with current it
-     * @param array  $aPersParam product persistent parameters (default null)
+     * @param null $sProductId Article ID
+     * @param null $dAmount Product amount
+     * @param null $aSel product select lists
+     * @param bool $blOverride if true overrides $dAmount, else sums previous with current it
+     * @param null $aPersParam product persistent parameters (default null)
      *
      * @return integer
+     * @throws \Exception
      */
     public function addItemToBasket($sProductId = null, $dAmount = null, $aSel = null, $blOverride = false, $aPersParam = null)
     {
@@ -334,9 +337,11 @@ class UserBasket extends BaseModel
     /**
      * Deletes current basket history
      *
-     * @param string $sOXID Object ID(default null)
+     * @param null $sOXID Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {

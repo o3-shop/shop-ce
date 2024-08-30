@@ -284,19 +284,22 @@ class BasketItem extends Base
 
     /**
      * Assigns basic params to basket item
-     *  - oxbasketitem::_setArticle();
-     *  - oxbasketitem::setAmount();
-     *  - oxbasketitem::_setSelectList();
-     *  - oxbasketitem::setPersParams();
-     *  - oxbasketitem::setBundle().
+     *  - Basketitem::_setArticle();
+     *  - Basketitem::setAmount();
+     *  - Basketitem::_setSelectList();
+     *  - Basketitem::setPersParams();
+     *  - Basketitem::setBundle().
      *
      * @param string $sProductID product id
-     * @param double $dAmount    amount
-     * @param array  $aSel       selection
-     * @param array  $aPersParam persistent params
-     * @param bool   $blBundle   bundle
+     * @param double $dAmount amount
+     * @param null $aSel selection
+     * @param null $aPersParam persistent params
+     * @param null $blBundle bundle
      *
-     * @throws NoArticleException, OutOfStockException, ArticleInputException
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function init($sProductID, $dAmount, $aSel = null, $aPersParam = null, $blBundle = null)
     {
@@ -318,6 +321,10 @@ class BasketItem extends Base
      *  - oxbasketitem::setPersParams().
      *
      * @param OrderArticle $oOrderArticle order article to load info from
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function initFromOrderArticle($oOrderArticle)
     {
@@ -362,11 +369,13 @@ class BasketItem extends Base
      * Sets item amount and weight which depends on amount
      * ( oxbasketitem::dAmount, oxbasketitem::dWeight )
      *
-     * @param double $dAmount    amount
-     * @param bool   $blOverride Whether to override current amount.
-     * @param string $sItemKey   item key
+     * @param double $dAmount amount
+     * @param bool $blOverride Whether to override current amount.
+     * @param null $sItemKey item key
      *
+     * @throws ArticleException
      * @throws ArticleInputException
+     * @throws NoArticleException
      * @throws OutOfStockException
      */
     public function setAmount($dAmount, $blOverride = true, $sItemKey = null)
@@ -457,6 +466,9 @@ class BasketItem extends Base
      * Returns article icon picture url
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getIconUrl()
     {
@@ -596,6 +608,9 @@ class BasketItem extends Base
      * Returns product title
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getTitle()
     {
@@ -615,6 +630,9 @@ class BasketItem extends Base
      * Returns product details URL
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getLink()
     {
@@ -693,6 +711,9 @@ class BasketItem extends Base
      * @param string $sName parameter name
      *
      * @return mixed
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function __get($sName)
     {
@@ -731,6 +752,8 @@ class BasketItem extends Base
      *
      * @param string $sProductId product id
      *
+     * @throws ArticleException
+     * @throws ArticleInputException
      * @throws NoArticleException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "setArticle" in next major
      */
@@ -793,6 +816,9 @@ class BasketItem extends Base
      * Stores item select lists ( oxbasketitem::aSelList )
      *
      * @param array $aSelList item select lists
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setSelectList" in next major
      */
     protected function _setSelectList($aSelList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -993,6 +1019,9 @@ class BasketItem extends Base
      * Returns varselect value
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getVarSelect()
     {
@@ -1019,6 +1048,7 @@ class BasketItem extends Base
      * Set language Id, reload basket content on language change.
      *
      * @param integer $iLanguageId language id
+     * @throws ArticleException
      */
     public function setLanguageId($iLanguageId)
     {

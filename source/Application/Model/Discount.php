@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Field;
@@ -83,9 +85,11 @@ class Discount extends MultiLanguageModel
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $sOXID Object ID(default null)
+     * @param null $sOXID Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -147,10 +151,12 @@ class Discount extends MultiLanguageModel
 
         return $saveStatus;
     }
+
     /**
      * Check for global discount (no articles, no categories)
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isGlobalDiscount()
     {
@@ -178,6 +184,7 @@ class Discount extends MultiLanguageModel
      * @param Article $oArticle article object
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isForArticle($oArticle)
     {
@@ -215,6 +222,7 @@ class Discount extends MultiLanguageModel
      * @param object $oArticle basket item
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isForBasketItem($oArticle)
     {
@@ -252,6 +260,7 @@ class Discount extends MultiLanguageModel
      * @param Basket $oBasket basket
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isForBasketAmount($oBasket)
     {
@@ -313,6 +322,7 @@ class Discount extends MultiLanguageModel
      * @param object $oBasket basket object
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isForBasket($oBasket)
     {
@@ -350,6 +360,7 @@ class Discount extends MultiLanguageModel
      * @param object $oArticle article object
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isForBundleItem($oArticle)
     {
@@ -378,6 +389,7 @@ class Discount extends MultiLanguageModel
      * @param object $oBasket basket object
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isForBundleBasket($oBasket)
     {
@@ -488,6 +500,8 @@ class Discount extends MultiLanguageModel
      * Returns article ids assigned to discount
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleIds()
     {
@@ -505,6 +519,8 @@ class Discount extends MultiLanguageModel
      * Returns category ids asigned to discount
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryIds()
     {
@@ -524,6 +540,7 @@ class Discount extends MultiLanguageModel
      * @param int $shopId The id of the current shop
      *
      * @return int The incremented oxsort
+     * @throws DatabaseConnectionException
      */
     public function getNextOxsort($shopId)
     {
@@ -541,6 +558,7 @@ class Discount extends MultiLanguageModel
      * @param object $oArticle article object to chesk
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkForArticleCategories" in next major
      */
     protected function _checkForArticleCategories($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -574,6 +592,7 @@ class Discount extends MultiLanguageModel
      * @param Article $oProduct product used for discount check
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductCheckQuery" in next major
      */
     protected function _getProductCheckQuery($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -595,6 +614,7 @@ class Discount extends MultiLanguageModel
      * @param Article $oArticle
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isArticleAssigned" in next major
      */
     protected function _isArticleAssigned($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -620,6 +640,7 @@ class Discount extends MultiLanguageModel
      * @param array $aCategoryIds
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isCategoriesAssigned" in next major
      */
     protected function _isCategoriesAssigned($aCategoryIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

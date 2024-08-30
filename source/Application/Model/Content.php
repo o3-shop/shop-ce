@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -142,6 +144,8 @@ class Content extends MultiLanguageModel implements IUrl
      * @param string $sLoadId id
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb($sLoadId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -180,10 +184,12 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Loads Content by using field oxloadid instead of oxid.
      *
-     * @param string $loadId     content load ID
-     * @param string $onlyActive selection state - active/inactive
+     * @param string $loadId content load ID
+     * @param bool $onlyActive selection state - active/inactive
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadByIdent($loadId, $onlyActive = false)
     {
@@ -273,9 +279,10 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * getLink returns link for this content in the frontend.
      *
-     * @param int $iLang language id [optional]
+     * @param null $iLang language id [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getLink($iLang = null)
     {
@@ -297,11 +304,12 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Returns base dynamic url: shopurl/index.php?cl=details
      *
-     * @param int  $iLang   language id
+     * @param int $iLang language id
      * @param bool $blAddId add current object id to url or not
-     * @param bool $blFull  return full including domain name [optional]
+     * @param bool $blFull return full including domain name [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getBaseStdLink($iLang, $blAddId = true, $blFull = true)
     {
@@ -346,10 +354,11 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Returns standard URL to product.
      *
-     * @param integer $iLang   language
-     * @param array   $aParams additional params to use [optional]
+     * @param null $iLang language
+     * @param array $aParams additional params to use [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getStdLink($iLang = null, $aParams = [])
     {
@@ -418,7 +427,9 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Save this Object to database, insert or update as needed.
      *
-     * @return mixed
+     * @return bool|string|null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function save()
     {
@@ -442,6 +453,8 @@ class Content extends MultiLanguageModel implements IUrl
      * Returns latest terms version id.
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getTermsVersion()
     {

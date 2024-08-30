@@ -22,6 +22,11 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
@@ -159,6 +164,8 @@ class Delivery extends MultiLanguageModel
      * Collects article Ids which are assigned to current delivery
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticles()
     {
@@ -180,6 +187,8 @@ class Delivery extends MultiLanguageModel
      * Collects category Ids which are assigned to current delivery
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategories()
     {
@@ -201,6 +210,8 @@ class Delivery extends MultiLanguageModel
      * Checks if delivery has assigned articles
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function hasArticles()
     {
@@ -211,6 +222,8 @@ class Delivery extends MultiLanguageModel
      * Checks if delivery has assigned categories
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function hasCategories()
     {
@@ -223,6 +236,9 @@ class Delivery extends MultiLanguageModel
      * @param BasketItem $oBasketItem basket item object
      *
      * @return double
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getDeliveryAmount($oBasketItem)
     {
@@ -315,9 +331,11 @@ class Delivery extends MultiLanguageModel
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $sOxId Object ID (default null)
+     * @param null $sOxId Object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOxId = null)
     {
@@ -343,6 +361,11 @@ class Delivery extends MultiLanguageModel
      * @param Basket $oBasket shop basket
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
      */
     public function isForBasket($oBasket)
     {
@@ -497,6 +520,7 @@ class Delivery extends MultiLanguageModel
      * @param string $sTitle delivery name
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByName($sTitle)
     {
@@ -514,6 +538,8 @@ class Delivery extends MultiLanguageModel
      * Returns array of country ISO's which are assigned to current delivery
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCountriesISO()
     {

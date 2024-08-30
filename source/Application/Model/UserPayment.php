@@ -22,8 +22,10 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 
 /**
  * User payment manager.
@@ -125,7 +127,8 @@ class UserPayment extends BaseModel
      *
      * @param string $sOxId oxuserpayment id
      *
-     * @return mixed
+     * @return bool
+     * @throws DatabaseConnectionException
      */
     public function load($sOxId)
     {
@@ -140,6 +143,7 @@ class UserPayment extends BaseModel
      * Inserts payment information to DB. Returns insert status.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "insert" in next major
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -168,6 +172,9 @@ class UserPayment extends BaseModel
      * Updates payment record in DB. Returns update status.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseException
+     * @throws \oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -196,10 +203,11 @@ class UserPayment extends BaseModel
     /**
      * Get user payment by payment id
      *
-     * @param User $oUser        user object
-     * @param string                                   $sPaymentType payment type
+     * @param null $oUser user object
+     * @param null $sPaymentType payment type
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function getPaymentByPaymentType($oUser = null, $sPaymentType = null)
     {

@@ -38,7 +38,6 @@ class RightsRolesElementsList extends ListModel
      */
     public function getElementsByObjectId(string $objectId)
     {
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('*')
             ->from($this->getBaseObject()->getViewName())
@@ -57,10 +56,10 @@ class RightsRolesElementsList extends ListModel
     /**
      * @param string $userId
      * @return array
+     * @throws Exception
      */
     public function getElementsByUserId(string $userId): array
     {
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('DISTINCT(re.elementid) as elementid', 'MAX(re.TYPE) as type')
             ->from(
@@ -122,7 +121,6 @@ class RightsRolesElementsList extends ListModel
      */
     public function getRestrictedViewElements(): array
     {
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('DISTINCT(re.elementid) as elementid, MAX(re.type) as type')
             ->from(

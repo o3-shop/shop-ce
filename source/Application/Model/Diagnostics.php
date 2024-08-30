@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -204,7 +206,7 @@ class Diagnostics
      *
      * @deprecated since v6.0.0 (2017-12-04); This functionality will be removed completely
      *
-     * @return bool|string
+     * @return string
      */
     public function getRevision()
     {
@@ -238,6 +240,8 @@ class Diagnostics
      * Collects information on the shop, like amount of categories, articles, users
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getShopDetails()
     {
@@ -262,10 +266,12 @@ class Diagnostics
     /**
      * counts result Rows
      *
-     * @param string  $sTable table
+     * @param string $sTable table
      * @param boolean $blMode mode
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "countRows" in next major
      */
     protected function _countRows($sTable, $blMode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -552,6 +558,7 @@ class Diagnostics
      * Returns MySQL server Information
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMySqlServerInfo" in next major
      */
     protected function _getMySqlServerInfo() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

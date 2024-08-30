@@ -86,7 +86,7 @@ class RequiredAddressFields
     /**
      * Returns required fields for user address validation.
      *
-     * @return mixed
+     * @return array
      */
     public function getBillingFields()
     {
@@ -98,7 +98,7 @@ class RequiredAddressFields
     /**
      * Returns required fields for delivery address validation.
      *
-     * @return mixed
+     * @return array
      */
     public function getDeliveryFields()
     {
@@ -113,7 +113,7 @@ class RequiredAddressFields
      * @param array  $aFields
      * @param string $sPrefix
      *
-     * @return mixed
+     * @return array
      */
     private function _filterFields($aFields, $sPrefix) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {

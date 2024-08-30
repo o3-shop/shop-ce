@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
@@ -56,6 +58,7 @@ class Actions extends MultiLanguageModel
      * Adds an article to this actions
      *
      * @param string $articleId id of the article to be added
+     * @throws DatabaseConnectionException
      */
     public function addArticle($articleId)
     {
@@ -85,6 +88,8 @@ class Actions extends MultiLanguageModel
      * @param string $articleId id of the article to be removed
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function removeArticle($articleId)
     {
@@ -105,9 +110,11 @@ class Actions extends MultiLanguageModel
      * performance - you can not load action object - just pass
      * action ID.
      *
-     * @param string $articleId Object ID
+     * @param null $articleId Object ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($articleId = null)
     {
@@ -226,6 +233,7 @@ class Actions extends MultiLanguageModel
      * return assigned banner article
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getBannerArticle()
     {
@@ -251,6 +259,7 @@ class Actions extends MultiLanguageModel
      * Fetch the oxobjectid of the article corresponding this action.
      *
      * @return string The id of the oxobjectid belonging to this action.
+     * @throws DatabaseConnectionException
      */
     protected function fetchBannerArticleId()
     {
@@ -287,6 +296,7 @@ class Actions extends MultiLanguageModel
      * assigned to banner, article link will be returned.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getBannerLink()
     {

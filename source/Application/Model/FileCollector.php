@@ -59,7 +59,7 @@ class FileCollector
     /**
      * get collection files
      *
-     * @return mixed
+     * @return array
      */
     public function getFiles()
     {

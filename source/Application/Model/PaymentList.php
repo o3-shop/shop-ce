@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -64,11 +66,12 @@ class PaymentList extends ListModel
     /**
      * Creates payment list filter SQL to load current state payment list
      *
-     * @param string                                   $sShipSetId user chosen delivery set
-     * @param double                                   $dPrice     basket products price
-     * @param User $oUser      session user object
+     * @param string $sShipSetId user chosen delivery set
+     * @param double $dPrice basket products price
+     * @param User $oUser session user object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($sShipSetId, $dPrice, $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -140,11 +143,12 @@ class PaymentList extends ListModel
     /**
      * Loads and returns list of user payments.
      *
-     * @param string                                   $sShipSetId user chosen delivery set
-     * @param double                                   $dPrice     basket product price excl. discount
-     * @param User $oUser      session user object
+     * @param string $sShipSetId user chosen delivery set
+     * @param double $dPrice basket product price excl. discount
+     * @param null $oUser session user object
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getPaymentList($sShipSetId, $dPrice, $oUser = null)
     {
@@ -168,7 +172,9 @@ class PaymentList extends ListModel
      * Loads payments mapped to a
      * predefined GoodRelations payment method.
      *
-     * @param double $dPrice product price
+     * @param null $dPrice product price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadRDFaPaymentList($dPrice = null)
     {

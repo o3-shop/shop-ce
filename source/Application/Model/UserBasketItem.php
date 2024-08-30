@@ -95,7 +95,7 @@ class UserBasketItem extends BaseModel
      *
      * @throws ArticleException article exception
      *
-     * @return Article
+     * @return Article|bool
      */
     public function getArticle($sItemKey)
     {
@@ -197,11 +197,11 @@ class UserBasketItem extends BaseModel
     /**
      * Basket item persistent parameters setter
      *
-     * @param string $sPersParams persistent parameters
+     * @param array $aPersParams persistent parameters
      */
-    public function setPersParams($sPersParams)
+    public function setPersParams($aPersParams)
     {
-        $this->oxuserbasketitems__oxpersparam = new Field(serialize($sPersParams), Field::T_RAW);
+        $this->oxuserbasketitems__oxpersparam = new Field(serialize($aPersParams), Field::T_RAW);
     }
 
     /**

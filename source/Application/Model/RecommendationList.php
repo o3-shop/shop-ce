@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -48,7 +50,7 @@ class RecommendationList extends BaseModel implements IUrl
     /**
      * Article list
      *
-     * @var string
+     * @var ListModel
      */
     protected $_oArticles = null;
 
@@ -78,11 +80,12 @@ class RecommendationList extends BaseModel implements IUrl
     /**
      * Returns list of recommendation list items
      *
-     * @param integer $iStart        start for sql limit
-     * @param integer $iNrofArticles nr of items per page
-     * @param bool    $blReload      if TRUE forces to reload list
+     * @param null $iStart start for sql limit
+     * @param null $iNrofArticles nr of items per page
+     * @param bool $blReload if TRUE forces to reload list
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getArticles($iStart = null, $iNrofArticles = null, $blReload = false)
     {
@@ -107,6 +110,7 @@ class RecommendationList extends BaseModel implements IUrl
      * Returns count of recommendation list items
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function getArtCount()
     {
@@ -139,6 +143,7 @@ class RecommendationList extends BaseModel implements IUrl
      * returns first article from this list's article list
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getFirstArticle()
     {
@@ -153,9 +158,11 @@ class RecommendationList extends BaseModel implements IUrl
     /**
      * Removes articles from the recommlist and deletes list
      *
-     * @param string $sOXID Object ID(default null)
+     * @param null $sOXID Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -184,6 +191,7 @@ class RecommendationList extends BaseModel implements IUrl
      * @param string $sOXID Object ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArtDescription($sOXID)
     {
@@ -206,7 +214,9 @@ class RecommendationList extends BaseModel implements IUrl
      *
      * @param string $sOXID Object ID
      *
-     * @return bool
+     * @return int|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function removeArticle($sOXID)
     {
@@ -270,6 +280,7 @@ class RecommendationList extends BaseModel implements IUrl
      * @param array $aArticleIds Object IDs
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getRecommListsByIds($aArticleIds)
     {
@@ -319,7 +330,8 @@ class RecommendationList extends BaseModel implements IUrl
      *     2. do not shown articles as 1st, which are shown in other recomm lists as 1st
      *
      * @param ListModel $oRecommList recommendation list
-     * @param array                                  $aIds        article ids
+     * @param array $aIds article ids
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFirstArticles" in next major
      */
     protected function _loadFirstArticles(ListModel $oRecommList, $aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -360,6 +372,7 @@ class RecommendationList extends BaseModel implements IUrl
      * @param string $sSearchStr Search string
      *
      * @return object oxlist with oxrecommlist objects
+     * @throws DatabaseConnectionException
      */
     public function getSearchRecommLists($sSearchStr)
     {
@@ -388,6 +401,7 @@ class RecommendationList extends BaseModel implements IUrl
      * @param string $sSearchStr Search string
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getSearchRecommListCount($sSearchStr)
     {
@@ -408,6 +422,7 @@ class RecommendationList extends BaseModel implements IUrl
      * @param string $sSearchStr Search string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSearchSelect" in next major
      */
     protected function _getSearchSelect($sSearchStr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -427,6 +442,7 @@ class RecommendationList extends BaseModel implements IUrl
      * Calculates and saves product rating average
      *
      * @param integer $iRating new rating value
+     * @throws Exception
      */
     public function addToRatingAverage($iRating)
     {
@@ -546,7 +562,8 @@ class RecommendationList extends BaseModel implements IUrl
     /**
      * Save this Object to database, insert or update as needed.
      *
-     * @return mixed
+     * @return bool|string|null
+     * @throws Exception
      */
     public function save()
     {

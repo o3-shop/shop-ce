@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
@@ -130,6 +132,8 @@ class ContentList extends ListModel
      * @param integer $iType - type of content
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb($iType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -144,6 +148,8 @@ class ContentList extends ListModel
      * Load category list data
      *
      * @param integer $type - type of content
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "load" in next major
      */
     protected function _load($type) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -181,6 +187,7 @@ class ContentList extends ListModel
      * @param integer $iType type.
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSQLByType" in next major
      */
     protected function _getSQLByType($iType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

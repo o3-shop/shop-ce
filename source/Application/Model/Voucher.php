@@ -21,7 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Exception\VoucherException;
 use OxidEsales\Eshop\Core\Field;
@@ -65,13 +67,13 @@ class Voucher extends BaseModel
     /**
      * Gets voucher from db by given number.
      *
-     * @param string $sVoucherNr         Voucher number
-     * @param array  $aVouchers          Array of available vouchers (default array())
-     * @param bool   $blCheckavalability check if voucher is still reserver od not
+     * @param string $sVoucherNr Voucher number
+     * @param array $aVouchers Array of available vouchers (default array())
+     * @param bool $blCheckavalability check if voucher is still reserver od not
      *
+     * @return bool|null
      * @throws VoucherException exception
-     *
-     * @return mixed
+     * @throws DatabaseConnectionException
      */
     public function getVoucherByNr($sVoucherNr, $aVouchers = [], $blCheckavalability = false)
     {
@@ -115,9 +117,10 @@ class Voucher extends BaseModel
     /**
      * marks voucher as used
      *
-     * @param string $sOrderId  order id
-     * @param string $sUserId   user id
+     * @param string $sOrderId order id
+     * @param string $sUserId user id
      * @param double $dDiscount used discount
+     * @throws Exception
      */
     public function markAsUsed($sOrderId, $sUserId, $dDiscount)
     {
@@ -169,9 +172,11 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws VoucherException exception
-     *
      * @return double
+     *
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
+     * @throws VoucherException exception
      */
     public function getDiscountValue($dPrice)
     {
@@ -185,15 +190,18 @@ class Voucher extends BaseModel
     }
 
     // Checking General Availability
+
     /**
      * Checks availability without user logged in. Returns array with errors.
      *
-     * @param array  $aVouchers array of vouchers
-     * @param double $dPrice    current sum (price)
+     * @param array $aVouchers array of vouchers
+     * @param double $dPrice current sum (price)
      *
+     * @return bool
+     *
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @throws VoucherException exception
-     *
-     * @return array
      */
     public function checkVoucherAvailability($aVouchers, $dPrice)
     {
@@ -212,12 +220,13 @@ class Voucher extends BaseModel
      * Performs basket level voucher availability check (no need to check if voucher
      * is reserved or so).
      *
-     * @param array  $aVouchers array of vouchers
-     * @param double $dPrice    current sum (price)
+     * @param array $aVouchers array of vouchers
+     * @param double $dPrice current sum (price)
      *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @throws VoucherException exception
-     *
-     * @return array
      */
     public function checkBasketVoucherAvailability($aVouchers, $dPrice)
     {
@@ -248,9 +257,9 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice base article price
      *
+     * @return bool
+     * @throws ObjectException
      * @throws VoucherException exception
-     *
-     * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailablePrice" in next major
      */
     protected function _isAvailablePrice($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -273,10 +282,10 @@ class Voucher extends BaseModel
      *
      * @param array $aVouchers array of vouchers
      *
-     * @throws VoucherException exception
-     *
      * @return bool
      *
+     * @throws ObjectException
+     * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableWithSameSeries" in next major
      */
     protected function _isAvailableWithSameSeries($aVouchers) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -310,9 +319,10 @@ class Voucher extends BaseModel
      *
      * @param array $aVouchers array of vouchers
      *
-     * @throws VoucherException exception
-     *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
+     * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableWithOtherSeries" in next major
      */
     protected function _isAvailableWithOtherSeries($aVouchers) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -352,9 +362,9 @@ class Voucher extends BaseModel
     /**
      * Checks if voucher is in valid time period. Returns true on success.
      *
-     * @throws VoucherException exception
-     *
      * @return bool
+     * @throws ObjectException
+     * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isValidDate" in next major
      */
     protected function _isValidDate() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -408,14 +418,16 @@ class Voucher extends BaseModel
     }
 
     // Checking User Availability
+
     /**
      * Checks availability for the given user. Returns array with errors.
      *
      * @param object $oUser user object
      *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @throws VoucherException exception
-     *
-     * @return array
      */
     public function checkUserAvailability($oUser)
     {
@@ -431,9 +443,10 @@ class Voucher extends BaseModel
      *
      * @param object $oUser user object
      *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @throws VoucherException exception
-     *
-     * @return boolean
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableInOtherOrder" in next major
      */
     protected function _isAvailableInOtherOrder($oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -467,9 +480,9 @@ class Voucher extends BaseModel
      *
      * @param object $oUser user object
      *
-     * @throws VoucherException exception
-     *
      * @return bool
+     * @throws ObjectException
+     * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isValidUserGroup" in next major
      */
     protected function _isValidUserGroup($oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -517,8 +530,6 @@ class Voucher extends BaseModel
     /**
      * create oxVoucherSerie object of this voucher
      *
-     * @throws ObjectException
-     *
      * @return VoucherSerie
      */
     public function getSerie()
@@ -539,6 +550,8 @@ class Voucher extends BaseModel
      * Returns true if voucher is product specific, otherwise false
      *
      * @return boolean
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isProductVoucher" in next major
      */
     protected function _isProductVoucher() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -559,6 +572,8 @@ class Voucher extends BaseModel
      * Returns true if voucher is category specific, otherwise false
      *
      * @return boolean
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isCategoryVoucher" in next major
      */
     protected function _isCategoryVoucher() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -579,6 +594,7 @@ class Voucher extends BaseModel
      * Returns the discount object created from voucher serie data
      *
      * @return object
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSerieDiscount" in next major
      */
     protected function _getSerieDiscount() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -608,9 +624,11 @@ class Voucher extends BaseModel
     /**
      * Returns basket item information array from session or order.
      *
-     * @param Discount $oDiscount discount object
+     * @param null $oDiscount discount object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBasketItems" in next major
      */
     protected function _getBasketItems($oDiscount = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -627,9 +645,11 @@ class Voucher extends BaseModel
     /**
      * Returns basket item information (id,amount,price) array takig item list from order.
      *
-     * @param Discount $oDiscount discount object
+     * @param null $oDiscount discount object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOrderBasketItems" in next major
      */
     protected function _getOrderBasketItems($oDiscount = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -662,9 +682,11 @@ class Voucher extends BaseModel
     /**
      * Returns basket item information (id,amount,price) array taking item list from session.
      *
-     * @param Discount $oDiscount discount object
+     * @param null $oDiscount discount object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSessionBasketItems" in next major
      */
     protected function _getSessionBasketItems($oDiscount = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -698,11 +720,11 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
+     * @return double
+     * @throws ObjectException
      * @throws VoucherException exception
-     *
      * @deprecated on b-dev (2015-03-31); Use function _getGenericDiscountValue()
      *
-     * @return double
      */
     protected function _getGenericDiscoutValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -714,9 +736,8 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws VoucherException exception
-     *
      * @return double
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getGenericDiscountValue" in next major
      */
     protected function _getGenericDiscountValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -741,6 +762,7 @@ class Voucher extends BaseModel
      * Return discount value
      *
      * @return double
+     * @throws ObjectException
      */
     public function getDiscount()
     {
@@ -753,6 +775,7 @@ class Voucher extends BaseModel
      * Return discount type
      *
      * @return string
+     * @throws ObjectException
      */
     public function getDiscountType()
     {
@@ -766,11 +789,11 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws VoucherException exception
-     *
-     * @deprecated on b-dev (2015-03-31); Use function _getProductDiscountValue()
-     *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
+     * @throws VoucherException exception
+     * @deprecated on b-dev (2015-03-31); Use function _getProductDiscountValue()
      */
     protected function _getProductDiscoutValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -782,9 +805,10 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws VoucherException exception
-     *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
+     * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductDiscountValue" in next major
      */
     protected function _getProductDiscountValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -848,11 +872,11 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws VoucherException exception
-     *
-     * @deprecated on b-dev (2015-03-31); Use function _getCategoryDiscountValue()
-     *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
+     * @throws VoucherException exception
+     * @deprecated on b-dev (2015-03-31); Use function _getCategoryDiscountValue()
      */
     protected function _getCategoryDiscoutValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -864,9 +888,10 @@ class Voucher extends BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws VoucherException exception
-     *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
+     * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryDiscountValue" in next major
      */
     protected function _getCategoryDiscountValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

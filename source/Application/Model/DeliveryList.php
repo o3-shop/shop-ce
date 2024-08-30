@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -108,11 +109,12 @@ class DeliveryList extends ListModel
      * assigned users, countries or user groups. Performs
      * additional filtering according to these parameters
      *
-     * @param User $oUser      session user object
-     * @param string                                   $sCountryId user country id
-     * @param string                                   $sDelSet    user chosen delivery set
+     * @param null $oUser session user object
+     * @param null $sCountryId user country id
+     * @param null $sDelSet user chosen delivery set
      *
-     * @return array
+     * @return DeliveryList
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActiveDeliveryList" in next major
      */
     protected function _getList($oUser = null, $sCountryId = null, $sDelSet = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -149,11 +151,12 @@ class DeliveryList extends ListModel
     /**
      * Creates delivery list filter SQL to load current state delivery list
      *
-     * @param User $oUser      session user object
-     * @param string                                   $sCountryId user country id
-     * @param string                                   $sDelSet    user chosen delivery set
+     * @param User $oUser session user object
+     * @param string $sCountryId user country id
+     * @param string $sDelSet user chosen delivery set
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($oUser, $sCountryId, $sDelSet) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -233,12 +236,13 @@ class DeliveryList extends ListModel
      *    NOTICE: for performance reasons deliveries is cached in
      *    $myConfig->aDeliveryList.
      *
-     * @param object                                   $oBasket     basket object
-     * @param User $oUser       session user
-     * @param string                                   $sDelCountry user country id
-     * @param string                                   $sDelSet     delivery set id
+     * @param object $oBasket basket object
+     * @param null $oUser session user
+     * @param null $sDelCountry user country id
+     * @param null $sDelSet delivery set id
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDeliveryList($oBasket, $oUser = null, $sDelCountry = null, $sDelSet = null)
     {
@@ -311,12 +315,13 @@ class DeliveryList extends ListModel
     /**
      * Checks if deliveries in list fits for current basket and delivery set
      *
-     * @param Basket $oBasket        shop basket
-     * @param User   $oUser          session user
-     * @param string                                     $sDelCountry    delivery country
-     * @param string                                     $sDeliverySetId delivery set id to check its relation to delivery list
+     * @param Basket $oBasket shop basket
+     * @param User $oUser session user
+     * @param string $sDelCountry delivery country
+     * @param string $sDeliverySetId delivery set id to check its relation to delivery list
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function hasDeliveries($oBasket, $oUser, $sDelCountry, $sDeliverySetId)
     {

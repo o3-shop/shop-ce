@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -148,10 +149,11 @@ class Shop extends MultiLanguageModel
     /**
      * (Re)generates shop views
      *
-     * @param bool  $multishopInheritCategories Config option blMultishopInherit_oxcategories
-     * @param array $mallInherit                Array of config options blMallInherit
+     * @param bool $multishopInheritCategories Config option blMultishopInherit_oxcategories
+     * @param null $mallInherit Array of config options blMallInherit
      *
      * @return bool is all views generated successfully
+     * @throws DatabaseConnectionException
      */
     public function generateViews($multishopInheritCategories = false, $mallInherit = null)
     {
@@ -373,6 +375,7 @@ class Shop extends MultiLanguageModel
      * Returns false when any of the queries fail, otherwise return true
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "runQueries" in next major
      */
     protected function _runQueries() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

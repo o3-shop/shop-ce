@@ -26,6 +26,8 @@ use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\ArticleException;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Exception\VoucherException;
@@ -442,19 +444,20 @@ class Basket extends Base
     /**
      * Adds user item to basket. Returns BasketItem object if adding succeeded
      *
-     * @param string $sProductID       id of product
-     * @param double $dAmount          product amount
-     * @param mixed  $aSel             product select lists (default null)
-     * @param mixed  $aPersParam       product persistent parameters (default null)
-     * @param bool   $blOverride       marker to accumulate passed amount or renew (default false)
-     * @param bool   $blBundle         marker if product is bundle or not (default false)
-     * @param mixed  $sOldBasketItemId id if old basket item if to change it
+     * @param string $sProductID id of product
+     * @param double $dAmount product amount
+     * @param mixed $aSel product select lists (default null)
+     * @param mixed $aPersParam product persistent parameters (default null)
+     * @param bool $blOverride marker to accumulate passed amount or renew (default false)
+     * @param bool $blBundle marker if product is bundle or not (default false)
+     * @param mixed $sOldBasketItemId id if old basket item if to change it
      *
+     * @return object ArticleInputException, NoArticleException
+     * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
      * @throws NoArticleException
      * @throws OutOfStockException
-     *
-     * @return object oxArticleInputException, oxNoArticleException
      */
     public function addToBasket($sProductID, $dAmount, $aSel = null, $aPersParam = null, $blOverride = false, $blBundle = false, $sOldBasketItemId = null)
     {
@@ -557,6 +560,10 @@ class Basket extends Base
      * @param OrderArticle $oOrderArticle order article to store in basket
      *
      * @return BasketItem
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function addOrderArticleToBasket($oOrderArticle)
     {
@@ -802,6 +809,7 @@ class Basket extends Base
      * Adds bundles to basket
      *
      * @param array $aBundles added bundle articles
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addBundlesToBasket" in next major
      */
     protected function _addBundlesToBasket($aBundles) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1524,6 +1532,9 @@ class Basket extends Base
      * class parameter Basket::$_aBasketSummary
      *
      * @return object
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getBasketSummary()
     {
@@ -1602,6 +1613,8 @@ class Basket extends Base
      * (oxvoucher::MarkAsReserved())
      *
      * @param string $sVoucherId voucher ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function addVoucher($sVoucherId)
     {
@@ -1714,6 +1727,7 @@ class Basket extends Base
      * Populates current basket from the saved one.
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function load()
     {
@@ -1913,6 +1927,7 @@ class Basket extends Base
      * Returns array of basket oxarticle objects
      *
      * @return array
+     * @throws ArticleException
      */
     public function getBasketArticles()
     {
@@ -2861,6 +2876,7 @@ class Basket extends Base
      * @param string $sProductId product id
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function canAddProductToBasket($sProductId)
     {
@@ -2910,6 +2926,7 @@ class Basket extends Base
      * @param string $sRootCatId root category id
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isProductInRootCategory" in next major
      */
     protected function _isProductInRootCategory($sProductId, $sRootCatId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3043,6 +3060,9 @@ class Basket extends Base
      * Returns true if at least one product is downloadable in basket
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function hasDownloadableProducts()
     {
@@ -3062,6 +3082,9 @@ class Basket extends Base
      * Returns whether there are any articles in basket with intangible products agreement enabled.
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function hasArticlesWithIntangibleAgreement()
     {
@@ -3082,6 +3105,9 @@ class Basket extends Base
      * Returns whether there are any articles in basket with downloadable products agreement enabled.
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function hasArticlesWithDownloadableAgreement()
     {

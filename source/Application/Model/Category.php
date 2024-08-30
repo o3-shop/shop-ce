@@ -23,10 +23,13 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsView;
+use oxObjectException;
 
 /**
  * Category manager.
@@ -67,28 +70,28 @@ class Category extends MultiLanguageModel implements IUrl
     /**
      * visibility of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blIsVisible;
 
     /**
      * expanded state of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blExpanded;
 
     /**
      * visibility of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blHasSubCats;
 
     /**
      * has visible sub categories state of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blHasVisibleSubCats;
 
@@ -228,6 +231,7 @@ class Category extends MultiLanguageModel implements IUrl
      * @param string $sOXID id
      *
      * @return array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb($sOXID) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -244,6 +248,7 @@ class Category extends MultiLanguageModel implements IUrl
      * @param string $sOXID id
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function load($sOXID)
     {
@@ -278,9 +283,11 @@ class Category extends MultiLanguageModel implements IUrl
     /**
      * Delete empty categories, returns true on success.
      *
-     * @param string $sOXID Object ID
+     * @param null $sOXID Object ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -742,6 +749,8 @@ class Category extends MultiLanguageModel implements IUrl
      * Loads and returns attribute list associated with this category
      *
      * @return AttributeList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributes()
     {
@@ -791,6 +800,7 @@ class Category extends MultiLanguageModel implements IUrl
      * Returns parent category object for current category (if it is available).
      *
      * @return Category
+     * @throws DatabaseConnectionException
      */
     public function getParentCategory()
     {
@@ -819,7 +829,8 @@ class Category extends MultiLanguageModel implements IUrl
      *
      * @param string $sCategoryId category id
      *
-     * @return integer
+     * @return false|string|void
+     * @throws DatabaseConnectionException
      */
     public static function getRootId($sCategoryId)
     {
@@ -853,6 +864,8 @@ class Category extends MultiLanguageModel implements IUrl
      * Inserts new category (and updates existing node oxLeft amd oxRight accordingly). Returns true on success.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "insert" in next major
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -916,6 +929,9 @@ class Category extends MultiLanguageModel implements IUrl
      * Updates category tree, returns true on success.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1061,7 +1077,7 @@ class Category extends MultiLanguageModel implements IUrl
     /**
      * Returns category icon picture url if exist, false - if not
      *
-     * @return mixed
+     * @return bool|string|void|null
      */
     public function getIconUrl()
     {
@@ -1079,7 +1095,7 @@ class Category extends MultiLanguageModel implements IUrl
     /**
      * Returns category thumbnail picture url if exist, false - if not
      *
-     * @return mixed
+     * @return bool|string|void|null
      */
     public function getThumbUrl()
     {
@@ -1093,7 +1109,7 @@ class Category extends MultiLanguageModel implements IUrl
     /**
      * Returns category promotion icon picture url if exist, false - if not
      *
-     * @return mixed
+     * @return bool|string|void|null
      */
     public function getPromotionIconUrl()
     {
@@ -1110,7 +1126,7 @@ class Category extends MultiLanguageModel implements IUrl
      * @param string $sPicName picture name
      * @param string $sPicType picture type related with picture dir: icon - icon; 0 - image
      *
-     * @return mixed
+     * @return false|string
      */
     public function getPictureUrlForType($sPicName, $sPicType)
     {
@@ -1185,9 +1201,11 @@ class Category extends MultiLanguageModel implements IUrl
      * Default is set to 'OXID'
      *
      * @param string $sField field to be retrieved from each subcategory
-     * @param string $sOXID  Cetegory ID
+     * @param null $sOXID Cetegory ID
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getFieldFromSubCategories($sField = 'OXID', $sOXID = null)
     {

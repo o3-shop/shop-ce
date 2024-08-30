@@ -40,7 +40,7 @@ class Links extends MultiLanguageModel
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      *
-     * @return Links
+     * @return void
      */
     public function __construct()
     {

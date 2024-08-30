@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SeoEncoder;
 
@@ -76,12 +78,13 @@ class SeoEncoderArticle extends SeoEncoder
     /**
      * Returns SEO uri for passed article and active tag
      *
-     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-     *
      * @param Article $oArticle article object
-     * @param int                                         $iLang    language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+     *
      */
     public function getArticleRecommUri($oArticle, $iLang)
     {
@@ -153,11 +156,12 @@ class SeoEncoderArticle extends SeoEncoder
     /**
      * create article uri for given category and save it
      *
-     * @param Article  $oArticle  article object
+     * @param Article $oArticle article object
      * @param Category $oCategory category object
-     * @param int                                          $iLang     language to generate uri for
+     * @param int $iLang language to generate uri for
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createArticleCategoryUri" in next major
      */
     protected function _createArticleCategoryUri($oArticle, $oCategory, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -197,11 +201,12 @@ class SeoEncoderArticle extends SeoEncoder
     /**
      * Returns SEO uri for passed article
      *
-     * @param Article $oArticle     article object
-     * @param int                                         $iLang        language id
-     * @param bool                                        $blRegenerate if TRUE forces seo url regeneration
+     * @param Article $oArticle article object
+     * @param int $iLang language id
+     * @param bool $blRegenerate if TRUE forces seo url regeneration
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArticleUri($oArticle, $iLang, $blRegenerate = false)
     {
@@ -262,7 +267,8 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @param Article $oArticle product
      *
-     * @return string
+     * @return Category
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMainCategory" in next major
      */
     protected function _getMainCategory($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -304,9 +310,10 @@ class SeoEncoderArticle extends SeoEncoder
      * Returns SEO uri for passed article
      *
      * @param Article $oArticle article object
-     * @param int                                         $iLang    language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArticleMainUri($oArticle, $iLang)
     {
@@ -351,6 +358,7 @@ class SeoEncoderArticle extends SeoEncoder
      * @param Article $oArticle article object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareArticleTitle" in next major
      */
     protected function _prepareArticleTitle($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -385,11 +393,12 @@ class SeoEncoderArticle extends SeoEncoder
     /**
      * Returns vendor seo uri for current article
      *
-     * @param Article $oArticle     article object
-     * @param int                                         $iLang        language id
-     * @param bool                                        $blRegenerate if TRUE forces seo url regeneration
+     * @param Article $oArticle article object
+     * @param int $iLang language id
+     * @param bool $blRegenerate if TRUE forces seo url regeneration
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArticleVendorUri($oArticle, $iLang, $blRegenerate = false)
     {
@@ -464,11 +473,12 @@ class SeoEncoderArticle extends SeoEncoder
     /**
      * Returns manufacturer seo uri for current article
      *
-     * @param Article $oArticle     article object
-     * @param int                                         $iLang        language id
-     * @param bool                                        $blRegenerate if TRUE forces seo url regeneration
+     * @param Article $oArticle article object
+     * @param int $iLang language id
+     * @param bool $blRegenerate if TRUE forces seo url regeneration
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArticleManufacturerUri($oArticle, $iLang, $blRegenerate = false)
     {
@@ -544,9 +554,10 @@ class SeoEncoderArticle extends SeoEncoder
      * return article main url, with path of its default category
      *
      * @param Article $oArticle product
-     * @param int                                         $iLang    language id
+     * @param null $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArticleMainUrl($oArticle, $iLang = null)
     {
@@ -561,10 +572,11 @@ class SeoEncoderArticle extends SeoEncoder
      * Encodes article URLs into SEO format
      *
      * @param Article $oArticle Article object
-     * @param int                                         $iLang    language
-     * @param int                                         $iType    type
+     * @param null $iLang language
+     * @param int $iType type
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getArticleUrl($oArticle, $iLang = null, $iType = 0)
     {
@@ -603,6 +615,8 @@ class SeoEncoderArticle extends SeoEncoder
      * deletes article seo entries
      *
      * @param Article $oArticle article to remove
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteArticle($oArticle)
     {
@@ -622,9 +636,10 @@ class SeoEncoderArticle extends SeoEncoder
      * Returns alternative uri used while updating seo
      *
      * @param string $sObjectId object id
-     * @param int    $iLang     language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

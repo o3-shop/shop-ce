@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -49,10 +50,9 @@ class VatSelector extends Base
     /**
      * get VAT for user, can NOT be null
      *
-     * @param User $oUser        given  user object
-     * @param bool                                     $blCacheReset reset cache
+     * @param User $oUser given  user object
+     * @param bool $blCacheReset reset cache
      *
-     * @throws ObjectException if wrong country
      * @return double | false
      */
     public function getUserVat(User $oUser, $blCacheReset = false)
@@ -93,7 +93,7 @@ class VatSelector extends Base
      * @param User    $oUser    given user object
      * @param Country $oCountry given country object
      *
-     * @return mixed
+     * @return false|int
      * @deprecated underscore prefix violates PSR12, will be renamed to "getForeignCountryUserVat" in next major
      */
     protected function _getForeignCountryUserVat(User $oUser, Country $oCountry) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -114,7 +114,8 @@ class VatSelector extends Base
      *
      * @param Article $oArticle given article
      *
-     * @return float|false
+     * @return false|string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVatForArticleCategory" in next major
      */
     protected function _getVatForArticleCategory(Article $oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -158,6 +159,7 @@ class VatSelector extends Base
      * @param Article $oArticle given article
      *
      * @return double
+     * @throws DatabaseConnectionException
      */
     public function getArticleVat(Article $oArticle)
     {
@@ -186,9 +188,10 @@ class VatSelector extends Base
      * basket price calculation behaviour (Article::getBasketPrice())
      *
      * @param Article $oArticle article object
-     * @param Basket  $oBasket  oxbasket object
+     * @param Basket $oBasket oxbasket object
      *
      * @return double
+     * @throws DatabaseConnectionException
      */
     public function getBasketItemVat(Article $oArticle, $oBasket)
     {
@@ -201,6 +204,7 @@ class VatSelector extends Base
      * @param Article $oArticle article object
      *
      * @return double | false
+     * @throws ObjectException
      */
     public function getArticleUserVat(Article $oArticle)
     {

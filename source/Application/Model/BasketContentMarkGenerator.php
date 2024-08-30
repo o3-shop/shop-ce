@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
+
 /**
  * Class oxBasketContentMarkGenerator which forms explanation marks.
  */
@@ -61,6 +65,9 @@ class BasketContentMarkGenerator
      * @param string $sMarkIdentification Mark identification.
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function getMark($sMarkIdentification)
     {
@@ -89,6 +96,9 @@ class BasketContentMarkGenerator
      * @param string $sCurrentMark Current mark.
      *
      * @return array
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     private function _formMarks($sCurrentMark) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {

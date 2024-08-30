@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -152,6 +153,7 @@ class VoucherSerie extends BaseModel
      * Returns array of vouchers counts.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function countVouchers()
     {

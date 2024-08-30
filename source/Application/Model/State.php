@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 
 /**
@@ -48,10 +49,11 @@ class State extends MultiLanguageModel
     /**
      * Returns country id by code
      *
-     * @param string $sCode      country code
+     * @param string $sCode country code
      * @param string $sCountryId country id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByCode($sCode, $sCountryId)
     {
@@ -72,6 +74,7 @@ class State extends MultiLanguageModel
      * @param integer|string $iStateId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTitleById($iStateId)
     {

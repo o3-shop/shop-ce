@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
@@ -74,9 +76,11 @@ class Attribute extends MultiLanguageModel
     /**
      * Removes attributes from articles, returns true on success.
      *
-     * @param string $sOXID Object ID
+     * @param null $sOXID Object ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -108,7 +112,8 @@ class Attribute extends MultiLanguageModel
      * Assigns attribute to variant
      *
      * @param array $aMDVariants article ids with selectionlist values
-     * @param array $aSelTitle   selection list titles
+     * @param array $aSelTitle selection list titles
+     * @throws \Exception
      */
     public function assignVarToAttribute($aMDVariants, $aSelTitle)
     {
@@ -152,6 +157,7 @@ class Attribute extends MultiLanguageModel
      * @param string $sSelTitle selection list title
      *
      * @return mixed attribute id or false
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAttrId" in next major
      */
     protected function _getAttrId($sSelTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -170,6 +176,7 @@ class Attribute extends MultiLanguageModel
      * @param array $aSelTitle selection list title
      *
      * @return string attribute id
+     * @throws \Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "createAttribute" in next major
      */
     protected function _createAttribute($aSelTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -194,6 +201,8 @@ class Attribute extends MultiLanguageModel
      * @param string $sArtId article ids
      *
      * @return null;
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributeAssigns($sArtId)
     {

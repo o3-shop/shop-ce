@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 
 /**
@@ -50,9 +52,11 @@ class Groups extends MultiLanguageModel
     /**
      * Deletes user group from database. Returns true/false, according to deleting status.
      *
-     * @param string $sOXID Object ID (default null)
+     * @param null $sOXID Object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {

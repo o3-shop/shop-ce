@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -90,10 +91,11 @@ class DeliverySetList extends ListModel
      * assigned users, countries or user groups. Performs
      * additional filtering according to these parameters
      *
-     * @param User $oUser      user object
-     * @param string                                   $sCountryId user country id
+     * @param null $oUser user object
+     * @param null $sCountryId user country id
      *
-     * @return array
+     * @return DeliverySetList
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActiveDeliverySetList" in next major
      */
     protected function _getList($oUser = null, $sCountryId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -132,10 +134,11 @@ class DeliverySetList extends ListModel
     /**
      * Creates delivery set list filter SQL to load current state delivery set list
      *
-     * @param User $oUser      user object
-     * @param string                                   $sCountryId user country id
+     * @param User $oUser user object
+     * @param string $sCountryId user country id
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($oUser, $sCountryId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -195,11 +198,12 @@ class DeliverySetList extends ListModel
     /**
      * Creates current state delivery set list
      *
-     * @param User $oUser      user object
-     * @param string                                   $sCountryId user country id
-     * @param string                                   $sDelSet    preferred delivery set ID (optional)
+     * @param User $oUser user object
+     * @param string $sCountryId user country id
+     * @param null $sDelSet preferred delivery set ID (optional)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDeliverySetList($oUser, $sCountryId, $sDelSet = null)
     {
@@ -226,11 +230,12 @@ class DeliverySetList extends ListModel
      *   2. active ship set id (string)
      *   3. payment list for active ship set (array)
      *
-     * @param string                                   $sShipSet current ship set id (can be null if not set yet)
-     * @param User $oUser    active user
-     * @param double                                   $oBasket  basket object
+     * @param string $sShipSet current ship set id (can be null if not set yet)
+     * @param User $oUser active user
+     * @param double $oBasket basket object
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDeliverySetData($sShipSet, $oUser, $oBasket)
     {
@@ -317,7 +322,8 @@ class DeliverySetList extends ListModel
      * Loads delivery set mapped to a
      * predefined GoodRelations delivery method.
      *
-     * @param string $sDelId delivery set id
+     * @param null $sDelId delivery set id
+     * @throws DatabaseConnectionException
      */
     public function loadRDFaDeliverySetList($sDelId = null)
     {

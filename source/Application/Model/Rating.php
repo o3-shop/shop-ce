@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeInterface;
@@ -59,11 +61,13 @@ class Rating extends BaseModel
     /**
      * Checks if user can rate product.
      *
-     * @param string $sUserId   user id
-     * @param string $sType     object type
+     * @param string $sUserId user id
+     * @param string $sType object type
      * @param string $sObjectId object id
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function allowRating($sUserId, $sType, $sObjectId)
     {
@@ -97,11 +101,12 @@ class Rating extends BaseModel
     /**
      * calculates and return objects rating
      *
-     * @param string $sObjectId           object id
-     * @param string $sType               object type
-     * @param array  $aIncludedObjectsIds array of ids
+     * @param string $sObjectId object id
+     * @param string $sType object type
+     * @param null $aIncludedObjectsIds array of ids
      *
      * @return float
+     * @throws DatabaseConnectionException
      */
     public function getRatingAverage($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
@@ -135,11 +140,12 @@ class Rating extends BaseModel
     /**
      * calculates and return objects rating count
      *
-     * @param string $sObjectId           object id
-     * @param string $sType               object type
-     * @param array  $aIncludedObjectsIds array of ids
+     * @param string $sObjectId object id
+     * @param string $sType object type
+     * @param null $aIncludedObjectsIds array of ids
      *
-     * @return integer
+     * @return false|string
+     * @throws DatabaseConnectionException
      */
     public function getRatingCount($sObjectId, $sType, $aIncludedObjectsIds = null)
     {

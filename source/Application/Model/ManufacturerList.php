@@ -24,7 +24,6 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use stdClass;
 
 /**
  * Manufacturer list manager.
@@ -36,7 +35,7 @@ class ManufacturerList extends ListModel
     /**
      * Manufacturer root.
      *
-     * @var stdClass
+     * @var Manufacturer
      */
     protected $_oRoot = null;
 

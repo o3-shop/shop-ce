@@ -21,10 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
+use oxObjectException;
 
 /**
  * Newsletter Subscriptions manager
@@ -91,6 +95,7 @@ class NewsSubscribed extends BaseModel
      * @param string $sEmailAddress subscribers email address
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function loadFromEmail($sEmailAddress)
     {
@@ -104,6 +109,7 @@ class NewsSubscribed extends BaseModel
      * @param string $email
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function getSubscribedUserIdByEmail($email)
     {
@@ -124,6 +130,7 @@ class NewsSubscribed extends BaseModel
      * @param string $sOxUserId subscribers oxid
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function loadFromUserId($sOxUserId)
     {
@@ -142,7 +149,7 @@ class NewsSubscribed extends BaseModel
     /**
      * Inserts nbews object data to DB. Returns true on success.
      *
-     * @return mixed oxid on success or false on failure
+     * @return bool oxid on success or false on failure
      * @deprecated underscore prefix violates PSR12, will be renamed to "insert" in next major
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -156,7 +163,9 @@ class NewsSubscribed extends BaseModel
     /**
      * We need to check if we unsubscribe here
      *
-     * @return mixed oxid on success or false on failure
+     * @return bool oxid on success or false on failure
+     * @throws DatabaseException
+     * @throws oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -193,6 +202,7 @@ class NewsSubscribed extends BaseModel
      * Newsletter subscription status setter
      *
      * @param int $iStatus subscription status
+     * @throws Exception
      */
     public function setOptInStatus($iStatus)
     {
@@ -214,6 +224,7 @@ class NewsSubscribed extends BaseModel
      * Newsletter subscription email sending status setter
      *
      * @param int $iStatus subscription status
+     * @throws Exception
      */
     public function setOptInEmailStatus($iStatus)
     {
@@ -242,6 +253,7 @@ class NewsSubscribed extends BaseModel
      * @param User $oUser subscription user object
      *
      * @return bool
+     * @throws Exception
      */
     public function updateSubscription($oUser)
     {

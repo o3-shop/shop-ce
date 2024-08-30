@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -46,6 +48,8 @@ class AttributeList extends ListModel
      * @param array $aIds article id's
      *
      * @return array $aAttributes;
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAttributesByIds($aIds)
     {
@@ -72,6 +76,8 @@ class AttributeList extends ListModel
      * @param string $sSelect SQL select
      *
      * @return array $aAttributes
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createAttributeListFromSql" in next major
      */
     protected function _createAttributeListFromSql($sSelect) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -100,7 +106,9 @@ class AttributeList extends ListModel
      * Load attributes by article Id
      *
      * @param string $sArticleId article id
-     * @param string $sParentId  article parent id
+     * @param null $sParentId article parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAttributes($sArticleId, $sParentId = null)
     {
@@ -133,8 +141,10 @@ class AttributeList extends ListModel
     /**
      * Load displayable in baskte/order attributes by article Id
      *
-     * @param string $sArtId    article ids
-     * @param string $sParentId parent id
+     * @param string $sArtId article ids
+     * @param null $sParentId parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAttributesDisplayableInBasket($sArtId, $sParentId = null)
     {
@@ -167,10 +177,12 @@ class AttributeList extends ListModel
     /**
      * get category attributes by category Id
      *
-     * @param string  $sCategoryId category Id
-     * @param integer $iLang       language No
+     * @param string $sCategoryId category Id
+     * @param integer $iLang language No
      *
      * @return object;
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryAttributes($sCategoryId, $iLang)
     {

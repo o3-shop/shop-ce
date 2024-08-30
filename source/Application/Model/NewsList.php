@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
@@ -85,6 +86,7 @@ class NewsList extends ListModel
      * Returns count of all entries.
      *
      * @return integer $iRecCnt
+     * @throws DatabaseConnectionException
      */
     public function getCount()
     {

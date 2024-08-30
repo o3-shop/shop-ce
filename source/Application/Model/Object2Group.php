@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
 use OxidEsales\Eshop\Core\Field;
@@ -54,9 +55,8 @@ class Object2Group extends BaseModel
      * The table oxobject2group has an UNIQUE index on (OXGROUPSID, OXOBJECTID, OXSHOPID)
      * which ensures that a relationship would not be duplicated.
      *
-     * @throws DatabaseErrorException
-     *
      * @return bool
+     * @throws Exception
      */
     public function save()
     {

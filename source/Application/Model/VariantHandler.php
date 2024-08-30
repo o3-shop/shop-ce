@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -49,7 +51,7 @@ class VariantHandler extends Base
     /**
      * Multidimensional variant tree structure
      *
-     * @var OxMdVariant
+     * @var MdVariant
      */
     protected $_oMdVariants = null;
 
@@ -69,7 +71,7 @@ class VariantHandler extends Base
      * @param object $oVariants all article variants
      * @param string $sParentId parent article id
      *
-     * @return oxMdVariant
+     * @return MdVariant
      */
     public function buildMdVariants($oVariants, $sParentId)
     {
@@ -95,8 +97,10 @@ class VariantHandler extends Base
     /**
      * Generate variants from selection lists
      *
-     * @param array  $aSels    ids of selection list
+     * @param array $aSels ids of selection list
      * @param object $oArticle parent article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function genVariantFromSell($aSels, $oArticle)
     {
@@ -138,12 +142,14 @@ class VariantHandler extends Base
     /**
      * Assigns values of selection list to variants
      *
-     * @param array  $aValues        multilang values of selection list
-     * @param object $oVariants      variant list
-     * @param object $oArticle       parent article
-     * @param array  $aConfLanguages array of all active languages
+     * @param array $aValues multilang values of selection list
+     * @param object $oVariants variant list
+     * @param object $oArticle parent article
+     * @param array $aConfLanguages array of all active languages
      *
-     * @return mixed
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignValues" in next major
      */
     protected function _assignValues($aValues, $oVariants, $oArticle, $aConfLanguages) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -286,7 +292,9 @@ class VariantHandler extends Base
      * Inserts article variant name for all languages
      *
      * @param string $sUpdate query for update variant name
-     * @param string $sArtId  parent article id
+     * @param string $sArtId parent article id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateArticleVarName" in next major
      */
     protected function _updateArticleVarName($sUpdate, $sArtId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -480,7 +488,7 @@ class VariantHandler extends Base
      * @param string                                          $sActVariantId active variant id
      * @param int                                             $iLimit        limit variant lists count (if non zero, return limited number of multidimensional variant selections)
      *
-     * @return Ambigous false | array
+     * @return false | array
      */
     public function buildVariantSelections($sVarName, $oVariantList, $aFilter, $sActVariantId, $iLimit = 0)
     {
