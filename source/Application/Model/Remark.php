@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Remark manager.
  *
  */
-class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Remark extends BaseModel
 {
     /**
      * Current class name
@@ -64,7 +66,7 @@ class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
         if ($blRet = parent::load($oxID)) {
             // convert date's to international format
             $this->assign([
-                'oxcreate'    => \OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBDate($this->oxremark__oxcreate->value)
+                'oxcreate'    => Registry::getUtilsDate()->formatDBDate($this->oxremark__oxcreate->value)
             ]);
         }
 
@@ -80,9 +82,9 @@ class Remark extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // set oxcreate
-        $sNow = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-        $this->oxremark__oxcreate = new \OxidEsales\Eshop\Core\Field($sNow, \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxremark__oxheader = new \OxidEsales\Eshop\Core\Field($sNow, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $sNow = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+        $this->oxremark__oxcreate = new Field($sNow, Field::T_RAW);
+        $this->oxremark__oxheader = new Field($sNow, Field::T_RAW);
 
         return parent::_insert();
     }

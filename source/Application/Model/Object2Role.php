@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 
-class Object2Role extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Object2Role extends BaseModel
 {
     /** @var boolean Load the relation even if from other shop */
     protected $_blDisableShopCheck = true;
@@ -59,8 +59,8 @@ class Object2Role extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         try {
             return parent::save();
-        } catch (\OxidEsales\Eshop\Core\Exception\DatabaseErrorException $exception) {
-            if ($exception->getCode() !== \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database::DUPLICATE_KEY_ERROR_CODE) {
+        } catch (DatabaseErrorException $exception) {
+            if ($exception->getCode() !== Database::DUPLICATE_KEY_ERROR_CODE) {
                 throw $exception;
             }
         }

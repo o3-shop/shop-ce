@@ -21,20 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
+use stdClass;
 
 /**
  * Vendor list manager.
  * Collects list of vendors according to collection rules (activ, etc.).
  *
  */
-class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
+class VendorList extends ListModel
 {
     /**
      * Vendor root.
      *
-     * @var \stdClass
+     * @var stdClass
      */
     protected $_oRoot = null;
 
@@ -55,7 +57,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Active vendor object
      *
-     * @var \OxidEsales\Eshop\Application\Model\Vendor
+     * @var Vendor
      */
     protected $_oClickedVendor = null;
 
@@ -115,7 +117,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
 
 
         //Create fake vendor root category
-        $this->_oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $this->_oRoot = oxNew(Vendor::class);
         $this->_oRoot->load('root');
 
         //category fields
@@ -140,7 +142,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Root vendor list node (which usually is a manually prefilled object) getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\Vendor
+     * @return Vendor
      */
     public function getRootCat()
     {
@@ -165,7 +167,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected function _addCategoryFields($oVendor) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oVendor->oxcategories__oxid = new \OxidEsales\Eshop\Core\Field("v_" . $oVendor->oxvendor__oxid->value);
+        $oVendor->oxcategories__oxid = new Field("v_" . $oVendor->oxvendor__oxid->value);
         $oVendor->oxcategories__oxicon = $oVendor->oxvendor__oxicon;
         $oVendor->oxcategories__oxtitle = $oVendor->oxvendor__oxtitle;
         $oVendor->oxcategories__oxdesc = $oVendor->oxvendor__oxshortdesc;
@@ -177,7 +179,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Sets active (open) vendor object
      *
-     * @param \OxidEsales\Eshop\Application\Model\Vendor $oVendor active vendor
+     * @param Vendor $oVendor active vendor
      */
     public function setClickVendor($oVendor)
     {
@@ -187,7 +189,7 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * returns active (open) vendor object
      *
-     * @return \OxidEsales\Eshop\Application\Model\Vendor
+     * @return Vendor
      */
     public function getClickVendor()
     {
@@ -201,8 +203,8 @@ class VendorList extends \OxidEsales\Eshop\Core\Model\ListModel
     protected function _seoSetVendorData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // only when SEO id on and in front end
-        if (\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && !$this->isAdmin()) {
-            $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class);
+        if (Registry::getUtils()->seoIsActive() && !$this->isAdmin()) {
+            $oEncoder = Registry::get(SeoEncoderVendor::class);
 
             // preparing root vendor category
             if ($this->_oRoot) {

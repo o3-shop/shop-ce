@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 
@@ -29,7 +33,7 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingB
  * Performs loading, updating, inserting of article review.
  *
  */
-class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Review extends BaseModel
 {
 
     /**
@@ -67,7 +71,7 @@ class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
         $blRet = parent::assign($dbRecord);
 
         if (isset($this->oxreviews__oxuserid) && $this->oxreviews__oxuserid->value) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $params = [
                 ':oxid' => $this->oxreviews__oxuserid->value
             ];
@@ -75,7 +79,7 @@ class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
             $firstName = $oDb->getOne("SELECT oxfname FROM oxuser 
                 WHERE oxid = :oxid", $params);
 
-            $this->oxuser__oxfname = new \OxidEsales\Eshop\Core\Field($firstName);
+            $this->oxuser__oxfname = new Field($firstName);
         }
 
         return $blRet;
@@ -92,7 +96,8 @@ class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         if ($blRet = parent::load($oxId)) {
             // convert date's to international format
-            $this->oxreviews__oxcreate->setValue(\OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBDate($this->oxreviews__oxcreate->value));
+            $this->oxreviews__oxcreate->setValue(
+                Registry::getUtilsDate()->formatDBDate($this->oxreviews__oxcreate->value));
         }
 
         return $blRet;
@@ -107,7 +112,7 @@ class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // set oxcreate
-        $this->oxreviews__oxcreate = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
+        $this->oxreviews__oxcreate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
 
         return parent::_insert();
     }
@@ -120,20 +125,20 @@ class Review extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param boolean $blLoadEmpty true if want to load empty text reviews
      * @param int     $iLoadInLang language to select for loading
      *
-     * @return oxList
+     * @return ListModel
      */
     public function loadList($sType, $aIds, $blLoadEmpty = false, $iLoadInLang = null)
     {
-        $oRevs = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oRevs = oxNew(ListModel::class);
         $oRevs->init('oxreview');
 
         $params = [
             ':oxtype' => $sType,
-            ':oxlang' => is_null($iLoadInLang) ? (int) \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang
+            ':oxlang' => is_null($iLoadInLang) ? (int) Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang
         ];
 
         if (is_array($aIds) && count($aIds)) {
-            $sObjectIdWhere = "oxreviews.oxobjectid in ( " . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . " )";
+            $sObjectIdWhere = "oxreviews.oxobjectid in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aIds)) . " )";
         } elseif (is_string($aIds) && $aIds) {
             $sObjectIdWhere = "oxreviews.oxobjectid = :oxobjectid";
             $params[':oxobjectid'] = $aIds;

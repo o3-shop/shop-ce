@@ -20,6 +20,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OxidEsales\EshopCommunity\Core\Model\ListModel;
 use OxidEsales\EshopCommunity\Core\Registry;
@@ -63,7 +64,7 @@ class RightsRolesElementsList extends ListModel
         $queryBuilder = $this->getQueryBuilder();
         $queryBuilder->select('DISTINCT(re.elementid) as elementid', 'MAX(re.TYPE) as type')
             ->from(
-                (oxNew(\OxidEsales\Eshop\Application\Model\RightsRoles::class)->getViewName()),
+                (oxNew(RightsRoles::class)->getViewName()),
                 'rr'
             )
             ->leftJoin(
@@ -117,7 +118,7 @@ class RightsRolesElementsList extends ListModel
 
     /**
      * @return array
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getRestrictedViewElements(): array
     {

@@ -21,11 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Contract\ISelectList;
+
 /**
  * Variant selection lists manager class
  *
  */
-class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
+class VariantSelectList implements ISelectList
 {
     /**
      * Variant selection list label
@@ -51,7 +53,7 @@ class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
     /**
      * Active variant selection object
      *
-     * @var oxSelection
+     * @var Selection
      */
     protected $_oActiveSelection = null;
 
@@ -94,7 +96,7 @@ class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
 
             // creating new
             if (!isset($this->_aList[$sKey])) {
-                $this->_aList[$sKey] = oxNew(\OxidEsales\Eshop\Application\Model\Selection::class, $sName, $sValue, $blDisabled, $blActive);
+                $this->_aList[$sKey] = oxNew(Selection::class, $sName, $sValue, $blDisabled, $blActive);
             } else {
                 // overriding states
                 if ($this->_aList[$sKey]->isDisabled() && !$blDisabled) {
@@ -116,7 +118,7 @@ class VariantSelectList implements \OxidEsales\Eshop\Core\Contract\ISelectList
     /**
      * Returns active selection object
      *
-     * @return oxSelection
+     * @return Selection
      */
     public function getActiveSelection()
     {

@@ -21,16 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
-use oxDb;
 use oxException;
 
 /**
  * Article files manager.
  *
  */
-class File extends \OxidEsales\Eshop\Core\Model\BaseModel
+class File extends BaseModel
 {
     /**
      * No active user exception code.
@@ -112,11 +114,11 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
         $this->_checkArticleFile($aFileInfo);
 
         $sFileHash = $this->_getFileHash($aFileInfo['tmp_name']);
-        $this->oxfiles__oxstorehash = new \OxidEsales\Eshop\Core\Field($sFileHash, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxfiles__oxstorehash = new Field($sFileHash, Field::T_RAW);
         $sUploadTo = $this->getStoreLocation();
 
         if (!$this->_uploadFile($aFileInfo['tmp_name'], $sUploadTo)) {
-            throw new \OxidEsales\Eshop\Core\Exception\StandardException('EXCEPTION_COULDNOTWRITETOFILE');
+            throw new StandardException('EXCEPTION_COULDNOTWRITETOFILE');
         }
     }
 
@@ -132,12 +134,12 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         //checking params
         if (!isset($aFileInfo['name']) || !isset($aFileInfo['tmp_name'])) {
-            throw new \OxidEsales\Eshop\Core\Exception\StandardException('EXCEPTION_NOFILE');
+            throw new StandardException('EXCEPTION_NOFILE');
         }
 
         // error uploading file ?
         if (isset($aFileInfo['error']) && $aFileInfo['error']) {
-            throw new \OxidEsales\Eshop\Core\Exception\StandardException('EXCEPTION_FILEUPLOADERROR_' . ((int) $aFileInfo['error']));
+            throw new StandardException('EXCEPTION_FILEUPLOADERROR_' . ((int) $aFileInfo['error']));
         }
     }
 
@@ -149,7 +151,7 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _getBaseDownloadDirPath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sConfigValue = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sDownloadsDir');
+        $sConfigValue = Registry::getConfig()->getConfigParam('sDownloadsDir');
 
         //Unix full path is set
         if ($sConfigValue && $sConfigValue[0] == DIRECTORY_SEPARATOR) {
@@ -337,7 +339,7 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
         if (!$this->isUploaded()) {
             return false;
         }
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $iCount = $oDb->getOne(
             'SELECT COUNT(*) FROM `oxfiles` WHERE `OXSTOREHASH` = :oxstorehash',
             [
@@ -367,12 +369,12 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function download()
     {
-        $oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $oUtils = Registry::getUtils();
         $sFileName = $this->_getFilenameForUrl();
         $sFileLocations = $this->getStoreLocation();
 
         if (!$this->exist() || !$this->isUnderDownloadFolder()) {
-            throw new \OxidEsales\Eshop\Core\Exception\StandardException('EXCEPTION_NOFILE');
+            throw new StandardException('EXCEPTION_NOFILE');
         }
 
         $oUtils->setHeader("Pragma: public");
@@ -407,7 +409,7 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
         if ($this->_blHasValidDownloads == null) {
             $this->_blHasValidDownloads = false;
 
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
 
             $sSql = "SELECT
                         `oxorderfiles`.`oxid`
@@ -421,7 +423,7 @@ class File extends \OxidEsales\Eshop\Core\Model\BaseModel
                         AND `oxorderarticles`.`oxstorno` = 0";
             $params = [
                 ':oxfileid' => $this->getId(),
-                ':oxvaliduntil' => date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime())
+                ':oxvaliduntil' => date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime())
             ];
 
             if ($oDb->getOne($sSql, $params)) {

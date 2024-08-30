@@ -21,12 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 
 /**
  * State handler
  */
-class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class State extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -54,7 +55,7 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getIdByCode($sCode, $sCountryId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $params = [
             ':oxisoalpha2' => $sCode,
             ':oxcountryid' => $sCountryId
@@ -74,7 +75,7 @@ class State extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getTitleById($iStateId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sQ = "SELECT oxtitle FROM " . getViewName("oxstates") . " 
             WHERE oxid = :oxid";
 

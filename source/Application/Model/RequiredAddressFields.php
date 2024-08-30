@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Defines and returns delivery and billing required fields.
  */
@@ -55,7 +57,7 @@ class RequiredAddressFields
     {
         $this->setRequiredFields($this->_aDefaultRequiredFields);
 
-        $aRequiredFields = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aMustFillFields');
+        $aRequiredFields = Registry::getConfig()->getConfigParam('aMustFillFields');
         if (is_array($aRequiredFields)) {
             $this->setRequiredFields($aRequiredFields);
         }

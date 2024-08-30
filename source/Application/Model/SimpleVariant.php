@@ -21,14 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
-use oxPrice;
 
 /**
  * Lightweight variant handler. Implemnets only absolutely needed oxArticle methods.
  *
  */
-class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class SimpleVariant extends MultiLanguageModel implements IUrl
 {
     /**
      * Use lazy loading for this item
@@ -40,14 +42,14 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Variant price
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oPrice = null;
 
     /**
      * Parent article
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oParent = null;
 
@@ -75,7 +77,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * user object
      *
-     * @var oxUser
+     * @var User
      */
     protected $_oUser = null;
 
@@ -104,7 +106,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Returns article user
      *
-     * @return oxUser
+     * @return User
      */
     public function getArticleUser()
     {
@@ -145,7 +147,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Implementing (faking) performance friendly method from oxArticle
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getPrice()
     {
@@ -156,7 +158,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
         }
 
         if ($this->_oPrice === null) {
-            $this->_oPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+            $this->_oPrice = oxNew(Price::class);
             if (($dPrice = $this->_getGroupPrice())) {
                 $dPrice = $this->modifyGroupPrice($dPrice);
                 $this->_oPrice->setPrice($dPrice, $this->_dVat);
@@ -187,11 +189,11 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Applies currency factor
      *
-     * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
+     * @param Price $oPrice Price object
      * @param object                       $oCur   Currency object
      * @deprecated underscore prefix violates PSR12, will be renamed to "applyCurrency" in next major
      */
-    protected function _applyCurrency(\OxidEsales\Eshop\Core\Price $oPrice, $oCur = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _applyCurrency(Price $oPrice, $oCur = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$oCur) {
             $oCur = Registry::getConfig()->getActShopCurrencyObject();
@@ -203,7 +205,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Applies discounts which should be applied in general case (for 0 amount)
      *
-     * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
+     * @param Price $oPrice Price object
      * @deprecated underscore prefix violates PSR12, will be renamed to "applyParentDiscounts" in next major
      */
     protected function _applyParentDiscounts($oPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -216,7 +218,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * apply parent article VAT to given price
      *
-     * @param \OxidEsales\Eshop\Core\Price $oPrice price object
+     * @param Price $oPrice price object
      * @deprecated underscore prefix violates PSR12, will be renamed to "applyParentVat" in next major
      */
     protected function _applyParentVat($oPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -245,7 +247,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     {
         $sPrice = null;
         if (($oPrice = $this->getPrice())) {
-            $sPrice = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getBruttoPrice());
+            $sPrice = Registry::getLang()->formatCurrency($oPrice->getBruttoPrice());
         }
 
         return $sPrice;
@@ -254,7 +256,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Sets parent article
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oParent Parent article
+     * @param Article $oParent Parent article
      */
     public function setParent($oParent)
     {
@@ -264,7 +266,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     /**
      * Parent article getter.
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     public function getParent()
     {
@@ -334,7 +336,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
         // possible required linktype for articles doesn't exist
         $iLinkType = null;
         if (!isset($this->_aBaseStdUrls[$iLang][$iLinkType])) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->setId($this->getId());
             $oArticle->setLinkType($iLinkType);
             $this->_aBaseStdUrls[$iLang][$iLinkType] = $oArticle->getBaseStdLink($iLang, $blAddId, $blFull);
@@ -359,7 +361,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
 
         $iLinkType = $this->getLinkType();
         if (!isset($this->_aStdUrls[$iLang][$iLinkType])) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->setId($this->getId());
             $oArticle->setLinkType($iLinkType);
             $this->_aStdUrls[$iLang][$iLinkType] = $oArticle->getStdLink($iLang, $aParams);
@@ -379,7 +381,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
     {
         // possible required linktype for articles doesn't exist
         $iLinkType = null;
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class)->getArticleUrl($this, $iLang, $iLinkType);
+        return Registry::get(SeoEncoderArticle::class)->getArticleUrl($this, $iLang, $iLinkType);
     }
 
     /**
@@ -395,7 +397,7 @@ class SimpleVariant extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impl
             $iLang = (int) $this->getLanguage();
         }
 
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
+        if (!Registry::getUtils()->seoIsActive()) {
             return $this->getStdLink($iLang);
         }
 

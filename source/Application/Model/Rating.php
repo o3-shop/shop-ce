@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeInterface;
 
@@ -29,7 +31,7 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeI
  * Performs loading, updating, inserting of article rates.
  *
  */
-class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Rating extends BaseModel
 {
     /**
      * Shop control variable
@@ -65,11 +67,11 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function allowRating($sUserId, $sType, $sObjectId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $myConfig = Registry::getConfig();
 
         if ($iRatingLogsTimeout = $myConfig->getConfigParam('iRatingLogsTimeout')) {
-            $sExpDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() - $iRatingLogsTimeout * 24 * 60 * 60);
+            $sExpDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() - $iRatingLogsTimeout * 24 * 60 * 60);
             $oDb->execute("delete from oxratings where oxtimestamp < :expDate", [
                 ':expDate' => $sExpDate
             ]);
@@ -122,7 +124,7 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
             ':oxtype' => $sType
         ];
 
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $database = DatabaseProvider::getMaster();
         if ($fRating = $database->getOne($sSelect, $params)) {
             $fRating = round($fRating, 1);
         }
@@ -156,7 +158,7 @@ class Rating extends \OxidEsales\Eshop\Core\Model\BaseModel
             LIMIT 1";
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $masterDb = DatabaseProvider::getMaster();
         $iCount = $masterDb->getOne($sSelect, [
             ':oxobjectid' => $sObjectId,
             ':oxtype' => $sType

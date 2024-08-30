@@ -21,9 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
-use oxField;
 
 /**
  * Newsletter Subscriptions manager
@@ -31,7 +32,7 @@ use oxField;
  * information, deletion and other.
  *
  */
-class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
+class NewsSubscribed extends BaseModel
 {
     /**
      * Subscription marker
@@ -106,7 +107,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function getSubscribedUserIdByEmail($email)
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $params = [
             ':oxemail' => (string) $email
         ];
@@ -126,7 +127,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function loadFromUserId($sOxUserId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $params = [
             ':oxuserid' => $sOxUserId,
             ':oxshopid' => Registry::getConfig()->getShopId()
@@ -147,7 +148,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // set subscription date
-        $this->oxnewssubscribed__oxsubscribed = new \OxidEsales\Eshop\Core\Field(date('Y-m-d H:i:s'), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxnewssubscribed__oxsubscribed = new Field(date('Y-m-d H:i:s'), Field::T_RAW);
 
         return parent::_insert();
     }
@@ -195,7 +196,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function setOptInStatus($iStatus)
     {
-        $this->oxnewssubscribed__oxdboptin = new \OxidEsales\Eshop\Core\Field($iStatus, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxnewssubscribed__oxdboptin = new Field($iStatus, Field::T_RAW);
         $this->save();
     }
 
@@ -216,7 +217,7 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function setOptInEmailStatus($iStatus)
     {
-        $this->oxnewssubscribed__oxemailfailed = new \OxidEsales\Eshop\Core\Field($iStatus, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxnewssubscribed__oxemailfailed = new Field($iStatus, Field::T_RAW);
         $this->save();
     }
 
@@ -235,10 +236,10 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
     }
 
     /**
-     * This method is called from \OxidEsales\Eshop\Application\Model\User::update. Currently it updates user
+     * This method is called from User::update. Currently it updates user
      * information kept in db
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser subscription user object
+     * @param User $oUser subscription user object
      *
      * @return bool
      */
@@ -246,13 +247,13 @@ class NewsSubscribed extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         // user email changed ?
         if ($oUser->oxuser__oxusername->value && $this->oxnewssubscribed__oxemail->value != $oUser->oxuser__oxusername->value) {
-            $this->oxnewssubscribed__oxemail = new \OxidEsales\Eshop\Core\Field($oUser->oxuser__oxusername->value, \OxidEsales\Eshop\Core\Field::T_RAW);
+            $this->oxnewssubscribed__oxemail = new Field($oUser->oxuser__oxusername->value, Field::T_RAW);
         }
 
         // updating some other fields
-        $this->oxnewssubscribed__oxsal = new \OxidEsales\Eshop\Core\Field($oUser->oxuser__oxsal->value, \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxnewssubscribed__oxfname = new \OxidEsales\Eshop\Core\Field($oUser->oxuser__oxfname->value, \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxnewssubscribed__oxlname = new \OxidEsales\Eshop\Core\Field($oUser->oxuser__oxlname->value, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxnewssubscribed__oxsal = new Field($oUser->oxuser__oxsal->value, Field::T_RAW);
+        $this->oxnewssubscribed__oxfname = new Field($oUser->oxuser__oxfname->value, Field::T_RAW);
+        $this->oxnewssubscribed__oxlname = new Field($oUser->oxuser__oxlname->value, Field::T_RAW);
 
         return (bool) $this->save();
     }

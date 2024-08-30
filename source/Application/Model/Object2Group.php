@@ -21,15 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Manages object (users, discounts, deliveries...) assignment to groups.
  */
-class Object2Group extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Object2Group extends BaseModel
 {
     /** @var boolean Load the relation even if from other shop */
     protected $_blDisableShopCheck = true;
@@ -44,7 +45,7 @@ class Object2Group extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         parent::__construct();
         $this->init('oxobject2group');
-        $this->oxobject2group__oxshopid = new \OxidEsales\Eshop\Core\Field(Registry::getConfig()->getShopId(), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxobject2group__oxshopid = new Field(Registry::getConfig()->getShopId(), Field::T_RAW);
     }
 
     /**
@@ -61,8 +62,8 @@ class Object2Group extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         try {
             return parent::save();
-        } catch (\OxidEsales\Eshop\Core\Exception\DatabaseErrorException $exception) {
-            if ($exception->getCode() !== \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database::DUPLICATE_KEY_ERROR_CODE) {
+        } catch (DatabaseErrorException $exception) {
+            if ($exception->getCode() !== Database::DUPLICATE_KEY_ERROR_CODE) {
                 throw $exception;
             }
         }

@@ -21,9 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -33,7 +38,7 @@ use OxidEsales\Eshop\Core\Registry;
  * deletes and etc.
  *
  */
-class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Newsletter extends BaseModel
 {
     /**
      * Newsletter HTML format text (default null).
@@ -99,7 +104,7 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
         $blDeleted = parent::delete($sOxId);
 
         if ($blDeleted) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $sDelete = "delete from oxobject2group where oxobject2group.oxshopid = :oxshopid and oxobject2group.oxobjectid = :oxobjectid";
             $oDb->execute($sDelete, [
                 ':oxshopid' => $this->getShopId(),
@@ -122,7 +127,7 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
         }
 
         // usergroups
-        $this->_oGroups = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class, "oxgroups");
+        $this->_oGroups = oxNew(ListModel::class, "oxgroups");
         $sViewName = getViewName("oxgroups");
 
         // performance
@@ -186,7 +191,7 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function send()
     {
-        $oxEMail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oxEMail = oxNew(Email::class);
         $blSend = $oxEMail->sendNewsletterMail($this, $this->_oUser, $this->oxnewsletter__oxsubject->value);
 
         return $blSend;
@@ -204,10 +209,10 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $myConfig = Registry::getConfig();
 
-        $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+        $oShop = oxNew(Shop::class);
         $oShop->load($myConfig->getShopId());
 
-        $oView = oxNew(\OxidEsales\Eshop\Application\Controller\FrontendController::class);
+        $oView = oxNew(FrontendController::class);
         $oShop = $oView->addGlobalParams($oShop);
 
         $oView->addTplParam('myshop', $oShop);
@@ -221,7 +226,7 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         $aInput[] = [$this->getId() . 'html', $this->oxnewsletter__oxtemplate->value];
         $aInput[] = [$this->getId() . 'plain', $this->oxnewsletter__oxplaintemplate->value];
-        $aRes = \OxidEsales\Eshop\Core\Registry::getUtilsView()->parseThroughSmarty($aInput, null, $oView, true);
+        $aRes = Registry::getUtilsView()->parseThroughSmarty($aInput, null, $oView, true);
 
         $this->_sHtmlText = $aRes[0];
         $this->_sPlainText = $aRes[1];
@@ -249,20 +254,20 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
      * Add newsletter products (#559 only if we have user we can assign this info),
      * adds products which fit to the last order of assigned user.
      *
-     * @param \OxidEsales\Eshop\Core\Controller\BaseController $oView            view object to store view data
+     * @param BaseController $oView            view object to store view data
      * @param bool                                             $blPerfLoadAktion perform option load actions
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignProducts" in next major
      */
     protected function _assignProducts($oView, $blPerfLoadAktion = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($blPerfLoadAktion) {
-            $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            $oArtList = oxNew(ArticleList::class);
             $oArtList->loadActionArticles('OXNEWSLETTER');
             $oView->addTplParam('articlelist', $oArtList);
         }
 
         if ($this->_oUser->getId()) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $sArticleTable = $oArticle->getViewName();
 
             // add products which fit to the last order of this user
@@ -295,10 +300,10 @@ class Newsletter extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @return null
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFieldData" in next major
      */
-    protected function _setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ('oxtemplate' === $sFieldName || 'oxplaintemplate' === $sFieldName) {
-            $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+            $iDataType = Field::T_RAW;
         }
 
         return parent::_setFieldData($sFieldName, $sValue, $iDataType);

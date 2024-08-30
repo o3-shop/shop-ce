@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Article file link manager.
  *
  */
-class OrderFileList extends \OxidEsales\Eshop\Core\Model\ListModel
+class OrderFileList extends ListModel
 {
     /**
      * List Object class name

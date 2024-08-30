@@ -21,14 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 
 /**
  * Article amount price list
  *
  */
-class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
+class AmountPriceList extends ListModel
 {
     /**
      * List Object class name
@@ -40,7 +41,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * oxArticle object
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oArticle = null;
 
@@ -56,7 +57,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      *  Article getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article $_oArticle
+     * @return Article $_oArticle
      */
     public function getArticle()
     {
@@ -66,7 +67,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Article setter
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article
+     * @param Article $oArticle Article
      */
     public function setArticle($oArticle)
     {
@@ -76,7 +77,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Load category list data
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article Article
+     * @param Article $article Article
      */
     public function load($article)
     {
@@ -96,7 +97,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     protected function _loadFromDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sArticleId = $this->getArticle()->getId();
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+        $db = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
         if (Registry::getConfig()->getConfigParam('blVariantInheritAmountPrice') && $this->getArticle()->getParentId()) {
             $sArticleId = $this->getArticle()->getParentId();

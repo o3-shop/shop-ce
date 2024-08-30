@@ -21,14 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
 
 /**
  * Manufacturer manager
  *
  */
-class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Manufacturer extends MultiLanguageModel implements IUrl
 {
     protected static $_aRootManufacturer = [];
 
@@ -142,10 +144,10 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
 
         // manufacturer article count is stored in cache
         if ($this->_blShowArticleCnt && !$this->isAdmin()) {
-            $this->_iNrOfArticles = \OxidEsales\Eshop\Core\Registry::getUtilsCount()->getManufacturerArticleCount($this->getId());
+            $this->_iNrOfArticles = Registry::getUtilsCount()->getManufacturerArticleCount($this->getId());
         }
 
-        $this->oxmanufacturers__oxnrofarticles = new \OxidEsales\Eshop\Core\Field($this->_iNrOfArticles, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxmanufacturers__oxnrofarticles = new Field($this->_iNrOfArticles, Field::T_RAW);
     }
 
     /**
@@ -154,7 +156,7 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
      *
      * @param string $sOxid object id
      *
-     * @return oxmanufacturer
+     * @return Manufacturer
      */
     public function load($sOxid)
     {
@@ -174,9 +176,10 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
     protected function _setRootObjectData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $this->setId('root');
-        $this->oxmanufacturers__oxicon = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxmanufacturers__oxtitle = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('BY_MANUFACTURER', $this->getLanguage(), false), \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxmanufacturers__oxshortdesc = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxmanufacturers__oxicon = new Field('', Field::T_RAW);
+        $this->oxmanufacturers__oxtitle = new Field(
+            Registry::getLang()->translateString('BY_MANUFACTURER', $this->getLanguage(), false), Field::T_RAW);
+        $this->oxmanufacturers__oxshortdesc = new Field('', Field::T_RAW);
 
         return true;
     }
@@ -191,7 +194,7 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
      */
     public function getBaseSeoLink($iLang, $iPage = 0)
     {
-        $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class);
+        $oEncoder = Registry::get(SeoEncoderManufacturer::class);
         if (!$iPage) {
             return $oEncoder->getManufacturerUrl($this, $iLang);
         }
@@ -208,7 +211,7 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
      */
     public function getLink($iLang = null)
     {
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
+        if (!Registry::getUtils()->seoIsActive()) {
             return $this->getStdLink($iLang);
         }
 
@@ -257,7 +260,7 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
             $iLang = $this->getLanguage();
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
     }
 
     /**
@@ -348,7 +351,7 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
         }
 
         if (parent::delete($oxid)) {
-            \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class)->onDeleteManufacturer($this);
+            Registry::get(SeoEncoderManufacturer::class)->onDeleteManufacturer($this);
 
             return true;
         }
@@ -370,7 +373,7 @@ class Manufacturer extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel imple
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return \OxidEsales\Eshop\Core\Registry::getPictureHandler()->getPicUrl("manufacturer/icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl("manufacturer/icon/", $sIcon, $sSize);
         }
     }
 

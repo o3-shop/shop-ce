@@ -21,9 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
-use oxField;
-use oxUtilsView;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsView;
 
 /**
  * News manager.
@@ -31,7 +33,7 @@ use oxUtilsView;
  * these user may read news), etc.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class News extends MultiLanguageModel
 {
     /**
      * User group object (default null).
@@ -67,7 +69,7 @@ class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         // convert date's to international format
         if ($this->oxnews__oxdate) {
-            $this->oxnews__oxdate->setValue(\OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value));
+            $this->oxnews__oxdate->setValue(Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value));
         }
     }
 
@@ -131,7 +133,7 @@ class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         }
 
         if ($blDelete = parent::delete($sOxid)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $oDb->execute("delete from oxobject2group where oxobject2group.oxobjectid = :oxobjectid", [
                 ':oxobjectid' => $sOxid
             ]);
@@ -146,7 +148,7 @@ class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->oxnews__oxdate->setValue(\OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value, true));
+        $this->oxnews__oxdate->setValue(Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value, true));
 
         parent::_update();
     }
@@ -159,11 +161,12 @@ class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$this->oxnews__oxdate || \OxidEsales\Eshop\Core\Registry::getUtilsDate()->isEmptyDate($this->oxnews__oxdate->value)) {
+        if (!$this->oxnews__oxdate || Registry::getUtilsDate()->isEmptyDate($this->oxnews__oxdate->value)) {
             // if date field is empty, assigning current date
-            $this->oxnews__oxdate = new \OxidEsales\Eshop\Core\Field(date('Y-m-d'));
+            $this->oxnews__oxdate = new Field(date('Y-m-d'));
         } else {
-            $this->oxnews__oxdate = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value, true));
+            $this->oxnews__oxdate = new Field(
+                Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value, true));
         }
 
         return parent::_insert();
@@ -179,12 +182,12 @@ class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @return null
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFieldData" in next major
      */
-    protected function _setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         switch (strtolower($sFieldName)) {
             case 'oxlongdesc':
             case 'oxnews__oxlongdesc':
-                $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+                $iDataType = Field::T_RAW;
                 break;
         }
         return parent::_setFieldData($sFieldName, $sValue, $iDataType);
@@ -197,8 +200,8 @@ class News extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getLongDesc()
     {
-        /** @var \OxidEsales\Eshop\Core\UtilsView $oUtilsView */
-        $oUtilsView = \OxidEsales\Eshop\Core\Registry::getUtilsView();
+        /** @var UtilsView $oUtilsView */
+        $oUtilsView = Registry::getUtilsView();
         return $oUtilsView->parseThroughSmarty($this->oxnews__oxlongdesc->getRawValue(), $this->getId() . $this->getLanguage(), null, true);
     }
 }

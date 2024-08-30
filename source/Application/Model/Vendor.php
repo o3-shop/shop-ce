@@ -21,14 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
 
 /**
  * Vendor manager
  *
  */
-class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Vendor extends MultiLanguageModel implements IUrl
 {
     protected static $_aRootVendor = [];
 
@@ -110,10 +112,10 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
 
         // vendor article count is stored in cache
         if ($this->_blShowArticleCnt && !$this->isAdmin()) {
-            $this->_iNrOfArticles = \OxidEsales\Eshop\Core\Registry::getUtilsCount()->getVendorArticleCount($this->getId());
+            $this->_iNrOfArticles = Registry::getUtilsCount()->getVendorArticleCount($this->getId());
         }
 
-        $this->oxvendor__oxnrofarticles = new \OxidEsales\Eshop\Core\Field($this->_iNrOfArticles, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxnrofarticles = new Field($this->_iNrOfArticles, Field::T_RAW);
     }
 
     /**
@@ -142,9 +144,10 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
     protected function _setRootObjectData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $this->setId('root');
-        $this->oxvendor__oxicon = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxvendor__oxtitle = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false), \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxvendor__oxshortdesc = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxicon = new Field('', Field::T_RAW);
+        $this->oxvendor__oxtitle = new Field(
+            Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false), Field::T_RAW);
+        $this->oxvendor__oxshortdesc = new Field('', Field::T_RAW);
 
         return true;
     }
@@ -159,7 +162,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      */
     public function getBaseSeoLink($iLang, $iPage = 0)
     {
-        $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class);
+        $oEncoder = Registry::get(SeoEncoderVendor::class);
         if (!$iPage) {
             return $oEncoder->getVendorUrl($this, $iLang);
         }
@@ -176,7 +179,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      */
     public function getLink($iLang = null)
     {
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
+        if (!Registry::getUtils()->seoIsActive()) {
             return $this->getStdLink($iLang);
         }
 
@@ -225,7 +228,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
             $iLang = $this->getLanguage();
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
     }
 
     /**
@@ -316,7 +319,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
         }
 
         if (parent::delete($oxid)) {
-            \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class)->onDeleteVendor($this);
+            Registry::get(SeoEncoderVendor::class)->onDeleteVendor($this);
 
             return true;
         }
@@ -339,7 +342,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return \OxidEsales\Eshop\Core\Registry::getPictureHandler()->getPicUrl("vendor/icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl("vendor/icon/", $sIcon, $sSize);
         }
     }
 

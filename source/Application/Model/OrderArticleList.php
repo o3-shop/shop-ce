@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * Order article list manager.
  *
  */
-class OrderArticleList extends \OxidEsales\Eshop\Core\Model\ListModel
+class OrderArticleList extends ListModel
 {
     /**
      * Class constructor, initiates class constructor (parent::oxbase()).

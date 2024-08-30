@@ -21,14 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 
 /**
  * Country manager
  *
  */
-class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Country extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -87,7 +89,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         $sCountryId = $this->getId();
         $sViewName = getViewName("oxstates", $this->getLanguage());
         $sQ = "select * from {$sViewName} where `oxcountryid` = :oxcountryid order by `oxtitle`  ";
-        $this->_aStates = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $this->_aStates = oxNew(ListModel::class);
         $this->_aStates->init("oxstate");
         $this->_aStates->selectString($sQ, [
             ':oxcountryid' => $sCountryId
@@ -105,7 +107,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getIdByCode($sCode)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         return $oDb->getOne("select oxid from oxcountry where oxisoalpha2 = :oxisoalpha2", [
             ':oxisoalpha2' => $sCode

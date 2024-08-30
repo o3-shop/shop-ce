@@ -21,10 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Exception\VoucherException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 use stdClass;
-use oxField;
 
 /**
  * Voucher manager.
@@ -32,7 +36,7 @@ use oxField;
  * managing functions.
  *
  */
-class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Voucher extends BaseModel
 {
     protected $_oSerie = null;
 
@@ -65,7 +69,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param array  $aVouchers          Array of available vouchers (default array())
      * @param bool   $blCheckavalability check if voucher is still reserver od not
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return mixed
      */
@@ -75,7 +79,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
         if (!empty($sVoucherNr)) {
             $sViewName = $this->getViewName();
             $sSeriesViewName = getViewName('oxvoucherseries');
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+            $oDb = DatabaseProvider::getMaster();
 
             $sQ = "select {$sViewName}.* from {$sViewName}, {$sSeriesViewName} where
                         {$sSeriesViewName}.oxid = {$sViewName}.oxvoucherserieid and
@@ -98,7 +102,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             $sQ .= " limit 1 FOR UPDATE";
 
             if (!($oRet = $this->assignRecord($sQ))) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+                $oEx = oxNew(VoucherException::class);
                 $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOVOUCHER');
                 $oEx->setVoucherNr($sVoucherNr);
                 throw $oEx;
@@ -122,7 +126,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             $this->oxvouchers__oxorderid->setValue($sOrderId);
             $this->oxvouchers__oxuserid->setValue($sUserId);
             $this->oxvouchers__oxdiscount->setValue($dDiscount);
-            $this->oxvouchers__oxdateused->setValue(date("Y-m-d", \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
+            $this->oxvouchers__oxdateused->setValue(date("Y-m-d", Registry::getUtilsDate()->getTime()));
             $this->save();
         }
     }
@@ -136,7 +140,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sVoucherID = $this->oxvouchers__oxid->value;
 
         if ($sVoucherID) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+            $oDb = DatabaseProvider::getMaster();
             $sQ = "update oxvouchers set oxreserved = :oxreserved where oxid = :oxid";
             $oDb->execute($sQ, [
                 ':oxreserved' => time(),
@@ -154,7 +158,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
         $sVoucherID = $this->oxvouchers__oxid->value;
 
         if ($sVoucherID) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $sQ = "update oxvouchers set oxreserved = 0 where oxid = :oxid";
             $oDb->execute($sQ, [':oxid' => $sVoucherID]);
         }
@@ -165,7 +169,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return double
      */
@@ -187,7 +191,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param array  $aVouchers array of vouchers
      * @param double $dPrice    current sum (price)
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return array
      */
@@ -211,7 +215,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param array  $aVouchers array of vouchers
      * @param double $dPrice    current sum (price)
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return array
      */
@@ -233,7 +237,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             return true;
         }
 
-        $exception = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+        $exception = oxNew(VoucherException::class);
         $exception->setMessage('ERROR_MESSAGE_VOUCHER_NOVOUCHER');
         $exception->setVoucherNr($this->oxvouchers__oxvouchernr->value);
         throw $exception;
@@ -244,7 +248,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice base article price
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailablePrice" in next major
@@ -254,7 +258,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
         $oSeries = $this->getSerie();
         $oCur = Registry::getConfig()->getActShopCurrencyObject();
         if ($oSeries->oxvoucherseries__oxminimumvalue->value && $dPrice < ($oSeries->oxvoucherseries__oxminimumvalue->value * $oCur->rate)) {
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+            $oEx = oxNew(VoucherException::class);
             $oEx->setMessage('ERROR_MESSAGE_VOUCHER_INCORRECTPRICE');
             $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
             throw $oEx;
@@ -269,7 +273,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param array $aVouchers array of vouchers
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return bool
      *
@@ -285,10 +289,10 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             $oSeries = $this->getSerie();
             if (!$oSeries->oxvoucherseries__oxallowsameseries->value) {
                 foreach ($aVouchers as $voucherId => $voucherNr) {
-                    $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
+                    $oVoucher = oxNew(Voucher::class);
                     $oVoucher->load($voucherId);
                     if ($this->oxvouchers__oxvoucherserieid->value == $oVoucher->oxvouchers__oxvoucherserieid->value) {
-                        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+                        $oEx = oxNew(VoucherException::class);
                         $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOTALLOWEDSAMESERIES');
                         $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
                         throw $oEx;
@@ -306,7 +310,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param array $aVouchers array of vouchers
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableWithOtherSeries" in next major
@@ -315,9 +319,9 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         if (is_array($aVouchers) && count($aVouchers)) {
             $oSeries = $this->getSerie();
-            $sIds = implode(',', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray(array_keys($aVouchers)));
+            $sIds = implode(',', DatabaseProvider::getDb()->quoteArray(array_keys($aVouchers)));
             $blAvailable = true;
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             if (!$oSeries->oxvoucherseries__oxallowotherseries->value) {
                 // just search for vouchers with different series
                 $sSql = "select 1 from oxvouchers where oxvouchers.oxid in ($sIds) and ";
@@ -335,7 +339,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
                 ]);
             }
             if (!$blAvailable) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+                $oEx = oxNew(VoucherException::class);
                 $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOTALLOWEDOTHERSERIES');
                 $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
                 throw $oEx;
@@ -348,7 +352,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Checks if voucher is in valid time period. Returns true on success.
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "isValidDate" in next major
@@ -374,7 +378,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             return true;
         }
 
-        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+        $oEx = oxNew(VoucherException::class);
         $oEx->setMessage('MESSAGE_COUPON_EXPIRED');
         if ($iFrom > $iTime && $iTo > $iTime) {
             $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOVOUCHER');
@@ -386,7 +390,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Checks if voucher is not yet reserved before.
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "isNotReserved" in next major
@@ -397,7 +401,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             return true;
         }
 
-        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+        $oEx = oxNew(VoucherException::class);
         $oEx->setMessage('EXCEPTION_VOUCHER_ISRESERVED');
         $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
         throw $oEx;
@@ -409,7 +413,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param object $oUser user object
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return array
      */
@@ -427,7 +431,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param object $oUser user object
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return boolean
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableInOtherOrder" in next major
@@ -436,7 +440,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $oSeries = $this->getSerie();
         if (!$oSeries->oxvoucherseries__oxallowuseanother->value) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $sSelect = 'select count(*) from ' . $this->getViewName() . ' 
                 where oxuserid = :oxuserid and ';
             $sSelect .= 'oxvoucherserieid = :oxvoucherserieid and ';
@@ -448,7 +452,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             ];
 
             if ($oDb->getOne($sSelect, $params)) {
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+                $oEx = oxNew(VoucherException::class);
                 $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOTALLOWEDSAMESERIES');
                 $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
                 throw $oEx;
@@ -463,7 +467,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param object $oUser user object
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "isValidUserGroup" in next major
@@ -485,7 +489,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             }
         }
 
-        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+        $oEx = oxNew(VoucherException::class);
         $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOTVALIDUSERGROUP');
         $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
         throw $oEx;
@@ -505,7 +509,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             $oVoucher->sVoucherNr = $this->oxvouchers__oxvouchernr->value;
         }
 
-        // R. set in oxBasket : $oVoucher->fVoucherdiscount = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency( $this->oxvouchers__oxdiscount->value );
+        // R. set in oxBasket : $oVoucher->fVoucherdiscount = Registry::getLang()->formatCurrency( $this->oxvouchers__oxdiscount->value );
 
         return $oVoucher;
     }
@@ -513,18 +517,18 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * create oxVoucherSerie object of this voucher
      *
-     * @throws oxObjectException
+     * @throws ObjectException
      *
-     * @return oxVoucherSerie
+     * @return VoucherSerie
      */
     public function getSerie()
     {
         if ($this->_oSerie !== null) {
             return $this->_oSerie;
         }
-        $oSerie = oxNew(\OxidEsales\Eshop\Application\Model\VoucherSerie::class);
+        $oSerie = oxNew(VoucherSerie::class);
         if (!$oSerie->load($this->oxvouchers__oxvoucherserieid->value)) {
-            throw oxNew(\OxidEsales\Eshop\Core\Exception\ObjectException::class);
+            throw oxNew(ObjectException::class);
         }
         $this->_oSerie = $oSerie;
 
@@ -539,7 +543,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _isProductVoucher() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oSeries = $this->getSerie();
         $sSelect = "select 1 from oxobject2discount 
             where oxdiscountid = :oxdiscountid and oxtype = :oxtype";
@@ -559,7 +563,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _isCategoryVoucher() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oSeries = $this->getSerie();
         $sSelect = "select 1 from oxobject2discount 
             where oxdiscountid = :oxdiscountid and oxtype = :oxtype";
@@ -580,23 +584,23 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _getSerieDiscount() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oSeries = $this->getSerie();
-        $oDiscount = oxNew(\OxidEsales\Eshop\Application\Model\Discount::class);
+        $oDiscount = oxNew(Discount::class);
 
         $oDiscount->setId($oSeries->getId());
-        $oDiscount->oxdiscount__oxshopid = new \OxidEsales\Eshop\Core\Field($oSeries->oxvoucherseries__oxshopid->value);
-        $oDiscount->oxdiscount__oxactive = new \OxidEsales\Eshop\Core\Field(true);
-        $oDiscount->oxdiscount__oxactivefrom = new \OxidEsales\Eshop\Core\Field($oSeries->oxvoucherseries__oxbegindate->value);
-        $oDiscount->oxdiscount__oxactiveto = new \OxidEsales\Eshop\Core\Field($oSeries->oxvoucherseries__oxenddate->value);
-        $oDiscount->oxdiscount__oxtitle = new \OxidEsales\Eshop\Core\Field($oSeries->oxvoucherseries__oxserienr->value);
-        $oDiscount->oxdiscount__oxamount = new \OxidEsales\Eshop\Core\Field(1);
-        $oDiscount->oxdiscount__oxamountto = new \OxidEsales\Eshop\Core\Field(MAX_64BIT_INTEGER);
-        $oDiscount->oxdiscount__oxprice = new \OxidEsales\Eshop\Core\Field(0);
-        $oDiscount->oxdiscount__oxpriceto = new \OxidEsales\Eshop\Core\Field(MAX_64BIT_INTEGER);
-        $oDiscount->oxdiscount__oxaddsumtype = new \OxidEsales\Eshop\Core\Field($oSeries->oxvoucherseries__oxdiscounttype->value == 'percent' ? '%' : 'abs');
-        $oDiscount->oxdiscount__oxaddsum = new \OxidEsales\Eshop\Core\Field($oSeries->oxvoucherseries__oxdiscount->value);
-        $oDiscount->oxdiscount__oxitmartid = new \OxidEsales\Eshop\Core\Field();
-        $oDiscount->oxdiscount__oxitmamount = new \OxidEsales\Eshop\Core\Field();
-        $oDiscount->oxdiscount__oxitmmultiple = new \OxidEsales\Eshop\Core\Field();
+        $oDiscount->oxdiscount__oxshopid = new Field($oSeries->oxvoucherseries__oxshopid->value);
+        $oDiscount->oxdiscount__oxactive = new Field(true);
+        $oDiscount->oxdiscount__oxactivefrom = new Field($oSeries->oxvoucherseries__oxbegindate->value);
+        $oDiscount->oxdiscount__oxactiveto = new Field($oSeries->oxvoucherseries__oxenddate->value);
+        $oDiscount->oxdiscount__oxtitle = new Field($oSeries->oxvoucherseries__oxserienr->value);
+        $oDiscount->oxdiscount__oxamount = new Field(1);
+        $oDiscount->oxdiscount__oxamountto = new Field(MAX_64BIT_INTEGER);
+        $oDiscount->oxdiscount__oxprice = new Field(0);
+        $oDiscount->oxdiscount__oxpriceto = new Field(MAX_64BIT_INTEGER);
+        $oDiscount->oxdiscount__oxaddsumtype = new Field($oSeries->oxvoucherseries__oxdiscounttype->value == 'percent' ? '%' : 'abs');
+        $oDiscount->oxdiscount__oxaddsum = new Field($oSeries->oxvoucherseries__oxdiscount->value);
+        $oDiscount->oxdiscount__oxitmartid = new Field();
+        $oDiscount->oxdiscount__oxitmamount = new Field();
+        $oDiscount->oxdiscount__oxitmmultiple = new Field();
 
         return $oDiscount;
     }
@@ -604,7 +608,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Returns basket item information array from session or order.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Discount $oDiscount discount object
+     * @param Discount $oDiscount discount object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBasketItems" in next major
@@ -623,7 +627,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Returns basket item information (id,amount,price) array takig item list from order.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Discount $oDiscount discount object
+     * @param Discount $oDiscount discount object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOrderBasketItems" in next major
@@ -634,7 +638,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
             $oDiscount = $this->_getSerieDiscount();
         }
 
-        $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+        $oOrder = oxNew(Order::class);
         $oOrder->load($this->oxvouchers__oxorderid->value);
 
         $aItems = [];
@@ -658,7 +662,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Returns basket item information (id,amount,price) array taking item list from session.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Discount $oDiscount discount object
+     * @param Discount $oDiscount discount object
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSessionBasketItems" in next major
@@ -694,7 +698,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @deprecated on b-dev (2015-03-31); Use function _getGenericDiscountValue()
      *
@@ -710,7 +714,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return double
      * @deprecated underscore prefix violates PSR12, will be renamed to "getGenericDiscountValue" in next major
@@ -762,7 +766,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @deprecated on b-dev (2015-03-31); Use function _getProductDiscountValue()
      *
@@ -778,7 +782,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return double
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductDiscountValue" in next major
@@ -790,7 +794,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         // Basket Item Count and isAdmin check (unble to access property $oOrder->_getOrderBasket()->_blSkipVouchersAvailabilityChecking)
         if (!count($aBasketItems) && !$this->isAdmin()) {
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+            $oEx = oxNew(VoucherException::class);
             $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOVOUCHER');
             $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
             throw $oEx;
@@ -798,10 +802,10 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         $oSeries = $this->getSerie();
 
-        $oVoucherPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $oDiscountPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $oProductPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $oProductTotal = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $oVoucherPrice = oxNew(Price::class);
+        $oDiscountPrice = oxNew(Price::class);
+        $oProductPrice = oxNew(Price::class);
+        $oProductTotal = oxNew(Price::class);
 
         // Is the voucher discount applied to at least one basket item
         $blDiscountApplied = false;
@@ -844,7 +848,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @deprecated on b-dev (2015-03-31); Use function _getCategoryDiscountValue()
      *
@@ -860,7 +864,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param double $dPrice price to calculate discount on it
      *
-     * @throws oxVoucherException exception
+     * @throws VoucherException exception
      *
      * @return double
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryDiscountValue" in next major
@@ -872,14 +876,14 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         // Basket Item Count and isAdmin check (unable to access property $oOrder->_getOrderBasket()->_blSkipVouchersAvailabilityChecking)
         if (!count($aBasketItems) && !$this->isAdmin()) {
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+            $oEx = oxNew(VoucherException::class);
             $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOVOUCHER');
             $oEx->setVoucherNr($this->oxvouchers__oxvouchernr->value);
             throw $oEx;
         }
 
-        $oProductPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
-        $oProductTotal = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $oProductPrice = oxNew(Price::class);
+        $oProductTotal = oxNew(Price::class);
 
         foreach ($aBasketItems as $aBasketItem) {
             $oProductPrice->setPrice($aBasketItem['price']);
@@ -926,7 +930,7 @@ class Voucher extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     protected function _getVoucherTimeout() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iVoucherTimeout = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('iVoucherTimeout') ?:
+        $iVoucherTimeout = (int) Registry::getConfig()->getConfigParam('iVoucherTimeout') ?:
             3 * 3600;
 
         return $iVoucherTimeout;

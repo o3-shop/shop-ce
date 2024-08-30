@@ -21,14 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * News list manager.
  * Creates news objects, fetches its data.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
+class NewsList extends ListModel
 {
     /**
      * List Object class name
@@ -87,7 +88,7 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function getCount()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sNewsViewName = getViewName('oxnews');
         $oBaseObject = $this->getBaseObject();
@@ -117,7 +118,7 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * News list user setter
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
+     * @param User $oUser user object
      */
     public function setUser($oUser)
     {
@@ -127,7 +128,7 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * News list user getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\User
+     * @return User
      */
     public function getUser()
     {

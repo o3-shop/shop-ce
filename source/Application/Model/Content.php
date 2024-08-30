@@ -21,16 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
-use oxDb;
 
 /**
  * Content manager.
  * Base object for content pages
  *
  */
-class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Content extends MultiLanguageModel implements IUrl
 {
     /**
      * Current class name.
@@ -108,7 +110,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
     public function getExpanded()
     {
         if (!isset($this->_blExpanded)) {
-            $this->_blExpanded = ($this->getId() == \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxcid'));
+            $this->_blExpanded = ($this->getId() == Registry::getConfig()->getRequestParameter('oxcid'));
         }
 
         return $this->_blExpanded;
@@ -121,7 +123,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      */
     public function setCategoryId($sCategoryId)
     {
-        $this->oxcontents__oxcatid = new \OxidEsales\Eshop\Core\Field($sCategoryId);
+        $this->oxcontents__oxcatid = new Field($sCategoryId);
     }
 
     /**
@@ -154,7 +156,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
         if ($sLoadId == 'oxcredits') {
             // fetching column names
             $sColQ = "SHOW COLUMNS FROM oxcontents WHERE field LIKE  'oxcontent%'";
-            $aCols = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getAll($sColQ);
+            $aCols = DatabaseProvider::getDb()->getAll($sColQ);
 
             // building subquery
             $sPattern = "IF ( %s != '', %s, %s ) ";
@@ -170,7 +172,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             $sSelect = str_replace("`{$sTable}`.`oxcontent`", "( $sContQ ) as oxcontent", $sSelect);
         }
 
-        $aData = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getRow($sSelect);
+        $aData = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getRow($sSelect);
 
         return $aData;
     }
@@ -252,7 +254,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
         // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
 
         if ($this->oxcontents__oxcontent) {
-            $this->oxcontents__oxcontent->setValue(str_replace('&lang=', '&amp;lang=', $this->oxcontents__oxcontent->value), \OxidEsales\Eshop\Core\Field::T_RAW);
+            $this->oxcontents__oxcontent->setValue(str_replace('&lang=', '&amp;lang=', $this->oxcontents__oxcontent->value), Field::T_RAW);
         }
     }
 
@@ -265,7 +267,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      */
     public function getBaseSeoLink($iLang)
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class)->getContentUrl($this, $iLang);
+        return Registry::get(SeoEncoderContent::class)->getContentUrl($this, $iLang);
     }
 
     /**
@@ -277,7 +279,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      */
     public function getLink($iLang = null)
     {
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
+        if (!Registry::getUtils()->seoIsActive()) {
             return $this->getStdLink($iLang);
         }
 
@@ -322,7 +324,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             if ($this->_sParentCatId !== false && $this->oxcontents__oxcatid->value && $this->oxcontents__oxcatid->value != 'oxrootid') {
                 if ($this->_sParentCatId === null) {
                     $this->_sParentCatId = false;
-                    $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+                    $oDb = DatabaseProvider::getDb();
                     $sParentId = $oDb->getOne("select oxparentid from oxcategories where oxid = :oxid", [
                         ':oxid' => $this->oxcontents__oxcatid->value
                     ]);
@@ -355,7 +357,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             $iLang = $this->getLanguage();
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
     }
 
     /**
@@ -368,11 +370,11 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
      * @return null
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFieldData" in next major
      */
-    protected function _setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sLoweredFieldName = strtolower($sFieldName);
         if ('oxcontent' === $sLoweredFieldName || 'oxcontents__oxcontent' === $sLoweredFieldName) {
-            $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+            $iDataType = Field::T_RAW;
         }
 
         return parent::_setFieldData($sFieldName, $sValue, $iDataType);
@@ -405,7 +407,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
         }
 
         if (parent::delete($sOXID)) {
-            \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class)->onDeleteContent($sOXID);
+            Registry::get(SeoEncoderContent::class)->onDeleteContent($sOXID);
 
             return true;
         }
@@ -425,7 +427,7 @@ class Content extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements
             $sShopId = Registry::getConfig()->getShopId();
             $sVersion = $this->oxcontents__oxtermversion->value;
 
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             // dropping expired..
             $oDb->execute("delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion", [
                 ':oxshopid' => $sShopId,

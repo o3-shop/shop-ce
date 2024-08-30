@@ -21,9 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxField;
-use oxDb;
 
 /**
  * Virtual basket manager class. Virtual baskets are user article lists which are stored in database (noticelists, wishlists).
@@ -33,7 +35,7 @@ use oxDb;
  * articles to it.
  *
  */
-class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
+class UserBasket extends BaseModel
 {
     /**
      * Array of fields which must be skipped when updating object data
@@ -84,11 +86,11 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
         $this->_blNewBasket = false;
 
         if (!isset($this->oxuserbaskets__oxpublic->value)) {
-            $this->oxuserbaskets__oxpublic = new \OxidEsales\Eshop\Core\Field(1, \OxidEsales\Eshop\Core\Field::T_RAW);
+            $this->oxuserbaskets__oxpublic = new Field(1, Field::T_RAW);
         }
 
-        $iTime = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
-        $this->oxuserbaskets__oxupdate = new \OxidEsales\Eshop\Core\Field($iTime);
+        $iTime = Registry::getUtilsDate()->getTime();
+        $this->oxuserbaskets__oxupdate = new Field($iTime);
 
         return parent::_insert();
     }
@@ -100,8 +102,8 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function setIsNewBasket()
     {
         $this->_blNewBasket = true;
-        $iTime = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
-        $this->oxuserbaskets__oxupdate = new \OxidEsales\Eshop\Core\Field($iTime);
+        $iTime = Registry::getUtilsDate()->getTime();
+        $this->oxuserbaskets__oxupdate = new Field($iTime);
     }
 
     /**
@@ -166,7 +168,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
         $this->_aBasketItems = [];
 
         // loading basket items
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         $sViewName = $oArticle->getViewName();
 
         $sSelect = "select oxuserbasketitems.* from oxuserbasketitems 
@@ -178,7 +180,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         $sSelect .= " order by oxartnum, oxsellist, oxpersparam ";
 
-        $oItems = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oItems = oxNew(ListModel::class);
         $oItems->init('oxuserbasketitem');
         $oItems->selectstring($sSelect, [
             ':oxbasketid' => $this->getId()
@@ -199,20 +201,20 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param array  $aSelList    product select lists
      * @param string $aPersParams persistent parameters
      *
-     * @return oxUserBasketItem
+     * @return UserBasketItem
      * @deprecated underscore prefix violates PSR12, will be renamed to "createItem" in next major
      */
     protected function _createItem($sProductId, $aSelList = null, $aPersParams = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oNewItem = oxNew(\OxidEsales\Eshop\Application\Model\UserBasketItem::class);
-        $oNewItem->oxuserbasketitems__oxartid = new \OxidEsales\Eshop\Core\Field($sProductId, \OxidEsales\Eshop\Core\Field::T_RAW);
-        $oNewItem->oxuserbasketitems__oxbasketid = new \OxidEsales\Eshop\Core\Field($this->getId(), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $oNewItem = oxNew(UserBasketItem::class);
+        $oNewItem->oxuserbasketitems__oxartid = new Field($sProductId, Field::T_RAW);
+        $oNewItem->oxuserbasketitems__oxbasketid = new Field($this->getId(), Field::T_RAW);
         if ($aPersParams && count($aPersParams)) {
             $oNewItem->setPersParams($aPersParams);
         }
 
         if (!$aSelList) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->load($sProductId);
             $aSelectLists = $oArticle->getSelectLists();
             if (($iSelCnt = count($aSelectLists))) {
@@ -234,7 +236,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
      * @param array  $aSelList    select lists
      * @param string $aPersParams persistent parameters
      *
-     * @return oxUserBasketItem
+     * @return UserBasketItem
      */
     public function getItem($sProductId, $aSelList, $aPersParams = null)
     {
@@ -315,14 +317,14 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
                     unset($this->_aBasketItems[$this->_getItemKey($sProductId, $aSel, $aPersParam)]);
                 }
             } else {
-                $oUserBasketItem->oxuserbasketitems__oxamount = new \OxidEsales\Eshop\Core\Field($dAmount, \OxidEsales\Eshop\Core\Field::T_RAW);
+                $oUserBasketItem->oxuserbasketitems__oxamount = new Field($dAmount, Field::T_RAW);
                 $oUserBasketItem->save();
 
                 $this->_aBasketItems[$this->_getItemKey($sProductId, $aSel, $aPersParam)] = $oUserBasketItem;
             }
 
             //update timestamp
-            $this->oxuserbaskets__oxupdate = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
+            $this->oxuserbaskets__oxupdate = new Field(Registry::getUtilsDate()->getTime());
             $this->save();
 
             return $dAmount;
@@ -345,7 +347,7 @@ class UserBasket extends \OxidEsales\Eshop\Core\Model\BaseModel
         $blDelete = false;
         if ($sOXID && ($blDelete = parent::delete($sOXID))) {
             // cleaning up related data
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $sQ = "delete from oxuserbasketitems where oxbasketid = :oxbasketid";
             $oDb->execute($sQ, [
                 ':oxbasketid' => $sOXID

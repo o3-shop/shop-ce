@@ -21,15 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
-use oxDb;
 
 /**
  * Wrapping manager.
  * Performs Wrapping data/objects loading, deleting.
  *
  */
-class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Wrapping extends MultiLanguageModel
 {
     /**
      * Class name
@@ -41,7 +44,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Wrapping oxprice object.
      *
-     * @var oxprice
+     * @var Price
      */
     protected $_oPrice = null;
 
@@ -102,7 +105,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getWrappingPrice($dAmount = 1)
     {
         if ($this->_oPrice === null) {
-            $this->_oPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+            $this->_oPrice = oxNew(Price::class);
 
             if (!$this->_blWrappingVatOnTop) {
                 $this->_oPrice->setBruttoPriceMode();
@@ -128,7 +131,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getWrappingList($sWrapType)
     {
         // load wrapping
-        $oEntries = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $oEntries = oxNew(ListModel::class);
         $oEntries->init('oxwrapping');
         $sWrappingViewName = getViewName('oxwrapping');
         $sSelect = "select * from $sWrappingViewName 
@@ -152,7 +155,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getWrappingCount($sWrapType)
     {
         $sWrappingViewName = getViewName('oxwrapping');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sQ = "select count(*) from $sWrappingViewName 
             where $sWrappingViewName.oxactive = :oxactive 
               and $sWrappingViewName.oxtype = :oxtype";
@@ -191,7 +194,7 @@ class Wrapping extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     {
         $dPrice = $this->getPrice();
 
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dPrice, Registry::getConfig()->getActShopCurrencyObject());
+        return Registry::getLang()->formatCurrency($dPrice, Registry::getConfig()->getActShopCurrencyObject());
     }
 
     /**

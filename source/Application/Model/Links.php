@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 
 /**
  * Links manager.
  * Collects stored in DB links data (URL, description).
  */
-class Links extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Links extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -39,7 +40,7 @@ class Links extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Class constructor, initiates parent constructor (parent::oxI18n()).
      *
-     * @return oxLinks
+     * @return Links
      */
     public function __construct()
     {
@@ -57,10 +58,10 @@ class Links extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @return null
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFieldData" in next major
      */
-    protected function _setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ('oxurldesc' === strtolower($sFieldName) || 'oxlinks__oxurldesc' === strtolower($sFieldName)) {
-            $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+            $iDataType = Field::T_RAW;
         }
 
         return parent::_setFieldData($sFieldName, $sValue, $iDataType);

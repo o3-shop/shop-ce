@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
+use OxidEsales\Eshop\Core\Field;
 
 /**
  * Simple list object
@@ -57,7 +57,7 @@ class ListObject
         }
         foreach ($aData as $sKey => $sValue) {
             $sFieldName = strtolower($this->_sTableName . '__' . $sKey);
-            $this->$sFieldName = new \OxidEsales\Eshop\Core\Field($sValue);
+            $this->$sFieldName = new Field($sValue);
         }
     }
 

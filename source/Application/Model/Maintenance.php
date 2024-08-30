@@ -33,6 +33,6 @@ class Maintenance
     public function execute()
     {
         // updating upcoming prices
-        oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class)->updateUpcomingPrices(true);
+        oxNew(ArticleList::class)->updateUpcomingPrices(true);
     }
 }

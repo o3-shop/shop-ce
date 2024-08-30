@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Media URL handler
  *
  */
-class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class MediaUrl extends MultiLanguageModel
 {
     /**
      * Current class name

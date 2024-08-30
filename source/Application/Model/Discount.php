@@ -21,9 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
@@ -31,7 +34,7 @@ use stdClass;
  * Discounts manager.
  *
  */
-class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Discount extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -93,7 +96,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oDb->execute('delete from oxobject2discount where oxobject2discount.oxdiscountid = :oxdiscountid', [
             ':oxdiscountid' => $sOXID
         ]);
@@ -108,7 +111,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * Returns saving status
      *
-     * @throws \oxInputException
+     * @throws InputException
      * @throws StandardException
      *
      * @return bool
@@ -120,12 +123,12 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         if (is_null($oxsort)) {
             $shopId = $this->oxdiscount__oxshopid->value;
             $newSort = $this->getNextOxsort($shopId);
-            $this->oxdiscount__oxsort = new \oxField($newSort, \OxidEsales\Eshop\Core\Field::T_RAW);
+            $this->oxdiscount__oxsort = new Field($newSort, Field::T_RAW);
         }
 
         // Validate oxsort before saving
         if (!is_numeric($this->oxdiscount__oxsort->value)) {
-            $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
+            $exception = oxNew(InputException::class);
             $exception->setMessage('DISCOUNT_ERROR_OXSORT_NOT_A_NUMBER');
 
             throw $exception;
@@ -133,9 +136,9 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         try {
             $saveStatus = parent::save();
-        } catch (\OxidEsales\Eshop\Core\Exception\StandardException $exception) {
-            if ($exception->getCode() == \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database::DUPLICATE_KEY_ERROR_CODE && false !== strpos($exception->getMessage(), 'UNIQ_OXSORT')) {
-                $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
+        } catch (StandardException $exception) {
+            if ($exception->getCode() == Database::DUPLICATE_KEY_ERROR_CODE && false !== strpos($exception->getMessage(), 'UNIQ_OXSORT')) {
+                $exception = oxNew(InputException::class);
                 $exception->setMessage('DISCOUNT_ERROR_OXSORT_NOT_UNIQUE');
             }
 
@@ -152,7 +155,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function isGlobalDiscount()
     {
         if (is_null($this->_blIsForArticleOrForCategory)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
 
             $sQuery = "select 1
                         from oxobject2discount
@@ -172,7 +175,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Checks if discount applies for article
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
+     * @param Article $oArticle article object
      *
      * @return bool
      */
@@ -224,7 +227,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         // check if this article is assigned
         $sQ = "select 1 from oxobject2discount 
@@ -246,7 +249,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Tests if total amount or price (price priority) of articles that can be applied to current discount fits to discount configuration
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket basket
+     * @param Basket $oBasket basket
      *
      * @return bool
      */
@@ -331,7 +334,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         }
 
         // oxobject2discount configuration check
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sQ = 'select 1 from oxobject2discount 
             where oxdiscountid = :oxdiscountid and oxtype in ("oxarticles", "oxcategories" ) ';
         $params = [
@@ -354,7 +357,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sQ = "select 1 from oxobject2discount where oxdiscountid = :oxdiscountid";
         $sQ .= $this->_getProductCheckQuery($oArticle);
         $params = [
@@ -488,7 +491,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getArticleIds()
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $db = DatabaseProvider::getDb();
         $params = [
             ':oxdiscountid' => $this->getId(),
             ':oxtype' => 'oxarticles'
@@ -505,7 +508,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function getCategoryIds()
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $db = DatabaseProvider::getDb();
         $params = [
             ':oxdiscountid' => $this->getId(),
             ':oxtype' => 'oxcategories'
@@ -525,7 +528,7 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getNextOxsort($shopId)
     {
         $query = "SELECT MAX(`oxsort`)+10 FROM `oxdiscount` WHERE `oxshopid` = :oxshopid";
-        $nextSort = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($query, [
+        $nextSort = DatabaseProvider::getDb()->getOne($query, [
             ':oxshopid' => $shopId
         ]);
 
@@ -549,9 +552,9 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             return false;
         }
 
-        $sCatIds = "(" . implode(",", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aCatIds)) . ")";
+        $sCatIds = "(" . implode(",", DatabaseProvider::getDb()->quoteArray($aCatIds)) . ")";
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         // getOne appends limit 1, so this one should be fast enough
         $sQ = "select oxobjectid from oxobject2discount 
             where oxdiscountid = :oxdiscountid 
@@ -568,14 +571,14 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * Returns part of query for discount check. If product is variant - query contains both id check e.g.
      * "and (oxobjectid = '...' or oxobjectid = '...')
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oProduct product used for discount check
+     * @param Article $oProduct product used for discount check
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductCheckQuery" in next major
      */
     protected function _getProductCheckQuery($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         // check if this article is assigned
         if (($sParentId = $oProduct->getParentId())) {
             $sArticleId = " and ( oxobjectid = " . $oDb->quote($oProduct->getProductId()) . " or oxobjectid = " . $oDb->quote($sParentId) . " )";
@@ -589,14 +592,14 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Checks whether this article is assigned to discount
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle
+     * @param Article $oArticle
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "isArticleAssigned" in next major
      */
     protected function _isArticleAssigned($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sQ = "select 1
                 from oxobject2discount
@@ -625,9 +628,9 @@ class Discount extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
-        $sCategoryIds = "(" . implode(",", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aCategoryIds)) . ")";
+        $sCategoryIds = "(" . implode(",", DatabaseProvider::getDb()->quoteArray($aCategoryIds)) . ")";
         $sQ = "select 1
                 from oxobject2discount
                 where oxdiscountid = :oxdiscountid and oxobjectid in {$sCategoryIds} and oxtype = :oxtype";

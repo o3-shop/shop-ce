@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 
 /**
  * Shop view validator.
@@ -157,7 +157,7 @@ class ShopViewValidator
     protected function _getAllViews() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (empty($this->_aAllViews)) {
-            $this->_aAllViews = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol("SHOW TABLES LIKE  'oxv\_%'");
+            $this->_aAllViews = DatabaseProvider::getDb()->getCol("SHOW TABLES LIKE  'oxv\_%'");
         }
 
         return $this->_aAllViews;

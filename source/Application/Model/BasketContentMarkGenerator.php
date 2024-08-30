@@ -41,16 +41,16 @@ class BasketContentMarkGenerator
     /**
      * Basket that is used to get article type(downloadable, intangible etc..).
      *
-     * @var \OxidEsales\Eshop\Application\Model\Basket
+     * @var Basket
      */
     private $_oBasket;
 
     /**
      * Sets basket that is used to get article type(downloadable, intangible etc..).
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
+     * @param Basket $oBasket
      */
-    public function __construct(\OxidEsales\Eshop\Application\Model\Basket $oBasket)
+    public function __construct(Basket $oBasket)
     {
         $this->_oBasket = $oBasket;
     }
@@ -76,7 +76,7 @@ class BasketContentMarkGenerator
     /**
      * Basket that is used to get article type(downloadable, intangible etc..).
      *
-     * @return \OxidEsales\Eshop\Application\Model\Basket
+     * @return Basket
      */
     private function _getBasket() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {

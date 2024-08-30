@@ -21,12 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Model\ListModel;
+
 /**
  * Country list manager class.
  * Collects a list of countries according to collection rules (active).
  *
  */
-class CountryList extends \OxidEsales\Eshop\Core\Model\ListModel
+class CountryList extends ListModel
 {
     /**
      * Call parent class constructor
