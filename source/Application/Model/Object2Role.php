@@ -52,7 +52,7 @@ class Object2Role extends BaseModel
      * The table oxobject2group has a UNIQUE index on (OXGROUPSID, OXOBJECTID, OXSHOPID)
      * which ensures that a relationship would not be duplicated.
      *
-     * @return bool
+     * @return bool|void
      * @throws Exception
      */
     public function save()

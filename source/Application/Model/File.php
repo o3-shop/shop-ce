@@ -27,7 +27,6 @@ use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxException;
 
 /**
  * Article files manager.
@@ -106,8 +105,7 @@ class File extends BaseModel
      *
      * @param int $sFileIndex File index
      *
-     * @throws StandardException
-     * @throws oxException Throws exception if file wasn't moved or if rights wasn't changed.
+     * @throws StandardException Throws exception if file wasn't moved or if rights wasn't changed.
      */
     public function processFile($sFileIndex)
     {
@@ -334,7 +332,7 @@ class File extends BaseModel
      * Checks if file is not used for  other objects.
      * If not used, unlink the file.
      *
-     * @return null|false
+     * @return bool|void
      * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteFile" in next major
      */

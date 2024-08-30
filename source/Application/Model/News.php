@@ -63,7 +63,7 @@ class News extends MultiLanguageModel
     /**
      * Assigns object data.
      *
-     * @param string $dbRecord database record to be assigned
+     * @param array $dbRecord database record to be assigned
      */
     public function assign($dbRecord)
     {

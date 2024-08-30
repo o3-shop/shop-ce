@@ -293,13 +293,13 @@ class UserBasket extends BaseModel
      * Method adds/removes user chosen article to/from his noticelist or wishlist. Returns total amount
      * of articles in list.
      *
-     * @param null $sProductId Article ID
-     * @param null $dAmount Product amount
-     * @param null $aSel product select lists
+     * @param string|null $sProductId Article ID
+     * @param double|null $dAmount Product amount
+     * @param array|null $aSel product select lists
      * @param bool $blOverride if true overrides $dAmount, else sums previous with current it
-     * @param null $aPersParam product persistent parameters (default null)
+     * @param array|null $aPersParam product persistent parameters (default null)
      *
-     * @return integer
+     * @return integer|void
      * @throws \Exception
      */
     public function addItemToBasket($sProductId = null, $dAmount = null, $aSel = null, $blOverride = false, $aPersParam = null)

@@ -338,7 +338,7 @@ class Payment extends MultiLanguageModel
      *
      * @deprecated in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
      *
-     * @return string
+     * @return string|void
      */
     public function getFNettoPrice()
     {
@@ -352,7 +352,7 @@ class Payment extends MultiLanguageModel
      *
      * @deprecated in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
      *
-     * @return string
+     * @return string|void
      */
     public function getFBruttoPrice()
     {
@@ -366,7 +366,7 @@ class Payment extends MultiLanguageModel
      *
      * @deprecated in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
      *
-     * @return string
+     * @return string|void
      */
     public function getFPriceVat()
     {

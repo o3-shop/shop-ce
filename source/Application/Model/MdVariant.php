@@ -279,7 +279,7 @@ class MdVariant extends Base
     /**
      * Returns MD variant price as a text.
      *
-     * @return string
+     * @return string|void
      */
     public function getFPrice()
     {

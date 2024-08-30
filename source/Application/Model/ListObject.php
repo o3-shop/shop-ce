@@ -31,7 +31,7 @@ class ListObject
     /**
      * @var string
      */
-    private $_sTableName = '';
+    private $_sTableName;
 
     /**
      * Class constructor
@@ -48,7 +48,7 @@ class ListObject
      *
      * @param object $aData Database record
      *
-     * @return null
+     * @return void
      */
     public function assign($aData)
     {

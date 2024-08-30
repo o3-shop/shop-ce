@@ -68,7 +68,7 @@ class DiscountList extends ListModel
      * For iterating through the list, use getArray() on the list,
      * as iterating on object itself can cause concurrency problems.
      *
-     * @param null $oUser user object (optional)
+     * @param User|null $oUser user object (optional)
      *
      * @return DiscountList
      * @throws DatabaseConnectionException

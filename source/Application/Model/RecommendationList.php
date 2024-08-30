@@ -279,7 +279,7 @@ class RecommendationList extends BaseModel implements IUrl
      *
      * @param array $aArticleIds Object IDs
      *
-     * @return ListModel
+     * @return ListModel|void
      * @throws DatabaseConnectionException
      */
     public function getRecommListsByIds($aArticleIds)
@@ -371,7 +371,7 @@ class RecommendationList extends BaseModel implements IUrl
      *
      * @param string $sSearchStr Search string
      *
-     * @return object oxlist with oxrecommlist objects
+     * @return object|void oxlist with oxrecommlist objects
      * @throws DatabaseConnectionException
      */
     public function getSearchRecommLists($sSearchStr)

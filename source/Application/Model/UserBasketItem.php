@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -93,9 +94,9 @@ class UserBasketItem extends BaseModel
      *
      * @param string $sItemKey the key that will be given to oxarticle setItemKey
      *
-     * @throws ArticleException article exception
-     *
      * @return Article|bool
+     * @throws ArticleException article exception
+     * @throws DatabaseConnectionException
      */
     public function getArticle($sItemKey)
     {

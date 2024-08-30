@@ -28,7 +28,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\UtilsView;
 use oxObjectException;
 
 /**
@@ -192,33 +191,24 @@ class Category extends MultiLanguageModel implements IUrl
         switch ($sName) {
             case 'aSubCats':
                 return $this->_aSubCats;
-                break;
             case 'aContent':
                 return $this->_aContentCats;
-                break;
             case 'iArtCnt':
                 return $this->getNrOfArticles();
-                break;
             case 'isVisible':
                 return $this->getIsVisible();
-                break;
             case 'expanded':
                 return $this->getExpanded();
-                break;
             case 'hasSubCats':
                 return $this->getHasSubCats();
-                break;
             case 'hasVisibleSubCats':
                 return $this->getHasVisibleSubCats();
-                break;
             case 'openlink':
             case 'closelink':
             case 'link':
                 return $this->getLink();
-                break;
             case 'dimagedir':
                 return $this->getPictureUrl();
-                break;
         }
         return parent::__get($sName);
     }
@@ -1157,12 +1147,11 @@ class Category extends MultiLanguageModel implements IUrl
      * Returns long description, parsed through smarty. should only be used by exports or so.
      * In templates use [{oxeval var=$oCategory->oxcategories__oxlongdesc->getRawValue()}]
      *
-     * @return string
+     * @return string|void
      */
     public function getLongDesc()
     {
         if (isset($this->oxcategories__oxlongdesc) && $this->oxcategories__oxlongdesc instanceof Field) {
-            /** @var UtilsView $oUtilsView */
             $oUtilsView = Registry::getUtilsView();
             return $oUtilsView->parseThroughSmarty($this->oxcategories__oxlongdesc->getRawValue(), $this->getId() . $this->getLanguage(), null, true);
         }

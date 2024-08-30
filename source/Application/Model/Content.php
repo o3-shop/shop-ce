@@ -90,7 +90,6 @@ class Content extends MultiLanguageModel implements IUrl
         switch ($sName) {
             case 'expanded':
                 return $this->getExpanded();
-                break;
         }
         return parent::__get($sName);
     }
@@ -455,7 +454,7 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Returns latest terms version id.
      *
-     * @return string
+     * @return string|void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */

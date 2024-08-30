@@ -457,6 +457,7 @@ class Basket extends Base
      * @throws ArticleException
      * @throws ArticleInputException
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
      * @throws OutOfStockException
      */
@@ -560,7 +561,7 @@ class Basket extends Base
      *
      * @param OrderArticle $oOrderArticle order article to store in basket
      *
-     * @return BasketItem
+     * @return BasketItem|void
      * @throws ArticleException
      * @throws ArticleInputException
      * @throws DatabaseConnectionException
@@ -704,6 +705,7 @@ class Basket extends Base
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getItemBundles" in next major
      */
     protected function _getItemBundles($oBasketItem, $aBundles = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -743,6 +745,7 @@ class Basket extends Base
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBasketBundles" in next major
      */
     protected function _getBasketBundles($aBundles = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -815,6 +818,7 @@ class Basket extends Base
      *
      * @param array $aBundles added bundle articles
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addBundlesToBasket" in next major
      */
     protected function _addBundlesToBasket($aBundles) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -946,6 +950,7 @@ class Basket extends Base
      *
      * @return Price
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcDeliveryCost" in next major
      */
     protected function _calcDeliveryCost() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1022,7 +1027,7 @@ class Basket extends Base
     /**
      * Get most used vat percent:
      *
-     * @return double
+     * @return double|void
      */
     public function getMostUsedVatPercent()
     {
@@ -1034,7 +1039,7 @@ class Basket extends Base
     /**
      * Get most used vat percent:
      *
-     * @return double
+     * @return double|void
      */
     public function getAdditionalServicesVatPercent()
     {
@@ -1439,8 +1444,9 @@ class Basket extends Base
      *
      * @param bool $blForceUpdate set this parameter to TRUE to force basket recalculation
      *
-     * @return null
+     * @return void
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function calculateBasket($blForceUpdate = false)
     {
@@ -1736,8 +1742,9 @@ class Basket extends Base
     /**
      * Populates current basket from the saved one.
      *
-     * @return null
+     * @return void
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function load()
     {
@@ -1910,6 +1917,7 @@ class Basket extends Base
      *
      * @return string oxDeliverySet
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getShippingId()
     {
@@ -1940,6 +1948,7 @@ class Basket extends Base
      * @return array
      * @throws ArticleException
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketArticles()
     {
@@ -2446,7 +2455,7 @@ class Basket extends Base
      *
      * @deprecated in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
      *
-     * @return double | bool
+     * @return double|void
      */
     public function getPaymentCosts()
     {
@@ -3045,7 +3054,7 @@ class Basket extends Base
     }
 
     /**
-     * Resets new basket item addition state on unserialization
+     * Resets new basket item addition state on deserialization
      */
     public function __wakeUp()
     {
@@ -3074,6 +3083,7 @@ class Basket extends Base
      * @return bool
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
      * @throws NoArticleException
      */
     public function hasDownloadableProducts()
@@ -3096,6 +3106,7 @@ class Basket extends Base
      * @return bool
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
      * @throws NoArticleException
      */
     public function hasArticlesWithIntangibleAgreement()
@@ -3119,6 +3130,7 @@ class Basket extends Base
      * @return bool
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
      * @throws NoArticleException
      */
     public function hasArticlesWithDownloadableAgreement()

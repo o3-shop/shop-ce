@@ -366,7 +366,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
     /**
      * Returns manufacture icon
      *
-     * @return string
+     * @return string|void
      */
     public function getIconUrl()
     {

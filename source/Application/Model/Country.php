@@ -43,7 +43,7 @@ class Country extends MultiLanguageModel
     /**
      * State list
      *
-     * @var oxStateList
+     * @var array
      */
     protected $_aStates = null;
 

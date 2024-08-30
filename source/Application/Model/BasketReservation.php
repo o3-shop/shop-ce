@@ -293,7 +293,7 @@ class BasketReservation extends Base
      *
      * @throws Exception
      *
-     * @return null
+     * @return void
      */
     public function discardUnusedReservations($iLimit)
     {

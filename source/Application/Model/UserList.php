@@ -43,7 +43,7 @@ class UserList extends ListModel
      *
      * @param string $sSearchStr Search string
      *
-     * @return null;
+     * @return void
      */
     public function loadWishlistUsers($sSearchStr)
     {

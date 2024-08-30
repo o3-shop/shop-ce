@@ -235,9 +235,9 @@ class DeliverySetList extends ListModel
      *
      * @param string $sShipSet current ship set id (can be null if not set yet)
      * @param User $oUser active user
-     * @param double $oBasket basket object
+     * @param Basket $oBasket basket object
      *
-     * @return array
+     * @return array|void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
@@ -333,7 +333,6 @@ class DeliverySetList extends ListModel
     {
         $sTable = getViewName('oxdeliveryset');
         if ($sDelId) {
-            $oDb = DatabaseProvider::getDb();
             $sSubSql = "( select $sTable.* from $sTable left join oxdel2delset on oxdel2delset.oxdelsetid=$sTable.oxid where " . $this->getBaseObject()->getSqlActiveSnippet() . " and oxdel2delset.oxdelid = :oxdelid ) as $sTable";
         } else {
             $sSubSql = $sTable;

@@ -1144,7 +1144,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param array $aRecord Array representing current field values
      *
-     * @return null
+     * @return void
      */
     public function assign($aRecord)
     {
@@ -1384,7 +1384,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Loads and returns array with cross-selling information.
      *
-     * @return array
+     * @return Articlelist|void
      */
     public function getCrossSelling()
     {
@@ -1741,7 +1741,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Simple way to get variants without querying oxArticle table first. This is basically used for lists.
      *
-     * @return null
+     * @return array|Simplevariantlist|Articlelist|void
      * @throws DatabaseConnectionException
      */
     public function getSimpleVariants()
@@ -2531,7 +2531,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param null $articleId Article ID
      * @param null $parentArticleId Parent ID
      *
-     * @return null
+     * @return void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
@@ -2596,7 +2596,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns custom article VAT value if possible
      * By default value is taken from oxarticle__oxvat field
      *
-     * @return double
+     * @return double|void
      */
     public function getCustomVAT()
     {
@@ -3225,7 +3225,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param int $iIndex picture index
      *
-     * @return string
+     * @return string|void
      */
     public function getPictureUrl($iIndex = 1)
     {
@@ -3299,7 +3299,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param int $iIndex picture index
      *
-     * @return string
+     * @return string|void
      */
     public function getZoomPictureUrl($iIndex = '')
     {
@@ -3353,7 +3353,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Get parent article
      *
-     * @return Article
+     * @return Article|void
      */
     public function getParentArticle()
     {
@@ -3583,7 +3583,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sFieldName article picture field name
      * @param int    $iIndex     article picture index
      *
-     * @return string
+     * @return string|void
      */
     public function getPictureFieldValue($sFieldName, $iIndex = null)
     {
@@ -3619,7 +3619,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns oxarticles__oxunitname value processed by \OxidEsales\Eshop\Core\Language::translateString()
      *
-     * @return string
+     * @return string|void
      */
     public function getUnitName()
     {
@@ -3931,7 +3931,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * inserts article long description to oxartextends table
      *
-     * @return null
+     * @return void
      * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "saveArtLongDesc" in next major
      */
@@ -4568,7 +4568,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param string $sFieldName field name
      *
-     * @return null ;
+     * @return void
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignParentFieldValue" in next major
      */
     protected function _assignParentFieldValue($sFieldName) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

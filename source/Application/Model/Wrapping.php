@@ -228,7 +228,7 @@ class Wrapping extends MultiLanguageModel
     /**
      * Returns returns dyn image dir
      *
-     * @return string
+     * @return string|void
      */
     public function getPictureUrl()
     {

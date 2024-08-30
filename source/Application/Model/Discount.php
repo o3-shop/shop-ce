@@ -220,7 +220,7 @@ class Discount extends MultiLanguageModel
     /**
      * Checks if discount is set up for some basket item
      *
-     * @param object $oArticle basket item
+     * @param Article $oArticle basket item
      *
      * @return bool
      * @throws DatabaseConnectionException
@@ -358,7 +358,7 @@ class Discount extends MultiLanguageModel
     /**
      * Checks if discount type is bundle discount
      *
-     * @param object $oArticle article object
+     * @param Article $oArticle article object
      *
      * @return bool
      * @throws DatabaseConnectionException

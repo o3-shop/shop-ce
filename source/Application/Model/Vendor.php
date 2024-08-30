@@ -335,7 +335,7 @@ class Vendor extends MultiLanguageModel implements IUrl
     /**
      * Returns article picture
      *
-     * @return string
+     * @return string|void
      */
     public function getIconUrl()
     {

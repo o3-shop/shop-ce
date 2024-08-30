@@ -253,7 +253,7 @@ class User extends BaseModel
      *
      * @param string $sParamName name of parameter to get value
      *
-     * @return mixed
+     * @return ListModel|Field|int|bool|array|void
      * @throws DatabaseConnectionException
      */
     public function __get($sParamName)
@@ -262,33 +262,24 @@ class User extends BaseModel
         switch ($sParamName) {
             case 'oGroups':
                 return $this->_oGroups = $this->getUserGroups();
-                break;
             case 'iCntNoticeListArticles':
                 return $this->_iCntNoticeListArticles = $this->getNoticeListArtCnt();
-                break;
             case 'iCntWishListArticles':
                 return $this->_iCntWishListArticles = $this->getWishListArtCnt();
-                break;
             // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             case 'iCntRecommLists':
                 return $this->_iCntRecommLists = $this->getRecommListsCount();
-                break;
             // END deprecated
             case 'oAddresses':
                 return $this->getUserAddresses();
-                break;
             case 'oPayments':
                 return $this->_oPayments = $this->getUserPayments();
-                break;
             case 'oxuser__oxcountry':
                 return $this->oxuser__oxcountry = $this->getUserCountry();
-                break;
             case 'sDBOptin':
                 return $this->sDBOptin = $this->getNewsSubscription()->getOptInStatus();
-                break;
             case 'sEmailFailed':
                 return $this->sEmailFailed = $this->getNewsSubscription()->getOptInEmailStatus();
-                break;
         }
     }
 
@@ -1613,7 +1604,7 @@ class User extends BaseModel
      *
      * @param bool $blForceAdmin (default false)
      *
-     * @return bool
+     * @return bool|void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
@@ -2056,7 +2047,7 @@ class User extends BaseModel
      *
      * @param string $sUid update id
      *
-     * @return bool
+     * @return bool|void
      * @throws DatabaseConnectionException
      */
     public function loadUserByUpdateId($sUid)

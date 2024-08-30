@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Exception\ArticleException;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 
 /**
@@ -67,6 +68,7 @@ class BasketContentMarkGenerator
      * @return string
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
      * @throws NoArticleException
      */
     public function getMark($sMarkIdentification)
@@ -99,6 +101,7 @@ class BasketContentMarkGenerator
      * @throws ArticleException
      * @throws ArticleInputException
      * @throws NoArticleException
+     * @throws DatabaseConnectionException
      */
     private function _formMarks($sCurrentMark) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {

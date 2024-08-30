@@ -66,7 +66,7 @@ class Newsletter extends BaseModel
     /**
      * User session object (default null).
      *
-     * @var object
+     * @var User
      */
     protected $_oUser = null;
 

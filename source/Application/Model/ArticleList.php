@@ -91,7 +91,7 @@ class ArticleList extends ListModel
     /**
      * Get history article id's from session or cookie.
      *
-     * @return array
+     * @return array|void
      */
     public function getHistoryArticles()
     {
@@ -283,7 +283,7 @@ class ArticleList extends ListModel
      * @param string $sActionID Action id
      * @param int    $iLimit    Select limit
      *
-     * @return null
+     * @return void
      */
     public function loadActionArticles($sActionID, $iLimit = null)
     {
@@ -326,7 +326,7 @@ class ArticleList extends ListModel
      *
      * @param string $sArticleId Article id
      *
-     * @return null
+     * @return void
      */
     public function loadArticleCrossSell($sArticleId)
     {
@@ -380,7 +380,7 @@ class ArticleList extends ListModel
      *
      * @param string $sArticleId Article id
      *
-     * @return null
+     * @return void
      */
     public function loadArticleAccessoires($sArticleId)
     {
@@ -681,7 +681,7 @@ class ArticleList extends ListModel
      *
      * @param array $aIds Article ID array
      *
-     * @return null;
+     * @return void
      * @throws DatabaseConnectionException
      */
     public function loadIds($aIds)
@@ -710,7 +710,7 @@ class ArticleList extends ListModel
      *
      * @param array $aOrders user orders array
      *
-     * @return null;
+     * @return void
      */
     public function loadOrderArticles($aOrders)
     {
@@ -815,9 +815,9 @@ class ArticleList extends ListModel
      *
      * @param bool $blForceUpdate if true, forces price update without timeout check, default value is FALSE
      *
-     * @throws Exception
+     * @return false|int
+     *@throws Exception
      *
-     * @return mixed
      */
     public function updateUpcomingPrices($blForceUpdate = false)
     {
@@ -1249,7 +1249,7 @@ class ArticleList extends ListModel
      * @param string $sCurrUpdateTime
      * @param DatabaseInterface $oDb
      *
-     * @return mixed
+     * @return int
      * @throws DatabaseErrorException
      */
     protected function updateOxArticles($sCurrUpdateTime, $oDb)

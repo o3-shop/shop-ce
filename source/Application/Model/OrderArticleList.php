@@ -42,7 +42,7 @@ class OrderArticleList extends ListModel
      *
      * @param string $sOxId object id
      *
-     * @return null
+     * @return void
      */
     public function loadOrderArticlesForUser($sOxId)
     {

@@ -837,7 +837,7 @@ class RssFeed extends Base
      *
      * @param Article $oArticle load lists for this article
      *
-     * @return null
+     * @return void
      * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
@@ -909,7 +909,7 @@ class RssFeed extends Base
      *
      * @param RecommendationList $oRecommList recomm list to load articles from
      *
-     * @return null
+     * @return void
      * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *

@@ -280,7 +280,7 @@ class Actions extends MultiLanguageModel
     /**
      * Returns assigned banner article picture url
      *
-     * @return string
+     * @return string|void
      */
     public function getBannerPictureUrl()
     {

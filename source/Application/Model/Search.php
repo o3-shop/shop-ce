@@ -129,7 +129,7 @@ class Search extends Base
      * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
      * @param bool $sSortBy sort by
      *
-     * @return string
+     * @return string|void
      * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSearchSelect" in next major
      */

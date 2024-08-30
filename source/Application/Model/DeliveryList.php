@@ -239,9 +239,9 @@ class DeliveryList extends ListModel
      *    $myConfig->aDeliveryList.
      *
      * @param object $oBasket basket object
-     * @param null $oUser session user
-     * @param null $sDelCountry user country id
-     * @param null $sDelSet delivery set id
+     * @param User|null $oUser session user
+     * @param string|null $sDelCountry user country id
+     * @param string|null $sDelSet delivery set id
      *
      * @return array
      * @throws DatabaseConnectionException

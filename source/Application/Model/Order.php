@@ -673,6 +673,7 @@ class Order extends BaseModel
      *
      * @param Basket $oBasket Shopping basket object
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromBasket" in next major
      */
     protected function _loadFromBasket(Basket $oBasket) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -954,10 +955,10 @@ class Order extends BaseModel
      * and finally executes it (oxPaymentGateway::executePayment()). On failure -
      * deletes order and returns * error code 2.
      *
-     * @param Basket $oBasket      basket object
-     * @param object                                     $oUserpayment user payment object
-     *
+     * @param Basket $oBasket basket object
+     * @param $oUserPayment
      * @return  integer 2 or an error code
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "executePayment" in next major
      */
     protected function _executePayment(Basket $oBasket, $oUserPayment) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1111,7 +1112,7 @@ class Order extends BaseModel
      * @param array $aArticleList array of basket products
      * @param User $oUser basket user object
      *
-     * @return null
+     * @return void
      * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateNoticeList" in next major
      */
@@ -1373,9 +1374,10 @@ class Order extends BaseModel
      * Updates stock information, deletes current ordering details from DB,
      * returns true on success.
      *
-     * @param string $sOxId Ordering ID (default null)
+     * @param null $sOxId Ordering ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function delete($sOxId = null)
     {
@@ -1968,6 +1970,7 @@ class Order extends BaseModel
      * @throws ArticleException
      * @throws ArticleInputException
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
      * @throws OutOfStockException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addArticlesToBasket" in next major
@@ -2126,6 +2129,7 @@ class Order extends BaseModel
      * @return null
      * @throws ArticleInputException
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
      * @throws OutOfStockException
      */
@@ -2162,6 +2166,9 @@ class Order extends BaseModel
         return $iValidState;
     }
 
+    /**
+     * @return int|void
+     */
     public function validateVouchers($basket)
     {
         $voucherIds = array_keys($basket->getVouchers());
@@ -2232,8 +2239,9 @@ class Order extends BaseModel
      *
      * @param Basket $oBasket basket object
      *
-     * @return null
+     * @return int|void
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function validateDelivery($oBasket)
     {
@@ -2267,8 +2275,9 @@ class Order extends BaseModel
      * @param Basket $oBasket basket object
      * @param User|null $oUser user object
      *
-     * @return null
+     * @return int|void
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function validatePayment($oBasket, $oUser = null)
     {
@@ -2449,6 +2458,7 @@ class Order extends BaseModel
      *
      * @return bool
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     private function isValidPayment($basket, $oUser = null)
     {

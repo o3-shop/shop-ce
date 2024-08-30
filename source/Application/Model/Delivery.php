@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
@@ -238,7 +239,10 @@ class Delivery extends MultiLanguageModel
      * @return double
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
+     * @throws ObjectException
      */
     public function getDeliveryAmount($oBasketItem)
     {
@@ -366,6 +370,7 @@ class Delivery extends MultiLanguageModel
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws NoArticleException
+     * @throws ObjectException
      */
     public function isForBasket($oBasket)
     {

@@ -721,7 +721,7 @@ class BasketItem extends Base
      *
      * @param string $sName parameter name
      *
-     * @return mixed
+     * @return Article|void
      * @throws ArticleException
      * @throws ArticleInputException
      * @throws DatabaseConnectionException

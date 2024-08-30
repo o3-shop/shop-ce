@@ -75,7 +75,7 @@ class UserPayment extends BaseModel
      *
      * @param string $sName name of field
      *
-     * @return string
+     * @return string|array
      */
     public function __get($sName)
     {

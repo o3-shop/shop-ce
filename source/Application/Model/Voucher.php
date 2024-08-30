@@ -935,13 +935,10 @@ class Voucher extends BaseModel
             // simple voucher mapping
             case 'sVoucherId':
                 return $this->getId();
-                break;
             case 'sVoucherNr':
                 return $this->oxvouchers__oxvouchernr;
-                break;
             case 'fVoucherdiscount':
                 return $this->oxvouchers__oxdiscount;
-                break;
         }
         return parent::__get($sName);
     }

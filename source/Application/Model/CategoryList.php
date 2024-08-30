@@ -413,7 +413,7 @@ class CategoryList extends ListModel
     /**
      * Getter for active category
      *
-     * @return Category
+     * @return Category|void
      */
     public function getClickCat()
     {
@@ -425,7 +425,7 @@ class CategoryList extends ListModel
     /**
      * Getter for active root category
      *
-     * @return array of oxCategory
+     * @return array|void array of oxCategory
      */
     public function getClickRoot()
     {
@@ -477,7 +477,7 @@ class CategoryList extends ListModel
     /**
      * Category list postprocessing routine, responsible for generation of active category path
      *
-     * @return null
+     * @return void
      * @deprecated underscore prefix violates PSR12, will be renamed to "ppAddPathInfo" in next major
      */
     protected function _ppAddPathInfo() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -742,7 +742,6 @@ class CategoryList extends ListModel
             case 'aPath':
             case 'aFullPath':
                 return $this->getPath();
-                break;
         }
         return parent::__get($sName);
     }

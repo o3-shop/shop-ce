@@ -201,7 +201,7 @@ class Attribute extends MultiLanguageModel
      *
      * @param string $sArtId article ids
      *
-     * @return null;
+     * @return array|void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */

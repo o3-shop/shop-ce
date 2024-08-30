@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 
 /**
@@ -128,9 +129,10 @@ class Address extends BaseModel
     /**
      * Get state title
      *
-     * @param string $sId state ID
+     * @param null $sId state ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getStateTitle($sId = null)
     {
