@@ -24,7 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Diagnostic tool result outputer
+ * Diagnostic tool result output
  * Performs OutputKey check of shop files and generates report file.
  *
  */

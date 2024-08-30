@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -111,9 +112,9 @@ class Attribute extends MultiLanguageModel
     /**
      * Assigns attribute to variant
      *
-     * @param array $aMDVariants article ids with selectionlist values
+     * @param array $aMDVariants article IDs with selection-list values
      * @param array $aSelTitle selection list titles
-     * @throws \Exception
+     * @throws Exception
      */
     public function assignVarToAttribute($aMDVariants, $aSelTitle)
     {
@@ -156,7 +157,7 @@ class Attribute extends MultiLanguageModel
      *
      * @param string $sSelTitle selection list title
      *
-     * @return mixed attribute id or false
+     * @return false|string attribute id or false
      * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAttrId" in next major
      */
@@ -176,7 +177,7 @@ class Attribute extends MultiLanguageModel
      * @param array $aSelTitle selection list title
      *
      * @return string attribute id
-     * @throws \Exception
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "createAttribute" in next major
      */
     protected function _createAttribute($aSelTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -281,7 +282,7 @@ class Attribute extends MultiLanguageModel
     /**
      * Get attribute values
      *
-     * @return Array
+     * @return array
      */
     public function getValues()
     {

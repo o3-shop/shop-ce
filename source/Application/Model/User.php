@@ -44,6 +44,7 @@ use OxidEsales\Eshop\Core\Sha512Hasher;
 use OxidEsales\Eshop\Core\UtilsObject;
 use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
+use oxObjectException;
 use Psr\Log\LoggerInterface;
 
 use function bin2hex;
@@ -185,7 +186,7 @@ class User extends BaseModel
     protected $_oSelAddress = null;
 
     /**
-     * Id of wishlist user
+     * ID of wishlist user
      *
      * @var string
      */
@@ -321,13 +322,13 @@ class User extends BaseModel
     }
 
     /**
-     * Returns user country (object) according to passed parameters or they
+     * Returns user country (object) according to passed parameters, or they
      * are taken from user object ( oxid, country id) and session (language)
      *
      * @param null $sCountryId country id (optional)
      * @param null $iLang active language (optional)
      *
-     * @return string
+     * @return Field|object|null
      * @throws DatabaseConnectionException
      */
     public function getUserCountry($sCountryId = null, $iLang = null)
@@ -353,7 +354,7 @@ class User extends BaseModel
     }
 
     /**
-     * Returns user countryid according to passed name
+     * Returns user's country-ID according to passed name
      *
      * @param null $sCountry country
      *
@@ -575,7 +576,7 @@ class User extends BaseModel
             Field::T_RAW
         );
 
-        // processing birth date which came from output as array
+        // processing birthdate which came from output as array
         if ($this->oxuser__oxbirthdate && is_array($this->oxuser__oxbirthdate->value)) {
             $this->oxuser__oxbirthdate = new Field(
                 $this->convertBirthday($this->oxuser__oxbirthdate->value),
@@ -629,7 +630,7 @@ class User extends BaseModel
 
     /**
      * Removes user data stored in some DB tables (such as oxuserpayments, oxaddress
-     * oxobject2group, oxremark, etc). Return true on success.
+     * oxobject2group, oxremark, etc.). Return true on success.
      *
      * @param null $oxid object ID (default null)
      *
@@ -670,10 +671,10 @@ class User extends BaseModel
 
             $database->commitTransaction();
             $deleted = true;
-        } catch (Exception $exeption) {
+        } catch (Exception $exception) {
             $database->rollbackTransaction();
 
-            throw $exeption;
+            throw $exception;
         }
 
         return $deleted;
@@ -695,7 +696,7 @@ class User extends BaseModel
             $this->oxuser__oxcreate->setValue(Registry::getUtilsDate()->formatDBDate($this->oxuser__oxcreate->value));
         }
 
-        // change newsSubcription user id
+        // change newsSubscription user id
         if (isset($this->_oNewsSubscription)) {
             $this->_oNewsSubscription->oxnewssubscribed__oxuserid = new Field($oxID, Field::T_RAW);
         }
@@ -794,7 +795,7 @@ class User extends BaseModel
     }
 
     /**
-     * Caclulates amount of orders made by user
+     * Calculates amount of orders made by user
      *
      * @return int
      * @throws DatabaseConnectionException
@@ -975,7 +976,7 @@ class User extends BaseModel
     public function addToGroup($sGroupID)
     {
         if (!$this->inGroup($sGroupID)) {
-            // create oxgroup object
+            // create Group object
             $oGroup = oxNew(Groups::class);
             if ($oGroup->load($sGroupID)) {
                 $oNewGroup = oxNew(Object2Group::class);
@@ -1009,9 +1010,9 @@ class User extends BaseModel
                 ':oxobjectid' => $this->getId(),
                 ':oxgroupsid' => $sGroupID
             ]);
-            foreach ($oGroups as $oRemgroup) {
-                if ($oRemgroup->delete()) {
-                    unset($this->_oGroups[$oRemgroup->oxobject2group__oxgroupsid->value]);
+            foreach ($oGroups as $oRemoveGroup) {
+                if ($oRemoveGroup->delete()) {
+                    unset($this->_oGroups[$oRemoveGroup->oxobject2group__oxgroupsid->value]);
                 }
             }
         }
@@ -1029,15 +1030,15 @@ class User extends BaseModel
         if (is_numeric($iSuccess) && $iSuccess != 2 && $iSuccess <= 3) {
             //adding user to particular customer groups
             $myConfig = Registry::getConfig();
-            $dMidlleCustPrice = (float) $myConfig->getConfigParam('sMidlleCustPrice');
+            $dMiddleCustPrice = (float) $myConfig->getConfigParam('sMidlleCustPrice');
             $dLargeCustPrice = (float) $myConfig->getConfigParam('sLargeCustPrice');
 
             $this->addToGroup('oxidcustomer');
             $dBasketPrice = $oBasket->getPrice()->getBruttoPrice();
-            if ($dBasketPrice < $dMidlleCustPrice) {
+            if ($dBasketPrice < $dMiddleCustPrice) {
                 $this->addToGroup('oxidsmallcust');
             }
-            if ($dBasketPrice >= $dMidlleCustPrice && $dBasketPrice < $dLargeCustPrice) {
+            if ($dBasketPrice >= $dMiddleCustPrice && $dBasketPrice < $dLargeCustPrice) {
                 $this->addToGroup('oxidmiddlecust');
             }
             if ($dBasketPrice >= $dLargeCustPrice) {
@@ -1150,7 +1151,7 @@ class User extends BaseModel
     }
 
     /**
-     * Performs bunch of checks if user profile data is correct; on any
+     * Performs a bunch of checks if user profile data is correct; on any
      * error exception is thrown
      *
      * @param string $sLogin user login name
@@ -1248,7 +1249,7 @@ class User extends BaseModel
 
     /**
      * When changing/updating user information in frontend this method validates user
-     * input. If data is fine - automatically assigns this values. Additionally calls
+     * input. If data is fine - automatically assigns this values. Additionally, calls
      * methods (User::_setAutoGroups, User::setNewsSubscription) to perform automatic
      * groups assignment and returns newsletter subscription status. If some action
      * fails - exception is thrown.
@@ -1360,7 +1361,7 @@ class User extends BaseModel
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
-     *                                        compatible with the current passhword hash any more.
+     *                                        compatible with the current password hash anymore.
      *
      */
     protected function _getLoginQueryHashedWithMD5($userName, $password, $shopId, $isAdmin) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1398,7 +1399,7 @@ class User extends BaseModel
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
-     *                                        compatible with the current passhword hash any more.
+     *                                        compatible with the current password hash anymore.
      *
      */
     protected function _getLoginQuery($userName, $password, $shopId, $isAdmin) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1423,7 +1424,7 @@ class User extends BaseModel
     }
 
     /**
-     * Returns shopselect part of login query sql
+     * Returns shop-select part of login query sql
      *
      * @param object $myConfig shop config
      * @param string $sShopID  shopid
@@ -1749,9 +1750,9 @@ class User extends BaseModel
                 $this->setId();
 
                 // map all user data fields
-                foreach ($aData as $fldname => $value) {
-                    $sField = "oxuser__" . strtolower($fldname);
-                    $this->$sField = new Field($aData[$fldname]);
+                foreach ($aData as $fieldName => $value) {
+                    $sField = "oxuser__" . strtolower($fieldName);
+                    $this->$sField = new Field($aData[$fieldName]);
                 }
 
                 $this->oxuser__oxactive = new Field(1);
@@ -1853,7 +1854,7 @@ class User extends BaseModel
      * @return bool
      * @throws DatabaseConnectionException
      * @throws DatabaseException
-     * @throws \oxObjectException
+     * @throws oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -2138,7 +2139,7 @@ class User extends BaseModel
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
-     *                                        compatible with the current passhword hash any more.
+     *                                        compatible with the current password hash anymore.
      *
 
      *
@@ -2387,7 +2388,7 @@ class User extends BaseModel
         $sUserId = $this->getId();
 
         if ($sUserId && is_array($aRecEmail) && count($aRecEmail) > 0) {
-            //iserting statistics about invitation
+            // inserting statistics about invitation
             $sDate = Registry::getUtilsDate()->formatDBDate(date("Y-m-d"), true);
             foreach ($aRecEmail as $sRecEmail) {
                 $sSql = "INSERT INTO oxinvitations SET oxuserid = :oxuserid, oxemail = :oxemail, oxdate = :oxdate, oxpending = '1', oxaccepted = '0', oxtype = '1'";
@@ -2401,7 +2402,7 @@ class User extends BaseModel
     }
 
     /**
-     * return user id by user name
+     * return user id by username
      *
      * @param string $userName
      *
@@ -2466,7 +2467,7 @@ class User extends BaseModel
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
-     *                                        compatible with the current passhword hash any more.
+     *                                        compatible with the current password hash anymore.
      *
      */
     protected function _dbLogin(string $userName, $password, $shopID) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -2678,7 +2679,7 @@ class User extends BaseModel
     }
 
     /**
-     * Deletes noticelists, wishlists or saved baskets
+     * Deletes notice-lists, wishlists or saved baskets
      *
      * @param DatabaseInterface $database
      * @throws DatabaseErrorException
@@ -2781,7 +2782,7 @@ class User extends BaseModel
     /**
      * Callback function for array_walk to delete items using the delete method of the given model class
      *
-     * @param string  $id        Id of the item to be deleted
+     * @param string  $id        ID of the item to be deleted
      * @param integer $key       Key of the array
      * @param string  $className Model class to be used
      */
@@ -2808,7 +2809,7 @@ class User extends BaseModel
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
-     *                                        compatible with the current passhword hash any more.
+     *                                        compatible with the current password hash anymore.
      *
      * @return string
      */
@@ -2826,19 +2827,19 @@ class User extends BaseModel
 
     /**
      * @param string            $password
-     * @param DatabaseInterface $databaseb
+     * @param DatabaseInterface $database
      *
      * @deprecated since v6.4.0 (2019-03-15); `\OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface`
      *                                        was added as the new default for hashing passwords. Hashing passwords with
      *                                        MD5 and SHA512 is still supported in order support login with older
      *                                        password hashes. Therefor this method might not be
-     *                                        compatible with the current passhword hash any more.
+     *                                        compatible with the current password hash anymore.
      *
      * @return string
      */
-    protected function formQueryPartForMD5Password($password, DatabaseInterface $databaseb): string
+    protected function formQueryPartForMD5Password($password, DatabaseInterface $database): string
     {
-        $sPassSelect = ' oxuser.oxpassword = BINARY MD5( CONCAT( ' . $databaseb->quote($password) . ', UNHEX( oxuser.oxpasssalt ) ) ) ';
+        $sPassSelect = ' oxuser.oxpassword = BINARY MD5( CONCAT( ' . $database->quote($password) . ', UNHEX( oxuser.oxpasssalt ) ) ) ';
 
         return $sPassSelect;
     }
@@ -2868,7 +2869,7 @@ class User extends BaseModel
     {
         $sShopSelect = '';
 
-        // Admin view: can only login with higher than 'user' rights
+        // Admin view: can only log in with higher than 'user' rights
         if ($blAdmin) {
             $sShopSelect = " and ( oxrights != 'user' ) ";
         } else {

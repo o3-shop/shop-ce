@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -116,6 +117,7 @@ class PriceAlarm extends BaseModel
      * Loads pricealarm article
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getArticle()
     {
@@ -134,6 +136,7 @@ class PriceAlarm extends BaseModel
      * Returns formatted pricealarm article original price
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getFPrice()
     {
@@ -153,6 +156,7 @@ class PriceAlarm extends BaseModel
      * Returns pricealarm article original price
      *
      * @return double
+     * @throws DatabaseConnectionException
      */
     public function getPrice()
     {
@@ -178,6 +182,7 @@ class PriceAlarm extends BaseModel
      * Returns pricealarm article full title
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTitle()
     {
@@ -243,6 +248,7 @@ class PriceAlarm extends BaseModel
      * Returns pricealarm status
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     public function getPriceAlarmStatus()
     {

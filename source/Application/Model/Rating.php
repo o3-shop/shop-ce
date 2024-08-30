@@ -110,9 +110,9 @@ class Rating extends BaseModel
      */
     public function getRatingAverage($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
-        $sQuerySnipet = " AND `oxobjectid` = :oxobjectid";
+        $sQuerySnippet = " AND `oxobjectid` = :oxobjectid";
         if (is_array($aIncludedObjectsIds) && count($aIncludedObjectsIds) > 0) {
-            $sQuerySnipet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
+            $sQuerySnippet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
         }
 
         $sSelect = "
@@ -121,7 +121,7 @@ class Rating extends BaseModel
             FROM `oxreviews`
             WHERE `oxrating` > 0
                  AND `oxtype` = :oxtype"
-                   . $sQuerySnipet . "
+                   . $sQuerySnippet . "
             LIMIT 1";
 
         $params = [
@@ -149,9 +149,9 @@ class Rating extends BaseModel
      */
     public function getRatingCount($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
-        $sQuerySnipet = " AND `oxobjectid` = :oxobjectid";
+        $sQuerySnippet = " AND `oxobjectid` = :oxobjectid";
         if (is_array($aIncludedObjectsIds) && count($aIncludedObjectsIds) > 0) {
-            $sQuerySnipet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
+            $sQuerySnippet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
         }
 
         $sSelect = "
@@ -160,7 +160,7 @@ class Rating extends BaseModel
             FROM `oxreviews`
             WHERE `oxrating` > 0
                 AND `oxtype` = :oxtype"
-                   . $sQuerySnipet . "
+                   . $sQuerySnippet . "
             LIMIT 1";
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -174,7 +174,7 @@ class Rating extends BaseModel
     }
 
     /**
-     * Retuns review object type
+     * Returns review object type
      *
      * @return string
      */
@@ -184,7 +184,7 @@ class Rating extends BaseModel
     }
 
     /**
-     * Retuns review object id
+     * Returns review object id
      *
      * @return string
      */

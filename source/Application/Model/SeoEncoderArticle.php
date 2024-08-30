@@ -207,6 +207,7 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleUri($oArticle, $iLang, $blRegenerate = false)
     {
@@ -367,7 +368,7 @@ class SeoEncoderArticle extends SeoEncoder
         if (!($sTitle = $oArticle->oxarticles__oxtitle->value)) {
             // taking parent article title
             if (($sParentId = $oArticle->oxarticles__oxparentid->value)) {
-                // looking in cache ..
+                // looking in cache ...
                 if (!isset(self::$_aTitleCache[$sParentId])) {
                     $oDb = DatabaseProvider::getDb();
                     $sQ = "select oxtitle from " . $oArticle->getViewName() . " where oxid = :oxid";
@@ -577,6 +578,7 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleUrl($oArticle, $iLang = null, $iType = 0)
     {
@@ -640,6 +642,7 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

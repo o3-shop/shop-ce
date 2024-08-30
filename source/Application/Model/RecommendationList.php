@@ -327,7 +327,7 @@ class RecommendationList extends BaseModel implements IUrl
      * loads first articles to recomm list also ordering them and clearing not usable list objects
      * ordering priorities:
      *     1. first show articles from our search
-     *     2. do not shown articles as 1st, which are shown in other recomm lists as 1st
+     *     2. do not show articles as 1st, which are shown in other recomm lists as 1st
      *
      * @param ListModel $oRecommList recommendation list
      * @param array $aIds article ids
@@ -457,6 +457,7 @@ class RecommendationList extends BaseModel implements IUrl
      * Collects user written reviews about an article.
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
      */
     public function getReviews()
     {

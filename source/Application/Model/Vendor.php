@@ -70,7 +70,7 @@ class Vendor extends MultiLanguageModel implements IUrl
     protected $_blIsVisible;
 
     /**
-     * has visible endors state of a category
+     * has visible vendors state of a category
      *
      * @var bool
      */
@@ -265,7 +265,7 @@ class Vendor extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * sets the visibilty of a category
+     * sets the visibility of a category
      *
      * @param bool $blVisible vendors visibility status setter
      */
@@ -351,7 +351,7 @@ class Vendor extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns category thumbnail picture url if exist, false - if not
+     * Returns category thumbnail picture url if exists, false - if not
      *
      * @return false
      */

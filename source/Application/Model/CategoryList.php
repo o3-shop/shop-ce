@@ -265,7 +265,7 @@ class CategoryList extends ListModel
     /**
      * returns sql snippet for union of select category's and its upper level
      * siblings of the same root (siblings of the category, and parents and
-     * grandparents etc)
+     * grandparents etc.)
      *
      * @param Category $oCat current category object
      * @param null $aColumns required column names (optional)
@@ -440,7 +440,7 @@ class CategoryList extends ListModel
      */
     protected function _ppRemoveInactiveCategories() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        // Collect all items which must be remove
+        // Collect all items which must be removed
         $aRemoveList = [];
         foreach ($this->_aArray as $sId => $oCat) {
             if ($oCat->oxcategories__oxppremove->value) {
@@ -517,7 +517,7 @@ class CategoryList extends ListModel
     }
 
     /**
-     * Category list postprocessing routine, responsible building an sorting of hierarchical category tree
+     * Category list postprocessing routine, responsible building a sorting of hierarchical category tree
      * @deprecated underscore prefix violates PSR12, will be renamed to "ppBuildTree" in next major
      */
     protected function _ppBuildTree() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -657,7 +657,7 @@ class CategoryList extends ListModel
     /**
      * Recursively updates root nodes, this method is used (only) in updateCategoryTree()
      *
-     * @param string $oxRootId rootid of tree
+     * @param string $oxRootId root-ID of tree
      * @param bool $isRoot is the current node root?
      * @param string $thisRoot the id of the root
      * @throws DatabaseConnectionException
@@ -734,7 +734,7 @@ class CategoryList extends ListModel
      *
      * @param string $sName variable name
      *
-     * @return string
+     * @return array
      */
     public function __get($sName)
     {

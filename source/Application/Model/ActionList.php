@@ -91,7 +91,7 @@ class ActionList extends ListModel
     }
 
     /**
-     * Loads next not yet started promotions by cound
+     * Loads next not yet started promotions by count
      *
      * @param int $iCount count to load
      * @throws DatabaseConnectionException

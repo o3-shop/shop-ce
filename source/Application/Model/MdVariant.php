@@ -25,7 +25,7 @@ use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Defines an element of multidimentional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
+ * Defines an element of multidimensional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
  *
  */
 class MdVariant extends Base
@@ -73,7 +73,7 @@ class MdVariant extends Base
     protected $_dPrice = null;
 
     /**
-     * Variant Price text represenatation. Eg. "10,00 EUR" or "from 8,00 EUR"
+     * Variant Price text representation. E.g. "10,00 EUR" or "from 8,00 EUR"
      *
      * @var string
      */
@@ -187,7 +187,7 @@ class MdVariant extends Base
     }
 
     /**
-     * Returns corresponding article URL or recusively first variant URL from subvariant set
+     * Returns corresponding article URL or recursively first variant URL from subvariant set
      *
      * @return string
      */
@@ -334,7 +334,7 @@ class MdVariant extends Base
     }
 
     /**
-     * Returns corresponding article id or recusively first variant id from subvariant set
+     * Returns corresponding article id or recursively first variant id from subvariant set
      *
      * @return string
      */

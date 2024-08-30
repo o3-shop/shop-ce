@@ -23,12 +23,14 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Lightweight variant handler. Implemnets only absolutely needed oxArticle methods.
+ * Lightweight variant handler. Implements only absolutely needed oxArticle methods.
  *
  */
 class SimpleVariant extends MultiLanguageModel implements IUrl
@@ -55,14 +57,14 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     protected $_oParent = null;
 
     /**
-     * Stardard/dynamic article urls for languages
+     * Standard/dynamic article urls for languages
      *
      * @var array
      */
     protected $_aStdUrls = [];
 
     /**
-     * Stardard/dynamic article urls for languages
+     * Standard/dynamic article urls for languages
      *
      * @var array
      */
@@ -94,7 +96,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Implementing (fakeing) performance friendly method from oxArticle
+     * Implementing (faking) performance friendly method from oxArticle
      *oxbase
      *
      * @return null
@@ -149,6 +151,9 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      * Implementing (faking) performance friendly method from oxArticle
      *
      * @return Price|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getPrice()
     {
@@ -207,6 +212,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      * Applies discounts which should be applied in general case (for 0 amount)
      *
      * @param Price $oPrice Price object
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "applyParentDiscounts" in next major
      */
     protected function _applyParentDiscounts($oPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -220,6 +226,8 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      * apply parent article VAT to given price
      *
      * @param Price $oPrice price object
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "applyParentVat" in next major
      */
     protected function _applyParentVat($oPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -240,9 +248,12 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns formated product price.
+     * Returns formatted product price.
      *
      * @return string|null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getFPrice()
     {
@@ -295,6 +306,8 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      * @param string $sCatNid category ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function inCategory($sCatNid)
     {
@@ -312,6 +325,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      * @param string $sCatNid Price category ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function inPriceCategory($sCatNid)
     {
@@ -378,6 +392,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBaseSeoLink($iLang)
     {
@@ -393,6 +408,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getLink($iLang = null)
     {

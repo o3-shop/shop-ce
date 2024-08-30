@@ -220,7 +220,7 @@ class Order extends BaseModel
     protected $_sClassName = 'oxorder';
 
     /**
-     * Useage of seperate orders numbering for different shops
+     * Usage of separate orders numbering for different shops
      *
      * @var bool
      */
@@ -344,7 +344,7 @@ class Order extends BaseModel
     }
 
     /**
-     * returned assigned orderarticles from order
+     * returned assigned order-articles from order
      *
      * @param bool $blExcludeCanceled excludes canceled items from list
      *
@@ -495,7 +495,7 @@ class Order extends BaseModel
      * and saves full order with error status. Then executes payment. On failure -
      * deletes order and returns error code 2. On success - saves order (Order::save()),
      * removes article from wishlist (Order::_updateWishlist()), updates voucher data
-     * (Order::_markVouchers()). Finally sends order confirmation email to customer
+     * (Order::_markVouchers()). Finally, sends order confirmation email to customer
      * (Email::SendOrderEMailToUser()) and shop owner (Email::SendOrderEMailToOwner()).
      * If this is order recalculation, skipping payment execution, marking vouchers as used
      * and sending order by email to shop owner and user
@@ -576,7 +576,7 @@ class Order extends BaseModel
         // updating order trans status (success status)
         $this->_setOrderStatus('OK');
 
-        // store orderid
+        // store order-ID
         $oBasket->setOrderId($this->getId());
 
         // updating wish lists
@@ -668,10 +668,11 @@ class Order extends BaseModel
     /**
      * Gathers and assigns to new oxOrder object customer data, payment, delivery
      * and shipping info, customer order remark, currency, voucher, language data.
-     * Additionally stores general discount and wrapping. Sets order status to "error"
+     * Additionally, stores general discount and wrapping. Sets order status to "error"
      * and creates oxOrderArticle objects and assigns to them basket articles.
      *
      * @param Basket $oBasket Shopping basket object
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromBasket" in next major
      */
     protected function _loadFromBasket(Basket $oBasket) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -803,21 +804,21 @@ class Order extends BaseModel
 
 
         // delivery address
-        if (($oDelAdress = $this->getDelAddressInfo())) {
+        if (($oDelAddress = $this->getDelAddressInfo())) {
             // set delivery address
-            $this->oxorder__oxdelcompany = clone $oDelAdress->oxaddress__oxcompany;
-            $this->oxorder__oxdelfname = clone $oDelAdress->oxaddress__oxfname;
-            $this->oxorder__oxdellname = clone $oDelAdress->oxaddress__oxlname;
-            $this->oxorder__oxdelstreet = clone $oDelAdress->oxaddress__oxstreet;
-            $this->oxorder__oxdelstreetnr = clone $oDelAdress->oxaddress__oxstreetnr;
-            $this->oxorder__oxdeladdinfo = clone $oDelAdress->oxaddress__oxaddinfo;
-            $this->oxorder__oxdelcity = clone $oDelAdress->oxaddress__oxcity;
-            $this->oxorder__oxdelcountryid = clone $oDelAdress->oxaddress__oxcountryid;
-            $this->oxorder__oxdelstateid = clone $oDelAdress->oxaddress__oxstateid;
-            $this->oxorder__oxdelzip = clone $oDelAdress->oxaddress__oxzip;
-            $this->oxorder__oxdelfon = clone $oDelAdress->oxaddress__oxfon;
-            $this->oxorder__oxdelfax = clone $oDelAdress->oxaddress__oxfax;
-            $this->oxorder__oxdelsal = clone $oDelAdress->oxaddress__oxsal;
+            $this->oxorder__oxdelcompany = clone $oDelAddress->oxaddress__oxcompany;
+            $this->oxorder__oxdelfname = clone $oDelAddress->oxaddress__oxfname;
+            $this->oxorder__oxdellname = clone $oDelAddress->oxaddress__oxlname;
+            $this->oxorder__oxdelstreet = clone $oDelAddress->oxaddress__oxstreet;
+            $this->oxorder__oxdelstreetnr = clone $oDelAddress->oxaddress__oxstreetnr;
+            $this->oxorder__oxdeladdinfo = clone $oDelAddress->oxaddress__oxaddinfo;
+            $this->oxorder__oxdelcity = clone $oDelAddress->oxaddress__oxcity;
+            $this->oxorder__oxdelcountryid = clone $oDelAddress->oxaddress__oxcountryid;
+            $this->oxorder__oxdelstateid = clone $oDelAddress->oxaddress__oxstateid;
+            $this->oxorder__oxdelzip = clone $oDelAddress->oxaddress__oxzip;
+            $this->oxorder__oxdelfon = clone $oDelAddress->oxaddress__oxfon;
+            $this->oxorder__oxdelfax = clone $oDelAddress->oxaddress__oxfax;
+            $this->oxorder__oxdelsal = clone $oDelAddress->oxaddress__oxsal;
         }
     }
 
@@ -948,7 +949,7 @@ class Order extends BaseModel
     }
 
     /**
-     * Executes payment. Additionally loads oxPaymentGateway object, initiates
+     * Executes payment. Additionally, loads oxPaymentGateway object, initiates
      * it by adding payment parameters (oxPaymentGateway::setPaymentParams())
      * and finally executes it (oxPaymentGateway::executePayment()). On failure -
      * deletes order and returns * error code 2.
@@ -959,10 +960,10 @@ class Order extends BaseModel
      * @return  integer 2 or an error code
      * @deprecated underscore prefix violates PSR12, will be renamed to "executePayment" in next major
      */
-    protected function _executePayment(Basket $oBasket, $oUserpayment) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _executePayment(Basket $oBasket, $oUserPayment) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oPayTransaction = $this->_getGateway();
-        $oPayTransaction->setPaymentParams($oUserpayment);
+        $oPayTransaction->setPaymentParams($oUserPayment);
 
         if (!$oPayTransaction->executePayment($oBasket->getPrice()->getBruttoPrice(), $this)) {
             $this->delete();
@@ -1038,21 +1039,21 @@ class Order extends BaseModel
         // Store this payment information, we might allow users later to
         // reactivate already give payment information
 
-        $oUserpayment = oxNew(UserPayment::class);
-        $oUserpayment->oxuserpayments__oxuserid = clone $this->oxorder__oxuserid;
-        $oUserpayment->oxuserpayments__oxpaymentsid = new Field($sPaymentid, Field::T_RAW);
-        $oUserpayment->oxuserpayments__oxvalue = new Field(Registry::getUtils()->assignValuesToText($aDynVal), Field::T_RAW);
-        $oUserpayment->oxpayments__oxdesc = clone $oPayment->oxpayments__oxdesc;
-        $oUserpayment->oxpayments__oxlongdesc = clone $oPayment->oxpayments__oxlongdesc;
-        $oUserpayment->setDynValues($aPaymentDynValues);
-        $oUserpayment->save();
+        $oUserPayment = oxNew(UserPayment::class);
+        $oUserPayment->oxuserpayments__oxuserid = clone $this->oxorder__oxuserid;
+        $oUserPayment->oxuserpayments__oxpaymentsid = new Field($sPaymentid, Field::T_RAW);
+        $oUserPayment->oxuserpayments__oxvalue = new Field(Registry::getUtils()->assignValuesToText($aDynVal), Field::T_RAW);
+        $oUserPayment->oxpayments__oxdesc = clone $oPayment->oxpayments__oxdesc;
+        $oUserPayment->oxpayments__oxlongdesc = clone $oPayment->oxpayments__oxlongdesc;
+        $oUserPayment->setDynValues($aPaymentDynValues);
+        $oUserPayment->save();
 
         // storing payment information to order
-        $this->oxorder__oxpaymentid = new Field($oUserpayment->getId(), Field::T_RAW);
-        $this->oxorder__oxpaymenttype = clone $oUserpayment->oxuserpayments__oxpaymentsid;
+        $this->oxorder__oxpaymentid = new Field($oUserPayment->getId(), Field::T_RAW);
+        $this->oxorder__oxpaymenttype = clone $oUserPayment->oxuserpayments__oxpaymentsid;
 
         // returning user payment object which will be used later in code ...
-        return $oUserpayment;
+        return $oUserPayment;
     }
 
     /**
@@ -1069,8 +1070,9 @@ class Order extends BaseModel
      * aAdds/removes user chosen article to/from his noticelist
      * or wishlist (oxuserbasket::addItemToBasket()).
      *
-     * @param array  $aArticleList basket products
-     * @param object $oUser        user object
+     * @param array $aArticleList basket products
+     * @param object $oUser user object
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateWishlist" in next major
      */
     protected function _updateWishlist($aArticleList, $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1106,10 +1108,11 @@ class Order extends BaseModel
      * After order is finished this method cleans up users notice list, by
      * removing bought items from users notice list
      *
-     * @param array                                    $aArticleList array of basket products
-     * @param User $oUser        basket user object
+     * @param array $aArticleList array of basket products
+     * @param User $oUser basket user object
      *
      * @return null
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateNoticeList" in next major
      */
     protected function _updateNoticeList($aArticleList, $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1126,7 +1129,7 @@ class Order extends BaseModel
             return;
         }
 
-        // loading users notice list ..
+        // loading users notice list ...
         if ($oUserBasket = $oUser->getBasket('noticelist')) {
             // only if wishlist is enabled
             foreach ($aArticleList as $oContent) {
@@ -1211,23 +1214,23 @@ class Order extends BaseModel
      */
     public function getDelAddressInfo()
     {
-        $oDelAdress = null;
+        $oDelAddress = null;
         if (!($soxAddressId = Registry::getConfig()->getRequestParameter('deladrid'))) {
             $soxAddressId = Registry::getSession()->getVariable('deladrid');
         }
         if ($soxAddressId) {
-            $oDelAdress = oxNew(Address::class);
-            $oDelAdress->load($soxAddressId);
+            $oDelAddress = oxNew(Address::class);
+            $oDelAddress->load($soxAddressId);
 
             //get delivery country name from delivery country id
-            if ($oDelAdress->oxaddress__oxcountryid->value && $oDelAdress->oxaddress__oxcountryid->value != -1) {
+            if ($oDelAddress->oxaddress__oxcountryid->value && $oDelAddress->oxaddress__oxcountryid->value != -1) {
                 $oCountry = oxNew(Country::class);
-                $oCountry->load($oDelAdress->oxaddress__oxcountryid->value);
-                $oDelAdress->oxaddress__oxcountry = clone $oCountry->oxcountry__oxtitle;
+                $oCountry->load($oDelAddress->oxaddress__oxcountryid->value);
+                $oDelAddress->oxaddress__oxcountry = clone $oCountry->oxcountry__oxtitle;
             }
         }
 
-        return $oDelAdress;
+        return $oDelAddress;
     }
 
     /**
@@ -1253,7 +1256,7 @@ class Order extends BaseModel
                 throw $oEx;
             }
 
-            // check if its still available
+            // check if it's still available
             $dArtStockAmount = $oBasket->getArtStockInBasket($oProd->getId(), $key);
             $iOnStock = $oProd->checkForStock($oContent->getAmount(), $dArtStockAmount);
             if ($iOnStock !== true) {
@@ -1284,7 +1287,7 @@ class Order extends BaseModel
         $myConfig = Registry::getConfig();
         $oUtilsDate = Registry::getUtilsDate();
 
-        //V #M525 orderdate must be the same as it was
+        //V #M525 oxorderdate must be the same as it was
         if (!$this->oxorder__oxorderdate || !$this->oxorder__oxorderdate->value) {
             $this->oxorder__oxorderdate = new Field(date('Y-m-d H:i:s', $oUtilsDate->getTime()), Field::T_RAW);
         } else {
@@ -1570,7 +1573,7 @@ class Order extends BaseModel
     }
 
     /**
-     * Fake entries, pdf is generated in modules.. myorder.
+     * Fake entries, pdf is generated in modules...
      *
      * @param mixed $oPdf pdf object
      */
@@ -1579,7 +1582,7 @@ class Order extends BaseModel
     }
 
     /**
-     * Fake entries, pdf is generated in modules.. myorder.
+     * Fake entries, pdf is generated in modules...
      *
      * @param mixed $oPdf pdf object
      */
@@ -1588,7 +1591,7 @@ class Order extends BaseModel
     }
 
     /**
-     * Fake entries, pdf is generated in modules.. myorder.
+     * Fake entries, pdf is generated in modules...
      *
      * @param mixed $oPdf pdf object
      */
@@ -1597,7 +1600,7 @@ class Order extends BaseModel
     }
 
     /**
-     * Fake entries, pdf is generated in modules.. myorder.
+     * Fake entries, pdf is generated in modules...
      *
      * @param string $sFilename file name
      * @param int    $iSelLang  selected language
@@ -1868,6 +1871,7 @@ class Order extends BaseModel
      * Get payment type
      *
      * @return UserPayment
+     * @throws DatabaseConnectionException
      */
     public function getPaymentType()
     {
@@ -1937,10 +1941,12 @@ class Order extends BaseModel
      *
      * @param Basket $oBasket basket object
      * @param ListModel $aOrderArticles order articles
+     * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
      * @throws OutOfStockException
-     * @throws ArticleException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addOrderArticlesToBasket" in next major
      */
     protected function _addOrderArticlesToBasket($oBasket, $aOrderArticles) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -2169,7 +2175,7 @@ class Order extends BaseModel
     }
 
     /**
-     * Validates basket. Currently checks if minimum order price > basket price
+     * Validates basket. Currently, checks if minimum order price > basket price
      *
      * @param Basket $oBasket basket object
      *
@@ -2438,10 +2444,11 @@ class Order extends BaseModel
     /**
      * Returns true if payment is valid.
      *
-     * @param Basket    $basket
-     * @param User|null $oUser  user object
+     * @param Basket $basket
+     * @param User|null $oUser user object
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     private function isValidPayment($basket, $oUser = null)
     {
@@ -2467,6 +2474,7 @@ class Order extends BaseModel
 
     /**
      * @return mixed
+     * @throws DatabaseConnectionException
      */
     private function getDynamicValues()
     {
@@ -2485,6 +2493,7 @@ class Order extends BaseModel
 
     /**
      * @return array
+     * @throws DatabaseConnectionException
      */
     private function getDynamicValuesFromPaymentType()
     {

@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
@@ -71,6 +72,7 @@ class DiscountList extends ListModel
      *
      * @return DiscountList
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDiscountList" in next major
      */
     protected function _getList($oUser = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -81,7 +83,7 @@ class DiscountList extends ListModel
             // loading list
             $this->selectString($this->_getFilterSelect($oUser));
 
-            // setting list proterties
+            // setting list properties
             $this->_blReload = false; // reload marker
             $this->_sUserId = $sUserId; // discount list user id
         }
@@ -93,11 +95,13 @@ class DiscountList extends ListModel
     }
 
     /**
-     * Returns user country id for for discount selection
+     * Returns user country-ID for discount selection
      *
      * @param User $oUser oxuser object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCountryId($oUser)
     {
@@ -124,6 +128,7 @@ class DiscountList extends ListModel
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -188,6 +193,7 @@ class DiscountList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleDiscounts($oArticle, $oUser = null)
     {
@@ -211,6 +217,7 @@ class DiscountList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketItemDiscounts($oArticle, $oBasket, $oUser = null)
     {
@@ -234,6 +241,7 @@ class DiscountList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketDiscounts($oBasket, $oUser = null)
     {
@@ -258,6 +266,7 @@ class DiscountList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketItemBundleDiscounts($oArticle, $oBasket, $oUser = null)
     {
@@ -276,11 +285,12 @@ class DiscountList extends ListModel
     /**
      * Returns array of basket bundle discounts
      *
-     * @param Basket $oBasket oxbasket object
+     * @param Basket $oBasket Basket object
      * @param null $oUser oxuser object (optional)
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketBundleDiscounts($oBasket, $oUser = null)
     {

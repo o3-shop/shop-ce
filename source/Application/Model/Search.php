@@ -40,7 +40,7 @@ class Search extends Base
     protected $_iLanguage = 0;
 
     /**
-     * Class constructor. Executes search lenguage setter
+     * Class constructor. Executes search language setter
      */
     public function __construct()
     {
@@ -65,9 +65,9 @@ class Search extends Base
      * Returns a list of articles according to search parameters. Returns matched
      *
      * @param bool $sSearchParamForQuery query parameter
-     * @param bool $sInitialSearchCat initial category to seearch in
-     * @param bool $sInitialSearchVendor initial vendor to seearch for
-     * @param bool $sInitialSearchManufacturer initial Manufacturer to seearch for
+     * @param bool $sInitialSearchCat initial category to search in
+     * @param bool $sInitialSearchVendor initial vendor to search for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
      * @param bool $sSortBy sort by
      *
      * @return ArticleList
@@ -99,9 +99,9 @@ class Search extends Base
      * Returns the amount of articles according to search parameters.
      *
      * @param bool $sSearchParamForQuery query parameter
-     * @param bool $sInitialSearchCat initial category to seearch in
-     * @param bool $sInitialSearchVendor initial vendor to seearch for
-     * @param bool $sInitialSearchManufacturer initial Manufacturer to seearch for
+     * @param bool $sInitialSearchCat initial category to search in
+     * @param bool $sInitialSearchVendor initial vendor to search for
+     * @param bool $sInitialSearchManufacturer initial Manufacturer to search for
      *
      * @return int
      * @throws DatabaseConnectionException
@@ -144,7 +144,7 @@ class Search extends Base
 
         // performance
         if ($sInitialSearchCat) {
-            // lets search this category - is no such category - skip all other code
+            // let's search this category - is no such category - skip all other code
             $oCategory = oxNew(Category::class);
             $sCatTable = $oCategory->getViewName();
 
@@ -163,7 +163,7 @@ class Search extends Base
 
         // performance:
         if ($sInitialSearchVendor) {
-            // lets search this vendor - if no such vendor - skip all other code
+            // let's search this vendor - if no such vendor - skip all other code
             $oVendor = oxNew(Vendor::class);
             $sVndTable = $oVendor->getViewName();
 
@@ -182,7 +182,7 @@ class Search extends Base
 
         // performance:
         if ($sInitialSearchManufacturer) {
-            // lets search this Manufacturer - if no such Manufacturer - skip all other code
+            // let's search this Manufacturer - if no such Manufacturer - skip all other code
             $oManufacturer = oxNew(Manufacturer::class);
             $sManTable = $oManufacturer->getViewName();
 
@@ -296,7 +296,7 @@ class Search extends Base
                     $sSearch .= ' or ';
                 }
 
-                // as long description now is on different table table must differ
+                // as long description now is on different table, table must differ
                 $sSearchField = $this->getSearchField($sArticleTable, $sField);
 
                 $sSearch .= " {$sSearchField} like " . $oDb->quote("%$sSearchString%");

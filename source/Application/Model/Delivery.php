@@ -264,7 +264,7 @@ class Delivery extends MultiLanguageModel
                     if ($this->getCalculationRule() == self::CALCULATION_RULE_FOR_EACH_PRODUCT) {
                         $dAmount += $oProduct->getPrice()->getPrice();
                     } else {
-                        $dAmount += $oBasketItem->getPrice()->getPrice(); // price// currency conversion must allready be done in price class / $oCur->rate; // $oBasketItem->oPrice->getPrice() / $oCur->rate;
+                        $dAmount += $oBasketItem->getPrice()->getPrice(); // price// currency conversion must already be done in price class / $oCur->rate; // $oBasketItem->oPrice->getPrice() / $oCur->rate;
                     }
                     break;
                 case self::CONDITION_TYPE_WEIGHT: // weight
@@ -566,7 +566,7 @@ class Delivery extends MultiLanguageModel
     }
 
     /**
-     * Returns condition type (type >= from <= to) : a - amount, s - size, w -weight, p - price
+     * Returns condition type (type >= from <= to) : a - amount, s - size, w - weight, p - price
      *
      * @return string
      */

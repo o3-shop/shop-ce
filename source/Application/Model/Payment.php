@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
@@ -299,7 +301,7 @@ class Payment extends MultiLanguageModel
     /**
      * Returns price object for current payment applied on basket
      *
-     * @param UserBasket $oBasket session basket
+     * @param Basket $oBasket session basket
      */
     public function calculate($oBasket)
     {
@@ -377,6 +379,8 @@ class Payment extends MultiLanguageModel
      * Returns array of country Ids which are assigned to current payment
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCountries()
     {
@@ -398,9 +402,11 @@ class Payment extends MultiLanguageModel
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $sOxId Object ID(default null)
+     * @param null $sOxId Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOxId = null)
     {
@@ -422,13 +428,15 @@ class Payment extends MultiLanguageModel
     /**
      * Function checks if loaded payment is valid to current basket
      *
-     * @param array                                    $aDynValue    dynamical value (in this case oxiddebitnote are checked only)
-     * @param string                                   $sShopId      id of current shop
-     * @param User $oUser        the current user
-     * @param double                                   $dBasketPrice the current basket price (oBasket->dPrice)
-     * @param string                                   $sShipSetId   the current ship set
+     * @param array $aDynValue dynamical value (in this case oxiddebitnote are checked only)
+     * @param string $sShopId id of current shop
+     * @param User $oUser the current user
+     * @param double $dBasketPrice the current basket price (oBasket->dPrice)
+     * @param string $sShipSetId the current ship set
      *
      * @return bool true if payment is valid
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function isValidPayment($aDynValue, $sShopId, $oUser, $dBasketPrice, $sShipSetId)
     {

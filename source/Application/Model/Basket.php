@@ -29,6 +29,7 @@ use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Exception\VoucherException;
 use OxidEsales\Eshop\Core\Field;
@@ -299,7 +300,7 @@ class Basket extends Base
 
 
     /**
-     * Save basket to data base if user is logged in
+     * Save basket to database if user is logged in
      *
      * @var bool
      */
@@ -562,6 +563,8 @@ class Basket extends Base
      * @return BasketItem
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
      * @throws OutOfStockException
      */
@@ -697,9 +700,10 @@ class Basket extends Base
      * Returns array of bundled discount articles
      *
      * @param object $oBasketItem basket item object
-     * @param array  $aBundles    array of found bundles
+     * @param array $aBundles array of found bundles
      *
      * @return array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getItemBundles" in next major
      */
     protected function _getItemBundles($oBasketItem, $aBundles = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -738,6 +742,7 @@ class Basket extends Base
      * @param array $aBundles array of found bundles
      *
      * @return array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBasketBundles" in next major
      */
     protected function _getBasketBundles($aBundles = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -940,6 +945,7 @@ class Basket extends Base
      * Iterates through basket items and calculates its delivery costs
      *
      * @return Price
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcDeliveryCost" in next major
      */
     protected function _calcDeliveryCost() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1044,7 +1050,7 @@ class Basket extends Base
     /**
      * Get most used vat percent:
      *
-     * @return double
+     * @return bool
      */
     public function isProportionalCalculationOn()
     {
@@ -1143,10 +1149,10 @@ class Basket extends Base
                         }
 
                         // assigning real voucher discount value as this is the only place where real value is calculated
-                        $dVoucherdiscount = $oVoucher->getDiscountValue($dPrice);
+                        $dVoucherDiscount = $oVoucher->getDiscountValue($dPrice);
 
-                        if ($dVoucherdiscount > 0) {
-                            $dVatPart = ($dPrice - $dVoucherdiscount) / $dPrice * 100;
+                        if ($dVoucherDiscount > 0) {
+                            $dVatPart = ($dPrice - $dVoucherDiscount) / $dPrice * 100;
 
                             if (!$this->_aDiscountedVats) {
                                 if ($oPriceList = $this->getDiscountProductsPrice()) {
@@ -1161,14 +1167,14 @@ class Basket extends Base
                         }
 
                         // accumulating discount value
-                        $this->_oVoucherDiscount->add($dVoucherdiscount);
+                        $this->_oVoucherDiscount->add($dVoucherDiscount);
 
                         // collecting formatted for preview
-                        $oStdVoucher->fVoucherdiscount = $oLang->formatCurrency($dVoucherdiscount, $this->getBasketCurrency());
-                        $oStdVoucher->dVoucherdiscount = $dVoucherdiscount;
+                        $oStdVoucher->fVoucherdiscount = $oLang->formatCurrency($dVoucherDiscount, $this->getBasketCurrency());
+                        $oStdVoucher->dVoucherdiscount = $dVoucherDiscount;
 
                         // subtracting voucher discount
-                        $dPrice = $dPrice - $dVoucherdiscount;
+                        $dPrice = $dPrice - $dVoucherDiscount;
                     } catch (VoucherException $oEx) {
                         // removing voucher on error
                         $oVoucher->unMarkAsReserved();
@@ -1434,6 +1440,7 @@ class Basket extends Base
      * @param bool $blForceUpdate set this parameter to TRUE to force basket recalculation
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function calculateBasket($blForceUpdate = false)
     {
@@ -1485,7 +1492,7 @@ class Basket extends Base
         //  7. check for vouchers
         $this->_calcVoucherDiscount();
 
-        //  8. applies all discounts to pricelist
+        //  8. applies all discounts to price-list
         $this->_applyDiscounts();
 
         //  9. calculating additional costs:
@@ -1534,7 +1541,10 @@ class Basket extends Base
      * @return object
      * @throws ArticleException
      * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @throws NoArticleException
+     * @throws ObjectException
      */
     public function getBasketSummary()
     {
@@ -1606,7 +1616,7 @@ class Basket extends Base
     }
 
     /**
-     * Checks and sets voucher information. Checks it's availability according
+     * Checks and sets voucher information. Checks its availability according
      * to few conditions: oxvoucher::checkVoucherAvailability(),
      * oxvoucher::checkUserAvailability(). Errors are stored in
      * Basket::voucherErrors array. After all voucher is marked as reserved
@@ -1899,6 +1909,7 @@ class Basket extends Base
      * Get basket shipping set, if shipping set id is not set, try to get it from session
      *
      * @return string oxDeliverySet
+     * @throws DatabaseConnectionException
      */
     public function getShippingId()
     {
@@ -1928,6 +1939,7 @@ class Basket extends Base
      *
      * @return array
      * @throws ArticleException
+     * @throws DatabaseConnectionException
      */
     public function getBasketArticles()
     {
@@ -1942,8 +1954,8 @@ class Basket extends Base
                     $aSelList = $oBasketItem->getSelList();
                     if (is_array($aSelList) && ($aSelectlist = $oProduct->getSelectLists($sItemKey))) {
                         reset($aSelList);
-                        foreach ($aSelList as $conkey => $iSel) {
-                            $aSelectlist[$conkey][$iSel]->selected = 1;
+                        foreach ($aSelList as $key => $iSel) {
+                            $aSelectlist[$key][$iSel]->selected = 1;
                         }
                         $oProduct->setSelectlist($aSelectlist);
                     }
@@ -2195,7 +2207,7 @@ class Basket extends Base
     /**
      * Returns gift card object (if available)
      *
-     * @return oxWrapping
+     * @return Wrapping
      */
     public function getCard()
     {
@@ -2882,7 +2894,7 @@ class Basket extends Base
     {
         $blCanAdd = null;
 
-        // if basket category is not set..
+        // if basket category is not set...
         if ($this->_sBasketCategoryId === null) {
             $oCat = null;
 
@@ -2911,7 +2923,7 @@ class Basket extends Base
             }
         }
 
-        // avoiding double check..
+        // avoiding double check...
         if ($blCanAdd === null) {
             $blCanAdd = $this->_sBasketCategoryId ? $this->_isProductInRootCategory($sProductId, $this->getBasketRootCatId()) : true;
         }

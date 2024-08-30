@@ -41,7 +41,7 @@ class VatSelector extends Base
     protected $_blCatVatSet = null;
 
     /**
-     * keeps loaded user Vats for later reusage
+     * keeps loaded user Vats for later usage
      *
      * @var array
      */
@@ -187,8 +187,8 @@ class VatSelector extends Base
      * item ( executes VatSelector::getArticleVat()). Can be used to override
      * basket price calculation behaviour (Article::getBasketPrice())
      *
-     * @param Article $oArticle article object
-     * @param Basket $oBasket oxbasket object
+     * @param Article $oArticle Article object
+     * @param Basket $oBasket Basket object
      *
      * @return double
      * @throws DatabaseConnectionException

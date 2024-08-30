@@ -28,7 +28,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Shopping basket item manager.
- * Manager class for shopping basket item (class may be overriden).
+ * Manager class for shopping basket item (class may be overridden).
  *
  */
 class UserBasketItem extends BaseModel
@@ -41,7 +41,7 @@ class UserBasketItem extends BaseModel
     protected $_sClassName = 'oxuserbasketitem';
 
     /**
-     * Article object assigned to userbasketitem
+     * Article object assigned to user-basket-item
      *
      * @var Article
      */
@@ -207,7 +207,7 @@ class UserBasketItem extends BaseModel
     /**
      * Sets data field value
      *
-     * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $sFieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      *

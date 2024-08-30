@@ -72,6 +72,7 @@ class PaymentList extends ListModel
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($sShipSetId, $dPrice, $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -120,11 +121,13 @@ class PaymentList extends ListModel
     }
 
     /**
-     * Returns user country id for for payment selection
+     * Returns user country id for payment selection
      *
      * @param User $oUser oxuser object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCountryId($oUser)
     {
@@ -145,10 +148,11 @@ class PaymentList extends ListModel
      *
      * @param string $sShipSetId user chosen delivery set
      * @param double $dPrice basket product price excl. discount
-     * @param null $oUser session user object
+     * @param User|null $oUser session user object
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getPaymentList($sShipSetId, $dPrice, $oUser = null)
     {

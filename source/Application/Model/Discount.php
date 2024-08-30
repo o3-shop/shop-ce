@@ -185,6 +185,7 @@ class Discount extends MultiLanguageModel
      *
      * @return bool
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function isForArticle($oArticle)
     {
@@ -217,7 +218,7 @@ class Discount extends MultiLanguageModel
     }
 
     /**
-     * Checks if discount is setup for some basket item
+     * Checks if discount is set up for some basket item
      *
      * @param object $oArticle basket item
      *
@@ -317,7 +318,7 @@ class Discount extends MultiLanguageModel
     }
 
     /**
-     * Checks if discount is setup for whole basket
+     * Checks if discount is set up for whole basket
      *
      * @param object $oBasket basket object
      *
@@ -404,7 +405,7 @@ class Discount extends MultiLanguageModel
      * Returns absolute discount value
      *
      * @param float     $dPrice  item price
-     * @param float|int $dAmount item amount, interpretted only when discount is absolute (default 1)
+     * @param float|int $dAmount item amount, interpreted only when discount is absolute (default 1)
      *
      * @return float
      */
@@ -436,7 +437,7 @@ class Discount extends MultiLanguageModel
     }
 
     /**
-     * Return add sum in abs type discount with efected currency rate;
+     * Return add sum in abs type discount with effected currency rate;
      * Return discount percent value in other way;
      *
      * @return double
@@ -453,7 +454,7 @@ class Discount extends MultiLanguageModel
     }
 
     /**
-     * Return addsum type
+     * Return AddSumType
      *
      * @return string
      */
@@ -482,7 +483,7 @@ class Discount extends MultiLanguageModel
     }
 
     /**
-     * Returns compact discount object which is used in oxbasket
+     * Returns compact discount object which is used in Basket
      *
      * @return stdClass
      */
@@ -516,7 +517,7 @@ class Discount extends MultiLanguageModel
     }
 
     /**
-     * Returns category ids asigned to discount
+     * Returns category ids assigned to discount
      *
      * @return array
      * @throws DatabaseConnectionException
@@ -555,7 +556,7 @@ class Discount extends MultiLanguageModel
     /**
      * Checks if discount may be applied according amounts info
      *
-     * @param object $oArticle article object to chesk
+     * @param object $oArticle article object to check
      *
      * @return bool
      * @throws DatabaseConnectionException
@@ -566,7 +567,7 @@ class Discount extends MultiLanguageModel
         // check if article is in some assigned category
         $aCatIds = $oArticle->getCategoryIds();
         if (!$aCatIds || !count($aCatIds)) {
-            // no categories are set for article, so no discounts from categories..
+            // no categories are set for article, so no discounts from categories...
             return false;
         }
 

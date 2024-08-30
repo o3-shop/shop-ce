@@ -70,7 +70,7 @@ class NewsSubscribed extends BaseModel
     }
 
     /**
-     * Loads object (newssubscription) details from DB. Returns true on success.
+     * Loads object (Newssubscription) details from DB. Returns true on success.
      *
      * @param string $oxId oxnewssubscribed ID
      *
@@ -147,7 +147,7 @@ class NewsSubscribed extends BaseModel
     }
 
     /**
-     * Inserts nbews object data to DB. Returns true on success.
+     * Inserts news object data to DB. Returns true on success.
      *
      * @return bool oxid on success or false on failure
      * @deprecated underscore prefix violates PSR12, will be renamed to "insert" in next major
@@ -247,7 +247,7 @@ class NewsSubscribed extends BaseModel
     }
 
     /**
-     * This method is called from User::update. Currently it updates user
+     * This method is called from User::update. Currently, it updates user
      * information kept in db
      *
      * @param User $oUser subscription user object

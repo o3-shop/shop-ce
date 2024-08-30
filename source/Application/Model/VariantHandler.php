@@ -158,7 +158,7 @@ class VariantHandler extends Base
         $myLang = Registry::getLang();
         $iCounter = 0;
         $aVarselect = []; //multilanguage names of existing variants
-        //iterating through all select list values (eg. $oValue->name = S, M, X, XL)
+        //iterating through all select list values (e.g. $oValue->name = S, M, X, XL)
         for ($i = 0; $i < count($aValues); $i++) {
             $oValue = $aValues[$i][0];
             $dPriceMod = $this->_getValuePrice($oValue, $oArticle->oxarticles__oxprice->value);
@@ -247,11 +247,11 @@ class VariantHandler extends Base
             if ($oValue->priceUnit == 'abs') {
                 $dPriceMod = $oValue->price;
             } elseif ($oValue->priceUnit == '%') {
-                $dPriceModPerc = abs($oValue->price) * $dParentPrice / 100.0;
+                $dPriceModPercent = abs($oValue->price) * $dParentPrice / 100.0;
                 if (($oValue->price) >= 0.0) {
-                    $dPriceMod = $dPriceModPerc;
+                    $dPriceMod = $dPriceModPercent;
                 } else {
-                    $dPriceMod = -$dPriceModPerc;
+                    $dPriceMod = -$dPriceModPercent;
                 }
             }
         }
@@ -262,10 +262,11 @@ class VariantHandler extends Base
     /**
      * Creates new article variant.
      *
-     * @param array  $aParams   assigned parameters
-     * @param string $sParentId parent article id
+     * @param null $aParams assigned parameters
+     * @param null $sParentId parent article id
      *
      * @return null
+     * @throws \Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "createNewVariant" in next major
      */
     protected function _createNewVariant($aParams = null, $sParentId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -277,7 +278,7 @@ class VariantHandler extends Base
         $sShopID = Registry::getSession()->getVariable("actshop");
         $aParams['oxarticles__oxshopid'] = $sShopID;
 
-        // varianthandling
+        // variant-handling
         $aParams['oxarticles__oxparentid'] = $sParentId;
 
         $oArticle = oxNew(Article::class);
@@ -460,7 +461,7 @@ class VariantHandler extends Base
     }
 
     /**
-     * In case multidimentional variants ON explodes title by _sMdSeparator
+     * In case multidimensional variants ON explodes title by _sMdSeparator
      * and returns array, else - returns array containing title
      *
      * @param string $sTitle title to process
@@ -486,7 +487,7 @@ class VariantHandler extends Base
      * @param ArticleList $oVariantList  variant list
      * @param array                                           $aFilter       variant filter
      * @param string                                          $sActVariantId active variant id
-     * @param int                                             $iLimit        limit variant lists count (if non zero, return limited number of multidimensional variant selections)
+     * @param int                                             $iLimit        limit variant lists count (if non-zero, return limited number of multidimensional variant selections)
      *
      * @return false | array
      */

@@ -185,7 +185,7 @@ class SelectList extends MultiLanguageModel implements ISelectList
     {
         if ($this->_oActiveSelection === null) {
             if (($aSelections = $this->getSelections())) {
-                // first is allways active
+                // first is always active
                 $this->_oActiveSelection = reset($aSelections);
             }
         }

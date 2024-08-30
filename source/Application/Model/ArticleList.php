@@ -50,7 +50,7 @@ class ArticleList extends ListModel
     protected $_sObjectsInListName = 'oxarticle';
 
     /**
-     * Set to true if Select Lists should be laoded
+     * Set to true if Select Lists should be loaded
      *
      * @var bool
      */
@@ -139,8 +139,8 @@ class ArticleList extends ListModel
 
         $this->setHistoryArticles($aHistoryArticles);
 
-        //remove current article and return array
-        //asignment =, not ==
+        // remove current article and return array
+        // assignment =, not ==
         if (($iCurrentArt = array_search($sArtId, $aHistoryArticles)) !== false) {
             unset($aHistoryArticles[$iCurrentArt]);
         }
@@ -269,7 +269,7 @@ class ArticleList extends ListModel
 
                 $sSelect = "select * from $sArticleTable ";
                 $sSelect .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . " and $sArticleTable.oxissearch = 1 ";
-                $sSelect .= "and $sArticleTable.oxparentid = '' and $sArticleTable.oxsoldamount>0 ";
+                $sSelect .= "and $sArticleTable.oxparentid = '' and $sArticleTable.oxsoldamount > 0 ";
                 $sSelect .= "order by $sArticleTable.oxsoldamount desc $sLimit";
 
                 $this->selectString($sSelect);
@@ -322,7 +322,7 @@ class ArticleList extends ListModel
     }
 
     /**
-     * Loads article cross selling
+     * Loads article cross-selling
      *
      * @param string $sArticleId Article id
      *
@@ -346,7 +346,7 @@ class ArticleList extends ListModel
               AND {$oBaseObject->getSqlActiveSnippet()} 
             ORDER BY oxobject2article.oxsort";
 
-        // #525 bidirectional cross selling
+        // #525 bidirectional cross-selling
         if ($myConfig->getConfigParam('blBidirectCross')) {
             $sSelect = "
                 (
@@ -456,7 +456,7 @@ class ArticleList extends ListModel
             return $iArticleCount;
         }
 
-        // this select is FAST so no need to hazzle here with getNrOfArticles()
+        // this select is FAST so no need to hassle here with getNrOfArticles()
         return Registry::getUtilsCount()->getCatArticleCount($sCatId);
     }
 
@@ -464,7 +464,7 @@ class ArticleList extends ListModel
      * Loads articles for the recommlist
      *
      * @param string $sRecommId Recommlist ID
-     * @param null $sArticlesFilter Additional filter for recommlist's items
+     * @param null $sArticlesFilter Additional filter for recommlists items
      * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
@@ -479,7 +479,7 @@ class ArticleList extends ListModel
      * Loads only ID's and create Fake objects.
      *
      * @param string $sRecommId Recommlist ID
-     * @param string $sArticlesFilter Additional filter for recommlist's items
+     * @param string $sArticlesFilter Additional filter for recommlists items
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
@@ -499,7 +499,7 @@ class ArticleList extends ListModel
      * Returns the appropriate SQL select
      *
      * @param string $sRecommId Recommlist ID
-     * @param null $sArticlesFilter Additional filter for recommlist's items
+     * @param null $sArticlesFilter Additional filter for recommlists items
      *
      * @return string
      * @throws DatabaseConnectionException
@@ -576,7 +576,7 @@ class ArticleList extends ListModel
     }
 
     /**
-     * Loads Id list of appropriate price products
+     * Loads ID list of appropriate price products
      *
      * @param float $dPriceFrom Starting price
      * @param float $dPriceTo Max price
@@ -1094,7 +1094,7 @@ class ArticleList extends ListModel
                     $sSearch .= ' or ';
                 }
 
-                // as long description now is on different table table must differ
+                // as long description now is on different table must differ
                 $sSearchTable = $this->getSearchTableName($sArticleTable, $sField);
 
                 $sSearch .= $sSearchTable . '.' . $sField . ' like ' . $oDb->quote('%' . $sSearchString . '%') . ' ';

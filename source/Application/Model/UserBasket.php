@@ -30,9 +30,9 @@ use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Virtual basket manager class. Virtual baskets are user article lists which are stored in database (noticelists, wishlists).
+ * Virtual basket manager class. Virtual baskets are user article lists which are stored in database (notice-lists, wishlists).
  * The name of the class is left like this because of historic reasons.
- * It is more relevant to wishlist and noticelist than to shoping basket.
+ * It is more relevant to wishlist and noticelist than to shopping basket.
  * Collects shopping basket information, updates it (DB level), removes or adds
  * articles to it.
  *
@@ -84,7 +84,7 @@ class UserBasket extends BaseModel
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        // marking basket as not new any more
+        // marking basket as not new anymore
         $this->_blNewBasket = false;
 
         if (!isset($this->oxuserbaskets__oxpublic->value)) {
@@ -199,11 +199,12 @@ class UserBasket extends BaseModel
     /**
      * Creates and returns  oxuserbasketitem object
      *
-     * @param string $sProductId  Product Id
-     * @param array  $aSelList    product select lists
-     * @param array $aPersParams persistent parameters
+     * @param string $sProductId Product ID
+     * @param null $aSelList product select lists
+     * @param null $aPersParams persistent parameters
      *
      * @return UserBasketItem
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createItem" in next major
      */
     protected function _createItem($sProductId, $aSelList = null, $aPersParams = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -234,11 +235,12 @@ class UserBasket extends BaseModel
      * Searches for item in basket items array and returns it. If not item was
      * found - new item is created.
      *
-     * @param string $sProductId  product id, basket item id or basket item index
-     * @param array  $aSelList    select lists
-     * @param string $aPersParams persistent parameters
+     * @param string $sProductId product id, basket item id or basket item index
+     * @param array $aSelList select lists
+     * @param null $aPersParams persistent parameters
      *
      * @return UserBasketItem
+     * @throws DatabaseConnectionException
      */
     public function getItem($sProductId, $aSelList, $aPersParams = null)
     {
@@ -261,7 +263,7 @@ class UserBasket extends BaseModel
     /**
      * Returns unique item key according to its ID and user chosen select
      *
-     * @param string $sProductId Product Id
+     * @param string $sProductId Product ID
      * @param array  $aSel       product select lists
      * @param array  $aPersParam basket item persistent parameters
      *
@@ -370,14 +372,14 @@ class UserBasket extends BaseModel
      */
     public function isVisible()
     {
-        $oActivUser = Registry::getConfig()->getUser();
-        $sActivUserId = null;
-        if ($oActivUser) {
-            $sActivUserId = $oActivUser->getId();
+        $oActiveUser = Registry::getConfig()->getUser();
+        $sActiveUserId = null;
+        if ($oActiveUser) {
+            $sActiveUserId = $oActiveUser->getId();
         }
 
         $blIsVisible = (bool) ($this->oxuserbaskets__oxpublic->value) ||
-                       ($sActivUserId && ($this->oxuserbaskets__oxuserid->value == $sActivUserId));
+                       ($sActiveUserId && ($this->oxuserbaskets__oxuserid->value == $sActiveUserId));
 
         return $blIsVisible;
     }

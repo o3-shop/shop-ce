@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -33,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DeliveryList extends ListModel
 {
     /**
-     * Session user Id
+     * Session user ID
      *
      * @var string
      */
@@ -104,7 +105,7 @@ class DeliveryList extends ListModel
     /**
      * Returns active delivery list
      *
-     * Loads all active delivery in list. Additionally
+     * Loads all active delivery in list. Additionally,
      * checks if set has user customized parameters like
      * assigned users, countries or user groups. Performs
      * additional filtering according to these parameters
@@ -115,6 +116,7 @@ class DeliveryList extends ListModel
      *
      * @return DeliveryList
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActiveDeliveryList" in next major
      */
     protected function _getList($oUser = null, $sCountryId = null, $sDelSet = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -220,8 +222,8 @@ class DeliveryList extends ListModel
      *  - first checks if delivery loading is enabled in config -
      *    $myConfig->bl_perfLoadDelivery is TRUE;
      *  - loads delivery set list by calling this::GetDeliverySetList(...);
-     *  - checks if there is any active (eg. chosen delivery set in order
-     *    process etc) delivery set defined and if its set - rearranges
+     *  - checks if there is any active (e.g. chosen delivery set in order
+     *    process etc.) delivery set defined and if its set - rearranges
      *    delivery set list by storing active set at the beginning in the
      *    list.
      *  - goes through delivery sets and loads its deliveries, checks if any
@@ -243,6 +245,7 @@ class DeliveryList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDeliveryList($oBasket, $oUser = null, $sDelCountry = null, $sDelSet = null)
     {
@@ -322,6 +325,7 @@ class DeliveryList extends ListModel
      *
      * @return bool
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function hasDeliveries($oBasket, $oUser, $sDelCountry, $sDeliverySetId)
     {

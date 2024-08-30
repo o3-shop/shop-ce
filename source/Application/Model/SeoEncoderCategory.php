@@ -72,7 +72,7 @@ class SeoEncoderCategory extends SeoEncoder
     }
 
     /**
-     * _getCatecgoryCacheId return string for isntance cache id
+     * _getCategoryCacheId return string for instance cache id
      *
      * @param Category $oCat  category object
      * @param int                                          $iLang active language
@@ -229,7 +229,7 @@ class SeoEncoderCategory extends SeoEncoder
             ':oxright' => (int) $aCatInfo[0][2]
         ]);
 
-        // update subarticles
+        // update sub-articles
         $sQ = "update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category "
               . "as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft "
               . "and cat.oxright <= :oxright) as seo2 "

@@ -162,7 +162,7 @@ class Content extends MultiLanguageModel implements IUrl
             $sColQ = "SHOW COLUMNS FROM oxcontents WHERE field LIKE  'oxcontent%'";
             $aCols = DatabaseProvider::getDb()->getAll($sColQ);
 
-            // building subquery
+            // building sub-query
             $sPattern = "IF ( %s != '', %s, %s ) ";
             $iCount = count($aCols) - 1;
 
@@ -270,6 +270,7 @@ class Content extends MultiLanguageModel implements IUrl
      * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getBaseSeoLink($iLang)
     {
@@ -328,7 +329,7 @@ class Content extends MultiLanguageModel implements IUrl
 
         if ($blAddId) {
             $sUrl .= "&amp;oxcid=" . $this->getId();
-            // adding parent category if if available
+            // adding parent category if available
             if ($this->_sParentCatId !== false && $this->oxcontents__oxcatid->value && $this->oxcontents__oxcatid->value != 'oxrootid') {
                 if ($this->_sParentCatId === null) {
                     $this->_sParentCatId = false;
@@ -372,7 +373,7 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Sets data field value.
      *
-     * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $sFieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      *
@@ -405,9 +406,11 @@ class Content extends MultiLanguageModel implements IUrl
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $sOXID Object ID(default null)
+     * @param null $sOXID Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -439,7 +442,7 @@ class Content extends MultiLanguageModel implements IUrl
             $sVersion = $this->oxcontents__oxtermversion->value;
 
             $oDb = DatabaseProvider::getDb();
-            // dropping expired..
+            // dropping expired...
             $oDb->execute("delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion", [
                 ':oxshopid' => $sShopId,
                 ':notoxtermversion' => $sVersion

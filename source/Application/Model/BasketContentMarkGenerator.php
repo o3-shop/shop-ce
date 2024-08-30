@@ -43,14 +43,14 @@ class BasketContentMarkGenerator
     private $_aMarks;
 
     /**
-     * Basket that is used to get article type(downloadable, intangible etc..).
+     * Basket that is used to get article type(downloadable, intangible etc...).
      *
      * @var Basket
      */
     private $_oBasket;
 
     /**
-     * Sets basket that is used to get article type(downloadable, intangible etc..).
+     * Sets basket that is used to get article type(downloadable, intangible etc...).
      *
      * @param Basket $oBasket
      */
@@ -81,7 +81,7 @@ class BasketContentMarkGenerator
     }
 
     /**
-     * Basket that is used to get article type(downloadable, intangible etc..).
+     * Basket that is used to get article type(downloadable, intangible etc...).
      *
      * @return Basket
      */

@@ -185,7 +185,7 @@ class Category extends MultiLanguageModel implements IUrl
      *
      * @param string $sName name of variable to get
      *
-     * @return string
+     * @return array|int|bool
      */
     public function __get($sName)
     {
@@ -214,8 +214,6 @@ class Category extends MultiLanguageModel implements IUrl
             case 'openlink':
             case 'closelink':
             case 'link':
-                //case 'toListLink':
-                //case 'noparamlink':
                 return $this->getLink();
                 break;
             case 'dimagedir':
@@ -461,7 +459,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * returns number or articles in category
+     * returns number of articles in category
      *
      * @return integer
      */
@@ -488,7 +486,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * sets the number or articles in category
+     * sets the number of articles in category
      *
      * @param int $iNum category product count setter
      */
@@ -806,7 +804,7 @@ class Category extends MultiLanguageModel implements IUrl
     {
         $oCat = null;
 
-        // loading only if parent id is not rootid
+        // loading only if parent ID is not oxrootid
         if ($this->oxcategories__oxparentid->value && $this->oxcategories__oxparentid->value != 'oxrootid') {
             // checking if object itself has ref to parent
             if ($this->_oParent) {
@@ -953,11 +951,11 @@ class Category extends MultiLanguageModel implements IUrl
         $blRes = parent::_update();
 
         // #872C - need to update category tree oxleft and oxright values (nested sets),
-        // then sub trees are moved inside one root, or to another root.
+        // then subtrees are moved inside one root, or to another root.
         // this is done in 3 basic steps
         // 1. increase oxleft and oxright values of target root tree by $iTreeSize, where oxleft>=$iMoveAfter , oxright>=$iMoveAfter
         // 2. modify current subtree, we want to move by adding $iDelta to it's oxleft and oxright,  where oxleft>=$sOldParentLeft and oxright<=$sOldParentRight values,
-        //    in this step we also modify rootid's if they were changed
+        //    in this step we also modify root-IDs if they were changed
         // 3. decreasing oxleft and oxright values of current root tree, where oxleft >= $sOldParentRight+1 , oxright >= $sOldParentRight+1
 
         // did we change position in tree ?
@@ -971,27 +969,24 @@ class Category extends MultiLanguageModel implements IUrl
                 ':oxid' => $this->oxcategories__oxparentid->value
             ]);
 
-            //If empty rootID, we set it to categorys oxid
+            // If empty rootID, we set it to category's oxid
             if ($sNewRootID == "") {
-                //echo "<br>* ) Creating new root tree ( {$this->_sOXID} )";
                 $sNewRootID = $this->getId();
             }
             $sNewParentLeft = $database->getOne("select oxleft from oxcategories where oxid = :oxid", [
                 ':oxid' => $this->oxcategories__oxparentid->value
             ]);
 
-            //if(!$sNewParentLeft){
-            //the current node has become root node, (oxrootid == "oxrootid")
+            // if (!$sNewParentLeft) {
+            // the current node has become root node, (oxrootid == "oxrootid")
             //    $sNewParentLeft = 0;
-            //}
+            // }
 
             $iMoveAfter = $sNewParentLeft + 1;
 
-            //New parentid can not be set to it's child
+            // New parent-ID can not be set to it's child
             if ($sNewParentLeft > $sOldParentLeft && $sNewParentLeft < $sOldParentRight && $this->oxcategories__oxrootid->value == $sNewRootID) {
-                //echo "<br>* ) Can't asign category to it's child";
-
-                //Restoring old parentid, stoping further actions
+                // Restoring old oxparentid, stopping further actions
                 $sRestoreOld = "UPDATE oxcategories SET OXPARENTID = :oxparentid WHERE oxid = :oxid";
                 $database->execute($sRestoreOld, [
                     ':oxparentid' => $sOldParentID,
@@ -1001,7 +996,7 @@ class Category extends MultiLanguageModel implements IUrl
                 return false;
             }
 
-            //Old parent will be shifted too, if it is in the same tree
+            // Old parent will be shifted too, if it is in the same tree
             if ($sOldParentLeft > $iMoveAfter && $this->oxcategories__oxrootid->value == $sNewRootID) {
                 $sOldParentLeft += $iTreeSize;
                 $sOldParentRight += $iTreeSize;
@@ -1014,19 +1009,17 @@ class Category extends MultiLanguageModel implements IUrl
             $sAddOld = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($this->oxcategories__oxrootid->value) . ";";
             $sAddNew = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($sNewRootID) . ";";
 
-            //Updating everything after new position
+            // Updating everything after new position
             $params = [':treeSize' => $iTreeSize, ':offset' => $iMoveAfter];
             $database->execute("UPDATE oxcategories SET OXLEFT = (OXLEFT + :treeSize) WHERE OXLEFT >= :offset" . $sAddNew, $params);
             $database->execute("UPDATE oxcategories SET OXRIGHT = (OXRIGHT + :treeSize) WHERE OXRIGHT >= :offset" . $sAddNew, $params);
-            //echo "<br>1.) + $iTreeSize, >= $iMoveAfter";
 
             $sChangeRootID = "";
             if ($this->oxcategories__oxrootid->value != $sNewRootID) {
-                //echo "<br>* ) changing root IDs ( {$this->oxcategories__oxrootid->value} -> {$sNewRootID} )";
                 $sChangeRootID = ", OXROOTID=" . $database->quote($sNewRootID);
             }
 
-            //Updating subtree
+            // Updating subtree
             $query = "UPDATE oxcategories SET OXLEFT = (OXLEFT + :delta), OXRIGHT = (OXRIGHT + :delta) " . $sChangeRootID .
                      "WHERE OXLEFT >= :oxleft AND OXRIGHT <= :oxright" . $sAddOld;
             $database->execute($query, [
@@ -1034,9 +1027,8 @@ class Category extends MultiLanguageModel implements IUrl
                 ':oxleft' => $sOldParentLeft,
                 ':oxright' => $sOldParentRight
             ]);
-            //echo "<br>2.) + $iDelta, >= $sOldParentLeft and <= $sOldParentRight";
 
-            //Updating everything after old position
+            // Updating everything after old position
             $params = [':treeSize' => $iTreeSize, ':offset' => $sOldParentRight + 1];
             $database->execute("UPDATE oxcategories SET OXLEFT = (OXLEFT - :treeSize) WHERE OXLEFT >= :offset" . $sAddOld, $params);
             $database->execute("UPDATE oxcategories SET OXRIGHT = (OXRIGHT - :treeSize) WHERE OXRIGHT >= :offset" . $sAddOld, $params);
@@ -1053,7 +1045,7 @@ class Category extends MultiLanguageModel implements IUrl
     /**
      * Sets data field value
      *
-     * @param string $fieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $fieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $value     value of data field
      * @param int    $dataType  field type
      *
@@ -1062,7 +1054,7 @@ class Category extends MultiLanguageModel implements IUrl
      */
     protected function _setFieldData($fieldName, $value, $dataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        //preliminary quick check saves 3% of execution time in category lists by avoiding redundant strtolower() call
+        // preliminary quick check saves 3% of execution time in category lists by avoiding redundant strtolower() call
         $fieldNameIndex2 = $fieldName[2];
         if ($fieldNameIndex2 === 'l' || $fieldNameIndex2 === 'L' || (isset($fieldName[16]) && ($fieldName[16] == 'l' || $fieldName[16] == 'L'))) {
             $loweredFieldName = strtolower($fieldName);
@@ -1075,7 +1067,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns category icon picture url if exist, false - if not
+     * Returns category icon picture url if exists, false - if not
      *
      * @return bool|string|void|null
      */
@@ -1093,7 +1085,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns category thumbnail picture url if exist, false - if not
+     * Returns category thumbnail picture url if exists, false - if not
      *
      * @return bool|string|void|null
      */
@@ -1107,7 +1099,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns category promotion icon picture url if exist, false - if not
+     * Returns category promotion icon picture url if exists, false - if not
      *
      * @return bool|string|void|null
      */
@@ -1121,7 +1113,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns category picture url if exist, false - if not
+     * Returns category picture url if exists, false - if not
      *
      * @param string $sPicName picture name
      * @param string $sPicType picture type related with picture dir: icon - icon; 0 - image
@@ -1138,7 +1130,7 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns true if category parentid is 'oxrootid'
+     * Returns true if category's parent-ID is 'oxrootid'
      *
      * @return bool
      */
@@ -1197,13 +1189,13 @@ class Category extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Gets one field from all of subcategories.
+     * Gets one field from all subcategories.
      * Default is set to 'OXID'
      *
      * @param string $sField field to be retrieved from each subcategory
-     * @param null $sOXID Cetegory ID
+     * @param null $sOXID Category ID
      *
-     * @return array
+     * @return array|bool
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */

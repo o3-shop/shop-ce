@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Price;
@@ -50,7 +51,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     protected $_sClassName = 'oxorderarticle';
 
     /**
-     * Persisten info
+     * Persistent info
      *
      * @var array
      */
@@ -93,7 +94,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
 
     /**
      * Array of fields to skip when saving
-     * Overrids oxBase variable
+     * Overrides oxBase variable
      *
      * @var array
      */
@@ -143,11 +144,11 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Performs stock modification for current order article. Additionally
+     * Performs stock modification for current order article. Additionally,
      * executes changeable article onChange/updateSoldAmount methods to
      * update chained data
      *
-     * @param double $dAddAmount amount which will be substracled from value in db
+     * @param double $dAddAmount amount which will be subtracted from value in db
      * @param bool $blAllowNegativeStock amount allow or not negative stock value
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
@@ -178,9 +179,9 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Adds or substracts defined amount passed by param from arcticle stock
+     * Adds or subtracts defined amount passed by param from article stock
      *
-     * @param int $dAddAmount amount which will be added/substracled from value in db
+     * @param int $dAddAmount amount which will be added/subtracted from value in db
      * @param bool $blAllowNegativeStock allow/disallow negative stock value
      *
      * @return double
@@ -236,14 +237,14 @@ class OrderArticle extends BaseModel implements ArticleInterface
     {
         $this->_aPersParam = $aParams;
 
-        // serializing persisten info stored while ordering
+        // serializing persistent info stored while ordering
         $this->oxorderarticles__oxpersparam = new Field(serialize($aParams), Field::T_RAW);
     }
 
     /**
      * Sets data field value
      *
-     * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $sFieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      *
@@ -372,9 +373,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * Loads, caches and returns real order article instance. If article is not
      * available (deleted from db or so) false is returned
      *
-     * @param string $sArticleId article id (optional, is not passed oxorderarticles__oxartid will be used)
+     * @param null $sArticleId article id (optional, is not passed oxorderarticles__oxartid will be used)
      *
      * @return Article|false
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getOrderArticle" in next major
      */
     protected function _getOrderArticle($sArticleId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -396,9 +398,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Returns article select lists, implements iBaseArticle interface method
      *
-     * @param string $sKeyPrefix prefix (not used)
+     * @param null $sKeyPrefix prefix (not used)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getSelectLists($sKeyPrefix = null)
     {
@@ -413,10 +416,11 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Returns order article selection list array
      *
-     * @param string $sArtId           ordered article id [optional]
-     * @param string $sOrderArtSelList order article selection list [optional]
+     * @param null $sArtId ordered article id [optional]
+     * @param null $sOrderArtSelList order article selection list [optional]
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getOrderArticleSelectList($sArtId = null, $sOrderArtSelList = null)
     {
@@ -478,11 +482,14 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Returns basket order article price
      *
-     * @param double                                     $dAmount  basket item amount
-     * @param array                                      $aSelList chosen selection list
-     * @param Basket $oBasket  basket
+     * @param double $dAmount basket item amount
+     * @param array $aSelList chosen selection list
+     * @param Basket $oBasket basket
      *
      * @return Price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getBasketPrice($dAmount, $aSelList, $oBasket)
     {
@@ -508,10 +515,12 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Returns empty array, implements iBaseArticle interface getter method
      *
-     * @param bool $blActCats   select categories if all parents are active
+     * @param bool $blActCats select categories if all parents are active
      * @param bool $blSkipCache force reload or not (default false - no reload)
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryIds($blActCats = false, $blSkipCache = false)
     {
@@ -564,7 +573,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     /**
      * Marks object as new order item (this marker useful when recalculating stocks after order recalculation)
      *
-     * @param bool $blIsNew marker value - TRUE if this item is newy added to order
+     * @param bool $blIsNew marker value - TRUE if this item is newly added to order
      */
     public function setIsNewOrderItem($blIsNew)
     {
@@ -640,7 +649,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Deletes order article object. If deletion succeded - updates
+     * Deletes order article object. If deletion succeeded - updates
      * article stock information. Returns deletion status
      *
      * @param null $sOXID Article id
@@ -662,7 +671,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Saves order article object. If saving succeded - updates
+     * Saves order article object. If saving succeeded - updates
      * article stock information if OrderArticle::isNewOrderItem()
      * returns TRUE. Returns saving status
      *
@@ -689,10 +698,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
                 $this->updateArticleStock($this->oxorderarticles__oxamount->value * (-1), $myConfig->getConfigParam('blAllowNegativeStock'));
             }
 
-            // seting downloadable products article files
+            // setting downloadable products article files
             $this->_setOrderFiles();
 
-            // marking object as "non new" disable further stock changes
+            // marking object as "non-new" disable further stock changes
             $this->setIsNewOrderItem(false);
         }
 
@@ -727,7 +736,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Get Total brut price formated
+     * Get Total brut price formatted
      *
      * @return string
      */
@@ -741,7 +750,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Get  brut price formated
+     * Get  brut price formatted
      *
      * @return string
      */
@@ -755,7 +764,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Get Net price formated
+     * Get Net price formatted
      *
      * @return string
      */
@@ -781,7 +790,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
                 // returning the cached object
                 return $this->_aOrderCache[$this->oxorderarticles__oxorderid->value];
             }
-            // creatina new order object and trying to load it
+            // creating new order object and trying to load it
             $oOrder = oxNew(Order::class);
             if ($oOrder->load($this->oxorderarticles__oxorderid->value)) {
                 return $this->_aOrderCache[$this->oxorderarticles__oxorderid->value] = $oOrder;
@@ -823,6 +832,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
      * Get article
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getArticle()
     {
@@ -876,7 +886,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
     }
 
     /**
-     * Get Total brut price formated
+     * Get Total brut price formatted
      *
      * @return string
      */

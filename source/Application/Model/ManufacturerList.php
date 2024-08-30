@@ -27,7 +27,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Manufacturer list manager.
- * Collects list of manufacturers according to collection rules (activ, etc.).
+ * Collects list of manufacturers according to collection rules (active, etc.).
  *
  */
 class ManufacturerList extends ListModel
@@ -102,7 +102,7 @@ class ManufacturerList extends ListModel
     }
 
     /**
-     * Creates fake root for manufacturer tree, and ads category list fileds for each manufacturer item
+     * Creates fake root for manufacturer tree and adds category list fields for each manufacturer item
      *
      * @param string $sLinkTarget  Name of class, responsible for category rendering
      * @param string $sActCat      Active category

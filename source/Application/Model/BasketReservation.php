@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use Exception;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
@@ -49,7 +51,7 @@ class BasketReservation extends Base
     protected $_aCurrentlyReserved = null;
 
     /**
-     * return the ID of active resevations user basket
+     * return the ID of active reservations user basket
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getReservationsId" in next major
@@ -184,6 +186,8 @@ class BasketReservation extends Base
      *
      * @param array $aBasketDiff basket difference array
      *
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @see oxBasketReservation::_basketDifference
      * @deprecated underscore prefix violates PSR12, will be renamed to "reserveArticles" in next major
      */
@@ -208,6 +212,8 @@ class BasketReservation extends Base
      * reserve given basket items, only when not in admin mode
      *
      * @param Basket $oBasket basket object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function reserveBasket(Basket $oBasket)
     {
@@ -222,7 +228,9 @@ class BasketReservation extends Base
      * update sold amount
      *
      * @param string $sArticleId article id
-     * @param double $dAmount    amount to use
+     * @param double $dAmount amount to use
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function commitArticleReservation($sArticleId, $dAmount)
     {
@@ -246,6 +254,8 @@ class BasketReservation extends Base
      * return the reserved stock to article
      *
      * @param string $sArticleId article id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function discardArticleReservation($sArticleId)
     {

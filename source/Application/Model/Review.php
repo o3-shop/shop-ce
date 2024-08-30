@@ -106,7 +106,7 @@ class Review extends BaseModel
     }
 
     /**
-     * Inserts object data fiels in DB. Returns true on success.
+     * Inserts object data fields in DB. Returns true on success.
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "insert" in next major
@@ -122,9 +122,9 @@ class Review extends BaseModel
     /**
      * get oxList of reviews for given object ids and type
      *
-     * @param string $sType type of given ids
-     * @param mixed $aIds given object ids to load, can be array or just one id, given as string
-     * @param boolean $blLoadEmpty true if want to load empty text reviews
+     * @param string $sType type of given IDs
+     * @param mixed $aIds given object IDs to load, can be an array or just one id, given as string
+     * @param boolean $blLoadEmpty true if it wants to load empty text reviews
      * @param null $iLoadInLang language to select for loading
      *
      * @return ListModel
@@ -180,7 +180,7 @@ class Review extends BaseModel
     }
 
     /**
-     * Retuns review object type
+     * Returns review object type
      *
      * @return string
      */
@@ -190,7 +190,7 @@ class Review extends BaseModel
     }
 
     /**
-     * Retuns review object id
+     * Returns review object id
      *
      * @return string
      */

@@ -27,7 +27,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Vendor list manager.
- * Collects list of vendors according to collection rules (activ, etc.).
+ * Collects list of vendors according to collection rules (active, etc.).
  *
  */
 class VendorList extends ListModel
@@ -101,7 +101,7 @@ class VendorList extends ListModel
     }
 
     /**
-     * Creates fake root for vendor tree, and ads category list fileds for each vendor item
+     * Creates fake root for vendor tree, and ads category list fields for each vendor item
      *
      * @param string $sLinkTarget  Name of class, responsible for category rendering
      * @param string $sActCat      Active category

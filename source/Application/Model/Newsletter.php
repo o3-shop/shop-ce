@@ -37,7 +37,7 @@ use OxidEsales\Eshop\Core\Registry;
  * @deprecated Functionality for Newsletter management will be removed.
  * Newsletter manager.
  * Performs creation of newsletter text, assign newsletter to user groups,
- * deletes and etc.
+ * deletes etc.
  *
  */
 class Newsletter extends BaseModel
@@ -130,7 +130,7 @@ class Newsletter extends BaseModel
             return $this->_oGroups;
         }
 
-        // usergroups
+        // user-groups
         $this->_oGroups = oxNew(ListModel::class, "oxgroups");
         $sViewName = getViewName("oxgroups");
 
@@ -169,8 +169,10 @@ class Newsletter extends BaseModel
      * Creates oxshop object and sets base parameters (such as currency and
      * language).
      *
-     * @param string|User $sUserid          User ID or OBJECT
-     * @param bool        $blPerfLoadAktion perform option load actions
+     * @param string|User $sUserid User ID or OBJECT
+     * @param bool $blPerfLoadAktion perform option load actions
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function prepare($sUserid, $blPerfLoadAktion = false)
     {
@@ -207,6 +209,8 @@ class Newsletter extends BaseModel
      * this user, generates HTML and plaintext format newsletters.
      *
      * @param bool $blPerfLoadAktion perform option load actions
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setParams" in next major
      */
     protected function _setParams($blPerfLoadAktion = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -258,8 +262,10 @@ class Newsletter extends BaseModel
      * Add newsletter products (#559 only if we have user we can assign this info),
      * adds products which fit to the last order of assigned user.
      *
-     * @param BaseController $oView            view object to store view data
-     * @param bool                                             $blPerfLoadAktion perform option load actions
+     * @param BaseController $oView view object to store view data
+     * @param bool $blPerfLoadAktion perform option load actions
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignProducts" in next major
      */
     protected function _assignProducts($oView, $blPerfLoadAktion = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -297,7 +303,7 @@ class Newsletter extends BaseModel
     /**
      * Sets data field value
      *
-     * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $sFieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      *

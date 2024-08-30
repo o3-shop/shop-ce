@@ -319,7 +319,7 @@ class Diagnostics
 
 
     /**
-     * Returns the installed PHP devoder (like Zend Optimizer, Guard Loader)
+     * Returns the installed PHP decoder (like Zend Optimizer, Guard Loader)
      *
      * @return string
      */
@@ -344,6 +344,7 @@ class Diagnostics
      * We will use the exec command here several times. In order tro prevent stop on failure, use $this->isExecAllowed().
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getServerInfo()
     {

@@ -65,7 +65,7 @@ class RssFeed extends Base
     /**
      * Give back the cache file name for the given oxActionId.
      *
-     * @param string $sOxActionId The oxaction we want the cache file name for.
+     * @param string $sOxActionId The action we want the cache file name for.
      *
      * @return string The name of the corresponding file cache file.
      */
@@ -208,9 +208,9 @@ class RssFeed extends Base
 
     /**
      * _saveToCache writes generated rss data to cache
-     * returns true on successfull write, false otherwise
-     * A successfull write means only write ok AND data has actually changed
-     * if give
+     * returns true on successful write, false otherwise
+     * A successful write means only write ok AND data has actually changed
+     * if given
      *
      * @param string $name     cache name
      * @param array  $aContent data to be saved
@@ -264,7 +264,7 @@ class RssFeed extends Base
             $oItem->guid = $oItem->link = $myUtilsUrl->prepareUrlForNoSession($oArticle->getLink());
             $oItem->isGuidPermalink = true;
             // $oItem->description             = $oArticle->getLongDescription()->value; //oxarticles__oxshortdesc->value;
-            //#4038: Smarty not parsed in RSS, although smarty parsing activated for longdescriptions
+            //#4038: Smarty not parsed in RSS, although smarty parsing activated for long-descriptions
             if (Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
                 $oItem->description = $oArticle->getLongDesc();
             } else {
@@ -747,7 +747,7 @@ class RssFeed extends Base
      */
     public function loadSearchArticles($sSearch, $sCatId, $sVendorId, $sManufacturerId)
     {
-        // dont use cache for search
+        // don't use cache for search
         //if ($this->_aChannel = $this->_loadFromCache(self::RSS_SEARCHARTS.md5($sSearch.$sCatId.$sVendorId))) {
         //    return;
         //}
@@ -758,7 +758,7 @@ class RssFeed extends Base
         $oArtList = oxNew(Search::class)->getSearchArticles($sSearch, $sCatId, $sVendorId, $sManufacturerId, oxNew(Article::class)->getViewName() . '.oxtimestamp desc');
 
         $this->_loadData(
-            // dont use cache for search
+            // don't use cache for search
             null,
             //self::RSS_SEARCHARTS.md5($sSearch.$sCatId.$sVendorId),
             $this->getSearchArticlesTitle($sSearch, $sCatId, $sVendorId, $sManufacturerId),
@@ -988,7 +988,7 @@ class RssFeed extends Base
     }
 
     /**
-     * Returns timestamp of defind cache time to live
+     * Returns timestamp of defined cache time to live
      *
      * @return integer
      */

@@ -101,7 +101,7 @@ class File extends BaseModel
     }
 
     /**
-     * Sets oxefile__oxstorehash with file hash.
+     * Sets oxfile__oxstorehash with file hash.
      * Moves file to desired location and change its access rights.
      *
      * @param int $sFileIndex File index
@@ -235,7 +235,7 @@ class File extends BaseModel
     }
 
     /**
-     * Returns relative sub dir of oxconfig 'sDownloadsDir' of
+     * Returns relative sub dir of Config 'sDownloadsDir' of
      * required file from supplied $sFileHash parameter.
      * Creates dir in case it does not exist.
      *
@@ -258,7 +258,7 @@ class File extends BaseModel
 
     /**
      * Calculates file hash.
-     * Currently MD5 is used.
+     * Currently, MD5 is used.
      *
      * @param string $sFileName File name values
      *

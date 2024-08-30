@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -33,14 +34,14 @@ use OxidEsales\Eshop\Core\Registry;
 class DeliverySetList extends ListModel
 {
     /**
-     * Session user Id
+     * Session user ID
      *
      * @var string
      */
     protected $_sUserId = null;
 
     /**
-     * Country Id
+     * Country ID
      *
      * @var string
      */
@@ -86,7 +87,7 @@ class DeliverySetList extends ListModel
     /**
      * Returns active delivery set list
      *
-     * Loads all active delivery sets in list. Additionally
+     * Loads all active delivery sets in list. Additionally,
      * checks if set has user customized parameters like
      * assigned users, countries or user groups. Performs
      * additional filtering according to these parameters
@@ -96,6 +97,7 @@ class DeliverySetList extends ListModel
      *
      * @return DeliverySetList
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActiveDeliverySetList" in next major
      */
     protected function _getList($oUser = null, $sCountryId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -204,6 +206,7 @@ class DeliverySetList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDeliverySetList($oUser, $sCountryId, $sDelSet = null)
     {
@@ -236,6 +239,7 @@ class DeliverySetList extends ListModel
      *
      * @return array
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDeliverySetData($sShipSet, $oUser, $oBasket)
     {

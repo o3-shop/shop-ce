@@ -52,7 +52,7 @@ class Object2Group extends BaseModel
     /**
      * Extends the default save method
      * to prevent from exception if same relationship already exist.
-     * The table oxobject2group has an UNIQUE index on (OXGROUPSID, OXOBJECTID, OXSHOPID)
+     * The table oxobject2group has a UNIQUE index on (OXGROUPSID, OXOBJECTID, OXSHOPID)
      * which ensures that a relationship would not be duplicated.
      *
      * @return bool

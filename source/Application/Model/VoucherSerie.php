@@ -56,7 +56,7 @@ class VoucherSerie extends BaseModel
     }
 
     /**
-     * Override delete function so we can delete user group and article or category relations first.
+     * Override delete function, so we can delete user group and article or category relations first.
      *
      * @param string $sOxId object ID (default null)
      *
@@ -109,7 +109,7 @@ class VoucherSerie extends BaseModel
     }
 
     /**
-     * Removes product or dategory relations.
+     * Removes product or category relations.
      */
     public function unsetDiscountRelations()
     {

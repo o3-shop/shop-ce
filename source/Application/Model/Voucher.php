@@ -69,13 +69,13 @@ class Voucher extends BaseModel
      *
      * @param string $sVoucherNr Voucher number
      * @param array $aVouchers Array of available vouchers (default array())
-     * @param bool $blCheckavalability check if voucher is still reserver od not
+     * @param bool $blCheckAvailability check if voucher is still reserved or not
      *
      * @return bool|null
      * @throws VoucherException exception
      * @throws DatabaseConnectionException
      */
-    public function getVoucherByNr($sVoucherNr, $aVouchers = [], $blCheckavalability = false)
+    public function getVoucherByNr($sVoucherNr, $aVouchers = [], $blCheckAvailability = false)
     {
         $oRet = null;
         if (!empty($sVoucherNr)) {
@@ -96,7 +96,7 @@ class Voucher extends BaseModel
             $sQ .= " and ( {$sViewName}.oxdateused is NULL || {$sViewName}.oxdateused = 0 ) ";
 
             //voucher timeout for 3 hours
-            if ($blCheckavalability) {
+            if ($blCheckAvailability) {
                 $iTime = time() - $this->_getVoucherTimeout();
                 $sQ .= " and {$sViewName}.oxreserved < '{$iTime}' order by {$sViewName}.oxreserved asc ";
             }
@@ -376,11 +376,11 @@ class Voucher extends BaseModel
         $iTomorrow = mktime(0, 0, 0, date("m"), date("d") + 1, date("Y"));
         $iYesterday = mktime(0, 0, 0, date("m"), date("d") - 1, date("Y"));
 
-        // Checks if beginning date is set, if not set $iFrom to yesterday so it will be valid.
+        // Checks if beginning date is set, if not set $iFrom to yesterday, so it will be valid.
         $iFrom = ((int) $oSeries->oxvoucherseries__oxbegindate->value) ?
             strtotime($oSeries->oxvoucherseries__oxbegindate->value) : $iYesterday;
 
-        // Checks if end date is set, if no set $iTo to tomorrow so it will be valid.
+        // Checks if end date is set, if no set $iTo to tomorrow, so it will be valid.
         $iTo = ((int) $oSeries->oxvoucherseries__oxenddate->value) ?
             strtotime($oSeries->oxvoucherseries__oxenddate->value) : $iTomorrow;
 
@@ -476,7 +476,7 @@ class Voucher extends BaseModel
     }
 
     /**
-     * Checks if user belongs to the same group as the voucher. Returns true on sucess.
+     * Checks if user belongs to the same group as the voucher. Returns true on success.
      *
      * @param object $oUser user object
      *
@@ -643,7 +643,7 @@ class Voucher extends BaseModel
     }
 
     /**
-     * Returns basket item information (id,amount,price) array takig item list from order.
+     * Returns basket item information (id,amount,price) array taking item list from order.
      *
      * @param null $oDiscount discount object
      *
@@ -785,7 +785,7 @@ class Voucher extends BaseModel
     }
 
     /**
-     * Returns the discount value used, if voucher is aplied only for specific products.
+     * Returns the discount value used, if voucher is applied only for specific products.
      *
      * @param double $dPrice price to calculate discount on it
      *
@@ -801,7 +801,7 @@ class Voucher extends BaseModel
     }
 
     /**
-     * Returns the discount value used, if voucher is aplied only for specific products.
+     * Returns the discount value used, if voucher is applied only for specific products.
      *
      * @param double $dPrice price to calculate discount on it
      *
@@ -816,7 +816,7 @@ class Voucher extends BaseModel
         $oDiscount = $this->_getSerieDiscount();
         $aBasketItems = $this->_getBasketItems($oDiscount);
 
-        // Basket Item Count and isAdmin check (unble to access property $oOrder->_getOrderBasket()->_blSkipVouchersAvailabilityChecking)
+        // Basket Item Count and isAdmin check (unable to access property $oOrder->_getOrderBasket()->_blSkipVouchersAvailabilityChecking)
         if (!count($aBasketItems) && !$this->isAdmin()) {
             $oEx = oxNew(VoucherException::class);
             $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOVOUCHER');

@@ -24,8 +24,12 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use Exception;
 use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
 use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
@@ -65,7 +69,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     protected $_blUseLazyLoading = true;
 
     /**
-     * item key the usage with oxuserbasketitem
+     * item key the usage with oxuserbasketitems
      *
      * @var string (md5 hash)
      */
@@ -73,7 +77,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Variable controls price calculation type (set true, to calculate price
-     * with taxes and etc, or false to return base article price).
+     * with taxes etc., or false to return base article price).
      *
      * @var bool
      */
@@ -131,14 +135,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     protected $_blLoadVariants = true;
 
     /**
-     * Article variants without empty stock, not orderable flagged variants
+     * Article variants without empty stock, not order-able flagged variants
      *
      * @var array
      */
     protected $_aVariants = null;
 
     /**
-     * Article variants with empty stock, not orderable flagged variants
+     * Article variants with empty stock, not order-able flagged variants
      *
      * @var array
      */
@@ -190,7 +194,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * $_fPricePerUnit holds price per unit value in active shop currency.
      * $_fPricePerUnit is calculated from Article::oxarticles__oxunitquantity->value
-     * and from Article::oxarticles__oxuniname->value. If either one of these values is empty then $_fPricePerUnit is not calculated.
+     * and from Article::oxarticles__oxunitname->value. If either one of these values is empty then $_fPricePerUnit is not calculated.
      * Example: In case when product price is 10 EUR and product quantity is 0.5 (liters) then $_fPricePerUnit would be 20,00
      */
     protected $_fPricePerUnit = null;
@@ -361,7 +365,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * T price
      *
-     * @var object
+     * @var Price
      */
     protected $_oTPrice = null;
 
@@ -509,7 +513,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Magic getter, deals with values which are loaded on demand.
-     * Additionally it sets default value for unknown picture fields
+     * Additionally, it sets default value for unknown picture fields
      *
      * @param string $sName Variable name
      *
@@ -611,9 +615,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns part of sql query used in active snippet. If config
      * option "blUseStock" is TRUE checks if "oxstockflag != 2 or
      * ( oxstock + oxvarstock ) > 0". If config option "blVariantParentBuyable"
-     * is TRUE checks if product has variants, and if has - checks is
+     * is TRUE checks if product has variants, and if it has - checks is
      * there at least one variant which is buyable. If config option
-     * option "blUseTimeCheck" is TRUE additionally checks if variants
+     * "blUseTimeCheck" is TRUE additionally checks if variants
      * "oxactivefrom < current data < oxactiveto"
      *
      * @param bool $blForceCoreTable force core table usage
@@ -645,11 +649,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Returns part of query which checks if product is variant of current
-     * object. Additionally if config option "blUseStock" is TRUE checks
+     * object. Additionally, if config option "blUseStock" is TRUE checks
      * stock state "( oxstock > 0 or ( oxstock <= 0 and ( oxstockflag = 1
-     * or oxstockflag = 4 ) )"
+     * or oxstockflag = 4 ) ) )"
      *
-     * @param bool $blRemoveNotOrderables remove or leave non orderable products
+     * @param bool $blRemoveNotOrderables remove or leave non order-able products
      * @param bool $blForceCoreTable      force core table usage
      *
      * @return string
@@ -835,7 +839,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Checks whether article is inluded in comparison list
+     * Checks whether article is included in comparison list
      *
      * @return bool
      */
@@ -845,7 +849,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Set if article is inluded in comparison list
+     * Set if article is included in comparison list
      *
      * @param bool $blOnList Whether is article on the list
      */
@@ -855,7 +859,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * A setter for $_blLoadParentData (whether article parent info should be laoded fully) class variable
+     * A setter for $_blLoadParentData (whether article parent info should be loaded fully) class variable
      *
      * @param bool $blLoadParentData Whether to load parent data
      */
@@ -893,8 +897,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns formatted price per unit
      *
-     * @deprecated since v5.1 (2013-09-25); use oxPrice smarty plugin for formatting in templates
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
+     * @deprecated since v5.1 (2013-09-25); use oxPrice smarty plugin for formatting in templates
      */
     public function getFUnitPrice()
     {
@@ -913,6 +920,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns price per unit
      *
      * @return Price|null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getUnitPrice()
     {
@@ -933,9 +943,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns formatted article min price
      *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated since v5.1 (2013-10-04); use oxPrice smarty plugin for formatting in templates
      *
-     * @return string
      */
     public function getFMinPrice()
     {
@@ -951,9 +963,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns formatted min article variant price
      *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated since v5.1 (2013-10-04); use oxPrice smarty plugin for formatting in templates
      *
-     * @return string
      */
     public function getFVarMinPrice()
     {
@@ -969,7 +983,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns article min price of variants
      *
-     * @return Price
+     * @return Price|void
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      */
     public function getVarMinPrice()
     {
@@ -992,6 +1008,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Calculates lowest price of available article variants.
      *
      * @return double
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "calculateVarMinPrice" in next major
      */
     protected function _calculateVarMinPrice() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1004,7 +1021,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns article min price in calculation included variants
      *
-     * @return Price
+     * @return Price|void
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      */
     public function getMinPrice()
     {
@@ -1031,6 +1050,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param double $dPrice
      *
      * @return double
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareModifiedPrice" in next major
      */
     protected function _prepareModifiedPrice($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1044,6 +1064,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns true if article has variant with different price
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isRangePrice()
     {
@@ -1070,7 +1091,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Setter to set if article has range price
      *
-     * @param bool $blIsRangePrice - true if range, else false
+     * @param bool $blIsRangePrice - true if ranged, else false
      *
      * @return null
      */
@@ -1119,7 +1140,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Assigns to oxarticle object some base parameters/values (such as
-     * detaillink, moredetaillink, etc).
+     * detail-link, more-detail-link, etc).
      *
      * @param array $aRecord Array representing current field values
      *
@@ -1175,10 +1196,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sOXID Article object ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function load($sOXID)
     {
-        // A. #1325 resetting to avoid problems when reloading (details etc)
+        // A. #1325 resetting to avoid problems when reloading (details etc.)
         $this->_blNotBuyableParent = false;
 
         $aData = $this->_loadData($sOXID);
@@ -1204,6 +1226,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $articleId
      *
      * @return array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadData" in next major
      */
     protected function _loadData($articleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1238,6 +1261,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Calculates and saves product rating average
      *
      * @param integer $rating new rating value
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function addToRatingAverage($rating)
     {
@@ -1287,6 +1312,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param bool $blIncludeVariants - include variant ratings
      *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleRatingAverage($blIncludeVariants = false)
     {
@@ -1305,6 +1332,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param bool $blIncludeVariants - include variant ratings
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleRatingCount($blIncludeVariants = false)
     {
@@ -1322,6 +1351,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Collects user written reviews about an article.
      *
      * @return ListModel
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getReviews()
     {
@@ -1331,7 +1362,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $aIds[] = $this->oxarticles__oxparentid->value;
         }
 
-        // showing variant reviews ..
+        // showing variant reviews ...
         if (Registry::getConfig()->getConfigParam('blShowVariantReviews')) {
             $aAdd = $this->getVariantIds();
             if (is_array($aAdd)) {
@@ -1351,23 +1382,23 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Loads and returns array with cross selling information.
+     * Loads and returns array with cross-selling information.
      *
      * @return array
      */
     public function getCrossSelling()
     {
-        $oCrosslist = oxNew(ArticleList::class);
-        $oCrosslist->loadArticleCrossSell($this->oxarticles__oxid->value);
-        if ($oCrosslist->count()) {
-            return $oCrosslist;
+        $oCrossList = oxNew(ArticleList::class);
+        $oCrossList->loadArticleCrossSell($this->oxarticles__oxid->value);
+        if ($oCrossList->count()) {
+            return $oCrossList;
         }
     }
 
     /**
      * Loads and returns array with accessories information.
      *
-     * @return array
+     * @return array|void
      */
     public function getAccessoires()
     {
@@ -1378,19 +1409,21 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             return;
         }
 
-        $oAcclist = oxNew(ArticleList::class);
-        $oAcclist->setSqlLimit(0, $myConfig->getConfigParam('iNrofCrossellArticles'));
-        $oAcclist->loadArticleAccessoires($this->oxarticles__oxid->value);
+        $oAccList = oxNew(ArticleList::class);
+        $oAccList->setSqlLimit(0, $myConfig->getConfigParam('iNrofCrossellArticles'));
+        $oAccList->loadArticleAccessoires($this->oxarticles__oxid->value);
 
-        if ($oAcclist->count()) {
-            return $oAcclist;
+        if ($oAccList->count()) {
+            return $oAccList;
         }
     }
 
     /**
      * Returns a list of similar products.
      *
-     * @return array
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getSimilarProducts()
     {
@@ -1427,18 +1460,20 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
             $sSearch = $this->_generateSimListSearchStr($sArticleTable, $aList);
 
-            $oSimilarlist = oxNew(ArticleList::class);
-            $oSimilarlist->setSqlLimit(0, $myConfig->getConfigParam('iNrofSimilarArticles'));
-            $oSimilarlist->selectString($sSearch);
+            $oSimilarList = oxNew(ArticleList::class);
+            $oSimilarList->setSqlLimit(0, $myConfig->getConfigParam('iNrofSimilarArticles'));
+            $oSimilarList->selectString($sSearch);
 
-            return $oSimilarlist;
+            return $oSimilarList;
         }
     }
 
     /**
      * Loads and returns articles list, bought by same customer.
      *
-     * @return ArticleList|null
+     * @return ArticleList|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCustomerAlsoBoughtThisProducts()
     {
@@ -1463,7 +1498,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns list object with info about article price that depends on amount in basket.
      * Takes data from oxprice2article table. Returns false if such info is not set.
      *
-     * @return mixed
+     * @return array|object|null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function loadAmountPriceInfo()
     {
@@ -1483,16 +1521,17 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Returns all selectlists this article has (used in oxbasket)
+     * Returns all selectlists this article has (used in Basket)
      *
-     * @param string $sKeyPrefix Optional key prefix
+     * @param null $sKeyPrefix Optional key prefix
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getSelectLists($sKeyPrefix = null)
     {
-        //#1468C - more then one article in basket with different selectlist...
-        //optionall function parameter $sKeyPrefix added, used only in basket.php
+        //#1468C - more than one article in basket with different selectlist...
+        //optionally function parameter $sKeyPrefix added, used only in basket.php
         $sKey = $this->getId();
         if (isset($sKeyPrefix)) {
             $sKey = $sKeyPrefix . '__' . $sKey;
@@ -1576,11 +1615,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns variants selections lists array
      *
-     * @param array  $aFilterIds    ids of active selections [optional]
-     * @param string $sActVariantId active variant id [optional]
-     * @param int    $iLimit        limit variant lists count (if non zero, return limited number of multidimensional variant selections)
+     * @param array|null $aFilterIds ids of active selections [optional]
+     * @param string|null $sActVariantId active variant id [optional]
+     * @param int $iLimit limit variant lists count (if non-zero, return limited number of multidimensional variant selections)
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getVariantSelections($aFilterIds = null, $sActVariantId = null, $iLimit = 0)
     {
@@ -1610,10 +1650,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns product selections lists array (used in azure theme)
      *
-     * @param int   $iLimit  if given - will load limited count of selections [optional]
-     * @param array $aFilter selection filter [optional]
+     * @param null $iLimit if given - will load limited count of selections [optional]
+     * @param null $aFilter selection filter [optional]
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getSelections($iLimit = null, $aFilter = null)
     {
@@ -1641,7 +1684,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $oList->getBaseObject()->setVat($dVat);
             $oList->selectString($sQ, [':oxobjectid' => $this->getId()]);
 
-            //#1104S if this is variant and it has no selectlists, trying with parent
+            //#1104S if this is variant and has no selectlists, trying with parent
             if ($oList->count() == 0 && $this->oxarticles__oxparentid->value) {
                 $oList->selectString($sQ, [':oxobjectid' => $this->oxarticles__oxparentid->value]);
             }
@@ -1669,10 +1712,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns variant list (list contains oxArticle objects)
      *
-     * @param bool $blRemoveNotOrderables if true, removes from list not orderable articles, which are out of stock [optional]
-     * @param bool $blForceCoreTable      if true forces core table use, default is false [optional]
+     * @param bool $blRemoveNotOrderables if true, removes from list not order-able articles, which are out of stock [optional]
+     * @param null $blForceCoreTable if true forces core table use, default is false [optional]
      *
      * @return ArticleList
+     * @throws DatabaseConnectionException
      */
     public function getFullVariants($blRemoveNotOrderables = true, $blForceCoreTable = null)
     {
@@ -1683,10 +1727,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Collects and returns article variants.
      * Note: Only active variants are returned by this method. If you need full variant list use Article::getAdminVariants()
      *
-     * @param bool $blRemoveNotOrderables if true, removes from list not orderable articles, which are out of stock
-     * @param bool $blForceCoreTable      if true forces core table use, default is false [optional]
+     * @param bool $blRemoveNotOrderables if true, removes from list not order-able articles, which are out of stock
+     * @param null $blForceCoreTable if true forces core table use, default is false [optional]
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getVariants($blRemoveNotOrderables = true, $blForceCoreTable = null)
     {
@@ -1697,6 +1742,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Simple way to get variants without querying oxArticle table first. This is basically used for lists.
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function getSimpleVariants()
     {
@@ -1730,7 +1776,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 order by oxsort ";
             $oVariants->selectString($sSql, [':oxparentid' => $sId]);
 
-            //if we have variants then depending on config option the parent may be non buyable
+            //if we have variants then depending on config option the parent may be non-buyable
             if (!Registry::getConfig()->getConfigParam('blVariantParentBuyable') && ($oVariants->count() > 0)) {
                 //$this->blNotBuyable = true;
                 $this->_blNotBuyableParent = true;
@@ -1746,6 +1792,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * load category by price
      *
      * @return Category
+     * @throws DatabaseConnectionException
      */
     public function getCategory()
     {
@@ -1795,10 +1842,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns ID's of categories where this article is assigned
      *
-     * @param bool $blActCats   select categories if all parents are active
+     * @param bool $blActCats select categories if all parents are active
      * @param bool $blSkipCache Whether to skip cache
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryIds($blActCats = false, $blSkipCache = false)
     {
@@ -1819,7 +1868,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Returns current article vendor object. If $blShopCheck = false, then
-     * vendor loading will fallback to oxI18n object and blReadOnly parameter
+     * vendor loading will fall back to oxI18n object and blReadOnly parameter
      * will be set to true if vendor is not assigned to current shop
      *
      * @param bool $blShopCheck Set false if shop check is not required (default is true)
@@ -1918,6 +1967,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sCatNid category ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function inCategory($sCatNid)
     {
@@ -1931,6 +1982,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sCatId category ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function isAssignedToCategory($sCatId)
     {
@@ -1967,7 +2021,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns T price
      *
-     * @return Price|null
+     * @return Price|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getTPrice()
     {
@@ -1991,7 +2048,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         $this->_applyCurrency($oPrice);
 
         if ($this->isParentNotBuyable()) {
-            // if parent article is not buyable then compare agains min article variant price
+            // if parent article is not buyable then compare against min article variant price
             $oPrice2 = $this->getVarMinPrice();
         } else {
             // else compare against article price
@@ -2012,6 +2069,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Checks if discount should be skipped for this article in basket. Returns true if yes.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function skipDiscounts()
     {
@@ -2058,11 +2116,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
 
     /**
      * Returns base article price from database. Price may differ according to users group
-     * Override this function if you want e.g. different prices for diff. usergroups.
+     * Override this function if you want e.g. different prices for diff. user-groups.
      *
-     * @param double $dAmount article amount. Default is 1
+     * @param int $dAmount article amount. Default is 1
      *
-     * @return double
+     * @return double|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasePrice($dAmount = 1)
     {
@@ -2075,7 +2135,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             return;
         }
 
-        // GroupPrice or DB price ajusted by AmountPrice
+        // GroupPrice or DB price adjusted by AmountPrice
         $dPrice = $this->_getModifiedAmountPrice($dAmount);
 
         return $dPrice;
@@ -2087,6 +2147,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param int $amount
      *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getModifiedAmountPrice" in next major
      */
     protected function _getModifiedAmountPrice($amount) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -2099,7 +2161,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      *
      * @param float|int $dAmount article amount.
      *
-     * @return Price
+     * @return Price|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getPrice($dAmount = 1)
     {
@@ -2160,11 +2225,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Creates, calculates and returns oxPrice object for basket product.
      *
-     * @param float  $dAmount  Amount
-     * @param array  $aSelList Selection list
-     * @param object $oBasket  User shopping basket object
+     * @param float $dAmount Amount
+     * @param array $aSelList Selection list
+     * @param Basket $oBasket User shopping basket object
      *
      * @return Price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getBasketPrice($dAmount, $aSelList, $oBasket)
     {
@@ -2241,10 +2309,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Reduce article stock. return the affected amount
      *
-     * @param float $dAmount              amount to reduce
-     * @param bool  $blAllowNegativeStock are negative stocks allowed?
+     * @param float $dAmount amount to reduce
+     * @param bool $blAllowNegativeStock are negative stocks allowed?
      *
      * @return float
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function reduceStock($dAmount, $blAllowNegativeStock = false)
     {
@@ -2280,9 +2350,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Recursive function. Updates quantity of sold articles.
      * Return true if amount was changed in database.
      *
-     * @param float $dAmount Number of articles sold
+     * @param int $dAmount Number of articles sold
      *
-     * @return mixed
+     * @return bool|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function updateSoldAmount($dAmount = 0)
     {
@@ -2321,6 +2393,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Disables reminder functionality for article
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function disableReminder()
     {
@@ -2334,6 +2408,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * (Article::_saveArtLongDesc()) save the object using parent::save() method.
      *
      * @return bool
+     * @throws Exception
      */
     public function save()
     {
@@ -2362,7 +2437,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * collect article pics, icons, zoompic and puts it all in an array
+     * collect article pics, icons, zoom-pic and puts it all in an array
      * structure of array (ActPicID, ActPic, MorePics, Pics, Icons, ZoomPic)
      *
      * @return array
@@ -2452,11 +2527,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Call Article::onChange($sAction, $sOXID) with ID parameter when changes are executed over SQL.
      * (or use module class instead of oxArticle if such exists)
      *
-     * @param string $action          Action constant
-     * @param string $articleId       Article ID
-     * @param string $parentArticleId Parent ID
+     * @param null $action Action constant
+     * @param null $articleId Article ID
+     * @param null $parentArticleId Parent ID
      *
      * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onChange($action = null, $articleId = null, $parentArticleId = null)
     {
@@ -2494,8 +2571,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 $this->_onChangeUpdateStock($parentArticleId);
             }
         }
-        //if we have parent id then update count
-        //update count even if blUseStock is not active
+        // if we have parent id then update count
+        // even if blUseStock is not active
         if ($parentArticleId) {
             $this->_onChangeUpdateVarCount($parentArticleId);
         }
@@ -2531,11 +2608,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Checks if stock configuration allows to buy user chosen amount $dAmount
      *
-     * @param double     $dAmount         buyable amount
+     * @param double $dAmount buyable amount
      * @param double|int $dArtStockAmount stock amount
-     * @param bool       $selectForUpdate Set true to select for update
+     * @param bool $selectForUpdate Set true to select for update
      *
      * @return mixed
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function checkForStock($dAmount, $dArtStockAmount = 0, $selectForUpdate = false)
     {
@@ -2558,7 +2637,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $iOnStock = $rs->fields['oxstock'] - $dArtStockAmount;
             $iStockFlag = $rs->fields['oxstockflag'];
 
-            //When using stockflag 1 and 4 with basket reservations enabled but disallowing
+            //When using oxstockflag 1 and 4 with basket reservations enabled but disallowing
             //negative stock values we would allow to reserve more items than are initially available
             //by keeping the stock level not lower than zero. When discarding reservations
             //stock level might differ from original value.
@@ -2598,6 +2677,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Get article long description
      *
      * @return object $oField field object
+     * @throws DatabaseConnectionException
      */
     public function getLongDescription()
     {
@@ -2605,7 +2685,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             // initializing
             $this->_oLongDesc = new Field();
 
-            // choosing which to get..
+            // choosing which to get...
             $sOxid = $this->getId();
             $sViewName = getViewName('oxartextends', $this->getLanguage());
 
@@ -2634,6 +2714,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * In templates use [{oxeval var=$oProduct->getLongDescription()->getRawValue()}]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getLongDesc()
     {
@@ -2641,7 +2722,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Save article long description to oxartext table
+     * Save article long description to oxartextends table
      *
      * @param string $longDescription description to set
      */
@@ -2653,7 +2734,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * the uninitilized list of attributes
+     * the uninitialised list of attributes
      * use getAttributes
      * @return AttributeList
      */
@@ -2666,6 +2747,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Loads and returns attribute list associated with this article
      *
      * @return AttributeList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributes()
     {
@@ -2681,6 +2764,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Loads and returns attribute list for display in basket
      *
      * @return AttributeList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributesDisplayableInBasket()
     {
@@ -2714,10 +2799,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns raw article seo url
      *
-     * @param int  $iLang  language id
+     * @param int $iLang language id
      * @param bool $blMain force to return main url [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getBaseSeoLink($iLang, $blMain = false)
     {
@@ -2733,10 +2819,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Gets article link
      *
-     * @param int  $iLang  language id [optional]
+     * @param null $iLang language id [optional]
      * @param bool $blMain force to return main url [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getLink($iLang = null, $blMain = false)
     {
@@ -2765,9 +2852,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns main object URL. If SEO is ON returned link will be in SEO form,
      * else URL will have dynamic form
      *
-     * @param int $iLang language id [optional]
+     * @param null $iLang language id [optional]
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getMainLink($iLang = null)
     {
@@ -2884,7 +2972,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Get image url
      *
-     * @return array
+     * @return string|null
      */
     public function getDynImageDir()
     {
@@ -2895,6 +2983,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns select lists to display
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDispSelList()
     {
@@ -2918,7 +3007,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             // and assign special article values
             $this->_sMoreDetailLink = Registry::getConfig()->getShopHomeUrl() . 'cl=moredetails';
 
-            // not always it is okey, as not all the time active category is the same as primary article cat.
+            // not always it is ok, as not all the time active category is the same as primary article cat.
             if ($sActCat = Registry::getConfig()->getRequestParameter('cnid')) {
                 $this->_sMoreDetailLink .= '&amp;cnid=' . $sActCat;
             }
@@ -2932,6 +3021,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Get to basket link
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getToBasketLink()
     {
@@ -2944,7 +3034,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 // and assign special article values
                 $this->_sToBasketLink = $myConfig->getShopHomeUrl();
 
-                // override some classes as these should never showup
+                // override some classes as these should never show up
                 $actControllerId = Registry::getConfig()->getRequestControllerId();
                 if ($actControllerId == 'thankyou') {
                     $actControllerId = 'basket';
@@ -3026,9 +3116,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns rounded T price.
      *
+     * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated since v5.1 (2013-10-03); use getTPrice() and oxPrice modifier;
-     *
-     * @return double | bool
      */
     public function getFTPrice()
     {
@@ -3043,9 +3135,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns formatted product's price.
      *
+     * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated since v5.1 (2013-10-04); use oxPrice smarty plugin for formatting in templates
-     *
-     * @return double
      */
     public function getFPrice()
     {
@@ -3073,9 +3167,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns formatted product's NETTO price.
      *
+     * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated since v5.1 (2013-10-03); use getPrice() and oxPrice modifier;
-     *
-     * @return double
      */
     public function getFNetPrice()
     {
@@ -3225,6 +3321,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * apply article and article use
      *
      * @param Price $oPrice target price
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      */
     public function applyVats(Price $oPrice)
     {
@@ -3235,6 +3333,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Applies discounts which should be applied in general case (for 0 amount)
      *
      * @param Price $oPrice Price object
+     * @throws DatabaseConnectionException
      */
     public function applyDiscountsForVariant($oPrice)
     {
@@ -3317,7 +3416,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Returns false if object is not derived from oxorderarticle class
+     * Returns false if object is not derived from OrderArticle class
      *
      * @return bool
      */
@@ -3359,6 +3458,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $sFields fields to load from oxCategories
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getSqlForPriceCategories($sFields = '')
     {
@@ -3379,6 +3479,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $categoryPriceId Price category ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function inPriceCategory($categoryPriceId)
     {
@@ -3391,6 +3492,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $categoryPriceId The id of the category we want to check, if this article is in.
      *
      * @return string One, if the given article is in the given price category, else empty string.
+     * @throws DatabaseConnectionException
      */
     protected function fetchFirstInPriceCategory($categoryPriceId)
     {
@@ -3409,6 +3511,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $categoryPriceId The price category id.
      *
      * @return string The wished sql.
+     * @throws DatabaseConnectionException
      */
     protected function createFetchFirstInPriceCategorySql($categoryPriceId)
     {
@@ -3429,7 +3532,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Get the database object.
      *
-     * @return \OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface
+     * @return DatabaseInterface
+     * @throws DatabaseConnectionException
      */
     protected function getDatabase()
     {
@@ -3440,6 +3544,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Returns multidimensional variant structure
      *
      * @return MdVariant
+     * @throws DatabaseConnectionException
      */
     public function getMdVariants()
     {
@@ -3464,7 +3569,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Returns first level variants from multidimensional variants list
      *
-     * @return MdVariant
+     * @return array
+     * @throws DatabaseConnectionException
      */
     public function getMdSubvariants()
     {
@@ -3566,6 +3672,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Checks if articles has amount price
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function hasAmountPrice()
     {
@@ -3586,11 +3693,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Loads and returns variants list.
      *
-     * @param bool      $loadSimpleVariants    if parameter $blSimple - list will be filled with oxSimpleVariant objects, else - oxArticle
-     * @param bool      $blRemoveNotOrderables if true, removes from list not orderable articles, which are out of stock [optional]
-     * @param bool|null $forceCoreTableUsage   if true forces core table use, default is false [optional]
+     * @param bool $loadSimpleVariants if parameter $blSimple - list will be filled with oxSimpleVariant objects, else - oxArticle
+     * @param bool $blRemoveNotOrderables if true, removes from list not order-able articles, which are out of stock [optional]
+     * @param bool|null $forceCoreTableUsage if true forces core table use, default is false [optional]
      *
      * @return array|Simplevariantlist|Articlelist
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadVariantList" in next major
      */
     protected function _loadVariantList($loadSimpleVariants, $blRemoveNotOrderables = true, $forceCoreTableUsage = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3654,12 +3762,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                 stopProfile("selectVariants");
             }
 
-            //if we have variants then depending on config option the parent may be non buyable
+            //if we have variants then depending on config option the parent may be non-buyable
             if (!$config->getConfigParam('blVariantParentBuyable') && $this->_blHasVariants) {
                 $this->_blNotBuyableParent = true;
             }
 
-            //if we have variants, but all variants are incative means article may be non buyable (depends on config option)
+            //if we have variants, but all variants are inactive means article may be non-buyable (depends on config option)
             if (!$config->getConfigParam('blVariantParentBuyable') && count($variants) == 0 && $this->_blHasVariants) {
                 $this->_blNotBuyable = true;
             }
@@ -3675,6 +3783,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $field category ID field name
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "selectCategoryIds" in next major
      */
     protected function _selectCategoryIds($query, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3698,6 +3808,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param bool $blActCats select categories if all parents are active
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryIdsSelect" in next major
      */
     protected function _getCategoryIdsSelect($blActCats = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3738,9 +3849,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Calculates price of article (adds taxes, currency and discounts).
      *
      * @param Price $oPrice price object
-     * @param double                       $dVat   vat value, optional, if passed, bypasses "bl_perfCalcVatOnlyForBasketOrder" config value
+     * @param null $dVat vat value, optional, if passed, bypasses "bl_perfCalcVatOnlyForBasketOrder" config value
      *
      * @return Price
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "calculatePrice" in next major
      */
     protected function _calculatePrice($oPrice, $dVat = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3770,9 +3883,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Checks if parent has ANY variant assigned
      *
-     * @param bool $blForceCoreTable force core table usage
+     * @param null $blForceCoreTable force core table usage
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "hasAnyVariant" in next major
      */
     protected function _hasAnyVariant($blForceCoreTable = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3815,9 +3929,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * inserts article long description to artextends table
+     * inserts article long description to oxartextends table
      *
      * @return null
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "saveArtLongDesc" in next major
      */
     protected function _saveArtLongDesc() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3938,6 +4053,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param int $amount Basket amount
      *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAmountPrice" in next major
      */
     protected function _getAmountPrice($amount = 1) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3964,10 +4081,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Modifies article price according to selected select list value
      *
-     * @param double $dPrice      Modifiable price
-     * @param array  $aChosenList Selection list array
+     * @param double $dPrice Modifiable price
+     * @param null $aChosenList Selection list array
      *
      * @return double
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "modifySelectListPrice" in next major
      */
     protected function _modifySelectListPrice($dPrice, $aChosenList = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -3998,15 +4116,16 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param array $aAmPriceList Amount price list
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "fillAmountPriceList" in next major
      */
     protected function _fillAmountPriceList($aAmPriceList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oLang = Registry::getLang();
 
-        // trying to find lowest price value
+        // trying to find the lowest price value
         foreach ($aAmPriceList as $sId => $oItem) {
-            /** @var Price $oItemPrice */
             $oItemPrice = $this->_getPriceObject();
             if ($oItem->oxprice2article__oxaddabs->value) {
                 $dBasePrice = $oItem->oxprice2article__oxaddabs->value;
@@ -4041,6 +4160,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param bool $blActiveVariants Parameter to load only active variants.
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getVariantIds($blActiveVariants = true)
     {
@@ -4072,6 +4193,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * retrieve article VAT (cached)
      *
      * @return double
+     * @throws DatabaseConnectionException
      */
     public function getArticleVat()
     {
@@ -4086,7 +4208,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Applies VAT to article
      *
      * @param Price $oPrice Price object
-     * @param double                       $dVat   VAT percent
+     * @param double $dVat VAT percent
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "applyVAT" in next major
      */
     protected function _applyVAT(Price $oPrice, $dVat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4121,7 +4244,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * gets attribs string
      *
      * @param string $sAttributeSql Attribute selection snippet
-     * @param int    $iCnt          The number of selected attributes
+     * @param int $iCnt The number of selected attributes
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAttribsString" in next major
      */
     protected function _getAttribsString(&$sAttributeSql, &$iCnt) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4149,9 +4274,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Gets similar list.
      *
      * @param string $sAttributeSql Attribute selection snippet
-     * @param int    $iCnt          Similar list article count
+     * @param int $iCnt Similar list article count
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSimList" in next major
      */
     protected function _getSimList($sAttributeSql, $iCnt) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4186,9 +4313,10 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Generates search string for similar list.
      *
      * @param string $sArticleTable Article table name
-     * @param array  $aList         A list of original articles
+     * @param array $aList A list of original articles
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateSimListSearchStr" in next major
      */
     protected function _generateSimListSearchStr($sArticleTable, $aList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4209,10 +4337,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Generates SearchString for getCategory()
      *
-     * @param string $sOXID            Article ID
-     * @param bool   $blSearchPriceCat Whether to perform the search within price categories
+     * @param string $sOXID Article ID
+     * @param bool $blSearchPriceCat Whether to perform the search within price categories
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateSearchStr" in next major
      */
     protected function _generateSearchStr($sOXID, $blSearchPriceCat = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4235,6 +4364,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Generates SQL select string for getCustomerAlsoBoughtThisProduct
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateSearchStrForCustomerBought" in next major
      */
     protected function _generateSearchStrForCustomerBought() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4294,11 +4425,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Generates select string for isAssignedToCategory()
      *
-     * @param string $sOXID        Article ID
-     * @param string $sCatId       Category ID
-     * @param bool   $dPriceFromTo Article price for price categories
+     * @param string $sOXID Article ID
+     * @param string $sCatId Category ID
+     * @param bool $dPriceFromTo Article price for price categories
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateSelectCatStr" in next major
      */
     protected function _generateSelectCatStr($sOXID, $sCatId, $dPriceFromTo = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4328,9 +4460,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Collecting assigned to article amount-price list
      *
+     * @return AmountPriceList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated on b-dev (2015-04-02); use buildAmountPriceList().
      *
-     * @return AmountPriceList
      */
     protected function _getAmountPriceList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -4341,6 +4475,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Collecting assigned to article amount-price list.
      *
      * @return AmountPriceList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function buildAmountPriceList()
     {
@@ -4502,7 +4638,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * if we have variants then depending on config option the parent may be non buyable
+     * if we have variants then depending on config option the parent may be non-buyable
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignNotBuyableParent" in next major
      */
     protected function _assignNotBuyableParent() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4570,7 +4706,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         //exceptional handling for variant parent stock:
         if ($this->_blNotBuyable && $this->oxarticles__oxvarstock->value) {
             $this->setBuyableState(true);
-            //but then at least setting notBuaybleParent to true
+            //but then at least setting notBuyableParent to true
             $this->_blNotBuyableParent = true;
         }
 
@@ -4581,7 +4717,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $this->setBuyableState(false);
         }
 
-        //setting to non buyable when variant list is empty (for example not loaded or inactive) and $this is non buyable parent
+        //setting to non-buyable when variant list is empty (for example not loaded or inactive) and $this is non-buyable parent
         if (!$this->_blNotBuyable && $this->_blNotBuyableParent && $this->oxarticles__oxvarcount->value == 0) {
             $this->setBuyableState(false);
         }
@@ -4602,7 +4738,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * assigns dynimagedir to article
+     * assigns DynImageDir to article
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignDynImageDir" in next major
      */
     protected function _assignDynImageDir() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4618,12 +4754,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Adds a flag if article is on comparisonlist.
+     * Adds a flag if article is on comparison-list.
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignComparisonListFlag" in next major
      */
     protected function _assignComparisonListFlag() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        // #657 add a flag if article is on comparisonlist
+        // #657 add a flag if article is on comparison-list
 
         $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
         if (isset($aItems[$this->getId()])) {
@@ -4655,6 +4791,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Executes Article::_skipSaveFields() and updates article information
      *
      * @return bool
+     * @throws \oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4673,6 +4810,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $articleId Article ID
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteRecords" in next major
      */
     protected function _deleteRecords($articleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4754,6 +4893,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Deletes variant records
      *
      * @param string $sOXID Article ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteVariantRecords" in next major
      */
     protected function _deleteVariantRecords($sOXID) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4801,9 +4942,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Resets category and vendor counts. This method is supposed to be called on article change trigger.
      *
-     * @param string $sOxid           object to reset id ID
-     * @param string $sVendorId       Vendor ID
-     * @param string $sManufacturerId Manufacturer ID
+     * @param string $sOxid object to reset ID
+     * @param null $sVendorId Vendor ID
+     * @param null $sManufacturerId Manufacturer ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "onChangeResetCounts" in next major
      */
     protected function _onChangeResetCounts($sOxid, $sVendorId = null, $sManufacturerId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4829,6 +4972,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Updates article stock. This method is supposed to be called on article change trigger.
      *
      * @param string $parentId product parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "onChangeUpdateStock" in next major
      */
     protected function _onChangeUpdateStock($parentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4867,7 +5012,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             }
             if ($this->oxarticles__oxstockflag->value == 2 && $oldStock xor $stock) {
                 //means the stock status could be changed (oxstock turns from 0 to 1 or from 1 to 0)
-                // so far we leave it like this but later we could move all count resets to one or two functions
+                // so far we leave it like this, but later we could move all count resets to one or two functions
                 $this->_onChangeResetCounts($parentId, $vendorId, $manufacturerId);
             }
         }
@@ -4877,6 +5022,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Resets article count cache when stock value is zero and article goes offline.
      *
      * @param string $sOxid product id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "onChangeStockResetCount" in next major
      */
     protected function _onChangeStockResetCount($sOxid) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4899,6 +5046,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Updates variant count. This method is supposed to be called on article change trigger.
      *
      * @param string $parentId Parent ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "onChangeUpdateVarCount" in next major
      */
     protected function _onChangeUpdateVarCount($parentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -4923,6 +5072,8 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Updates variant min price. This method is supposed to be called on article change trigger.
      *
      * @param string $sParentId Parent ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setVarMinMaxPrice" in next major
      */
     protected function _setVarMinMaxPrice($sParentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -5143,6 +5294,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Return variant min price
      *
      * @return null
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVarMinRawPrice" in next major
      */
     protected function _getVarMinPrice() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -5182,6 +5334,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * Return variant max price
      *
      * @return null
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVarMaxPrice" in next major
      */
     protected function _getVarMaxPrice() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -5247,6 +5400,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @param string $articleId id
      *
      * @return array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb($articleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -5270,7 +5424,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     /**
      * Set parent field value to child - variants in DB
      *
-     * @return bool
+     * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateParentDependFields" in next major
      */
     protected function _updateParentDependFields() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

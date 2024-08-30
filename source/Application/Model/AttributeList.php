@@ -43,11 +43,11 @@ class AttributeList extends ListModel
     }
 
     /**
-     * Load all attributes by article Id's
+     * Load all attributes by article IDs
      *
      * @param array $aIds article id's
      *
-     * @return array $aAttributes;
+     * @return array|void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
@@ -103,7 +103,7 @@ class AttributeList extends ListModel
     }
 
     /**
-     * Load attributes by article Id
+     * Load attributes by article ID
      *
      * @param string $sArticleId article id
      * @param null $sParentId article parent id
@@ -139,7 +139,7 @@ class AttributeList extends ListModel
     }
 
     /**
-     * Load displayable in baskte/order attributes by article Id
+     * Load displayable in basket/order attributes by article ID
      *
      * @param string $sArtId article ids
      * @param null $sParentId parent id
@@ -175,7 +175,7 @@ class AttributeList extends ListModel
     }
 
     /**
-     * get category attributes by category Id
+     * get category attributes by category ID
      *
      * @param string $sCategoryId category Id
      * @param integer $iLang language No

@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -68,7 +70,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
     protected $_blIsVisible;
 
     /**
-     * has visible endors state of a category
+     * has visible manufacturers state of a category
      *
      * @var bool
      */
@@ -295,7 +297,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * sets the visibilty of a category
+     * sets the visibility of a category
      *
      * @param bool $blVisible manufacturers visibility status setter
      */
@@ -338,9 +340,11 @@ class Manufacturer extends MultiLanguageModel implements IUrl
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $oxid Object ID(default null)
+     * @param null $oxid Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($oxid = null)
     {
@@ -378,7 +382,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
     }
 
     /**
-     * Returns false, becouse manufacturer has not thumbnail
+     * Returns false, because manufacturer has not thumbnail
      *
      * @return false
      */

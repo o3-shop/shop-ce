@@ -58,7 +58,7 @@ class OrderFile extends BaseModel
     }
 
     /**
-     * reset order files downloadcount and / or expration times
+     * reset order files download-count and / or expiration times
      */
     public function reset()
     {
@@ -190,7 +190,7 @@ class OrderFile extends BaseModel
     }
 
     /**
-     * returns state payed or not the order
+     * returns state paid or not the order
      *
      * @return bool
      */
