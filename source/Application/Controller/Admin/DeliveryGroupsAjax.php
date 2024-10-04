@@ -38,7 +38,9 @@ class DeliveryGroupsAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxgroups', 1, 0, 0],
             ['oxid', 'oxgroups', 0, 0, 0],
             ['oxid', 'oxgroups', 0, 0, 1],
@@ -59,11 +61,22 @@ class DeliveryGroupsAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $oRequest = Registry::getRequest();
         $oDb = DatabaseProvider::getDb();
 
         // active AJAX component
-        $sGroupTable = $this->_getViewName('oxgroups');
+        $sGroupTable = $this->getViewName('oxgroups');
 
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -94,9 +107,9 @@ class DeliveryGroupsAjax extends ListComponentAjax
      */
     public function removeGroupFromDel()
     {
-        $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
+        $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
             $sRemoveGroups = implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
@@ -110,13 +123,13 @@ class DeliveryGroupsAjax extends ListComponentAjax
      */
     public function addGroupToDel()
     {
-        $aChosenCat = $this->_getActionIds('oxgroups.oxid');
+        $aChosenCat = $this->getActionIds('oxgroups.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sGroupTable = $this->_getViewName('oxgroups');
-            $aChosenCat = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
+            $sGroupTable = $this->getViewName('oxgroups');
+            $aChosenCat = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aChosenCat)) {

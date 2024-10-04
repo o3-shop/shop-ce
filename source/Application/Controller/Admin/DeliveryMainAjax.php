@@ -38,7 +38,9 @@ class DeliveryMainAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxcountry', 1, 1, 0],
             ['oxisoalpha2', 'oxcountry', 1, 0, 0],
             ['oxisoalpha3', 'oxcountry', 0, 0, 0],
@@ -63,7 +65,18 @@ class DeliveryMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sCountryTable = $this->_getViewName('oxcountry');
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $sCountryTable = $this->getViewName('oxcountry');
         $oDb = DatabaseProvider::getDb();
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -94,9 +107,9 @@ class DeliveryMainAjax extends ListComponentAjax
      */
     public function removeCountryFromDel()
     {
-        $aChosenCntr = $this->_getActionIds('oxobject2delivery.oxid');
+        $aChosenCntr = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
             $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
@@ -109,13 +122,13 @@ class DeliveryMainAjax extends ListComponentAjax
      */
     public function addCountryToDel()
     {
-        $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
+        $aChosenCntr = $this->getActionIds('oxcountry.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sCountryTable = $this->_getViewName('oxcountry');
-            $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->_getQuery()));
+            $sCountryTable = $this->getViewName('oxcountry');
+            $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {

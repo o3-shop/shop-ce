@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -40,6 +41,7 @@ class ArticlePictures extends AdminDetailsController
      * engine, returns name of template file "article_pictures.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -71,6 +73,7 @@ class ArticlePictures extends AdminDetailsController
      * Saves (uploads) pictures to server.
      *
      * @return void
+     * @throws DatabaseConnectionException
      */
     public function save()
     {
@@ -109,6 +112,7 @@ class ArticlePictures extends AdminDetailsController
      * Also deletes custom icon and thumbnail.
      *
      * @return void
+     * @throws DatabaseConnectionException
      */
     public function deletePicture()
     {
@@ -131,15 +135,15 @@ class ArticlePictures extends AdminDetailsController
 
         if ($iIndex == "ICO") {
             // deleting main icon
-            $this->_deleteMainIcon($oArticle);
+            $this->deleteMainIcon($oArticle);
         } elseif ($iIndex == "TH") {
             // deleting thumbnail
-            $this->_deleteThumbnail($oArticle);
+            $this->deleteThumbnail($oArticle);
         } else {
             $iIndex = (int) $iIndex;
             if ($iIndex > 0) {
                 // deleting master picture
-                $this->_resetMasterPicture($oArticle, $iIndex, true);
+                $this->resetMasterPicture($oArticle, $iIndex, true);
             }
         }
 
@@ -156,6 +160,19 @@ class ArticlePictures extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetMasterPicture" in next major
      */
     protected function _resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->resetMasterPicture($oArticle, $iIndex, $blDeleteMaster);
+    }
+
+    /**
+     * Deletes selected master picture and all pictures generated
+     * from master picture
+     *
+     * @param Article $oArticle       article object
+     * @param int                                         $iIndex         master picture index
+     * @param bool                                        $blDeleteMaster if TRUE - deletes and unsets master image file
+     */
+    protected function resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false)
     {
         if ($this->canResetMasterPicture($oArticle, $iIndex)) {
             if (!$oArticle->isDerived()) {
@@ -174,7 +191,7 @@ class ArticlePictures extends AdminDetailsController
             }
 
             if ($iIndex == 1) {
-                $this->_cleanupCustomFields($oArticle);
+                $this->cleanupCustomFields($oArticle);
             }
         }
     }
@@ -186,6 +203,16 @@ class ArticlePictures extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteMainIcon" in next major
      */
     protected function _deleteMainIcon($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->deleteMainIcon($oArticle);
+    }
+
+    /**
+     * Deletes main icon file
+     *
+     * @param Article $oArticle article object
+     */
+    protected function deleteMainIcon($oArticle)
     {
         if ($this->canDeleteMainIcon($oArticle)) {
             if (!$oArticle->isDerived()) {
@@ -206,6 +233,16 @@ class ArticlePictures extends AdminDetailsController
      */
     protected function _deleteThumbnail($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->deleteThumbnail($oArticle);
+    }
+
+    /**
+     * Deletes thumbnail file
+     *
+     * @param Article $oArticle article object
+     */
+    protected function deleteThumbnail($oArticle)
+    {
         if ($this->canDeleteThumbnail($oArticle)) {
             if (!$oArticle->isDerived()) {
                 $oPicHandler = Registry::getPictureHandler();
@@ -225,6 +262,17 @@ class ArticlePictures extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "cleanupCustomFields" in next major
      */
     protected function _cleanupCustomFields($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->cleanupCustomFields($oArticle);
+    }
+
+    /**
+     * Cleans up article custom fields oxicon and oxthumb. If there is custom
+     * icon or thumb picture, leaves records untouched.
+     *
+     * @param Article $oArticle article object
+     */
+    protected function cleanupCustomFields($oArticle)
     {
         $sIcon = $oArticle->oxarticles__oxicon->value;
         $sThumb = $oArticle->oxarticles__oxthumb->value;

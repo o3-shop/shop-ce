@@ -76,7 +76,7 @@ class ActionsMain extends AdminDetailsController
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             // generating category tree for select list
-            $this->_createCategoryTree("artcattree", $soxId);
+            $this->createCategoryTree("artcattree", $soxId);
 
             $oActionsMainAjax = oxNew(ActionsMainAjax::class);
             $this->_aViewData['oxajax'] = $oActionsMainAjax->getColumns();
@@ -92,7 +92,7 @@ class ActionsMain extends AdminDetailsController
                     switch ($iAoc) {
                         case 'article':
                             // generating category tree for select list
-                            $this->_createCategoryTree("artcattree", $soxId);
+                            $this->createCategoryTree("artcattree", $soxId);
 
                             if ($oArticle = $oPromotion->getBannerArticle()) {
                                 $this->_aViewData['actionarticle_artnum'] = $oArticle->oxarticles__oxartnum->value;
@@ -114,7 +114,7 @@ class ActionsMain extends AdminDetailsController
                     }
                 } else {
                     if ($oPromotion->oxactions__oxtype->value == 2) {
-                        $this->_aViewData["editor"] = $this->_generateTextEditor(
+                        $this->_aViewData["editor"] = $this->generateTextEditor(
                             "100%",
                             300,
                             $oPromotion,

@@ -37,13 +37,14 @@ class ActionsOrderAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [
-        ['oxtitle', 'oxselectlist', 1, 1, 0],
-        ['oxsort', 'oxobject2selectlist', 1, 0, 0],
-        ['oxident', 'oxselectlist', 0, 0, 0],
-        ['oxvaldesc', 'oxselectlist', 0, 0, 0],
-        ['oxid', 'oxobject2selectlist', 0, 0, 1]
-    ]
+    protected $_aColumns = [
+        'container1' => [
+            ['oxtitle', 'oxselectlist', 1, 1, 0],
+            ['oxsort', 'oxobject2selectlist', 1, 0, 0],
+            ['oxident', 'oxselectlist', 0, 0, 0],
+            ['oxvaldesc', 'oxselectlist', 0, 0, 0],
+            ['oxid', 'oxobject2selectlist', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -55,7 +56,18 @@ class ActionsOrderAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSelTable = $this->_getViewName('oxselectlist');
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $sSelTable = $this->getViewName('oxselectlist');
         $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         return " from $sSelTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sSelTable.oxid " .
@@ -69,6 +81,16 @@ class ActionsOrderAjax extends ListComponentAjax
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getSorting();
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     */
+    protected function getSorting()
     {
         return 'order by oxobject2selectlist.oxsort ';
     }
@@ -118,11 +140,11 @@ class ActionsOrderAjax extends ListComponentAjax
             }
         }
 
-        $sQAdd = $this->_getQuery();
+        $sQAdd = $this->getQuery();
 
-        $sQ = 'select ' . $this->_getQueryCols() . $sQAdd;
+        $sQ = 'select ' . $this->getQueryCols() . $sQAdd;
         $sCountQ = 'select count( * ) ' . $sQAdd;
 
-        $this->_outputResponse($this->_getData($sCountQ, $sQ));
+        $this->outputResponse($this->getData($sCountQ, $sQ));
     }
 }

@@ -410,7 +410,7 @@ class ArticleList extends ListModel
      * Loads only ID's and create Fake objects for cmp_categories.
      *
      * @param string $sCatId Category tree ID
-     * @param array $aSessionFilter Like array ( catid => array( attrid => value,...))
+     * @param array|null $aSessionFilter Like array ( catid => array( attrid => value,...))
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */

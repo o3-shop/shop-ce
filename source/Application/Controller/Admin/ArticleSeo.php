@@ -146,15 +146,15 @@ class ArticleSeo extends ObjectSeo
             $oProduct = oxNew(Article::class);
             $oProduct->load($this->getEditObjectId());
 
-            if ($oCatList = $this->_getCategoryList($oProduct)) {
+            if ($oCatList = $this->getCategoryList($oProduct)) {
                 $this->_aSelectionList["oxcategory"][$this->_iEditLang] = $oCatList;
             }
 
-            if ($oVndList = $this->_getVendorList($oProduct)) {
+            if ($oVndList = $this->getVendorList($oProduct)) {
                 $this->_aSelectionList["oxvendor"][$this->_iEditLang] = $oVndList;
             }
 
-            if ($oManList = $this->_getManufacturerList($oProduct)) {
+            if ($oManList = $this->getManufacturerList($oProduct)) {
                 $this->_aSelectionList["oxmanufacturer"][$this->_iEditLang] = $oManList;
             }
         }
@@ -173,6 +173,20 @@ class ArticleSeo extends ObjectSeo
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
      */
     protected function _getCategoryList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getCategoryList($oArticle);
+    }
+
+    /**
+     * Returns array of product categories
+     *
+     * @param Article $oArticle Article object
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getCategoryList($oArticle)
     {
         $sMainCatId = false;
         if ($oMainCat = $oArticle->getCategory()) {
@@ -216,12 +230,26 @@ class ArticleSeo extends ObjectSeo
      *
      * @param Article $oArticle Article object
      *
-     * @return array|void
+     * @return array|null
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getVendorList" in next major
      */
     protected function _getVendorList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getVendorList($oArticle);
+    }
+
+    /**
+     * Returns array containing product vendor object
+     *
+     * @param Article $oArticle Article object
+     *
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getVendorList($oArticle)
     {
         if ($oArticle->oxarticles__oxvendorid->value) {
             $oVendor = oxNew(Vendor::class);
@@ -236,12 +264,26 @@ class ArticleSeo extends ObjectSeo
      *
      * @param Article $oArticle Article object
      *
-     * @return array|void
+     * @return array|null
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturerList" in next major
      */
     protected function _getManufacturerList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getManufacturerList($oArticle);
+    }
+
+    /**
+     * Returns array containing product manufacturer object
+     *
+     * @param Article $oArticle Article object
+     *
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getManufacturerList($oArticle)
     {
         if ($oArticle->oxarticles__oxmanufacturerid->value) {
             $oManufacturer = oxNew(Manufacturer::class);
@@ -331,6 +373,16 @@ class ArticleSeo extends ObjectSeo
      */
     protected function _getAltSeoEntryId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getAltSeoEntryId();
+    }
+
+    /**
+     * Returns alternative seo entry id
+     *
+     * @return null
+     */
+    protected function getAltSeoEntryId()
+    {
         return $this->getEditObjectId();
     }
 
@@ -341,6 +393,16 @@ class ArticleSeo extends ObjectSeo
      * @deprecated underscore prefix violates PSR12, will be renamed to "getType" in next major
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getType();
+    }
+
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
     {
         return 'oxarticle';
     }
@@ -367,6 +429,16 @@ class ArticleSeo extends ObjectSeo
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getEncoder();
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderCategory
+     */
+    protected function getEncoder()
+    {
         return Registry::get(SeoEncoderArticle::class);
     }
 
@@ -382,7 +454,7 @@ class ArticleSeo extends ObjectSeo
         $product = oxNew(Article::class);
 
         if ($product->load($this->getEditObjectId())) {
-            $seoEncoder = $this->_getEncoder();
+            $seoEncoder = $this->getEncoder();
 
             switch ($this->getActCatType()) {
                 case 'oxvendor':
@@ -430,8 +502,8 @@ class ArticleSeo extends ObjectSeo
      */
     public function isEntryFixed()
     {
-        $sId = $this->_getSaveObjectId();
-        $iLang = (int) $this->getEditLang();
+        $sId = $this->getEditObjectId();
+        $iLang = $this->getEditLang();
         $iShopId = Registry::getConfig()->getShopId();
         $sParam = $this->processParam($this->getActCatId());
 

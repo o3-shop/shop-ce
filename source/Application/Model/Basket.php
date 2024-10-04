@@ -1017,7 +1017,7 @@ class Basket extends Base
     /**
      * Basket user setter
      *
-     * @param User $oUser Basket user
+     * @param User|null $oUser Basket user
      */
     public function setBasketUser($oUser)
     {

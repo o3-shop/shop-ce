@@ -37,7 +37,8 @@ class AttributeOrderAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [
+    protected $_aColumns = [
+        'container1' => [
             ['oxtitle', 'oxattribute', 1, 1, 0],
             ['oxsort', 'oxcategory2attribute', 1, 0, 0],
             ['oxid', 'oxcategory2attribute', 0, 0, 1],
@@ -53,7 +54,18 @@ class AttributeOrderAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSelTable = $this->_getViewName('oxattribute');
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $sSelTable = $this->getViewName('oxattribute');
         $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         return " from $sSelTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sSelTable.oxid " .
@@ -67,6 +79,16 @@ class AttributeOrderAjax extends ListComponentAjax
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getSorting();
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     */
+    protected function getSorting()
     {
         return 'order by oxcategory2attribute.oxsort ';
     }
@@ -113,11 +135,11 @@ class AttributeOrderAjax extends ListComponentAjax
             }
         }
 
-        $sQAdd = $this->_getQuery();
+        $sQAdd = $this->getQuery();
 
-        $sQ = 'select ' . $this->_getQueryCols() . $sQAdd;
+        $sQ = 'select ' . $this->getQueryCols() . $sQAdd;
         $sCountQ = 'select count( * ) ' . $sQAdd;
 
-        $this->_outputResponse($this->_getData($sCountQ, $sQ));
+        $this->outputResponse($this->getData($sCountQ, $sQ));
     }
 }

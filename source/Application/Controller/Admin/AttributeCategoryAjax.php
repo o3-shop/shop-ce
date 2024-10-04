@@ -40,23 +40,25 @@ class AttributeCategoryAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field, table, visible, multilanguage, ident
             ['oxtitle', 'oxcategories', 1, 1, 0],
             ['oxdesc', 'oxcategories', 1, 1, 0],
             ['oxid', 'oxcategories', 0, 0, 0],
-            ['oxid', 'oxcategories', 0, 0, 1]
+            ['oxid', 'oxcategories', 0, 0, 1],
         ],
          'container2' => [
              ['oxtitle', 'oxcategories', 1, 1, 0],
              ['oxdesc', 'oxcategories', 1, 1, 0],
              ['oxid', 'oxcategories', 0, 0, 0],
              ['oxid', 'oxcategory2attribute', 0, 0, 1],
-             ['oxid', 'oxcategories', 0, 0, 1]
+             ['oxid', 'oxcategories', 0, 0, 1],
          ],
          'container3' => [
              ['oxtitle', 'oxattribute', 1, 1, 0],
              ['oxsort', 'oxcategory2attribute', 1, 0, 0],
-             ['oxid', 'oxcategory2attribute', 0, 0, 1]
+             ['oxid', 'oxcategory2attribute', 0, 0, 1],
          ]
     ];
 
@@ -69,10 +71,21 @@ class AttributeCategoryAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $myConfig = Registry::getConfig();
         $oDb = DatabaseProvider::getDb();
 
-        $sCatTable = $this->_getViewName('oxcategories');
+        $sCatTable = $this->getViewName('oxcategories');
         $sDiscountId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchDiscountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
@@ -105,10 +118,10 @@ class AttributeCategoryAjax extends ListComponentAjax
      */
     public function removeCatFromAttr()
     {
-        $aChosenCat = $this->_getActionIds('oxcategory2attribute.oxid');
+        $aChosenCat = $this->getActionIds('oxcategory2attribute.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxcategory2attribute.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxcategory2attribute.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
             $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
@@ -126,14 +139,14 @@ class AttributeCategoryAjax extends ListComponentAjax
      */
     public function addCatToAttr()
     {
-        $aAddCategory = $this->_getActionIds('oxcategories.oxid');
+        $aAddCategory = $this->getActionIds('oxcategories.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $oAttribute = oxNew(Attribute::class);
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sCatTable = $this->_getViewName('oxcategories');
-            $aAddCategory = $this->_getAll($this->_addFilter("select $sCatTable.oxid " . $this->_getQuery()));
+            $sCatTable = $this->getViewName('oxcategories');
+            $aAddCategory = $this->getAll($this->addFilter("select $sCatTable.oxid " . $this->getQuery()));
         }
 
         if ($oAttribute->load($soxId) && is_array($aAddCategory)) {

@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -57,6 +58,7 @@ class ActionsList extends AdminListController
      * Calls parent::render() and returns name of template to render
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -71,15 +73,30 @@ class ActionsList extends AdminListController
     /**
      * Adds active promotion check
      *
-     * @param array  $whereQuery  SQL condition array
+     * @param array $whereQuery SQL condition array
      * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_prepareWhereQuery($whereQuery, $fullQuery);
+        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+    }
+
+    /**
+     * Adds active promotion check
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
         $sTable = getViewName("oxactions");
 

@@ -91,6 +91,7 @@ class ArticleList extends AdminListController
      * returns name of template file "article_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -262,12 +263,27 @@ class ArticleList extends AdminListController
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_buildSelectString($listObject);
+        return $this->buildSelectString($listObject);
+    }
+
+    /**
+     * Builds and returns SQL query string.
+     *
+     * @param null $listObject list main object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function buildSelectString($listObject = null)
+    {
+        $sQ = parent::buildSelectString($listObject);
         if ($sQ) {
             $sTable = getViewName("oxarticles");
             $sQ .= " and $sTable.oxparentid = '' ";
 
             $sType = false;
+            $sValue = '';
+
             $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
             if ($sArtCat && strstr($sArtCat, "@@") !== false) {
                 list($sType, $sValue) = explode("@@", $sArtCat);
@@ -300,6 +316,7 @@ class ArticleList extends AdminListController
      * Builds and returns array of SQL WHERE conditions.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {

@@ -47,13 +47,23 @@ class DynamicScreenController extends AdminListController
     /**
      * Sets up navigation for current view
      *
-     * @param string $node None name
+     * @param string $sNode None name
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
-    protected function _setupNavigation($node) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets up navigation for current view
+     *
+     * @param string $sNode None name
+     */
+    protected function setupNavigation($sNode)
     {
         $myAdminNavig = $this->getNavigation();
-        $node = Registry::getRequest()->getRequestEscapedParameter('menu');
+        $sNode = Registry::getRequest()->getRequestEscapedParameter('menu');
 
         // active tab
         $iActTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
@@ -62,10 +72,10 @@ class DynamicScreenController extends AdminListController
         $sActTab = $iActTab ? "&actedit=$iActTab" : '';
 
         // list url
-        $this->_aViewData['listurl'] = $myAdminNavig->getListUrl($node) . $sActTab;
+        $this->_aViewData['listurl'] = $myAdminNavig->getListUrl($sNode) . $sActTab;
 
         // edit url
-        $sEditUrl = $myAdminNavig->getEditUrl($node, $iActTab) . $sActTab;
+        $sEditUrl = $myAdminNavig->getEditUrl($sNode, $iActTab) . $sActTab;
         if (!getStr()->preg_match("/^http(s)?:\/\//", $sEditUrl)) {
             //internal link, adding path
             /** @var UtilsUrl $oUtilsUrl */
@@ -77,19 +87,19 @@ class DynamicScreenController extends AdminListController
         $this->_aViewData['editurl'] = $sEditUrl;
 
         // tabs
-        $this->_aViewData['editnavi'] = $myAdminNavig->getTabs($node, $iActTab);
+        $this->_aViewData['editnavi'] = $myAdminNavig->getTabs($sNode, $iActTab);
 
         // active tab
-        $this->_aViewData['actlocation'] = $myAdminNavig->getActiveTab($node, $iActTab);
+        $this->_aViewData['actlocation'] = $myAdminNavig->getActiveTab($sNode, $iActTab);
 
         // default tab
-        $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($node, $this->_iDefEdit);
+        $this->_aViewData['default_edit'] = $myAdminNavig->getActiveTab($sNode, $this->_iDefEdit);
 
         // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
 
         // buttons
-        $this->_aViewData['bottom_buttons'] = $myAdminNavig->getBtn($node);
+        $this->_aViewData['bottom_buttons'] = $myAdminNavig->getBtn($sNode);
     }
 
     /**

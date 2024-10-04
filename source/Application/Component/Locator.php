@@ -31,6 +31,8 @@ use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
 use OxidEsales\Eshop\Application\Model\SeoEncoderRecomm;
 use OxidEsales\Eshop\Application\Model\SeoEncoderVendor;
 use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -103,19 +105,24 @@ class Locator extends Base
      * Sets details locator data for articles that came from regular list.
      *
      * @param FrontendController $oLocatorTarget view object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setListLocatorData" in next major
      */
     protected function _setListLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->setListLocatorData($oLocatorTarget, $oCurrArticle);
     }
-    
+
     /**
      * Sets details locator data for articles that came from regular list.
      *
      * @param FrontendController $oLocatorTarget view object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function setListLocatorData($oLocatorTarget, $oCurrArticle)
     {
@@ -158,19 +165,24 @@ class Locator extends Base
      * Sets details locator data for articles that came from vendor list.
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setVendorLocatorData" in next major
      */
     protected function _setVendorLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->setVendorLocatorData($oLocatorTarget, $oCurrArticle);
     }
-    
+
     /**
      * Sets details locator data for articles that came from vendor list.
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function setVendorLocatorData($oLocatorTarget, $oCurrArticle)
     {
@@ -214,19 +226,24 @@ class Locator extends Base
      * Sets details locator data for articles that came from Manufacturer list.
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setManufacturerLocatorData" in next major
      */
     protected function _setManufacturerLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->setManufacturerLocatorData($oLocatorTarget, $oCurrArticle);
     }
-    
+
     /**
      * Sets details locator data for articles that came from Manufacturer list.
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function setManufacturerLocatorData($oLocatorTarget, $oCurrArticle)
     {
@@ -280,19 +297,24 @@ class Locator extends Base
      * Sets details locator data for articles that came from search list.
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setSearchLocatorData" in next major
      */
     protected function _setSearchLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->setSearchLocatorData($oLocatorTarget, $oCurrArticle);
     }
-    
+
     /**
      * Sets details locator data for articles that came from search list.
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function setSearchLocatorData($oLocatorTarget, $oCurrArticle)
     {
@@ -359,8 +381,10 @@ class Locator extends Base
      * <b>sSearchTitle</b>, <b>searchparamforhtml</b>
      *
      * @param FrontendController $oLocatorTarget FrontendController object
-     * @param Article            $oCurrArticle   current article
+     * @param Article $oCurrArticle current article
      *
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      */
     protected function _setRecommlistLocatorData($oLocatorTarget, $oCurrArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -419,26 +443,30 @@ class Locator extends Base
     /**
      * Setting product position in list, amount of articles etc
      *
-     * @param Category $oCategory    active category id
-     * @param object                                       $oCurrArticle current article
-     * @param string                                       $sOrderBy     order by fields
+     * @param Category $oCategory active category id
+     * @param object $oCurrArticle current article
+     * @param null $sOrderBy order by fields
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadIdsInList" in next major
      */
     protected function _loadIdsInList($oCategory, $oCurrArticle, $sOrderBy = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->loadIdsInList($oCategory, $oCurrArticle, $sOrderBy);
     }
-    
+
     /**
      * Setting product position in list, amount of articles etc
      *
-     * @param Category $oCategory    active category id
-     * @param object                                       $oCurrArticle current article
-     * @param string                                       $sOrderBy     order by fields
+     * @param Category $oCategory active category id
+     * @param object $oCurrArticle current article
+     * @param null $sOrderBy order by fields
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function loadIdsInList($oCategory, $oCurrArticle, $sOrderBy = null)
     {
@@ -569,26 +597,28 @@ class Locator extends Base
     /**
      * Searches for current article in article list and sets previous/next product ids
      *
-     * @param Article            $oArticle       current Article
-     * @param object             $oIdList        articles list containing only fake article objects !!!
+     * @param Article $oArticle current Article
+     * @param object $oIdList articles list containing only fake article objects !!!
      * @param FrontendController $oLocatorTarget FrontendController object
      *
      * @return integer
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductPos" in next major
      */
     protected function _getProductPos($oArticle, $oIdList, $oLocatorTarget) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getProductPos($oArticle, $oIdList, $oLocatorTarget);
     }
-    
+
     /**
      * Searches for current article in article list and sets previous/next product ids
      *
-     * @param Article            $oArticle       current Article
-     * @param object             $oIdList        articles list containing only fake article objects !!!
+     * @param Article $oArticle current Article
+     * @param object $oIdList articles list containing only fake article objects !!!
      * @param FrontendController $oLocatorTarget FrontendController object
      *
      * @return integer
+     * @throws DatabaseConnectionException
      */
     protected function getProductPos($oArticle, $oIdList, $oLocatorTarget)
     {

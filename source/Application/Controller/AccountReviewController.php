@@ -81,7 +81,7 @@ class AccountReviewController extends AccountController
      */
     public function deleteReviewAndRating()
     {
-        if ($this->getSession()->checkSessionChallenge()) {
+        if (Registry::getSession()->checkSessionChallenge()) {
             try {
                 $this->deleteReview();
                 $this->deleteRating();

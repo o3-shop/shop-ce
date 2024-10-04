@@ -47,6 +47,16 @@ class SeoEncoderVendor extends SeoEncoder
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getUrlExtension();
+    }
+
+    /**
+     * Returns target "extension" (/)
+     *
+     * @return string
+     */
+    protected function getUrlExtension()
+    {
         return '/';
     }
 
@@ -169,6 +179,19 @@ class SeoEncoderVendor extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($vendorId, $languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getAltUri($vendorId, $languageId);
+    }
+
+    /**
+     * Returns alternative uri used while updating seo.
+     *
+     * @param string $vendorId   Vendor id
+     * @param int    $languageId Language id
+     *
+     * @return string
+     */
+    protected function getAltUri($vendorId, $languageId)
     {
         $seoUrl = null;
         $vendor = oxNew(Vendor::class);

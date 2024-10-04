@@ -47,7 +47,7 @@ class DeliveryArticles extends AdminDetailsController
         $soxId = $this->getEditObjectId();
 
         if (isset($soxId) && $soxId != "-1") {
-            $this->_createCategoryTree("artcattree");
+            $this->createCategoryTree("artcattree");
 
             // load object
             $oDelivery = oxNew(Delivery::class);

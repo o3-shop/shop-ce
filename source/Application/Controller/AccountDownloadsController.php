@@ -89,7 +89,7 @@ class AccountDownloadsController extends AccountController
         $oOrderFileList = oxNew(OrderFileList::class);
         $oOrderFileList->loadUserFiles($this->getUser()->getId());
 
-        $this->_oOrderFilesList = $this->_prepareForTemplate($oOrderFileList);
+        $this->_oOrderFilesList = $this->prepareForTemplate($oOrderFileList);
 
         return $this->_oOrderFilesList;
     }
@@ -103,6 +103,18 @@ class AccountDownloadsController extends AccountController
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareForTemplate" in next major
      */
     protected function _prepareForTemplate($oOrderFileList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->prepareForTemplate($oOrderFileList);
+    }
+
+    /**
+     * Returns prepared orders files list
+     *
+     * @param OrderFileList $oOrderFileList - list or orderfiles
+     *
+     * @return array
+     */
+    protected function prepareForTemplate($oOrderFileList)
     {
         $oOrderArticles = [];
 

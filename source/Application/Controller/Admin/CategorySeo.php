@@ -25,6 +25,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -49,7 +50,7 @@ class CategorySeo extends ObjectSeo
             $oCategory->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oCategory->save();
 
-            $this->_getEncoder()->markRelatedAsExpired($oCategory);
+            $this->getEncoder()->markRelatedAsExpired($oCategory);
         }
 
         return parent::save();
@@ -62,6 +63,16 @@ class CategorySeo extends ObjectSeo
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getEncoder();
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderCategory
+     */
+    protected function getEncoder()
     {
         return Registry::get(SeoEncoderCategory::class);
     }
@@ -84,6 +95,16 @@ class CategorySeo extends ObjectSeo
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getType();
+    }
+
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
         return 'oxcategory';
     }
 
@@ -91,6 +112,7 @@ class CategorySeo extends ObjectSeo
      * Returns true if SEO object id has suffix enabled
      *
      * @return bool|void
+     * @throws DatabaseConnectionException
      */
     public function isEntrySuffixed()
     {
@@ -104,12 +126,13 @@ class CategorySeo extends ObjectSeo
      * Returns seo uri
      *
      * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getEntryUri()
     {
         $oCategory = oxNew(Category::class);
         if ($oCategory->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getCategoryUri($oCategory, $this->getEditLang());
+            return $this->getEncoder()->getCategoryUri($oCategory, $this->getEditLang());
         }
     }
 }

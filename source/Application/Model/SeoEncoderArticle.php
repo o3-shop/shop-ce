@@ -50,6 +50,16 @@ class SeoEncoderArticle extends SeoEncoder
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getUrlExtension();
+    }
+
+    /**
+     * Returns target "extension" (.html)
+     *
+     * @return string
+     */
+    protected function getUrlExtension()
+    {
         return '.html';
     }
 
@@ -64,6 +74,20 @@ class SeoEncoderArticle extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductForLang" in next major
      */
     protected function _getProductForLang($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getProductForLang($oArticle, $iLang);
+    }
+
+    /**
+     * Checks if current article is in same language as preferred (language id passed by param).
+     * In case languages are not the same - reloads article object in different language
+     *
+     * @param Article $oArticle article to check language
+     * @param int                                         $iLang    user defined language id
+     *
+     * @return Article
+     */
+    protected function getProductForLang($oArticle, $iLang)
     {
         if (isset($iLang) && $iLang != $oArticle->getLanguage()) {
             $sId = $oArticle->getId();
@@ -150,6 +174,16 @@ class SeoEncoderArticle extends SeoEncoder
      */
     protected function _getListType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getListType();
+    }
+
+    /**
+     * Returns active list type
+     *
+     * @return string
+     */
+    protected function getListType()
+    {
         return Registry::getConfig()->getActiveView()->getListType();
     }
 
@@ -165,6 +199,21 @@ class SeoEncoderArticle extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "createArticleCategoryUri" in next major
      */
     protected function _createArticleCategoryUri($oArticle, $oCategory, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->createArticleCategoryUri($oArticle, $oCategory, $iLang);
+    }
+
+    /**
+     * create article uri for given category and save it
+     *
+     * @param Article $oArticle article object
+     * @param Category $oCategory category object
+     * @param int $iLang language to generate uri for
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function createArticleCategoryUri($oArticle, $oCategory, $iLang)
     {
         startProfile(__FUNCTION__);
         $oArticle = $this->_getProductForLang($oArticle, $iLang);
@@ -252,6 +301,19 @@ class SeoEncoderArticle extends SeoEncoder
      */
     protected function _getCategory($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCategory($oArticle, $iLang);
+    }
+
+    /**
+     * Returns active category if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Category|null
+     */
+    protected function getCategory($oArticle, $iLang)
+    {
         $oCat = null;
         $oView = Registry::getConfig()->getActiveView();
         if ($oView instanceof FrontendController) {
@@ -273,6 +335,19 @@ class SeoEncoderArticle extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMainCategory" in next major
      */
     protected function _getMainCategory($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getMainCategory($oArticle);
+    }
+
+    /**
+     * Returns products main category id
+     *
+     * @param Article $oArticle product
+     *
+     * @return Category
+     * @throws DatabaseConnectionException
+     */
+    protected function getMainCategory($oArticle)
     {
         $oMainCat = null;
 
@@ -364,6 +439,20 @@ class SeoEncoderArticle extends SeoEncoder
      */
     protected function _prepareArticleTitle($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->prepareArticleTitle($oArticle);
+    }
+
+    /**
+     * Returns seo title for current article (if oxTitle field is empty, oxArtnum is used).
+     * Additionally - if oxVarSelect is set - title is appended with its value
+     *
+     * @param Article $oArticle article object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareArticleTitle($oArticle)
+    {
         // create title part for uri
         if (!($sTitle = $oArticle->oxarticles__oxtitle->value)) {
             // taking parent article title
@@ -451,6 +540,19 @@ class SeoEncoderArticle extends SeoEncoder
      */
     protected function _getVendor($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getVendor($oArticle, $iLang);
+    }
+
+    /**
+     * Returns active vendor if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Vendor|null
+     */
+    protected function getVendor($oArticle, $iLang)
+    {
         $oView = Registry::getConfig()->getActiveView();
 
         $oVendor = null;
@@ -529,6 +631,19 @@ class SeoEncoderArticle extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturer" in next major
      */
     protected function _getManufacturer($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getManufacturer($oArticle, $iLang);
+    }
+
+    /**
+     * Returns active manufacturer if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Manufacturer|null
+     */
+    protected function getManufacturer($oArticle, $iLang)
     {
         $oManufacturer = null;
         if ($sActManufacturerId = $oArticle->oxarticles__oxmanufacturerid->value) {
@@ -647,6 +762,21 @@ class SeoEncoderArticle extends SeoEncoder
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getAltUri($sObjectId, $iLang);
+    }
+
+    /**
+     * Returns alternative uri used while updating seo
+     *
+     * @param string $sObjectId object id
+     * @param int $iLang language id
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getAltUri($sObjectId, $iLang)
+    {
         $sSeoUrl = null;
         $oArticle = oxNew(Article::class);
         $oArticle->setSkipAssign(true);
@@ -666,5 +796,5 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $sSeoUrl;
-    }
+    }   
 }

@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -63,7 +64,7 @@ class CategoryMain extends AdminDetailsController
 
         if (isset($categoryId) && $categoryId != self::NEW_CATEGORY_ID) {
             // generating category tree for select list
-            $this->_createCategoryTree("artcattree", $categoryId);
+            $this->createCategoryTree("artcattree", $categoryId);
 
             // load object
             $oCategory->loadInLang($this->_iEditLang, $categoryId);
@@ -96,11 +97,11 @@ class CategoryMain extends AdminDetailsController
                 $oCategory->oxcategories__oxparentid->setValue('');
             }
 
-            $this->_getCategoryTree("cattree", $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
+            $this->getCategoryTree("cattree", $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
 
             $this->_aViewData["defsort"] = $oCategory->oxcategories__oxdefsort->value;
         } else {
-            $this->_createCategoryTree("cattree", "", true, $myConfig->getShopId());
+            $this->createCategoryTree("cattree", "", true, $myConfig->getShopId());
         }
 
         $this->_aViewData["sortableFields"] = $this->getSortableFields();
@@ -156,7 +157,7 @@ class CategoryMain extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        $aParams = $this->_parseRequestParametersForSave(
+        $aParams = $this->parseRequestParametersForSave(
             Registry::getRequest()->getRequestEscapedParameter('editval')
         );
 
@@ -188,6 +189,18 @@ class CategoryMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "processLongDesc" in next major
      */
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->processLongDesc($sValue);
+    }
+
+    /**
+     * Fixes html broken by html editor
+     *
+     * @param string $sValue value to fix
+     *
+     * @return string
+     */
+    protected function processLongDesc($sValue)
     {
         // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
         return str_replace('&lang=', '&amp;lang=', $sValue);
@@ -233,7 +246,7 @@ class CategoryMain extends AdminDetailsController
         /** @var Category $oItem */
         $oItem = oxNew(Category::class);
         $oItem->load($sOxId);
-        $this->_deleteCatPicture($oItem, $sField);
+        $this->deleteCatPicture($oItem, $sField);
     }
 
     /**
@@ -247,6 +260,20 @@ class CategoryMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteCatPicture" in next major
      */
     protected function _deleteCatPicture($item, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->deleteCatPicture($item, $field);
+    }
+
+    /**
+     * Delete category picture, specified in $sField parameter
+     *
+     * @param Category $item active category object
+     * @param string $field picture field name
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function deleteCatPicture($item, $field)
     {
         if ($item->isDerived()) {
             return;
@@ -296,6 +323,18 @@ class CategoryMain extends AdminDetailsController
      */
     protected function _parseRequestParametersForSave($aReqParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->parseRequestParametersForSave($aReqParams);
+    }
+
+    /**
+     * Parse parameters prior to saving category.
+     *
+     * @param array $aReqParams Request parameters.
+     *
+     * @return array
+     */
+    protected function parseRequestParametersForSave($aReqParams)
+    {
         // checkbox handling
         if (!isset($aReqParams['oxcategories__oxactive'])) {
             $aReqParams['oxcategories__oxactive'] = 0;
@@ -320,7 +359,7 @@ class CategoryMain extends AdminDetailsController
         }
 
         if (isset($aReqParams["oxcategories__oxlongdesc"])) {
-            $aReqParams["oxcategories__oxlongdesc"] = $this->_processLongDesc($aReqParams["oxcategories__oxlongdesc"]);
+            $aReqParams["oxcategories__oxlongdesc"] = $this->processLongDesc($aReqParams["oxcategories__oxlongdesc"]);
         }
 
         if (empty($aReqParams['oxcategories__oxpricefrom'])) {
@@ -337,8 +376,9 @@ class CategoryMain extends AdminDetailsController
      * Set parameters, language and files to category object.
      *
      * @param Category $category
-     * @param array                                        $params
-     * @param string                                       $categoryId
+     * @param array $params
+     * @param string $categoryId
+     * @throws DatabaseConnectionException
      */
     protected function resetCategoryPictures($category, $params, $categoryId)
     {

@@ -89,7 +89,7 @@ class DiscountMain extends AdminDetailsController
                 return "popups/discount_main.tpl";
             } elseif ($iAoc == "2") {
                 // generating category tree for artikel choose select list
-                $this->_createCategoryTree("artcattree");
+                $this->createCategoryTree("artcattree");
 
                 $oDiscountItemAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountItemAjax::class);
                 $this->_aViewData['oxajax'] = $oDiscountItemAjax->getColumns();
@@ -224,6 +224,7 @@ class DiscountMain extends AdminDetailsController
      * Increment the maximum value of oxsort found in the database by certain amount and return it.
      *
      * @return int The incremented oxsort.
+     * @throws DatabaseConnectionException
      */
     public function getNextOxsort()
     {

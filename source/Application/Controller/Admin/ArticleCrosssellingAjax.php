@@ -46,24 +46,26 @@ class ArticleCrosssellingAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxobject2article', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxobject2article', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -75,9 +77,20 @@ class ArticleCrosssellingAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $myConfig = Registry::getConfig();
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sView = $this->_getViewName('oxobject2category');
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sView = $this->getViewName('oxobject2category');
 
         $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -142,10 +155,10 @@ class ArticleCrosssellingAjax extends ListComponentAjax
      */
     public function removeArticleCross()
     {
-        $aChosenArt = $this->_getActionIds('oxobject2article.oxid');
+        $aChosenArt = $this->getActionIds('oxobject2article.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2article.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2article.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
             $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
@@ -159,13 +172,13 @@ class ArticleCrosssellingAjax extends ListComponentAjax
      */
     public function addArticleCross()
     {
-        $aChosenArt = $this->_getActionIds('oxarticles.oxid');
+        $aChosenArt = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sArtTable = $this->_getViewName('oxarticles');
-            $aChosenArt = $this->_getAll(parent::_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
+            $sArtTable = $this->getViewName('oxarticles');
+            $aChosenArt = $this->getAll(parent::addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
         $oArticle = oxNew(Article::class);

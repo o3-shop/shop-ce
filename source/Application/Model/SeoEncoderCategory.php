@@ -43,6 +43,16 @@ class SeoEncoderCategory extends SeoEncoder
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getUrlExtension();
+    }
+
+    /**
+     * Returns target "extension" (/)
+     *
+     * @return string
+     */
+    protected function getUrlExtension()
+    {
         return '/';
     }
 
@@ -59,6 +69,22 @@ class SeoEncoderCategory extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "categoryUrlLoader" in next major
      */
     protected function _categoryUrlLoader($oCat, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->categoryUrlLoader($oCat, $iLang);
+    }
+
+    /**
+     * _categoryUrlLoader loads category from db
+     * returns false if cat needs to be encoded (load failed)
+     *
+     * @param Category $oCat  category object
+     * @param int                                          $iLang active language id
+     *
+     * @access protected
+     *
+     * @return boolean
+     */
+    protected function categoryUrlLoader($oCat, $iLang)
     {
         $sCacheId = $this->_getCategoryCacheId($oCat, $iLang);
         if (isset($this->_aCatCache[$sCacheId])) {
@@ -277,6 +303,19 @@ class SeoEncoderCategory extends SeoEncoder
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getAltUri($sObjectId, $iLang);
+    }
+
+    /**
+     * Returns alternative uri used while updating seo
+     *
+     * @param string $sObjectId object id
+     * @param int    $iLang     language id
+     *
+     * @return string
+     */
+    protected function getAltUri($sObjectId, $iLang)
     {
         $sSeoUrl = null;
         $oCat = oxNew(Category::class);

@@ -54,25 +54,27 @@ class ArticleAccessoriesAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-                                              ['oxartnum', 'oxarticles', 1, 0, 0],
-                                              ['oxtitle', 'oxarticles', 1, 1, 0],
-                                              ['oxean', 'oxarticles', 1, 0, 0],
-                                              ['oxmpn', 'oxarticles', 0, 0, 0],
-                                              ['oxprice', 'oxarticles', 0, 0, 0],
-                                              ['oxstock', 'oxarticles', 0, 0, 0],
-                                              ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                            'container2' => [
-                                ['oxartnum', 'oxarticles', 1, 0, 0],
-                                ['oxtitle', 'oxarticles', 1, 1, 0],
-                                ['oxsort', 'oxaccessoire2article', 1, 1, 0],
-                                ['oxean', 'oxarticles', 1, 0, 0],
-                                ['oxmpn', 'oxarticles', 0, 0, 0],
-                                ['oxprice', 'oxarticles', 0, 0, 0],
-                                ['oxstock', 'oxarticles', 0, 0, 0],
-                                ['oxid', 'oxaccessoire2article', 0, 0, 1]
-                            ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table,         visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxsort', 'oxaccessoire2article', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxaccessoire2article', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -83,6 +85,17 @@ class ArticleAccessoriesAjax extends ListComponentAjax
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
     {
         $myConfig = Registry::getConfig();
         $oxidId = Registry::getConfig()->getRequestEscapedParameter('oxid');
@@ -130,7 +143,6 @@ class ArticleAccessoriesAjax extends ListComponentAjax
         return $outputQuery;
     }
 
-
     /**
      * override default sorting and replace it with OXSORT field
      *
@@ -138,6 +150,16 @@ class ArticleAccessoriesAjax extends ListComponentAjax
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->getSorting();
+    }
+
+    /**
+     * override default sorting and replace it with OXSORT field
+     *
+     * @return string
+     */
+    protected function getSorting()
     {
         if ($this->containerId == 'container2') {
             return ' order by _2,_0';

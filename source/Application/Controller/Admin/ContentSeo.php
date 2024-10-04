@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
 use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Application\Model\SeoEncoderContent;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -39,9 +40,19 @@ class ContentSeo extends ObjectSeo
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return 'oxcontent';
+        return $this->getType();
     }
 
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
+        return 'oxcontent';
+    }
+    
     /**
      * Returns current object type seo encoder object
      *
@@ -50,6 +61,16 @@ class ContentSeo extends ObjectSeo
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getEncoder();
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderContent
+     */
+    protected function getEncoder()
+    {
         return Registry::get(SeoEncoderContent::class);
     }
 
@@ -57,12 +78,13 @@ class ContentSeo extends ObjectSeo
      * Returns seo uri
      *
      * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getEntryUri()
     {
         $oContent = oxNew(Content::class);
         if ($oContent->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getContentUri($oContent, $this->getEditLang());
+            return $this->getEncoder()->getContentUri($oContent, $this->getEditLang());
         }
     }
 }

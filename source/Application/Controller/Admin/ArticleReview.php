@@ -65,7 +65,7 @@ class ArticleReview extends AdminDetailsController
                 $this->_aViewData['readonly'] = true;
             }
 
-            $reviewList = $this->_getReviewList($article);
+            $reviewList = $this->getReviewList($article);
 
             foreach ($reviewList as $review) {
                 if ($review->oxreviews__oxid->value == $reviewId) {
@@ -102,6 +102,19 @@ class ArticleReview extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getReviewList" in next major
      */
     protected function _getReviewList($article) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getReviewList($article);
+    }
+
+    /**
+     * returns reviews list for article
+     *
+     * @param Article $article Article object
+     *
+     * @return ListModel
+     * @throws DatabaseConnectionException
+     */
+    protected function getReviewList($article)
     {
         $database = DatabaseProvider::getDb();
         $query = "select oxreviews.* from oxreviews

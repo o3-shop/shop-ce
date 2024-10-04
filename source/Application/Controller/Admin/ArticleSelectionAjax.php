@@ -39,18 +39,20 @@ class ArticleSelectionAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxselectlist', 1, 1, 0],
             ['oxident', 'oxselectlist', 1, 0, 0],
             ['oxvaldesc', 'oxselectlist', 1, 0, 0],
-            ['oxid', 'oxselectlist', 0, 0, 1]
+            ['oxid', 'oxselectlist', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxtitle', 'oxselectlist', 1, 1, 0],
-             ['oxident', 'oxselectlist', 1, 0, 0],
-             ['oxvaldesc', 'oxselectlist', 1, 0, 0],
-             ['oxid', 'oxobject2selectlist', 0, 0, 1]
-         ]
+        'container2' => [
+            ['oxtitle', 'oxselectlist', 1, 1, 0],
+            ['oxident', 'oxselectlist', 1, 0, 0],
+            ['oxvaldesc', 'oxselectlist', 1, 0, 0],
+            ['oxid', 'oxobject2selectlist', 0, 0, 1],
+        ]
     ];
 
     /**
@@ -62,8 +64,19 @@ class ArticleSelectionAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSLViewName = $this->_getViewName('oxselectlist');
-        $sArtViewName = $this->_getViewName('oxarticles');
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $sSLViewName = $this->getViewName('oxselectlist');
+        $sArtViewName = $this->getViewName('oxarticles');
         $oDb = DatabaseProvider::getDb();
 
         $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
@@ -100,9 +113,9 @@ class ArticleSelectionAjax extends ListComponentAjax
      */
     public function removeSel()
     {
-        $aChosenArt = $this->_getActionIds('oxobject2selectlist.oxid');
+        $aChosenArt = $this->getActionIds('oxobject2selectlist.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2selectlist.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2selectlist.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
             $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
@@ -122,13 +135,13 @@ class ArticleSelectionAjax extends ListComponentAjax
      */
     public function addSel()
     {
-        $aAddSel = $this->_getActionIds('oxselectlist.oxid');
+        $aAddSel = $this->getActionIds('oxselectlist.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sSLViewName = $this->_getViewName('oxselectlist');
-            $aAddSel = $this->_getAll($this->_addFilter("select $sSLViewName.oxid " . $this->_getQuery()));
+            $sSLViewName = $this->getViewName('oxselectlist');
+            $aAddSel = $this->getAll($this->addFilter("select $sSLViewName.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aAddSel)) {

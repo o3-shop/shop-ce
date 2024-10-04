@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -93,6 +95,7 @@ class AccountRecommlistController extends AccountController
      * template to render AccountWishlistController::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -215,7 +218,7 @@ class AccountRecommlistController extends AccountController
     /**
      * Set active recommlist
      *
-     * @param object $oRecommList Recommendation list
+     * @param object|bool $oRecommList Recommendation list
      */
     public function setActiveRecommList($oRecommList)
     {
@@ -226,6 +229,7 @@ class AccountRecommlistController extends AccountController
      * add new recommlist
      *
      * @return void
+     * @throws Exception
      */
     public function saveRecommList()
     {

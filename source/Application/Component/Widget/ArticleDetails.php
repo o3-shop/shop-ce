@@ -26,9 +26,10 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Manufacturer;
-use OxidEsales\Eshop\Application\Model\SimpleVariantList;
 use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Core\SortingValidator;
@@ -218,8 +219,6 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     /**
      * Array of id to form recommendation list.
      *
-     * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-     *
      * @var array
      */
     protected $_aSimilarRecommListIds = null;
@@ -240,19 +239,21 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * @param string $sParentId parent product id
      *
      * @return Article
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getParentProduct" in next major
      */
     protected function _getParentProduct($sParentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getParentProduct($sParentId);
     }
-    
+
     /**
      * Returns current product parent article object if it is available.
      *
      * @param string $sParentId parent product id
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     protected function getParentProduct($sParentId)
     {
@@ -329,6 +330,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Checks if rating functionality is on and allowed to user.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function canRate()
     {
@@ -348,6 +351,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Loading full list of attributes.
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributes()
     {
@@ -404,7 +409,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Returns variant lists of current product
      * excludes currently viewed product.
      *
-     * @return array|SimpleVariantList|ArticleList
+     * @return array
+     * @throws DatabaseConnectionException
      */
     public function getVariantListExceptCurrent()
     {
@@ -425,7 +431,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Loading full list of variants,
      * if we are child and do not have any variants then let's load all parent variants as ours.
      *
-     * @return array|SimpleVariantList|ArticleList
+     * @return array
+     * @throws DatabaseConnectionException
      */
     public function loadVariantInformation()
     {
@@ -463,7 +470,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     /**
      * Returns variant lists of current product.
      *
-     * @return array|SimpleVariantList|ArticleList
+     * @return array
+     * @throws DatabaseConnectionException
      */
     public function getVariantList()
     {
@@ -474,6 +482,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns media files of current product.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getMediaFiles()
     {
@@ -491,6 +500,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * @param int $iCnt product count
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getLastProducts($iCnt = 4)
     {
@@ -512,6 +522,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns product's vendor.
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getManufacturer()
     {
@@ -526,6 +537,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns product's vendor.
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getVendor()
     {
@@ -540,6 +552,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns product's root category.
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getCategory()
     {
@@ -554,6 +567,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns picture gallery of current article.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getPictureGallery()
     {
@@ -569,6 +583,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns active picture.
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getActPicture()
     {
@@ -581,6 +596,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns true if there more pictures.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function morePics()
     {
@@ -593,6 +609,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns icons of current article.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getIcons()
     {
@@ -605,6 +622,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns if to show zoom pictures.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function showZoomPics()
     {
@@ -617,6 +635,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns zoom pictures.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getZoomPics()
     {
@@ -629,6 +648,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns reviews of current article.
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getReviews()
     {
@@ -646,6 +667,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns cross selling.
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getCrossSelling()
     {
@@ -663,6 +685,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns similar article list.
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getSimilarProducts()
     {
@@ -679,9 +703,10 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     /**
      * Return array of id to form recommend list.
      *
+     * @return array
+     * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
      */
     public function getSimilarRecommListIds()
     {
@@ -700,6 +725,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns accessories of article.
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getAccessoires()
     {
@@ -717,6 +743,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns list of customer also bought these products.
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAlsoBoughtTheseProducts()
     {
@@ -734,6 +762,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns if price alarm is enabled.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isPriceAlarm()
     {
@@ -747,13 +776,14 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * @param int $languageId language id
      *
      * @return object
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
     protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getSubject($languageId);
     }
-    
+
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
@@ -761,6 +791,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * @param int $iLang language id
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     protected function getSubject($iLang)
     {
@@ -801,6 +832,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Checks should persist parameter input field be displayed.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isPersParam()
     {
@@ -813,6 +845,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns rating value.
      *
      * @return double
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getRatingValue()
     {
@@ -841,6 +875,8 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Template variable getter. Returns rating count.
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getRatingCount()
     {
@@ -888,6 +924,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Returns variant selection.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getVariantSelections()
     {
@@ -907,6 +944,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Returns pictures product object.
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getPicturesProduct()
     {
@@ -922,6 +960,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Get product.
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getProduct()
     {
@@ -932,7 +971,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             if ($this->getViewParameter('_object')) {
                 $this->_oProduct = $this->getViewParameter('_object');
             } else {
-                //this option is only for lists and we must reset value
+                //this option is only for lists. We must reset value
                 //as blLoadVariants = false affect "ab price" functionality
                 $myConfig->setConfigParam('blLoadVariants', true);
 
@@ -988,6 +1027,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Returns name of template file to render.
      *
      * @return string $this->_sThisTemplate current template file name
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -1022,6 +1062,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Should we show MD variant selection? - Not for 1 dimension variants.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isMdVariantView()
     {
@@ -1039,20 +1080,22 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     /**
      * Runs additional checks for article.
      *
-     * @param Utils  $myUtils  General utils.
+     * @param Utils $myUtils General utils.
      * @param Config $myConfig Main shop configuration.
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "additionalChecksForArticle" in next major
      */
     protected function _additionalChecksForArticle($myUtils, $myConfig) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->additionalChecksForArticle($myUtils, $myConfig);
     }
-    
+
     /**
      * Runs additional checks for article.
      *
-     * @param Utils  $myUtils  General utils.
+     * @param Utils $myUtils General utils.
      * @param Config $myConfig Main shop configuration.
+     * @throws DatabaseConnectionException
      */
     protected function additionalChecksForArticle($myUtils, $myConfig)
     {

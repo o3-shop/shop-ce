@@ -25,6 +25,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
@@ -44,6 +45,7 @@ class ArticleStock extends AdminDetailsController
      * returns the name of template file.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

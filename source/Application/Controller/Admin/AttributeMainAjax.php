@@ -46,14 +46,16 @@ class AttributeMainAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
             ['oxean', 'oxarticles', 1, 0, 0],
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
          'container2' => [
              ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -62,8 +64,8 @@ class AttributeMainAjax extends ListComponentAjax
              ['oxmpn', 'oxarticles', 0, 0, 0],
              ['oxprice', 'oxarticles', 0, 0, 0],
              ['oxstock', 'oxarticles', 0, 0, 0],
-             ['oxid', 'oxobject2attribute', 0, 0, 1]
-         ]
+             ['oxid', 'oxobject2attribute', 0, 0, 1],
+         ],
     ];
 
     /**
@@ -75,12 +77,23 @@ class AttributeMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $myConfig = Registry::getConfig();
         $oDb = DatabaseProvider::getDb();
 
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sOCatView = $this->_getViewName('oxobject2category');
-        $sOAttrView = $this->_getViewName('oxobject2attribute');
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sOCatView = $this->getViewName('oxobject2category');
+        $sOAttrView = $this->getViewName('oxobject2attribute');
 
         $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -120,15 +133,29 @@ class AttributeMainAjax extends ListComponentAjax
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_addFilter($sQ);
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        $sQ = parent::addFilter($sQ);
 
         // display variants or not ?
         if (Registry::getConfig()->getConfigParam('blVariantsSelection')) {
-            $sQ .= ' group by ' . $this->_getViewName('oxarticles') . '.oxid ';
+            $sQ .= ' group by ' . $this->getViewName('oxarticles') . '.oxid ';
 
             $oStr = getStr();
             if ($oStr->strpos($sQ, "select count( * ) ") === 0) {
@@ -144,12 +171,12 @@ class AttributeMainAjax extends ListComponentAjax
      */
     public function removeAttrArticle()
     {
-        $aChosenCat = $this->_getActionIds('oxobject2attribute.oxid');
+        $aChosenCat = $this->getActionIds('oxobject2attribute.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sO2AttributeView = $this->_getViewName('oxobject2attribute');
+            $sO2AttributeView = $this->getViewName('oxobject2attribute');
 
-            $sQ = parent::_addFilter("delete $sO2AttributeView.* " . $this->_getQuery());
+            $sQ = parent::addFilter("delete $sO2AttributeView.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
             $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
@@ -163,13 +190,13 @@ class AttributeMainAjax extends ListComponentAjax
      */
     public function addAttrArticle()
     {
-        $aAddArticle = $this->_getActionIds('oxarticles.oxid');
+        $aAddArticle = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $aAddArticle = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
+            $sArticleTable = $this->getViewName('oxarticles');
+            $aAddArticle = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
         }
 
         $oAttribute = oxNew(Attribute::class);

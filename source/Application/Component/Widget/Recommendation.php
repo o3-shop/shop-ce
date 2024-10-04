@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
 use OxidEsales\Eshop\Application\Controller\RecommListController;
 use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 
 /**
  * Recomendation list.
@@ -52,6 +53,7 @@ class Recommendation extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * Returns similar recommendation list.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getSimilarRecommLists()
     {

@@ -30,6 +30,7 @@ use OxidEsales\Eshop\Core\Exception\CookieException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\InputException;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -170,7 +171,7 @@ class UserComponent extends BaseController
         if ($this->getParent()->isEnabledPrivateSales()) {
             // load session user
             $oUser = $this->getUser();
-            $sClass = $this->getParent()->getClassName();
+            $sClass = $this->getParent()->getClassKey();
 
             // no session user
             if (!$oUser && !in_array($sClass, $this->_aAllowedClasses)) {
@@ -187,17 +188,21 @@ class UserComponent extends BaseController
      * Tries to load user ID from session.
      *
      * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadSessionUser" in next major
      */
     protected function _loadSessionUser() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->loadSessionUser();
     }
-    
+
     /**
      * Tries to load user ID from session.
      *
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function loadSessionUser()
     {
@@ -484,6 +489,7 @@ class UserComponent extends BaseController
      *
      * @return  mixed    redirection string or true if successful, false otherwise
      * @throws DatabaseErrorException
+     * @throws StandardException
      */
     public function createUser()
     {
@@ -655,6 +661,7 @@ class UserComponent extends BaseController
      *
      * @return void|string
      * @throws DatabaseErrorException
+     * @throws StandardException
      */
     public function registerUser()
     {
@@ -1060,7 +1067,7 @@ class UserComponent extends BaseController
     {
         $existingUser = oxNew(User::class);
         $existingUser->load($existingUser->getIdByUserName($newName));
-        if ($existingUser && $this->isGuestUser($existingUser)) {
+        if ($this->isGuestUser($existingUser)) {
             $existingUser->delete();
         }
     }

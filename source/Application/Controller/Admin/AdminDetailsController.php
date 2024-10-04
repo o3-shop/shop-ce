@@ -65,6 +65,19 @@ class AdminDetailsController extends AdminController
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getEditValue($oObject, $sField);
+    }
+
+    /**
+     * Returns string which must be edited by editor.
+     *
+     * @param BaseModel $oObject object used for editing
+     * @param string                                 $sField  name of editable field
+     *
+     * @return string
+     */
+    protected function getEditValue($oObject, $sField)
+    {
         $sEditObjectValue = '';
         if ($oObject && $sField && isset($oObject->$sField)) {
             if ($oObject->$sField instanceof Field) {
@@ -73,7 +86,7 @@ class AdminDetailsController extends AdminController
                 $sEditObjectValue = $oObject->$sField->value;
             }
 
-            $sEditObjectValue = $this->_processEditValue($sEditObjectValue);
+            $sEditObjectValue = $this->processEditValue($sEditObjectValue);
             $oObject->$sField = new Field($sEditObjectValue, Field::T_RAW);
         }
 
@@ -89,6 +102,18 @@ class AdminDetailsController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "processEditValue" in next major
      */
     protected function _processEditValue($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->processEditValue($sValue);
+    }
+
+    /**
+     * Processes edit value.
+     *
+     * @param string $sValue string to process
+     *
+     * @return string
+     */
+    protected function processEditValue($sValue)
     {
         // A. replace ONLY if long description is not processed by smarty, or users will not be able to
         // store smarty tags ([{$shop->currenthomedir}]/[{$oViewConf->getCurrentHomeDir()}]) in long
@@ -115,7 +140,7 @@ class AdminDetailsController extends AdminController
      */
     protected function _getPlainEditor($width, $height, $object, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $objectValue = $this->_getEditValue($object, $field);
+        $objectValue = $this->getEditValue($object, $field);
 
         $textEditor = oxNew(TextEditorHandler::class);
 
@@ -153,7 +178,7 @@ class AdminDetailsController extends AdminController
      */
     protected function generateTextEditor($width, $height, $object, $field, $stylesheet = null)
     {
-        $objectValue = $this->_getEditValue($object, $field);
+        $objectValue = $this->getEditValue($object, $field);
 
         $textEditorHandler = $this->createTextEditorHandler();
         $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
@@ -200,6 +225,21 @@ class AdminDetailsController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "createCategoryTree" in next major
      */
     protected function _createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    }
+
+    /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return object
+     */
+    protected function createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null)
     {
         // caching category tree, to load it once, not many times
         if (!isset($this->oCatTree) || $blForceNonCache) {
@@ -252,7 +292,29 @@ class AdminDetailsController extends AdminController
         $blForceNonCache = false,
         $iTreeShopId = null
     ) {
-        $oCatTree = $this->_createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
+        return $this->getCategoryTree($sTplVarName, $sSelectedCatId, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    }
+
+    /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     * Returns ID of selected category if available.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sSelectedCatId  ID of category witch was selected in select list
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return string
+     */
+    protected function getCategoryTree(
+        $sTplVarName,
+        $sSelectedCatId,
+        $sEditCatId = '',
+        $blForceNonCache = false,
+        $iTreeShopId = null
+    ) {
+        $oCatTree = $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
 
         // mark selected
         if ($sSelectedCatId) {
@@ -305,6 +367,16 @@ class AdminDetailsController extends AdminController
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets-up navigation parameters.
+     *
+     * @param string $sNode active view id
+     */
+    protected function setupNavigation($sNode)
+    {
         // navigation according to class
         if ($sNode) {
             $myAdminNavig = $this->getNavigation();
@@ -324,6 +396,16 @@ class AdminDetailsController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetCounts" in next major
      */
     protected function _resetCounts($aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->resetCounts($aIds);
+    }
+
+    /**
+     * Resets count of vendor/manufacturer category items.
+     *
+     * @param array $aIds to reset type => id
+     */
+    protected function resetCounts($aIds)
     {
         foreach ($aIds as $sType => $aResetInfo) {
             foreach ($aResetInfo as $sResetId => $iPos) {

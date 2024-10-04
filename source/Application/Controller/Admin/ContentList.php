@@ -60,6 +60,7 @@ class ContentList extends AdminListController
      * name.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -86,7 +87,21 @@ class ContentList extends AdminListController
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_prepareWhereQuery($whereQuery, $fullQuery);
+        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+    }
+
+    /**
+     * Adding folder check and empty folder field check.
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sViewName = getviewName("oxcontents");
 
@@ -99,5 +114,5 @@ class ContentList extends AdminListController
         }
 
         return $sQ;
-    }
+    }    
 }

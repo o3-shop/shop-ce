@@ -25,6 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -41,6 +42,7 @@ class ArticleCrossselling extends AdminDetailsController
      * "article_crossselling.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -49,10 +51,10 @@ class ArticleCrossselling extends AdminDetailsController
         $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         // cross-selling
-        $this->_createCategoryTree("artcattree");
+        $this->createCategoryTree("artcattree");
 
         // accessoires
-        $this->_createCategoryTree("artcattree2");
+        $this->createCategoryTree("artcattree2");
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {

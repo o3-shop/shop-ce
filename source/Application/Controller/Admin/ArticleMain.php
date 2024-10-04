@@ -50,6 +50,7 @@ class ArticleMain extends AdminDetailsController
      * name of template file "article_main.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -97,7 +98,7 @@ class ArticleMain extends AdminDetailsController
             }
 
             // #381A
-            $this->_formJumpList($oArticle, $oParentArticle);
+            $this->formJumpList($oArticle, $oParentArticle);
 
             //hook for modules
             $oArticle = $this->customizeArticleInformation($oArticle);
@@ -115,7 +116,7 @@ class ArticleMain extends AdminDetailsController
             }
         }
 
-        $this->_aViewData["editor"] = $this->_generateTextEditor(
+        $this->_aViewData["editor"] = $this->generateTextEditor(
             "100%",
             300,
             $oArticle,
@@ -138,10 +139,23 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getEditValue($oObject, $sField);
+    }
+
+    /**
+     * Returns string which must be edited by editor
+     *
+     * @param BaseModel $oObject object with field will be used for editing
+     * @param string                                 $sField  name of editable field
+     *
+     * @return string
+     */
+    protected function getEditValue($oObject, $sField)
+    {
         $sEditObjectValue = '';
         if ($oObject) {
             $oDescField = $oObject->getLongDescription();
-            $sEditObjectValue = $this->_processEditValue($oDescField->getRawValue());
+            $sEditObjectValue = $this->processEditValue($oDescField->getRawValue());
         }
 
         return $sEditObjectValue;
@@ -214,7 +228,7 @@ class ArticleMain extends AdminDetailsController
         }
 
         $oArticle->assign($aParams);
-        $oArticle->setArticleLongDesc($this->_processLongDesc($aParams['oxarticles__oxlongdesc']));
+        $oArticle->setArticleLongDesc($this->processLongDesc($aParams['oxarticles__oxlongdesc']));
         $oArticle->setLanguage($this->_iEditLang);
         $oArticle = Registry::getUtilsFile()->processFiles($oArticle);
         $oArticle->save();
@@ -242,6 +256,18 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->processLongDesc($sValue);
+    }
+
+    /**
+     * Fixes html broken by html editor
+     *
+     * @param string $sValue value to fix
+     *
+     * @return string
+     */
+    protected function processLongDesc($sValue)
+    {
         // TODO: the code below is redundant, optimize it, assignments should go smooth without conversions
         // hack, if editor screws up text (htmledit tends to do so)
         $sValue = str_replace('&amp;nbsp;', '&nbsp;', $sValue);
@@ -264,12 +290,24 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _resetCategoriesCounter($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->resetCategoriesCounter($sArticleId);
+    }
+
+    /**
+     * Resets article categories counters
+     *
+     * @param string $sArticleId Article id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function resetCategoriesCounter($sArticleId)
+    {
         $oDb = DatabaseProvider::getDb();
         $sQ = "select oxcatnid from oxobject2category where oxobjectid = :oxobjectid";
         $oRs = $oDb->select($sQ, [
             ':oxobjectid' => $sArticleId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $this->resetCounter("catArticle", $oRs->fields[0]);
                 $oRs->fetchRow();
@@ -339,28 +377,28 @@ class ArticleMain extends AdminDetailsController
             $oArticle->save();
 
             //copy categories
-            $this->_copyCategories($sOldId, $sNewId);
+            $this->copyCategories($sOldId, $sNewId);
 
             //attributes
-            $this->_copyAttributes($sOldId, $sNewId);
+            $this->copyAttributes($sOldId, $sNewId);
 
             //select-list
-            $this->_copySelectlists($sOldId, $sNewId);
+            $this->copySelectlists($sOldId, $sNewId);
 
             //cross-selling
-            $this->_copyCrossseling($sOldId, $sNewId);
+            $this->copyCrossseling($sOldId, $sNewId);
 
             //accessoire
-            $this->_copyAccessoires($sOldId, $sNewId);
+            $this->copyAccessoires($sOldId, $sNewId);
 
             // #983A copying staffelpreis info
-            $this->_copyStaffelpreis($sOldId, $sNewId);
+            $this->copyStaffelpreis($sOldId, $sNewId);
 
             //copy article extends (long-description)
-            $this->_copyArtExtends($sOldId, $sNewId);
+            $this->copyArtExtends($sOldId, $sNewId);
 
             //files
-            $this->_copyFiles($sOldId, $sNewId);
+            $this->copyFiles($sOldId, $sNewId);
 
             $this->resetContentCache();
 
@@ -372,7 +410,7 @@ class ArticleMain extends AdminDetailsController
             $oRs = $oDb->select($sQ, [
                 ':oxparentid' => $sOldId
             ]);
-            if ($oRs !== false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     $this->copyArticle($oRs->fields[0], $myUtilsObject->generateUid(), $sNewId);
                     $oRs->fetchRow();
@@ -413,6 +451,19 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _copyCategories($sOldId, $newArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->copyCategories($sOldId, $newArticleId);
+    }
+
+    /**
+     * Copying category assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $newArticleId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyCategories($sOldId, $newArticleId)
+    {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
@@ -421,7 +472,7 @@ class ArticleMain extends AdminDetailsController
         $oRs = $oDb->select($sQ, [
             ':oxobjectid' => $sOldId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $uniqueId = $myUtilsObject->generateUid();
                 $sCatId = $oRs->fields[0];
@@ -444,6 +495,19 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _copyAttributes($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->copyAttributes($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying attributes assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyAttributes($sOldId, $sNewId)
+    {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
@@ -451,7 +515,7 @@ class ArticleMain extends AdminDetailsController
         $oRs = $oDb->select($sQ, [
             ':oxobjectid' => $sOldId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 // #1055A
                 $oAttr = oxNew(BaseModel::class);
@@ -476,6 +540,19 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _copyFiles($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->copyFiles($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying files
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyFiles($sOldId, $sNewId)
+    {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
@@ -483,7 +560,7 @@ class ArticleMain extends AdminDetailsController
         $oRs = $oDb->select($sQ, [
             ':oxartid' => $sOldId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $oFile = oxNew(File::class);
                 $oFile->setId($myUtilsObject->generateUID());
@@ -509,6 +586,19 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _copySelectlists($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->copySelectlists($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying selectlists assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copySelectlists($sOldId, $sNewId)
+    {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
@@ -516,7 +606,7 @@ class ArticleMain extends AdminDetailsController
         $oRs = $oDb->select($sQ, [
             ':oxobjectid' => $sOldId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUid = $myUtilsObject->generateUID();
                 $sId = $oRs->fields[0];
@@ -543,6 +633,19 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _copyCrossseling($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->copyCrossseling($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying cross-selling assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyCrossseling($sOldId, $sNewId)
+    {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
@@ -550,7 +653,7 @@ class ArticleMain extends AdminDetailsController
         $oRs = $oDb->select($sQ, [
             ':oxarticlenid' => $sOldId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUid = $myUtilsObject->generateUID();
                 $sId = $oRs->fields[0];
@@ -577,6 +680,19 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _copyAccessoires($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->copyAccessoires($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying accessoires assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function copyAccessoires($sOldId, $sNewId)
+    {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
@@ -584,7 +700,7 @@ class ArticleMain extends AdminDetailsController
         $oRs = $oDb->select($sQ, [
             ':oxarticlenid' => $sOldId
         ]);
-        if ($oRs !== false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUId = $myUtilsObject->generateUid();
                 $sId = $oRs->fields[0];
@@ -608,6 +724,17 @@ class ArticleMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyStaffelpreis" in next major
      */
     protected function _copyStaffelpreis($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->copyStaffelpreis($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying staffelpreis assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $sNewId ID from new article
+     */
+    protected function copyStaffelpreis($sOldId, $sNewId)
     {
         $sShopId = Registry::getConfig()->getShopId();
         $oPriceList = oxNew(ListModel::class);
@@ -636,6 +763,18 @@ class ArticleMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyArtExtends" in next major
      */
     protected function _copyArtExtends($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->copyArtExtends($sOldId, $sNewId);
+    }
+
+    /**
+     * Copying article extends
+     *
+     * @param string $sOldId - ID from old article
+     * @param string $sNewId - ID from new article
+     * @throws Exception
+     */
+    protected function copyArtExtends($sOldId, $sNewId)
     {
         $oExt = oxNew(BaseModel::class);
         $oExt->init("oxartextends");
@@ -674,33 +813,44 @@ class ArticleMain extends AdminDetailsController
      */
     protected function _formJumpList($oArticle, $oParentArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->formJumpList($oArticle, $oParentArticle);
+    }
+
+    /**
+     * Function forms article variants jump list.
+     *
+     * @param object $oArticle       article object
+     * @param object $oParentArticle article parent object
+     */
+    protected function formJumpList($oArticle, $oParentArticle)
+    {
         $aJumpList = [];
         //fetching parent article variants
         $sOxIdField = 'oxarticles__oxid';
         if (isset($oParentArticle)) {
-            $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->_getTitle($oParentArticle)];
+            $aJumpList[] = [$oParentArticle->$sOxIdField->value, $this->getTitle($oParentArticle)];
             $sEditLanguageParameter = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
             $oParentVariants = $oParentArticle->getAdminVariants($sEditLanguageParameter);
             if ($oParentVariants->count()) {
                 foreach ($oParentVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->_getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->getTitle($oVar)];
                     if ($oVar->$sOxIdField->value == $oArticle->$sOxIdField->value) {
                         $oVariants = $oArticle->getAdminVariants($sEditLanguageParameter);
                         if ($oVariants->count()) {
                             foreach ($oVariants as $oVVar) {
-                                $aJumpList[] = [$oVVar->$sOxIdField->value, " -- " . $this->_getTitle($oVVar)];
+                                $aJumpList[] = [$oVVar->$sOxIdField->value, " -- " . $this->getTitle($oVVar)];
                             }
                         }
                     }
                 }
             }
         } else {
-            $aJumpList[] = [$oArticle->$sOxIdField->value, $this->_getTitle($oArticle)];
+            $aJumpList[] = [$oArticle->$sOxIdField->value, $this->getTitle($oArticle)];
             //fetching this article variants data
             $oVariants = $oArticle->getAdminVariants(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
             if ($oVariants && $oVariants->count()) {
                 foreach ($oVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->_getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->getTitle($oVar)];
                 }
             }
         }
@@ -718,6 +868,18 @@ class ArticleMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getTitle" in next major
      */
     protected function _getTitle($oObj) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getTitle($oObj);
+    }
+
+    /**
+     * Returns formed variant title
+     *
+     * @param object $oObj product object
+     *
+     * @return string
+     */
+    protected function getTitle($oObj)
     {
         $sTitle = $oObj->oxarticles__oxtitle->value;
         if (!strlen($sTitle)) {
@@ -827,10 +989,10 @@ class ArticleMain extends AdminDetailsController
      * Save non-standard article information if needed.
      * Intended to be used by modules.
      *
-     * @param Article $article
+     * @param object $article
      * @param array                                       $parameters
      *
-     * @return Article
+     * @return object
      */
     protected function saveAdditionalArticleData($article, $parameters)
     {

@@ -38,19 +38,21 @@ class DeliveryCategoriesAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxtitle', 'oxcategories', 1, 1, 0],
-        ['oxdesc', 'oxcategories', 1, 1, 0],
-        ['oxid', 'oxcategories', 0, 0, 0],
-        ['oxid', 'oxcategories', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxtitle', 'oxcategories', 1, 1, 0],
-                                     ['oxdesc', 'oxcategories', 1, 1, 0],
-                                     ['oxid', 'oxcategories', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1],
-                                     ['oxid', 'oxcategories', 0, 0, 1]
-                                 ],
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxcategories', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxtitle', 'oxcategories', 1, 1, 0],
+            ['oxdesc', 'oxcategories', 1, 1, 0],
+            ['oxid', 'oxcategories', 0, 0, 0],
+            ['oxid', 'oxobject2delivery', 0, 0, 1],
+            ['oxid', 'oxcategories', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -62,8 +64,19 @@ class DeliveryCategoriesAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         // looking for table/view
-        $sCatTable = $this->_getViewName('oxcategories');
+        $sCatTable = $this->getViewName('oxcategories');
         $oDb = DatabaseProvider::getDb();
         $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -100,11 +113,11 @@ class DeliveryCategoriesAjax extends ListComponentAjax
      */
     public function removeCatFromDel()
     {
-        $aChosenCat = $this->_getActionIds('oxobject2delivery.oxid');
+        $aChosenCat = $this->getActionIds('oxobject2delivery.oxid');
 
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
             $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
@@ -118,13 +131,13 @@ class DeliveryCategoriesAjax extends ListComponentAjax
      */
     public function addCatToDel()
     {
-        $aChosenCat = $this->_getActionIds('oxcategories.oxid');
+        $aChosenCat = $this->getActionIds('oxcategories.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sCatTable = $this->_getViewName('oxcategories');
-            $aChosenCat = $this->_getAll($this->_addFilter("select $sCatTable.oxid " . $this->_getQuery()));
+            $sCatTable = $this->getViewName('oxcategories');
+            $aChosenCat = $this->getAll($this->addFilter("select $sCatTable.oxid " . $this->getQuery()));
         }
 
         if (isset($soxId) && $soxId != "-1" && isset($aChosenCat) && $aChosenCat) {

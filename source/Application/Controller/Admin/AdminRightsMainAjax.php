@@ -37,7 +37,9 @@ class AdminRightsMainAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table,  visible, multilanguage, ident
             ['oxusername', 'oxuser', 1, 0, 0],
             ['oxlname', 'oxuser', 0, 0, 0],
             ['oxfname', 'oxuser', 0, 0, 0],
@@ -49,18 +51,18 @@ class AdminRightsMainAjax extends ListComponentAjax
             ['oxbirthdate', 'oxuser', 0, 0, 0],
             ['oxid', 'oxuser', 0, 0, 1],
         ],
-     'container2' => [
-         ['oxusername', 'oxuser', 1, 0, 0],
-         ['oxlname', 'oxuser', 0, 0, 0],
-         ['oxfname', 'oxuser', 0, 0, 0],
-         ['oxstreet', 'oxuser', 0, 0, 0],
-         ['oxstreetnr', 'oxuser', 0, 0, 0],
-         ['oxcity', 'oxuser', 0, 0, 0],
-         ['oxzip', 'oxuser', 0, 0, 0],
-         ['oxfon', 'oxuser', 0, 0, 0],
-         ['oxbirthdate', 'oxuser', 0, 0, 0],
-         ['oxid', 'o3object2role', 0, 0, 1],
-     ]
+        'container2' => [
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'o3object2role', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -71,6 +73,17 @@ class AdminRightsMainAjax extends ListComponentAjax
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
     {
         $myConfig = Registry::getConfig();
 
@@ -109,10 +122,10 @@ class AdminRightsMainAjax extends ListComponentAjax
      */
     public function removeuserfromrole()
     {
-        $aRemoveRoles = $this->_getActionIds('o3object2role.oxid');
+        $aRemoveRoles = $this->getActionIds('o3object2role.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete o3object2role.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete o3object2role.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveRoles && is_array($aRemoveRoles)) {
             $sQ = "delete from o3object2role where o3object2role.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveRoles)) . ") ";
@@ -125,12 +138,12 @@ class AdminRightsMainAjax extends ListComponentAjax
      */
     public function addusertorole()
     {
-        $aAddUsers = $this->_getActionIds('oxuser.oxid');
+        $aAddUsers = $this->getActionIds('oxuser.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sUserTable = (oxNew(User::class))->getViewName();
-            $aAddUsers = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
+            $aAddUsers = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aAddUsers)) {
             foreach ($aAddUsers as $sAdduser) {

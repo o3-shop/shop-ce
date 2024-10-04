@@ -67,7 +67,7 @@ class ArticleExtend extends AdminDetailsController
 
         $oxId = $this->getEditObjectId();
 
-        $this->_createCategoryTree("artcattree");
+        $this->createCategoryTree("artcattree");
 
         // all categories
         if (isset($oxId) && $oxId != "-1") {
@@ -308,6 +308,10 @@ class ArticleExtend extends AdminDetailsController
         $resultFromDatabase = $database->select($query, [
             ':oxid' => $article->$bundleIdField->value
         ]);
+
+        $articleNumber = new Field();
+        $articleTitle = new Field();
+
         if ($resultFromDatabase && $resultFromDatabase->count() > 0) {
             while (!$resultFromDatabase->EOF) {
                 $articleNumber = new Field($resultFromDatabase->fields[1]);

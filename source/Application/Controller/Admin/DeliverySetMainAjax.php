@@ -39,7 +39,9 @@ class DeliverySetMainAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field, table, visible, multilanguage, ident
             ['oxtitle', 'oxdelivery', 1, 1, 0],
             ['oxaddsum', 'oxdelivery', 1, 0, 0],
             ['oxaddsumtype', 'oxdelivery', 1, 0, 0],
@@ -62,11 +64,22 @@ class DeliverySetMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $oDb = DatabaseProvider::getDb();
 
-        $sDeliveryViewName = $this->_getViewName('oxdelivery');
+        $sDeliveryViewName = $this->getViewName('oxdelivery');
 
         // category selected or not ?
         if (!$sId) {
@@ -89,9 +102,9 @@ class DeliverySetMainAjax extends ListComponentAjax
      */
     public function removeFromSet()
     {
-        $aRemoveGroups = $this->_getActionIds('oxdel2delset.oxid');
+        $aRemoveGroups = $this->getActionIds('oxdel2delset.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxdel2delset.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxdel2delset.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
             $sQ = "delete from oxdel2delset where oxdel2delset.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
@@ -106,13 +119,13 @@ class DeliverySetMainAjax extends ListComponentAjax
      */
     public function addToSet()
     {
-        $aChosenSets = $this->_getActionIds('oxdelivery.oxid');
+        $aChosenSets = $this->getActionIds('oxdelivery.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sDeliveryViewName = $this->_getViewName('oxdelivery');
-            $aChosenSets = $this->_getAll($this->_addFilter("select $sDeliveryViewName.oxid " . $this->_getQuery()));
+            $sDeliveryViewName = $this->getViewName('oxdelivery');
+            $aChosenSets = $this->getAll($this->addFilter("select $sDeliveryViewName.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).

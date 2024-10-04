@@ -62,6 +62,8 @@ class AccountWishlistController extends AccountController
      */
     protected $_oWishList = null;
 
+    protected $_aWishProductList = null;
+
     /**
      * list the wishlist items
      *

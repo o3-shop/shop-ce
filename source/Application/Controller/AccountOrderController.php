@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -93,6 +94,7 @@ class AccountOrderController extends AccountController
      * Template variable getter. Returns orders
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getOrderList()
     {
@@ -118,6 +120,7 @@ class AccountOrderController extends AccountController
      * Template variable getter. Returns ordered articles
      *
      * @return ArticleList|false
+     * @throws DatabaseConnectionException
      */
     public function getOrderArticleList()
     {

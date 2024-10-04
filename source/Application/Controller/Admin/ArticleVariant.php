@@ -25,6 +25,8 @@ use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\VariantHandler;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -49,6 +51,7 @@ class ArticleVariant extends AdminDetailsController
      * template file "article_variant.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -95,7 +98,7 @@ class ArticleVariant extends AdminDetailsController
             }
 
             if ($oArticle->oxarticles__oxparentid->value) {
-                $this->_aViewData["parentarticle"] = $this->_getProductParent($oArticle->oxarticles__oxparentid->value);
+                $this->_aViewData["parentarticle"] = $this->getProductParent($oArticle->oxarticles__oxparentid->value);
                 $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
                 $this->_aViewData["issubvariant"] = 1;
                 // A. disable variant information editing for variant
@@ -122,10 +125,11 @@ class ArticleVariant extends AdminDetailsController
     /**
      * Saves article variant.
      *
-     * @param string $sOXID   Object ID
-     * @param array  $aParams Parameters
+     * @param string $sOXID Object ID
+     * @param array $aParams Parameters
      *
      * @return void
+     * @throws Exception
      */
     public function savevariant($sOXID = null, $aParams = null)
     {
@@ -153,7 +157,7 @@ class ArticleVariant extends AdminDetailsController
             $aParams['oxarticles__oxactive'] = 0;
         }
 
-        if (!$this->_isAnythingChanged($oArticle, $aParams)) {
+        if (!$this->isAnythingChanged($oArticle, $aParams)) {
             return;
         }
 
@@ -165,7 +169,7 @@ class ArticleVariant extends AdminDetailsController
         $oArticle->resetRemindStatus();
 
         if ($sOXID == "-1") {
-            if ($oParent = $this->_getProductParent($oArticle->oxarticles__oxparentid->value)) {
+            if ($oParent = $this->getProductParent($oArticle->oxarticles__oxparentid->value)) {
                 // assign field from parent for new variant
                 // #4406
                 $oArticle->oxarticles__oxisconfigurable = new Field($oParent->oxarticles__oxisconfigurable->value);
@@ -187,6 +191,19 @@ class ArticleVariant extends AdminDetailsController
      */
     protected function _isAnythingChanged($oProduct, $aData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->isAnythingChanged($oProduct, $aData);
+    }
+
+    /**
+     * Checks if anything is changed in given data compared with existing product values.
+     *
+     * @param Article $oProduct Product to be checked.
+     * @param array                                       $aData    Data provided for check.
+     *
+     * @return bool
+     */
+    protected function isAnythingChanged($oProduct, $aData)
+    {
         if (!is_array($aData)) {
             return true;
         }
@@ -205,9 +222,23 @@ class ArticleVariant extends AdminDetailsController
      * @param string $sParentId parent product id
      *
      * @return Article
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductParent" in next major
      */
     protected function _getProductParent($sParentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getProductParent($sParentId);
+    }
+
+    /**
+     * Returns variant parent object
+     *
+     * @param string $sParentId parent product id
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     */
+    protected function getProductParent($sParentId)
     {
         if (
             $this->_oProductParent === null ||
@@ -255,7 +286,7 @@ class ArticleVariant extends AdminDetailsController
 
         $this->resetContentCache();
 
-        $variantOxid = Registry::getConfig()->getRequestRawParameter('voxid');
+        $variantOxid = Registry::getRequest()->getRequestRawParameter('voxid');
         $variant = oxNew(Article::class);
         $variant->delete($variantOxid);
     }
@@ -286,6 +317,8 @@ class ArticleVariant extends AdminDetailsController
      * Add selection list
      *
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function addsel()
     {

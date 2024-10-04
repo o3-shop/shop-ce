@@ -22,6 +22,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\RightsRoles;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
@@ -56,6 +57,7 @@ class AdminRightsList extends AdminListController
      * returns name of template file "article_list.tpl".
      *
      * @return string|null
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

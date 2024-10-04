@@ -38,7 +38,9 @@ class DeliveryUsersAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field, table, visible, multilanguage, ident
             ['oxusername', 'oxuser', 1, 0, 0],
             ['oxlname', 'oxuser', 0, 0, 0],
             ['oxfname', 'oxuser', 0, 0, 0],
@@ -73,10 +75,21 @@ class DeliveryUsersAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $myConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
 
-        $sUserTable = $this->_getViewName('oxuser');
+        $sUserTable = $this->getViewName('oxuser');
         $oDb = DatabaseProvider::getDb();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -112,9 +125,9 @@ class DeliveryUsersAjax extends ListComponentAjax
      */
     public function removeUserFromDel()
     {
-        $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
+        $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
             $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
@@ -127,13 +140,13 @@ class DeliveryUsersAjax extends ListComponentAjax
      */
     public function addUserToDel()
     {
-        $aChosenUsr = $this->_getActionIds('oxuser.oxid');
+        $aChosenUsr = $this->getActionIds('oxuser.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sUserTable = $this->_getViewName('oxuser');
-            $aChosenUsr = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
+            $sUserTable = $this->getViewName('oxuser');
+            $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {

@@ -63,8 +63,19 @@ class DiscountMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $oRequest = Registry::getRequest();
-        $sCountryTable = $this->_getViewName('oxcountry');
+        $sCountryTable = $this->getViewName('oxcountry');
         $oDb = DatabaseProvider::getDb();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -90,9 +101,9 @@ class DiscountMainAjax extends ListComponentAjax
      */
     public function removeDiscCountry()
     {
-        $aChosenCntr = $this->_getActionIds('oxobject2discount.oxid');
+        $aChosenCntr = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
             $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
@@ -106,12 +117,12 @@ class DiscountMainAjax extends ListComponentAjax
     public function addDiscCountry()
     {
         $oRequest = Registry::getRequest();
-        $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
+        $aChosenCntr = $this->getActionIds('oxcountry.oxid');
         $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         if ($oRequest->getRequestEscapedParameter('all')) {
-            $sCountryTable = $this->_getViewName('oxcountry');
-            $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->_getQuery()));
+            $sCountryTable = $this->getViewName('oxcountry');
+            $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {

@@ -53,6 +53,17 @@ class CategoryUpdate extends AdminController
      */
     protected function _getCategoryList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCategoryList();
+    }
+
+    /**
+     * Returns category list object
+     *
+     * @return CategoryList
+     * @throws Exception
+     */
+    protected function getCategoryList()
+    {
         if ($this->_oCatList == null) {
             $this->_oCatList = oxNew(CategoryList::class);
             $this->_oCatList->updateCategoryTree(false);
@@ -69,6 +80,6 @@ class CategoryUpdate extends AdminController
      */
     public function getCatListUpdateInfo()
     {
-        return $this->_getCategoryList()->getUpdateInfo();
+        return $this->getCategoryList()->getUpdateInfo();
     }
 }

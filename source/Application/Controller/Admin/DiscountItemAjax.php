@@ -67,12 +67,23 @@ class DiscountItemAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $oConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
 
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
-        $sDiscTable = $this->_getViewName('oxdiscount');
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
+        $sDiscTable = $this->getViewName('oxdiscount');
         $oDb = DatabaseProvider::getDb();
         $sOxid = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchOxid = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -122,7 +133,7 @@ class DiscountItemAjax extends ListComponentAjax
     public function removeDiscArt()
     {
         $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $aChosenArt = $this->_getActionIds('oxdiscount.oxitmartid');
+        $aChosenArt = $this->getActionIds('oxdiscount.oxitmartid');
         if (is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = '' where oxid = :oxid and oxitmartid = :oxitmartid";
             DatabaseProvider::getDb()->execute($sQ, [
@@ -137,7 +148,7 @@ class DiscountItemAjax extends ListComponentAjax
      */
     public function addDiscArt()
     {
-        $aChosenArt = $this->_getActionIds('oxarticles.oxid');
+        $aChosenArt = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = :oxitmartid where oxid = :oxid";
@@ -157,6 +168,17 @@ class DiscountItemAjax extends ListComponentAjax
      */
     protected function _getQueryCols() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQueryCols();
+    }
+
+    /**
+     * Formats and returns chunk of SQL query string with definition of
+     * fields to load from DB. Adds sub-select to get variant title from parent article
+     *
+     * @return string
+     */
+    protected function getQueryCols()
+    {
         $queryForIdColumns = $this->getQueryForIdentifierColumns();
 
         return sprintf(
@@ -167,14 +189,13 @@ class DiscountItemAjax extends ListComponentAjax
         );
     }
 
-
     private function getQueryForVisibleColumns(): string
     {
         $query = '';
         $languageSuffix = $this->getLanguageSuffix();
         $selectVariantsEnabled = Registry::getConfig()->getConfigParam('blVariantsSelection');
-        foreach ($this->_getVisibleColNames() as $key => [$columnName, $tableName]) {
-            $view = $this->_getViewName($tableName);
+        foreach ($this->getVisibleColNames() as $key => [$columnName, $tableName]) {
+            $view = $this->getViewName($tableName);
             if ($selectVariantsEnabled && $columnName === 'oxtitle') {
                 $query .= sprintf(
                     ' IF( %s.%s != \'\', %1$s.%2$s, CONCAT((select oxart.%2$s from %1$s as oxart where oxart.oxid = %1$s.oxparentid),\', \',%1$s.oxvarselect%s)) as _%s',
@@ -194,8 +215,8 @@ class DiscountItemAjax extends ListComponentAjax
     private function getQueryForIdentifierColumns(): string
     {
         $query = '';
-        foreach ($this->_getIdentColNames() as $key => [$columnName, $tableName]) {
-            $view = $this->_getViewName($tableName);
+        foreach ($this->getIdentColNames() as $key => [$columnName, $tableName]) {
+            $view = $this->getViewName($tableName);
             $query .= "{$view}.{$columnName} as _{$key}";
             $query .= ', ';
         }

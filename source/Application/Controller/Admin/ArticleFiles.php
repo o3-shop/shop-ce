@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\File;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
@@ -55,6 +56,7 @@ class ArticleFiles extends AdminDetailsController
      * Smarty engine and returns template file name "article_extend.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -93,7 +95,7 @@ class ArticleFiles extends AdminDetailsController
             foreach ($aArticleFiles as $sArticleFileId => $aArticleFileUpdate) {
                 $oArticleFile = oxNew(File::class);
                 $oArticleFile->load($sArticleFileId);
-                $aArticleFileUpdate = $this->_processOptions($aArticleFileUpdate);
+                $aArticleFileUpdate = $this->processOptions($aArticleFileUpdate);
                 $oArticleFile->assign($aArticleFileUpdate);
 
                 if ($oArticleFile->isUnderDownloadFolder()) {
@@ -111,6 +113,7 @@ class ArticleFiles extends AdminDetailsController
      * @param bool $blReset Load article again
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getArticle($blReset = false)
     {
@@ -146,7 +149,7 @@ class ArticleFiles extends AdminDetailsController
         $soxId = $this->getEditObjectId();
 
         $aParams = Registry::getRequest()->getRequestEscapedParameter('newfile');
-        $aParams = $this->_processOptions($aParams);
+        $aParams = $this->processOptions($aParams);
         $aNewFile = Registry::getConfig()->getUploadedFile('newArticleFile');
 
         //uploading and processing supplied file
@@ -179,6 +182,7 @@ class ArticleFiles extends AdminDetailsController
      * Deletes article file from file-id parameter and checks if this file belongs to current article.
      *
      * @return void
+     * @throws DatabaseConnectionException
      */
     public function deletefile()
     {
@@ -225,6 +229,18 @@ class ArticleFiles extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "processOptions" in next major
      */
     protected function _processOptions($aParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->processOptions($aParams);
+    }
+
+    /**
+     * Process config options. If value is not set, save as "-1" to database
+     *
+     * @param array $aParams params
+     *
+     * @return array
+     */
+    protected function processOptions($aParams)
     {
         if (!is_array($aParams)) {
             $aParams = [];

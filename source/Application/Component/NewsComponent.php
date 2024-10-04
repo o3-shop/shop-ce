@@ -67,7 +67,7 @@ class NewsComponent extends BaseController
         // if news must be displayed only on start page ?
         if (
             $myConfig->getConfigParam('bl_perfLoadNewsOnlyStart') &&
-            $oActView->getClassName() != "start"
+            $oActView->getClassKey() != "start"
         ) {
             return;
         }

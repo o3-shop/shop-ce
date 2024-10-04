@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\ContentList;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\Registry;
@@ -105,8 +106,9 @@ class UtilsComponent extends BaseController
      * and adds article to it.
      *
      * @param string $sProductId Product/article ID (default null)
-     * @param double $dAmount    amount of good (default null)
-     * @param array  $aSel       product selection list (default null)
+     * @param double $dAmount amount of good (default null)
+     * @param array $aSel product selection list (default null)
+     * @throws Exception
      */
     public function toNoticeList($sProductId = null, $dAmount = null, $aSel = null)
     {
@@ -122,8 +124,9 @@ class UtilsComponent extends BaseController
      * adds article to it.
      *
      * @param string $sProductId Product/article ID (default null)
-     * @param double $dAmount    amount of good (default null)
-     * @param array  $aSel       product selection list (default null)
+     * @param double $dAmount amount of good (default null)
+     * @param array $aSel product selection list (default null)
+     * @throws Exception
      */
     public function toWishList($sProductId = null, $dAmount = null, $aSel = null)
     {
@@ -140,24 +143,26 @@ class UtilsComponent extends BaseController
     /**
      * Adds chosen product to defined user list. if amount is 0, item is removed from the list
      *
-     * @param string $sListType  user product list type
+     * @param string $sListType user product list type
      * @param string $sProductId product id
-     * @param double $dAmount    product amount
-     * @param array  $aSel       product selection list
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "toList" in next major
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->toList($sListType, $sProductId, $dAmount, $aSel);
     }
-    
+
     /**
      * Adds chosen product to defined user list. if amount is 0, item is removed from the list
      *
-     * @param string $sListType  user product list type
+     * @param string $sListType user product list type
      * @param string $sProductId product id
-     * @param double $dAmount    product amount
-     * @param array  $aSel       product selection list
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
      */
     protected function toList($sListType, $sProductId, $dAmount, $aSel)
     {

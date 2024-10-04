@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -78,6 +80,7 @@ class AccountNewsletterController extends AccountController
      * Template variable getter. Returns 0 when newsletter had been changed.
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function isNewsletter()
     {
@@ -94,6 +97,8 @@ class AccountNewsletterController extends AccountController
      * current subscription status. Returns true on success.
      *
      * @return bool|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function subscribe()
     {

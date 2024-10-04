@@ -25,6 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax;
 use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -40,6 +41,7 @@ class ArticleAttribute extends AdminDetailsController
      * returns name of template file "article_attribute.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

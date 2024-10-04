@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -38,6 +39,7 @@ class CategoryOrder extends AdminDetailsController
      * engine and returns name of template file "category_order.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

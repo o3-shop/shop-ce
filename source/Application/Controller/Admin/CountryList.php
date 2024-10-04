@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 
 /**
  * Admin selectlist list manager.
@@ -61,6 +62,7 @@ class CountryList extends AdminListController
      * file "selectlist_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -74,13 +76,14 @@ class CountryList extends AdminListController
      * undefined order behind the "active" countries.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {
         $aListSorting = parent::getListSorting();
 
         if (array_keys($aListSorting['oxcountry']) === ['oxactive']) {
-            $aListSorting['oxcountry'][$this->_getSecondSortFieldName()] = 'asc';
+            $aListSorting['oxcountry'][$this->getSecondSortFieldName()] = 'asc';
         }
 
         return $aListSorting;
@@ -93,6 +96,16 @@ class CountryList extends AdminListController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSecondSortFieldName" in next major
      */
     protected function _getSecondSortFieldName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getSecondSortFieldName();
+    }
+
+    /**
+     * Getter for the second sort field name (for getting the expected order out of the database).
+     *
+     * @return string The name of the field we want to be the second order by argument.
+     */
+    protected function getSecondSortFieldName()
     {
         return $this->sSecondDefSortField;
     }

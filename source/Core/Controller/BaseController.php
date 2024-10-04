@@ -213,7 +213,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sKey parameter key
      *
-     * @return string
+     * @return string|array
      */
     public function getViewParameter($sKey)
     {

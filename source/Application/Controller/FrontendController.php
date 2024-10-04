@@ -706,7 +706,7 @@ class FrontendController extends BaseController
     /**
      * Active category setter
      *
-     * @param Category $category active category
+     * @param object $category active category
      */
     public function setActiveCategory($category)
     {
@@ -2474,7 +2474,7 @@ class FrontendController extends BaseController
     /**
      * Sets Manufacturer list for search
      *
-     * @param array $list manufacturer list
+     * @param object $list manufacturer list
      */
     public function setManufacturerList($list)
     {

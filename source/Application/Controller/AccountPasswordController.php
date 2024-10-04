@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\InputValidator;
 use OxidEsales\Eshop\Core\Registry;
@@ -75,6 +76,7 @@ class AccountPasswordController extends AccountController
      * changes current user password
      *
      * @return void
+     * @throws Exception
      */
     public function changePassword()
     {

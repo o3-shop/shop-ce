@@ -179,6 +179,16 @@ class AdminListController extends AdminController
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getViewListSize();
+    }
+
+    /**
+     * Viewable list size getter
+     *
+     * @return int
+     */
+    protected function getViewListSize()
+    {
         if (!$this->_iViewListSize) {
             $config = Registry::getConfig();
             if ($profile = Registry::getSession()->getVariable('profile')) {
@@ -198,22 +208,22 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Returns view list size
-     *
-     * @return int
-     */
-    public function getViewListSize()
-    {
-        return $this->_getViewListSize();
-    }
-
-    /**
      * Viewable list size getter (used in list_*.php views)
      *
      * @return int
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUserDefListSize" in next major
      */
     protected function _getUserDefListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getUserDefListSize();
+    }
+
+    /**
+     * Viewable list size getter (used in list_*.php views)
+     *
+     * @return int
+     */
+    protected function getUserDefListSize()
     {
         if (!$this->_iViewListSize) {
             if (!($viewListSize = (int)Registry::getRequest()->getRequestEscapedParameter('viewListSize'))) {
@@ -239,7 +249,7 @@ class AdminListController extends AdminController
         $this->_aViewData['mylist'] = $this->getItemList();
 
         // set navigation parameters
-        $this->_setListNavigationParams();
+        $this->setListNavigationParams();
 
         return $return;
     }
@@ -279,6 +289,17 @@ class AdminListController extends AdminController
      */
     protected function _calcListItemsCount($sql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->calcListItemsCount($sql);
+    }
+
+    /**
+     * Calculates list items count
+     *
+     * @param string $sql SQL query used co select list items
+     * @throws DatabaseConnectionException
+     */
+    protected function calcListItemsCount($sql)
+    {
         $stringModifier = getStr();
 
         // count SQL
@@ -303,9 +324,19 @@ class AdminListController extends AdminController
      */
     protected function _setCurrentListPosition($page = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $adminListSize = $this->_getViewListSize();
+        $this->setCurrentListPosition($page);
+    }
 
-        $jumpToPage = $page ? ((int)$page) : ((int)((int)Registry::getRequest()->getRequestEscapedParameter('lstrt')) / $adminListSize);
+    /**
+     * Set current list position
+     *
+     * @param string $page jump page string
+     */
+    protected function setCurrentListPosition($page = null)
+    {
+        $adminListSize = $this->getViewListSize();
+
+        $jumpToPage = (int)($page ? $page : (((int)Registry::getRequest()->getRequestEscapedParameter('lstrt')) / $adminListSize));
         $jumpToPage = ($page && $jumpToPage) ? ($jumpToPage - 1) : $jumpToPage;
 
         $jumpToPage = $jumpToPage * $adminListSize;
@@ -328,6 +359,19 @@ class AdminListController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareOrderByQuery" in next major
      */
     protected function _prepareOrderByQuery($query = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->prepareOrderByQuery($query);
+    }
+
+    /**
+     * Adds order by to SQL query string.
+     *
+     * @param null $query sql string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareOrderByQuery($query = null)
     {
         // sorting
         $sortFields = $this->getListSorting();
@@ -374,9 +418,20 @@ class AdminListController extends AdminController
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $listObject !== null ? $listObject->buildSelectString(null) : "";
+        return $this->buildSelectString($listObject);
     }
 
+    /**
+     * Builds and returns SQL query string.
+     *
+     * @param object $listObject list main object
+     *
+     * @return string
+     */
+    protected function buildSelectString($listObject = null)
+    {
+        return $listObject !== null ? $listObject->buildSelectString(null) : "";
+    }
 
     /**
      * Prepares SQL where query according SQL condition array and attaches it to SQL end.
@@ -389,6 +444,20 @@ class AdminListController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "processFilter" in next major
      */
     protected function _processFilter($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->processFilter($fieldValue);
+    }
+
+    /**
+     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
+     * For each search value if german umlauts exist, adds them
+     * and replaced by spec. char to query
+     *
+     * @param string $fieldValue Filters
+     *
+     * @return string
+     */
+    protected function processFilter($fieldValue)
     {
         $stringModifier = getStr();
 
@@ -409,6 +478,20 @@ class AdminListController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildFilter" in next major
      */
     protected function _buildFilter($value, $isSearchValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->buildFilter($value, $isSearchValue);
+    }
+
+    /**
+     * Builds part of SQL query
+     *
+     * @param string $value filter value
+     * @param bool $isSearchValue filter value type, true means surround search key with '%'
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function buildFilter($value, $isSearchValue)
     {
         if ($isSearchValue) {
             //is search string, using LIKE
@@ -431,6 +514,18 @@ class AdminListController extends AdminController
      */
     protected function _isSearchValue($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->isSearchValue($fieldValue);
+    }
+
+    /**
+     * Checks if filter contains wildcards like %
+     *
+     * @param string $fieldValue filter value
+     *
+     * @return bool
+     */
+    protected function isSearchValue($fieldValue)
+    {
         return (getStr()->preg_match('/^%/', $fieldValue) && getStr()->preg_match('/%$/', $fieldValue));
     }
 
@@ -448,16 +543,32 @@ class AdminListController extends AdminController
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+    }
+
+    /**
+     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
+     * For each search value if german umlauts exist, adds them
+     * and replaced by spec. char to query
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
         if (is_array($whereQuery) && count($whereQuery)) {
             $myUtilsString = Registry::getUtilsString();
             foreach ($whereQuery as $identifierName => $fieldValue) {
                 $fieldValue = trim($fieldValue);
 
                 //check if this is search string (contains % sign at beginning and end of string)
-                $isSearchValue = $this->_isSearchValue($fieldValue);
+                $isSearchValue = $this->isSearchValue($fieldValue);
 
                 //removing % symbols
-                $fieldValue = $this->_processFilter($fieldValue);
+                $fieldValue = $this->processFilter($fieldValue);
 
                 if (strlen($fieldValue)) {
                     $values = explode(' ', $fieldValue);
@@ -479,12 +590,12 @@ class AdminListController extends AdminController
                         //for search in same field for different values using AND
                         $queryBoolAction = ' and ';
 
-                        $fullQuery .= $this->_buildFilter($value, $isSearchValue);
+                        $fullQuery .= $this->buildFilter($value, $isSearchValue);
 
                         if ($uml) {
                             $fullQuery .= " or {$quotedIdentifierName} ";
 
-                            $fullQuery .= $this->_buildFilter($uml, $isSearchValue);
+                            $fullQuery .= $this->buildFilter($uml, $isSearchValue);
                             $fullQuery .= ')'; // end of OR section
                         }
                     }
@@ -507,6 +618,18 @@ class AdminListController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "changeselect" in next major
      */
     protected function _changeselect($query) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->changeselect($query);
+    }
+
+    /**
+     * Override this for individual search in admin.
+     *
+     * @param string $query SQL select to change
+     *
+     * @return string
+     */
+    protected function changeselect($query)
     {
         return $query;
     }
@@ -539,7 +662,7 @@ class AdminListController extends AdminController
                             if ($localDateFormat && $localDateFormat != 'ISO' && isset($listItem->$field)) {
                                 $fieldType = $listItem->{$field}->fldtype;
                                 if ("datetime" == $fieldType || "date" == $fieldType) {
-                                    $value = $this->_convertToDBDate($value, $fieldType);
+                                    $value = $this->convertToDBDate($value, $fieldType);
                                 }
                             }
 
@@ -564,6 +687,19 @@ class AdminListController extends AdminController
      */
     protected function _convertToDBDate($value, $fieldType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->convertToDBDate($value, $fieldType);
+    }
+
+    /**
+     * Converts date/datetime values to DB scheme (#M1260)
+     *
+     * @param string $value     Field value
+     * @param string $fieldType Field type
+     *
+     * @return string
+     */
+    protected function convertToDBDate($value, $fieldType)
+    {
         $convertedObject = new Field();
         $convertedObject->setValue($value);
         if ($fieldType == "datetime") {
@@ -571,16 +707,16 @@ class AdminListController extends AdminController
                 Registry::getUtilsDate()->convertDBDateTime($convertedObject, true);
             } else {
                 if (strlen($value) > 10) {
-                    return $this->_convertTime($value);
+                    return $this->convertTime($value);
                 } else {
-                    return $this->_convertDate($value);
+                    return $this->convertDate($value);
                 }
             }
         } elseif ($fieldType == "date") {
             if (strlen($value) == 10) {
                 Registry::getUtilsDate()->convertDBDate($convertedObject, true);
             } else {
-                return $this->_convertDate($value);
+                return $this->convertDate($value);
             }
         }
 
@@ -596,6 +732,18 @@ class AdminListController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "convertDate" in next major
      */
     protected function _convertDate($date) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->convertDate($date);
+    }
+
+    /**
+     * Converter for date field search. If not full date will be searched.
+     *
+     * @param string $date searched date
+     *
+     * @return string
+     */
+    protected function convertDate($date)
     {
         // regexps to validate input
         $datePatterns = [
@@ -636,6 +784,18 @@ class AdminListController extends AdminController
      */
     protected function _convertTime($fullDate) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->convertTime($fullDate);
+    }
+
+    /**
+     * Converter for datetime field search. If not full time will be searched.
+     *
+     * @param string $fullDate searched date
+     *
+     * @return string
+     */
+    protected function convertTime($fullDate)
+    {
         $date = substr($fullDate, 0, 10);
         $convertedObject = new Field();
         $convertedObject->setValue($date);
@@ -675,9 +835,17 @@ class AdminListController extends AdminController
      */
     protected function _setListNavigationParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setListNavigationParams();
+    }
+
+    /**
+     * Set parameters needed for list navigation
+     */
+    protected function setListNavigationParams()
+    {
         // list navigation
         $showNavigation = false;
-        $adminListSize = $this->_getViewListSize();
+        $adminListSize = $this->getViewListSize();
         if ($this->_iListSize > $adminListSize) {
             // yes, we need to build the navigation object
             $pageNavigation = new stdClass();
@@ -742,7 +910,7 @@ class AdminListController extends AdminController
 
         // determine not used space in List
         $listSizeToShow = $this->_iListSize - $this->_iCurrListPos;
-        $adminListSize = $this->_getViewListSize();
+        $adminListSize = $this->getViewListSize();
         $notUsed = $adminListSize - min($listSizeToShow, $adminListSize);
         $space = $notUsed * 15;
 
@@ -760,6 +928,16 @@ class AdminListController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets-up navigation parameters
+     *
+     * @param string $sNode active view id
+     */
+    protected function setupNavigation($sNode)
     {
         // navigation according to class
         if ($sNode) {
@@ -821,19 +999,19 @@ class AdminListController extends AdminController
                 }
             }
 
-            $query = $this->_buildSelectString($listObject);
-            $query = $this->_prepareWhereQuery($where, $query);
-            $query = $this->_prepareOrderByQuery($query);
-            $query = $this->_changeselect($query);
+            $query = $this->buildSelectString($listObject);
+            $query = $this->prepareWhereQuery($where, $query);
+            $query = $this->prepareOrderByQuery($query);
+            $query = $this->changeselect($query);
 
             // calculates count of list items
-            $this->_calcListItemsCount($query);
+            $this->calcListItemsCount($query);
 
             // setting current list position (page)
-            $this->_setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
+            $this->setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
 
             // setting addition params for list: current list size
-            $this->_oList->setSqlLimit($this->_iCurrListPos, $this->_getViewListSize());
+            $this->_oList->setSqlLimit($this->_iCurrListPos, $this->getViewListSize());
 
             $this->_oList->selectString($query);
         }

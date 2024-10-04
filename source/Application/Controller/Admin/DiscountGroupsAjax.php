@@ -64,9 +64,20 @@ class DiscountGroupsAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $oRequest = Registry::getRequest();
         // active AJAX component
-        $sGroupTable = $this->_getViewName('oxgroups');
+        $sGroupTable = $this->getViewName('oxgroups');
         $oDb = DatabaseProvider::getDb();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -95,9 +106,9 @@ class DiscountGroupsAjax extends ListComponentAjax
      */
     public function removeDiscGroup()
     {
-        $groupIds = $this->_getActionIds('oxobject2discount.oxid');
+        $groupIds = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $query = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
+            $query = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
             $groupIdsQuoted = implode(", ", DatabaseProvider::getDb()->quoteArray($groupIds));
@@ -112,12 +123,12 @@ class DiscountGroupsAjax extends ListComponentAjax
     public function addDiscGroup()
     {
         $oRequest = Registry::getRequest();
-        $groupIds = $this->_getActionIds('oxgroups.oxid');
+        $groupIds = $this->getActionIds('oxgroups.oxid');
         $discountId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         if ($oRequest->getRequestEscapedParameter('all')) {
-            $groupTable = $this->_getViewName('oxgroups');
-            $groupIds = $this->_getAll($this->_addFilter("select $groupTable.oxid " . $this->_getQuery()));
+            $groupTable = $this->getViewName('oxgroups');
+            $groupIds = $this->getAll($this->addFilter("select $groupTable.oxid " . $this->getQuery()));
         }
         if ($discountId && $discountId != self::NEW_DISCOUNT_ID && is_array($groupIds)) {
             foreach ($groupIds as $groupId) {

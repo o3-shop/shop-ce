@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 
 /**
  * Admin article categories thumbnail manager.
@@ -36,6 +37,7 @@ class CategoryPictures extends AdminDetailsController
      * of template file "category_pictures.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

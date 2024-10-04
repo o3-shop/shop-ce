@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -106,6 +107,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      * Get product article
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getProduct()
     {
@@ -300,19 +302,21 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      * @param string $sArticleId Article id
      *
      * @return Article
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getArticleById" in next major
      */
     protected function _getArticleById($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getArticleById($sArticleId);
     }
-    
+
     /**
      * Returns prepared article by id.
      *
      * @param string $sArticleId Article id
      *
      * @return Article
+     * @throws DatabaseConnectionException
      */
     protected function getArticleById($sArticleId)
     {

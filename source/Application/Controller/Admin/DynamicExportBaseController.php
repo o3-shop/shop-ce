@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -217,7 +218,7 @@ class DynamicExportBaseController extends AdminDetailsController
         }
 
         // delete temporary heap table
-        DatabaseProvider::getDb()->execute("drop TABLE if exists " . $this->_getHeapTableName());
+        DatabaseProvider::getDb()->execute("drop TABLE if exists " . $this->getHeapTableName());
     }
 
     /**
@@ -316,7 +317,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     public function removeSid($sInput)
     {
-        $sSid = $this->getSession()->getId();
+        $sSid = Registry::getSession()->getId();
 
         // remove sid from link
         $sOutput = str_replace("sid={$sSid}/", "", $sInput);
@@ -347,7 +348,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $sInput = str_replace("\t", "    ", $sInput);
 
         // remove html entities, remove html tags
-        $sInput = $this->_unHTMLEntities(strip_tags($sInput));
+        $sInput = $this->unHTMLEntities(strip_tags($sInput));
 
         $oStr = getStr();
         if ($oStr->strlen($sInput) > $iMaxSize - 3) {
@@ -479,7 +480,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     public function getDeepestCategoryPath($oArticle)
     {
-        return $this->_findDeepestCatPath($oArticle);
+        return $this->findDeepestCatPath($oArticle);
     }
 
     /**
@@ -492,26 +493,26 @@ class DynamicExportBaseController extends AdminDetailsController
     public function prepareExport()
     {
         $oDB = DatabaseProvider::getDb();
-        $sHeapTable = $this->_getHeapTableName();
+        $sHeapTable = $this->getHeapTableName();
 
         // #1070 Saulius 2005.11.28
         // check mySQL version
         $oRs = $oDB->select("SHOW VARIABLES LIKE 'version'");
-        $sTableCharset = $this->_generateTableCharSet($oRs->fields[1]);
+        $sTableCharset = $this->generateTableCharSet($oRs->fields[1]);
 
         // create heap table
-        if (!($this->_createHeapTable($sHeapTable, $sTableCharset))) {
+        if (!($this->createHeapTable($sHeapTable, $sTableCharset))) {
             // error
             Registry::getUtils()->showMessageAndExit("Could not create HEAP Table {$sHeapTable}\n<br>");
         }
 
-        $sCatAdd = $this->_getCatAdd(Registry::getRequest()->getRequestEscapedParameter('acat'));
-        if (!$this->_insertArticles($sHeapTable, $sCatAdd)) {
+        $sCatAdd = $this->getCatAdd(Registry::getRequest()->getRequestEscapedParameter('acat'));
+        if (!$this->insertArticles($sHeapTable, $sCatAdd)) {
             Registry::getUtils()->showMessageAndExit("Could not insert Articles in Table {$sHeapTable}\n<br>");
         }
 
-        $this->_removeParentArticles($sHeapTable);
-        $this->_setSessionParams();
+        $this->removeParentArticles($sHeapTable);
+        $this->setSessionParams();
 
         // get total cnt
         return $oDB->getOne("select count(*) from {$sHeapTable}");
@@ -526,6 +527,7 @@ class DynamicExportBaseController extends AdminDetailsController
      * @return Article
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getOneArticle($iCnt, &$blContinue)
     {
@@ -536,9 +538,9 @@ class DynamicExportBaseController extends AdminDetailsController
         $myConfig->setConfigParam('blExport', true);
         $blContinue = false;
 
-        if (($oArticle = $this->_initArticle($this->_getHeapTableName(), $iCnt, $blContinue))) {
+        if (($oArticle = $this->initArticle($this->getHeapTableName(), $iCnt, $blContinue))) {
             $blContinue = true;
-            $oArticle = $this->_setCampaignDetailLink($oArticle);
+            $oArticle = $this->setCampaignDetailLink($oArticle);
         }
 
         //[Alfonsas 2006-05-31] unsetting specific parameter
@@ -580,6 +582,19 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function _unHtmlEntities($sInput) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->unHtmlEntities($sInput);
+    }
+
+    /**
+     * Replace HTML Entities
+     * Replacement for html_entity_decode which is only available from PHP 4.3.0 onj
+     *
+     * @param string $sInput string to replace
+     *
+     * @return string
+     */
+    protected function unHtmlEntities($sInput)
+    {
         $aTransTbl = array_flip(get_html_translation_table(HTML_ENTITIES));
 
         return strtr($sInput, $aTransTbl);
@@ -593,8 +608,18 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function _getHeapTableName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getHeapTableName();
+    }
+
+    /**
+     * Create valid Heap table name
+     *
+     * @return string
+     */
+    protected function getHeapTableName()
+    {
         // table name must not start with any digit
-        return "tmp_" . str_replace("0", "", md5($this->getSession()->getId()));
+        return "tmp_" . str_replace("0", "", md5(Registry::getSession()->getId()));
     }
 
     /**
@@ -608,6 +633,20 @@ class DynamicExportBaseController extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateTableCharSet" in next major
      */
     protected function _generateTableCharSet($sMysqlVersion) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->generateTableCharSet($sMysqlVersion);
+    }
+
+    /**
+     * generates table charset
+     *
+     * @param string $sMysqlVersion MySql version
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function generateTableCharSet($sMysqlVersion)
     {
         $sTableCharset = "";
 
@@ -639,10 +678,25 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function _createHeapTable($sHeapTable, $sTableCharset) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->createHeapTable($sHeapTable, $sTableCharset);
+    }
+
+    /**
+     * creates heap-table
+     *
+     * @param string $sHeapTable table name
+     * @param string $sTableCharset table charset
+     *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function createHeapTable($sHeapTable, $sTableCharset)
+    {
         $blDone = false;
         $oDB = DatabaseProvider::getDb();
         $sQ = "CREATE TABLE IF NOT EXISTS {$sHeapTable} ( `oxid` CHAR(32) NOT NULL default '' ) ENGINE=InnoDB {$sTableCharset}";
-        if (($oDB->execute($sQ)) !== false) {
+        if ($oDB->execute($sQ)) {
             $blDone = true;
             $oDB->execute("TRUNCATE TABLE {$sHeapTable}");
         }
@@ -660,6 +714,19 @@ class DynamicExportBaseController extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCatAdd" in next major
      */
     protected function _getCatAdd($aChosenCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getCatAdd($aChosenCat);
+    }
+
+    /**
+     * creates additional cat string
+     *
+     * @param array $aChosenCat Selected category array
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getCatAdd($aChosenCat)
     {
         $sCatAdd = null;
         if (is_array($aChosenCat) && count($aChosenCat)) {
@@ -691,6 +758,21 @@ class DynamicExportBaseController extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "insertArticles" in next major
      */
     protected function _insertArticles($sHeapTable, $sCatAdd) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->insertArticles($sHeapTable, $sCatAdd);
+    }
+
+    /**
+     * inserts articles into heap-table
+     *
+     * @param string $sHeapTable heap table name
+     * @param string $sCatAdd category id filter (part of sql)
+     *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function insertArticles($sHeapTable, $sCatAdd)
     {
         $oDB = DatabaseProvider::getDb();
 
@@ -746,6 +828,18 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function _removeParentArticles($sHeapTable) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->removeParentArticles($sHeapTable);
+    }
+
+    /**
+     * removes parent articles so that we only have variants itself
+     *
+     * @param string $sHeapTable table name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function removeParentArticles($sHeapTable)
+    {
         if (!(Registry::getRequest()->getRequestEscapedParameter('blExportMainVars'))) {
             $oDB = DatabaseProvider::getDb();
             $sArticleTable = getViewName('oxarticles');
@@ -777,6 +871,14 @@ class DynamicExportBaseController extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "setSessionParams" in next major
      */
     protected function _setSessionParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setSessionParams();
+    }
+
+    /**
+     * stores some info in session
+     */
+    protected function setSessionParams()
     {
         // reset it from session
         Registry::getSession()->deleteVariable("sExportDelCost");
@@ -828,6 +930,18 @@ class DynamicExportBaseController extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadRootCats" in next major
      */
     protected function _loadRootCats() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->loadRootCats();
+    }
+
+    /**
+     * Load all root cat's == all trees
+     *
+     * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function loadRootCats()
     {
         if ($this->_aCatLvlCache === null) {
             $this->_aCatLvlCache = [];
@@ -883,12 +997,26 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function _findDeepestCatPath($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->findDeepestCatPath($oArticle);
+    }
+
+    /**
+     * finds deepest category path
+     *
+     * @param Article $oArticle article object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function findDeepestCatPath($oArticle)
+    {
         $sRet = "";
 
         // find deepest
         $aIds = $oArticle->getCategoryIds();
         if (is_array($aIds) && count($aIds)) {
-            if ($aCatLvlCache = $this->_loadRootCats()) {
+            if ($aCatLvlCache = $this->loadRootCats()) {
                 $sIdMax = null;
                 $dMaxLvl = 0;
                 foreach ($aIds as $sCatId) {
@@ -920,12 +1048,30 @@ class DynamicExportBaseController extends AdminDetailsController
      * @param int $iCnt record number
      * @param bool $blContinue false is used to stop exporting
      *
-     * @return Article|void
+     * @return void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "initArticle" in next major
      */
     protected function _initArticle($sHeapTable, $iCnt, &$blContinue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->initArticle($sHeapTable, $iCnt, $blContinue);
+    }
+
+    /**
+     * initialize article
+     *
+     * @param string $sHeapTable heap table name
+     * @param int $iCnt record number
+     * @param bool $blContinue false is used to stop exporting
+     *
+     * @return Article|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
+     */
+    protected function initArticle($sHeapTable, $iCnt, &$blContinue)
     {
         $oRs = $this->getDb()->selectLimit("select oxid from $sHeapTable", 1, $iCnt);
         if ($oRs && $oRs->count() > 0) {
@@ -961,6 +1107,20 @@ class DynamicExportBaseController extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "setCampaignDetailLink" in next major
      */
     protected function _setCampaignDetailLink($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->setCampaignDetailLink($oArticle);
+    }
+
+    /**
+     * sets detail link for campaigns
+     *
+     * @param Article $oArticle article object
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function setCampaignDetailLink($oArticle)
     {
         // #827
         if ($sCampaign = Registry::getRequest()->getRequestEscapedParameter('sExportCampaign')) {

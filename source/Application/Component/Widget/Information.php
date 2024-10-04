@@ -56,7 +56,7 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
     /**
      * Get services content list
      *
-     * @return array
+     * @return object
      */
     public function getServicesList()
     {

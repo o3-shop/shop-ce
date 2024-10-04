@@ -27,10 +27,12 @@ use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BasketChangedEvent;
@@ -116,6 +118,8 @@ class BasketComponent extends BaseController
      * executes parent::render() and returns basket object.
      *
      * @return object   $oBasket    basket object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -136,17 +140,20 @@ class BasketComponent extends BaseController
      * oxcmp_basket::_addItems() and puts article to basket.
      * Returns position where to redirect user browser.
      *
-     * @param string $sProductId Product ID (default null)
-     * @param double $dAmount    Product amount (default null)
-     * @param array  $aSel       (default null)
-     * @param array  $aPersParam (default null)
-     * @param bool   $blOverride If true amount in basket is replaced by $dAmount otherwise amount is increased by
+     * @param null $sProductId Product ID (default null)
+     * @param null $dAmount Product amount (default null)
+     * @param null $aSel (default null)
+     * @param null $aPersParam (default null)
+     * @param bool $blOverride If true amount in basket is replaced by $dAmount otherwise amount is increased by
      *                           $dAmount (default false)
      *
+     * @return void|string
+     * @throws ArticleException
+     * @throws ArticleInputException
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     *
-     * @return void|string
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     public function toBasket($sProductId = null, $dAmount = null, $aSel = null, $aPersParam = null, $blOverride = false)
     {
@@ -216,8 +223,12 @@ class BasketComponent extends BaseController
      * @param bool $blOverride If true means increase amount of chosen article (default false)
      *
      * @return void
+     * @throws ArticleException
+     * @throws ArticleInputException
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     public function changeBasket(
         $sProductId = null,
@@ -254,7 +265,7 @@ class BasketComponent extends BaseController
         // fetching other needed info
         $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
         $aSel = isset($aSel) ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
-        $aPersParam = $aPersParam ? $aPersParam : Registry::getRequest()->getRequestEscapedParameter('persparam');
+        $aPersParam = $aPersParam ?: Registry::getRequest()->getRequestEscapedParameter('persparam');
 
         // adding articles
         if ($aProducts = $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
@@ -395,7 +406,7 @@ class BasketComponent extends BaseController
         $aProducts = Registry::getRequest()->getRequestEscapedParameter('aproducts');
 
         // collecting specified item
-        $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
+        $sProductId = $sProductId ?: Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sProductId) {
             // additionally fetching current product info
             $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
@@ -443,6 +454,12 @@ class BasketComponent extends BaseController
      * @param array $products products to add array
      *
      * @return  object  $oBasketItem    last added basket item
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     protected function _addItems($products) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -507,7 +524,7 @@ class BasketComponent extends BaseController
      */
     protected function _setLastCall($sCallName, $aProductInfo, $aBasketInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->setLastCall($sCallName, $aProductInfo, $aBasketInfo);
+        $this->setLastCall($sCallName, $aProductInfo, $aBasketInfo);
     }
     
     /**
@@ -530,7 +547,7 @@ class BasketComponent extends BaseController
      */
     protected function _setLastCallFnc($sCallName) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->setLastCallFnc($sCallName);
+        $this->setLastCallFnc($sCallName);
     }
 
     /**
@@ -569,6 +586,7 @@ class BasketComponent extends BaseController
      * Returns true if active root category was changed
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isRootCatChanged()
     {
@@ -654,10 +672,13 @@ class BasketComponent extends BaseController
      * Add one item to basket. Handle eventual errors.
      *
      * @param Basket $basket
-     * @param array                                      $itemData
-     * @param string                                     $errorDestination
+     * @param array $itemData
+     * @param string $errorDestination
      *
      * @return object
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function addItemToBasket($basket, $itemData, $errorDestination)
     {

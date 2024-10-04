@@ -40,7 +40,9 @@ class CategoryOrderAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
             ['oxpos', 'oxobject2category', 1, 0, 0],
@@ -70,9 +72,20 @@ class CategoryOrderAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         // looking for table/view
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+        $sArtTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
         $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
@@ -103,12 +116,23 @@ class CategoryOrderAjax extends ListComponentAjax
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getSorting();
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getSorting()
+    {
         $sOrder = '';
         if (Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
-            $sOrder = parent::_getSorting();
+            $sOrder = parent::getSorting();
         } elseif (($aSkipArt = Registry::getSession()->getVariable('neworder_sess'))) {
             $sOrderBy = '';
-            $sArtTable = $this->_getViewName('oxarticles');
+            $sArtTable = $this->getViewName('oxarticles');
             $sSep = '';
             foreach ($aSkipArt as $sId) {
                 $sOrderBy = " $sArtTable.oxid=" . DatabaseProvider::getDb()->quote($sId) . " " . $sSep . $sOrderBy;
@@ -125,7 +149,7 @@ class CategoryOrderAjax extends ListComponentAjax
      */
     public function removeCatOrderArticle()
     {
-        $aRemoveArt = $this->_getActionIds('oxarticles.oxid');
+        $aRemoveArt = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $aSkipArt = Registry::getSession()->getVariable('neworder_sess');
 
@@ -137,8 +161,8 @@ class CategoryOrderAjax extends ListComponentAjax
             }
             Registry::getSession()->setVariable('neworder_sess', $aSkipArt);
 
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $sO2CView = $this->_getViewName('oxobject2category');
+            $sArticleTable = $this->getViewName('oxarticles');
+            $sO2CView = $this->getViewName('oxobject2category');
 
             // checking if all articles were moved from one
             $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid ";
@@ -161,7 +185,7 @@ class CategoryOrderAjax extends ListComponentAjax
      */
     public function addCatOrderArticle()
     {
-        $aAddArticle = $this->_getActionIds('oxarticles.oxid');
+        $aAddArticle = $this->getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $aOrdArt = Registry::getSession()->getVariable('neworder_sess');
@@ -178,8 +202,8 @@ class CategoryOrderAjax extends ListComponentAjax
             }
             Registry::getSession()->setVariable('neworder_sess', $aOrdArt);
 
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $sO2CView = $this->_getViewName('oxobject2category');
+            $sArticleTable = $this->getViewName('oxarticles');
+            $sO2CView = $this->getViewName('oxobject2category');
 
             // checking if all articles were moved from one
             $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid ";
@@ -214,7 +238,7 @@ class CategoryOrderAjax extends ListComponentAjax
 
             $aNewOrder = Registry::getSession()->getVariable("neworder_sess");
             if (is_array($aNewOrder) && count($aNewOrder)) {
-                $sO2CView = $this->_getViewName('oxobject2category');
+                $sO2CView = $this->getViewName('oxobject2category');
                 $sSelect = "select * from $sO2CView where $sO2CView.oxcatnid = :oxcatnid and $sO2CView.oxobjectid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aNewOrder)) . " )";
                 $oList = oxNew(ListModel::class);
                 $oList->init($this->getObject2CategoryClass(), 'oxobject2category');

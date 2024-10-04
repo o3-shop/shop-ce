@@ -29,6 +29,8 @@ use OxidEsales\Eshop\Application\Model\FileChecker;
 use OxidEsales\Eshop\Application\Model\FileCheckerResult;
 use OxidEsales\Eshop\Application\Model\FileCollector;
 use OxidEsales\Eshop\Application\Model\SmartyRenderer;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -90,6 +92,16 @@ class DiagnosticsMain extends AdminDetailsController
      */
     protected function _hasError() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->hasError();
+    }
+
+    /**
+     * Error status getter
+     *
+     * @return bool
+     */
+    protected function hasError()
+    {
         return $this->_blError;
     }
 
@@ -101,9 +113,18 @@ class DiagnosticsMain extends AdminDetailsController
      */
     protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->_sErrorMessage;
+        return $this->getErrorMessage();
     }
 
+    /**
+     * Error status getter
+     *
+     * @return string
+     */
+    protected function getErrorMessage()
+    {
+        return $this->_sErrorMessage;
+    }
 
     /**
      * Calls parent constructor and initializes checker object
@@ -127,8 +148,8 @@ class DiagnosticsMain extends AdminDetailsController
     {
         parent::render();
 
-        if ($this->_hasError()) {
-            $this->_aViewData['sErrorMessage'] = $this->_getErrorMessage();
+        if ($this->hasError()) {
+            $this->_aViewData['sErrorMessage'] = $this->getErrorMessage();
         }
 
         return "diagnostics_form.tpl";
@@ -167,9 +188,10 @@ class DiagnosticsMain extends AdminDetailsController
      *
      * @param array $aFileList array list of files to be checked
      *
+     * @return null|FileCheckerResult
+     * @throws Exception
      * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
      *
-     * @return null|FileCheckerResult
      */
     protected function _checkOxidFiles($aFileList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -231,7 +253,7 @@ class DiagnosticsMain extends AdminDetailsController
     {
         $sReport = "";
 
-        $aDiagnosticsResult = $this->_runBasicDiagnostics();
+        $aDiagnosticsResult = $this->runBasicDiagnostics();
         $sReport .= $this->_oRenderer->renderTemplate("diagnostics_main.tpl", $aDiagnosticsResult);
 
         /**
@@ -241,7 +263,7 @@ class DiagnosticsMain extends AdminDetailsController
             $aFileList = $this->_getFilesToCheck();
             $oFileCheckerResult = $this->_checkOxidFiles($aFileList);
 
-            if ($this->_hasError()) {
+            if ($this->hasError()) {
                 return;
             }
 
@@ -259,9 +281,24 @@ class DiagnosticsMain extends AdminDetailsController
      * Shop and module details, database health, php parameters, server information
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "runBasicDiagnostics" in next major
      */
     protected function _runBasicDiagnostics() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->runBasicDiagnostics();
+    }
+
+    /**
+     * Performs main system diagnostic.
+     * Shop and module details, database health, php parameters, server information
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function runBasicDiagnostics()
     {
         $aViewData = [];
         $oDiagnostics = oxNew(Diagnostics::class);
@@ -325,7 +362,7 @@ class DiagnosticsMain extends AdminDetailsController
 
         return $aViewData;
     }
-
+    
     /**
      * Downloads result of system file check
      */

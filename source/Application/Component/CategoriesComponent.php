@@ -25,6 +25,9 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Application\Model\ManufacturerList;
 use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 
@@ -71,6 +74,9 @@ class CategoriesComponent extends BaseController
      * list.
      *
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function init()
     {
@@ -101,6 +107,7 @@ class CategoriesComponent extends BaseController
      * get active article
      *
      * @return Article|void
+     * @throws DatabaseConnectionException
      */
     public function getProduct()
     {
@@ -124,17 +131,23 @@ class CategoriesComponent extends BaseController
      * get active category id
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActCat" in next major
      */
     protected function _getActCat() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getActCat();
     }
-    
+
     /**
      * get active category id
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     protected function getActCat()
     {
@@ -171,17 +184,20 @@ class CategoriesComponent extends BaseController
      * Category tree loader
      *
      * @param string $sActCat active category id
+     * @return null
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadCategoryTree" in next major
      */
     protected function _loadCategoryTree($sActCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->loadCategoryTree($sActCat);
     }
-    
+
     /**
      * Category tree loader
      *
      * @param string $sActCat active category id
+     * @throws DatabaseConnectionException
      */
     protected function loadCategoryTree($sActCat)
     {
@@ -263,28 +279,34 @@ class CategoriesComponent extends BaseController
     /**
      * Adds additional parameters: active category, list type and category id
      *
-     * @param Article $oProduct         loaded product
-     * @param string                                      $sActCat          active category id
-     * @param string                                      $sActManufacturer active manufacturer id
-     * @param string                                      $sActVendor       active vendor
+     * @param Article $oProduct loaded product
+     * @param string $sActCat active category id
+     * @param string $sActManufacturer active manufacturer id
+     * @param string $sActVendor active vendor
      *
      * @return string $sActCat
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addAdditionalParams" in next major
      */
     protected function _addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
     }
-    
+
     /**
      * Adds additional parameters: active category, list type and category id
      *
-     * @param Article $oProduct         loaded product
-     * @param string                                      $sActCat          active category id
-     * @param string                                      $sActManufacturer active manufacturer id
-     * @param string                                      $sActVendor       active vendor
+     * @param Article $oProduct loaded product
+     * @param string $sActCat active category id
+     * @param string $sActManufacturer active manufacturer id
+     * @param string $sActVendor active vendor
      *
      * @return string $sActCat
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     protected function addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor)
     {
@@ -329,19 +351,23 @@ class CategoriesComponent extends BaseController
      * @param Article $oProduct current product object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDefaultParams" in next major
      */
     protected function _getDefaultParams($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getDefaultParams($oProduct);
     }
-    
+
     /**
      * Returns array containing default list type and category (or manufacturer ir vendor) id
      *
      * @param Article $oProduct current product object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function getDefaultParams($oProduct)
     {

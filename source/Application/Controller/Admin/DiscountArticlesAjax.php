@@ -80,11 +80,22 @@ class DiscountArticlesAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $oConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
 
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
 
         $oDb = DatabaseProvider::getDb();
         $sOxid = $oRequest->getRequestEscapedParameter('oxid');
@@ -127,10 +138,10 @@ class DiscountArticlesAjax extends ListComponentAjax
      */
     public function removeDiscArt()
     {
-        $aChosenArt = $this->_getActionIds('oxobject2discount.oxid');
+        $aChosenArt = $this->getActionIds('oxobject2discount.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::_addFilter("delete oxobject2discount.* " . $this->_getQuery());
+            $sQ = parent::addFilter("delete oxobject2discount.* " . $this->getQuery());
             DatabaseProvider::getDb()->execute($sQ);
         } elseif (is_array($aChosenArt)) {
             $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
@@ -144,13 +155,13 @@ class DiscountArticlesAjax extends ListComponentAjax
     public function addDiscArt()
     {
         $oRequest = Registry::getRequest();
-        $articleIds = $this->_getActionIds('oxarticles.oxid');
+        $articleIds = $this->getActionIds('oxarticles.oxid');
         $discountListId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // adding
         if ($oRequest->getRequestEscapedParameter('all')) {
-            $articleTable = $this->_getViewName('oxarticles');
-            $articleIds = $this->_getAll(parent::_addFilter("select $articleTable.oxid " . $this->_getQuery()));
+            $articleTable = $this->getViewName('oxarticles');
+            $articleIds = $this->getAll(parent::addFilter("select $articleTable.oxid " . $this->getQuery()));
         }
         if ($discountListId && $discountListId != self::NEW_DISCOUNT_LIST_ID && is_array($articleIds)) {
             foreach ($articleIds as $articleId) {

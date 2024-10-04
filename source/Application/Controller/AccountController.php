@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Controller\CompareController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsUrl;
 
@@ -131,6 +132,7 @@ class AccountController extends FrontendController
      * template to render account::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -146,7 +148,7 @@ class AccountController extends FrontendController
             !$user || !$user->$passwordField->value ||
             ($this->isEnabledPrivateSales() && (!$user->isTermsAccepted() || $this->confirmTerms()))
         ) {
-            $this->_sThisTemplate = $this->_getLoginTemplate();
+            $this->_sThisTemplate = $this->getLoginTemplate();
         }
 
         return $this->_sThisTemplate;
@@ -162,6 +164,18 @@ class AccountController extends FrontendController
      */
     protected function _getLoginTemplate() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getLoginTemplate();
+    }
+
+    /**
+     * Returns login template name:
+     *  - if "login" feature is on returns $this->_sThisAltLoginTemplate
+     *  - else returns $this->_sThisLoginTemplate
+     *
+     * @return string
+     */
+    protected function getLoginTemplate()
+    {
         return $this->isEnabledPrivateSales() ? $this->_sThisAltLoginTemplate : $this->_sThisLoginTemplate;
     }
 
@@ -169,6 +183,7 @@ class AccountController extends FrontendController
      * Confirms term agreement. Returns value of confirmed term
      *
      * @return string | bool
+     * @throws DatabaseConnectionException
      */
     public function confirmTerms()
     {
@@ -243,6 +258,7 @@ class AccountController extends FrontendController
      * changes default template for compare in popup
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function getOrderCnt()
     {
@@ -369,7 +385,7 @@ class AccountController extends FrontendController
     {
         $title = parent::getTitle();
 
-        if (Registry::getConfig()->getActiveView()->getClassName() == 'account') {
+        if (Registry::getConfig()->getActiveView()->getClassKey() == 'account') {
             $baseLanguageId = Registry::getLang()->getBaseLanguage();
             $title = Registry::getLang()->translateString('PAGE_TITLE_ACCOUNT', $baseLanguageId, false);
             if ($user = $this->getUser()) {
@@ -400,7 +416,7 @@ class AccountController extends FrontendController
         if ($this->canUserAccountBeDeleted() && $user->delete()) {
             $this->accountDeletionStatus = true;
             $user->logout();
-            $session = $this->getSession();
+            $session = Registry::getSession();
             $session->destroy();
         }
     }
@@ -412,9 +428,7 @@ class AccountController extends FrontendController
      */
     public function isUserAllowedToDeleteOwnAccount()
     {
-        $allowUsersToDeleteTheirAccount = $this
-            ->getConfig()
-            ->getConfigParam('blAllowUsersToDeleteTheirAccount');
+        $allowUsersToDeleteTheirAccount = Registry::getConfig()->getConfigParam('blAllowUsersToDeleteTheirAccount');
 
         $user = $this->getUser();
 
@@ -438,6 +452,6 @@ class AccountController extends FrontendController
      */
     private function canUserAccountBeDeleted()
     {
-        return $this->getSession()->checkSessionChallenge() && $this->isUserAllowedToDeleteOwnAccount();
+        return Registry::getSession()->checkSessionChallenge() && $this->isUserAllowedToDeleteOwnAccount();
     }
 }

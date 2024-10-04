@@ -138,7 +138,7 @@ class AdminController extends BaseController
         $myConfig->setConfigParam('blAdmin', true);
         $this->setAdminMode(true);
 
-        if ($oShop = $this->_getEditShop($myConfig->getShopId())) {
+        if ($oShop = $this->getEditShop($myConfig->getShopId())) {
             // passing shop info
             $this->_sShopTitle = $oShop->oxshops__oxname->getRawValue();
             $this->_sShopVersion = oxNew(ShopVersion::class)->getVersion();
@@ -154,6 +154,18 @@ class AdminController extends BaseController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEditShop" in next major
      */
     protected function _getEditShop($sShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getEditShop($sShopId);
+    }
+
+    /**
+     * Returns (cached) shop object
+     *
+     * @param string $sShopId shop id
+     *
+     * @return Shop
+     */
+    protected function getEditShop($sShopId)
     {
         if (!$this->_oEditShop) {
             $this->_oEditShop = Registry::getConfig()->getActiveShop();
@@ -176,7 +188,7 @@ class AdminController extends BaseController
     public function init()
     {
         // authorization check
-        if (!$this->_authorize()) {
+        if (!$this->authorize()) {
             Registry::getUtils()->redirect('index.php?cl=login', true, 302);
             exit('Authorization error occurred!');
         }
@@ -239,6 +251,16 @@ class AdminController extends BaseController
      */
     protected function _getServiceProtocol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getServiceProtocol();
+    }
+
+    /**
+     * Returns service url protocol: "https" is admin works in ssl mode, "http" if no ssl
+     *
+     * @return string
+     */
+    protected function getServiceProtocol()
+    {
         return Registry::getConfig()->isSsl() ? 'https' : 'http';
     }
 
@@ -254,7 +276,7 @@ class AdminController extends BaseController
     public function getServiceUrl($sLangAbbr = null)
     {
         if ($this->_sServiceUrl === null) {
-            $sProtocol = $this->_getServiceProtocol();
+            $sProtocol = $this->getServiceProtocol();
 
             $editionSelector = new EditionSelector();
             $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $editionSelector->getEdition() . '/';
@@ -270,7 +292,7 @@ class AdminController extends BaseController
                 $sLangAbbr = "en";
             }
 
-            $this->_sServiceUrl = $sUrl . $this->_getShopVersionNr() . "/{$sCountry}/{$sLangAbbr}/";
+            $this->_sServiceUrl = $sUrl . ShopVersion::getVersion() . "/{$sCountry}/{$sLangAbbr}/";
         }
 
         return $this->_sServiceUrl;
@@ -295,6 +317,16 @@ class AdminController extends BaseController
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets-up navigation parameters
+     *
+     * @param string $sNode active view id
+     */
+    protected function setupNavigation($sNode)
     {
         // navigation according to class
         if ($sNode) {
@@ -328,7 +360,7 @@ class AdminController extends BaseController
         $oLang = Registry::getLang();
 
         // sets up navigation data
-        $this->_setupNavigation(Registry::getConfig()->getRequestControllerId());
+        $this->setupNavigation(Registry::getConfig()->getRequestControllerId());
 
         // active object id
         $sOxId = $this->getEditObjectId();
@@ -343,7 +375,7 @@ class AdminController extends BaseController
         // loading active shop
         if ($sActShopId = Registry::getSession()->getVariable('actshop')) {
             // load object
-            $this->_aViewData['actshopobj'] = $this->_getEditShop($sActShopId);
+            $this->_aViewData['actshopobj'] = $this->getEditShop($sActShopId);
         }
 
         // add language data to all templates
@@ -352,7 +384,7 @@ class AdminController extends BaseController
         $this->_aViewData['languages'] = $oLang->getLanguageArray($iLanguage);
 
         // setting maximum upload size
-        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->_getMaxUploadFileInfo(@ini_get("upload_max_filesize"));
+        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->getMaxUploadFileInfo(@ini_get("upload_max_filesize"));
 
         // "save-on-tab"
         if (!isset($this->_aViewData['updatelist'])) {
@@ -372,6 +404,19 @@ class AdminController extends BaseController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMaxUploadFileInfo" in next major
      */
     protected function _getMaxUploadFileInfo($maxFileSize, $isFormatted = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getMaxUploadFileInfo($maxFileSize, $isFormatted);
+    }
+
+    /**
+     * Returns maximum allowed size of upload file and formatted size equivalent
+     *
+     * @param int  $maxFileSize recommended maximum size of file (normal value is taken from php ini, otherwise sets 2MB)
+     * @param bool $isFormatted  Return formatted
+     *
+     * @return array
+     */
+    protected function getMaxUploadFileInfo($maxFileSize, $isFormatted = false)
     {
         $maxFileSize = $maxFileSize ? trim($maxFileSize) : '2M';
 
@@ -451,7 +496,7 @@ class AdminController extends BaseController
                     $myUtilsCount->resetManufacturerArticleCount($sValue);
                     break;
             }
-            $this->_resetContentCache();
+            $this->resetContentCache();
         }
     }
 
@@ -474,6 +519,19 @@ class AdminController extends BaseController
      */
     protected function _allowAdminEdit($sUserId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->allowAdminEdit($sUserId);
+    }
+
+    /**
+     * Checks if current $sUserId user is not an admin and checks if user can be edited by logged-in user.
+     * This method does not perform full rights check.
+     *
+     * @param string $sUserId user id
+     *
+     * @return bool
+     */
+    protected function allowAdminEdit($sUserId)
+    {
         return true;
     }
 
@@ -487,6 +545,19 @@ class AdminController extends BaseController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCountryByCode" in next major
      */
     protected function _getCountryByCode($sCountryCode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getCountryByCode($sCountryCode);
+    }
+
+    /**
+     * Get english country name by country iso alpha 2 code
+     *
+     * @param string $sCountryCode Country code
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getCountryByCode($sCountryCode)
     {
         //default country
         $sCountry = 'international';
@@ -526,8 +597,18 @@ class AdminController extends BaseController
      */
     protected function _authorize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (bool) (
-            $this->getSession()->checkSessionChallenge()
+        return $this->authorize();
+    }
+
+    /**
+     * performs authorization of admin user
+     *
+     * @return boolean
+     */
+    protected function authorize()
+    {
+        return (
+            Registry::getSession()->checkSessionChallenge()
             && count(Registry::getUtilsServer()->getOxCookie())
             && Registry::getUtils()->checkAccessRights()
         );

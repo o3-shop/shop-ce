@@ -48,7 +48,9 @@ class CategoryMainAjax extends ListComponentAjax
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
             ['oxean', 'oxarticles', 1, 0, 0],
@@ -77,8 +79,19 @@ class CategoryMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
 
         $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -114,12 +127,26 @@ class CategoryMainAjax extends ListComponentAjax
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sQ = parent::_addFilter($sQ);
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        $sArtTable = $this->getViewName('oxarticles');
+        $sQ = parent::addFilter($sQ);
 
         // display variants or not ?
         if (!Registry::getConfig()->getConfigParam('blVariantsSelection')) {
@@ -137,22 +164,22 @@ class CategoryMainAjax extends ListComponentAjax
      */
     public function addArticle()
     {
-        $aArticles = $this->_getActionIds('oxarticles.oxid');
+        $aArticles = $this->getActionIds('oxarticles.oxid');
         $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $sShopID = Registry::getConfig()->getShopId();
 
         DatabaseProvider::getDb()->startTransaction();
         try {
             $database = DatabaseProvider::getDb();
-            $sArticleTable = $this->_getViewName('oxarticles');
+            $sArticleTable = $this->getViewName('oxarticles');
 
             // adding
             if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-                $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
+                $aArticles = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
             }
 
             if (is_array($aArticles)) {
-                $sO2CView = $this->_getViewName('oxobject2category');
+                $sO2CView = $this->getViewName('oxobject2category');
 
                 $oNew = oxNew(Object2Category::class);
                 $sProdIds = "";
@@ -179,7 +206,7 @@ class CategoryMainAjax extends ListComponentAjax
                 }
 
                 // updating oxtime values
-                $this->_updateOxTime($sProdIds);
+                $this->updateOxTime($sProdIds);
 
                 $this->resetArtSeoUrl($aArticles);
                 $this->resetCounter("catArticle", $sCategoryID);
@@ -202,8 +229,20 @@ class CategoryMainAjax extends ListComponentAjax
      */
     protected function _updateOxTime($sProdIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->updateOxTime($sProdIds);
+    }
+
+    /**
+     * Updates oxtime value for products
+     *
+     * @param string $sProdIds product ids: "id1", "id2", "id3"
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function updateOxTime($sProdIds)
+    {
         if ($sProdIds) {
-            $sO2CView = $this->_getViewName('oxobject2category');
+            $sO2CView = $this->getViewName('oxobject2category');
             $sSqlShopFilter = $this->getUpdateOxTimeQueryShopFilter();
             $sSqlWhereShopFilter = $this->getUpdateOxTimeSqlWhereFilter();
             $sQ = "update oxobject2category set oxtime = 0 where oxid in (
@@ -246,13 +285,13 @@ class CategoryMainAjax extends ListComponentAjax
      */
     public function removeArticle()
     {
-        $aArticles = $this->_getActionIds('oxarticles.oxid');
+        $aArticles = $this->getActionIds('oxarticles.oxid');
         $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
+            $sArticleTable = $this->getViewName('oxarticles');
+            $aArticles = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
         }
 
         // adding
@@ -290,7 +329,7 @@ class CategoryMainAjax extends ListComponentAjax
         $db->execute($sQ);
 
         // updating oxtime values
-        $this->_updateOxTime($prodIds);
+        $this->updateOxTime($prodIds);
     }
 
     /**
