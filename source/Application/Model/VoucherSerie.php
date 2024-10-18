@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Voucher serie manager.
@@ -85,7 +86,7 @@ class VoucherSerie extends BaseModel
         if ($this->_oGroups === null) {
             $this->_oGroups = oxNew(ListModel::class);
             $this->_oGroups->init('oxgroups');
-            $sViewName = getViewName("oxgroups");
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups");
             $sSelect = "select gr.* from {$sViewName} as gr, oxobject2group as o2g where
                          o2g.oxobjectid = :oxobjectid and gr.oxid = o2g.oxgroupsid ";
             $this->_oGroups->selectString($sSelect, [

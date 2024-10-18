@@ -29,7 +29,10 @@ use OxidEsales\Eshop\Application\Model\DeliverySet;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\Wrapping;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
 use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Registry;
@@ -157,6 +160,8 @@ class OrderController extends FrontendController
      * info (Order::getShipping()).
      *
      * @return string Returns name of template to render order::_sThisTemplate
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -165,7 +170,7 @@ class OrderController extends FrontendController
             $myConfig = Registry::getConfig();
 
             if ($myConfig->getConfigParam('blPsBasketReservationEnabled')) {
-                $this->getSession()->getBasketReservations()->renewExpiration();
+                Registry::getSession()->getBasketReservations()->renewExpiration();
                 if (!$oBasket || !$oBasket->getProductsCount()) {
                     Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
                 }
@@ -206,10 +211,15 @@ class OrderController extends FrontendController
      * disabled in admin). Finally, you will be redirected to next page (order::_getNextStep()).
      *
      * @return string|void
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
      */
     public function execute()
     {
-        if (!$this->getSession()->checkSessionChallenge()) {
+        if (!Registry::getSession()->checkSessionChallenge()) {
             return;
         }
 
@@ -226,7 +236,7 @@ class OrderController extends FrontendController
         }
 
         // get basket contents
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         if ($oBasket->getProductsCount()) {
             try {
                 $oOrder = oxNew(Order::class);
@@ -254,6 +264,8 @@ class OrderController extends FrontendController
      * Template variable getter. Returns payment object
      *
      * @return object
+     * @throws DatabaseErrorException
+     * @throws DatabaseConnectionException
      */
     public function getPayment()
     {
@@ -293,7 +305,7 @@ class OrderController extends FrontendController
     {
         if ($this->_oBasket === null) {
             $this->_oBasket = false;
-            if ($oBasket = $this->getSession()->getBasket()) {
+            if ($oBasket = Registry::getSession()->getBasket()) {
                 $this->_oBasket = $oBasket;
             }
         }
@@ -332,6 +344,9 @@ class OrderController extends FrontendController
      * Template variable getter. Returns basket article list
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ArticleException
      */
     public function getBasketArticles()
     {
@@ -365,6 +380,8 @@ class OrderController extends FrontendController
      * Template variable getter. Returns shipping set
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getShipSet()
     {
@@ -425,6 +442,7 @@ class OrderController extends FrontendController
      * Returns wrapping options availability state (TRUE/FALSE)
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isWrapping()
     {
@@ -560,6 +578,10 @@ class OrderController extends FrontendController
      * Validates whether necessary terms and conditions checkboxes were checked.
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      * @deprecated underscore prefix violates PSR12, will be renamed to "validateTermsAndConditions" in next major
      */
     protected function _validateTermsAndConditions() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

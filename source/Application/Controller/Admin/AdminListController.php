@@ -29,6 +29,8 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -187,7 +189,7 @@ class AdminListController extends AdminController
      *
      * @return int
      */
-    protected function getViewListSize()
+    public function getViewListSize()
     {
         if (!$this->_iViewListSize) {
             $config = Registry::getConfig();
@@ -300,7 +302,7 @@ class AdminListController extends AdminController
      */
     protected function calcListItemsCount($sql)
     {
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
 
         // count SQL
         $sql = $stringModifier->preg_replace('/select .* from/i', 'select count(*) from ', $sql);
@@ -388,7 +390,7 @@ class AdminListController extends AdminController
             $descending = $descending !== null ? (bool)$descending : $this->_blDesc;
 
             foreach ($sortFields as $table => $fieldData) {
-                $table = $table ? (getViewName($table, $languageId) . '.') : '';
+                $table = $table ? (Registry::get(TableViewNameGenerator::class)->getViewName($table, $languageId) . '.') : '';
                 foreach ($fieldData as $column => $sortDirectory) {
                     $field = $table . $column;
 
@@ -459,7 +461,7 @@ class AdminListController extends AdminController
      */
     protected function processFilter($fieldValue)
     {
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
 
         //removing % symbols
         $fieldValue = $stringModifier->preg_replace("/^%|%$/", "", trim($fieldValue));
@@ -526,7 +528,7 @@ class AdminListController extends AdminController
      */
     protected function isSearchValue($fieldValue)
     {
-        return (getStr()->preg_match('/^%/', $fieldValue) && getStr()->preg_match('/%$/', $fieldValue));
+        return (Str::getStr()->preg_match('/^%/', $fieldValue) && Str::getStr()->preg_match('/%$/', $fieldValue));
     }
 
     /**
@@ -656,7 +658,7 @@ class AdminListController extends AdminController
                             $field = "{$table}__{$name}";
 
                             // if no table name attached to field name, add it
-                            $name = $table ? getViewName($table, $languageId) . ".{$name}" : $name;
+                            $name = $table ? Registry::get(TableViewNameGenerator::class)->getViewName($table, $languageId) . ".{$name}" : $name;
 
                             // #M1260: if field is date
                             if ($localDateFormat && $localDateFormat != 'ISO' && isset($listItem->$field)) {
@@ -763,7 +765,7 @@ class AdminListController extends AdminController
 
         // looking for date field
         $dateMatches = [];
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
         foreach ($datePatterns as $pattern => $type) {
             if ($stringModifier->preg_match($pattern, $date, $dateMatches)) {
                 $date = $dateMatches[$dateFormats[$type][0]] . "-" . $dateMatches[$dateFormats[$type][1]];
@@ -800,7 +802,7 @@ class AdminListController extends AdminController
         $convertedObject = new Field();
         $convertedObject->setValue($date);
         Registry::getUtilsDate()->convertDBDate($convertedObject, true);
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
 
         // looking for time field
         $time = substr($fullDate, 11);
@@ -986,7 +988,7 @@ class AdminListController extends AdminController
             $listObject = $this->_oList->getBaseObject();
 
             Registry::getSession()->setVariable('tabelle', $this->_sListClass);
-            $this->_aViewData['listTable'] = getViewName($listObject->getCoreTableName());
+            $this->_aViewData['listTable'] = Registry::get(TableViewNameGenerator::class)->getViewName($listObject->getCoreTableName());
             Registry::getConfig()->setGlobalParameter('ListCoreTable', $listObject->getCoreTableName());
 
             if ($listObject->isMultilang()) {

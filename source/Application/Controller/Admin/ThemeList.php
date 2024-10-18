@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Theme;
 
 /**
@@ -36,6 +37,7 @@ class ThemeList extends AdminListController
      * Calls parent::render() and returns name of template to render
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

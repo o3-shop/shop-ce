@@ -111,11 +111,11 @@ class GenericImportMain extends AdminDetailsController
             $navigationStep++;
         }
 
-        $navigationStep = $this->_checkErrors($navigationStep);
+        $navigationStep = $this->checkErrors($navigationStep);
 
         if ($navigationStep == 1) {
-            $this->_aViewData['sGiCsvFieldTerminator'] = Str::getStr()->htmlentities($this->_getCsvFieldsTerminator());
-            $this->_aViewData['sGiCsvFieldEncloser'] = Str::getStr()->htmlentities($this->_getCsvFieldsEncolser());
+            $this->_aViewData['sGiCsvFieldTerminator'] = Str::getStr()->htmlentities($this->getCsvFieldsTerminator());
+            $this->_aViewData['sGiCsvFieldEncloser'] = Str::getStr()->htmlentities($this->getCsvFieldsEncloser());
         }
 
         if ($navigationStep == 2) {
@@ -141,7 +141,7 @@ class GenericImportMain extends AdminDetailsController
             $importObject = $genericImport->getImportObject($type);
             $this->_aViewData['sType'] = $type;
             $this->_aViewData['sImportTable'] = $importObject->getBaseTableName();
-            $this->_aViewData['aCsvFieldsList'] = $this->_getCsvFieldsNames();
+            $this->_aViewData['aCsvFieldsList'] = $this->getCsvFieldsNames();
             $this->_aViewData['aDbFieldsList'] = $importObject->getFieldList();
         }
 
@@ -154,14 +154,14 @@ class GenericImportMain extends AdminDetailsController
             $genericImport->setCsvFileFieldsOrder($csvFields);
             $genericImport->setCsvContainsHeader(Registry::getSession()->getVariable('blCsvContainsHeader'));
 
-            $genericImport->importFile($this->_getUploadedCsvFilePath());
+            $genericImport->importFile($this->getUploadedCsvFilePath());
             $this->_aViewData['iTotalRows'] = $genericImport->getImportedRowCount();
 
             //checking if errors occurred during import
-            $this->_checkImportErrors($genericImport);
+            $this->checkImportErrors($genericImport);
 
             //deleting uploaded csv file from temp dir
-            $this->_deleteCsvFile();
+            $this->deleteCsvFile();
 
             //check if repeating import - then forcing first step
             if ($oRequest->getRequestEscapedParameter('iRepeatImport')) {
@@ -173,7 +173,7 @@ class GenericImportMain extends AdminDetailsController
         if ($navigationStep == 1) {
             $this->_aViewData['aImportTables'] = $genericImport->getImportObjectsList();
             asort($this->_aViewData['aImportTables']);
-            $this->_resetUploadedCsvData();
+            $this->resetUploadedCsvData();
         }
 
         $this->_aViewData['sNavStep'] = $navigationStep;
@@ -187,7 +187,15 @@ class GenericImportMain extends AdminDetailsController
      */
     protected function _deleteCsvFile() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sPath = $this->_getUploadedCsvFilePath();
+        $this->deleteCsvFile();
+    }
+
+    /**
+     * Deletes uploaded csv file from temp directory
+     */
+    protected function deleteCsvFile()
+    {
+        $sPath = $this->getUploadedCsvFilePath();
         if (is_file($sPath)) {
             @unlink($sPath);
         }
@@ -202,11 +210,23 @@ class GenericImportMain extends AdminDetailsController
      */
     protected function _getCsvFieldsNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCsvFieldsNames();
+    }
+
+    /**
+     * Get columns names from CSV file header. If file has no header
+     * returns default columns names Column 1, Column 2 ...
+     *
+     * @return array
+     */
+    protected function getCsvFieldsNames()
+    {
         $blCsvContainsHeader = Registry::getRequest()->getRequestEscapedParameter('blContainsHeader');
         Registry::getSession()->setVariable('blCsvContainsHeader', $blCsvContainsHeader);
-        $this->_getUploadedCsvFilePath();
+        $this->getUploadedCsvFilePath();
 
-        $aFirstRow = $this->_getCsvFirstRow();
+        $aFirstRow = $this->getCsvFirstRow();
+        $aCsvFields = [];
 
         if (!$blCsvContainsHeader) {
             $iIndex = 1;
@@ -232,12 +252,23 @@ class GenericImportMain extends AdminDetailsController
      */
     protected function _getCsvFirstRow() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sPath = $this->_getUploadedCsvFilePath();
+        return $this->getCsvFirstRow();
+    }
+
+    /**
+     * Get first row from uploaded CSV file
+     *
+     * @return array
+     */
+    protected function getCsvFirstRow()
+    {
+        $sPath = $this->getUploadedCsvFilePath();
         $iMaxLineLength = 8192;
+        $aRow = [];
 
         //getting first row
         if (($rFile = @fopen($sPath, "r")) !== false) {
-            $aRow = fgetcsv($rFile, $iMaxLineLength, $this->_getCsvFieldsTerminator(), $this->_getCsvFieldsEncolser());
+            $aRow = fgetcsv($rFile, $iMaxLineLength, $this->getCsvFieldsTerminator(), $this->getCsvFieldsEncloser());
             fclose($rFile);
         }
 
@@ -249,6 +280,14 @@ class GenericImportMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetUploadedCsvData" in next major
      */
     protected function _resetUploadedCsvData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->resetUploadedCsvData();
+    }
+
+    /**
+     * Resets CSV parameters stored in session
+     */
+    protected function resetUploadedCsvData()
     {
         $this->_sCsvFilePath = null;
         Registry::getSession()->setVariable('sCsvFilePath', null);
@@ -266,8 +305,21 @@ class GenericImportMain extends AdminDetailsController
      */
     protected function _checkErrors($iNavStep) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->checkErrors($iNavStep);
+    }
+
+    /**
+     * Checks current import navigation step errors.
+     * Returns step id in which error occurred.
+     *
+     * @param int $iNavStep Navigation step id
+     *
+     * @return int
+     */
+    protected function checkErrors($iNavStep)
+    {
         if ($iNavStep == 2) {
-            if (!$this->_getUploadedCsvFilePath()) {
+            if (!$this->getUploadedCsvFilePath()) {
                 $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('GENIMPORT_ERRORUPLOADINGFILE');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
@@ -302,10 +354,21 @@ class GenericImportMain extends AdminDetailsController
      * Checks if CSV file was uploaded. If uploaded - moves it to temp dir
      * and stores path to file in session. Return path to uploaded file.
      *
-     * @return string|void
+     * @return string|null
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUploadedCsvFilePath" in next major
      */
     protected function _getUploadedCsvFilePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getUploadedCsvFilePath();
+    }
+
+    /**
+     * Checks if CSV file was uploaded. If uploaded - moves it to temp dir
+     * and stores path to file in session. Return path to uploaded file.
+     *
+     * @return string|null|void
+     */
+    protected function getUploadedCsvFilePath()
     {
         //try to get uploaded csv file path
         if ($this->_sCsvFilePath !== null) {
@@ -333,6 +396,16 @@ class GenericImportMain extends AdminDetailsController
      */
     protected function _checkImportErrors($oErpImport) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->checkImportErrors($oErpImport);
+    }
+
+    /**
+     * Checks if any error occurred during import and displays them
+     *
+     * @param object $oErpImport Import object
+     */
+    protected function checkImportErrors($oErpImport)
+    {
         foreach ($oErpImport->getStatistics() as $aValue) {
             if (!$aValue ['r']) {
                 $oEx = oxNew(ExceptionToDisplay::class);
@@ -350,6 +423,16 @@ class GenericImportMain extends AdminDetailsController
      */
     protected function _getCsvFieldsTerminator() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCsvFieldsTerminator();
+    }
+
+    /**
+     * Get csv field terminator symbol
+     *
+     * @return string
+     */
+    protected function getCsvFieldsTerminator()
+    {
         if ($this->_sStringTerminator === null) {
             $this->_sStringTerminator = $this->_sDefaultStringTerminator;
             if ($char = Registry::getConfig()->getConfigParam('sGiCsvFieldTerminator')) {
@@ -364,9 +447,19 @@ class GenericImportMain extends AdminDetailsController
      * Get csv field encloser symbol
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsEncolser" in next major
+     * @deprecated underscore prefix violates PSR12, will be renamed to "getCsvFieldsEncloser" in next major
      */
     protected function _getCsvFieldsEncolser() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getCsvFieldsEncloser();
+    }
+
+    /**
+     * Get csv field encloser symbol
+     *
+     * @return string
+     */
+    protected function getCsvFieldsEncloser()
     {
         if ($this->_sStringEncloser === null) {
             $this->_sStringEncloser = $this->_sDefaultStringEncloser;
@@ -384,7 +477,7 @@ class GenericImportMain extends AdminDetailsController
     private function setErrorToView($invalidData)
     {
         $error = oxNew(DisplayError::class);
-        $error->setFormatParameters(htmlspecialchars($invalidData));
+        $error->setFormatParameters([htmlspecialchars($invalidData)]);
         $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
         Registry::getUtilsView()->addErrorToDisplay($error);
     }

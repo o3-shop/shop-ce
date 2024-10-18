@@ -26,13 +26,14 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Manufacturer;
 use OxidEsales\Eshop\Application\Model\SeoEncoderArticle;
-use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
 use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Article seo config class
@@ -65,7 +66,7 @@ class ArticleSeo extends ObjectSeo
         $sType = false;
         $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
         if ($aData && isset($aData["oxparams"])) {
-            $oStr = getStr();
+            $oStr = Str::getStr();
             $iEndPos = $oStr->strpos($aData["oxparams"], "#");
             $sType = $oStr->substr($aData["oxparams"], 0, $iEndPos);
         } elseif ($aList = $this->getSelectionList()) {
@@ -92,7 +93,7 @@ class ArticleSeo extends ObjectSeo
         $iLang = false;
         $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
         if ($aData && isset($aData["oxparams"])) {
-            $oStr = getStr();
+            $oStr = Str::getStr();
             $iStartPos = $oStr->strpos($aData["oxparams"], "#");
             $iEndPos = $oStr->strpos($aData["oxparams"], "#", $iStartPos + 1);
             $iLang = $oStr->substr($aData["oxparams"], $iEndPos + 1);
@@ -116,7 +117,7 @@ class ArticleSeo extends ObjectSeo
         $sId = false;
         $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
         if ($aData && isset($aData["oxparams"])) {
-            $oStr = getStr();
+            $oStr = Str::getStr();
             $iStartPos = $oStr->strpos($aData["oxparams"], "#");
             $iEndPos = $oStr->strpos($aData["oxparams"], "#", $iStartPos + 1);
             $iLen = $oStr->strlen($aData["oxparams"]);
@@ -197,7 +198,7 @@ class ArticleSeo extends ObjectSeo
         $iLang = $this->getEditLang();
 
         // adding categories
-        $sView = getViewName('oxobject2category');
+        $sView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $sSqlForPriceCategories = $oArticle->getSqlForPriceCategories('oxid');
         $sQ = "select oxobject2category.oxcatnid as oxid from {$sView} as oxobject2category " .
@@ -424,7 +425,7 @@ class ArticleSeo extends ObjectSeo
     /**
      * Returns current object type seo encoder object
      *
-     * @return SeoEncoderCategory
+     * @return SeoEncoderArticle
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -435,7 +436,7 @@ class ArticleSeo extends ObjectSeo
     /**
      * Returns current object type seo encoder object
      *
-     * @return SeoEncoderCategory
+     * @return SeoEncoderArticle
      */
     protected function getEncoder()
     {

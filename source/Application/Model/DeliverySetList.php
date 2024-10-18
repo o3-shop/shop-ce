@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * DeliverySet list manager.
@@ -145,7 +146,7 @@ class DeliverySetList extends ListModel
      */
     protected function _getFilterSelect($oUser, $sCountryId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sTable = getViewName('oxdeliveryset');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset');
         $sQ = "select $sTable.* from $sTable ";
         $sQ .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
 
@@ -169,9 +170,9 @@ class DeliverySetList extends ListModel
             }
         }
 
-        $sUserTable = getViewName('oxuser');
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $sUserTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxuser');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
+        $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
         $oDb = DatabaseProvider::getDb();
 
@@ -317,7 +318,7 @@ class DeliverySetList extends ListModel
      */
     public function loadNonRDFaDeliverySetList()
     {
-        $sTable = getViewName('oxdeliveryset');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset');
         $sSubSql = "SELECT * FROM oxobject2delivery WHERE oxobject2delivery.OXDELIVERYID = $sTable.OXID AND oxobject2delivery.OXTYPE = 'rdfadeliveryset'";
         $this->selectString("SELECT $sTable.* FROM $sTable WHERE NOT EXISTS($sSubSql) AND $sTable.OXACTIVE = 1");
     }
@@ -327,11 +328,10 @@ class DeliverySetList extends ListModel
      * predefined GoodRelations delivery method.
      *
      * @param null $sDelId delivery set id
-     * @throws DatabaseConnectionException
      */
     public function loadRDFaDeliverySetList($sDelId = null)
     {
-        $sTable = getViewName('oxdeliveryset');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset');
         if ($sDelId) {
             $sSubSql = "( select $sTable.* from $sTable left join oxdel2delset on oxdel2delset.oxdelsetid=$sTable.oxid where " . $this->getBaseObject()->getSqlActiveSnippet() . " and oxdel2delset.oxdelid = :oxdelid ) as $sTable";
         } else {

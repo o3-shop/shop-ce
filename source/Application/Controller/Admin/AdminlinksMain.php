@@ -25,6 +25,7 @@ use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Links;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -45,7 +46,7 @@ class AdminlinksMain extends AdminDetailsController
         parent::render();
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        $oLinks = oxNew(Links::class, getViewName('oxlinks'));
+        $oLinks = oxNew(Links::class, Registry::get(TableViewNameGenerator::class)->getViewName('oxlinks'));
 
         if (isset($soxId) && $soxId != "-1") {
             $oLinks->loadInLang($this->_iEditLang, $soxId);
@@ -118,7 +119,7 @@ class AdminlinksMain extends AdminDetailsController
         }
 
         $iEditLanguage = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
-        $oLinks = oxNew(Links::class, getViewName('oxlinks'));
+        $oLinks = oxNew(Links::class, Registry::get(TableViewNameGenerator::class)->getViewName('oxlinks'));
 
         if ($soxId != "-1") {
             //$oLinks->load( $soxId );
@@ -160,7 +161,7 @@ class AdminlinksMain extends AdminDetailsController
             $aParams['oxlinks__oxactive'] = 0;
         }
 
-        $oLinks = oxNew(Links::class, getViewName('oxlinks'));
+        $oLinks = oxNew(Links::class, Registry::get(TableViewNameGenerator::class)->getViewName('oxlinks'));
         $iEditLanguage = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
 
         if ($soxId != "-1") {

@@ -21,15 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\NavigationTree;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
-use OxidEsales\Eshop\Core\Edition\EditionSelector;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\NamespaceInformationProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use OxidEsales\Facts\Facts;
 
 /**
  * Main Controller class for admin area.
@@ -211,6 +213,7 @@ class AdminController extends BaseController
      * @param object $oShop Object to modify some parameters
      *
      * @return object
+     * @throws Exception
      */
     public function addGlobalParams($oShop = null)
     {
@@ -267,19 +270,20 @@ class AdminController extends BaseController
     /**
      * Returns service URL
      *
-     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
-     *
      * @param string $sLangAbbr language abbr.
      *
      * @return string
+     * @throws Exception
+     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
+     *
      */
     public function getServiceUrl($sLangAbbr = null)
     {
         if ($this->_sServiceUrl === null) {
             $sProtocol = $this->getServiceProtocol();
 
-            $editionSelector = new EditionSelector();
-            $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $editionSelector->getEdition() . '/';
+            $oFacts = new Facts();
+            $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $oFacts->getEdition() . '/';
 
             $sCountry = 'international';
 
@@ -566,7 +570,7 @@ class AdminController extends BaseController
             $aLangIds = Registry::getLang()->getLanguageIds();
             $iEnglishId = array_search("en", $aLangIds);
             if (false !== $iEnglishId) {
-                $sViewName = getViewName("oxcountry", $iEnglishId);
+                $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxcountry", $iEnglishId);
                 $sQ = "select oxtitle from {$sViewName} where oxisoalpha2 = :oxisoalpha2";
                 // Value does not change that often, reading from slave is ok here (see ESDEV-3804 and ESDEV-3822).
                 $sCountryName = DatabaseProvider::getDb()->getOne($sQ, [

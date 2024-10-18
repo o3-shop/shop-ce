@@ -25,6 +25,8 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Discount list manager.
@@ -160,9 +162,9 @@ class DiscountList extends ListModel
             }
         }
 
-        $sUserTable = getViewName('oxuser');
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $sUserTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxuser');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
+        $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
         $sCountrySql = $sCountryId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxcountry' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
         $sUserSql = $sUserId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxuser' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
@@ -274,7 +276,7 @@ class DiscountList extends ListModel
         $aDiscList = $this->_getList($oUser)->getArray();
         /** @var Discount $oDiscount */
         foreach ($aDiscList as $oDiscount) {
-            if ($oDiscount->isForBundleItem($oArticle, $oBasket) && $oDiscount->isForBasketAmount($oBasket)) {
+            if ($oDiscount->isForBundleItem($oArticle) && $oDiscount->isForBasketAmount($oBasket)) {
                 $aList[$oDiscount->getId()] = $oDiscount;
             }
         }
@@ -315,7 +317,7 @@ class DiscountList extends ListModel
     public function hasSkipDiscountCategories()
     {
         if ($this->_hasSkipDiscountCategories === null || $this->_blReload) {
-            $sViewName = getViewName('oxcategories');
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
             $sQ = "select 1 from {$sViewName} where {$sViewName}.oxactive = 1 and {$sViewName}.oxskipdiscounts = '1' ";
 
             $this->_hasSkipDiscountCategories = (bool) DatabaseProvider::getDb()->getOne($sQ);

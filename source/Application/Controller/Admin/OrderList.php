@@ -60,6 +60,7 @@ class OrderList extends AdminListController
      * file "order_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -116,6 +117,7 @@ class OrderList extends AdminListController
      * Returns sorting fields array
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {

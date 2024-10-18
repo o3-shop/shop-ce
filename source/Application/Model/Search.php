@@ -25,6 +25,7 @@ use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Implements search
@@ -76,7 +77,7 @@ class Search extends Base
     public function getSearchArticles($sSearchParamForQuery = false, $sInitialSearchCat = false, $sInitialSearchVendor = false, $sInitialSearchManufacturer = false, $sSortBy = false)
     {
         // sets active page
-        $this->iActPage = (int) Registry::getConfig()->getRequestParameter('pgNr');
+        $this->iActPage = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
         $this->iActPage = ($this->iActPage < 0) ? 0 : $this->iActPage;
 
         // load only articles which we show on screen
@@ -112,7 +113,7 @@ class Search extends Base
         $sSelect = $this->_getSearchSelect($sSearchParamForQuery, $sInitialSearchCat, $sInitialSearchVendor, $sInitialSearchManufacturer, false);
         if ($sSelect) {
             $sPartial = substr($sSelect, strpos($sSelect, ' from '));
-            $sSelect = "select count( " . getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
+            $sSelect = "select count( " . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
 
             $iCnt = DatabaseProvider::getDb()->getOne($sSelect);
         }
@@ -206,7 +207,7 @@ class Search extends Base
 
         $oArticle = oxNew(Article::class);
         $sArticleTable = $oArticle->getViewName();
-        $sO2CView = getViewName('oxobject2category');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
 
         $sSelectFields = $oArticle->getSelectFields();
 
@@ -218,7 +219,7 @@ class Search extends Base
 
         // must be additional conditions in select if searching in category
         if ($sInitialSearchCat) {
-            $sCatView = getViewName('oxcategories', $this->_iLanguage);
+            $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories', $this->_iLanguage);
             $sInitialSearchCatQuoted = $oDb->quote($sInitialSearchCat);
             $sSelectCat = "select oxid from {$sCatView} where oxid = $sInitialSearchCatQuoted and (oxpricefrom != '0' or oxpriceto != 0)";
             if ($oDb->getOne($sSelectCat)) {
@@ -267,7 +268,7 @@ class Search extends Base
         $oDb = DatabaseProvider::getDb();
         $myConfig = Registry::getConfig();
         $blSep = false;
-        $sArticleTable = getViewName('oxarticles', $this->_iLanguage);
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
 
         $aSearchCols = $myConfig->getConfigParam('aSearchCols');
         if (!(is_array($aSearchCols) && count($aSearchCols))) {
@@ -331,7 +332,7 @@ class Search extends Base
         $searchColumns = Registry::getConfig()->getConfigParam('aSearchCols');
 
         if (is_array($searchColumns) && in_array('oxlongdesc', $searchColumns)) {
-            $viewName = getViewName('oxartextends', $this->_iLanguage);
+            $viewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage);
             $descriptionJoin = " LEFT JOIN {$viewName } ON {$table}.oxid={$viewName }.oxid ";
         }
         return $descriptionJoin;
@@ -349,7 +350,7 @@ class Search extends Base
     protected function getSearchField($table, $field)
     {
         if ($field == 'oxlongdesc') {
-            $searchField = getViewName('oxartextends', $this->_iLanguage) . ".{$field}";
+            $searchField = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage) . ".{$field}";
         } else {
             $searchField = "{$table}.{$field}";
         }

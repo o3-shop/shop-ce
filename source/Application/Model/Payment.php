@@ -28,6 +28,7 @@ use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Payment manager.
@@ -151,7 +152,7 @@ class Payment extends MultiLanguageModel
         if ($this->_oGroups == null && ($sOxid = $this->getId())) {
             // user groups
             $this->_oGroups = oxNew('oxlist', 'oxgroups');
-            $sViewName = getViewName("oxgroups", $this->getLanguage());
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->getLanguage());
 
             // performance
             $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group

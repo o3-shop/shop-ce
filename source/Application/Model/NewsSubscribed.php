@@ -28,7 +28,6 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
-use oxObjectException;
 
 /**
  * Newsletter Subscriptions manager
@@ -165,7 +164,6 @@ class NewsSubscribed extends BaseModel
      *
      * @return bool oxid on success or false on failure
      * @throws DatabaseException
-     * @throws oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
@@ -45,6 +46,7 @@ class ModuleList extends AdminListController
      * Calls parent::render() and returns name of template to render
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

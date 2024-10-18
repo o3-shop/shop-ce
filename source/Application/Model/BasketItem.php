@@ -411,8 +411,8 @@ class BasketItem extends Base
         }
 
         // checking for stock
-        if ($this->getStockCheckStatus() == true) {
-            $dArtStockAmount = $this->getSession()->getBasket()->getArtStockInBasket($oArticle->getId(), $sItemKey);
+        if ($this->getStockCheckStatus()) {
+            $dArtStockAmount = Registry::getSession()->getBasket()->getArtStockInBasket($oArticle->getId(), $sItemKey);
             $selectForUpdate = false;
             if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
                 $selectForUpdate = true;
@@ -644,6 +644,7 @@ class BasketItem extends Base
      * @throws ArticleInputException
      * @throws DatabaseConnectionException
      * @throws NoArticleException
+     * @throws DatabaseErrorException
      */
     public function getLink()
     {
@@ -651,7 +652,7 @@ class BasketItem extends Base
             $this->_sLink = Registry::getUtilsUrl()->cleanUrl($this->getArticle()->getLink(), ['force_sid']);
         }
 
-        return $this->getSession()->processUrl($this->_sLink);
+        return Registry::getSession()->processUrl($this->_sLink);
     }
 
     /**
@@ -768,6 +769,7 @@ class BasketItem extends Base
      * @throws ArticleInputException
      * @throws DatabaseConnectionException
      * @throws NoArticleException exception
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setArticle" in next major
      */
     protected function _setArticle($sProductId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1065,6 +1067,7 @@ class BasketItem extends Base
      * @param integer $iLanguageId language id
      * @throws ArticleException
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setLanguageId($iLanguageId)
     {

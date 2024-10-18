@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 use Exception;
@@ -42,6 +44,8 @@ class UserMain extends AdminDetailsController
      * file "user_main.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -118,6 +122,8 @@ class UserMain extends AdminDetailsController
      * Saves main user parameters.
      *
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function save()
     {

@@ -25,6 +25,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -41,6 +42,7 @@ class OrderOverview extends AdminDetailsController
      * "order_overview.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

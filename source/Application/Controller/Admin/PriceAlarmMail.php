@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -42,7 +43,7 @@ class PriceAlarmMail extends AdminDetailsController
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
+     * @throws DatabaseErrorException|ObjectException
      */
     public function render()
     {

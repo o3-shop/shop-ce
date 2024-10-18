@@ -29,6 +29,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use stdClass;
 
 /**
@@ -233,7 +234,7 @@ class ContentMain extends AdminDetailsController
     protected function prepareIdent($sIdent)
     {
         if ($sIdent) {
-            return getStr()->preg_replace("/[^a-zA-Z0-9_]*/", "", $sIdent);
+            return Str::getStr()->preg_replace("/[^a-zA-Z0-9_]*/", "", $sIdent);
         }
     }
 

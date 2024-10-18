@@ -27,6 +27,9 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
 use OxidEsales\Eshop\Application\Model\ListObject;
 use OxidEsales\Eshop\Application\Model\Wrapping;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use Psr\Log\LoggerInterface;
@@ -124,7 +127,7 @@ class BasketController extends FrontendController
     public function render()
     {
         if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            $this->getSession()->getBasketReservations()->renewExpiration();
+            Registry::getSession()->getBasketReservations()->renewExpiration();
         }
 
         parent::render();
@@ -136,6 +139,9 @@ class BasketController extends FrontendController
      * Return the current articles from the basket
      *
      * @return object | bool
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketArticles()
     {
@@ -143,7 +149,7 @@ class BasketController extends FrontendController
             $this->_oBasketArticles = false;
 
             // passing basket articles
-            if ($oBasket = $this->getSession()->getBasket()) {
+            if ($oBasket = Registry::getSession()->getBasket()) {
                 $this->_oBasketArticles = $oBasket->getBasketArticles();
             }
         }
@@ -155,6 +161,9 @@ class BasketController extends FrontendController
      * return the basket articles
      *
      * @return object | bool
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getFirstBasketProduct()
     {
@@ -174,6 +183,9 @@ class BasketController extends FrontendController
      * return the similar articles
      *
      * @return object | bool
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketSimilarList()
     {
@@ -192,9 +204,12 @@ class BasketController extends FrontendController
     /**
      * Return array of id to form recommend list.
      *
+     * @return array
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
      */
     public function getSimilarRecommListIds()
     {
@@ -226,6 +241,8 @@ class BasketController extends FrontendController
      * Assigns voucher to current basket
      *
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function addVoucher()
     {
@@ -239,7 +256,7 @@ class BasketController extends FrontendController
             return;
         }
 
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         $oBasket->addVoucher(Registry::getRequest()->getRequestEscapedParameter('voucherNr'));
     }
 
@@ -260,7 +277,7 @@ class BasketController extends FrontendController
             return;
         }
 
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         $oBasket->removeVoucher(Registry::getRequest()->getRequestEscapedParameter('voucherId'));
     }
 
@@ -297,6 +314,7 @@ class BasketController extends FrontendController
      * Returns wrapping options availability state (TRUE/FALSE)
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isWrapping()
     {
@@ -372,9 +390,9 @@ class BasketController extends FrontendController
         $oRequest = Registry::getRequest();
 
         if ($this->getViewConfig()->getShowGiftWrapping()) {
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
 
-            $this->_setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
+            $this->setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
 
             $oBasket->setCardMessage($oRequest->getRequestEscapedParameter('giftmessage'));
             $oBasket->setCardId($oRequest->getRequestEscapedParameter('chosencard'));
@@ -408,7 +426,7 @@ class BasketController extends FrontendController
     public function getBasketContentMarkGenerator()
     {
         /** @var BasketContentMarkGenerator $oBasketContentMarkGenerator */
-        return oxNew(BasketContentMarkGenerator::class, $this->getSession()->getBasket());
+        return oxNew(BasketContentMarkGenerator::class, Registry::getSession()->getBasket());
     }
 
     /**
@@ -419,6 +437,17 @@ class BasketController extends FrontendController
      * @deprecated underscore prefix violates PSR12, will be renamed to "setWrappingInfo" in next major
      */
     protected function _setWrappingInfo($oBasket, $aWrapping) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setWrappingInfo($oBasket, $aWrapping);
+    }
+
+    /**
+     * Sets basket wrapping
+     *
+     * @param Basket $oBasket
+     * @param array $aWrapping
+     */
+    protected function setWrappingInfo($oBasket, $aWrapping)
     {
         if (is_array($aWrapping) && count($aWrapping)) {
             foreach ($oBasket->getContents() as $sKey => $oBasketItem) {

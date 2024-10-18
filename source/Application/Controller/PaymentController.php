@@ -26,7 +26,10 @@ use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\DeliverySetList;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Model\PaymentList;
 use OxidEsales\Eshop\Application\Model\UserPayment;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -136,13 +139,15 @@ class PaymentController extends FrontendController
      * payment::_sThisTemplate.
      *
      * @return  string  current template file name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
         $myConfig = Registry::getConfig();
 
         if ($myConfig->getConfigParam('blPsBasketReservationEnabled')) {
-            $this->getSession()->getBasketReservations()->renewExpiration();
+            Registry::getSession()->getBasketReservations()->renewExpiration();
         }
 
         parent::render();
@@ -157,7 +162,7 @@ class PaymentController extends FrontendController
         if ($this->getIsOrderStep()) {
             //additional check if we really have a user now
             //and the basket is not empty
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
             $blPsBasketReservationEnabled = $myConfig->getConfigParam('blPsBasketReservationEnabled');
             if ($blPsBasketReservationEnabled && (!$oBasket || !$oBasket->getProductsCount())) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
@@ -246,7 +251,7 @@ class PaymentController extends FrontendController
      */
     public function changeshipping()
     {
-        $oSession = $this->getSession();
+        $oSession = Registry::getSession();
 
         $oBasket = $oSession->getBasket();
         $oBasket->setShipping(null);
@@ -264,11 +269,13 @@ class PaymentController extends FrontendController
      * <b>paymentid</b>, <b>dynvalue</b>, <b>payerror</b>
      *
      * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function validatePayment()
     {
         $myConfig = Registry::getConfig();
-        $oSession = $this->getSession();
+        $oSession = Registry::getSession();
 
         //#1308C - check user. Function is executed before render(), and oUser is not set!
         // Set it manually for use in methods getPaymentList(), getShippingSetList()...
@@ -331,6 +338,8 @@ class PaymentController extends FrontendController
      * Template variable getter. Returns payment-list
      *
      * @return PaymentList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getPaymentList()
     {
@@ -342,7 +351,7 @@ class PaymentController extends FrontendController
                 $sActShipSet = Registry::getSession()->getVariable('sShipSet');
             }
 
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
 
             // load sets, active set, and active set payment list
             list($aAllSets, $sActShipSet, $aPaymentList) =
@@ -363,6 +372,8 @@ class PaymentController extends FrontendController
      * Template variable getter. Returns all delivery sets
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAllSets()
     {
@@ -381,6 +392,8 @@ class PaymentController extends FrontendController
      * Template variable getter. Returns number of delivery sets
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAllSetsCnt()
     {
@@ -402,7 +415,7 @@ class PaymentController extends FrontendController
      * @param Basket $oBasket      basket object
      * @deprecated underscore prefix violates PSR12, will be renamed to "setValues" in next major
      */
-    protected function _setValues(&$aPaymentList, $oBasket = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setValues($aPaymentList, $oBasket = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($aPaymentList)) {
             foreach ($aPaymentList as $oPayment) {
@@ -459,6 +472,8 @@ class PaymentController extends FrontendController
      * Template variable getter. Returns dyn values
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDynValue()
     {
@@ -514,6 +529,8 @@ class PaymentController extends FrontendController
      * if fails, then tries to get payment ID from last order.
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCheckedPaymentId()
     {
@@ -556,6 +573,8 @@ class PaymentController extends FrontendController
      * Template variable getter. Returns payment list count
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getPaymentCnt()
     {
@@ -586,7 +605,7 @@ class PaymentController extends FrontendController
         }
 
         foreach ($aKeys as $sKey) {
-            if (isset($aData[$sKey]) && !empty($aData[$sKey])) {
+            if (!empty($aData[$sKey])) {
                 return false;
             }
         }

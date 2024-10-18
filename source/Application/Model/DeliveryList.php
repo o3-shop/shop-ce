@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Delivery list manager.
@@ -165,7 +166,7 @@ class DeliveryList extends ListModel
     {
         $oDb = DatabaseProvider::getDb();
 
-        $sTable = getViewName('oxdelivery');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery');
         $sQ = "select $sTable.* from ( select distinct $sTable.* from $sTable left join oxdel2delset on oxdel2delset.oxdelid=$sTable.oxid ";
         $sQ .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . " and oxdel2delset.oxdelsetid = " . $oDb->quote($sDelSet) . " ";
 
@@ -189,9 +190,9 @@ class DeliveryList extends ListModel
             }
         }
 
-        $sUserTable = getViewName('oxuser');
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $sUserTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxuser');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
+        $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
         $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxcountry' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
         $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxuser' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
@@ -362,7 +363,7 @@ class DeliveryList extends ListModel
     /**
      * Set current user object
      *
-     * @param User $oUser user object
+     * @param User|null $oUser user object
      */
     public function setUser($oUser)
     {
@@ -391,7 +392,7 @@ class DeliveryList extends ListModel
         $dSize = $oProduct->getSize();
         $dWeight = $oProduct->getWeight();
 
-        $sTable = getViewName('oxdelivery');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery');
         $params = [];
 
         $sQ = "select $sTable.* from $sTable";

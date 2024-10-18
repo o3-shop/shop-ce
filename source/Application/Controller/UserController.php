@@ -22,6 +22,10 @@
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -100,10 +104,10 @@ class UserController extends FrontendController
 
         if ($this->getIsOrderStep()) {
             if ($config->getConfigParam('blPsBasketReservationEnabled')) {
-                $this->getSession()->getBasketReservations()->renewExpiration();
+                Registry::getSession()->getBasketReservations()->renewExpiration();
             }
 
-            $basket = $this->getSession()->getBasket();
+            $basket = Registry::getSession()->getBasket();
             $isPsBasketReservationsEnabled = $config->getConfigParam('blPsBasketReservationEnabled');
             if (
                 $this->_blIsOrderStep && $isPsBasketReservationsEnabled &&
@@ -178,6 +182,7 @@ class UserController extends FrontendController
      * Template variable getter. Returns if user subscribed for newsletter
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isNewsSubscribed()
     {
@@ -241,10 +246,14 @@ class UserController extends FrontendController
      * Returns warning message if user want to buy downloadable product without registration.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function isDownloadableProductWarning()
     {
-        $basket = $this->getSession()->getBasket();
+        $basket = Registry::getSession()->getBasket();
         if ($basket && Registry::getConfig()->getConfigParam("blEnableDownloads")) {
             if ($basket->hasDownloadableProducts()) {
                 return true;

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -247,7 +248,7 @@ class UserBasket extends BaseModel
         // loading basket item list
         $aItems = $this->getItems();
         $sItemKey = $this->_getItemKey($sProductId, $aSelList, $aPersParams);
-        $oItem = null;
+
         // returning existing item
         if (isset($aItems[$sProductId])) {
             $oItem = $aItems[$sProductId];
@@ -300,7 +301,7 @@ class UserBasket extends BaseModel
      * @param array|null $aPersParam product persistent parameters (default null)
      *
      * @return integer|void
-     * @throws \Exception
+     * @throws Exception
      */
     public function addItemToBasket($sProductId = null, $dAmount = null, $aSel = null, $blOverride = false, $aPersParam = null)
     {

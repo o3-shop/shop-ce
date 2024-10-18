@@ -31,6 +31,7 @@ use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 use Exception;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Recommendation list manager class.
@@ -131,7 +132,7 @@ class RecommendationList extends BaseModel implements IUrl
      */
     protected function _getArticleSelect() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtView = getViewName('oxarticles');
+        $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $sSelect = "select count(distinct $sArtView.oxid) from oxobject2list ";
         $sSelect .= "left join $sArtView on oxobject2list.oxobjectid = $sArtView.oxid ";
         $sSelect .= "where (oxobject2list.oxlistid = '" . $this->getId() . "') ";
@@ -340,7 +341,7 @@ class RecommendationList extends BaseModel implements IUrl
         $sIds = implode(", ", $aIds);
 
         $aPrevIds = [];
-        $sArtView = getViewName('oxarticles');
+        $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         foreach ($oRecommList as $key => $oRecomm) {
             if (count($aPrevIds)) {
                 $sNegateSql = " AND $sArtView.oxid not in ( '" . implode("','", $aPrevIds) . "' ) ";
@@ -378,7 +379,7 @@ class RecommendationList extends BaseModel implements IUrl
     {
         if ($sSearchStr) {
             // sets active page
-            $iActPage = (int) Registry::getConfig()->getRequestParameter('pgNr');
+            $iActPage = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
             $iActPage = ($iActPage < 0) ? 0 : $iActPage;
 
             // load only lists which we show on screen

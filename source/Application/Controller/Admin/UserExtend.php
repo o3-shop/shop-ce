@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Country;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -69,6 +70,7 @@ class UserExtend extends AdminDetailsController
      * Saves user extended information.
      *
      * @return bool|void
+     * @throws DatabaseConnectionException
      */
     public function save()
     {

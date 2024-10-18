@@ -35,6 +35,7 @@ use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
+use OxidEsales\Facts\Facts;
 
 /**
  * Checks Version of System files.
@@ -198,7 +199,7 @@ class DiagnosticsMain extends AdminDetailsController
         $oFileChecker = oxNew(FileChecker::class);
         $oFileChecker->setBaseDirectory($this->_sShopDir);
         $oFileChecker->setVersion(Registry::getConfig()->getVersion());
-        $oFileChecker->setEdition(Registry::getConfig()->getEdition());
+        $oFileChecker->setEdition((new Facts())->getEdition());
         $oFileChecker->setRevision(Registry::getConfig()->getRevision());
 
         if (!$oFileChecker->init()) {
@@ -226,15 +227,16 @@ class DiagnosticsMain extends AdminDetailsController
      *
      * @param FileCheckerResult $oFileCheckerResult mixed file checker result object
      *
+     * @return string body of report
+     * @throws Exception
      * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
      *
-     * @return string body of report
      */
     protected function _getFileCheckReport($oFileCheckerResult) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aViewData = [
             "sVersion"       => Registry::getConfig()->getVersion(),
-            "sEdition"       => Registry::getConfig()->getEdition(),
+            "sEdition"       => (new Facts())->getEdition(),
             "sRevision"      => Registry::getConfig()->getRevision(),
             "aResultSummary" => $oFileCheckerResult->getResultSummary(),
             "aResultOutput"  => $oFileCheckerResult->getResult(),

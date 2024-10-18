@@ -604,7 +604,7 @@ class CategoryList extends ListModel
 
             // Get all root categories
             $rs = $database->select("select oxid, oxtitle from oxcategories where oxparentid = 'oxrootid' and $sWhere order by oxsort", false);
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     $this->_aUpdateInfo[] = "<b>Processing : " . $rs->fields[1] . "</b>(" . $rs->fields[0] . ")<br>";
                     if ($blVerbose) {
@@ -682,7 +682,7 @@ class CategoryList extends ListModel
             ':oxparentid' => $oxRootId
         ]);
         // If there are sub categories
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $parentId = $rs->fields[1];
                 $actOxid = $rs->fields[0];

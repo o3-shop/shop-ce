@@ -115,11 +115,12 @@ class SeoEncoderCategory extends SeoEncoder
     /**
      * Returns SEO uri for passed category
      *
-     * @param Category $oCat         category object
-     * @param int                                          $iLang        language
-     * @param bool                                         $blRegenerate if TRUE forces seo url regeneration
+     * @param Category $oCat category object
+     * @param int $iLang language
+     * @param bool $blRegenerate if TRUE forces seo url regeneration
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getCategoryUri($oCat, $iLang = null, $blRegenerate = false)
     {
@@ -175,12 +176,13 @@ class SeoEncoderCategory extends SeoEncoder
     /**
      * Returns category SEO url for specified page
      *
-     * @param Category $category   Category object.
-     * @param int                                          $pageNumber Number of the page which should be prepared.
-     * @param int                                          $languageId Language id.
-     * @param bool                                         $isFixed    Fixed url marker (default is null).
+     * @param Category $category Category object.
+     * @param int $pageNumber Number of the page which should be prepared.
+     * @param int $languageId Language id.
+     * @param bool $isFixed Fixed url marker (default is null).
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getCategoryPageUrl($category, $pageNumber, $languageId = null, $isFixed = null)
     {
@@ -207,9 +209,10 @@ class SeoEncoderCategory extends SeoEncoder
      * If category has subcategories, it iterates through them.
      *
      * @param Category $oCategory Category object
-     * @param int                                          $iLang     Language
+     * @param int $iLang Language
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getCategoryUrl($oCategory, $iLang = null)
     {
@@ -297,9 +300,10 @@ class SeoEncoderCategory extends SeoEncoder
      * Returns alternative uri used while updating seo
      *
      * @param string $sObjectId object id
-     * @param int    $iLang     language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -311,9 +315,10 @@ class SeoEncoderCategory extends SeoEncoder
      * Returns alternative uri used while updating seo
      *
      * @param string $sObjectId object id
-     * @param int    $iLang     language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function getAltUri($sObjectId, $iLang)
     {

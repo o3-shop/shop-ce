@@ -36,6 +36,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\PriceList;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -645,7 +646,7 @@ class Basket extends Base
             if (isset($this->_aBasketContents[$sItemKey])) {
                 $sArticleId = $this->_aBasketContents[$sItemKey]->getProductId();
                 if ($sArticleId) {
-                    $this->getSession()
+                    Registry::getSession()
                         ->getBasketReservations()
                         ->discardArticleReservation($sArticleId);
                 }
@@ -1857,10 +1858,10 @@ class Basket extends Base
     public function deleteBasket()
     {
         $this->_aBasketContents = [];
-        $this->getSession()->delBasket();
+        Registry::getSession()->delBasket();
 
         if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            $this->getSession()->getBasketReservations()->discardReservations();
+            Registry::getSession()->getBasketReservations()->discardReservations();
         }
 
         // merging basket history
@@ -2952,8 +2953,8 @@ class Basket extends Base
      */
     protected function _isProductInRootCategory($sProductId, $sRootCatId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sO2CTable = getViewName('oxobject2category');
-        $sCatTable = getViewName('oxcategories');
+        $sO2CTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
+        $sCatTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
 
         $oDb = DatabaseProvider::getDb();
         $sParentId = $oDb->getOne("select oxparentid from oxarticles where oxid = :oxid", [

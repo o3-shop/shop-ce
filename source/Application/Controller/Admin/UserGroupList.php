@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 
 /**
  * Admin usergroup list manager.
@@ -49,6 +50,7 @@ class UserGroupList extends AdminListController
      * file "usergroup_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

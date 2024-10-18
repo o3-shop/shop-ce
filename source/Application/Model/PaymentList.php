@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Payment list manager.
@@ -80,7 +81,7 @@ class PaymentList extends ListModel
         $oDb = DatabaseProvider::getDb();
         $sBoni = ($oUser && $oUser->oxuser__oxboni->value) ? $oUser->oxuser__oxboni->value : 0;
 
-        $sTable = getViewName('oxpayments');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sQ = "select {$sTable}.* from ( select distinct {$sTable}.* from {$sTable} ";
         $sQ .= "left join oxobject2group ON oxobject2group.oxobjectid = {$sTable}.oxid ";
         $sQ .= "inner join oxobject2payment ON oxobject2payment.oxobjectid = " . $oDb->quote($sShipSetId) . " and oxobject2payment.oxpaymentid = {$sTable}.oxid ";
@@ -102,8 +103,8 @@ class PaymentList extends ListModel
             }
         }
 
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
+        $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
         $sCountrySql = $sCountryId ? "exists( select 1 from oxobject2payment as s1 where s1.oxpaymentid={$sTable}.OXID and s1.oxtype='oxcountry' and s1.OXOBJECTID=" . $oDb->quote($sCountryId) . " limit 1 )" : '0';
         $sGroupSql = $sGroupIds ? "exists( select 1 from oxobject2group as s3 where s3.OXOBJECTID={$sTable}.OXID and s3.OXGROUPSID in ( {$sGroupIds} ) limit 1 )" : '0';
@@ -167,7 +168,7 @@ class PaymentList extends ListModel
      */
     public function loadNonRDFaPaymentList()
     {
-        $sTable = getViewName('oxpayments');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sSubSql = "SELECT * FROM oxobject2payment WHERE oxobject2payment.OXPAYMENTID = $sTable.OXID AND oxobject2payment.OXTYPE = 'rdfapayment'";
         $this->selectString("SELECT $sTable.* FROM $sTable WHERE NOT EXISTS($sSubSql) AND $sTable.OXACTIVE = 1");
     }
@@ -183,7 +184,7 @@ class PaymentList extends ListModel
     public function loadRDFaPaymentList($dPrice = null)
     {
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $sTable = getViewName('oxpayments');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sQ = "select $sTable.*, oxobject2payment.oxobjectid from $sTable left join (select oxobject2payment.* from oxobject2payment where oxobject2payment.oxtype = 'rdfapayment') as oxobject2payment on oxobject2payment.oxpaymentid=$sTable.oxid ";
         $sQ .= "where $sTable.oxactive = 1 ";
         if ($dPrice !== null) {
@@ -192,7 +193,7 @@ class PaymentList extends ListModel
         $rs = $oDb->select($sQ, [
             ':amount' => $dPrice
         ]);
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             $oSaved = clone $this->getBaseObject();
             while (!$rs->EOF) {
                 $oListObject = clone $oSaved;

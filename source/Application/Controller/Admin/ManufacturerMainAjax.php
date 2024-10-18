@@ -74,12 +74,23 @@ class ManufacturerMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         $config = Registry::getConfig();
         $oRequest = Registry::getRequest();
 
         // looking for table/view
-        $articlesViewName = $this->_getViewName('oxarticles');
-        $objectToCategoryViewName = $this->_getViewName('oxobject2category');
+        $articlesViewName = $this->getViewName('oxarticles');
+        $objectToCategoryViewName = $this->getViewName('oxobject2category');
         $database = DatabaseProvider::getDb();
 
         $manufacturerId = $oRequest->getRequestEscapedParameter('oxid');
@@ -110,13 +121,27 @@ class ManufacturerMainAjax extends ListComponentAjax
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
         $config = Registry::getConfig();
-        $articleViewName = $this->_getViewName('oxarticles');
-        $query = parent::_addFilter($sQ);
+        $articleViewName = $this->getViewName('oxarticles');
+        $query = parent::addFilter($sQ);
 
         // display variants or not ?
         $query .= $config->getConfigParam('blVariantsSelection') ? ' group by ' . $articleViewName . '.oxid ' : '';
@@ -129,12 +154,12 @@ class ManufacturerMainAjax extends ListComponentAjax
      */
     public function removeManufacturer()
     {
-        $articleIds = $this->_getActionIds('oxarticles.oxid');
+        $articleIds = $this->getActionIds('oxarticles.oxid');
         $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $articleViewTable = $this->_getViewName('oxarticles');
-            $articleIds = $this->_getAll($this->_addFilter("select $articleViewTable.oxid " . $this->_getQuery()));
+            $articleViewTable = $this->getViewName('oxarticles');
+            $articleIds = $this->getAll($this->addFilter("select $articleViewTable.oxid " . $this->getQuery()));
         }
 
         if (is_array($articleIds) && !empty($articleIds)) {
@@ -168,12 +193,12 @@ class ManufacturerMainAjax extends ListComponentAjax
     {
         $oRequest = Registry::getRequest();
 
-        $articleIds = $this->_getActionIds('oxarticles.oxid');
+        $articleIds = $this->getActionIds('oxarticles.oxid');
         $manufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         if ($oRequest->getRequestEscapedParameter('all')) {
-            $articleViewName = $this->_getViewName('oxarticles');
-            $articleIds = $this->_getAll($this->_addFilter("select $articleViewName.oxid " . $this->_getQuery()));
+            $articleViewName = $this->getViewName('oxarticles');
+            $articleIds = $this->getAll($this->addFilter("select $articleViewName.oxid " . $this->getQuery()));
         }
 
         if ($manufacturerId && $manufacturerId != "-1" && is_array($articleIds)) {

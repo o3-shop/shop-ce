@@ -26,8 +26,12 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * List of articles for a selected product group.
@@ -183,6 +187,8 @@ class ArticleListController extends FrontendController
      * articles page count. If yes - calls error_404_handler().
      *
      * @return  string  $this->_sThisTemplate   current template file name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -226,6 +232,7 @@ class ArticleListController extends FrontendController
      * sets empty category as active category and returns it.
      *
      * @return Category
+     * @throws DatabaseConnectionException
      */
     protected function getCategoryToRender()
     {
@@ -329,6 +336,7 @@ class ArticleListController extends FrontendController
      *  - OXARTICLE_LINKTYPE_CATEGORY - when active category is regular category
      *
      * @return int
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductLinkType" in next major
      */
     protected function _getProductLinkType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -382,6 +390,8 @@ class ArticleListController extends FrontendController
      * @param Category $category category object
      *
      * @return ArticleList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadArticles" in next major
      */
     protected function _loadArticles($category) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -463,6 +473,7 @@ class ArticleListController extends FrontendController
      * Returns active product id to load its seo meta info
      *
      * @return string|void
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -486,7 +497,7 @@ class ArticleListController extends FrontendController
 
             //fetching category path
             if (is_array($categoryTreePath = $this->getCatTreePath())) {
-                $stringModifier = getStr();
+                $stringModifier = Str::getStr();
                 $this->_sCatPathString = '';
                 foreach ($categoryTreePath as $category) {
                     if ($this->_sCatPathString) {
@@ -503,11 +514,12 @@ class ArticleListController extends FrontendController
     /**
      * Returns current view meta description data.
      *
-     * @param string $meta           Category path.
-     * @param int    $length         Max length of result, -1 for no truncation.
-     * @param bool   $removeDuplicatedWords If true - performs additional duplicate cleaning.
+     * @param string $meta Category path.
+     * @param int $length Max length of result, -1 for no truncation.
+     * @param bool $removeDuplicatedWords If true - performs additional duplicate cleaning.
      *
      * @return  string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
     protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -530,10 +542,10 @@ class ArticleListController extends FrontendController
         }
 
         // making safe for output
-        $description = getStr()->html_entity_decode($description);
-        $description = getStr()->strip_tags($description);
-        $description = getStr()->cleanStr($description);
-        $description = getStr()->htmlspecialchars($description);
+        $description = Str::getStr()->html_entity_decode($description);
+        $description = Str::getStr()->strip_tags($description);
+        $description = Str::getStr()->cleanStr($description);
+        $description = Str::getStr()->htmlspecialchars($description);
 
         return trim($description);
     }
@@ -563,11 +575,13 @@ class ArticleListController extends FrontendController
      * string duplicates, special chars. Also removes strings defined
      * in $config->aSkipTags (Admin area).
      *
-     * @param string $meta           Category path
-     * @param int    $length         Max length of result, -1 for no truncation
-     * @param bool   $descriptionTag If true - performs additional duplicate cleaning
+     * @param string $meta Category path
+     * @param int $length Max length of result, -1 for no truncation
+     * @param bool $descriptionTag If true - performs additional duplicate cleaning
      *
      * @return  string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "collectMetaDescription" in next major
      */
     protected function _collectMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -603,10 +617,11 @@ class ArticleListController extends FrontendController
     /**
      * Returns current view keywords separated by comma
      *
-     * @param string $keywords              Data to use as keywords
-     * @param bool   $removeDuplicatedWords Remove duplicated words
+     * @param string $keywords Data to use as keywords
+     * @param bool $removeDuplicatedWords Remove duplicated words
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
     protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -645,6 +660,8 @@ class ArticleListController extends FrontendController
      * @param string $keywords category path
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "collectMetaKeyword" in next major
      */
     protected function _collectMetaKeyword($keywords) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -653,7 +670,7 @@ class ArticleListController extends FrontendController
         $text = '';
 
         if (count($articleList = $this->getArticleList())) {
-            $stringModifier = getStr();
+            $stringModifier = Str::getStr();
             foreach ($articleList as $article) {
                 /** @var Article $article */
                 $description = $stringModifier->strip_tags(
@@ -695,6 +712,7 @@ class ArticleListController extends FrontendController
      * URL ("tpl" variable).
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTemplateName()
     {
@@ -711,11 +729,12 @@ class ArticleListController extends FrontendController
     /**
      * Adds page number parameter to current Url and returns formatted url
      *
-     * @param string $url         Url to append page numbers
-     * @param int    $page Current page number
-     * @param int    $languageId  Requested language
+     * @param string $url Url to append page numbers
+     * @param int $page Current page number
+     * @param int $languageId Requested language
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
     protected function _addPageNrParam($url, $page, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -747,6 +766,7 @@ class ArticleListController extends FrontendController
      * Generates Url for page navigation
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function generatePageNavigationUrl()
     {
@@ -761,6 +781,7 @@ class ArticleListController extends FrontendController
      * Returns default category sorting for selected category
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDefaultSorting()
     {
@@ -769,7 +790,7 @@ class ArticleListController extends FrontendController
         $category = $this->getActiveCategory();
         if ($category instanceof Category) {
             if ($defaultSorting = $category->getDefaultSorting()) {
-                $articleViewName = getViewName('oxarticles');
+                $articleViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
                 $sortBy = $articleViewName . '.' . $defaultSorting;
                 $sortDirection = ($category->getDefaultSortingMode()) ? "desc" : "asc";
                 $sorting = ['sortby' => $sortBy, 'sortdir' => $sortDirection];
@@ -784,6 +805,7 @@ class ArticleListController extends FrontendController
      * Returns title suffix used in template
      *
      * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getTitleSuffix()
     {
@@ -811,6 +833,7 @@ class ArticleListController extends FrontendController
      * @param int $languageId Language id
      *
      * @return object
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
     protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -823,6 +846,8 @@ class ArticleListController extends FrontendController
      * we do have here in this category
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributes()
     {
@@ -842,6 +867,8 @@ class ArticleListController extends FrontendController
      * Template variable getter. Returns category's article list
      *
      * @return ArticleList|null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleList()
     {
@@ -870,9 +897,11 @@ class ArticleListController extends FrontendController
     /**
      * Return array of id to form recommend list.
      *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
      */
     public function getSimilarRecommListIds()
     {
@@ -960,6 +989,7 @@ class ArticleListController extends FrontendController
      * subcategories.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function hasVisibleSubCats()
     {
@@ -977,6 +1007,7 @@ class ArticleListController extends FrontendController
      * Template variable getter. Returns list of subcategories.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getSubCatList()
     {
@@ -1008,6 +1039,7 @@ class ArticleListController extends FrontendController
      * Template variable getter. Returns category title.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTitle()
     {
@@ -1051,6 +1083,7 @@ class ArticleListController extends FrontendController
      * Template variable getter. Returns active search
      *
      * @return Category
+     * @throws DatabaseConnectionException
      */
     public function getActiveCategory()
     {
@@ -1069,6 +1102,7 @@ class ArticleListController extends FrontendController
      * Returns view canonical url
      *
      * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getCanonicalUrl()
     {

@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 
 /**
  * Admin wrapping list manager.
@@ -49,6 +50,7 @@ class WrappingList extends AdminListController
      * file "user_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

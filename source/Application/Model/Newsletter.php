@@ -32,6 +32,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * @deprecated Functionality for Newsletter management will be removed.
@@ -132,7 +133,7 @@ class Newsletter extends BaseModel
 
         // user-groups
         $this->_oGroups = oxNew(ListModel::class, "oxgroups");
-        $sViewName = getViewName("oxgroups");
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups");
 
         // performance
         $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group

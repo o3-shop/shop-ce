@@ -56,7 +56,7 @@ class ManufacturerMain extends AdminDetailsController
             $this->_aViewData["edit"] = $oManufacturer;
 
             // category tree
-            $this->_createCategoryTree("artcattree");
+            $this->createCategoryTree("artcattree");
 
             //Disable editing for derived articles
             if ($oManufacturer->isDerived()) {

@@ -115,7 +115,7 @@ class ThankYouController extends FrontendController
         parent::init();
 
         // get basket we might need some information from it here
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         $oBasket->setOrderId(Registry::getSession()->getVariable('sess_challenge'));
 
         // copying basket object

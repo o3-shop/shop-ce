@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin actions' manager.
@@ -98,7 +99,7 @@ class ActionsList extends AdminListController
     {
         $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
-        $sTable = getViewName("oxactions");
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxactions");
 
         // searching for empty oxfolder fields
         if ($sDisplayType) {

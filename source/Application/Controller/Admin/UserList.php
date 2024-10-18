@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -64,6 +65,7 @@ class UserList extends AdminListController
      * Executes parent::render(), sets blacklist and prevent delete flag
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -100,10 +102,11 @@ class UserList extends AdminListController
      * For each search value if german umlauts exist, adds them
      * and replaced by spec. char to query
      *
-     * @param array  $whereQuery SQL condition array
-     * @param string $fullQuery  SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated will be renamed to "prepareWhereQuery" in next major
      */
     public function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

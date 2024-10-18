@@ -25,6 +25,12 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsDate;
@@ -52,6 +58,12 @@ class OrderMain extends AdminDetailsController
      * name of template file "order_main.tpl".
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function render()
     {

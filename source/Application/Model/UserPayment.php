@@ -174,7 +174,6 @@ class UserPayment extends BaseModel
      * @return bool
      * @throws DatabaseConnectionException
      * @throws DatabaseException
-     * @throws \oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

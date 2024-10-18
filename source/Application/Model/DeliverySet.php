@@ -25,6 +25,8 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Order delivery set manager.
@@ -92,7 +94,7 @@ class DeliverySet extends MultiLanguageModel
     public function getIdByName($sTitle)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "SELECT `oxid` FROM `" . getViewName('oxdeliveryset') . "` 
+        $sQ = "SELECT `oxid` FROM `" . Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset') . "` 
             WHERE  `oxtitle` = :oxtitle";
         $sId = $oDb->getOne($sQ, [
             ':oxtitle' => $sTitle

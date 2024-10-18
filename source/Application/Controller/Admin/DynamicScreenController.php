@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\UtilsUrl;
 
 /**
@@ -76,7 +77,7 @@ class DynamicScreenController extends AdminListController
 
         // edit url
         $sEditUrl = $myAdminNavig->getEditUrl($sNode, $iActTab) . $sActTab;
-        if (!getStr()->preg_match("/^http(s)?:\/\//", $sEditUrl)) {
+        if (!Str::getStr()->preg_match("/^http(s)?:\/\//", $sEditUrl)) {
             //internal link, adding path
             /** @var UtilsUrl $oUtilsUrl */
             $oUtilsUrl = Registry::getUtilsUrl();

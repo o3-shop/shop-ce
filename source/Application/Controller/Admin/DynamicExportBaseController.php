@@ -30,6 +30,8 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -350,7 +352,7 @@ class DynamicExportBaseController extends AdminDetailsController
         // remove html entities, remove html tags
         $sInput = $this->unHTMLEntities(strip_tags($sInput));
 
-        $oStr = getStr();
+        $oStr = Str::getStr();
         if ($oStr->strlen($sInput) > $iMaxSize - 3) {
             $sInput = $oStr->substr($sInput, 0, $iMaxSize - 5) . "...";
         }
@@ -375,8 +377,8 @@ class DynamicExportBaseController extends AdminDetailsController
         $sLang = Registry::getLang()->getBaseLanguage();
         $oDB = DatabaseProvider::getDb();
 
-        $sCatView = getViewName('oxcategories', $sLang);
-        $sO2CView = getViewName('oxobject2category', $sLang);
+        $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories', $sLang);
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $sLang);
 
         //selecting category
         $sQ = "select $sCatView.oxleft, $sCatView.oxright, $sCatView.oxrootid from $sO2CView as oxobject2category left join $sCatView on $sCatView.oxid = oxobject2category.oxcatnid ";
@@ -425,8 +427,8 @@ class DynamicExportBaseController extends AdminDetailsController
         $sLang = Registry::getLang()->getBaseLanguage();
         $oDB = DatabaseProvider::getDb();
 
-        $sCatView = getViewName('oxcategories', $sLang);
-        $sO2CView = getViewName('oxobject2category', $sLang);
+        $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories', $sLang);
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $sLang);
 
         //selecting category
         $sQ = "select $sCatView.oxtitle from $sO2CView as oxobject2category left join $sCatView on $sCatView.oxid = oxobject2category.oxcatnid ";
@@ -560,7 +562,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     public function assureContent($sInput, $sReplace = null)
     {
-        $oStr = getStr();
+        $oStr = Str::getStr();
         if (!$oStr->strlen($sInput)) {
             if (!isset($sReplace) || !$oStr->strlen($sReplace)) {
                 $sReplace = "-";
@@ -784,8 +786,8 @@ class DynamicExportBaseController extends AdminDetailsController
         $oArticle = oxNew(Article::class);
         $oArticle->setLanguage($iExpLang);
 
-        $sO2CView = getViewName('oxobject2category', $iExpLang);
-        $sArticleTable = getViewName("oxarticles", $iExpLang);
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $iExpLang);
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles", $iExpLang);
 
         $insertQuery = "insert into {$sHeapTable} select {$sArticleTable}.oxid from {$sArticleTable}, {$sO2CView} as oxobject2category where ";
         $insertQuery .= $oArticle->getSqlActiveSnippet();
@@ -842,7 +844,7 @@ class DynamicExportBaseController extends AdminDetailsController
     {
         if (!(Registry::getRequest()->getRequestEscapedParameter('blExportMainVars'))) {
             $oDB = DatabaseProvider::getDb();
-            $sArticleTable = getViewName('oxarticles');
+            $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
             // we need to remove again parent articles so that we only have the variants itself
             $sQ = "select $sHeapTable.oxid from $sHeapTable, $sArticleTable where
@@ -946,7 +948,7 @@ class DynamicExportBaseController extends AdminDetailsController
         if ($this->_aCatLvlCache === null) {
             $this->_aCatLvlCache = [];
 
-            $sCatView = getViewName('oxcategories');
+            $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
             $oDb = DatabaseProvider::getDb();
 
             // Load all root cat's == all trees

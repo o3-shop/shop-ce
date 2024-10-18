@@ -62,6 +62,16 @@ class ManufacturerSeo extends ObjectSeo
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getEncoder();
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderManufacturer
+     */
+    protected function getEncoder()
+    {
         return Registry::get(SeoEncoderManufacturer::class);
     }
 
@@ -82,6 +92,16 @@ class ManufacturerSeo extends ObjectSeo
      * @deprecated underscore prefix violates PSR12, will be renamed to "getType" in next major
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getType();
+    }
+
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
     {
         return 'oxmanufacturer';
     }
@@ -108,7 +128,7 @@ class ManufacturerSeo extends ObjectSeo
     {
         $oManufacturer = oxNew(Manufacturer::class);
         if ($oManufacturer->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getManufacturerUri($oManufacturer, $this->getEditLang());
+            return $this->getEncoder()->getManufacturerUri($oManufacturer, $this->getEditLang());
         }
     }
 }

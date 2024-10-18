@@ -30,6 +30,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
@@ -49,6 +50,7 @@ class PriceAlarmMain extends AdminDetailsController
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function render()
     {
@@ -149,7 +151,7 @@ class PriceAlarmMain extends AdminDetailsController
      *
      * @return int
      * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
+     * @throws DatabaseErrorException|ObjectException
      */
     protected function getActivePriceAlarmsCount()
     {

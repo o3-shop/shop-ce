@@ -22,12 +22,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
+use OxidEsales\Facts\Facts;
 
 /**
  * Administrator GUI navigation manager class.
@@ -39,6 +42,7 @@ class NavigationController extends AdminController
      * passes data to Smarty engine, returns name of template file "nav_frame.tpl".
      *
      * @return string
+     * @throws Exception
      */
     public function render()
     {
@@ -55,13 +59,13 @@ class NavigationController extends AdminController
             $this->_aViewData["menustructure"] = $oNavTree->getDomXml()->documentElement->childNodes;
 
             // version patch string
-            $this->_aViewData["sVersion"] = $this->_sShopVersion;
+            $this->_aViewData["sVersion"] = oxNew(ShopVersion::class)->getVersion();
 
             //checking requirements if this is not nav frame reload
             if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
-                    $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
+                    $this->_aViewData['aMessage'] = $this->doStartUpChecks();
                 }
             } else {
                 //removing reload param to force requirements checking next time
@@ -104,7 +108,7 @@ class NavigationController extends AdminController
      */
     public function logout()
     {
-        $mySession = $this->getSession();
+        $mySession = Registry::getSession();
         $myConfig = Registry::getConfig();
 
         $oUser = oxNew(User::class);
@@ -140,9 +144,22 @@ class NavigationController extends AdminController
      * returns some messages if there is something to display
      *
      * @return array
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "doStartUpChecks" in next major
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->doStartUpChecks();
+    }
+
+    /**
+     * Every Time Admin starts we perform these checks
+     * returns some messages if there is something to display
+     *
+     * @return array
+     * @throws Exception
+     */
+    protected function doStartUpChecks()
     {
         $messages = [];
 
@@ -151,18 +168,18 @@ class NavigationController extends AdminController
             $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
             if (!$oSysReq->getSysReqStatus()) {
                 $messages['warning'] = Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE');
-                $messages['warning'] .= '<a href="?cl=sysreq&amp;stoken=' . $this->getSession()->getSessionChallengeToken() . '" target="basefrm">';
+                $messages['warning'] .= '<a href="?cl=sysreq&amp;stoken=' . Registry::getSession()->getSessionChallengeToken() . '" target="basefrm">';
                 $messages['warning'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
             }
         } else {
             $messages['message'] = Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE_INACTIVE');
-            $messages['message'] .= '<a href="?cl=sysreq&amp;stoken=' . $this->getSession()->getSessionChallengeToken() . '" target="basefrm">';
+            $messages['message'] .= '<a href="?cl=sysreq&amp;stoken=' . Registry::getSession()->getSessionChallengeToken() . '" target="basefrm">';
             $messages['message'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
         }
 
         // version check
         if (Registry::getConfig()->getConfigParam('blCheckForUpdates')) {
-            if ($sVersionNotice = $this->_checkVersion()) {
+            if ($sVersionNotice = $this->checkVersion()) {
                 $messages['message'] .= $sVersionNotice;
             }
         }
@@ -190,16 +207,28 @@ class NavigationController extends AdminController
     /**
      * Checks if newer shop version available. If true - returns message
      *
-     * @return string|void
+     * @return string
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkVersion" in next major
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $edition = Registry::getConfig()->getEdition();
+        return $this->checkVersion();
+    }
+
+    /**
+     * Checks if newer shop version available. If true - returns message
+     *
+     * @return string|void
+     * @throws Exception
+     */
+    protected function checkVersion()
+    {
+        $edition = (new Facts())->getEdition();
         $query = 'http://admin.oxid-esales.com/' . $edition . '/onlinecheck.php?getlatestversion';
         $latestVersion = Registry::getUtilsFile()->readRemoteFileAsString($query);
         if ($latestVersion) {
-            $currentVersion = Registry::getConfig()->getVersion();
+            $currentVersion = oxNew(ShopVersion::class)->getVersion();
             if (version_compare($currentVersion, $latestVersion, '<')) {
                 return sprintf(
                     Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),

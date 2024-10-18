@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\Eshop\Core\UtilsView;
 
 /**
@@ -85,7 +86,7 @@ class News extends MultiLanguageModel
         if ($this->_oGroups == null && $sOxid = $this->getId()) {
             // user-groups
             $this->_oGroups = oxNew('oxlist', 'oxgroups');
-            $sViewName = getViewName("oxgroups", $this->getLanguage());
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->getLanguage());
             $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group ";
             $sSelect .= "where oxobject2group.oxobjectid = :oxobjectid ";
             $sSelect .= "and oxobject2group.oxgroupsid={$sViewName}.oxid ";

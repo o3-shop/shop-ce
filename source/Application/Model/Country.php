@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Country manager
@@ -73,7 +74,7 @@ class Country extends MultiLanguageModel
      */
     public function isInEU()
     {
-        return (bool) ($this->oxcountry__oxvatstatus->value == 1);
+        return ($this->oxcountry__oxvatstatus->value == 1);
     }
 
     /**
@@ -88,7 +89,7 @@ class Country extends MultiLanguageModel
         }
 
         $sCountryId = $this->getId();
-        $sViewName = getViewName("oxstates", $this->getLanguage());
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxstates", $this->getLanguage());
         $sQ = "select * from {$sViewName} where `oxcountryid` = :oxcountryid order by `oxtitle`  ";
         $this->_aStates = oxNew(ListModel::class);
         $this->_aStates->init("oxstate");

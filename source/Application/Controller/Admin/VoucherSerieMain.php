@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController;
 use OxidEsales\Eshop\Application\Model\VoucherSerie;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -128,6 +129,7 @@ class VoucherSerieMain extends DynamicExportBaseController
      * Returns voucher status information array
      *
      * @return array|void
+     * @throws DatabaseConnectionException
      */
     public function getStatus()
     {

@@ -31,6 +31,7 @@ use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Order delivery manager.
@@ -530,7 +531,7 @@ class Delivery extends MultiLanguageModel
     public function getIdByName($sTitle)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "SELECT `oxid` FROM `" . getViewName('oxdelivery') . "` 
+        $sQ = "SELECT `oxid` FROM `" . Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery') . "` 
             WHERE `oxtitle` = :oxtitle";
         $sId = $oDb->getOne($sQ, [
             ':oxtitle' => $sTitle
@@ -571,7 +572,7 @@ class Delivery extends MultiLanguageModel
     }
 
     /**
-     * Returns condition type (type >= from <= to) : a - amount, s - size, w - weight, p - price
+     * Returns condition type (type >= from <= to): a = amount, s = size, w = weight, p = price
      *
      * @return string
      */

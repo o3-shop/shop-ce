@@ -30,6 +30,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -80,7 +81,7 @@ class Voucher extends BaseModel
         $oRet = null;
         if (!empty($sVoucherNr)) {
             $sViewName = $this->getViewName();
-            $sSeriesViewName = getViewName('oxvoucherseries');
+            $sSeriesViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxvoucherseries');
             $oDb = DatabaseProvider::getMaster();
 
             $sQ = "select {$sViewName}.* from {$sViewName}, {$sSeriesViewName} where
@@ -258,7 +259,6 @@ class Voucher extends BaseModel
      * @param double $dPrice base article price
      *
      * @return bool
-     * @throws ObjectException
      * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailablePrice" in next major
      */
@@ -284,7 +284,6 @@ class Voucher extends BaseModel
      *
      * @return bool
      *
-     * @throws ObjectException
      * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableWithSameSeries" in next major
      */
@@ -321,7 +320,6 @@ class Voucher extends BaseModel
      *
      * @return bool
      * @throws DatabaseConnectionException
-     * @throws ObjectException
      * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableWithOtherSeries" in next major
      */
@@ -336,18 +334,15 @@ class Voucher extends BaseModel
                 // just search for vouchers with different series
                 $sSql = "select 1 from oxvouchers where oxvouchers.oxid in ($sIds) and ";
                 $sSql .= "oxvouchers.oxvoucherserieid != :notoxvoucherserieid";
-                $blAvailable &= !$oDb->getOne($sSql, [
-                    ':notoxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value
-                ]);
             } else {
                 // search for vouchers with different series and those vouchers do not allow other series
                 $sSql = "select 1 from oxvouchers left join oxvoucherseries on oxvouchers.oxvoucherserieid=oxvoucherseries.oxid ";
                 $sSql .= "where oxvouchers.oxid in ($sIds) and oxvouchers.oxvoucherserieid != :notoxvoucherserieid ";
                 $sSql .= "and not oxvoucherseries.oxallowotherseries";
-                $blAvailable &= !$oDb->getOne($sSql, [
-                    ':notoxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value
-                ]);
             }
+            $blAvailable &= !$oDb->getOne($sSql, [
+                ':notoxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value
+            ]);
             if (!$blAvailable) {
                 $oEx = oxNew(VoucherException::class);
                 $oEx->setMessage('ERROR_MESSAGE_VOUCHER_NOTALLOWEDOTHERSERIES');
@@ -363,7 +358,6 @@ class Voucher extends BaseModel
      * Checks if voucher is in valid time period. Returns true on success.
      *
      * @return bool
-     * @throws ObjectException
      * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isValidDate" in next major
      */
@@ -445,7 +439,6 @@ class Voucher extends BaseModel
      *
      * @return bool
      * @throws DatabaseConnectionException
-     * @throws ObjectException
      * @throws VoucherException exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isAvailableInOtherOrder" in next major
      */
@@ -551,7 +544,6 @@ class Voucher extends BaseModel
      *
      * @return boolean
      * @throws DatabaseConnectionException
-     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isProductVoucher" in next major
      */
     protected function _isProductVoucher() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -573,7 +565,6 @@ class Voucher extends BaseModel
      *
      * @return boolean
      * @throws DatabaseConnectionException
-     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isCategoryVoucher" in next major
      */
     protected function _isCategoryVoucher() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -594,7 +585,6 @@ class Voucher extends BaseModel
      * Returns the discount object created from voucher serie data
      *
      * @return object
-     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSerieDiscount" in next major
      */
     protected function _getSerieDiscount() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -635,7 +625,7 @@ class Voucher extends BaseModel
     {
         if ($this->oxvouchers__oxorderid->value) {
             return $this->_getOrderBasketItems($oDiscount);
-        } elseif ($this->getSession()->getBasket()) {
+        } elseif (Registry::getSession()->getBasket()) {
             return $this->_getSessionBasketItems($oDiscount);
         } else {
             return [];
@@ -695,7 +685,7 @@ class Voucher extends BaseModel
             $oDiscount = $this->_getSerieDiscount();
         }
 
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         $aItems = [];
         $iCount = 0;
 
@@ -722,7 +712,6 @@ class Voucher extends BaseModel
      *
      * @return double
      * @throws ObjectException
-     * @throws VoucherException exception
      * @deprecated on b-dev (2015-03-31); Use function _getGenericDiscountValue()
      *
      */
@@ -737,7 +726,6 @@ class Voucher extends BaseModel
      * @param double $dPrice price to calculate discount on it
      *
      * @return double
-     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getGenericDiscountValue" in next major
      */
     protected function _getGenericDiscountValue($dPrice) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -762,7 +750,6 @@ class Voucher extends BaseModel
      * Return discount value
      *
      * @return double
-     * @throws ObjectException
      */
     public function getDiscount()
     {
@@ -775,7 +762,6 @@ class Voucher extends BaseModel
      * Return discount type
      *
      * @return string
-     * @throws ObjectException
      */
     public function getDiscountType()
     {

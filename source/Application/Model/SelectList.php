@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Select list manager
@@ -90,7 +91,7 @@ class SelectList extends MultiLanguageModel implements ISelectList
         if ($this->_aFieldList == null && $this->oxselectlist__oxvaldesc->value) {
             $this->_aFieldList = Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->value, $dVat);
             foreach ($this->_aFieldList as $sKey => $oField) {
-                $this->_aFieldList[$sKey]->name = getStr()->strip_tags($this->_aFieldList[$sKey]->name);
+                $this->_aFieldList[$sKey]->name = Str::getStr()->strip_tags($this->_aFieldList[$sKey]->name);
             }
         }
 
@@ -168,7 +169,7 @@ class SelectList extends MultiLanguageModel implements ISelectList
             $aList = Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->getRawValue(), $this->getVat());
             foreach ($aList as $sKey => $oField) {
                 if ($oField->name) {
-                    $this->_aList[$sKey] = oxNew(Selection::class, getStr()->strip_tags($oField->name), $sKey, false, $this->_aList === false ? true : false);
+                    $this->_aList[$sKey] = oxNew(Selection::class, Str::getStr()->strip_tags($oField->name), $sKey, false, $this->_aList === false ? true : false);
                 }
             }
         }

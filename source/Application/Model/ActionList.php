@@ -25,6 +25,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Promotion List manager.
@@ -137,8 +138,8 @@ class ActionList extends ListModel
     protected function _getUserGroupFilter($oUser = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oUser = ($oUser == null) ? $this->getUser() : $oUser;
-        $sTable = getViewName('oxactions');
-        $sGroupTable = getViewName('oxgroups');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxactions');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
 
         $aIds = [];
         // checking for current session user which gives additional restrictions for user itself, users group and country
@@ -176,7 +177,7 @@ class ActionList extends ListModel
      */
     protected function fetchExistsActivePromotion()
     {
-        $query = "select 1 from " . getViewName('oxactions') . " 
+        $query = "select 1 from " . Registry::get(TableViewNameGenerator::class)->getViewName('oxactions') . " 
             where oxtype = :oxtype and oxactive = :oxactive and oxshopid = :oxshopid 
             limit 1";
 

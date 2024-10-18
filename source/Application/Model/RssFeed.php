@@ -22,12 +22,13 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Base;
-use OxidEsales\Eshop\Core\Edition\EditionSelector;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Facts\Facts;
 use stdClass;
 
 /**
@@ -136,9 +137,9 @@ class RssFeed extends Base
 
         $this->_aChannel['generator'] = $oShop->oxshops__oxname->value;
 
-        $editionSelector = new EditionSelector();
+        $oFacts = new Facts();
         $this->_aChannel['image']['url'] = Registry::getConfig()->getImageUrl()
-            . 'logo_' . strtolower($editionSelector->getEdition()) . '.png';
+            . 'logo_' . strtolower($oFacts->getEdition()) . '.png';
 
         $this->_aChannel['image']['title'] = $this->_aChannel['title'];
         $this->_aChannel['image']['link'] = $this->_aChannel['link'];
@@ -241,7 +242,7 @@ class RssFeed extends Base
         $myUtilsUrl = Registry::getUtilsUrl();
         $aItems = [];
         $oLang = Registry::getLang();
-        $oStr = getStr();
+        $oStr = Str::getStr();
 
         foreach ($oList as $oArticle) {
             $oItem = new stdClass();
@@ -277,7 +278,7 @@ class RssFeed extends Base
 
             $oItem->description = trim($oItem->description);
             if ($sThumb = $oArticle->getThumbnailUrl()) {
-                $oItem->description = "<img src='$sThumb' border=0 align='left' hspace=5>" . $oItem->description;
+                $oItem->description = "<img src='$sThumb' border='0' align='left' hspace='5'>" . $oItem->description;
             }
             $oItem->description = $oStr->htmlspecialchars($oItem->description);
 
@@ -348,7 +349,7 @@ class RssFeed extends Base
     protected function _getShopUrl() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sUrl = Registry::getConfig()->getShopUrl();
-        $oStr = getStr();
+        $oStr = Str::getStr();
         if ($oStr->strpos($sUrl, '?') !== false) {
             if (!$oStr->preg_match('/[?&](amp;)?$/i', $sUrl)) {
                 $sUrl .= '&amp;';
@@ -613,7 +614,7 @@ class RssFeed extends Base
      */
     public function getSearchArticlesTitle($sSearch, $sCatId, $sVendorId, $sManufacturerId)
     {
-        return $this->_prepareFeedName(getStr()->htmlspecialchars($this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', $sSearch, $sCatId, $sVendorId, $sManufacturerId)));
+        return $this->_prepareFeedName(Str::getStr()->htmlspecialchars($this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', $sSearch, $sCatId, $sVendorId, $sManufacturerId)));
     }
 
     /**
@@ -738,12 +739,13 @@ class RssFeed extends Base
     /**
      * loadSearchArticles loads 'Search Articles' rss data
      *
-     * @param string $sSearch         search string
-     * @param string $sCatId          category id
-     * @param string $sVendorId       vendor id
+     * @param string $sSearch search string
+     * @param string $sCatId category id
+     * @param string $sVendorId vendor id
      * @param string $sManufacturerId Manufacturer id
      *
      * @access public
+     * @throws DatabaseConnectionException
      */
     public function loadSearchArticles($sSearch, $sCatId, $sVendorId, $sManufacturerId)
     {
@@ -762,7 +764,7 @@ class RssFeed extends Base
             null,
             //self::RSS_SEARCHARTS.md5($sSearch.$sCatId.$sVendorId),
             $this->getSearchArticlesTitle($sSearch, $sCatId, $sVendorId, $sManufacturerId),
-            $this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', getStr()->htmlspecialchars($sSearch), $sCatId, $sVendorId, $sManufacturerId),
+            $this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', Str::getStr()->htmlspecialchars($sSearch), $sCatId, $sVendorId, $sManufacturerId),
             $this->_getArticleItems($oArtList),
             $this->getSearchArticlesUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId),
             $this->_getShopUrl() . "cl=search&amp;" . $this->_getSearchParamsUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId)
@@ -839,6 +841,7 @@ class RssFeed extends Base
      *
      * @return void
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      */

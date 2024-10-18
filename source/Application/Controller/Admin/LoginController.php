@@ -30,6 +30,7 @@ use OxidEsales\Eshop\Core\Exception\CookieException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\SystemEventHandler;
 
 /**
@@ -81,7 +82,7 @@ class LoginController extends AdminController
         //#533 user profile
         $this->addTplParam("profiles", Registry::getUtils()->loadAdminProfile($myConfig->getConfigParam('aInterfaceProfiles')));
 
-        $aLanguages = $this->_getAvailableLanguages();
+        $aLanguages = $this->getAvailableLanguages();
         $this->addTplParam("aLanguages", $aLanguages);
 
         // setting templates language to selected language id
@@ -143,7 +144,7 @@ class LoginController extends AdminController
             }
         } catch (UserException|CookieException $oEx) {
             $myUtilsView->addErrorToDisplay($oEx);
-            $oStr = getStr();
+            $oStr = Str::getStr();
             $this->addTplParam('user', $oStr->htmlspecialchars($sUser));
             $this->addTplParam('pwd', $oStr->htmlspecialchars($sPass));
             $this->addTplParam('profile', $oStr->htmlspecialchars($sProfile));
@@ -195,6 +196,17 @@ class LoginController extends AdminController
      */
     protected function _authorize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->authorize();
+    }
+
+    /**
+     * Users are always authorized to use login page.
+     * Rewrites authorization method.
+     *
+     * @return boolean
+     */
+    protected function authorize()
+    {
         return true;
     }
 
@@ -216,8 +228,18 @@ class LoginController extends AdminController
      */
     protected function _getAvailableLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getAvailableLanguages();
+    }
+
+    /**
+     * Get available admin interface languages
+     *
+     * @return array
+     */
+    protected function getAvailableLanguages()
+    {
         $sDefLang = Registry::getUtilsServer()->getOxCookie('oxidadminlanguage');
-        $sDefLang = $sDefLang ? $sDefLang : $this->_getBrowserLanguage();
+        $sDefLang = $sDefLang ? $sDefLang : $this->getBrowserLanguage();
 
         $aLanguages = Registry::getLang()->getAdminTplLanguageArray();
         foreach ($aLanguages as $oLang) {
@@ -234,6 +256,16 @@ class LoginController extends AdminController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBrowserLanguage" in next major
      */
     protected function _getBrowserLanguage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getBrowserLanguage();
+    }
+
+    /**
+     * Get detected user browser language abbreviation
+     *
+     * @return string
+     */
+    protected function getBrowserLanguage()
     {
         return strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
     }

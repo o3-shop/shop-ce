@@ -28,6 +28,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SeoEncoder;
 use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterAdminAjaxRequestProcessedEvent;
 
 /**
@@ -573,7 +574,7 @@ class ListComponentAjax extends Base
         if (is_array($aFilter) && count($aFilter)) {
             $aCols = $this->getVisibleColNames();
             $oDb = DatabaseProvider::getDb();
-            $oStr = getStr();
+            $oStr = Str::getStr();
 
             foreach ($aFilter as $sCol => $sValue) {
                 // skipping empty filters
@@ -846,7 +847,7 @@ class ListComponentAjax extends Base
      */
     protected function getViewName($sTable)
     {
-        return getViewName($sTable, Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
+        return Registry::get(TableViewNameGenerator::class)->getViewName($sTable, Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
     }
 
     /**

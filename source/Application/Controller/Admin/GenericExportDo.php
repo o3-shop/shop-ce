@@ -22,6 +22,9 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
@@ -65,6 +68,9 @@ class GenericExportDo extends DynamicExportBaseController
      * @param integer $iCnt export position
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function nextTick($iCnt)
     {

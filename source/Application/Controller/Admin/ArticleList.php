@@ -29,6 +29,8 @@ use OxidEsales\Eshop\Application\Model\VendorList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin article list manager.
@@ -278,7 +280,7 @@ class ArticleList extends AdminListController
     {
         $sQ = parent::buildSelectString($listObject);
         if ($sQ) {
-            $sTable = getViewName("oxarticles");
+            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles");
             $sQ .= " and $sTable.oxparentid = '' ";
 
             $sType = false;
@@ -292,8 +294,8 @@ class ArticleList extends AdminListController
             switch ($sType) {
                 // add category
                 case 'cat':
-                    $oStr = getStr();
-                    $sViewName = getViewName("oxobject2category");
+                    $oStr = Str::getStr();
+                    $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxobject2category");
                     $sInsert = "from $sTable left join {$sViewName} on {$sTable}.oxid = {$sViewName}.oxobjectid " .
                                "where {$sViewName}.oxcatnid = " . DatabaseProvider::getDb()->quote($sValue) . " and ";
                     $sQ = $oStr->preg_replace("/from\s+$sTable\s+where/i", $sInsert, $sQ);
@@ -326,7 +328,7 @@ class ArticleList extends AdminListController
         // adding folder check
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         if ($sFolder && $sFolder != '-1') {
-            $this->_aWhere[getViewName("oxarticles") . ".oxfolder"] = $sFolder;
+            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles") . ".oxfolder"] = $sFolder;
         }
 
         return $this->_aWhere;

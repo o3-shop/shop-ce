@@ -87,9 +87,8 @@ class Content extends MultiLanguageModel implements IUrl
      */
     public function __get($sName)
     {
-        switch ($sName) {
-            case 'expanded':
-                return $this->getExpanded();
+        if ($sName == 'expanded') {
+            return $this->getExpanded();
         }
         return parent::__get($sName);
     }
@@ -111,7 +110,7 @@ class Content extends MultiLanguageModel implements IUrl
     public function getExpanded()
     {
         if (!isset($this->_blExpanded)) {
-            $this->_blExpanded = ($this->getId() == Registry::getConfig()->getRequestParameter('oxcid'));
+            $this->_blExpanded = ($this->getId() == Registry::getRequest()->getRequestEscapedParameter('oxcid'));
         }
 
         return $this->_blExpanded;

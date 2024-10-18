@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 
@@ -112,7 +113,7 @@ class DiscountMain extends AdminDetailsController
         $sTitle = false;
         $sOxId = $this->getEditObjectId();
         if (isset($sOxId) && $sOxId != "-1") {
-            $sViewName = getViewName("oxarticles", $this->_iEditLang);
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles", $this->_iEditLang);
             // Reading from slave is ok here (see ESDEV-3804 and ESDEV-3822).
             $database = DatabaseProvider::getDb();
             $sQ = "select concat( $sViewName.oxartnum, ' ', $sViewName.oxtitle ) from oxdiscount

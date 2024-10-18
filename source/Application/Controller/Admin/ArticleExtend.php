@@ -32,6 +32,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 use Exception;
 
@@ -296,7 +297,7 @@ class ArticleExtend extends AdminDetailsController
         $database = DatabaseProvider::getDB();
         $config = Registry::getConfig();
 
-        $articleTable = getViewName('oxarticles', $this->_iEditLang);
+        $articleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iEditLang);
         $query = "select {$articleTable}.oxtitle, {$articleTable}.oxartnum, {$articleTable}.oxvarselect " .
             "from {$articleTable} where 1 ";
         // #546

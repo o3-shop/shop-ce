@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Class, responsible for retrieving correct vat for users and articles
@@ -121,7 +122,7 @@ class VatSelector extends Base
     protected function _getVatForArticleCategory(Article $oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = DatabaseProvider::getDb();
-        $sCatT = getViewName('oxcategories');
+        $sCatT = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
 
         if ($this->_blCatVatSet === null) {
             $sSelect = "SELECT oxid FROM $sCatT WHERE oxvat IS NOT NULL LIMIT 1";
@@ -135,7 +136,7 @@ class VatSelector extends Base
             return false;
         }
 
-        $sO2C = getViewName('oxobject2category');
+        $sO2C = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
         $sSql = "SELECT c.oxvat
                  FROM $sCatT AS c, $sO2C AS o2c
                  WHERE c.oxid=o2c.oxcatnid AND
@@ -204,7 +205,6 @@ class VatSelector extends Base
      * @param Article $oArticle article object
      *
      * @return double | false
-     * @throws ObjectException
      */
     public function getArticleUserVat(Article $oArticle)
     {

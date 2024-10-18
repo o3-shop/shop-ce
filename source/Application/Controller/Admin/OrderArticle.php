@@ -31,6 +31,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin order article manager.
@@ -152,7 +153,7 @@ class OrderArticle extends AdminDetailsController
 
             //get article id
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $sTable = getViewName("oxarticles");
+            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles");
             $sQ = "select oxid, oxparentid from $sTable where oxartnum = :oxartnum limit 1";
 
             $rs = $oDb->select($sQ, [

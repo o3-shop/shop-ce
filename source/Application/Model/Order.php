@@ -959,6 +959,7 @@ class Order extends BaseModel
      * @param $oUserPayment
      * @return  integer 2 or an error code
      * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "executePayment" in next major
      */
     protected function _executePayment(Basket $oBasket, $oUserPayment) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1168,7 +1169,8 @@ class Order extends BaseModel
      * and sets them to $this->_aVoucherList.
      *
      * @param Basket $oBasket basket object
-     * @param User   $oUser   user object
+     * @param User $oUser user object
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "markVouchers" in next major
      */
     protected function _markVouchers($oBasket, $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1216,7 +1218,7 @@ class Order extends BaseModel
     public function getDelAddressInfo()
     {
         $oDelAddress = null;
-        if (!($soxAddressId = Registry::getConfig()->getRequestParameter('deladrid'))) {
+        if (!($soxAddressId = Registry::getRequest()->getRequestEscapedParameter('deladrid'))) {
             $soxAddressId = Registry::getSession()->getVariable('deladrid');
         }
         if ($soxAddressId) {
@@ -1358,7 +1360,6 @@ class Order extends BaseModel
      *
      * @return null
      * @throws DatabaseException
-     * @throws \oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1377,7 +1378,7 @@ class Order extends BaseModel
      * @param null $sOxId Ordering ID (default null)
      *
      * @return bool
-     * @throws DatabaseConnectionException
+     * @throws DatabaseConnectionException|DatabaseErrorException
      */
     public function delete($sOxId = null)
     {
@@ -1702,7 +1703,7 @@ class Order extends BaseModel
         $rs = $oDb->select($sSelect, [
             ':oxorderid' => $this->oxorder__oxid->value
         ]);
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $aVouchers[] = $rs->fields['oxvouchernr'];
                 $rs->fetchRow();
@@ -2203,7 +2204,7 @@ class Order extends BaseModel
      */
     public function validateDeliveryAddress($oUser)
     {
-        $sDelAddressMD5 = Registry::getConfig()->getRequestParameter('sDeliveryAddressMD5');
+        $sDelAddressMD5 = Registry::getRequest()->getRequestEscapedParameter('sDeliveryAddressMD5');
 
         $sDeliveryAddress = $oUser->getEncodedDeliveryAddress();
 
@@ -2488,7 +2489,7 @@ class Order extends BaseModel
      */
     private function getDynamicValues()
     {
-        $dynamicValues = $this->getSession()->getVariable('dynvalue');
+        $dynamicValues = Registry::getSession()->getVariable('dynvalue');
 
         if (!$dynamicValues) {
             $dynamicValues = Registry::getRequest()->getRequestParameter('dynvalue');

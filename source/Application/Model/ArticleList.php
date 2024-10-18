@@ -95,7 +95,7 @@ class ArticleList extends ListModel
      */
     public function getHistoryArticles()
     {
-        if ($aArticlesIds = $this->getSession()->getVariable('aHistoryArticles')) {
+        if ($aArticlesIds = Registry::getSession()->getVariable('aHistoryArticles')) {
             return $aArticlesIds;
         } elseif ($sArticlesIds = Registry::getUtilsServer()->getOxCookie('aHistoryArticles')) {
             return explode('|', $sArticlesIds);
@@ -109,7 +109,7 @@ class ArticleList extends ListModel
      */
     public function setHistoryArticles($aArticlesIds)
     {
-        if ($this->getSession()->getId()) {
+        if (Registry::getSession()->getId()) {
             Registry::getSession()->setVariable('aHistoryArticles', $aArticlesIds);
             // clean cookie, if session started
             Registry::getUtilsServer()->setOxCookie('aHistoryArticles', '');
@@ -221,7 +221,7 @@ class ArticleList extends ListModel
                 $this->loadActionArticles('oxnewest', $iLimit);
                 break;
             case 2:
-                $sArticleTable = getViewName('oxarticles');
+                $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
                 if ($myConfig->getConfigParam('blNewArtByInsert')) {
                     $sType = 'oxinsert';
                 } else {
@@ -262,7 +262,7 @@ class ArticleList extends ListModel
                 $this->loadActionArticles('oxtop5', $iLimit);
                 break;
             case 2:
-                $sArticleTable = getViewName('oxarticles');
+                $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
                 //by default limit 5
                 $sLimit = ($iLimit > 0) ? "limit " . $iLimit : 'limit 5';
@@ -488,7 +488,7 @@ class ArticleList extends ListModel
     {
         $sSelect = $this->_getArticleSelect($sRecommId, $sArticlesFilter);
 
-        $sArtView = getViewName('oxarticles');
+        $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $sPartial = substr($sSelect, strpos($sSelect, ' from '));
         $sSelect = "select distinct $sArtView.oxid $sPartial ";
 
@@ -510,7 +510,7 @@ class ArticleList extends ListModel
     {
         $sRecommId = DatabaseProvider::getDb()->quote($sRecommId);
 
-        $sArtView = getViewName('oxarticles');
+        $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $sSelect = "select distinct $sArtView.*, oxobject2list.oxdesc from oxobject2list ";
         $sSelect .= "left join $sArtView on oxobject2list.oxobjectid = $sArtView.oxid ";
         $sSelect .= "where (oxobject2list.oxlistid = $sRecommId) " . $sArticlesFilter;
@@ -541,7 +541,7 @@ class ArticleList extends ListModel
             $sWhere = $this->_getSearchSelect($sSearchStr);
         }
 
-        $sArticleTable = getViewName('oxarticles');
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
         // longdesc field now is kept on different table
         $sDescJoin = $this->getDescriptionJoin();
@@ -551,7 +551,7 @@ class ArticleList extends ListModel
 
         // must be additional conditions in select if searching in category
         if ($sSearchCat) {
-            $sO2CView = getViewName('oxobject2category');
+            $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
             $sSelect = "select $sArticleTable.oxid from $sO2CView as oxobject2category, $sArticleTable $sDescJoin ";
             $sSelect .= "where oxobject2category.oxcatnid=" . $oDb->quote($sSearchCat) . " and oxobject2category.oxobjectid=$sArticleTable.oxid and ";
         }
@@ -879,7 +879,7 @@ class ArticleList extends ListModel
     protected function _createIdListFromSql($sSql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $rs = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->select($sSql);
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $rs->fields = array_change_key_case($rs->fields, CASE_LOWER);
                 $this[$rs->fields['oxid']] = $rs->fields['oxid']; //only the oxid
@@ -900,8 +900,8 @@ class ArticleList extends ListModel
      */
     protected function _getFilterIdsSql($sCatId, $aFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sO2CView = getViewName('oxobject2category');
-        $sO2AView = getViewName('oxobject2attribute');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
+        $sO2AView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
         $sFilter = '';
         $iCnt = 0;
@@ -943,7 +943,7 @@ class ArticleList extends ListModel
      */
     protected function _getFilterSql($sCatId, $aFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArticleTable = getViewName('oxarticles');
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $aIds = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($this->_getFilterIdsSql($sCatId, $aFilter));
         $sIds = '';
 
@@ -980,8 +980,8 @@ class ArticleList extends ListModel
      */
     protected function _getCategorySelect($sFields, $sCatId, $aSessionFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArticleTable = getViewName('oxarticles');
-        $sO2CView = getViewName('oxobject2category');
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
 
         // ----------------------------------
         // sorting
@@ -1021,8 +1021,8 @@ class ArticleList extends ListModel
      */
     protected function _getCategoryCountSelect($sCatId, $aSessionFilter) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArticleTable = getViewName('oxarticles');
-        $sO2CView = getViewName('oxobject2category');
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
 
 
         // ----------------------------------
@@ -1152,7 +1152,7 @@ class ArticleList extends ListModel
      */
     protected function _getVendorSelect($sVendorId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArticleTable = getViewName('oxarticles');
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $oBaseObject = $this->getBaseObject();
         $sFieldNames = $oBaseObject->getSelectFields();
         $sSelect = "select $sFieldNames from $sArticleTable ";
@@ -1177,7 +1177,7 @@ class ArticleList extends ListModel
      */
     protected function _getManufacturerSelect($sManufacturerId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArticleTable = getViewName('oxarticles');
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $oBaseObject = $this->getBaseObject();
         $sFieldNames = $oBaseObject->getSelectFields();
         $sSelect = "select $sFieldNames from $sArticleTable ";
@@ -1306,7 +1306,7 @@ class ArticleList extends ListModel
         $searchColumns = Registry::getConfig()->getConfigParam('aSearchCols');
 
         if (is_array($searchColumns) && in_array('oxlongdesc', $searchColumns)) {
-            $viewName = getViewName('oxartextends');
+            $viewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends');
             $descriptionJoin = " LEFT JOIN $viewName ON {$viewName}.oxid={$table}.oxid ";
         }
         return $descriptionJoin;

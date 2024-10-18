@@ -30,6 +30,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfigurationInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
@@ -149,6 +150,16 @@ class ShopConfiguration extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getModuleForConfigVars" in next major
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getModuleForConfigVars();
+    }
+
+    /**
+     * return theme filter for config variables
+     *
+     * @return string
+     */
+    protected function getModuleForConfigVars()
     {
         return '';
     }
@@ -279,6 +290,19 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _parseConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->parseConstraint($type, $constraint);
+    }
+
+    /**
+     * parse constraint from type and serialized values
+     *
+     * @param string $type       variable type
+     * @param string $constraint serialized constraint
+     *
+     * @return array|null
+     */
+    protected function parseConstraint($type, $constraint)
+    {
         if ($type == "select") {
             return array_map('trim', explode('|', $constraint));
         }
@@ -295,6 +319,19 @@ class ShopConfiguration extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "serializeConstraint" in next major
      */
     protected function _serializeConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->serializeConstraint($type, $constraint);
+    }
+
+    /**
+     * serialize constraint from type and value
+     *
+     * @param string $type       variable type
+     * @param mixed  $constraint constraint value
+     *
+     * @return string
+     */
+    protected function serializeConstraint($type, $constraint)
     {
         if ($type == "select") {
             return implode('|', array_map('trim', $constraint));
@@ -314,7 +351,7 @@ class ShopConfiguration extends AdminDetailsController
      */
     public function _unserializeConfVar($type, $name, $value) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $str = getStr();
+        $str = Str::getStr();
         $data = null;
 
         switch ($type) {
@@ -403,6 +440,18 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _arrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->arrayToMultiline($input);
+    }
+
+    /**
+     * Converts simple array to multiline text. Returns this text.
+     *
+     * @param array $input Array with text
+     *
+     * @return string
+     */
+    protected function arrayToMultiline($input)
+    {
         return implode("\n", (array) $input);
     }
 
@@ -415,6 +464,18 @@ class ShopConfiguration extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToArray" in next major
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->multilineToArray($multiline);
+    }
+
+    /**
+     * Converts Multiline text to simple array. Returns this array.
+     *
+     * @param string $multiline Multiline text
+     *
+     * @return array|void
+     */
+    protected function multilineToArray($multiline)
     {
         $array = explode("\n", $multiline);
         if (is_array($array)) {
@@ -439,6 +500,18 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->aarrayToMultiline($input);
+    }
+
+    /**
+     * Converts associative array to multiline text. Returns this text.
+     *
+     * @param array $input Array to convert
+     *
+     * @return string|void
+     */
+    protected function aarrayToMultiline($input)
+    {
         if (is_array($input)) {
             $multiline = '';
             foreach ($input as $key => $value) {
@@ -462,7 +535,19 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $string = getStr();
+        return $this->multilineToAarray($multiline);
+    }
+
+        /**
+     * Converts Multiline text to associative array. Returns this array.
+     *
+     * @param string $multiline Multiline text
+     *
+     * @return array
+     */
+    protected function multilineToAarray($multiline)
+    {
+        $string = Str::getStr();
         $array = [];
         $lines = explode("\n", $multiline);
         foreach ($lines as $line) {

@@ -62,8 +62,19 @@ class NewsMainAjax extends ListComponentAjax
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         // active AJAX component
-        $sGroupTable = $this->_getViewName('oxgroups');
+        $sGroupTable = $this->getViewName('oxgroups');
         $oDb = DatabaseProvider::getDb();
         $sDiscountId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchDiscountId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -89,9 +100,9 @@ class NewsMainAjax extends ListComponentAjax
      */
     public function removeGroupFromNews()
     {
-        $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
+        $aRemoveGroups = $this->getActionIds('oxobject2group.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
+            $sQ = $this->addFilter("delete oxobject2group.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
             $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
@@ -104,12 +115,12 @@ class NewsMainAjax extends ListComponentAjax
      */
     public function addGroupToNews()
     {
-        $aAddGroups = $this->_getActionIds('oxgroups.oxid');
+        $aAddGroups = $this->getActionIds('oxgroups.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sGroupTable = $this->_getViewName('oxgroups');
-            $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
+            $sGroupTable = $this->getViewName('oxgroups');
+            $aAddGroups = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aAddGroups)) {

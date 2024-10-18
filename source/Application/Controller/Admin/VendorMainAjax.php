@@ -108,6 +108,7 @@ class VendorMainAjax extends ListComponentAjax
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

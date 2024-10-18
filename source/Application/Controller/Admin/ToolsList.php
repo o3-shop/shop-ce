@@ -75,7 +75,7 @@ class ToolsList extends AdminListController
             }
 
             $sUpdateSQL = trim(stripslashes($sUpdateSQL));
-            $oStr = getStr();
+            $oStr = Str::getStr();
             $iLen = $oStr->strlen($sUpdateSQL);
             if ($this->_prepareSQL($sUpdateSQL, $iLen)) {
                 $aQueries = $this->aSQLs;
@@ -188,7 +188,7 @@ class ToolsList extends AdminListController
     {
         $sStrStart = "";
         $blString = false;
-        $oStr = getStr();
+        $oStr = Str::getStr();
 
         //removing "mysqldump" application comments
         while ($oStr->preg_match("/^\-\-.*\n/", $sSQL)) {

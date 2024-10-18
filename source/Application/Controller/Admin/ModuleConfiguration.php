@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use InvalidArgumentException;
 use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
@@ -41,6 +43,8 @@ class ModuleConfiguration extends ShopConfiguration
 {
     /** @var string Template name. */
     protected $_sModule = 'shop_config.tpl';
+
+    protected $_sModuleId = null;
 
     /**
      * Add additional config type for modules.
@@ -106,11 +110,13 @@ class ModuleConfiguration extends ShopConfiguration
      *      'constraints' => constraints list as array[name] = constraint
      *      'grouping'    => grouping info as array[name] = grouping
      *
-     * @deprecated since v6.4.0 (2019-04-08); it moved to Internal\Framework\Module package
-     *
      * @param array $aModuleSettings settings array from module metadata
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated since v6.4.0 (2019-04-08); it moved to Internal\Framework\Module package
+     *
      */
     public function _loadMetadataConfVars($aModuleSettings) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -127,7 +133,7 @@ class ModuleConfiguration extends ShopConfiguration
         $aVarConstraints = [];
         $aGrouping = [];
 
-        $aDbVariables = $this->loadConfVars($oConfig->getShopId(), $this->_getModuleForConfigVars());
+        $aDbVariables = $this->loadConfVars($oConfig->getShopId(), $this->getModuleForConfigVars());
 
         if (is_array($aModuleSettings)) {
             foreach ($aModuleSettings as $aValue) {
@@ -137,10 +143,10 @@ class ModuleConfiguration extends ShopConfiguration
                 if (is_null($oConfig->getConfigParam($sName))) {
                     switch ($aValue["type"]) {
                         case "arr":
-                            $sValue = $this->_arrayToMultiline($aValue["value"]);
+                            $sValue = $this->arrayToMultiline($aValue["value"]);
                             break;
                         case "aarr":
-                            $sValue = $this->_aarrayToMultiline($aValue["value"]);
+                            $sValue = $this->aarrayToMultiline($aValue["value"]);
                             break;
                         case "bool":
                             $sValue = filter_var($aValue["value"], FILTER_VALIDATE_BOOLEAN);
@@ -149,7 +155,7 @@ class ModuleConfiguration extends ShopConfiguration
                             $sValue = $aValue["value"];
                             break;
                     }
-                    $sValue = getStr()->htmlentities($sValue);
+                    $sValue = Str::getStr()->htmlentities($sValue);
                 } else {
                     $sDbType = $this->_getDbConfigTypeName($sType);
                     $sValue = $aDbVariables['vars'][$sDbType][$sName];
@@ -242,10 +248,10 @@ class ModuleConfiguration extends ShopConfiguration
                 foreach ($moduleConfiguration->getModuleSettings() as $moduleSetting) {
                     if ($moduleSetting->getName() === $name) {
                         if ($moduleSetting->getType() === 'aarr') {
-                            $value = $this->_multilineToAarray($value);
+                            $value = $this->multilineToAarray($value);
                         }
                         if ($moduleSetting->getType() === 'arr') {
-                            $value = $this->_multilineToArray($value);
+                            $value = $this->multilineToArray($value);
                         }
                         if ($moduleSetting->getType() === 'bool') {
                             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -304,10 +310,10 @@ class ModuleConfiguration extends ShopConfiguration
             if ($setting->getValue() !== null) {
                 switch ($setting->getType()) {
                     case 'arr':
-                        $value = $this->_arrayToMultiline($setting->getValue());
+                        $value = $this->arrayToMultiline($setting->getValue());
                         break;
                     case 'aarr':
-                        $value = $this->_aarrayToMultiline($setting->getValue());
+                        $value = $this->aarrayToMultiline($setting->getValue());
                         break;
                     case 'bool':
                         $value = filter_var($setting->getValue(), FILTER_VALIDATE_BOOLEAN);

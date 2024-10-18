@@ -29,6 +29,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -53,6 +54,7 @@ class PriceAlarmSend extends AdminListController
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function render()
     {
@@ -104,6 +106,7 @@ class PriceAlarmSend extends AdminListController
      * @return int
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     protected function countActivePriceAlerts()
     {
@@ -138,6 +141,7 @@ class PriceAlarmSend extends AdminListController
      * @param int $limit How much price alerts to send.
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     protected function sendPriceChangeNotifications($start, $limit)
     {

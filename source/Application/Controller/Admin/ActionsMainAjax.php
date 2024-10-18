@@ -29,6 +29,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use Exception;
 
 /**
@@ -161,7 +162,7 @@ class ActionsMainAjax extends ListComponentAjax
         if (Registry::getConfig()->getConfigParam('blVariantsSelection')) {
             $sQ .= ' group by ' . $this->getViewName('oxarticles') . '.oxid ';
 
-            $oStr = getStr();
+            $oStr = Str::getStr();
             if ($oStr->strpos($sQ, "select count( * ) ") === 0) {
                 $sQ = "select count( * ) from ( {$sQ} ) as _cnttable";
             }

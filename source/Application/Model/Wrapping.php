@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Wrapping manager.
@@ -134,7 +135,7 @@ class Wrapping extends MultiLanguageModel
         // load wrapping
         $oEntries = oxNew(ListModel::class);
         $oEntries->init('oxwrapping');
-        $sWrappingViewName = getViewName('oxwrapping');
+        $sWrappingViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxwrapping');
         $sSelect = "select * from $sWrappingViewName 
             where $sWrappingViewName.oxactive = :oxactive
               and $sWrappingViewName.oxtype = :oxtype";
@@ -156,7 +157,7 @@ class Wrapping extends MultiLanguageModel
      */
     public function getWrappingCount($sWrapType)
     {
-        $sWrappingViewName = getViewName('oxwrapping');
+        $sWrappingViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxwrapping');
         $oDb = DatabaseProvider::getDb();
         $sQ = "select count(*) from $sWrappingViewName 
             where $sWrappingViewName.oxactive = :oxactive 

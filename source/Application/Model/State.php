@@ -24,6 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * State handler
@@ -79,7 +81,7 @@ class State extends MultiLanguageModel
     public function getTitleById($iStateId)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "SELECT oxtitle FROM " . getViewName("oxstates") . " 
+        $sQ = "SELECT oxtitle FROM " . Registry::get(TableViewNameGenerator::class)->getViewName("oxstates") . " 
             WHERE oxid = :oxid";
 
         $sStateTitle = $oDb->getOne($sQ, [

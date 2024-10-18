@@ -85,7 +85,7 @@ class OxidStartController extends FrontendController
         $systemEventHandler = $this->_getSystemEventHandler();
         $systemEventHandler->onShopEnd();
 
-        $mySession = $this->getSession();
+        $mySession = Registry::getSession();
 
         if (isset($mySession)) {
             $mySession->freeze();

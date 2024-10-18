@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\News;
 use OxidEsales\Eshop\Core\Registry;
@@ -69,7 +70,7 @@ class NewsText extends AdminDetailsController
 
             $this->_aViewData["edit"] = $oNews;
         }
-        $this->_aViewData["editor"] = $this->_generateTextEditor("100%", 255, $oNews, "oxnews__oxlongdesc", "news.tpl.css");
+        $this->_aViewData["editor"] = $this->generateTextEditor("100%", 255, $oNews, "oxnews__oxlongdesc", "news.tpl.css");
 
         return "news_text.tpl";
     }
@@ -78,7 +79,7 @@ class NewsText extends AdminDetailsController
      * Saves news text.
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function save()
     {

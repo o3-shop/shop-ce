@@ -26,7 +26,10 @@ use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Application\Model\DeliveryList;
 use OxidEsales\Eshop\Application\Model\DeliverySetList;
 use OxidEsales\Eshop\Application\Model\PaymentList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\UtilsView;
 
 /**
@@ -145,6 +148,8 @@ class ContentController extends FrontendController
      * of template to render content::_sThisTemplate
      *
      * @return  string  $this->_sThisTemplate   current template file name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -198,11 +203,13 @@ class ContentController extends FrontendController
      * Returns current view meta data
      * If $meta parameter comes empty, sets to it current content title
      *
-     * @param string $meta      category path
-     * @param int    $length    max length of result, -1 for no truncation
-     * @param bool   $removeDuplicatedWords if true - performs additional duplicate cleaning
+     * @param string $meta category path
+     * @param int $length max length of result, -1 for no truncation
+     * @param bool $removeDuplicatedWords if true - performs additional duplicate cleaning
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
     protected function _prepareMetaDescription($meta, $length = 200, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -218,10 +225,12 @@ class ContentController extends FrontendController
      * Returns current view keywords seperated by comma
      * If $keywords parameter comes empty, sets to it current content title
      *
-     * @param string $keywords               data to use as keywords
-     * @param bool   $removeDuplicatedWords remove duplicated words
+     * @param string $keywords data to use as keywords
+     * @param bool $removeDuplicatedWords remove duplicated words
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
     protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -237,6 +246,8 @@ class ContentController extends FrontendController
      * If current content is assigned to category returns its object
      *
      * @return Content
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentCategory()
     {
@@ -256,6 +267,7 @@ class ContentController extends FrontendController
      * if private sales switched ON and user is not logged in
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function showPlainTemplate()
     {
@@ -289,6 +301,8 @@ class ContentController extends FrontendController
      * If no content id specified, uses "impressum" content id
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentId()
     {
@@ -321,6 +335,8 @@ class ContentController extends FrontendController
      * Template variable getter. Returns active content
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContent()
     {
@@ -341,6 +357,8 @@ class ContentController extends FrontendController
      * @param int $languageId language id
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
     protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -364,7 +382,7 @@ class ContentController extends FrontendController
             $sTplName = basename($sTplName);
 
             //checking if it is template name, not content id
-            if (!getStr()->preg_match("/\.tpl$/", $sTplName)) {
+            if (!Str::getStr()->preg_match("/\.tpl$/", $sTplName)) {
                 $sTplName = null;
             } else {
                 $sTplName = 'message/' . $sTplName;
@@ -378,6 +396,8 @@ class ContentController extends FrontendController
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBreadCrumb()
     {
@@ -397,6 +417,8 @@ class ContentController extends FrontendController
      * Template variable getter. Returns tag title
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getTitle()
     {
@@ -423,6 +445,8 @@ class ContentController extends FrontendController
      * business entity data, payment charge specifications or delivery charge
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentPageTpl()
     {
@@ -493,6 +517,7 @@ class ContentController extends FrontendController
      * Returns delivery methods with assigned deliverysets.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDeliveryChargeSpecs()
     {
@@ -556,6 +581,8 @@ class ContentController extends FrontendController
      * Returns content parsed through smarty
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getParsedContent()
     {
@@ -573,6 +600,8 @@ class ContentController extends FrontendController
      * Returns view canonical url
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCanonicalUrl()
     {

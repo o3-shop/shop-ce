@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -81,6 +82,7 @@ class UserPayment extends AdminDetailsController
      * and returns the name of the template file.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -211,6 +213,7 @@ class UserPayment extends AdminDetailsController
      * Returns selected Payment
      *
      * @return object
+     * @throws DatabaseConnectionException
      */
     public function getSelUserPayment()
     {

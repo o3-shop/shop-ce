@@ -28,6 +28,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SeoEncoder;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Seo encoder for articles
@@ -358,7 +359,7 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         $oDb = DatabaseProvider::getDb();
-        $categoryViewName = getViewName("oxobject2category");
+        $categoryViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxobject2category");
 
         // add main category caching;
         $sQ = "select oxcatnid from " . $categoryViewName . " where oxobjectid = :oxobjectid order by oxtime";

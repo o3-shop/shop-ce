@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Application\Model\Groups;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin deliveryset User manager.
@@ -50,7 +51,7 @@ class DeliverySetUsers extends AdminDetailsController
         // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
-        $oGroups->selectString("select * from " . getViewName("oxgroups", $this->_iEditLang));
+        $oGroups->selectString("select * from " . Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->_iEditLang));
 
         $oRoot = new Groups();
         $oRoot->oxgroups__oxid = new Field("");

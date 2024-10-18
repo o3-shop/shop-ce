@@ -29,6 +29,8 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Article attributes manager.
@@ -164,10 +166,10 @@ class Attribute extends MultiLanguageModel
     protected function _getAttrId($sSelTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = DatabaseProvider::getDB();
-        $sAttViewName = getViewName('oxattribute');
+        $sAttViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
 
         return $oDb->getOne("select oxid from $sAttViewName where LOWER(oxtitle) = :oxtitle ", [
-            ':oxtitle' => getStr()->strtolower($sSelTitle)
+            ':oxtitle' => Str::getStr()->strtolower($sSelTitle)
         ]);
     }
 
@@ -217,7 +219,7 @@ class Attribute extends MultiLanguageModel
             $rs = $oDb->select($sSelect, [
                 ':oxobjectid' => $sArtId
             ]);
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     $aIds[] = $rs->fields[0];
                     $rs->fetchRow();
@@ -236,7 +238,7 @@ class Attribute extends MultiLanguageModel
      */
     public function setTitle($sTitle)
     {
-        $this->_sTitle = getStr()->htmlspecialchars($sTitle);
+        $this->_sTitle = Str::getStr()->htmlspecialchars($sTitle);
     }
 
     /**
@@ -256,7 +258,7 @@ class Attribute extends MultiLanguageModel
      */
     public function addValue($sValue)
     {
-        $this->_aValues[] = getStr()->htmlspecialchars($sValue);
+        $this->_aValues[] = Str::getStr()->htmlspecialchars($sValue);
     }
 
     /**
@@ -266,7 +268,7 @@ class Attribute extends MultiLanguageModel
      */
     public function setActiveValue($sValue)
     {
-        $this->_sActiveValue = getStr()->htmlspecialchars($sValue);
+        $this->_sActiveValue = Str::getStr()->htmlspecialchars($sValue);
     }
 
     /**

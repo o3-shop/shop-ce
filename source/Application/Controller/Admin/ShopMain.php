@@ -68,6 +68,7 @@ class ShopMain extends AdminDetailsController
         }
 
         $user = $this->getUser();
+        $shop = null;
         $shopId = $this->updateShopIdByUser($user, $shopId, true);
 
         if (isset($shopId) && $shopId != self::NEW_SHOP_ID) {

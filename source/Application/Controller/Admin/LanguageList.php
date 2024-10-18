@@ -98,11 +98,12 @@ class LanguageList extends AdminListController
      * file "selectlist_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
-        $this->_aViewData['mylist'] = $this->_getLanguagesList();
+        $this->_aViewData['mylist'] = $this->getLanguagesList();
 
         return "language_list.tpl";
     }
@@ -111,9 +112,21 @@ class LanguageList extends AdminListController
      * Collects shop languages list.
      *
      * @return array
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getLanguagesList" in next major
      */
     protected function _getLanguagesList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getLanguagesList();
+    }
+
+    /**
+     * Collects shop languages list.
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     */
+    protected function getLanguagesList()
     {
         $aLangParams = Registry::getConfig()->getConfigParam('aLanguageParams');
         $aLanguages = Registry::getLang()->getLanguageArray();
@@ -162,6 +175,20 @@ class LanguageList extends AdminListController
      */
     protected function _sortLanguagesCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->sortLanguagesCallback($oLang1, $oLang2);
+    }
+
+    /**
+     * Callback function for sorting languages objects. Sorts array according
+     * 'sort' parameter
+     *
+     * @param object $oLang1 language object
+     * @param object $oLang2 language object
+     *
+     * @return int
+     */
+    protected function sortLanguagesCallback($oLang1, $oLang2)
+    {
         $sSortParam = $this->_sDefSortField;
         $sVal1 = is_string($oLang1->$sSortParam) ? strtolower($oLang1->$sSortParam) : $oLang1->$sSortParam;
         $sVal2 = is_string($oLang2->$sSortParam) ? strtolower($oLang2->$sSortParam) : $oLang2->$sSortParam;
@@ -184,6 +211,19 @@ class LanguageList extends AdminListController
      */
     protected function _resetMultiLangDbFields($iLangId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->resetMultiLangDbFields($iLangId);
+    }
+
+    /**
+     * Resets all multilanguage fields with specific language id
+     * to default value in all tables.
+     *
+     * @param string $iLangId language ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function resetMultiLangDbFields($iLangId)
+    {
         $iLangId = (int) $iLangId;
 
         //skipping reseting language with id = 0
@@ -205,5 +245,5 @@ class LanguageList extends AdminListController
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
-    }
+    }    
 }

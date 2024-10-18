@@ -83,12 +83,12 @@ class LanguageMain extends AdminDetailsController
 
         $sOxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         //loading languages info from config
-        $this->_aLangData = $this->_getLanguages();
+        $this->_aLangData = $this->getLanguages();
 
         if (isset($sOxId) && $sOxId != "-1") {
             //checking if translations files exists
-            $this->_checkLangTranslations($sOxId);
-            $this->_aViewData["edit"] = $this->_getLanguageInfo($sOxId);
+            $this->checkLangTranslations($sOxId);
+            $this->_aViewData["edit"] = $this->getLanguageInfo($sOxId);
         }
 
         return "language_main.tpl";
@@ -121,9 +121,9 @@ class LanguageMain extends AdminDetailsController
         }
 
         //loading languages info from config
-        $this->_aLangData = $this->_getLanguages();
+        $this->_aLangData = $this->getLanguages();
         //checking input errors
-        if (!$this->_validateInput()) {
+        if (!$this->validateInput()) {
             return;
         }
 
@@ -138,7 +138,7 @@ class LanguageMain extends AdminDetailsController
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
                 $aParams['abbr'] = $sOxId;
             } else {
-                $this->_updateAbbervation($sOxId, $aParams['abbr']);
+                $this->updateAbbreviation($sOxId, $aParams['abbr']);
                 $sOxId = $aParams['abbr'];
                 $this->setEditObjectId($sOxId);
 
@@ -149,7 +149,7 @@ class LanguageMain extends AdminDetailsController
         // if adding new language, setting lang id to abbreviation
         if ($blNewLanguage = ($sOxId == -1)) {
             $sOxId = $aParams['abbr'];
-            $this->_aLangData['params'][$sOxId]['baseId'] = $this->_getAvailableLangBaseId();
+            $this->_aLangData['params'][$sOxId]['baseId'] = $this->getAvailableLangBaseId();
             $this->setEditObjectId($sOxId);
         }
 
@@ -163,7 +163,7 @@ class LanguageMain extends AdminDetailsController
 
         //if setting lang as default
         if ($aParams['default'] == '1') {
-            $this->_setDefaultLang($sOxId);
+            $this->setDefaultLang($sOxId);
         }
 
         //updating language urls
@@ -172,7 +172,7 @@ class LanguageMain extends AdminDetailsController
         $this->_aLangData['sslUrls'][$iBaseId] = $aParams['basesslurl'];
 
         //sort parameters, urls and languages arrays by language base id
-        $this->_sortLangArraysByBaseId();
+        $this->sortLangArraysByBaseId();
 
         $this->_aViewData["updatelist"] = "1";
 
@@ -185,8 +185,8 @@ class LanguageMain extends AdminDetailsController
             //checking if added language already has created multilang fields
             //with new base ID - if not, creating new fields
             if ($blNewLanguage) {
-                if (!$this->_checkMultilangFieldsExistsInDb($sOxId)) {
-                    $this->_addNewMultilangFieldsToDb();
+                if (!$this->checkMultilangFieldsExistsInDb($sOxId)) {
+                    $this->addNewMultilangFieldsToDb();
                 } else {
                     $blViewError = true;
                 }
@@ -210,6 +210,18 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _getLanguageInfo($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getLanguageInfo($sOxId);
+    }
+
+    /**
+     * Get selected language info
+     *
+     * @param string $sOxId language abbreviation
+     *
+     * @return array
+     */
+    protected function getLanguageInfo($sOxId)
+    {
         $sDefaultLang = Registry::getConfig()->getConfigParam('sDefaultLang');
 
         $aLangData = $this->_aLangData['params'][$sOxId];
@@ -230,6 +242,16 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _setLanguages($aLangData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setLanguages($aLangData);
+    }
+
+    /**
+     * Languages array setter
+     *
+     * @param array $aLangData languages parameters array
+     */
+    protected function setLanguages($aLangData)
+    {
         $this->_aLangData = $aLangData;
     }
 
@@ -243,6 +265,18 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _getLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getLanguages();
+    }
+
+    /**
+     * Loads from config all data related with languages.
+     * If no languages parameters array exists, sets default parameters values.
+     * Returns collected languages parameters array.
+     *
+     * @return array
+     */
+    protected function getLanguages()
+    {
         $aLangData['params'] = Registry::getConfig()->getConfigParam('aLanguageParams');
         $aLangData['lang'] = Registry::getConfig()->getConfigParam('aLanguages');
         $aLangData['urls'] = Registry::getConfig()->getConfigParam('aLanguageURLs');
@@ -250,7 +284,7 @@ class LanguageMain extends AdminDetailsController
 
         // empty languages parameters array - creating new one with default values
         if (!is_array($aLangData['params'])) {
-            $aLangData['params'] = $this->_assignDefaultLangParams($aLangData['lang']);
+            $aLangData['params'] = $this->assignDefaultLangParams($aLangData['lang']);
         }
 
         return $aLangData;
@@ -261,9 +295,20 @@ class LanguageMain extends AdminDetailsController
      *
      * @param string $sOldId old ID
      * @param string $sNewId new ID
-     * @deprecated underscore prefix violates PSR12, will be renamed to "updateAbbervation" in next major
+     * @deprecated underscore prefix violates PSR12, will be renamed to "updateAbbreviation" in next major
      */
     protected function _updateAbbervation($sOldId, $sNewId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->updateAbbreviation($sOldId, $sNewId);
+    }
+
+    /**
+     * Replaces languages arrays keys by new value.
+     *
+     * @param string $sOldId old ID
+     * @param string $sNewId new ID
+     */
+    protected function updateAbbreviation($sOldId, $sNewId)
     {
         foreach (array_keys($this->_aLangData) as $sTypeKey) {
             if (is_array($this->_aLangData[$sTypeKey]) && count($this->_aLangData[$sTypeKey]) > 0) {
@@ -281,13 +326,22 @@ class LanguageMain extends AdminDetailsController
             }
         }
     }
-
+    
     /**
      * Sort languages, languages parameters, urls, ssl urls arrays according
      * base land ID
      * @deprecated underscore prefix violates PSR12, will be renamed to "sortLangArraysByBaseId" in next major
      */
     protected function _sortLangArraysByBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->sortLangArraysByBaseId();
+    }
+
+    /**
+     * Sort languages, languages parameters, urls, ssl urls arrays according
+     * base land ID
+     */
+    protected function sortLangArraysByBaseId()
     {
         $aUrls = [];
         $aSslUrls = [];
@@ -317,6 +371,18 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _assignDefaultLangParams($aLanguages) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->assignDefaultLangParams($aLanguages);
+    }
+
+    /**
+     * Assign default values for each language
+     *
+     * @param array $aLanguages language array
+     *
+     * @return array
+     */
+    protected function assignDefaultLangParams($aLanguages)
+    {
         $aParams = [];
         $iBaseId = 0;
 
@@ -339,6 +405,16 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _setDefaultLang($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setDefaultLang($sOxId);
+    }
+
+    /**
+     * Sets default language base ID to config var 'sDefaultLang'
+     *
+     * @param string $sOxId language abbreviation
+     */
+    protected function setDefaultLang($sOxId)
+    {
         $sDefaultId = $this->_aLangData['params'][$sOxId]['baseId'];
         Registry::getConfig()->saveShopConfVar('str', 'sDefaultLang', $sDefaultId);
     }
@@ -350,6 +426,16 @@ class LanguageMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAvailableLangBaseId" in next major
      */
     protected function _getAvailableLangBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getAvailableLangBaseId();
+    }
+
+    /**
+     * Get available language base ID
+     *
+     * @return int
+     */
+    protected function getAvailableLangBaseId()
     {
         $aBaseId = [];
         foreach ($this->_aLangData['params'] as $aLang) {
@@ -380,6 +466,17 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _checkLangTranslations($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->checkLangTranslations($sOxId);
+    }
+
+    /**
+     * Check selected language has translation file lang.php
+     * If not - displays warning
+     *
+     * @param string $sOxId language abbreviation
+     */
+    protected function checkLangTranslations($sOxId)
+    {
         $myConfig = Registry::getConfig();
 
         $sDir = dirname($myConfig->getTranslationsDir('lang.php', $sOxId));
@@ -401,6 +498,18 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _checkMultilangFieldsExistsInDb($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->checkMultilangFieldsExistsInDb($sOxId);
+    }
+
+    /**
+     * Check if selected language already has multilanguage fields in DB
+     *
+     * @param string $sOxId language abbreviation
+     *
+     * @return bool
+     */
+    protected function checkMultilangFieldsExistsInDb($sOxId)
+    {
         $iBaseId = $this->_aLangData['params'][$sOxId]['baseId'];
         $sTable = getLangTableName('oxarticles', $iBaseId);
         $sColumn = 'oxtitle' . Registry::getLang()->getLanguageTag($iBaseId);
@@ -420,6 +529,19 @@ class LanguageMain extends AdminDetailsController
      * @deprecated underscore prefix violates PSR12, will be renamed to "addNewMultilangFieldsToDb" in next major
      */
     protected function _addNewMultilangFieldsToDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->addNewMultilangFieldsToDb();
+    }
+
+    /**
+     * Adding new language to DB - creating new multilanguage fields with new
+     * language ID (e.g. oxtitle_4)
+     *
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function addNewMultilangFieldsToDb()
     {
         //creating new multilingual fields with new id over whole DB
         $oDbMeta = oxNew(DbMetaDataHandler::class);
@@ -450,6 +572,18 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _checkLangExists($sAbbr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->checkLangExists($sAbbr);
+    }
+
+    /**
+     * Check if language already exists
+     *
+     * @param string $sAbbr language abbreviation
+     *
+     * @return bool
+     */
+    protected function checkLangExists($sAbbr)
+    {
         $aAbbrs = array_keys($this->_aLangData['lang']);
 
         return in_array($sAbbr, $aAbbrs);
@@ -467,6 +601,20 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _sortLangParamsByBaseIdCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->sortLangParamsByBaseIdCallback($oLang1, $oLang2);
+    }
+
+    /**
+     * Callback function for sorting languages already. Sorts array according
+     * 'baseId' parameter
+     *
+     * @param object $oLang1 language array
+     * @param object $oLang2 language array
+     *
+     * @return int
+     */
+    protected function sortLangParamsByBaseIdCallback($oLang1, $oLang2)
+    {
         return ($oLang1['baseId'] < $oLang2['baseId']) ? -1 : 1;
     }
 
@@ -479,6 +627,17 @@ class LanguageMain extends AdminDetailsController
      */
     protected function _validateInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->validateInput();
+    }
+
+    /**
+     * Check language input errors
+     *
+     * @return bool
+     * @throws Exception
+     */
+    protected function validateInput()
+    {
         $result = true;
 
         $oxid = $this->getEditObjectId();
@@ -486,7 +645,7 @@ class LanguageMain extends AdminDetailsController
 
         // if creating new language, checking if language already exists with
         // entered language abbreviation
-        if (($oxid == -1) && $this->_checkLangExists($parameters['abbr'])) {
+        if (($oxid == -1) && $this->checkLangExists($parameters['abbr'])) {
             $this->addDisplayException('LANGUAGE_ALREADYEXISTS_ERROR');
             $result = false;
         }
@@ -560,7 +719,7 @@ class LanguageMain extends AdminDetailsController
             } elseif (!$configValidator->isValid($mLanguageDataParameters)) {
                 $blValid = false;
                 $error = oxNew(DisplayError::class);
-                $error->setFormatParameters(htmlspecialchars($mLanguageDataParameters));
+                $error->setFormatParameters([htmlspecialchars($mLanguageDataParameters)]);
                 $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
                 Registry::getUtilsView()->addErrorToDisplay($error);
             }

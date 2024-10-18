@@ -23,6 +23,9 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Wrapping;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -63,6 +66,9 @@ class WrappingController extends FrontendController
      * Returns array of shopping basket articles
      *
      * @return array
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketItems()
     {
@@ -70,7 +76,7 @@ class WrappingController extends FrontendController
             $this->_aBasketItemList = false;
 
             // passing basket articles
-            if ($oBasket = $this->getSession()->getBasket()) {
+            if ($oBasket = Registry::getSession()->getBasket()) {
                 $this->_aBasketItemList = $oBasket->getBasketArticles();
             }
         }
@@ -132,7 +138,7 @@ class WrappingController extends FrontendController
         $aWrapping = Registry::getRequest()->getRequestEscapedParameter('wrapping');
 
         if ($this->getViewConfig()->getShowGiftWrapping()) {
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
             // setting wrapping info
             if (is_array($aWrapping) && count($aWrapping)) {
                 foreach ($oBasket->getContents() as $sKey => $oBasketItem) {

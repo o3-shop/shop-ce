@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Country list manager class.
@@ -45,7 +47,7 @@ class CountryList extends ListModel
      */
     public function loadActiveCountries($iLang = null)
     {
-        $sViewName = getViewName('oxcountry', $iLang);
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry', $iLang);
         $sSelect = "SELECT oxid, oxtitle, oxisoalpha2 FROM {$sViewName} WHERE oxactive = '1' ORDER BY oxorder, oxtitle ";
         $this->selectString($sSelect);
     }

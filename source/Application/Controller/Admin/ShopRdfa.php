@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin shop system RDFa manager.
@@ -60,7 +61,7 @@ class ShopRdfa extends ShopConfiguration
     public function getContentList()
     {
         $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
-        $sTable = getViewName("oxcontents", $this->_iEditLang);
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxcontents", $this->_iEditLang);
         $oContentList->selectString(
             "SELECT * 
              FROM {$sTable} 

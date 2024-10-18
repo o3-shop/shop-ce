@@ -26,7 +26,9 @@ use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\RecommendationList;
 use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 
@@ -71,6 +73,16 @@ class RssController extends FrontendController
      */
     protected function _getRssFeed() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getRssFeed();
+    }
+
+    /**
+     * get RssFeed
+     *
+     * @return RssFeed
+     */
+    protected function getRssFeed()
+    {
         if (!$this->_oRss) {
             $this->_oRss = oxNew(RssFeed::class);
         }
@@ -101,7 +113,7 @@ class RssController extends FrontendController
         $sCharset = Registry::getLang()->translateString("charset");
         Registry::getUtils()->setHeader("Content-Type: text/xml; charset=" . $sCharset);
         Registry::getUtils()->showMessageAndExit(
-            $this->_processOutput(
+            $this->processOutput(
                 $renderer->renderTemplate($this->_sThisTemplate, $this->_aViewData)
             )
         );
@@ -129,7 +141,19 @@ class RssController extends FrontendController
      */
     protected function _processOutput($sInput) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return getStr()->recodeEntities($sInput);
+        return $this->processOutput($sInput);
+    }
+
+    /**
+     * Processes xml before outputting to user
+     *
+     * @param string $sInput input to process
+     *
+     * @return string
+     */
+    protected function processOutput($sInput)
+    {
+        return Str::getStr()->recodeEntities($sInput);
     }
 
     /**
@@ -140,7 +164,7 @@ class RssController extends FrontendController
     public function topshop()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssTopShop')) {
-            $this->_getRssFeed()->loadTopInShop();
+            $this->getRssFeed()->loadTopInShop();
         } else {
             error_404_handler();
         }
@@ -154,7 +178,7 @@ class RssController extends FrontendController
     public function newarts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssNewest')) {
-            $this->_getRssFeed()->loadNewestArticles();
+            $this->getRssFeed()->loadNewestArticles();
         } else {
             error_404_handler();
         }
@@ -170,7 +194,7 @@ class RssController extends FrontendController
         if (Registry::getConfig()->getConfigParam('bl_rssCategories')) {
             $oCat = oxNew(Category::class);
             if ($oCat->load(Registry::getRequest()->getRequestEscapedParameter('cat'))) {
-                $this->_getRssFeed()->loadCategoryArticles($oCat);
+                $this->getRssFeed()->loadCategoryArticles($oCat);
             }
         } else {
             error_404_handler();
@@ -190,7 +214,7 @@ class RssController extends FrontendController
             $sVendorId = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
             $sManufacturerId = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
 
-            $this->_getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
+            $this->getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
         } else {
             error_404_handler();
         }
@@ -199,17 +223,18 @@ class RssController extends FrontendController
     /**
      * loads recommendation lists
      *
+     * @return void
+     * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      * @access public
-     * @return void
      */
     public function recommlists()
     {
         if ($this->getViewConfig()->getShowListmania() && Registry::getConfig()->getConfigParam('bl_rssRecommLists')) {
             $oArticle = oxNew(Article::class);
             if ($oArticle->load(Registry::getRequest()->getRequestEscapedParameter('anid'))) {
-                $this->_getRssFeed()->loadRecommLists($oArticle);
+                $this->getRssFeed()->loadRecommLists($oArticle);
 
                 return;
             }
@@ -220,17 +245,18 @@ class RssController extends FrontendController
     /**
      * loads recommendation list articles
      *
+     * @return void
+     * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      * @access public
-     * @return void
      */
     public function recommlistarts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssRecommListArts')) {
             $oRecommList = oxNew(RecommendationList::class);
             if ($oRecommList->load(Registry::getRequest()->getRequestEscapedParameter('recommid'))) {
-                $this->_getRssFeed()->loadRecommListArticles($oRecommList);
+                $this->getRssFeed()->loadRecommListArticles($oRecommList);
 
                 return;
             }
@@ -246,7 +272,7 @@ class RssController extends FrontendController
     public function bargain()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssBargain')) {
-            $this->_getRssFeed()->loadBargain();
+            $this->getRssFeed()->loadBargain();
         } else {
             error_404_handler();
         }
@@ -260,7 +286,7 @@ class RssController extends FrontendController
     public function getChannel()
     {
         if ($this->_oChannel === null) {
-            $this->_oChannel = $this->_getRssFeed()->getChannel();
+            $this->_oChannel = $this->getRssFeed()->getChannel();
         }
 
         return $this->_oChannel;
@@ -273,6 +299,6 @@ class RssController extends FrontendController
      */
     public function getCacheLifeTime()
     {
-        return $this->_getRssFeed()->getCacheTtl();
+        return $this->getRssFeed()->getCacheTtl();
     }
 }

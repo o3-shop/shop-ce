@@ -41,10 +41,10 @@ use OxidEsales\Eshop\Core\PasswordHasher;
 use OxidEsales\Eshop\Core\PasswordSaltGenerator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Sha512Hasher;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\Eshop\Core\UtilsObject;
 use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
-use oxObjectException;
 use Psr\Log\LoggerInterface;
 
 use function bin2hex;
@@ -327,7 +327,7 @@ class User extends BaseModel
         if ($this->_oUserCountryTitle == null || $sCountryId) {
             $sId = $sCountryId ? $sCountryId : $this->oxuser__oxcountryid->value;
             $oDb = DatabaseProvider::getDb();
-            $sViewName = getViewName('oxcountry', $iLang);
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry', $iLang);
 
             $countryTitle = $oDb->getOne("select oxtitle from {$sViewName} where oxid = :oxid", [
                 ':oxid' => $sId
@@ -355,7 +355,7 @@ class User extends BaseModel
     public function getUserCountryId($sCountry = null)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select oxid from " . getviewName("oxcountry") . " 
+        $sQ = "select oxid from " . Registry::get(TableViewNameGenerator::class)->getViewName("oxcountry") . " 
             where oxactive = '1' and oxisoalpha2 = :oxisoalpha2";
         $sCountryId = $oDb->getOne($sQ, [
             ':oxisoalpha2' => $sCountry
@@ -381,7 +381,7 @@ class User extends BaseModel
             $sOXID = $this->getId();
         }
 
-        $sViewName = getViewName("oxgroups");
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups");
         $this->_oGroups = oxNew('oxList', 'oxgroups');
         $sSelect = "select {$sViewName}.* from {$sViewName} left join oxobject2group on oxobject2group.oxgroupsid = {$sViewName}.oxid
                      where oxobject2group.oxobjectid = :oxobjectid";
@@ -442,8 +442,8 @@ class User extends BaseModel
             return $this->_sSelAddressId;
         }
 
-        $sAddressId = Registry::getConfig()->getRequestParameter("oxaddressid");
-        if (!$sAddressId && !Registry::getConfig()->getRequestParameter('reloadaddress')) {
+        $sAddressId = Registry::getRequest()->getRequestEscapedParameter("oxaddressid");
+        if (!$sAddressId && !Registry::getRequest()->getRequestEscapedParameter('reloadaddress')) {
             $sAddressId = Registry::getSession()->getVariable("deladrid");
         }
 
@@ -460,7 +460,7 @@ class User extends BaseModel
     {
         $this->_sWishId = null;
         // check if we have to set it here
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         foreach ($oBasket->getContents() as $oBasketItem) {
             if ($this->_sWishId = $oBasketItem->getWishId()) {
                 // stop on first found
@@ -963,6 +963,7 @@ class User extends BaseModel
      *
      * @return bool
      * @throws DatabaseErrorException
+     * @throws Exception
      */
     public function addToGroup($sGroupID)
     {
@@ -1165,7 +1166,7 @@ class User extends BaseModel
         $oInputValidator->checkEmail($this, $sLogin);
 
         // 3. password
-        $oInputValidator->checkPassword($this, $sPassword, $sPassword2, ((int) Registry::getConfig()->getRequestParameter('option') == 3));
+        $oInputValidator->checkPassword($this, $sPassword, $sPassword2, ((int) Registry::getRequest()->getRequestEscapedParameter('option') == 3));
 
         // 4. required fields
         $oInputValidator->checkRequiredFields($this, $aInvAddress, $aDelAddress);
@@ -1313,7 +1314,7 @@ class User extends BaseModel
     protected function _assignAddress($aDelAddress) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($aDelAddress) && count($aDelAddress)) {
-            $sAddressId = Registry::getConfig()->getRequestParameter('oxaddressid');
+            $sAddressId = Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
             $sAddressId = ($sAddressId === null || $sAddressId == -1 || $sAddressId == -2) ? null : $sAddressId;
 
             $oAddress = oxNew(Address::class);
@@ -1673,7 +1674,7 @@ class User extends BaseModel
 
             $sSelect = $this->formUserCookieQuery($sUser, $sShopID);
             $rs = $oDb->select($sSelect);
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     if ($passwordServiceBridge->verifyPassword($rs->fields[1] . static::USER_COOKIE_SALT, $sPWD)) {
                         // found
@@ -1845,7 +1846,6 @@ class User extends BaseModel
      * @return bool
      * @throws DatabaseConnectionException
      * @throws DatabaseException
-     * @throws oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1896,7 +1896,7 @@ class User extends BaseModel
             $params[':notoxid'] = $sOxid;
         }
         $oRs = $masterDb->select($sQ, $params);
-        if ($oRs != false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             if ($this->_blMallUsers) {
                 $blExists = true;
                 if ($oRs->fields[1] == 'user' && !$oRs->fields[2]) {
@@ -1940,7 +1940,7 @@ class User extends BaseModel
         }
 
         // sets active page
-        $iActPage = (int) Registry::getConfig()->getRequestParameter('pgNr');
+        $iActPage = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
         $iActPage = ($iActPage < 0) ? 0 : $iActPage;
 
         // load only lists which we show on screen

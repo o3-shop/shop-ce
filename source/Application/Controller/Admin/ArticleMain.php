@@ -35,6 +35,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -213,7 +214,7 @@ class ArticleMain extends AdminDetailsController
             Registry::getConfig()->getConfigParam('blWarnOnSameArtNums') &&
             $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
         ) {
-            $sSelect = "select oxid from " . getViewName('oxarticles');
+            $sSelect = "select oxid from " . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
             $sSelect .= " where oxartnum = " . $oDb->quote($aParams['oxarticles__oxartnum']);
             $sSelect .= " and oxid != " . $oDb->quote($aParams['oxarticles__oxid']);
             if ($oArticle->assignRecord($sSelect)) {
@@ -467,7 +468,7 @@ class ArticleMain extends AdminDetailsController
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sO2CView = getViewName('oxobject2category');
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
         $sQ = "select oxcatnid, oxtime from {$sO2CView} where oxobjectid = :oxobjectid";
         $oRs = $oDb->select($sQ, [
             ':oxobjectid' => $sOldId

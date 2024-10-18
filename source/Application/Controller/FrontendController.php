@@ -39,9 +39,11 @@ use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\ViewConfig;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Core\SortingValidator;
@@ -444,9 +446,7 @@ class FrontendController extends BaseController
      */
     public function isUserAllowedToManageOwnReviews()
     {
-        return (bool) $this
-            ->getConfig()
-            ->getConfigParam('blAllowUsersToManageTheirReviews');
+        return (bool) Registry::getConfig()->getConfigParam('blAllowUsersToManageTheirReviews');
     }
 
     /**
@@ -1065,6 +1065,8 @@ class FrontendController extends BaseController
      * @param string $metaIdent meta content ident
      *
      * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMetaFromContent" in next major
      */
     protected function _getMetaFromContent($metaIdent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -1075,7 +1077,7 @@ class FrontendController extends BaseController
                 $content->loadByIdent($metaIdent) &&
                 $content->oxcontents__oxactive->value
             ) {
-                return getStr()->strip_tags($content->oxcontents__oxcontent->value);
+                return Str::getStr()->strip_tags($content->oxcontents__oxcontent->value);
             }
         }
     }
@@ -1084,6 +1086,8 @@ class FrontendController extends BaseController
      * Template variable getter. Returns meta keywords
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getMetaKeywords()
     {
@@ -1107,6 +1111,8 @@ class FrontendController extends BaseController
      * Template variable getter. Returns meta description
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getMetaDescription()
     {
@@ -1293,7 +1299,7 @@ class FrontendController extends BaseController
     protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($meta) {
-            $stringModifier = getStr();
+            $stringModifier = Str::getStr();
             if ($length != -1) {
                 /* *
                  * performance - we do not need a huge amount of initial text.
@@ -1359,7 +1365,7 @@ class FrontendController extends BaseController
      */
     protected function _removeDuplicatedWords($input, $skipTags = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $stringModifier = getStr();
+        $stringModifier = Str::getStr();
         if (is_array($input)) {
             $input = implode(" ", $input);
         }
@@ -2403,7 +2409,7 @@ class FrontendController extends BaseController
      */
     public function isLowOrderPrice()
     {
-        if ($this->_blLowOrderPrice === null && ($basket = $this->getSession()->getBasket())) {
+        if ($this->_blLowOrderPrice === null && ($basket = Registry::getSession()->getBasket())) {
             $this->_blLowOrderPrice = $basket->isBelowMinOrderPrice();
         }
 
@@ -2581,6 +2587,8 @@ class FrontendController extends BaseController
      * @param string $ident content identifier
      *
      * @return Content
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentByIdent($ident)
     {
@@ -2678,6 +2686,7 @@ class FrontendController extends BaseController
      * return last finished promotion list
      *
      * @return ActionList
+     * @throws DatabaseConnectionException
      */
     public function getPromoFinishedList()
     {
@@ -2710,6 +2719,7 @@ class FrontendController extends BaseController
      * return future promotion list
      *
      * @return ActionList
+     * @throws DatabaseConnectionException
      */
     public function getPromoFutureList()
     {
@@ -2726,6 +2736,7 @@ class FrontendController extends BaseController
      * should promotions list be shown?
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function getShowPromotionList()
     {
@@ -2958,6 +2969,8 @@ class FrontendController extends BaseController
      * Checks country VAT and options (show vat only in basket and check if b2b mode is activated).
      *
      * @return boolean
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function isVatIncluded()
     {

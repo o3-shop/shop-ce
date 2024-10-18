@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -57,8 +58,8 @@ class AttributeList extends ListModel
             return;
         }
 
-        $sAttrViewName = getViewName('oxattribute');
-        $sViewName = getViewName('oxobject2attribute');
+        $sAttrViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
         $oxObjectIdsSql = implode(',', DatabaseProvider::getDb()->quoteArray($aIds));
 
@@ -84,7 +85,7 @@ class AttributeList extends ListModel
     {
         $aAttributes = [];
         $rs = DatabaseProvider::getDb()->select($sSelect);
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 if (!isset($aAttributes[$rs->fields[0]])) {
                     $aAttributes[$rs->fields[0]] = new stdClass();
@@ -115,8 +116,8 @@ class AttributeList extends ListModel
         if ($sArticleId) {
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sAttrViewName = getViewName('oxattribute');
-            $sViewName = getViewName('oxobject2attribute');
+            $sAttrViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
             $sSelect = "select {$sAttrViewName}.`oxid`, {$sAttrViewName}.`oxtitle`, o2a.`oxvalue` from {$sViewName} as o2a ";
             $sSelect .= "left join {$sAttrViewName} on {$sAttrViewName}.oxid = o2a.oxattrid ";
@@ -151,8 +152,8 @@ class AttributeList extends ListModel
         if ($sArtId) {
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sAttrViewName = getViewName('oxattribute');
-            $sViewName = getViewName('oxobject2attribute');
+            $sAttrViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
             $sSelect = "select o2a.*, {$sAttrViewName}.* from $sViewName as o2a ";
             $sSelect .= "left join {$sAttrViewName} on {$sAttrViewName}.oxid = o2a.oxattrid ";
@@ -202,9 +203,9 @@ class AttributeList extends ListModel
                 $sArtIds .= $oDb->quote($sId);
             }
 
-            $sAttTbl = getViewName('oxattribute', $iLang);
-            $sO2ATbl = getViewName('oxobject2attribute', $iLang);
-            $sC2ATbl = getViewName('oxcategory2attribute', $iLang);
+            $sAttTbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute', $iLang);
+            $sO2ATbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute', $iLang);
+            $sC2ATbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategory2attribute', $iLang);
 
             $sSelect = "SELECT DISTINCT att.oxid, att.oxtitle, o2a.oxvalue " .
                        "FROM $sAttTbl as att, $sO2ATbl as o2a ,$sC2ATbl as c2a " .
@@ -215,7 +216,7 @@ class AttributeList extends ListModel
                 ':oxobjectid' => $sCategoryId
             ]);
 
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF && list($sAttId, $sAttTitle, $sAttValue) = $rs->fields) {
                     if (!$this->offsetExists($sAttId)) {
                         $oAttribute = oxNew(Attribute::class);

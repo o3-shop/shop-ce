@@ -169,6 +169,7 @@ class NewsletterSend extends NewsletterSelection
      * Returns count of users assigned to active newsletter receiver group
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function getUserCount()
     {
@@ -207,6 +208,16 @@ class NewsletterSend extends NewsletterSelection
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Overrides parent method to pass referred id
+     *
+     * @param string $sNode referred id
+     */
+    protected function setupNavigation($sNode)
     {
         $sNode = 'newsletter_list';
 

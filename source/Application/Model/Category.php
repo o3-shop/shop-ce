@@ -28,7 +28,7 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxObjectException;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Category manager.
@@ -827,7 +827,7 @@ class Category extends MultiLanguageModel implements IUrl
         }
         $oDb = DatabaseProvider::getDb();
 
-        return $oDb->getOne('select oxrootid from ' . getViewName('oxcategories') . ' where oxid = :oxid', [
+        return $oDb->getOne('select oxrootid from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories') . ' where oxid = :oxid', [
             ':oxid' => $sCategoryId
         ]);
     }
@@ -919,7 +919,6 @@ class Category extends MultiLanguageModel implements IUrl
      * @return bool
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @throws oxObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

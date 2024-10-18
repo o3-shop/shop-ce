@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Contract\ISelectList;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Variant selection lists manager class
@@ -76,7 +77,7 @@ class VariantSelectList implements ISelectList
      */
     public function getLabel()
     {
-        return getStr()->htmlspecialchars($this->_sLabel);
+        return Str::getStr()->htmlspecialchars($this->_sLabel);
     }
 
     /**

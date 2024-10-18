@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Application\Model\Groups;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin article main delivery manager.
@@ -47,7 +48,7 @@ class DeliveryUsers extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        $sViewName = getViewName("oxgroups", $this->_iEditLang);
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->_iEditLang);
         // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');

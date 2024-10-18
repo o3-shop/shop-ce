@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Class oxUserAddressList
@@ -43,7 +45,7 @@ class UserAddressList extends ListModel
      */
     public function load($sUserId)
     {
-        $sViewName = getViewName('oxcountry');
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
         $oBaseObject = $this->getBaseObject();
         $sSelectFields = $oBaseObject->getSelectFields();
 

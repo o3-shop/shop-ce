@@ -104,7 +104,7 @@ class VoucherSerieExport extends VoucherSerieMain
     {
         $sSessionFileName = Registry::getSession()->getVariable("sExportFileName");
         if (!$sSessionFileName) {
-            $sSessionFileName = md5($this->getSession()->getId() . Registry::getUtilsObject()->generateUId());
+            $sSessionFileName = md5(Registry::getSession()->getId() . Registry::getUtilsObject()->generateUId());
             Registry::getSession()->setVariable("sExportFileName", $sSessionFileName);
         }
 

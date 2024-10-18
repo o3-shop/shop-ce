@@ -29,6 +29,7 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Application\Model\Contract\ArticleInterface;
 
 /**
@@ -433,7 +434,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
 
             if ($oArticle = $this->_getOrderArticle($sArtId)) {
                 $aList = explode(", ", $sOrderArtSelList);
-                $oStr = getStr();
+                $oStr = Str::getStr();
 
                 $aArticleSelList = $oArticle->getSelectLists();
 
@@ -688,7 +689,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
                 $myConfig->getConfigParam('blUseStock') &&
                 $myConfig->getConfigParam('blPsBasketReservationEnabled')
             ) {
-                $this->getSession()
+                Registry::getSession()
                     ->getBasketReservations()
                     ->commitArticleReservation(
                         $this->oxorderarticles__oxartid->value,

@@ -23,7 +23,9 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin shop list manager.
@@ -68,6 +70,7 @@ class ShopList extends AdminListController
      * file "shop_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -110,6 +113,7 @@ class ShopList extends AdminListController
      * Sets SQL WHERE condition. Returns array of conditions.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {
@@ -117,7 +121,7 @@ class ShopList extends AdminListController
         $this->_aWhere = parent::buildWhere();
         if (!Registry::getSession()->getVariable('malladmin')) {
             // we only allow to see our shop
-            $this->_aWhere[getViewName("oxshops") . ".oxid"] = Registry::getSession()->getVariable("actshop");
+            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName("oxshops") . ".oxid"] = Registry::getSession()->getVariable("actshop");
         }
 
         return $this->_aWhere;
