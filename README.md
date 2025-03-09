@@ -1,6 +1,6 @@
 # O3-Shop
 
-![O3-Shop logo](https://gitlab.o3-shop.com/o3/o3-documentation/-/raw/main/source/assets/logo.png "O3-Shop")
+![O3-Shop logo](https://raw.githubusercontent.com/o3-shop/o3-documentation/refs/heads/main/source/assets/logo.png "O3-Shop")
 
 ## Shop core package
 
