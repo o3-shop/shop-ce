@@ -44,3 +44,8 @@
 /var/generated_services.yaml
 /tests/Integration/Internal/Container/Dao/generated_project.yaml
 /tests/.phpunit.result.cache
+
+# Config files
+.env
+/var/configuration/shops/1.yaml
+/var/generated/generated_services.yaml
