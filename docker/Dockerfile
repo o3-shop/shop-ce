@@ -49,4 +49,4 @@ RUN chmod -R 2775 /var/www/html/var && \
 EXPOSE 80
 
 # Start Apache server
-CMD ["apache2-foreground"]
+CMD ["docker/entrypoint.sh"]
