@@ -28,6 +28,9 @@ WORKDIR /var/www/html
 # Copy application files to the container
 COPY . .
 
+RUN cp .env.example .env && \
+    cp source/config.inc.php.dist source/config.inc.php
+
 RUN git config --global --add safe.directory /var/www/html
 
 # Install Composer
