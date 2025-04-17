@@ -1,4 +1,6 @@
-mv .env.example .env
+cp .env.example .env
+
+cp source/config.inc.php.dist source/config.inc.php
 
 composer install --no-interaction --optimize-autoloader
 
