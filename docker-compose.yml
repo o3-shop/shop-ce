@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: o3shop-app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: mysql://o3shop:o3shop@db/o3shop
+
+  db:
+    image: mysql:8.0
+    container_name: o3shop-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: o3shop
+      MYSQL_USER: o3shop
+      MYSQL_PASSWORD: o3shop
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
