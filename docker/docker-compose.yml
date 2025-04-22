@@ -3,13 +3,13 @@ version: '3.8'
 services:
   app:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile
     container_name: o3shop-app
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
+      - ./..:/var/www/html
     environment:
       APP_ENV: dev
       DATABASE_URL: mysql://o3shop:o3shop@db/o3shop
