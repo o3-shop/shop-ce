@@ -4,7 +4,7 @@ cp source/config.inc.php.dist source/config.inc.php
 
 cp var/configuration/shops/1.yaml.example var/configuration/shops/1.yaml
 
-composer install --no-interaction --optimize-autoloader
+yes | composer install --no-interaction --optimize-autoloader
 
 chown -R root:www-data /var/www/html/var && \
 chown -R root:www-data /var/www/html/source && \
