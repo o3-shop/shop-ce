@@ -2139,9 +2139,9 @@ class User extends BaseModel
     public function encodePassword($sPassword, $sSalt)
     {
         /** @var Sha512Hasher $oSha512Hasher */
-        $oSha512Hasher = oxNew('Sha512Hasher');
+        $oSha512Hasher = oxNew(Sha512Hasher::class);
         /** @var PasswordHasher $oHasher */
-        $oHasher = oxNew('PasswordHasher', $oSha512Hasher);
+        $oHasher = oxNew(PasswordHasher::class, $oSha512Hasher);
 
         return $oHasher->hash($sPassword, $sSalt);
     }

@@ -1,0 +1,547 @@
+modules:
+  oxps_usercentrics:
+    id: oxps_usercentrics
+    path: oxps/usercentrics
+    version: 1.0.0
+    configured: false
+    title:
+      en: 'O3-Shop Cookie Management powered by usercentrics'
+    description:
+      de: "Die Usercentrics Consent Management Platform (CMP) ermöglicht Ihnen, Ihre Marketing- und Datenstrategie\n                 mit rechtlichen Anforderungen in Einklang zu bringen.</p>\n                 <h2>Registrieren Sie sich deshalb jetzt bei Usercentrics</h2>  \n                 <form target=\"_blank\" method=\"GET\" action=\"https://usercentrics.com/de/preise/?partnerid=o3partnerid#business-paket\">\n                     <input type=\"hidden\" name=\"partnerid\" value=\"o3partnerid\">\n                     <input style=\"background: #0A2; color: #fff; font-weight: bold;\" type=\"submit\" value=\"Jetzt registrieren\">\n                     <p>\n                         Sollte ein anderer Mitarbeiter in Ihrem Unternehmen die Registrierung durchführen, bitte dabei zwingend die O3-Shop Partner-ID o3partnerid angeben, um die Integration vollständig nutzen zu können. Zu diesem Zweck können Sie diesen Link weitergeben: https://usercentrics.com/de/preise/?partnerid=o3partnerid#business-paket\n                     </p>\n                 </form>\n                 "
+      en: "The Usercentrics Consent Management Platform (CMP) enables you to harmonize your marketing and data \n                 strategy with legal requirements.</p>\n                 <h2>Register now for Usercentrics</h2>  \n                 <form target=\"_blank\" method=\"GET\" action=\"https://usercentrics.com/pricing/?partnerid=o3partnerid#business-package\">               \n                     <input type=\"hidden\" name=\"partnerid\" value=\"o3partnerid\">\n                     <input style=\"background: #0A2; color: #fff; font-weight: bold;\" type=\"submit\" value=\"Register Now\">\n                     <p>\n                         If another employee in your company registers, please make sure to enter the O3-Shop partner ID o3partnerid in order to be able to fully use the integration. For that reason you can forward this link to them: https://usercentrics.com/pricing/?partnerid=o3partnerid#business-package\n                     </p>\n                 </form>\n                 "
+    lang: ''
+    thumbnail: ''
+    author: O3-Shop
+    url: ''
+    email: ''
+    classExtensions:
+      OxidEsales\Eshop\Core\ViewHelper\JavaScriptRenderer: OxidProfessionalServices\Usercentrics\Core\ScriptRenderer
+      OxidEsales\Eshop\Core\ViewConfig: OxidProfessionalServices\Usercentrics\Core\ViewConfig
+    moduleSettings:
+      usercentricsId:
+        group: usercentrics_main
+        type: str
+        value: ''
+      smartDataProtectorActive:
+        group: usercentrics_advanced
+        type: bool
+        value: true
+      smartDataProtectorDeactivateBlocking:
+        group: usercentrics_advanced
+        type: str
+        value: ''
+      usercentricsMode:
+        group: usercentrics_advanced
+        type: select
+        value: CmpV2
+        constraints:
+          - CmpV1
+          - CmpV2
+          - CmpV2Legacy
+          - CmpV2Tcf
+          - CmpV2TcfLegacy
+          - Custom
+      developmentAutomaticConsent:
+        type: bool
+        value: false
+    templateBlocks:
+      -
+        template: layout/base.tpl
+        block: base_js
+        file: src/views/blocks/base_js.tpl
+      -
+        template: layout/base.tpl
+        block: head_meta_description
+        file: src/views/blocks/head_meta_description.tpl
+  oegdproptin:
+    id: oegdproptin
+    path: oe/gdproptin
+    version: 1.0.1
+    configured: false
+    title:
+      de: 'GDPR Opt-in'
+      en: 'GDPR Opt-in'
+    description:
+      de: 'Das Modul stellt Opt-in-Funktionalit&auml;t f&uuml;r die Datenschutz-Grundverordnung (DSGVO) bereit'
+      en: 'This module provides the opt-in functionality for the European General Data Protection Regulation (GDPR)'
+    lang: ''
+    thumbnail: logo.png
+    author: O3-Shop
+    url: 'https://www.o3-shop.com/'
+    email: ''
+    classExtensions:
+      OxidEsales\Eshop\Application\Component\Widget\ArticleDetails: OxidEsales\GdprOptinModule\Component\Widget\ArticleDetails
+      OxidEsales\Eshop\Application\Component\Widget\Review: OxidEsales\GdprOptinModule\Component\Widget\Review
+      OxidEsales\Eshop\Application\Component\UserComponent: OxidEsales\GdprOptinModule\Component\UserComponent
+      OxidEsales\Eshop\Application\Controller\ReviewController: OxidEsales\GdprOptinModule\Controller\ReviewController
+      OxidEsales\Eshop\Application\Controller\ArticleDetailsController: OxidEsales\GdprOptinModule\Controller\ArticleDetailsController
+      OxidEsales\Eshop\Application\Controller\ContactController: OxidEsales\GdprOptinModule\Controller\ContactController
+    events:
+      onActivate: '\OxidEsales\GdprOptinModule\Core\GdprOptinModule::onActivate'
+      onDeactivate: '\OxidEsales\GdprOptinModule\Core\GdprOptinModule::onDeactivate'
+    moduleSettings:
+      blOeGdprOptinInvoiceAddress:
+        group: oegdproptin_settings
+        type: bool
+        value: false
+      blOeGdprOptinDeliveryAddress:
+        group: oegdproptin_settings
+        type: bool
+        value: false
+      blOeGdprOptinUserRegistration:
+        group: oegdproptin_settings
+        type: bool
+        value: false
+      blOeGdprOptinProductReviews:
+        group: oegdproptin_settings
+        type: bool
+        value: false
+      OeGdprOptinContactFormMethod:
+        group: oegdproptin_contact_form
+        type: select
+        value: deletion
+        constraints:
+          - deletion
+          - statistical
+    templateBlocks:
+      -
+        template: form/user.tpl
+        block: user_billing_address_form
+        file: Application/views/blocks/user_invoice_address_form.tpl
+      -
+        template: form/user.tpl
+        block: user_shipping_address_form
+        file: Application/views/blocks/user_shipping_address_form.tpl
+      -
+        template: form/user.tpl
+        block: user_form
+        file: Application/views/blocks/user_address.tpl
+      -
+        template: form/user.tpl
+        block: user
+        file: Application/views/blocks/user.tpl
+      -
+        template: form/user_checkout_change.tpl
+        block: user_checkout_change
+        file: Application/views/blocks/user_checkout_change.tpl
+      -
+        template: form/user_checkout_change.tpl
+        block: user_checkout_shipping_feedback
+        file: Application/views/blocks/user_checkout_shipping_feedback.tpl
+      -
+        template: form/user_checkout_change.tpl
+        block: user_checkout_billing_feedback
+        file: Application/views/blocks/user_checkout_billing_feedback.tpl
+      -
+        template: form/fieldset/user_account.tpl
+        block: user_account_newsletter
+        file: Application/views/blocks/user_account_newsletter.tpl
+      -
+        template: form/contact.tpl
+        block: contact_form_fields
+        file: Application/views/blocks/contact_form_fields.tpl
+      -
+        template: widget/reviews/reviews.tpl
+        block: widget_reviews_form_fields
+        file: Application/views/blocks/widget_reviews_form_fields.tpl
+  oepaypal:
+    id: oepaypal
+    path: oe/oepaypal
+    version: 1.1.0
+    configured: false
+    title:
+      en: PayPal
+    description:
+      de: 'Modul für die Zahlung mit PayPal.'
+      en: 'Module for PayPal payment.'
+    lang: ''
+    thumbnail: logo.jpg
+    author: O3-Shop
+    url: 'https://www.o3-shop.com'
+    email: info@o3-shop.com
+    classExtensions:
+      OxidEsales\Eshop\Core\ViewConfig: OxidEsales\PayPalModule\Core\ViewConfig
+      OxidEsales\Eshop\Application\Component\BasketComponent: OxidEsales\PayPalModule\Component\BasketComponent
+      OxidEsales\Eshop\Application\Component\Widget\ArticleDetails: OxidEsales\PayPalModule\Component\Widget\ArticleDetails
+      OxidEsales\Eshop\Application\Controller\OrderController: OxidEsales\PayPalModule\Controller\OrderController
+      OxidEsales\Eshop\Application\Controller\PaymentController: OxidEsales\PayPalModule\Controller\PaymentController
+      OxidEsales\Eshop\Application\Controller\WrappingController: OxidEsales\PayPalModule\Controller\WrappingController
+      OxidEsales\Eshop\Application\Controller\Admin\OrderList: OxidEsales\PayPalModule\Controller\Admin\OrderList
+      OxidEsales\Eshop\Application\Controller\Admin\DeliverySetMain: OxidEsales\PayPalModule\Controller\Admin\DeliverySetMain
+      OxidEsales\Eshop\Application\Model\Address: OxidEsales\PayPalModule\Model\Address
+      OxidEsales\Eshop\Application\Model\User: OxidEsales\PayPalModule\Model\User
+      OxidEsales\Eshop\Application\Model\Order: OxidEsales\PayPalModule\Model\Order
+      OxidEsales\Eshop\Application\Model\Basket: OxidEsales\PayPalModule\Model\Basket
+      OxidEsales\Eshop\Application\Model\Article: OxidEsales\PayPalModule\Model\Article
+      OxidEsales\Eshop\Application\Model\PaymentGateway: OxidEsales\PayPalModule\Model\PaymentGateway
+      OxidEsales\Eshop\Application\Model\PaymentList: OxidEsales\PayPalModule\Model\PaymentList
+    controllers:
+      oepaypalexpresscheckoutdispatcher: OxidEsales\PayPalModule\Controller\ExpressCheckoutDispatcher
+      oepaypalstandarddispatcher: OxidEsales\PayPalModule\Controller\StandardDispatcher
+      oepaypalipnhandler: OxidEsales\PayPalModule\Controller\IPNHandler
+      oepaypalorder_paypal: OxidEsales\PayPalModule\Controller\Admin\OrderController
+    events:
+      onActivate: '\OxidEsales\PayPalModule\Core\Events::onActivate'
+      onDeactivate: '\OxidEsales\PayPalModule\Core\Events::onDeactivate'
+    moduleSettings:
+      oePayPalClientId:
+        group: oepaypal_banners
+        type: str
+        value: ''
+      oePayPalBannersHideAll:
+        group: oepaypal_banners
+        type: bool
+        value: false
+      oePayPalBannersStartPage:
+        group: oepaypal_banners
+        type: bool
+        value: true
+      oePayPalBannersStartPageSelector:
+        group: oepaypal_banners
+        type: str
+        value: '#wrapper .row'
+      oePayPalBannersCategoryPage:
+        group: oepaypal_banners
+        type: bool
+        value: true
+      oePayPalBannersCategoryPageSelector:
+        group: oepaypal_banners
+        type: str
+        value: .page-header
+      oePayPalBannersSearchResultsPage:
+        group: oepaypal_banners
+        type: bool
+        value: true
+      oePayPalBannersSearchResultsPageSelector:
+        group: oepaypal_banners
+        type: str
+        value: '#content .page-header .clearfix'
+      oePayPalBannersProductDetailsPage:
+        group: oepaypal_banners
+        type: bool
+        value: true
+      oePayPalBannersProductDetailsPageSelector:
+        group: oepaypal_banners
+        type: str
+        value: .detailsParams
+      oePayPalBannersCheckoutPage:
+        group: oepaypal_banners
+        type: bool
+        value: true
+      oePayPalBannersCartPageSelector:
+        group: oepaypal_banners
+        type: str
+        value: .cart-buttons
+      oePayPalBannersPaymentPageSelector:
+        group: oepaypal_banners
+        type: str
+        value: '.checkoutSteps ~ .spacer'
+      oePayPalBannersColorScheme:
+        group: oepaypal_banners
+        type: select
+        value: blue
+        constraints:
+          - blue
+          - black
+          - white
+          - white-no-border
+      blOEPayPalStandardCheckout:
+        group: oepaypal_checkout
+        type: bool
+        value: true
+      blOEPayPalExpressCheckout:
+        group: oepaypal_checkout
+        type: bool
+        value: true
+      blOEPayPalECheckoutInMiniBasket:
+        group: oepaypal_checkout
+        type: bool
+        value: true
+      blOEPayPalECheckoutInDetails:
+        group: oepaypal_checkout
+        type: bool
+        value: true
+      blOEPayPalFinalizeOrderOnPayPal:
+        group: oepaypal_checkout
+        type: bool
+        value: true
+      sOEPayPalBrandName:
+        group: oepaypal_display
+        type: str
+        value: 'PayPal Testshop'
+      sOEPayPalBorderColor:
+        group: oepaypal_display
+        type: str
+        value: 2b8da4
+      sOEPayPalLogoImageOption:
+        group: oepaypal_display
+        type: select
+        value: noLogo
+        constraints:
+          - noLogo
+          - shopLogo
+          - customLogo
+      sOEPayPalCustomShopLogoImage:
+        group: oepaypal_display
+        type: str
+        value: ''
+      blOEPayPalSendToPayPal:
+        group: oepaypal_payment
+        type: bool
+        value: true
+      blOEPayPalDefaultUserChoice:
+        group: oepaypal_payment
+        type: bool
+        value: true
+      sOEPayPalTransactionMode:
+        group: oepaypal_transaction
+        type: select
+        value: Sale
+        constraints:
+          - Sale
+          - Authorization
+          - Automatic
+      sOEPayPalEmptyStockLevel:
+        group: oepaypal_transaction
+        type: str
+        value: '0'
+      sOEPayPalUserEmail:
+        group: oepaypal_api
+        type: str
+        value: ''
+      sOEPayPalUsername:
+        group: oepaypal_api
+        type: str
+        value: ''
+      sOEPayPalPassword:
+        group: oepaypal_api
+        type: password
+        value: ''
+      sOEPayPalSignature:
+        group: oepaypal_api
+        type: str
+        value: ''
+      blPayPalLoggerEnabled:
+        group: oepaypal_development
+        type: bool
+        value: false
+      blOEPayPalSandboxMode:
+        group: oepaypal_development
+        type: bool
+        value: false
+      sOEPayPalSandboxUserEmail:
+        group: oepaypal_development
+        type: str
+        value: ''
+      sOEPayPalSandboxUsername:
+        group: oepaypal_development
+        type: str
+        value: ''
+      sOEPayPalSandboxPassword:
+        group: oepaypal_development
+        type: password
+        value: ''
+      sOEPayPalSandboxSignature:
+        group: oepaypal_development
+        type: str
+        value: ''
+    templateBlocks:
+      -
+        template: deliveryset_main.tpl
+        block: admin_deliveryset_main_form
+        file: /views/blocks/deliveryset_main.tpl
+      -
+        template: widget/sidebar/partners.tpl
+        block: partner_logos
+        file: /views/blocks/widget/sidebar/oepaypalpartnerbox.tpl
+      -
+        template: widget/minibasket/minibasket.tpl
+        block: widget_minibasket_total
+        file: /views/blocks/widget/minibasket/oepaypalexpresscheckoutminibasket.tpl
+      -
+        template: page/checkout/basket.tpl
+        block: basket_btn_next_top
+        file: /views/blocks/page/checkout/oepaypalexpresscheckout.tpl
+      -
+        template: page/checkout/basket.tpl
+        block: basket_btn_next_bottom
+        file: /views/blocks/page/checkout/oepaypalexpresscheckout.tpl
+      -
+        template: page/checkout/payment.tpl
+        block: select_payment
+        file: /views/blocks/page/checkout/oepaypalpaymentselector.tpl
+      -
+        template: order_list.tpl
+        block: admin_order_list_filter
+        file: /views/blocks/oepaypalorder_list_filter_actions.tpl
+      -
+        template: order_list.tpl
+        block: admin_order_list_sorting
+        file: /views/blocks/oepaypalorder_list_sorting_actions.tpl
+      -
+        template: order_list.tpl
+        block: admin_order_list_item
+        file: /views/blocks/oepaypalorder_list_items_actions.tpl
+      -
+        template: order_list.tpl
+        block: admin_order_list_colgroup
+        file: /views/blocks/oepaypalorder_list_colgroup_actions.tpl
+      -
+        template: page/details/inc/productmain.tpl
+        block: details_productmain_tobasket
+        file: /views/blocks/page/details/oepaypalexpresscheckoutdetailspage.tpl
+      -
+        template: page/details/inc/productmain.tpl
+        block: details_productmain_morepics
+        file: /views/blocks/page/details/oepaypalexpresscheckoutdetailspagepopup.tpl
+      -
+        template: page/checkout/basket.tpl
+        block: mb_basket_btn_next_top
+        file: /views/blocks/mobile/oepaypalexpresscheckout.tpl
+      -
+        template: page/checkout/basket.tpl
+        block: mb_basket_btn_next_bottom
+        file: /views/blocks/mobile/oepaypalexpresscheckout.tpl
+      -
+        template: page/checkout/payment.tpl
+        block: mb_select_payment_dropdown
+        file: /views/blocks/mobile/oepaypalpaymentdropdown.tpl
+      -
+        template: page/checkout/payment.tpl
+        block: mb_select_payment
+        file: /views/blocks/mobile/oepaypalpaymentselector.tpl
+      -
+        template: page/details/inc/productmain.tpl
+        block: mb_details_productmain_tobasket
+        file: /views/blocks/mobile/oepaypalexpresscheckoutdetailspage.tpl
+      -
+        template: page/details/inc/productmain.tpl
+        block: mb_details_productmain_morepics
+        file: /views/blocks/mobile/oepaypalexpresscheckoutdetailspagepopup.tpl
+      -
+        template: page/checkout/user.tpl
+        block: checkout_user_main
+        file: /views/blocks/page/checkout/oepaypalexpresscheckout.tpl
+      -
+        template: page/shop/start.tpl
+        block: start_welcome_text
+        file: /views/blocks/page/shop/start.tpl
+      -
+        template: page/search/search.tpl
+        block: search_header
+        file: /views/blocks/page/search/search.tpl
+      -
+        template: page/checkout/basket.tpl
+        block: checkout_basket_next_step_top
+        file: /views/blocks/page/checkout/basket_installment_banner_after.tpl
+      -
+        template: page/checkout/basket.tpl
+        block: checkout_basket_emptyshippingcart
+        file: /views/blocks/page/checkout/basket_installment_banner_before.tpl
+      -
+        template: page/checkout/payment.tpl
+        block: checkout_payment_main
+        file: /views/blocks/page/checkout/basket_installment_banner_before.tpl
+      -
+        template: page/list/list.tpl
+        block: page_list_listhead
+        file: /views/blocks/page/list/list.tpl
+      -
+        template: page/details/inc/productmain.tpl
+        block: details_productmain_price_value
+        file: /views/blocks/page/details/inc/productmain.tpl
+    templates:
+      order_paypal.tpl: oe/oepaypal/views/admin/tpl/order_paypal.tpl
+      ipnhandler.tpl: oe/oepaypal/views/tpl/ipnhandler.tpl
+      installment_banners.tpl: oe/oepaypal/views/tpl/installment_banners.tpl
+  o3-tinymce-editor:
+    id: o3-tinymce-editor
+    path: o3-shop/tinymce-editor
+    version: 1.0.0
+    configured: false
+    title:
+      en: 'TinyMCE Editor'
+    description:
+      en: 'TinyMCE 6 integration for O3-Shop'
+    lang: ''
+    thumbnail: logo.png
+    author: 'O3-Shop, Marat Bedoev'
+    url: 'https://www.o3-shop.com/'
+    email: ''
+    classExtensions:
+      OxidEsales\Eshop\Core\ViewConfig: O3\TinyMCE\Application\Core\ViewConfig
+    controllers:
+      tinyfilemanager: O3\TinyMCE\Application\Controller\Admin\TinyFileManager
+    events:
+      onActivate: 'O3\TinyMCE\Application\Core\Setup\Events::onActivate'
+      onDeactivate: 'O3\TinyMCE\Application\Core\Setup\Events::onDeactivate'
+    moduleSettings:
+      aTinyMCE_classes:
+        group: tinyMceMain
+        type: arr
+        value:
+          - article_main
+          - category_text
+          - content_main
+          - newsletter_main
+          - news_text
+      blTinyMCE_filemanager:
+        group: tinyMceMain
+        type: bool
+        value: true
+        position: 2
+    templateBlocks:
+      -
+        template: bottomnaviitem.tpl
+        block: admin_bottomnaviitem
+        file: Application/views/blocks/admin/bottomnaviitem_admin_bottomnaviitem.tpl
+    templates:
+      TinyFilemanager.tpl: o3-shop/tinymce-editor/Application/views/admin/filemanager.tpl
+      EditorSwitch.tpl: o3-shop/tinymce-editor/Application/views/admin/editorswitch.tpl
+moduleChains:
+  classExtensions:
+    OxidEsales\Eshop\Core\ViewHelper\JavaScriptRenderer:
+      - OxidProfessionalServices\Usercentrics\Core\ScriptRenderer
+    OxidEsales\Eshop\Core\ViewConfig:
+      - OxidProfessionalServices\Usercentrics\Core\ViewConfig
+      - OxidEsales\PayPalModule\Core\ViewConfig
+      - O3\TinyMCE\Application\Core\ViewConfig
+    OxidEsales\Eshop\Application\Component\Widget\ArticleDetails:
+      - OxidEsales\GdprOptinModule\Component\Widget\ArticleDetails
+      - OxidEsales\PayPalModule\Component\Widget\ArticleDetails
+    OxidEsales\Eshop\Application\Component\Widget\Review:
+      - OxidEsales\GdprOptinModule\Component\Widget\Review
+    OxidEsales\Eshop\Application\Component\UserComponent:
+      - OxidEsales\GdprOptinModule\Component\UserComponent
+    OxidEsales\Eshop\Application\Controller\ReviewController:
+      - OxidEsales\GdprOptinModule\Controller\ReviewController
+    OxidEsales\Eshop\Application\Controller\ArticleDetailsController:
+      - OxidEsales\GdprOptinModule\Controller\ArticleDetailsController
+    OxidEsales\Eshop\Application\Controller\ContactController:
+      - OxidEsales\GdprOptinModule\Controller\ContactController
+    OxidEsales\Eshop\Application\Component\BasketComponent:
+      - OxidEsales\PayPalModule\Component\BasketComponent
+    OxidEsales\Eshop\Application\Controller\OrderController:
+      - OxidEsales\PayPalModule\Controller\OrderController
+    OxidEsales\Eshop\Application\Controller\PaymentController:
+      - OxidEsales\PayPalModule\Controller\PaymentController
+    OxidEsales\Eshop\Application\Controller\WrappingController:
+      - OxidEsales\PayPalModule\Controller\WrappingController
+    OxidEsales\Eshop\Application\Controller\Admin\OrderList:
+      - OxidEsales\PayPalModule\Controller\Admin\OrderList
+    OxidEsales\Eshop\Application\Controller\Admin\DeliverySetMain:
+      - OxidEsales\PayPalModule\Controller\Admin\DeliverySetMain
+    OxidEsales\Eshop\Application\Model\Address:
+      - OxidEsales\PayPalModule\Model\Address
+    OxidEsales\Eshop\Application\Model\User:
+      - OxidEsales\PayPalModule\Model\User
+    OxidEsales\Eshop\Application\Model\Order:
+      - OxidEsales\PayPalModule\Model\Order
+    OxidEsales\Eshop\Application\Model\Basket:
+      - OxidEsales\PayPalModule\Model\Basket
+    OxidEsales\Eshop\Application\Model\Article:
+      - OxidEsales\PayPalModule\Model\Article
+    OxidEsales\Eshop\Application\Model\PaymentGateway:
+      - OxidEsales\PayPalModule\Model\PaymentGateway
+    OxidEsales\Eshop\Application\Model\PaymentList:
+      - OxidEsales\PayPalModule\Model\PaymentList

@@ -1,0 +1,31 @@
+name: 'shop-ce'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./..:/var/www/html
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: mysql://o3shop:o3shop@db/o3shop
+      TZ: Europe/Berlin
+      PATH: /var/www/html/vendor/o3-shop/testing-library/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+  db:
+    image: mysql:8.0
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: o3shop
+      MYSQL_USER: o3shop
+      MYSQL_PASSWORD: o3shop
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
