@@ -12,6 +12,10 @@ rm -rf wave-theme-main/out
 
 cp -r wave-theme-main/* source/Application/views/wave
 
+rm -rf wave-theme-main
+
+rm main.zip
+
 
 yes | composer install --no-interaction --optimize-autoloader
 
