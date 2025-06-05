@@ -11,7 +11,7 @@ RUN apt-get update && apt-get upgrade -y \
 # Install necessary PHP extensions and dependencies
 RUN apt-get update && apt-get install -y \
     git unzip libicu-dev libxml2-dev libzip-dev libjpeg-dev libpng-dev libfreetype6-dev mariadb-client wget unzip \
-    && docker-php-ext-install intl pdo pdo_mysql zip opcache bcmath soap
+    && docker-php-ext-install intl pdo pdo_mysql zip opcache bcmath soap mysqli
 
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype \
     && docker-php-ext-install -j$(nproc) gd

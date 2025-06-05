@@ -58,6 +58,31 @@ stop_containers() {
     fi
 }
 
+rebuild_containers() {
+  cd docker || { echo "Error: Docker directory not found"; exit 1; }
+
+      check_docker_compose
+
+      # Pull latest images before starting containers
+      echo "Pulling latest Docker images..."
+      $DOCKER_COMPOSE pull
+
+      $DOCKER_COMPOSE build --no-cache
+
+      # Start the containers in detached mode
+      echo "Starting Docker containers..."
+      $DOCKER_COMPOSE up -d
+
+      # Check if containers started successfully
+      if [ $? -eq 0 ]; then
+          echo "Docker containers started successfully"
+          $DOCKER_COMPOSE ps
+      else
+          echo "Error: Failed to start Docker containers"
+          exit 1
+      fi
+}
+
 # Main script execution
 case "$1" in
     start)
@@ -66,11 +91,15 @@ case "$1" in
     stop)
         stop_containers
         ;;
+    rebuild)
+        rebuild_containers
+        ;;
     *)
         echo "Usage: $0 {start|stop}"
         echo "  start - Start Docker containers"
         echo "  stop  - Stop Docker containers"
-        exit 1
+        echo "  rebuild  - Rebuild Docker containers"
+        exit
         ;;
 esac
 
