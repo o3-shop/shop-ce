@@ -14,7 +14,7 @@ $dbName = 'o3shop';
 $dbPort = 3306;
 
 // Shop configuration
-$shopUrl = 'http://localhost/';
+$shopUrl = 'http://127.0.0.1:8080';
 $shopName = 'My O3 Shop';
 $adminEmail = 'admin@example.com';
 $adminPass = 'admin123';
@@ -29,7 +29,7 @@ if ($mysqli->connect_error) {
 $result = $mysqli->query("SHOW TABLES LIKE 'oxshops'");
 if ($result->num_rows == 0) {
     echo "Importing database schema...\n";
-    $schemaFile = __DIR__ . '/source/Setup/Sql/database_schema.sql';
+    $schemaFile = __DIR__ . '/../source/Setup/Sql/database_schema.sql';
     if (file_exists($schemaFile)) {
         $commands = file_get_contents($schemaFile);
         if (!$mysqli->multi_query($commands)) {
@@ -39,7 +39,7 @@ if ($result->num_rows == 0) {
     }
 
     echo "Importing initial data...\n";
-    $dataFile = __DIR__ . '/source/Setup/Sql/initial_data.sql';
+    $dataFile = __DIR__ . '/../source/Setup/Sql/initial_data.sql';
     if (file_exists($dataFile)) {
         $commands = file_get_contents($dataFile);
         if (!$mysqli->multi_query($commands)) {
@@ -111,9 +111,9 @@ $stmt->execute();
 
 // Generate database views - THIS IS CRUCIAL
 echo "Generating database views...\n";
-$viewCommand = __DIR__ . '/vendor/bin/oe-eshop-db_views_generate';
+$viewCommand = __DIR__ . '/../vendor/bin/oe-eshop-db_views_generate';
 if (file_exists($viewCommand)) {
-    exec("cd " . __DIR__ . " && php $viewCommand 2>&1", $output, $returnCode);
+    exec("cd " . __DIR__ . " /.. && php $viewCommand 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
         echo "Database views generated successfully.\n";
     } else {
