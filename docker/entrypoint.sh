@@ -119,6 +119,24 @@ start_apache() {
 setup_db() {
   log "${YELLOW}Setting up the database"
 
+  log "Downloading demo data"
+
+  wget -q https://github.com/o3-shop/shop-demodata-ce/archive/refs/heads/main.zip -O shop-demodata-ce.zip || handle_error "Failed to download theme"
+
+  log "Unzip Demo data"
+  unzip -q shop-demodata-ce.zip || handle_error "Failed to extract theme archive"
+
+  mv shop-demodata-ce-main shop-demodata-ce
+
+  log "Move demo data to directory"
+
+  cp -r shop-demodata-ce vendor/o3-shop
+
+
+  rm -rf shop-demodata-ce
+  rm shop-demodata-ce.zip
+  log "${GREEN}Installed demo data package"
+
   # Database connection parameters - match your PHP setup
   local DB_HOST="db"
   local DB_USER="o3shop"
