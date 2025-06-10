@@ -1,5 +1,5 @@
+#!/usr/bin/env php
 <?php
-// o3-setup.php
 
 // Check for MySQLi extension
 if (!extension_loaded('mysqli')) {
@@ -18,6 +18,17 @@ $shopUrl = 'http://127.0.0.1:8080';
 $shopName = 'My O3 Shop';
 $adminEmail = 'admin@example.com';
 $adminPass = 'admin123';
+
+// Check if database already exists
+$mysqliCheck = new mysqli($dbHost, $dbUser, $dbPwd, '', $dbPort);
+if ($mysqliCheck->connect_error) {
+    die("DB Connection failed: " . $mysqliCheck->connect_error . "\n");
+}
+$dbExistsResult = $mysqliCheck->query("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$dbName'");
+if ($dbExistsResult && $dbExistsResult->num_rows > 0) {
+    die("Database '$dbName' already exists. Aborting setup.\n");
+}
+$mysqliCheck->close();
 
 // Connect to MySQL
 $mysqli = new mysqli($dbHost, $dbUser, $dbPwd, $dbName, $dbPort);
