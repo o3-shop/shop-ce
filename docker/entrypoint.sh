@@ -116,11 +116,42 @@ start_apache() {
     apache2-foreground
 }
 
+setup_db() {
+  log "${YELLOW}Setting up the database"
+
+  # Database connection parameters - match your PHP setup
+  local DB_HOST="db"
+  local DB_USER="o3shop"
+  local DB_PWD="o3shop"
+  local DB_PORT="3306"
+
+  log "${YELLOW}Waiting for database container (timeout 2 mins)..."
+  local timeout=120
+  local start_time=$(date +%s)
+
+  while ! mysqladmin ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PWD" --port "$DB_PORT" --silent; do
+    log "${YELLOW}Database not ready - retrying in 5s..."
+    sleep 5
+
+    # Timeout check
+    local current_time=$(date +%s)
+    if [ $((current_time - start_time)) -ge $timeout ]; then
+      log "${RED}Timeout reached - database not responding"
+      exit 1
+    fi
+  done
+
+  log "${GREEN}Database connection established"
+  bin/o3-setup
+}
+
+
 # Main execution
 main() {
     log "${GREEN}Starting shop setup...${NC}"
     
     setup_environment
+    setup_db
     install_theme
     install_dependencies
     set_permissions
