@@ -31,10 +31,20 @@ if ($dbExistsResult && $dbExistsResult->num_rows > 0) {
 $mysqliCheck->close();
 
 // Connect to MySQL
-$mysqli = new mysqli($dbHost, $dbUser, $dbPwd, $dbName, $dbPort);
+$mysqli = new mysqli($dbHost, $dbUser, $dbPwd, '', $dbPort);
 if ($mysqli->connect_error) {
     die("DB Connection failed: " . $mysqli->connect_error . "\n");
 }
+
+$dbExists = $mysqli->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$dbName'");
+if ($dbExists && $dbExists->num_rows == 0) {
+    // Step 3: Create the database if it does not exist
+    if (!$mysqli->query("CREATE DATABASE `$dbName`")) {
+        die("Database creation failed: " . $mysqli->error . "\n");
+    }
+}
+
+$mysqli->select_db($dbName) or die("Could not select database: " . $mysqli->error . "\n");
 
 // Check if schema is already imported
 $result = $mysqli->query("SHOW TABLES LIKE 'oxshops'");
@@ -49,15 +59,7 @@ if ($result->num_rows == 0) {
         while ($mysqli->next_result()) { /* flush results */ }
     }
 
-    echo "Importing initial data...\n";
-    $dataFile = __DIR__ . '/../source/Setup/Sql/initial_data.sql';
-    if (file_exists($dataFile)) {
-        $commands = file_get_contents($dataFile);
-        if (!$mysqli->multi_query($commands)) {
-            echo "Warning: Initial data import failed: " . $mysqli->error . "\n";
-        }
-        while ($mysqli->next_result()) { /* flush results */ }
-    }
+
 } else {
     echo "Database already initialized, skipping schema import.\n";
 }
@@ -119,6 +121,29 @@ $stmt = $mysqli->prepare("
 ");
 $stmt->bind_param('sss', $adminId, $adminEmail, $adminPassHash);
 $stmt->execute();
+
+echo "Installing Demo Data...\n";
+$demodataCommand = __DIR__ . '/../vendor/bin/oe-eshop-demodata_install';
+if (file_exists($demodataCommand)) {
+    exec("cd " . __DIR__ . " /.. && php $demodataCommand 2>&1", $output, $returnCode);
+    $command = "mysql --user=o3shop --password='o3shop' -h db -D o3shop < " . __DIR__ . "/../vendor/o3-shop/shop-demodata-ce/src/demodata.sql";
+    $output = shell_exec($command);
+    if ($output === null) {
+        echo "SQL script executed successfully.";
+    } else {
+        echo "Error executing SQL script: $output";
+    }
+
+    if ($returnCode === 0) {
+        echo "Demo Data Installed successfully.\n";
+    } else {
+        echo "Demo Data installation output:\n" . implode("\n", $output) . "\n";
+    }
+} else {
+    echo "WARNING: Demo Data not found $demodataCommand\n";
+    echo "If you want to have the demo data you need to run these commands:\n";
+    echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
+}
 
 // Generate database views - THIS IS CRUCIAL
 echo "Generating database views...\n";
