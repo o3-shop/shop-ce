@@ -116,26 +116,34 @@ start_apache() {
     apache2-foreground
 }
 
+install_demodata() {
+    if [ -d "vendor/o3-shop/shop-demodata-ce" ] && [ "$(ls -A vendor/o3-shop/shop-demodata-ce)" ]; then
+            log "Demodata is already installed. Skipping install."
+            return 0
+        fi
+
+
+    log "Downloading demo data"
+
+      wget -q https://github.com/o3-shop/shop-demodata-ce/archive/refs/heads/main.zip -O shop-demodata-ce.zip || handle_error "Failed to download theme"
+
+      log "Unzip Demo data"
+      unzip -q shop-demodata-ce.zip || handle_error "Failed to extract theme archive"
+
+      mv shop-demodata-ce-main shop-demodata-ce
+
+      log "Move demo data to directory"
+
+      cp -r shop-demodata-ce vendor/o3-shop
+
+
+      rm -rf shop-demodata-ce
+      rm shop-demodata-ce.zip
+      log "${GREEN}Installed demo data package"
+}
+
 setup_db() {
   log "${YELLOW}Setting up the database"
-
-  log "Downloading demo data"
-
-  wget -q https://github.com/o3-shop/shop-demodata-ce/archive/refs/heads/main.zip -O shop-demodata-ce.zip || handle_error "Failed to download theme"
-
-  log "Unzip Demo data"
-  unzip -q shop-demodata-ce.zip || handle_error "Failed to extract theme archive"
-
-  mv shop-demodata-ce-main shop-demodata-ce
-
-  log "Move demo data to directory"
-
-  cp -r shop-demodata-ce vendor/o3-shop
-
-
-  rm -rf shop-demodata-ce
-  rm shop-demodata-ce.zip
-  log "${GREEN}Installed demo data package"
 
   # Database connection parameters - match your PHP setup
   local DB_HOST="db"
@@ -169,6 +177,7 @@ main() {
     log "${GREEN}Starting shop setup...${NC}"
     
     setup_environment
+    install_demodata
     setup_db
     install_theme
     install_dependencies
