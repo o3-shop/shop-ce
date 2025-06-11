@@ -118,7 +118,7 @@ start_apache() {
 
 install_demodata() {
     if [ -d "vendor/o3-shop/shop-demodata-ce" ] && [ "$(ls -A vendor/o3-shop/shop-demodata-ce)" ]; then
-            log "Demodata is already installed. Skipping install."
+            log "${GREEN}Demodata is already installed. Skipping install."
             return 0
         fi
 
