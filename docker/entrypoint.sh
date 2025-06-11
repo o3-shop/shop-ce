@@ -177,10 +177,10 @@ main() {
     log "${GREEN}Starting shop setup...${NC}"
     
     setup_environment
+    install_dependencies
     install_demodata
     setup_db
     install_theme
-    install_dependencies
     set_permissions
     start_apache
 }
