@@ -123,7 +123,7 @@ install_demodata() {
         fi
 
 
-    log "Downloading demo data"
+    log "${YELLOW}Downloading demo data"
 
       wget -q https://github.com/o3-shop/shop-demodata-ce/archive/refs/heads/main.zip -O shop-demodata-ce.zip || handle_error "Failed to download theme"
 
