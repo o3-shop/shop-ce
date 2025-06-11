@@ -74,6 +74,56 @@ if ($result->num_rows == 0) {
         echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
     }
 
+    // Create/Update shop record with correct columns
+    echo "Setting up shop configuration...\n";
+    $shopId = 'oxbaseshop';
+
+// Build INSERT with only existing columns
+    $shopColumns = [
+        'OXID' => $shopId,
+        'OXACTIVE' => '1',
+        'OXNAME' => $shopName,
+        'OXURL' => $shopUrl,
+        'OXCOMPANY' => 'My Company',
+        'OXCITY' => 'My City',
+        'OXCOUNTRY' => 'Germany',
+        'OXINFOEMAIL' => $adminEmail,
+        'OXORDEREMAIL' => $adminEmail,
+        'OXOWNEREMAIL' => $adminEmail,
+    ];
+
+// Filter only existing columns
+    $validColumns = array_intersect_key($shopColumns, array_flip($columns));
+    $columnNames = implode(', ', array_keys($validColumns));
+    $placeholders = implode(', ', array_fill(0, count($validColumns), '?'));
+    $values = array_values($validColumns);
+
+    $stmt = $mysqli->prepare("
+    INSERT INTO oxshops ($columnNames) 
+    VALUES ($placeholders)
+    ON DUPLICATE KEY UPDATE OXNAME = VALUES(OXNAME), OXURL = VALUES(OXURL)
+");
+    $types = str_repeat('s', count($values));
+    $stmt->bind_param($types, ...$values);
+    $stmt->execute();
+
+
+
+    // Create admin user
+    echo "Creating admin user...\n";
+    $adminPassHash = password_hash($adminPass, PASSWORD_BCRYPT);
+    $adminId = md5($adminEmail . time());
+
+    $stmt = $mysqli->prepare("
+    INSERT INTO oxuser (
+        OXID, OXUSERNAME, OXPASSWORD, OXACTIVE, OXRIGHTS, OXFNAME, OXLNAME, OXSHOPID
+    ) VALUES (?, ?, ?, 1, 'malladmin', 'Admin', 'User', 1)
+    ON DUPLICATE KEY UPDATE 
+        OXPASSWORD = VALUES(OXPASSWORD),
+        OXRIGHTS = VALUES(OXRIGHTS)
+");
+    $stmt->bind_param('sss', $adminId, $adminEmail, $adminPassHash);
+    $stmt->execute();
 } else {
     echo "Database already initialized, skipping schema import.\n";
 }
@@ -86,57 +136,6 @@ while ($row = $result->fetch_assoc()) {
     $columns[] = $row['Field'];
 }
 echo "Available columns: " . implode(', ', $columns) . "\n";
-
-// Create/Update shop record with correct columns
-echo "Setting up shop configuration...\n";
-$shopId = 'oxbaseshop';
-
-// Build INSERT with only existing columns
-$shopColumns = [
-    'OXID' => $shopId,
-    'OXACTIVE' => '1',
-    'OXNAME' => $shopName,
-    'OXURL' => $shopUrl,
-    'OXCOMPANY' => 'My Company',
-    'OXCITY' => 'My City',
-    'OXCOUNTRY' => 'Germany',
-    'OXINFOEMAIL' => $adminEmail,
-    'OXORDEREMAIL' => $adminEmail,
-    'OXOWNEREMAIL' => $adminEmail,
-];
-
-// Filter only existing columns
-$validColumns = array_intersect_key($shopColumns, array_flip($columns));
-$columnNames = implode(', ', array_keys($validColumns));
-$placeholders = implode(', ', array_fill(0, count($validColumns), '?'));
-$values = array_values($validColumns);
-
-$stmt = $mysqli->prepare("
-    INSERT INTO oxshops ($columnNames) 
-    VALUES ($placeholders)
-    ON DUPLICATE KEY UPDATE OXNAME = VALUES(OXNAME), OXURL = VALUES(OXURL)
-");
-$types = str_repeat('s', count($values));
-$stmt->bind_param($types, ...$values);
-$stmt->execute();
-
-// Create admin user
-echo "Creating admin user...\n";
-$adminPassHash = password_hash($adminPass, PASSWORD_BCRYPT);
-$adminId = md5($adminEmail . time());
-
-$stmt = $mysqli->prepare("
-    INSERT INTO oxuser (
-        OXID, OXUSERNAME, OXPASSWORD, OXACTIVE, OXRIGHTS, OXFNAME, OXLNAME, OXSHOPID
-    ) VALUES (?, ?, ?, 1, 'malladmin', 'Admin', 'User', 1)
-    ON DUPLICATE KEY UPDATE 
-        OXPASSWORD = VALUES(OXPASSWORD),
-        OXRIGHTS = VALUES(OXRIGHTS)
-");
-$stmt->bind_param('sss', $adminId, $adminEmail, $adminPassHash);
-$stmt->execute();
-
-
 
 // Generate database views - THIS IS CRUCIAL
 echo "Generating database views...\n";
