@@ -22,7 +22,7 @@ $adminPass = 'admin123';
 // Check if database already exists
 $mysqli = new mysqli($dbHost, $dbUser, $dbPwd, '', $dbPort);
 if ($mysqli->connect_error) {
-    die("DB Connection failed: " . $mysqliCheck->connect_error . "\n");
+    die("DB Connection failed: " . $mysqli->connect_error . "\n");
 }
 $dbExistsResult = $mysqli->query("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$dbName'");
 if ($dbExistsResult && $dbExistsResult->num_rows > 0) {
