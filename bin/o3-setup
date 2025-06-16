@@ -74,6 +74,16 @@ if ($result->num_rows == 0) {
         echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
     }
 
+    // Get actual oxshops table structure
+    echo "Checking oxshops table structure...\n";
+    $result = $mysqli->query("DESCRIBE oxshops");
+    $columns = [];
+    while ($row = $result->fetch_assoc()) {
+        $columns[] = $row['Field'];
+    }
+    echo "Available columns: " . implode(', ', $columns) . "\n";
+
+
     // Create/Update shop record with correct columns
     echo "Setting up shop configuration...\n";
     $shopId = 'oxbaseshop';
@@ -128,14 +138,6 @@ if ($result->num_rows == 0) {
     echo "Database already initialized, skipping schema import.\n";
 }
 
-// Get actual oxshops table structure
-echo "Checking oxshops table structure...\n";
-$result = $mysqli->query("DESCRIBE oxshops");
-$columns = [];
-while ($row = $result->fetch_assoc()) {
-    $columns[] = $row['Field'];
-}
-echo "Available columns: " . implode(', ', $columns) . "\n";
 
 // Generate database views - THIS IS CRUCIAL
 echo "Generating database views...\n";
