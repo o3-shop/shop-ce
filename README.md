@@ -17,15 +17,14 @@ We work mostly with Colima. Expect this to be tested best.
 Follow these three simple steps:
 
 - Clone this [repository](https://github.com/o3-shop/shop-ce)
-- Open docker/docker-compose.yml
-- Run it -- either with your IDE or with docker desktop or on shell. Consult the internet, if you need to figure out how to to this.
+- Run `./docker.sh start` and it should go up and running 
 
-Aaand: You're ready to go. Just open http://localhost:8080. 
+Aaand: You're ready to go. Just open http://127.0.0.1:8080. 
 
 And just if you missed the docker log message:
 
-- Shop URL: http://localhost:8080
-- Admin URL: http://localhost:8080/admin/
+- Shop URL: http://127.0.0.1:8080
+- Admin URL: http://127.0.0.1:8080/admin/
 - Admin login: admin@example.com
 - Admin Password: admin123
 

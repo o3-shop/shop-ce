@@ -32,6 +32,14 @@ start_containers() {
     if [ $? -eq 0 ]; then
         echo "Docker containers started successfully"
         $DOCKER_COMPOSE ps
+
+        echo "
+| Credentials    |
+| -------------- | ---------------------------- |
+| Shop URL       | http://127.0.0.1:8080        |
+| Admin URL      | http://127.0.0.1:8080/admin/ |
+| Admin Login    | admin@example.com            |
+| Admin Password | admin123                     |"
     else
         echo "Error: Failed to start Docker containers"
         exit 1
