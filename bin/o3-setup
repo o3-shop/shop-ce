@@ -19,6 +19,11 @@ $shopName = 'My O3 Shop';
 $adminEmail = 'admin@example.com';
 $adminPass = 'admin123';
 
+// Mailpit configuration
+$mailpitHost = 'mailpit';  // Usually the service name in Docker
+$mailpitPort = 1025;       // Default Mailpit SMTP port
+$mailpitWebPort = 8025;    // Default Mailpit web interface port
+
 // Check if database already exists
 $mysqli = new mysqli($dbHost, $dbUser, $dbPwd, '', $dbPort);
 if ($mysqli->connect_error) {
@@ -117,7 +122,20 @@ if ($result->num_rows == 0) {
     $stmt->bind_param($types, ...$values);
     $stmt->execute();
 
+    // Configure Mailpit SMTP settings
+    echo "Configuring Mailpit SMTP settings...\n";
 
+    // Update OXSMTP field in oxshops table for Mailpit
+    $mailpitSmtp = $mailpitHost . ':' . $mailpitPort;
+    $stmt = $mysqli->prepare("UPDATE oxshops SET OXSMTP = ? WHERE OXID = ?");
+    $stmt->bind_param('ss', $mailpitSmtp, $shopId);
+    if ($stmt->execute()) {
+        echo "Mailpit SMTP configuration completed.\n";
+        echo "SMTP server set to: $mailpitSmtp\n";
+        echo "Mailpit web interface will be available at: http://127.0.0.1:$mailpitWebPort\n";
+    } else {
+        echo "ERROR: Failed to configure Mailpit SMTP settings.\n";
+    }
 
     // Create admin user
     echo "Creating admin user...\n";
@@ -136,8 +154,22 @@ if ($result->num_rows == 0) {
     $stmt->execute();
 } else {
     echo "Database already initialized, skipping schema import.\n";
-}
 
+    // Still configure Mailpit even if database exists
+    echo "Configuring Mailpit SMTP settings...\n";
+
+    $shopId = 1;
+    // Update OXSMTP field in oxshops table for Mailpit
+    $mailpitSmtp = $mailpitHost . ':' . $mailpitPort;
+    $stmt = $mysqli->prepare("UPDATE oxshops SET OXSMTP = ? WHERE OXID = ?");
+    $stmt->bind_param('ss', $mailpitSmtp, $shopId);
+    if ($stmt->execute()) {
+        echo "Mailpit SMTP configuration completed.\n";
+        echo "SMTP server set to: $mailpitSmtp\n";
+    } else {
+        echo "ERROR: Failed to configure Mailpit SMTP settings.\n";
+    }
+}
 
 // Generate database views - THIS IS CRUCIAL
 echo "Generating database views...\n";
@@ -159,6 +191,9 @@ echo "\n=== Setup Complete ===\n";
 echo "Shop URL: $shopUrl\n";
 echo "Admin Email: $adminEmail\n";
 echo "Admin Password: $adminPass\n";
+echo "Mailpit Web Interface: http://127.0.0.1:$mailpitWebPort\n";
+echo "SMTP Server: $mailpitHost:$mailpitPort\n";
 echo "\nIMPORTANT: If views weren't generated, run:\n";
 echo "php vendor/bin/oe-eshop-db_views_generate\n";
+echo "\nMailpit is configured for email testing. All emails will be captured in Mailpit.\n";
 ?>
