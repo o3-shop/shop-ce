@@ -40,5 +40,11 @@ services:
       MP_DATABASE: /data/mailpit.db
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
 volumes:
   db_data:
