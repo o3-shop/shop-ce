@@ -125,6 +125,7 @@ if ($result->num_rows == 0) {
     // Configure Mailpit SMTP settings
     echo "Configuring Mailpit SMTP settings...\n";
 
+    $shopId = 1;
     // Update OXSMTP field in oxshops table for Mailpit
     $mailpitSmtp = $mailpitHost . ':' . $mailpitPort;
     $stmt = $mysqli->prepare("UPDATE oxshops SET OXSMTP = ? WHERE OXID = ?");
