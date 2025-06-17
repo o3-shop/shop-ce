@@ -122,28 +122,23 @@ start_apache() {
 
 install_demodata() {
     if [ -d "vendor/o3-shop/shop-demodata-ce" ] && [ "$(ls -A vendor/o3-shop/shop-demodata-ce)" ]; then
-            log "${GREEN}Demodata is already installed. Skipping install."
-            return 0
-        fi
-
+      log "${GREEN}Demodata is already downloaded. Skipping download."
+      return 0
+    fi
 
     log "${YELLOW}Downloading demo data"
 
-      wget -q https://github.com/o3-shop/shop-demodata-ce/archive/refs/heads/main.zip -O shop-demodata-ce.zip || handle_error "Failed to download theme"
+    cd /tmp
+    git clone https://github.com/o3-shop/shop-demodata-ce
+    rm -rf shop-demodata-ce/.git
 
-      log "Unzip Demo data"
-      unzip -q shop-demodata-ce.zip || handle_error "Failed to extract theme archive"
+    log "Moving demo data into target directory 'vendor/o3-shop'"
+    cp -r shop-demodata-ce /var/www/html/vendor/o3-shop
 
-      mv shop-demodata-ce-main shop-demodata-ce
+    # rm -rf shop-demodata-ce
+    log "${GREEN}Installed demo data package"
 
-      log "Move demo data to directory"
-
-      cp -r shop-demodata-ce vendor/o3-shop
-
-
-      rm -rf shop-demodata-ce
-      rm shop-demodata-ce.zip
-      log "${GREEN}Installed demo data package"
+    cd /var/www/html
 }
 
 setup_db() {
