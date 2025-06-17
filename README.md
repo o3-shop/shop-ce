@@ -4,7 +4,7 @@
 
 ## Shop core package
 
-This package is part of the O3 shop. For more information, consult the [documentation](https://docs.o3-shop.com) and join the community on [https://community.o3-shop.com](https://community.o3-shop-com)
+This package is part of the O3 shop. For more information, consult the [documentation](https://docs.o3-shop.com)
 
 - License: GNU General Public License 3 [https://www.gnu.org/licenses/gpl-3.0.de.html](https://www.gnu.org/licenses/gpl-3.0.de.html)
 - Website: [https://www.O3-Shop.com](https://www.O3-Shop.com)
@@ -39,11 +39,11 @@ And just if you missed the docker log message:
 
 #### mailpit
 
-If you finish the setup, all emails are being sent to mailpit. You reach it at http://localhost:8081
+If you finish the setup, all emails are being sent to mailpit. You reach it at http://localhost:8025.
 
 ### adminer
 
-Also an adminer comes for free. Try http://localhost:8081.
+Also, an adminer comes with the standard installation. Try http://localhost:8081.
 
 # Bugs and issues
 
