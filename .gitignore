@@ -51,3 +51,5 @@
 /var/generated/generated_services.yaml
 
 .phpstorm.meta.php
+
+/docker/data
