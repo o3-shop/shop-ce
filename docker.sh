@@ -36,8 +36,8 @@ start_containers() {
         echo "
 | Credentials    |
 | -------------- | ---------------------------- |
-| Shop URL       | http://127.0.0.1:8080        |
-| Admin URL      | http://127.0.0.1:8080/admin/ |
+| Shop URL       | http://localhost:8080        |
+| Admin URL      | http://localhoat:8080/admin/ |
 | Admin Login    | admin@example.com            |
 | Admin Password | admin123                     |"
     else

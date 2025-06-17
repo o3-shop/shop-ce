@@ -14,7 +14,7 @@ $dbName = 'o3shop';
 $dbPort = 3306;
 
 // Shop configuration
-$shopUrl = 'http://127.0.0.1:8080';
+$shopUrl = 'http://localhost:8080';
 $shopName = 'My O3 Shop';
 $adminEmail = 'admin@example.com';
 $adminPass = 'admin123';
@@ -133,7 +133,7 @@ if ($result->num_rows == 0) {
     if ($stmt->execute()) {
         echo "Mailpit SMTP configuration completed.\n";
         echo "SMTP server set to: $mailpitSmtp\n";
-        echo "Mailpit web interface will be available at: http://127.0.0.1:$mailpitWebPort\n";
+        echo "Mailpit web interface will be available at: http://localhost:$mailpitWebPort\n";
     } else {
         echo "ERROR: Failed to configure Mailpit SMTP settings.\n";
     }
@@ -192,7 +192,7 @@ echo "\n=== Setup Complete ===\n";
 echo "Shop URL: $shopUrl\n";
 echo "Admin Email: $adminEmail\n";
 echo "Admin Password: $adminPass\n";
-echo "Mailpit Web Interface: http://127.0.0.1:$mailpitWebPort\n";
+echo "Mailpit Web Interface: http://localhost:$mailpitWebPort\n";
 echo "SMTP Server: $mailpitHost:$mailpitPort\n";
 echo "\nIMPORTANT: If views weren't generated, run:\n";
 echo "php vendor/bin/oe-eshop-db_views_generate\n";
