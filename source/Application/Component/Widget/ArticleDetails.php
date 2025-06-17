@@ -279,7 +279,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         return $this->getAddUrlParams();
     }
-    
+
     /**
      * In case list type is "search" returns search parameters which will be added to product details link.
      *
@@ -302,7 +302,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         return $this->processProduct($oProduct);
     }
-    
+
     /**
      * Processes product by setting link type and in case list type is search adds search parameters to details link.
      *
@@ -388,10 +388,10 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
                 $this->_iLinkType = OXARTICLE_LINKTYPE_VENDOR;
             } elseif ('manufacturer' == $sListType) {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_MANUFACTURER;
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+                // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             } elseif ('recommlist' == $sListType) {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_RECOMM;
-            // END deprecated
+                // END deprecated
             } else {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_CATEGORY;
 
@@ -858,7 +858,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             }
         }
 
-        return (double) $this->_dRatingValue;
+        return (double)$this->_dRatingValue;
     }
 
     /**
@@ -1011,7 +1011,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         return $this->setSortingParameters();
     }
-    
+
     /**
      * Set item sorting for widget based of retrieved parameters.
      */
