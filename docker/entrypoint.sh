@@ -101,7 +101,11 @@ set_permissions() {
             log "${YELLOW}Warning: $dir does not exist${NC}"
         fi
     done
-    
+
+    log "Setting ownership for configuration files"
+    chmod 444 /var/www/html/source/config.inc.php
+    chmod 444 /var/www/html/.env
+
     log "${GREEN}Permissions set successfully${NC}"
 }
 
