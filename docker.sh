@@ -1,5 +1,18 @@
 #!/bin/bash
 
+function getMyPath() {
+  # Version 1.0.1
+  source="${BASH_SOURCE[1]}"
+  while [ -h "$source" ]; do
+    dir="$(cd -P "$(dirname "$source")" && pwd)"
+    source="$(readlink "$source")"
+    [[ $source != /* ]] && source="$dir/$source"
+  done
+
+  cd -P "$(dirname "$source")" && pwd
+}
+
+
 # Determine which Docker Compose command to use
 check_docker_compose() {
     if command -v docker &> /dev/null && docker compose version &> /dev/null; then
@@ -16,7 +29,8 @@ check_docker_compose() {
 # Function to start Docker containers
 start_containers() {
     # Change to the docker directory
-    cd docker || { echo "Error: Docker directory not found"; exit 1; }
+    MY_DIR=$(getMyPath)
+    cd MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
 
     check_docker_compose
 
@@ -49,7 +63,8 @@ start_containers() {
 # Function to stop Docker containers
 stop_containers() {
     # Change to the docker directory
-    cd docker || { echo "Error: Docker directory not found"; exit 1; }
+    MY_DIR=$(getMyPath)
+    cd MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
 
     check_docker_compose
 
@@ -67,9 +82,18 @@ stop_containers() {
 }
 
 rebuild_containers() {
-  cd docker || { echo "Error: Docker directory not found"; exit 1; }
+      MY_DIR=$(getMyPath)
+      cd MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
 
       check_docker_compose
+
+      rm -f MY_DIR/runned.txt
+
+      rm -f MY_DIR/source/tmp/*.txt
+
+      rm -f MY_DIR/source/tmp/*.php
+
+      rm -f MY_DIR/source/tmp/smarty/*.php
 
       # Pull latest images before starting containers
       echo "Pulling latest Docker images..."
@@ -91,16 +115,22 @@ rebuild_containers() {
       fi
 }
 
+MY_DIR=$(getMyPath)
+if [ ! -f "$MY_DIR/docker/.env" ]; then
+    cp $MY_DIR/docker/.env.dev $MY_DIR/docker/.env
+fi
+
 # Main script execution
 case "$1" in
+
     start)
-        start_containers
+        start_containers || exit 127
         ;;
     stop)
-        stop_containers
+        stop_containers || exit 127
         ;;
     rebuild)
-        rebuild_containers
+        rebuild_containers || exit 127
         ;;
     *)
         echo "Usage: $0 {start|stop}"
