@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     git \
     nano \
     sudo \
+    wget \
     && apt-get install -y default-mysql-client
 
 # Configure and install PHP extensions
