@@ -4,7 +4,7 @@
 runned.txt
 
 /docker/data-mailpit
-
+!/docker/.env
 # Log
 /source/log/
 !/source/log/.htaccess
