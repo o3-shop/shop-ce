@@ -1,0 +1,200 @@
+#!/usr/bin/env php
+<?php
+
+// Check for MySQLi extension
+if (!extension_loaded('mysqli')) {
+    die("MySQLi extension not loaded. Install php8.2-mysql first.\n");
+}
+
+// Database credentials
+$dbHost = 'db';
+$dbUser = 'o3shop';
+$dbPwd  = 'o3shop';
+$dbName = 'o3shop';
+$dbPort = 3306;
+
+// Shop configuration
+$shopUrl = 'http://localhost:8080';
+$shopName = 'My O3 Shop';
+$adminEmail = 'admin@example.com';
+$adminPass = 'admin123';
+
+// Mailpit configuration
+$mailpitHost = 'mailpit';  // Usually the service name in Docker
+$mailpitPort = 1025;       // Default Mailpit SMTP port
+$mailpitWebPort = 8025;    // Default Mailpit web interface port
+
+// Check if database already exists
+$mysqli = new mysqli($dbHost, $dbUser, $dbPwd, '', $dbPort);
+if ($mysqli->connect_error) {
+    die("DB Connection failed: " . $mysqli->connect_error . "\n");
+}
+$dbExistsResult = $mysqli->query("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '$dbName'");
+if ($dbExistsResult && $dbExistsResult->num_rows > 0) {
+
+} else {
+    $dbExists = $mysqli->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$dbName'");
+    if ($dbExists && $dbExists->num_rows == 0) {
+        // Step 3: Create the database if it does not exist
+        if (!$mysqli->query("CREATE DATABASE `$dbName`")) {
+            die("Database creation failed: " . $mysqli->error . "\n");
+        }
+    }
+}
+
+$mysqli->select_db($dbName) or die("Could not select database: " . $mysqli->error . "\n");
+
+// Check if schema is already imported
+$result = $mysqli->query("SHOW TABLES LIKE 'oxshops'");
+if ($result->num_rows == 0) {
+    echo "Importing database schema...\n";
+    $schemaFile = __DIR__ . '/../source/Setup/Sql/database_schema.sql';
+    if (file_exists($schemaFile)) {
+        $commands = file_get_contents($schemaFile);
+        if (!$mysqli->multi_query($commands)) {
+            die("Schema import failed: " . $mysqli->error . "\n");
+        }
+        while ($mysqli->next_result()) { /* flush results */ }
+    }
+    echo "Installing Demo Data...\n";
+    $demodataCommand = __DIR__ . '/../vendor/bin/oe-eshop-demodata_install';
+    if (file_exists($demodataCommand)) {
+        exec("cd " . __DIR__ . " /.. && php $demodataCommand 2>&1", $output, $returnCode);
+        $command = "mysql --user=o3shop --password='o3shop' -h db -D o3shop < " . __DIR__ . "/../vendor/o3-shop/shop-demodata-ce/src/demodata.sql";
+        $output = shell_exec($command);
+        if ($output === null) {
+            echo "SQL script executed successfully.";
+        } else {
+            echo "Error executing SQL script: $output";
+        }
+
+        if ($returnCode === 0) {
+            echo "Demo Data Installed successfully.\n";
+        } else {
+            echo "Demo Data installation output:\n" . implode("\n", $output) . "\n";
+        }
+    } else {
+        echo "WARNING: Demo Data not found $demodataCommand\n";
+        echo "If you want to have the demo data you need to run these commands:\n";
+        echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
+    }
+
+    // Get actual oxshops table structure
+    echo "Checking oxshops table structure...\n";
+    $result = $mysqli->query("DESCRIBE oxshops");
+    $columns = [];
+    while ($row = $result->fetch_assoc()) {
+        $columns[] = $row['Field'];
+    }
+    echo "Available columns: " . implode(', ', $columns) . "\n";
+
+
+    // Create/Update shop record with correct columns
+    echo "Setting up shop configuration...\n";
+    $shopId = 'oxbaseshop';
+
+// Build INSERT with only existing columns
+    $shopColumns = [
+        'OXID' => $shopId,
+        'OXACTIVE' => '1',
+        'OXNAME' => $shopName,
+        'OXURL' => $shopUrl,
+        'OXCOMPANY' => 'My Company',
+        'OXCITY' => 'My City',
+        'OXCOUNTRY' => 'Germany',
+        'OXINFOEMAIL' => $adminEmail,
+        'OXORDEREMAIL' => $adminEmail,
+        'OXOWNEREMAIL' => $adminEmail,
+    ];
+
+// Filter only existing columns
+    $validColumns = array_intersect_key($shopColumns, array_flip($columns));
+    $columnNames = implode(', ', array_keys($validColumns));
+    $placeholders = implode(', ', array_fill(0, count($validColumns), '?'));
+    $values = array_values($validColumns);
+
+    $stmt = $mysqli->prepare("
+    INSERT INTO oxshops ($columnNames) 
+    VALUES ($placeholders)
+    ON DUPLICATE KEY UPDATE OXNAME = VALUES(OXNAME), OXURL = VALUES(OXURL)
+");
+    $types = str_repeat('s', count($values));
+    $stmt->bind_param($types, ...$values);
+    $stmt->execute();
+
+    // Configure Mailpit SMTP settings
+    echo "Configuring Mailpit SMTP settings...\n";
+
+    $shopId = 1;
+    // Update OXSMTP field in oxshops table for Mailpit
+    $mailpitSmtp = $mailpitHost . ':' . $mailpitPort;
+    $stmt = $mysqli->prepare("UPDATE oxshops SET OXSMTP = ? WHERE OXID = ?");
+    $stmt->bind_param('ss', $mailpitSmtp, $shopId);
+    if ($stmt->execute()) {
+        echo "Mailpit SMTP configuration completed.\n";
+        echo "SMTP server set to: $mailpitSmtp\n";
+        echo "Mailpit web interface will be available at: http://localhost:$mailpitWebPort\n";
+    } else {
+        echo "ERROR: Failed to configure Mailpit SMTP settings.\n";
+    }
+
+    // Create admin user
+    echo "Creating admin user...\n";
+    $adminPassHash = password_hash($adminPass, PASSWORD_BCRYPT);
+    $adminId = md5($adminEmail . time());
+
+    $stmt = $mysqli->prepare("
+    INSERT INTO oxuser (
+        OXID, OXUSERNAME, OXPASSWORD, OXACTIVE, OXRIGHTS, OXFNAME, OXLNAME, OXSHOPID
+    ) VALUES (?, ?, ?, 1, 'malladmin', 'Admin', 'User', 1)
+    ON DUPLICATE KEY UPDATE 
+        OXPASSWORD = VALUES(OXPASSWORD),
+        OXRIGHTS = VALUES(OXRIGHTS)
+");
+    $stmt->bind_param('sss', $adminId, $adminEmail, $adminPassHash);
+    $stmt->execute();
+} else {
+    echo "Database already initialized, skipping schema import.\n";
+
+    // Still configure Mailpit even if database exists
+    echo "Configuring Mailpit SMTP settings...\n";
+
+    $shopId = 1;
+    // Update OXSMTP field in oxshops table for Mailpit
+    $mailpitSmtp = $mailpitHost . ':' . $mailpitPort;
+    $stmt = $mysqli->prepare("UPDATE oxshops SET OXSMTP = ? WHERE OXID = ?");
+    $stmt->bind_param('ss', $mailpitSmtp, $shopId);
+    if ($stmt->execute()) {
+        echo "Mailpit SMTP configuration completed.\n";
+        echo "SMTP server set to: $mailpitSmtp\n";
+    } else {
+        echo "ERROR: Failed to configure Mailpit SMTP settings.\n";
+    }
+}
+
+// Generate database views - THIS IS CRUCIAL
+echo "Generating database views...\n";
+$viewCommand = __DIR__ . '/../vendor/bin/oe-eshop-db_views_generate';
+if (file_exists($viewCommand)) {
+    exec("cd " . __DIR__ . " /.. && php $viewCommand 2>&1", $output, $returnCode);
+    if ($returnCode === 0) {
+        echo "Database views generated successfully.\n";
+    } else {
+        echo "View generation output:\n" . implode("\n", $output) . "\n";
+    }
+} else {
+    echo "WARNING: View generator not found at $viewCommand\n";
+    echo "You MUST run this manually:\n";
+    echo "cd /var/www/html && php vendor/bin/oe-eshop-db_views_generate\n";
+}
+
+echo "\n=== Setup Complete ===\n";
+echo "Shop URL: $shopUrl\n";
+echo "Admin Email: $adminEmail\n";
+echo "Admin Password: $adminPass\n";
+echo "Mailpit Web Interface: http://localhost:$mailpitWebPort\n";
+echo "SMTP Server: $mailpitHost:$mailpitPort\n";
+echo "\nIMPORTANT: If views weren't generated, run:\n";
+echo "php vendor/bin/oe-eshop-db_views_generate\n";
+echo "\nMailpit is configured for email testing. All emails will be captured in Mailpit.\n";
+?>

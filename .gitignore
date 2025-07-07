@@ -44,3 +44,6 @@
 /var/generated_services.yaml
 /tests/Integration/Internal/Container/Dao/generated_project.yaml
 /tests/.phpunit.result.cache
+
+.env
+docker/data
