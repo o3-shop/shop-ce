@@ -3,6 +3,8 @@
 
 runned.txt
 
+/docker/data-mailpit
+
 # Log
 /source/log/
 !/source/log/.htaccess
