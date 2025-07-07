@@ -42,6 +42,17 @@ if ($dbExistsResult && $dbExistsResult->num_rows > 0) {
     }
 }
 
+if (!file_exists(__DIR__ . '/../runned.txt')) {
+    $mysqli->query("DROP DATABASE IF EXISTS `$dbName`");
+    $mysqli->query("CREATE DATABASE `$dbName`");
+    $myfile = fopen(__DIR__ . '/../runned.txt', "w") or die("Unable to open file!");
+    $txt = "Runned\n";
+    fwrite($myfile, $txt);
+    fclose($myfile);
+} else {
+    echo "Runned file already exists\n";
+}
+
 $mysqli->select_db($dbName) or die("Could not select database: " . $mysqli->error . "\n");
 
 // Check if schema is already imported

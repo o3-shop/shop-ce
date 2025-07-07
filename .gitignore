@@ -1,6 +1,8 @@
 # Shop configuration
 /source/config.inc.php
 
+runned.txt
+
 # Log
 /source/log/
 !/source/log/.htaccess
