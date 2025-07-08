@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: o3shop-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${O3SHOP_CONF_DBROOT}
+      MYSQL_DATABASE: ${O3SHOP_CONF_DBNAME}
+      MYSQL_USER: ${O3SHOP_CONF_DBUSER}
+      MYSQL_PASSWORD: ${O3SHOP_CONF_DBPWD}
+    volumes:
+      - ./data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  shop:
+    build:
+      dockerfile: Dockerfile
+    container_name: o3shop-app
+    depends_on:
+      - db
+    volumes:
+      - ./../:/var/www/html
+    environment:
+      PATH: /var/www/html/vendor/o3-shop/testing-library/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    ports:
+      - "8090:80"
+    working_dir: /var/www/html
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    volumes:
+      - ./data-mailpit:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+

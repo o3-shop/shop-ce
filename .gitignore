@@ -1,6 +1,10 @@
 # Shop configuration
 /source/config.inc.php
 
+runned.txt
+
+/docker/data-mailpit
+!/docker/.env
 # Log
 /source/log/
 !/source/log/.htaccess
@@ -44,3 +48,17 @@
 /var/generated_services.yaml
 /tests/Integration/Internal/Container/Dao/generated_project.yaml
 /tests/.phpunit.result.cache
+
+.env
+/.phpstorm.meta.php/oxid.meta.php
+/source/Application/views/wave/*
+/source/out/pictures/generated/*
+/source/out/pictures/master/category/*
+/source/out/pictures/master/manufacturer/*
+/source/out/pictures/master/product/*
+/source/out/pictures/master/wrapping/img_ecard_03_wp.jpg
+/source/out/pictures/promo/*
+/source/out/wave/*
+/var/configuration/shops/1.yaml
+/var/generated/generated_services.yaml
+docker/data
