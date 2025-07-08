@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
 // Check for MySQLi extension
 if (!extension_loaded('mysqli')) {
@@ -22,7 +23,7 @@ $dotenv->required([
 // Database credentials
 $dbHost = $_ENV['O3SHOP_CONF_DBHOST'];
 $dbUser = $_ENV['O3SHOP_CONF_DBUSER'];
-$dbPwd  = $_ENV['O3SHOP_CONF_DBUPWD'];
+$dbPwd  = $_ENV['O3SHOP_CONF_DBPWD'];
 $dbName = $_ENV['O3SHOP_CONF_DBNAME'];
 $dbPort = $_ENV['O3SHOP_CONF_DBPORT'];
 
