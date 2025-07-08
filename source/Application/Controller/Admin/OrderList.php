@@ -21,15 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin order list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Orders -> Display Orders.
  */
-class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class OrderList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -39,7 +42,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
     protected $_sListClass = 'oxorder';
 
     /**
-     * Enable/disable sorting by DESC (SQL) (defaultfalse - disable).
+     * Enable/disable sorting by DESC (SQL) (default false - disable).
      *
      * @var bool
      */
@@ -57,13 +60,14 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      * file "order_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $folders = $this->getConfig()->getConfigParam('aOrderfolder');
-        $folder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("folder");
+        $folders = Registry::getConfig()->getConfigParam('aOrderfolder');
+        $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // first display new orders
         if (!$folder && is_array($folders)) {
             $names = array_keys($folders);
@@ -71,8 +75,8 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
         }
 
         $search = ['oxorderarticles' => 'ARTID', 'oxpayments' => 'PAYMENT'];
-        $searchQuery = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("addsearch");
-        $searchField = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("addsearchfld");
+        $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
+        $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         $this->_aViewData["folder"] = $folder ? $folder : -1;
         $this->_aViewData["addsearchfld"] = $searchField ? $searchField : -1;
@@ -99,7 +103,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      */
     public function cancelOrder()
     {
-        $order = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+        $order = oxNew(Order::class);
         if ($order->load($this->getEditObjectId())) {
             $order->cancelOrder();
         }
@@ -113,6 +117,7 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
      * Returns sorting fields array
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {
@@ -127,19 +132,20 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
     /**
      * Adding folder check
      *
-     * @param array  $whereQuery SQL condition array
-     * @param string $fullQuery  SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
         $query = parent::_prepareWhereQuery($whereQuery, $fullQuery);
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
         $folders = $config->getConfigParam('aOrderfolder');
-        $folder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folder');
+        $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder != '-1') {
             $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
@@ -154,19 +160,20 @@ class OrderList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminList
     /**
      * Builds and returns SQL query string. Adds additional order check.
      *
-     * @param object $listObject list main object
+     * @param null $listObject list main object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $query = parent::_buildSelectString($listObject);
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
-        $searchQuery = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('addsearch');
+        $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
         $searchQuery = trim($searchQuery);
-        $searchField = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('addsearchfld');
+        $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
         if ($searchQuery) {
             switch ($searchField) {

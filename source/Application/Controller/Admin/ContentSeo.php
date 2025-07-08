@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Application\Model\SeoEncoderContent;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Content seo config class
  */
-class ContentSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class ContentSeo extends ObjectSeo
 {
     /**
      * Returns url type
@@ -36,30 +40,51 @@ class ContentSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSe
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getType();
+    }
+
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
         return 'oxcontent';
+    }
+    
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderContent
+     * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
+     */
+    protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getEncoder();
     }
 
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderContent
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
+     * @return SeoEncoderContent
      */
-    protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getEncoder()
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class);
+        return Registry::get(SeoEncoderContent::class);
     }
 
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getEntryUri()
     {
-        $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oContent = oxNew(Content::class);
         if ($oContent->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getContentUri($oContent, $this->getEditLang());
+            return $this->getEncoder()->getContentUri($oContent, $this->getEditLang());
         }
     }
 }

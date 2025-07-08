@@ -21,6 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Actions widget.
  * Access actions in tpl.
@@ -44,13 +47,13 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
     /**
      * Returns article list with action articles
      *
-     * @return object
+     * @return void|object
      */
     public function getAction()
     {
         $actionId = $this->getViewParameter('action');
-        if ($actionId && $this->_getLoadActionsParam()) {
-            $artList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        if ($actionId && $this->getLoadActionsParam()) {
+            $artList = oxNew(ArticleList::class);
             $artList->loadActionArticles($actionId);
             if ($artList->count()) {
                 return $artList;
@@ -66,7 +69,17 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
      */
     protected function _getLoadActionsParam() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->_blLoadActions = $this->getConfig()->getConfigParam('bl_perfLoadAktion');
+        return $this->getLoadActionsParam();
+    }
+    
+    /**
+     * Returns if actions are ON
+     *
+     * @return string
+     */
+    protected function getLoadActionsParam()
+    {
+        $this->_blLoadActions = Registry::getConfig()->getConfigParam('bl_perfLoadAktion');
 
         return $this->_blLoadActions;
     }
@@ -74,7 +87,7 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
     /**
      * Returns action name
      *
-     * @return string
+     * @return void|string
      */
     public function getActionName()
     {

@@ -21,7 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\VoucherSerie;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin voucherserie groups manager.
@@ -29,11 +31,11 @@ use oxRegistry;
  * serie of vouchers.
  * Admin Menu: Shop Settings -> Vouchers -> Groups.
  */
-class VoucherSerieGroups extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class VoucherSerieGroups extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxlist and oxvoucherserie
-     * objects, passes it's data to Smarty engine and returns name of template
+     * objects, passes its data to Smarty engine and returns name of template
      * file "voucherserie_groups.tpl".
      *
      * @return string
@@ -45,7 +47,7 @@ class VoucherSerieGroups extends \OxidEsales\Eshop\Application\Controller\Admin\
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oVoucherSerie = oxNew(\OxidEsales\Eshop\Application\Model\VoucherSerie::class);
+            $oVoucherSerie = oxNew(VoucherSerie::class);
             $oVoucherSerie->load($soxId);
             $oVoucherSerie->setUserGroups();
             $this->_aViewData["edit"] = $oVoucherSerie;
@@ -55,7 +57,7 @@ class VoucherSerieGroups extends \OxidEsales\Eshop\Application\Controller\Admin\
                 $this->_aViewData['readonly'] = true;
             }
         }
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oVoucherSerieGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oVoucherSerieGroupsAjax->getColumns();
 

@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
 use OxidEsales\Eshop\Application\Controller\TextEditorHandler;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\CategoryList;
 use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\ShopVersion;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin selectlist list manager.
  */
-class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class AdminDetailsController extends AdminController
 {
     /**
      * Global editor object.
@@ -44,7 +48,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function getDocumentationLanguageId()
     {
-        $language = \OxidEsales\Eshop\Core\Registry::getLang();
+        $language = Registry::getLang();
         $languageAbbr = $language->getLanguageAbbr($language->getTplLanguage());
 
         return $languageAbbr === "de" ? 0 : 1;
@@ -53,13 +57,26 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
     /**
      * Returns string which must be edited by editor.
      *
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $oObject object used for editing
+     * @param BaseModel $oObject object used for editing
      * @param string                                 $sField  name of editable field
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEditValue" in next major
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getEditValue($oObject, $sField);
+    }
+
+    /**
+     * Returns string which must be edited by editor.
+     *
+     * @param BaseModel $oObject object used for editing
+     * @param string                                 $sField  name of editable field
+     *
+     * @return string
+     */
+    protected function getEditValue($oObject, $sField)
     {
         $sEditObjectValue = '';
         if ($oObject && $sField && isset($oObject->$sField)) {
@@ -69,7 +86,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
                 $sEditObjectValue = $oObject->$sField->value;
             }
 
-            $sEditObjectValue = $this->_processEditValue($sEditObjectValue);
+            $sEditObjectValue = $this->processEditValue($sEditObjectValue);
             $oObject->$sField = new Field($sEditObjectValue, Field::T_RAW);
         }
 
@@ -86,12 +103,24 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function _processEditValue($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->processEditValue($sValue);
+    }
+
+    /**
+     * Processes edit value.
+     *
+     * @param string $sValue string to process
+     *
+     * @return string
+     */
+    protected function processEditValue($sValue)
+    {
         // A. replace ONLY if long description is not processed by smarty, or users will not be able to
         // store smarty tags ([{$shop->currenthomedir}]/[{$oViewConf->getCurrentHomeDir()}]) in long
         // descriptions, which are filled dynamically
-        if (!$this->getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
+        if (!Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
             $aReplace = ['[{$shop->currenthomedir}]', '[{$oViewConf->getCurrentHomeDir()}]'];
-            $sValue = str_replace($aReplace, $this->getConfig()->getCurrentShopURL(false), $sValue);
+            $sValue = str_replace($aReplace, Registry::getConfig()->getCurrentShopURL(false), $sValue);
         }
 
         return $sValue;
@@ -102,7 +131,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width  editor width
      * @param int                                    $height editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object object passed to editor
+     * @param BaseModel $object object passed to editor
      * @param string                                 $field  object field which content is passed to editor
      *
      * @deprecated since v6.0 (2017-06-29); Please use TextEditorHandler::renderPlainTextEditor() method.
@@ -111,7 +140,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function _getPlainEditor($width, $height, $object, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $objectValue = $this->_getEditValue($object, $field);
+        $objectValue = $this->getEditValue($object, $field);
 
         $textEditor = oxNew(TextEditorHandler::class);
 
@@ -123,7 +152,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width      editor width
      * @param int                                    $height     editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object     object passed to editor
+     * @param BaseModel $object     object passed to editor
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
@@ -141,7 +170,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param int                                    $width      editor width
      * @param int                                    $height     editor height
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $object     object passed to editor
+     * @param BaseModel $object     object passed to editor
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
@@ -149,7 +178,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function generateTextEditor($width, $height, $object, $field, $stylesheet = null)
     {
-        $objectValue = $this->_getEditValue($object, $field);
+        $objectValue = $this->getEditValue($object, $field);
 
         $textEditorHandler = $this->createTextEditorHandler();
         $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
@@ -192,14 +221,29 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * @param bool   $blForceNonCache Set to true to disable caching
      * @param int    $iTreeShopId     tree shop id
      *
-     * @return string
+     * @return object
      * @deprecated underscore prefix violates PSR12, will be renamed to "createCategoryTree" in next major
      */
     protected function _createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    }
+
+    /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return object
+     */
+    protected function createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null)
+    {
         // caching category tree, to load it once, not many times
         if (!isset($this->oCatTree) || $blForceNonCache) {
-            $this->oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+            $this->oCatTree = oxNew(CategoryList::class);
             $this->oCatTree->setShopID($iTreeShopId);
 
             // setting language
@@ -217,7 +261,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         }
 
         // add first fake category for not assigned articles
-        $oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oRoot = oxNew(Category::class);
         $oRoot->oxcategories__oxtitle = new Field('--');
 
         $oCatTree->assign(array_merge(['' => $oRoot], $oCatTree->getArray()));
@@ -248,7 +292,29 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
         $blForceNonCache = false,
         $iTreeShopId = null
     ) {
-        $oCatTree = $this->_createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
+        return $this->getCategoryTree($sTplVarName, $sSelectedCatId, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    }
+
+    /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     * Returns ID of selected category if available.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sSelectedCatId  ID of category witch was selected in select list
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return string
+     */
+    protected function getCategoryTree(
+        $sTplVarName,
+        $sSelectedCatId,
+        $sEditCatId = '',
+        $blForceNonCache = false,
+        $iTreeShopId = null
+    ) {
+        $oCatTree = $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
 
         // mark selected
         if ($sSelectedCatId) {
@@ -279,8 +345,8 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     public function changeFolder()
     {
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('setfolder');
-        $sFolderClass = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folderclass');
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('setfolder');
+        $sFolderClass = Registry::getRequest()->getRequestEscapedParameter('folderclass');
 
         if ($sFolderClass == 'oxcontent' && $sFolder == 'CMSFOLDER_NONE') {
             $sFolder = '';
@@ -301,6 +367,16 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets-up navigation parameters.
+     *
+     * @param string $sNode active view id
+     */
+    protected function setupNavigation($sNode)
+    {
         // navigation according to class
         if ($sNode) {
             $myAdminNavig = $this->getNavigation();
@@ -320,6 +396,16 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      * @deprecated underscore prefix violates PSR12, will be renamed to "resetCounts" in next major
      */
     protected function _resetCounts($aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->resetCounts($aIds);
+    }
+
+    /**
+     * Resets count of vendor/manufacturer category items.
+     *
+     * @param array $aIds to reset type => id
+     */
+    protected function resetCounts($aIds)
     {
         foreach ($aIds as $sType => $aResetInfo) {
             foreach ($aResetInfo as $sResetId => $iPos) {
@@ -342,7 +428,7 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      *
      * @param TextEditorHandler $textEditorHandler
      * @param mixed             $editedObject      The object we want to edit, either type of
-     *                                             \OxidEsales\Eshop\Core\BaseModel if you want to persist or anything
+     *                                             BaseModel if you want to persist or anything
      *                                             else
      * @param string            $field             The input field we want to edit
      * @param string            $stylesheet        The name of the CSS file
@@ -364,8 +450,6 @@ class AdminDetailsController extends \OxidEsales\Eshop\Application\Controller\Ad
      */
     protected function createTextEditorHandler()
     {
-        $textEditorHandler = oxNew(TextEditorHandler::class);
-
-        return $textEditorHandler;
+        return oxNew(TextEditorHandler::class);
     }
 }

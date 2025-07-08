@@ -21,12 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxAdminList;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * user list "view" class.
  */
-class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleList
+class ListReview extends ArticleList
 {
     /**
      * Type of list.
@@ -50,7 +54,7 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->_getUserDefListSize();
+        return $this->getViewListSize()();
     }
 
     /**
@@ -58,13 +62,14 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
      * and returns name of template file "list_review.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
-        oxAdminList::render();
+        AdminListController::render();
 
         $this->_aViewData["menustructure"] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
-        $this->_aViewData["articleListTable"] = getViewName('oxarticles');
+        $this->_aViewData["articleListTable"] = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
         return "list_review.tpl";
     }
@@ -72,14 +77,27 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
     /**
      * Returns select query string
      *
-     * @param object $oObject list item object
+     * @param object $listObject list item object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
      */
-    protected function _buildSelectString($oObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtTable = getViewName('oxarticles', $this->_iEditLang);
+        return $this->buildSelectString($listObject);
+    }
+
+    /**
+     * Returns select query string
+     *
+     * @param object $listObject list item object
+     *
+     * @return string
+     */
+    protected function buildSelectString($listObject = null)
+    {
+        $sArtTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iEditLang);
 
         $sQ = "select oxreviews.oxid, oxreviews.oxcreate, oxreviews.oxtext, oxreviews.oxobjectid, {$sArtTable}.oxparentid, {$sArtTable}.oxtitle as oxtitle, {$sArtTable}.oxvarselect as oxvarselect, oxparentarticles.oxtitle as parenttitle, ";
         $sQ .= "concat( {$sArtTable}.oxtitle, if(isnull(oxparentarticles.oxtitle), '', oxparentarticles.oxtitle), {$sArtTable}.oxvarselect) as arttitle from oxreviews ";
@@ -90,7 +108,7 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
 
         //removing parent id checking from sql
         $sStr = "/\s+and\s+" . $sArtTable . "\.oxparentid\s*=\s*''/";
-        $sQ = getStr()->preg_replace($sStr, " ", $sQ);
+        $sQ = Str::getStr()->preg_replace($sStr, " ", $sQ);
 
         return " $sQ and {$sArtTable}.oxid is not null ";
     }
@@ -98,23 +116,38 @@ class ListReview extends \OxidEsales\Eshop\Application\Controller\Admin\ArticleL
     /**
      * Adds filtering conditions to query string
      *
-     * @param array  $aWhere filter conditions
-     * @param string $sSql   query string
+     * @param array $whereQuery filter conditions
+     * @param string $fullQuery query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
-    protected function _prepareWhereQuery($aWhere, $sSql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSql = parent::_prepareWhereQuery($aWhere, $sSql);
+        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+    }
 
-        $sArtTable = getViewName('oxarticles', $this->_iEditLang);
+    /**
+     * Adds filtering conditions to query string
+     *
+     * @param array $whereQuery filter conditions
+     * @param string $fullQuery query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        $sSql = parent::prepareWhereQuery($whereQuery, $fullQuery);
+
+        $sArtTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iEditLang);
         $sArtTitleField = "{$sArtTable}.oxtitle";
 
         // if searching in article title field, updating sql for this case
         if ($this->_aWhere[$sArtTitleField]) {
             $sSqlForTitle = " (CONCAT( {$sArtTable}.oxtitle, if(isnull(oxparentarticles.oxtitle), '', oxparentarticles.oxtitle), {$sArtTable}.oxvarselect)) ";
-            $sSql = getStr()->preg_replace("/{$sArtTable}\.oxtitle\s+like/", "$sSqlForTitle like", $sSql);
+            $sSql = Str::getStr()->preg_replace("/{$sArtTable}\.oxtitle\s+like/", "$sSqlForTitle like", $sSql);
         }
 
         return $sSql;

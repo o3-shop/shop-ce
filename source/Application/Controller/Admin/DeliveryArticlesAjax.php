@@ -21,37 +21,43 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages delivery articles
  */
-class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliveryArticlesAjax extends ListComponentAjax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxobject2delivery', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxobject2delivery', 0, 0, 1],
+        ],
     ];
 
     /**
@@ -62,22 +68,34 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     protected $_blAllowExtColumns = true;
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $myConfig = Registry::getConfig();
+        $oDb = DatabaseProvider::getDb();
 
         // looking for table/view
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+        $sArtTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
 
-        $sDelId = $this->getConfig()->getRequestParameter('oxid');
-        $sSynchDelId = $this->getConfig()->getRequestParameter('synchoxid');
+        $sDelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchDelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sDelId) {
@@ -118,7 +136,7 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
         $sQ = parent::_addFilter( $sQ );
 
         // display variants or not ?
-        $sQ .= $this->getConfig()->getConfigParam( 'blVariantsSelection' ) ? ' group by '.$sArtTable.'.oxid ' : '';
+        $sQ .= Registry::getConfig()->getConfigParam( 'blVariantsSelection' ) ? ' group by '.$sArtTable.'.oxid ' : '';
         return $sQ;
     }*/
 
@@ -127,14 +145,14 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function removeArtFromDel()
     {
-        $aChosenArt = $this->_getActionIds('oxobject2delivery.oxid');
+        $aChosenArt = $this->getActionIds('oxobject2delivery.oxid');
         // removing all
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sQ = parent::_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = parent::addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -143,22 +161,22 @@ class DeliveryArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addArtToDel()
     {
-        $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $aChosenArt = $this->getActionIds('oxarticles.oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sArtTable = $this->_getViewName('oxarticles');
-            $aChosenArt = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sArtTable = $this->getViewName('oxarticles');
+            $aChosenArt = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
             foreach ($aChosenArt as $sChosenArt) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenArt);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxarticles");
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenArt);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxarticles");
                 $oObject2Delivery->save();
             }
         }

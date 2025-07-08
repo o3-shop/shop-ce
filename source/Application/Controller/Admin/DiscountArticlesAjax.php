@@ -21,13 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages discount articles
  */
-class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountArticlesAjax extends ListComponentAjax
 {
     /**  */
     const NEW_DISCOUNT_LIST_ID = "-1";
@@ -53,7 +58,7 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
         'container2' => [
             ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -62,26 +67,39 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxobject2discount', 0, 0, 1]
-        ]
+            ['oxid', 'oxobject2discount', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        return $this->getQuery();
+    }
 
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sOxid = $oConfig->getRequestParameter('oxid');
-        $sSynchOxid = $oConfig->getRequestParameter('synchoxid');
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
+
+        $oDb = DatabaseProvider::getDb();
+        $sOxid = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchOxid = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sOxid && $sSynchOxid) {
@@ -93,9 +111,6 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
                 $sQAdd = " from $sO2CView left join $sArticleTable on ";
                 $sQAdd .= $oConfig->getConfigParam('blVariantsSelection') ? "($sArticleTable.oxid=$sO2CView.oxobjectid or $sArticleTable.oxparentid=$sO2CView.oxobjectid)" : " $sArticleTable.oxid=$sO2CView.oxobjectid ";
                 $sQAdd .= " where $sO2CView.oxcatnid = " . $oDb->quote($sOxid) . " and $sArticleTable.oxid is not null ";
-
-                // resetting
-                $sId = null;
             } else {
                 $sQAdd = " from oxobject2discount, $sArticleTable where $sArticleTable.oxid=oxobject2discount.oxobjectid ";
                 $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
@@ -123,14 +138,14 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function removeDiscArt()
     {
-        $aChosenArt = $this->_getActionIds('oxobject2discount.oxid');
+        $aChosenArt = $this->getActionIds('oxobject2discount.oxid');
 
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sQ = parent::_addFilter("delete oxobject2discount.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = parent::addFilter("delete oxobject2discount.* " . $this->getQuery());
+            DatabaseProvider::getDb()->execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
+            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
+            DatabaseProvider::getDb()->execute($sQ);
         }
     }
 
@@ -139,14 +154,14 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addDiscArt()
     {
-        $config = $this->getConfig();
-        $articleIds = $this->_getActionIds('oxarticles.oxid');
-        $discountListId = $config->getRequestParameter('synchoxid');
+        $oRequest = Registry::getRequest();
+        $articleIds = $this->getActionIds('oxarticles.oxid');
+        $discountListId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if ($config->getRequestParameter('all')) {
-            $articleTable = $this->_getViewName('oxarticles');
-            $articleIds = $this->_getAll(parent::_addFilter("select $articleTable.oxid " . $this->_getQuery()));
+        if ($oRequest->getRequestEscapedParameter('all')) {
+            $articleTable = $this->getViewName('oxarticles');
+            $articleIds = $this->getAll(parent::addFilter("select $articleTable.oxid " . $this->getQuery()));
         }
         if ($discountListId && $discountListId != self::NEW_DISCOUNT_LIST_ID && is_array($articleIds)) {
             foreach ($articleIds as $articleId) {
@@ -160,14 +175,15 @@ class DiscountArticlesAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      *
      * @param string $discountListId
      * @param string $articleId
+     * @throws Exception
      */
     protected function addArticleToDiscount($discountListId, $articleId)
     {
-        $object2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $object2Discount = oxNew(BaseModel::class);
         $object2Discount->init('oxobject2discount');
-        $object2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($discountListId);
-        $object2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($articleId);
-        $object2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxarticles");
+        $object2Discount->oxobject2discount__oxdiscountid = new Field($discountListId);
+        $object2Discount->oxobject2discount__oxobjectid = new Field($articleId);
+        $object2Discount->oxobject2discount__oxtype = new Field("oxarticles");
 
         $object2Discount->save();
     }

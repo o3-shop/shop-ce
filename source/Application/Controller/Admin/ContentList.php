@@ -21,16 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin Contents manager.
  * Collects Content base information (Description), there is ability to filter
  * them by Description or delete them.
- * Admin Menu: Customerinformations -> Content.
+ * Admin Menu: Customer-Information -> Content.
  */
-class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ContentList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -58,16 +60,17 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
      * name.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("folder");
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sFolder = $sFolder ? $sFolder : -1;
 
         $this->_aViewData["folder"] = $sFolder;
-        $this->_aViewData["afolder"] = $this->getConfig()->getConfigParam('aCMSfolder');
+        $this->_aViewData["afolder"] = Registry::getConfig()->getConfigParam('aCMSfolder');
 
         return $this->_sThisTemplate;
     }
@@ -75,26 +78,41 @@ class ContentList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminLi
     /**
      * Adding folder check and empty folder field check.
      *
-     * @param array  $aWhere  SQL condition array
-     * @param string $sqlFull SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
      */
-    protected function _prepareWhereQuery($aWhere, $sqlFull) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::_prepareWhereQuery($aWhere, $sqlFull);
-        $sFolder = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('folder');
+        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+    }
+
+    /**
+     * Adding folder check and empty folder field check.
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
+        $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sViewName = getviewName("oxcontents");
 
-        //searchong for empty oxfolder fields
+        // searching for empty oxfolder fields
         if ($sFolder == 'CMSFOLDER_NONE' || $sFolder == 'CMSFOLDER_NONE_RR') {
             $sQ .= " and {$sViewName}.oxfolder = '' ";
         } elseif ($sFolder && $sFolder != '-1') {
-            $sFolder = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($sFolder);
+            $sFolder = DatabaseProvider::getDb()->quote($sFolder);
             $sQ .= " and {$sViewName}.oxfolder = {$sFolder}";
         }
 
         return $sQ;
-    }
+    }    
 }

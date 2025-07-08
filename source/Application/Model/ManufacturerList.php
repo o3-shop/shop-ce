@@ -21,20 +21,21 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxField;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Manufacturer list manager.
- * Collects list of manufacturers according to collection rules (activ, etc.).
+ * Collects list of manufacturers according to collection rules (active, etc.).
  *
  */
-class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
+class ManufacturerList extends ListModel
 {
     /**
      * Manufacturer root.
      *
-     * @var \stdClass
+     * @var Manufacturer
      */
     protected $_oRoot = null;
 
@@ -55,7 +56,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Active manufacturer object
      *
-     * @var \OxidEsales\Eshop\Application\Model\Manufacturer
+     * @var Manufacturer
      */
     protected $_oClickedManufacturer = null;
 
@@ -64,7 +65,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct()
     {
-        $this->setShowManufacturerArticleCnt($this->getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
+        $this->setShowManufacturerArticleCnt(Registry::getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
         parent::__construct('oxmanufacturer');
     }
 
@@ -101,7 +102,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * Creates fake root for manufacturer tree, and ads category list fileds for each manufacturer item
+     * Creates fake root for manufacturer tree and adds category list fields for each manufacturer item
      *
      * @param string $sLinkTarget  Name of class, responsible for category rendering
      * @param string $sActCat      Active category
@@ -114,7 +115,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
 
 
         //Create fake manufacturer root category
-        $this->_oRoot = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $this->_oRoot = oxNew(Manufacturer::class);
         $this->_oRoot->load("root");
 
         //category fields
@@ -139,7 +140,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Root manufacturer list node (which usually is a manually prefilled object) getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\Manufacturer
+     * @return Manufacturer
      */
     public function getRootCat()
     {
@@ -164,7 +165,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     protected function _addCategoryFields($oManufacturer) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oManufacturer->oxcategories__oxid = new \OxidEsales\Eshop\Core\Field($oManufacturer->oxmanufacturers__oxid->value);
+        $oManufacturer->oxcategories__oxid = new Field($oManufacturer->oxmanufacturers__oxid->value);
         $oManufacturer->oxcategories__oxicon = $oManufacturer->oxmanufacturers__oxicon;
         $oManufacturer->oxcategories__oxtitle = $oManufacturer->oxmanufacturers__oxtitle;
         $oManufacturer->oxcategories__oxdesc = $oManufacturer->oxmanufacturers__oxshortdesc;
@@ -176,7 +177,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Sets active (open) manufacturer object
      *
-     * @param \OxidEsales\Eshop\Application\Model\Manufacturer $oManufacturer active manufacturer
+     * @param Manufacturer $oManufacturer active manufacturer
      */
     public function setClickManufacturer($oManufacturer)
     {
@@ -186,7 +187,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * returns active (open) manufacturer object
      *
-     * @return \OxidEsales\Eshop\Application\Model\Manufacturer
+     * @return Manufacturer
      */
     public function getClickManufacturer()
     {
@@ -200,8 +201,8 @@ class ManufacturerList extends \OxidEsales\Eshop\Core\Model\ListModel
     protected function _seoSetManufacturerData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // only when SEO id on and in front end
-        if (\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && !$this->isAdmin()) {
-            $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class);
+        if (Registry::getUtils()->seoIsActive() && !$this->isAdmin()) {
+            $oEncoder = Registry::get(SeoEncoderManufacturer::class);
 
             // preparing root manufacturer category
             if ($this->_oRoot) {

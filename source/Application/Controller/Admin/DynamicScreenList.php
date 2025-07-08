@@ -21,28 +21,31 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin dynscreen list manager.
- * Arranges controll tabs and sets title.
+ * Arranges control tabs and sets title.
  *
  * @subpackage dyn
  *
  * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
  */
-class DynamicScreenList extends \OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenController
+class DynamicScreenList extends DynamicScreenController
 {
     /**
-     * Executes marent method parent::render() and returns mane of template
+     * Executes parent method parent::render() and returns mane of template
      * file "dynscreen_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
-        $this->_aViewData['menu'] = basename(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("menu"));
+        $this->_aViewData['menu'] = basename(Registry::getRequest()->getRequestEscapedParameter('menu'));
 
         return "dynscreen_list.tpl";
     }

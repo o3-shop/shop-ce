@@ -21,21 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxObjectException;
-use oxRegistry;
 
 /**
  * Current user recommlist manager.
- * When user is logged in in this manager window he can modify his
+ * When user is logged-in in this manager window he can modify his
  * own recommlists status - remove articles from list or store
  * them to shopping basket, view detail information.
  *
  * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
  */
-class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountRecommlistController extends AccountController
 {
     /**
      * Current class template name.
@@ -59,7 +61,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     protected $_oActRecommListArticles = null;
 
     /**
-     * returns the recomm list article. Whether the variable is empty, it list nothing
+     * returns the recomm list article. When the variable is empty it lists nothing
      *
      * @var array
      */
@@ -88,11 +90,12 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
     /**
      * If user is logged in loads his wishlist articles (articles may be accessed by
-     * \OxidEsales\Eshop\Application\Model\User::GetBasket()), loads similar articles (is available) for the last
-     * article in list loaded by \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts() and returns name of
-     * template to render \OxidEsales\Eshop\Application\Controller\AccountWishlistController::_sThisTemplate
+     * User::GetBasket()), loads similar articles (is available) for the last
+     * article in list loaded by Article::GetSimilarProducts() and returns name of
+     * template to render AccountWishlistController::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -109,7 +112,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
         // list of found oxrecommlists
         if (!$oActList && $oLists->count()) {
             $this->_iAllArtCnt = $oUser->getRecommListsCount();
-            $iNrofCatArticles = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+            $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
             $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
             $this->_iCntPages = ceil($this->_iAllArtCnt / $iNrofCatArticles);
         }
@@ -184,7 +187,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     }
 
     /**
-     * return the active entrys
+     * return the active entries
      *
      * @return null
      */
@@ -199,9 +202,9 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
             if (
                 ($oUser = $this->getUser()) &&
-                ($sRecommId = Registry::getConfig()->getRequestParameter('recommid'))
+                ($sRecommId = Registry::getRequest()->getRequestEscapedParameter('recommid'))
             ) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+                $oRecommList = oxNew(RecommendationList::class);
                 $sUserIdField = 'oxrecommlists__oxuserid';
                 if (($oRecommList->load($sRecommId)) && $oUser->getId() === $oRecommList->$sUserIdField->value) {
                     $this->_oActRecommList = $oRecommList;
@@ -215,7 +218,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Set active recommlist
      *
-     * @param object $oRecommList Recommendation list
+     * @param object|bool $oRecommList Recommendation list
      */
     public function setActiveRecommList($oRecommList)
     {
@@ -225,7 +228,8 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     /**
      * add new recommlist
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveRecommList()
     {
@@ -239,16 +243,16 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
         if (($oUser = $this->getUser())) {
             if (!($oRecommList = $this->getActiveRecommList())) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+                $oRecommList = oxNew(RecommendationList::class);
                 $oRecommList->oxrecommlists__oxuserid = new Field($oUser->getId());
-                $oRecommList->oxrecommlists__oxshopid = new Field($this->getConfig()->getShopId());
+                $oRecommList->oxrecommlists__oxshopid = new Field(Registry::getConfig()->getShopId());
             } else {
                 $this->_sThisTemplate = 'page/account/recommendationedit.tpl';
             }
 
-            $sTitle = trim((string) Registry::getConfig()->getRequestParameter('recomm_title', true));
-            $sAuthor = trim((string) Registry::getConfig()->getRequestParameter('recomm_author', true));
-            $sText = trim((string) Registry::getConfig()->getRequestParameter('recomm_desc', true));
+            $sTitle = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_title', true));
+            $sAuthor = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_author', true));
+            $sText = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_desc', true));
 
             $oRecommList->oxrecommlists__oxtitle = new Field($sTitle);
             $oRecommList->oxrecommlists__oxauthor = new Field($sAuthor);
@@ -258,7 +262,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
                 // marking entry as saved
                 $this->_blSavedEntry = (bool) $oRecommList->save();
                 $this->setActiveRecommList($this->_blSavedEntry ? $oRecommList : false);
-            } catch (\OxidEsales\Eshop\Core\Exception\ObjectException $oEx) {
+            } catch (ObjectException $oEx) {
                 //add to display at specific position
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'user');
             }
@@ -278,7 +282,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Delete recommlist
      *
-     * @return null
+     * @return void
      */
     public function editList()
     {
@@ -292,7 +296,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
 
         // deleting on demand
         if (
-            ($sAction = Registry::getConfig()->getRequestParameter('deleteList')) &&
+            (Registry::getRequest()->getRequestEscapedParameter('deleteList')) &&
             ($oRecommList = $this->getActiveRecommList())
         ) {
             $oRecommList->delete();
@@ -305,7 +309,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Delete recommlist
      *
-     * @return null
+     * @return void
      */
     public function removeArticle()
     {
@@ -318,7 +322,7 @@ class AccountRecommlistController extends \OxidEsales\Eshop\Application\Controll
         }
 
         if (
-            ($sArtId = Registry::getConfig()->getRequestParameter('aid')) &&
+            ($sArtId = Registry::getRequest()->getRequestEscapedParameter('aid')) &&
             ($oRecommList = $this->getActiveRecommList())
         ) {
             $oRecommList->removeArticle($sArtId);

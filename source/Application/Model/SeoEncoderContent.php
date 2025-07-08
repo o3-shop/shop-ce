@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\SeoEncoder;
 
 /**
  * Seo encoder base
  */
-class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
+class SeoEncoderContent extends SeoEncoder
 {
     /**
      * Returns target "extension" (/)
@@ -37,6 +40,16 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getUrlExtension();
+    }
+
+    /**
+     * Returns target "extension" (/)
+     *
+     * @return string
+     */
+    protected function getUrlExtension()
+    {
         return '/';
     }
 
@@ -44,11 +57,12 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      * Returns SEO uri for content object. Includes parent category path info if
      * content is assigned to it
      *
-     * @param \OxidEsales\Eshop\Application\Model\Content $oCont        content category object
-     * @param int                                         $iLang        language
-     * @param bool                                        $blRegenerate if TRUE forces seo url regeneration
+     * @param Content $oCont content category object
+     * @param null $iLang language
+     * @param bool $blRegenerate if TRUE forces seo url regeneration
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getContentUri($oCont, $iLang = null, $blRegenerate = false)
     {
@@ -59,19 +73,19 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
         if ($blRegenerate || !($sSeoUrl = $this->_loadFromDb('oxContent', $oCont->getId(), $iLang))) {
             if ($iLang != $oCont->getLanguage()) {
                 $sId = $oCont->getId();
-                $oCont = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+                $oCont = oxNew(Content::class);
                 $oCont->loadInLang($iLang, $sId);
             }
 
             $sSeoUrl = '';
             if ($oCont->getCategoryId() && $oCont->getType() === 2) {
-                $oCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+                $oCat = oxNew(Category::class);
                 if ($oCat->loadInLang($iLang, $oCont->oxcontents__oxcatid->value)) {
                     $sParentId = $oCat->oxcategories__oxparentid->value;
                     if ($sParentId && $sParentId != 'oxrootid') {
-                        $oParentCat = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+                        $oParentCat = oxNew(Category::class);
                         if ($oParentCat->loadInLang($iLang, $oCat->oxcategories__oxparentid->value)) {
-                            $sSeoUrl .= \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class)->getCategoryUri($oParentCat);
+                            $sSeoUrl .= Registry::get(SeoEncoderCategory::class)->getCategoryUri($oParentCat);
                         }
                     }
                 }
@@ -89,10 +103,11 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
     /**
      * encodeContentUrl encodes content link
      *
-     * @param \OxidEsales\Eshop\Application\Model\Content $oCont category object
-     * @param int                                         $iLang language
+     * @param Content $oCont category object
+     * @param null $iLang language
      *
      * @return string|bool
+     * @throws DatabaseConnectionException
      */
     public function getContentUrl($oCont, $iLang = null)
     {
@@ -107,10 +122,12 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      * deletes content seo entries
      *
      * @param string $sId content ids
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function onDeleteContent($sId)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcontent'", [
             ':oxobjectid' => $sId
         ]);
@@ -126,15 +143,30 @@ class SeoEncoderContent extends \OxidEsales\Eshop\Core\SeoEncoder
      * Returns alternative uri used while updating seo
      *
      * @param string $sObjectId object id
-     * @param int    $iLang     language id
+     * @param int $iLang language id
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getAltUri($sObjectId, $iLang);
+    }
+
+    /**
+     * Returns alternative uri used while updating seo
+     *
+     * @param string $sObjectId object id
+     * @param int $iLang language id
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getAltUri($sObjectId, $iLang)
+    {
         $sSeoUrl = null;
-        $oCont = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oCont = oxNew(Content::class);
         if ($oCont->loadInLang($iLang, $sObjectId)) {
             $sSeoUrl = $this->getContentUri($oCont, $iLang, true);
         }

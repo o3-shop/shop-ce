@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -30,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
  * sends suggestion mail to user.
  * @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely
  */
-class SuggestController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class SuggestController extends FrontendController
 {
     /**
      * Current class template name.
@@ -74,7 +78,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @var object
+     * @var array
      */
     protected $_aSuggestData = null;
 
@@ -94,18 +98,18 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Template variables:
      * <b>editval</b>, <b>error</b>
      *
-     * @return  null
+     * @return string|void
      */
     public function send()
     {
-        $aParams = Registry::getConfig()->getRequestParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
         if (!is_array($aParams)) {
             return;
         }
 
         // storing used written values
         $oParams = (object) $aParams;
-        $this->setSuggestData((object) Registry::getConfig()->getRequestParameter('editval'));
+        $this->setSuggestData((object) Registry::getRequest()->getRequestEscapedParameter('editval'));
 
         $oUtilsView = Registry::getUtilsView();
 
@@ -129,32 +133,32 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         $sReturn = "";
         // #1834M - specialchar search
-        $sSearchParamForLink = rawurlencode(Registry::getConfig()->getRequestParameter('searchparam', true));
+        $sSearchParamForLink = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
         if ($sSearchParamForLink) {
             $sReturn .= "&searchparam=$sSearchParamForLink";
         }
 
-        $sSearchCatId = Registry::getConfig()->getRequestParameter('searchcnid');
+        $sSearchCatId = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
         if ($sSearchCatId) {
             $sReturn .= "&searchcnid=$sSearchCatId";
         }
 
-        $sSearchVendor = Registry::getConfig()->getRequestParameter('searchvendor');
+        $sSearchVendor = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
         if ($sSearchVendor) {
             $sReturn .= "&searchvendor=$sSearchVendor";
         }
 
-        if (($sSearchManufacturer = Registry::getConfig()->getRequestParameter('searchmanufacturer'))) {
+        if (($sSearchManufacturer = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer'))) {
             $sReturn .= "&searchmanufacturer=$sSearchManufacturer";
         }
 
-        $sListType = Registry::getConfig()->getRequestParameter('listtype');
+        $sListType = Registry::getRequest()->getRequestEscapedParameter('listtype');
         if ($sListType) {
             $sReturn .= "&listtype=$sListType";
         }
 
         // sending suggest email
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
         $oProduct = $this->getProduct();
         if ($oProduct && $oEmail->sendSuggestMail($oParams, $oProduct)) {
             return 'details?anid=' . $oProduct->getId() . $sReturn;
@@ -173,8 +177,8 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_oProduct === null) {
             $this->_oProduct = false;
 
-            if ($sProductId = $this->getConfig()->getRequestParameter('anid')) {
-                $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            if ($sProductId = Registry::getRequest()->getRequestEscapedParameter('anid')) {
+                $oProduct = oxNew(Article::class);
                 $oProduct->load($sProductId);
                 $this->_oProduct = $oProduct;
             }
@@ -184,7 +188,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @return array
      */
@@ -201,7 +205,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @return array
      */
@@ -218,11 +222,11 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Template variable getter. Returns recommlist's reviews
+     * Template variable getter. Returns recommlists reviews
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
+     * @return array|bool
      */
     public function getRecommList()
     {
@@ -233,7 +237,7 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_oRecommList === null) {
             $this->_oRecommList = false;
             if ($oProduct = $this->getProduct()) {
-                $oRecommList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class);
+                $oRecommList = oxNew(RecommendationList::class);
                 $this->_oRecommList = $oRecommList->getRecommListsByIds([$oProduct->getId()]);
             }
         }
@@ -264,21 +268,21 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * get link of current view
      *
-     * @param int $iLang requested language
+     * @param int $languageId requested language
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function getLink($languageId = null)
     {
-        $sLink = parent::getLink($iLang);
+        $sLink = parent::getLink($languageId);
 
         // active category
-        if ($sVal = Registry::getConfig()->getRequestParameter('cnid')) {
+        if ($sVal = Registry::getRequest()->getRequestEscapedParameter('cnid')) {
             $sLink .= ((strpos($sLink, '?') === false) ? '?' : '&amp;') . "cnid={$sVal}";
         }
 
         // active article
-        if ($sVal = Registry::getConfig()->getRequestParameter('anid')) {
+        if ($sVal = Registry::getRequest()->getRequestEscapedParameter('anid')) {
             $sLink .= ((strpos($sLink, '?') === false) ? '?' : '&amp;') . "anid={$sVal}";
         }
 
@@ -308,8 +312,8 @@ class SuggestController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     private function redirectToHomeIfDisabled()
     {
-        if ($this->getConfig()->getConfigParam('blAllowSuggestArticle') !== true) {
-            Registry::getUtils()->redirect($this->getConfig()->getShopHomeUrl(), true, 301);
+        if (Registry::getConfig()->getConfigParam('blAllowSuggestArticle') !== true) {
+            Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl(), true, 301);
         }
     }
 }

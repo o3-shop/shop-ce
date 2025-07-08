@@ -21,13 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Payment list manager.
  *
  */
-class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
+class PaymentList extends ListModel
 {
     /**
      * Home country id
@@ -41,7 +46,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function __construct()
     {
-        $this->setHomeCountry($this->getConfig()->getConfigParam('aHomeCountry'));
+        $this->setHomeCountry(Registry::getConfig()->getConfigParam('aHomeCountry'));
         parent::__construct('oxpayment');
     }
 
@@ -62,19 +67,21 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Creates payment list filter SQL to load current state payment list
      *
-     * @param string                                   $sShipSetId user chosen delivery set
-     * @param double                                   $dPrice     basket products price
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser      session user object
+     * @param string $sShipSetId user chosen delivery set
+     * @param double $dPrice basket products price
+     * @param User $oUser session user object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilterSelect" in next major
      */
     protected function _getFilterSelect($sShipSetId, $dPrice, $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sBoni = ($oUser && $oUser->oxuser__oxboni->value) ? $oUser->oxuser__oxboni->value : 0;
 
-        $sTable = getViewName('oxpayments');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sQ = "select {$sTable}.* from ( select distinct {$sTable}.* from {$sTable} ";
         $sQ .= "left join oxobject2group ON oxobject2group.oxobjectid = {$sTable}.oxid ";
         $sQ .= "inner join oxobject2payment ON oxobject2payment.oxobjectid = " . $oDb->quote($sShipSetId) . " and oxobject2payment.oxpaymentid = {$sTable}.oxid ";
@@ -87,7 +94,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
 
         // checking for current session user which gives additional restrictions for user itself, users group and country
         if ($oUser) {
-            // user groups ( maybe would be better to fetch by function \OxidEsales\Eshop\Application\Model\User::getUserGroups() ? )
+            // user groups ( maybe would be better to fetch by function User::getUserGroups() ? )
             foreach ($oUser->getUserGroups() as $oGroup) {
                 if ($sGroupIds) {
                     $sGroupIds .= ', ';
@@ -96,8 +103,8 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
             }
         }
 
-        $sGroupTable = getViewName('oxgroups');
-        $sCountryTable = getViewName('oxcountry');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
+        $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
         $sCountrySql = $sCountryId ? "exists( select 1 from oxobject2payment as s1 where s1.oxpaymentid={$sTable}.OXID and s1.oxtype='oxcountry' and s1.OXOBJECTID=" . $oDb->quote($sCountryId) . " limit 1 )" : '0';
         $sGroupSql = $sGroupIds ? "exists( select 1 from oxobject2group as s3 where s3.OXOBJECTID={$sTable}.OXID and s3.OXGROUPSID in ( {$sGroupIds} ) limit 1 )" : '0';
@@ -115,11 +122,13 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * Returns user country id for for payment selection
+     * Returns user country id for payment selection
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser oxuser object
+     * @param User $oUser oxuser object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCountryId($oUser)
     {
@@ -138,11 +147,13 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Loads and returns list of user payments.
      *
-     * @param string                                   $sShipSetId user chosen delivery set
-     * @param double                                   $dPrice     basket product price excl. discount
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser      session user object
+     * @param string $sShipSetId user chosen delivery set
+     * @param double $dPrice basket product price excl. discount
+     * @param User|null $oUser session user object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getPaymentList($sShipSetId, $dPrice, $oUser = null)
     {
@@ -157,7 +168,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      */
     public function loadNonRDFaPaymentList()
     {
-        $sTable = getViewName('oxpayments');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sSubSql = "SELECT * FROM oxobject2payment WHERE oxobject2payment.OXPAYMENTID = $sTable.OXID AND oxobject2payment.OXTYPE = 'rdfapayment'";
         $this->selectString("SELECT $sTable.* FROM $sTable WHERE NOT EXISTS($sSubSql) AND $sTable.OXACTIVE = 1");
     }
@@ -166,12 +177,14 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Loads payments mapped to a
      * predefined GoodRelations payment method.
      *
-     * @param double $dPrice product price
+     * @param null $dPrice product price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadRDFaPaymentList($dPrice = null)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $sTable = getViewName('oxpayments');
+        $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sQ = "select $sTable.*, oxobject2payment.oxobjectid from $sTable left join (select oxobject2payment.* from oxobject2payment where oxobject2payment.oxtype = 'rdfapayment') as oxobject2payment on oxobject2payment.oxpaymentid=$sTable.oxid ";
         $sQ .= "where $sTable.oxactive = 1 ";
         if ($dPrice !== null) {
@@ -180,7 +193,7 @@ class PaymentList extends \OxidEsales\Eshop\Core\Model\ListModel
         $rs = $oDb->select($sQ, [
             ':amount' => $dPrice
         ]);
-        if ($rs != false && $rs->count() > 0) {
+        if ($rs && $rs->count() > 0) {
             $oSaved = clone $this->getBaseObject();
             while (!$rs->EOF) {
                 $oListObject = clone $oSaved;

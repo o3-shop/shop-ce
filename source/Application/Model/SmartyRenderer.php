@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use Psr\Container\ContainerInterface;
 
@@ -56,6 +57,6 @@ class SmartyRenderer
      */
     private function getContainer()
     {
-        return \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()->getContainer();
+        return ContainerFactory::getInstance()->getContainer();
     }
 }

@@ -21,10 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * Admin selectlist list manager.
  */
-class SelectListList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class SelectListList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).

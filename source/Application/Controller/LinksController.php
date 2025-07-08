@@ -21,7 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Interesting, useful links window.
@@ -29,7 +31,7 @@ use oxRegistry;
  * administrator GUI) with short link description and URL. OXID
  * Shop -> LINKS.
  */
-class LinksController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class LinksController extends FrontendController
 {
     /**
      * Current class template name.
@@ -55,7 +57,7 @@ class LinksController extends \OxidEsales\Eshop\Application\Controller\FrontendC
         if ($this->_oLinksList === null) {
             $this->_oLinksList = false;
             // Load links
-            $oLinksList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+            $oLinksList = oxNew(ListModel::class);
             $oLinksList->init("oxlinks");
             $oLinksList->getList();
             $this->_oLinksList = $oLinksList;
@@ -73,8 +75,8 @@ class LinksController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     {
         $aPaths = [];
         $aPath = [];
-        $iBaseLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('LINKS', $iBaseLanguage, false);
+        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
+        $aPath['title'] = Registry::getLang()->translateString('LINKS', $iBaseLanguage, false);
         $aPath['link'] = $this->getLink();
 
         $aPaths[] = $aPath;

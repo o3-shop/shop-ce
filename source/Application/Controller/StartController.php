@@ -21,14 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxRegistry;
-use oxUBase;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\ActionList;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Starting shop page.
  * Shop starter, manages starting visible articles, etc.
  */
-class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class StartController extends FrontendController
 {
     /**
      * List display type
@@ -119,17 +122,17 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      * (oxarticlelist::loadActionArticles()). Returns name of
      * template file to render.
      *
-     * @return  string  cuurent template file name
+     * @return  string  current template file name
      */
     public function render()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('showexceptionpage') == '1') {
+        if (Registry::getRequest()->getRequestEscapedParameter('showexceptionpage') == '1') {
             return 'message/exception.tpl';
         }
 
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
-        $oRss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+        $oRss = oxNew(RssFeed::class);
         if ($myConfig->getConfigParam('iTop5Mode') && $myConfig->getConfigParam('bl_rssTopShop')) {
             $this->addRssFeed($oRss->getTopInShopTitle(), $oRss->getTopInShopUrl(), 'topArticles');
         }
@@ -146,67 +149,67 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     }
 
     /**
-     * Returns current view meta data
-     * If $sMeta parameter comes empty, sets to it article title and description.
-     * It happens if current view has no meta data defined in oxcontent table
+     * Returns current view metadata
+     * If $meta parameter comes empty, sets to it article title and description.
+     * It happens if current view has no metadata defined in oxcontent table
      *
-     * @param string $sMeta     category path
-     * @param int    $iLength   max length of result, -1 for no truncation
-     * @param bool   $blDescTag if true - performs additional duplicate cleaning
+     * @param string $meta     category path
+     * @param int    $length   max length of result, -1 for no truncation
+     * @param bool   $removeDuplicatedWords if true - performs additional duplicate cleaning
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($sMeta, $iLength = 1024, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (
-            !$sMeta &&
-            $this->getConfig()->getConfigParam('bl_perfLoadAktion') &&
+            !$meta &&
+            Registry::getConfig()->getConfigParam('bl_perfLoadAktion') &&
             $oArt = $this->getFirstArticle()
         ) {
             $oDescField = $oArt->getLongDescription();
-            $sMeta = $oArt->oxarticles__oxtitle->value . ' - ' . $oDescField->value;
+            $meta = $oArt->oxarticles__oxtitle->value . ' - ' . $oDescField->value;
         }
 
-        return parent::_prepareMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::_prepareMetaDescription($meta, $length, $removeDuplicatedWords);
     }
 
     /**
      * Returns current view keywords seperated by comma
-     * If $sKeywords parameter comes empty, sets to it article title and description.
-     * It happens if current view has no meta data defined in oxcontent table
+     * If $keywords parameter comes empty, sets to it article title and description.
+     * It happens if current view has no metadata defined in oxcontent table
      *
-     * @param string $sKeywords               data to use as keywords
-     * @param bool   $blRemoveDuplicatedWords remove duplicated words
+     * @param string $keywords               data to use as keywords
+     * @param bool   $removeDuplicatedWords remove duplicated words
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (
-            !$sKeywords &&
-            $this->getConfig()->getConfigParam('bl_perfLoadAktion') &&
+            !$keywords &&
+            Registry::getConfig()->getConfigParam('bl_perfLoadAktion') &&
             $oArt = $this->getFirstArticle()
         ) {
             $oDescField = $oArt->getLongDescription();
-            $sKeywords = $oDescField->value;
+            $keywords = $oDescField->value;
         }
 
-        return parent::_prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords);
+        return parent::_prepareMetaKeyword($keywords, $removeDuplicatedWords);
     }
 
     /**
      * Template variable getter. Returns if actions are ON
      *
-     * @return string
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "getLoadActionsParam" in next major
      */
     protected function _getLoadActionsParam() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->_blLoadActions === null) {
             $this->_blLoadActions = false;
-            if ($this->getConfig()->getConfigParam('bl_perfLoadAktion')) {
+            if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
                 $this->_blLoadActions = true;
             }
         }
@@ -226,7 +229,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_aArticleList = [];
             if ($this->_getLoadActionsParam()) {
                 // start list
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXSTART');
                 if ($oArtList->count()) {
                     $this->_aArticleList = $oArtList;
@@ -248,7 +251,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_aTopArticleList = false;
             if ($this->_getLoadActionsParam()) {
                 // start list
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXTOPSTART');
                 if ($oArtList->count()) {
                     $this->_aTopArticleList = $oArtList;
@@ -271,7 +274,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_aNewArticleList = [];
             if ($this->_getLoadActionsParam()) {
                 // newest articles
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadNewestArticles();
                 if ($oArtList->count()) {
                     $this->_aNewArticleList = $oArtList;
@@ -293,7 +296,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_oFirstArticle = false;
             if ($this->_getLoadActionsParam()) {
                 // top articles ( big one )
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXFIRSTSTART');
                 if ($oArtList->count()) {
                     $this->_oFirstArticle = $oArtList->current();
@@ -332,7 +335,7 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
             $this->_oCatOfferArtList = [];
             if ($this->_getLoadActionsParam()) {
                 // "category offer" articles
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXCATOFFER');
                 if ($oArtList->count()) {
                     $this->_oCatOfferArtList = $oArtList;
@@ -350,18 +353,18 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
      */
     public function getTitleSuffix()
     {
-        return $this->getConfig()->getActiveShop()->oxshops__oxstarttitle->value;
+        return Registry::getConfig()->getActiveShop()->oxshops__oxstarttitle->value;
     }
 
     /**
      * Returns view canonical url
      *
-     * @return string
+     * @return string|void
      */
     public function getCanonicalUrl()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oViewConf = $this->getViewConfig())) {
-            return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->prepareCanonicalUrl($oViewConf->getHomeLink());
+        if (Registry::getUtils()->seoIsActive() && ($oViewConf = $this->getViewConfig())) {
+            return Registry::getUtilsUrl()->prepareCanonicalUrl($oViewConf->getHomeLink());
         }
     }
 
@@ -369,14 +372,14 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     /**
      * Returns active banner list
      *
-     * @return objects
+     * @return ActionList
      */
     public function getBanners()
     {
         $oBannerList = null;
 
-        if ($this->getConfig()->getConfigParam('bl_perfLoadAktion')) {
-            $oBannerList = oxNew(\OxidEsales\Eshop\Application\Model\ActionList::class);
+        if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
+            $oBannerList = oxNew(ActionList::class);
             $oBannerList->loadBanners();
         }
 
@@ -386,13 +389,13 @@ class StartController extends \OxidEsales\Eshop\Application\Controller\FrontendC
     /**
      * Returns manufacturer list for manufacturer slider
      *
-     * @return objects
+     * @return array
      */
     public function getManufacturerForSlider()
     {
         $oList = null;
 
-        if ($this->getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
+        if (Registry::getConfig()->getConfigParam('bl_perfLoadManufacturerTree')) {
             $oList = $this->getManufacturerlist();
         }
 

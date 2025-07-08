@@ -21,15 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\Wrapping;
-use oxList;
-use oxRegistry;
-use oxUBase;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Managing Gift Wrapping
  */
-class WrappingController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class WrappingController extends FrontendController
 {
     /**
      * Current class template name.
@@ -48,14 +51,14 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Wrapping objects list
      *
-     * @var oxlist
+     * @var ListModel
      */
     protected $_oWrappings = null;
 
     /**
      * Card objects list
      *
-     * @var oxlist
+     * @var ListModel
      */
     protected $_oCards = null;
 
@@ -63,6 +66,9 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
      * Returns array of shopping basket articles
      *
      * @return array
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketItems()
     {
@@ -70,7 +76,7 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
             $this->_aBasketItemList = false;
 
             // passing basket articles
-            if ($oBasket = $this->getSession()->getBasket()) {
+            if ($oBasket = Registry::getSession()->getBasket()) {
                 $this->_aBasketItemList = $oBasket->getBasketArticles();
             }
         }
@@ -81,12 +87,12 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Return basket wrappings list if available
      *
-     * @return oxlist
+     * @return ListModel
      */
     public function getWrappingList()
     {
         if ($this->_oWrappings === null) {
-            $this->_oWrappings = new \OxidEsales\Eshop\Core\Model\ListModel();
+            $this->_oWrappings = new ListModel();
 
             // load wrapping papers
             if ($this->getViewConfig()->getShowGiftWrapping()) {
@@ -100,12 +106,12 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Returns greeting cards list if available
      *
-     * @return oxlist
+     * @return ListModel
      */
     public function getCardList()
     {
         if ($this->_oCards === null) {
-            $this->_oCards = new \OxidEsales\Eshop\Core\Model\ListModel();
+            $this->_oCards = new ListModel();
 
             // load gift cards
             if ($this->getViewConfig()->getShowGiftWrapping()) {
@@ -118,21 +124,21 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
 
     /**
      * Updates wrapping data in session basket object
-     * (\OxidEsales\Eshop\Core\Session::getBasket()) - adds wrapping info to
+     * (Session::getBasket()) - adds wrapping info to
      * each article in basket (if possible). Plus adds
      * gift message and chosen card ( takes from GET/POST/session;
      * oBasket::giftmessage, oBasket::chosencard). Then sets
-     * basket back to session (\OxidEsales\Eshop\Core\Session::setBasket()). Returns
-     * "order" to redirect to order confirmation secreen.
+     * basket back to session (Session::setBasket()). Returns
+     * "order" to redirect to order confirmation screen.
      *
      * @return string
      */
     public function changeWrapping()
     {
-        $aWrapping = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('wrapping');
+        $aWrapping = Registry::getRequest()->getRequestEscapedParameter('wrapping');
 
         if ($this->getViewConfig()->getShowGiftWrapping()) {
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
             // setting wrapping info
             if (is_array($aWrapping) && count($aWrapping)) {
                 foreach ($oBasket->getContents() as $sKey => $oBasketItem) {
@@ -143,8 +149,8 @@ class WrappingController extends \OxidEsales\Eshop\Application\Controller\Fronte
                 }
             }
 
-            $oBasket->setCardMessage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('giftmessage'));
-            $oBasket->setCardId(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('chosencard'));
+            $oBasket->setCardMessage(Registry::getRequest()->getRequestEscapedParameter('giftmessage'));
+            $oBasket->setCardId(Registry::getRequest()->getRequestEscapedParameter('chosencard'));
             $oBasket->onUpdate();
         }
 

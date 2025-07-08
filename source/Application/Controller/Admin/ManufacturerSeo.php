@@ -21,27 +21,33 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Manufacturer seo config class
  */
-class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class ManufacturerSeo extends ObjectSeo
 {
     /**
-     * Updating showsuffix field
+     * Updating oxshowsuffix field
      *
      * @return null
+     * @throws Exception
      */
     public function save()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oManufacturer = oxNew(BaseModel::class);
         $oManufacturer->init('oxmanufacturers');
         if ($oManufacturer->load($this->getEditObjectId())) {
             $sShowSuffixField = 'oxmanufacturers__oxshowsuffix';
-            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('blShowSuffix');
-            $oManufacturer->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
+            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
+            $oManufacturer->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oManufacturer->save();
         }
 
@@ -51,12 +57,22 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderManufacturer
+     * @return SeoEncoderManufacturer
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class);
+        return $this->getEncoder();
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderManufacturer
+     */
+    protected function getEncoder()
+    {
+        return Registry::get(SeoEncoderManufacturer::class);
     }
 
     /**
@@ -77,17 +93,27 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getType();
+    }
+
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
         return 'oxmanufacturer';
     }
 
     /**
      * Returns true if SEO object id has suffix enabled
      *
-     * @return bool
+     * @return bool|void
      */
     public function isEntrySuffixed()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $oManufacturer = oxNew(Manufacturer::class);
         if ($oManufacturer->load($this->getEditObjectId())) {
             return (bool) $oManufacturer->oxmanufacturers__oxshowsuffix->value;
         }
@@ -96,13 +122,13 @@ class ManufacturerSeo extends \OxidEsales\Eshop\Application\Controller\Admin\Obj
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
      */
     public function getEntryUri()
     {
-        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $oManufacturer = oxNew(Manufacturer::class);
         if ($oManufacturer->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getManufacturerUri($oManufacturer, $this->getEditLang());
+            return $this->getEncoder()->getManufacturerUri($oManufacturer, $this->getEditLang());
         }
     }
 }

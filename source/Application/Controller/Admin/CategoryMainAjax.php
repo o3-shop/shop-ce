@@ -21,13 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Object2Category;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 use Exception;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
 
 /**
  * Class manages category articles
  */
-class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class CategoryMainAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -41,42 +48,54 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+         'container2' => [
+             ['oxartnum', 'oxarticles', 1, 0, 0],
+             ['oxtitle', 'oxarticles', 1, 1, 0],
+             ['oxean', 'oxarticles', 1, 0, 0],
+             ['oxmpn', 'oxarticles', 0, 0, 0],
+             ['oxprice', 'oxarticles', 0, 0, 0],
+             ['oxstock', 'oxarticles', 0, 0, 0],
+             ['oxid', 'oxarticles', 0, 0, 1],
+         ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        return $this->getQuery();
+    }
 
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
 
-        $sOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
         if (!$sOxid && $sSynchOxid) {
@@ -108,15 +127,29 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sQ = parent::_addFilter($sQ);
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        $sArtTable = $this->getViewName('oxarticles');
+        $sQ = parent::addFilter($sQ);
 
         // display variants or not ?
-        if (!$this->getConfig()->getConfigParam('blVariantsSelection')) {
+        if (!Registry::getConfig()->getConfigParam('blVariantsSelection')) {
             $sQ .= " and {$sArtTable}.oxparentid = '' ";
         }
 
@@ -131,26 +164,24 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function addArticle()
     {
-        $myConfig = $this->getConfig();
+        $aArticles = $this->getActionIds('oxarticles.oxid');
+        $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $sShopID = Registry::getConfig()->getShopId();
 
-        $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $sCategoryID = $myConfig->getRequestParameter('synchoxid');
-        $sShopID = $myConfig->getShopId();
-
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->startTransaction();
+        DatabaseProvider::getDb()->startTransaction();
         try {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sArticleTable = $this->_getViewName('oxarticles');
+            $database = DatabaseProvider::getDb();
+            $sArticleTable = $this->getViewName('oxarticles');
 
             // adding
-            if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
-                $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
+            if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+                $aArticles = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
             }
 
             if (is_array($aArticles)) {
-                $sO2CView = $this->_getViewName('oxobject2category');
+                $sO2CView = $this->getViewName('oxobject2category');
 
-                $oNew = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
+                $oNew = oxNew(Object2Category::class);
                 $sProdIds = "";
                 foreach ($aArticles as $sAdd) {
                     // check, if it's already in, then don't add it again
@@ -161,10 +192,10 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                         continue;
                     }
 
-                    $oNew->oxobject2category__oxid = new \OxidEsales\Eshop\Core\Field($oNew->setId(md5($sAdd . $sCategoryID . $sShopID)));
-                    $oNew->oxobject2category__oxobjectid = new \OxidEsales\Eshop\Core\Field($sAdd);
-                    $oNew->oxobject2category__oxcatnid = new \OxidEsales\Eshop\Core\Field($sCategoryID);
-                    $oNew->oxobject2category__oxtime = new \OxidEsales\Eshop\Core\Field(time());
+                    $oNew->oxobject2category__oxid = new Field($oNew->setId(md5($sAdd . $sCategoryID . $sShopID)));
+                    $oNew->oxobject2category__oxobjectid = new Field($sAdd);
+                    $oNew->oxobject2category__oxcatnid = new Field($sCategoryID);
+                    $oNew->oxobject2category__oxtime = new Field(time());
 
                     $oNew->save();
 
@@ -175,29 +206,43 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                 }
 
                 // updating oxtime values
-                $this->_updateOxTime($sProdIds);
+                $this->updateOxTime($sProdIds);
 
                 $this->resetArtSeoUrl($aArticles);
                 $this->resetCounter("catArticle", $sCategoryID);
             }
         } catch (Exception $exception) {
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->rollbackTransaction();
+            DatabaseProvider::getDb()->rollbackTransaction();
             throw $exception;
         }
 
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->commitTransaction();
+        DatabaseProvider::getDb()->commitTransaction();
     }
 
     /**
      * Updates oxtime value for products
      *
      * @param string $sProdIds product ids: "id1", "id2", "id3"
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "updateOxTime" in next major
      */
     protected function _updateOxTime($sProdIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->updateOxTime($sProdIds);
+    }
+
+    /**
+     * Updates oxtime value for products
+     *
+     * @param string $sProdIds product ids: "id1", "id2", "id3"
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function updateOxTime($sProdIds)
+    {
         if ($sProdIds) {
-            $sO2CView = $this->_getViewName('oxobject2category');
+            $sO2CView = $this->getViewName('oxobject2category');
             $sSqlShopFilter = $this->getUpdateOxTimeQueryShopFilter();
             $sSqlWhereShopFilter = $this->getUpdateOxTimeSqlWhereFilter();
             $sQ = "update oxobject2category set oxtime = 0 where oxid in (
@@ -212,7 +257,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
                       ) as _tmp
                    ) {$sSqlShopFilter}";
 
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($sQ);
+            DatabaseProvider::getDb()->execute($sQ);
         }
     }
 
@@ -240,13 +285,13 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      */
     public function removeArticle()
     {
-        $aArticles = $this->_getActionIds('oxarticles.oxid');
-        $sCategoryID = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
+        $aArticles = $this->getActionIds('oxarticles.oxid');
+        $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         // adding
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sArticleTable = $this->getViewName('oxarticles');
+            $aArticles = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
         }
 
         // adding
@@ -258,7 +303,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $this->resetCounter("catArticle", $sCategoryID);
 
         //notify services
-        $relation = oxNew(\OxidEsales\Eshop\Application\Model\Object2Category::class);
+        $relation = oxNew(Object2Category::class);
         $relation->setCategoryId($sCategoryID);
         $this->dispatchEvent(new AfterModelUpdateEvent($relation));
     }
@@ -266,13 +311,15 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
     /**
      * Delete articles from category (from oxobject2category).
      *
-     * @param array  $articles
+     * @param array $articles
      * @param string $categoryID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     protected function removeCategoryArticles($articles, $categoryID)
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $prodIds = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articles));
+        $db = DatabaseProvider::getDb();
+        $prodIds = implode(", ", DatabaseProvider::getDb()->quoteArray($articles));
 
         $delete = "delete from oxobject2category ";
         $where = $this->getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds);
@@ -282,7 +329,7 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
         $db->execute($sQ);
 
         // updating oxtime values
-        $this->_updateOxTime($prodIds);
+        $this->updateOxTime($prodIds);
     }
 
     /**
@@ -292,14 +339,15 @@ class CategoryMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\Li
      * @param string $prodIds
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds)
     {
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $db = DatabaseProvider::getDb();
         $where = "where oxcatnid=" . $db->quote($categoryID);
 
         $whereProductIdIn = " oxobjectid in ( {$prodIds} )";
-        if (!$this->getConfig()->getConfigParam('blVariantsSelection')) {
+        if (!Registry::getConfig()->getConfigParam('blVariantsSelection')) {
             $whereProductIdIn = "( " . $whereProductIdIn . " OR oxobjectid in (
                                         select oxid from oxarticles where oxparentid in ({$prodIds})
                                         )

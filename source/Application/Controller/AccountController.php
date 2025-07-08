@@ -21,7 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Controller\CompareController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\UtilsUrl;
 
 /**
  * Current user "My account" window.
@@ -30,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
  * is a link for logging out. Template includes Topoffer , bargain
  * boxes. O3-Shop -> MY ACCOUNT.
  */
-class AccountController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class AccountController extends FrontendController
 {
     /**
      * Number of user's orders.
@@ -128,6 +132,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * template to render account::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
@@ -140,10 +145,10 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $user = $this->getUser();
         $passwordField = 'oxuser__oxpassword';
         if (
-            !$user || ($user && !$user->$passwordField->value) ||
-            ($this->isEnabledPrivateSales() && $user && (!$user->isTermsAccepted() || $this->confirmTerms()))
+            !$user || !$user->$passwordField->value ||
+            ($this->isEnabledPrivateSales() && (!$user->isTermsAccepted() || $this->confirmTerms()))
         ) {
-            $this->_sThisTemplate = $this->_getLoginTemplate();
+            $this->_sThisTemplate = $this->getLoginTemplate();
         }
 
         return $this->_sThisTemplate;
@@ -159,6 +164,18 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     protected function _getLoginTemplate() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getLoginTemplate();
+    }
+
+    /**
+     * Returns login template name:
+     *  - if "login" feature is on returns $this->_sThisAltLoginTemplate
+     *  - else returns $this->_sThisLoginTemplate
+     *
+     * @return string
+     */
+    protected function getLoginTemplate()
+    {
         return $this->isEnabledPrivateSales() ? $this->_sThisAltLoginTemplate : $this->_sThisLoginTemplate;
     }
 
@@ -166,10 +183,11 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Confirms term agreement. Returns value of confirmed term
      *
      * @return string | bool
+     * @throws DatabaseConnectionException
      */
     public function confirmTerms()
     {
-        $termsConfirmation = Registry::getConfig()->getRequestParameter("term");
+        $termsConfirmation = Registry::getRequest()->getRequestEscapedParameter('term');
         if (!$termsConfirmation && $this->isEnabledPrivateSales()) {
             $user = $this->getUser();
             if ($user && !$user->isTermsAccepted()) {
@@ -192,11 +210,11 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $parameters = parent::getNavigationParams();
 
-        if ($sourceClass = Registry::getConfig()->getRequestParameter("sourcecl")) {
+        if ($sourceClass = Registry::getRequest()->getRequestEscapedParameter('sourcecl')) {
             $parameters['sourcecl'] = $sourceClass;
         }
 
-        if ($articleId = Registry::getConfig()->getRequestParameter("anid")) {
+        if ($articleId = Registry::getRequest()->getRequestEscapedParameter('anid')) {
             $parameters['anid'] = $articleId;
         }
 
@@ -207,21 +225,21 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * For some user actions (like writing product
      * review) user must be logged in. So e.g. in product details page
      * there is a link leading to current view. Link contains parameter
-     * "sourcecl", which tells where to redirect after successfull login.
+     * "sourcecl", which tells where to redirect after successful login.
      * If this parameter is defined and oxcmp_user::getLoginStatus() ==
      * USER_LOGIN_SUCCESS (means user has just logged in) then user is
      * redirected back to source view.
      *
-     * @return null
+     * @return void
      */
     public function redirectAfterLogin()
     {
         // in case source class is provided - redirecting back to it with all default parameters
         if (
-            ($sourceClass = Registry::getConfig()->getRequestParameter("sourcecl")) &&
+            ($sourceClass = Registry::getRequest()->getRequestEscapedParameter('sourcecl')) &&
             $this->_oaComponents['oxcmp_user']->getLoginStatus() === USER_LOGIN_SUCCESS
         ) {
-            $redirectUrl = $this->getConfig()->getShopUrl() . 'index.php?cl=' . rawurlencode($sourceClass);
+            $redirectUrl = Registry::getConfig()->getShopUrl() . 'index.php?cl=' . rawurlencode($sourceClass);
 
             // building redirect link
             foreach ($this->getNavigationParams() as $key => $value) {
@@ -230,7 +248,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
                 }
             }
 
-            /** @var \OxidEsales\Eshop\Core\UtilsUrl $utilsUrl */
+            /** @var UtilsUrl $utilsUrl */
             $utilsUrl = Registry::getUtilsUrl();
             return Registry::getUtils()->redirect($utilsUrl->processUrl($redirectUrl), true, 302);
         }
@@ -240,6 +258,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * changes default template for compare in popup
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function getOrderCnt()
     {
@@ -262,7 +281,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         if ($this->_sArticleId === null) {
             // passing wishlist information
-            if ($articleId = Registry::getConfig()->getRequestParameter('aid')) {
+            if ($articleId = Registry::getRequest()->getRequestEscapedParameter('aid')) {
                 $this->_sArticleId = $articleId;
             }
         }
@@ -280,7 +299,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_sSearchParamForHtml === null) {
             $this->_sSearchParamForHtml = false;
             if ($this->getArticleId()) {
-                $this->_sSearchParamForHtml = Registry::getConfig()->getRequestParameter('searchparam');
+                $this->_sSearchParamForHtml = Registry::getRequest()->getRequestEscapedParameter('searchparam');
             }
         }
 
@@ -297,7 +316,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_sSearchParam === null) {
             $this->_sSearchParam = false;
             if ($this->getArticleId()) {
-                $this->_sSearchParam = rawurlencode(Registry::getConfig()->getRequestParameter('searchparam', true));
+                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
             }
         }
 
@@ -315,7 +334,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
             $this->_sListType = false;
             if ($this->getArticleId()) {
                 // searching in vendor #671
-                $this->_sListType = Registry::getConfig()->getRequestParameter('listtype');
+                $this->_sListType = Registry::getRequest()->getRequestEscapedParameter('listtype');
             }
         }
 
@@ -352,7 +371,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getCompareItemsCnt()
     {
-        $compare = oxNew(\OxidEsales\Eshop\Application\Controller\CompareController::class);
+        $compare = oxNew(CompareController::class);
 
         return $compare->getCompareItemsCnt();
     }
@@ -366,7 +385,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     {
         $title = parent::getTitle();
 
-        if ($this->getConfig()->getActiveView()->getClassName() == 'account') {
+        if (Registry::getConfig()->getActiveView()->getClassKey() == 'account') {
             $baseLanguageId = Registry::getLang()->getBaseLanguage();
             $title = Registry::getLang()->translateString('PAGE_TITLE_ACCOUNT', $baseLanguageId, false);
             if ($user = $this->getUser()) {
@@ -390,14 +409,14 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
          * Setting derived to false allows mall users to delete their account being in a different shop as the shop
          * the account was originally created in.
          */
-        if ($this->getConfig()->getConfigParam('blMallUsers')) {
+        if (Registry::getConfig()->getConfigParam('blMallUsers')) {
             $user->setIsDerived(false);
         }
 
         if ($this->canUserAccountBeDeleted() && $user->delete()) {
             $this->accountDeletionStatus = true;
             $user->logout();
-            $session = $this->getSession();
+            $session = Registry::getSession();
             $session->destroy();
         }
     }
@@ -409,9 +428,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function isUserAllowedToDeleteOwnAccount()
     {
-        $allowUsersToDeleteTheirAccount = $this
-            ->getConfig()
-            ->getConfigParam('blAllowUsersToDeleteTheirAccount');
+        $allowUsersToDeleteTheirAccount = Registry::getConfig()->getConfigParam('blAllowUsersToDeleteTheirAccount');
 
         $user = $this->getUser();
 
@@ -419,7 +436,7 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Template variable getter. Returns true, if a user account has been sucessfully deleted, else false.
+     * Template variable getter. Returns true, if a user account has been successfully deleted, else false.
      *
      * @return bool
      */
@@ -435,6 +452,6 @@ class AccountController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     private function canUserAccountBeDeleted()
     {
-        return $this->getSession()->checkSessionChallenge() && $this->isUserAllowedToDeleteOwnAccount();
+        return Registry::getSession()->checkSessionChallenge() && $this->isUserAllowedToDeleteOwnAccount();
     }
 }

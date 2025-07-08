@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article crossselling configuration
  */
-class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleCrosssellingAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -42,41 +46,55 @@ class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\A
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 1, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxobject2article', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxobject2article', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sView = $this->_getViewName('oxobject2category');
+        return $this->getQuery();
+    }
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $myConfig = Registry::getConfig();
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sView = $this->getViewName('oxobject2category');
+
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
         if (!$sSelId) {
@@ -133,44 +151,44 @@ class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\A
     }
 
     /**
-     * Removing article from corssselling list
+     * Removing article from cross-selling list
      */
     public function removeArticleCross()
     {
-        $aChosenArt = $this->_getActionIds('oxobject2article.oxid');
+        $aChosenArt = $this->getActionIds('oxobject2article.oxid');
         // removing all
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2article.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = $this->addFilter("delete oxobject2article.* " . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
             $sQ = "delete from oxobject2article where oxobject2article.oxid in (" . $sChosenArticles . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
     /**
-     * Adding article to corssselling list
+     * Adding article to cross-selling list
      */
     public function addArticleCross()
     {
-        $aChosenArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $aChosenArt = $this->getActionIds('oxarticles.oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('all')) {
-            $sArtTable = $this->_getViewName('oxarticles');
-            $aChosenArt = $this->_getAll(parent::_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sArtTable = $this->getViewName('oxarticles');
+            $aChosenArt = $this->getAll(parent::addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         if ($oArticle->load($soxId) && $soxId && $soxId != "-1" && is_array($aChosenArt)) {
             foreach ($aChosenArt as $sAdd) {
-                $oNewGroup = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oNewGroup = oxNew(BaseModel::class);
                 $oNewGroup->init('oxobject2article');
-                $oNewGroup->oxobject2article__oxobjectid = new \OxidEsales\Eshop\Core\Field($sAdd);
-                $oNewGroup->oxobject2article__oxarticlenid = new \OxidEsales\Eshop\Core\Field($oArticle->oxarticles__oxid->value);
-                $oNewGroup->oxobject2article__oxsort = new \OxidEsales\Eshop\Core\Field(0);
+                $oNewGroup->oxobject2article__oxobjectid = new Field($sAdd);
+                $oNewGroup->oxobject2article__oxarticlenid = new Field($oArticle->oxarticles__oxid->value);
+                $oNewGroup->oxobject2article__oxsort = new Field(0);
                 $oNewGroup->save();
             }
 
@@ -181,7 +199,7 @@ class ArticleCrosssellingAjax extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Method is used to overload and add additional actions.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param Article $article
      */
     protected function onArticleAddingToCrossSelling($article)
     {

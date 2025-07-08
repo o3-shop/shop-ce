@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Core\Model;
 
-use oxObjectException;
-
 /**
  * Class handling multilanguage data fields
  */
@@ -461,8 +459,6 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
      * the main table, it will not save any dependend tables, which might
      * be loaded through oxlist (with exception of the active language set
      * table, which will be updated).
-     *
-     * @throws oxObjectException Throws on failure inserting
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "update" in next major

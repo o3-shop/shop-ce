@@ -21,16 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AttributeMainAjax;
+use OxidEsales\Eshop\Application\Model\Attribute;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
- * Admin article main attributes manager.
+ * Admin article main attributes' manager.
  * There is possibility to change attribute description, assign articles to
  * this attribute, etc.
  * Admin Menu: Manage Products -> Attributes -> Main.
  */
-class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AttributeMain extends AdminDetailsController
 {
     /**
      * Loads article Attributes info, passes it to Smarty engine and
@@ -42,15 +46,13 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     {
         parent::render();
 
-        $myConfig = $this->getConfig();
-
-        $oAttr = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
+        $oAttr = oxNew(Attribute::class);
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
 
         // copy this tree for our article choose
         if (isset($soxId) && $soxId != "-1") {
             // generating category tree for select list
-            $this->_createCategoryTree("artcattree", $soxId);
+            $this->createCategoryTree("artcattree", $soxId);
             // load object
             $oAttr->loadInLang($this->_iEditLang, $soxId);
 
@@ -66,7 +68,7 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
             }
 
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
                 $this->_aViewData["posslang"] = $aLang;
             }
@@ -81,8 +83,8 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
 
         $this->_aViewData["edit"] = $oAttr;
 
-        if ($myConfig->getRequestParameter("aoc")) {
-            $oAttributeMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AttributeMainAjax::class);
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
+            $oAttributeMainAjax = oxNew(AttributeMainAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeMainAjax->getColumns();
 
             return "popups/attribute_main.tpl";
@@ -94,16 +96,16 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     /**
      * Saves article attributes.
      *
-     * @return mixed
+     * @return void
      */
     public function save()
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        $oAttr = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
+        $oAttr = oxNew(Attribute::class);
 
         if ($soxId != "-1") {
             $oAttr->loadInLang($this->_iEditLang, $soxId);
@@ -120,7 +122,7 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $oAttr->setLanguage(0);
         $oAttr->assign($aParams);
         $oAttr->setLanguage($this->_iEditLang);
-        $oAttr = \OxidEsales\Eshop\Core\Registry::getUtilsFile()->processFiles($oAttr);
+        $oAttr = Registry::getUtilsFile()->processFiles($oAttr);
         $oAttr->save();
 
         $this->setEditObjectId($oAttr->getId());
@@ -129,16 +131,17 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
     /**
      * Saves attribute data to different language (eg. english).
      *
-     * @return null
+     * @return void
+     * @throws Exception
      */
     public function saveinnlang()
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        $oAttr = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
+        $oAttr = oxNew(Attribute::class);
 
         if ($soxId != "-1") {
             $oAttr->loadInLang($this->_iEditLang, $soxId);
@@ -155,7 +158,7 @@ class AttributeMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
         $oAttr->assign($aParams);
 
         // apply new language
-        $oAttr->setLanguage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("new_lang"));
+        $oAttr->setLanguage(Registry::getRequest()->getRequestEscapedParameter('new_lang'));
         $oAttr->save();
 
         // set oxid if inserted

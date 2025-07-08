@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use Exception;
+use OxidEsales\Eshop\Application\Model\ContentList;
+use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Transparent shop utilities class.
@@ -31,7 +33,7 @@ use oxRegistry;
  *
  * @subpackage oxcmp
  */
-class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class UtilsComponent extends BaseController
 {
     /**
      * Marking object as component
@@ -56,12 +58,12 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $blOverride = false,
         $blBundle = false
     ) {
-        // only if enabled and not search engine..
+        // only if enabled and not search engine...
         if ($this->getViewConfig()->getShowCompareList() && !Registry::getUtils()->isSearchEngine()) {
             // #657 special treatment if we want to put on comparelist
-            $blAddCompare = Registry::getConfig()->getRequestParameter('addcompare');
-            $blRemoveCompare = Registry::getConfig()->getRequestParameter('removecompare');
-            $sProductId = $sProductId ? $sProductId : Registry::getConfig()->getRequestParameter('aid');
+            $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
+            $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
+            $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
             if (($blAddCompare || $blRemoveCompare) && $sProductId) {
                 // toggle state in session array
                 $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
@@ -100,14 +102,13 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
-     * If session user is set loads user noticelist (\OxidEsales\Eshop\Application\Model\User::GetBasket())
+     * If session user is set loads user notice-list (\OxidEsales\Eshop\Application\Model\User::GetBasket())
      * and adds article to it.
      *
      * @param string $sProductId Product/article ID (default null)
-     * @param double $dAmount    amount of good (default null)
-     * @param array  $aSel       product selection list (default null)
-     *
-     * @return bool
+     * @param double $dAmount amount of good (default null)
+     * @param array $aSel product selection list (default null)
+     * @throws Exception
      */
     public function toNoticeList($sProductId = null, $dAmount = null, $aSel = null)
     {
@@ -115,7 +116,7 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
             return;
         }
 
-        $this->_toList('noticelist', $sProductId, $dAmount, $aSel);
+        $this->toList('noticelist', $sProductId, $dAmount, $aSel);
     }
 
     /**
@@ -123,10 +124,9 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
      * adds article to it.
      *
      * @param string $sProductId Product/article ID (default null)
-     * @param double $dAmount    amount of good (default null)
-     * @param array  $aSel       product selection list (default null)
-     *
-     * @return false
+     * @param double $dAmount amount of good (default null)
+     * @param array $aSel product selection list (default null)
+     * @throws Exception
      */
     public function toWishList($sProductId = null, $dAmount = null, $aSel = null)
     {
@@ -136,31 +136,46 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         // only if enabled
         if ($this->getViewConfig()->getShowWishlist()) {
-            $this->_toList('wishlist', $sProductId, $dAmount, $aSel);
+            $this->toList('wishlist', $sProductId, $dAmount, $aSel);
         }
     }
 
     /**
      * Adds chosen product to defined user list. if amount is 0, item is removed from the list
      *
-     * @param string $sListType  user product list type
+     * @param string $sListType user product list type
      * @param string $sProductId product id
-     * @param double $dAmount    product amount
-     * @param array  $aSel       product selection list
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "toList" in next major
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->toList($sListType, $sProductId, $dAmount, $aSel);
+    }
+
+    /**
+     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
+     *
+     * @param string $sListType user product list type
+     * @param string $sProductId product id
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
+     */
+    protected function toList($sListType, $sProductId, $dAmount, $aSel)
+    {
         // only if user is logged in
         if ($oUser = $this->getUser()) {
-            $sProductId = ($sProductId) ? $sProductId : Registry::getConfig()->getRequestParameter('itmid');
-            $sProductId = ($sProductId) ? $sProductId : Registry::getConfig()->getRequestParameter('aid');
-            $dAmount = isset($dAmount) ? $dAmount : Registry::getConfig()->getRequestParameter('am');
-            $aSel = $aSel ? $aSel : Registry::getConfig()->getRequestParameter('sel');
+            $sProductId = ($sProductId) ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('itmid');
+            $sProductId = ($sProductId) ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
+            $dAmount = isset($dAmount) ? $dAmount : Registry::getRequest()->getRequestEscapedParameter('am');
+            $aSel = $aSel ? $aSel : Registry::getRequest()->getRequestEscapedParameter('sel');
 
             // processing amounts
             $dAmount = str_replace(',', '.', $dAmount);
-            if (!$this->getConfig()->getConfigParam('blAllowUnevenAmounts')) {
+            if (!Registry::getConfig()->getConfigParam('blAllowUnevenAmounts')) {
                 $dAmount = round((string) $dAmount);
             }
 
@@ -175,7 +190,7 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      *  Set view data, call parent::render
      *
-     * @return null
+     * @return void
      */
     public function render()
     {
@@ -184,10 +199,8 @@ class UtilsComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
         $oParentView = $this->getParent();
 
         // add content for main menu
-        $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
+        $oContentList = oxNew(ContentList::class);
         $oContentList->loadMainMenulist();
         $oParentView->setMenueList($oContentList);
-
-        return;
     }
 }

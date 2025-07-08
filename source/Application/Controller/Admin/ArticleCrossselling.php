@@ -21,15 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax;
+use OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Admin article crosselling/accesories manager.
+ * Admin article crosselling/accessoires manager.
  * Creates list of available articles, there is ability to assign or remove
- * assigning of article to crosselling/accesories with other products.
- * Admin Menu: Manage Products -> Articles -> Crosssell.
+ * assigning of article to crosselling/accessoires with other products.
+ * Admin Menu: Manage Products -> Articles -> Cross-selling
  */
-class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleCrossselling extends AdminDetailsController
 {
     /**
      * Collects article crosselling and attributes information, passes
@@ -37,18 +42,19 @@ class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin
      * "article_crossselling.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
-        // crossselling
-        $this->_createCategoryTree("artcattree");
+        // cross-selling
+        $this->createCategoryTree("artcattree");
 
         // accessoires
-        $this->_createCategoryTree("artcattree2");
+        $this->createCategoryTree("artcattree2");
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
@@ -60,15 +66,15 @@ class ArticleCrossselling extends \OxidEsales\Eshop\Application\Controller\Admin
             }
         }
 
-        $iAoc = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc");
+        $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
-            $oArticleCrossellingAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleCrosssellingAjax::class);
+            $oArticleCrossellingAjax = oxNew(ArticleCrosssellingAjax::class);
             $this->_aViewData['oxajax'] = $oArticleCrossellingAjax->getColumns();
 
             return "popups/article_crossselling.tpl";
         } elseif ($iAoc == 2) {
-            $oArticleAccessoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class);
-            $this->_aViewData['oxajax'] = $oArticleAccessoriesAjax->getColumns();
+            $oArticleAccessoiresAjax = oxNew(ArticleAccessoriesAjax::class);
+            $this->_aViewData['oxajax'] = $oArticleAccessoiresAjax->getColumns();
 
             return "popups/article_accessories.tpl";
         }

@@ -21,14 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+use OxidEsales\Eshop\Application\Model\ManufacturerList;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Transparent category manager class (executed automatically).
  *
  * @subpackage oxcmp
  */
-class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseController
+class CategoriesComponent extends BaseController
 {
     /**
      * More category object.
@@ -47,14 +55,14 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
     /**
      * Marking object as component
      *
-     * @var bool
+     * @var CategoryList
      */
     protected $_oCategoryTree = null;
 
     /**
      * Marking object as component
      *
-     * @var bool
+     * @var ManufacturerList
      */
     protected $_oManufacturerTree = null;
 
@@ -65,14 +73,17 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      * category if any of them available. Generates category/navigation
      * list.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function init()
     {
         parent::init();
 
         // Performance
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         if (
             $myConfig->getConfigParam('blDisableNavBars') &&
             $myConfig->getTopActiveView()->getIsOrderStep()
@@ -80,31 +91,32 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
             return;
         }
 
-        $sActCat = $this->_getActCat();
+        $sActCat = $this->getActCat();
 
         if ($myConfig->getConfigParam('bl_perfLoadManufacturerTree')) {
             // building Manufacturer tree
-            $sActManufacturer = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('mnid');
-            $this->_loadManufacturerTree($sActManufacturer);
+            $sActManufacturer = Registry::getRequest()->getRequestEscapedParameter('mnid');
+            $this->loadManufacturerTree($sActManufacturer);
         }
 
         // building category tree for all purposes (nav, search and simple category trees)
-        $this->_loadCategoryTree($sActCat);
+        $this->loadCategoryTree($sActCat);
     }
 
     /**
      * get active article
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article|void
+     * @throws DatabaseConnectionException
      */
     public function getProduct()
     {
-        if (($sActProduct = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('anid'))) {
+        if (($sActProduct = Registry::getRequest()->getRequestEscapedParameter('anid'))) {
             $oParentView = $this->getParent();
             if (($oProduct = $oParentView->getViewProduct())) {
                 return $oProduct;
             } else {
-                $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+                $oProduct = oxNew(Article::class);
                 if ($oProduct->load($sActProduct)) {
                     // storing for reuse
                     $oParentView->setViewProduct($oProduct);
@@ -119,30 +131,46 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      * get active category id
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActCat" in next major
      */
     protected function _getActCat() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sActManufacturer = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('mnid');
+        return $this->getActCat();
+    }
 
-        $sActCat = $sActManufacturer ? null : \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('cnid');
+    /**
+     * get active category id
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
+     */
+    protected function getActCat()
+    {
+        $sActManufacturer = Registry::getRequest()->getRequestEscapedParameter('mnid');
+
+        $sActCat = $sActManufacturer ? null : Registry::getRequest()->getRequestEscapedParameter('cnid');
 
         // loaded article - then checking additional parameters
         $oProduct = $this->getProduct();
         if ($oProduct) {
-            $myConfig = $this->getConfig();
+            $myConfig = Registry::getConfig();
 
             $sActManufacturer = $myConfig->getConfigParam('bl_perfLoadManufacturerTree') ? $sActManufacturer : null;
 
-            $sActVendor = (getStr()->preg_match('/^v_.?/i', $sActCat)) ? $sActCat : null;
+            $sActVendor = (Str::getStr()->preg_match('/^v_.?/i', $sActCat)) ? $sActCat : null;
 
-            $sActCat = $this->_addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
+            $sActCat = $this->addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
         }
 
         // Checking for the default category
         if ($sActCat === null && !$oProduct && !$sActManufacturer) {
             // set remote cat
-            $sActCat = $this->getConfig()->getActiveShop()->oxshops__oxdefcat->value;
+            $sActCat = Registry::getConfig()->getActiveShop()->oxshops__oxdefcat->value;
             if ($sActCat == 'oxrootid') {
                 // means none selected
                 $sActCat = null;
@@ -156,12 +184,25 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      * Category tree loader
      *
      * @param string $sActCat active category id
+     * @return null
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadCategoryTree" in next major
      */
     protected function _loadCategoryTree($sActCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        /** @var \OxidEsales\Eshop\Application\Model\CategoryList $oCategoryTree */
-        $oCategoryTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        return $this->loadCategoryTree($sActCat);
+    }
+
+    /**
+     * Category tree loader
+     *
+     * @param string $sActCat active category id
+     * @throws DatabaseConnectionException
+     */
+    protected function loadCategoryTree($sActCat)
+    {
+        /** @var CategoryList $oCategoryTree */
+        $oCategoryTree = oxNew(CategoryList::class);
         $oCategoryTree->buildTree($sActCat);
 
         $oParentView = $this->getParent();
@@ -182,7 +223,17 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      */
     protected function _loadManufacturerTree($sActManufacturer) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        return $this->loadManufacturerTree($sActManufacturer);
+    }
+    
+    /**
+     * Manufacturer tree loader
+     *
+     * @param string $sActManufacturer active Manufacturer id
+     */
+    protected function loadManufacturerTree($sActManufacturer)
+    {
+        $myConfig = Registry::getConfig();
         if ($myConfig->getConfigParam('bl_perfLoadManufacturerTree')) {
             $oManufacturerTree = $this->getManufacturerList();
             $shopHomeURL = $myConfig->getShopHomeUrl();
@@ -205,14 +256,14 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
      * Executes parent::render(), loads expanded/clicked category object,
      * adds parameters template engine and returns list of category tree.
      *
-     * @return \OxidEsales\Eshop\Application\Model\CategoryList
+     * @return CategoryList|void
      */
     public function render()
     {
         parent::render();
 
         // Performance
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oParentView = $this->getParent();
 
         if ($myConfig->getConfigParam('bl_perfLoadManufacturerTree') && $this->_oManufacturerTree) {
@@ -228,21 +279,42 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
     /**
      * Adds additional parameters: active category, list type and category id
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oProduct         loaded product
-     * @param string                                      $sActCat          active category id
-     * @param string                                      $sActManufacturer active manufacturer id
-     * @param string                                      $sActVendor       active vendor
+     * @param Article $oProduct loaded product
+     * @param string $sActCat active category id
+     * @param string $sActManufacturer active manufacturer id
+     * @param string $sActVendor active vendor
      *
      * @return string $sActCat
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addAdditionalParams" in next major
      */
     protected function _addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSearchPar = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchparam');
-        $sSearchCat = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchcnid');
-        $sSearchVnd = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchvendor');
-        $sSearchMan = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('searchmanufacturer');
-        $sListType = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('listtype');
+        return $this->addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
+    }
+
+    /**
+     * Adds additional parameters: active category, list type and category id
+     *
+     * @param Article $oProduct loaded product
+     * @param string $sActCat active category id
+     * @param string $sActManufacturer active manufacturer id
+     * @param string $sActVendor active vendor
+     *
+     * @return string $sActCat
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
+     */
+    protected function addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor)
+    {
+        $sSearchPar = Registry::getRequest()->getRequestEscapedParameter('searchparam');
+        $sSearchCat = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
+        $sSearchVnd = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
+        $sSearchMan = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
+        $sListType = Registry::getRequest()->getRequestEscapedParameter('listtype');
 
         // search ?
         if ((!$sListType || $sListType == 'search') && ($sSearchPar || $sSearchCat || $sSearchVnd || $sSearchMan)) {
@@ -261,7 +333,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
             } elseif ($sActCat && $oProduct->isAssignedToCategory($sActCat)) {
                 // category ?
             } else {
-                list($sListType, $sActCat) = $this->_getDefaultParams($oProduct);
+                list($sListType, $sActCat) = $this->getDefaultParams($oProduct);
             }
         }
 
@@ -276,12 +348,28 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
     /**
      * Returns array containing default list type and category (or manufacturer ir vendor) id
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oProduct current product object
+     * @param Article $oProduct current product object
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDefaultParams" in next major
      */
     protected function _getDefaultParams($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getDefaultParams($oProduct);
+    }
+
+    /**
+     * Returns array containing default list type and category (or manufacturer ir vendor) id
+     *
+     * @param Article $oProduct current product object
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getDefaultParams($oProduct)
     {
         $sListType = null;
         $aArticleCats = $oProduct->getCategoryIds(true);
@@ -303,7 +391,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
     /**
      * Setter of category tree
      *
-     * @param \OxidEsales\Eshop\Application\Model\CategoryList $oCategoryTree category list
+     * @param CategoryList $oCategoryTree category list
      */
     public function setCategoryTree($oCategoryTree)
     {
@@ -313,7 +401,7 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
     /**
      * Setter of manufacturer tree
      *
-     * @param \OxidEsales\Eshop\Application\Model\ManufacturerList $oManufacturerTree manufacturer list
+     * @param ManufacturerList $oManufacturerTree manufacturer list
      */
     public function setManufacturerTree($oManufacturerTree)
     {
@@ -321,10 +409,10 @@ class CategoriesComponent extends \OxidEsales\Eshop\Core\Controller\BaseControll
     }
 
     /**
-     * @return \OxidEsales\Eshop\Application\Model\ManufacturerList
+     * @return ManufacturerList
      */
     protected function getManufacturerList()
     {
-        return oxNew(\OxidEsales\Eshop\Application\Model\ManufacturerList::class);
+        return oxNew(ManufacturerList::class);
     }
 }

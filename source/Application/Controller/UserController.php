@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * User details.
  * Collects and arranges user object data (information, like shipping address, etc.).
  */
-class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class UserController extends FrontendController
 {
     /**
      * Current class template.
@@ -87,27 +91,27 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     protected $_sWishId = null;
 
     /**
-     * Loads customer basket object form session (\OxidEsales\Eshop\Core\Session::getBasket()),
+     * Loads customer basket object form session (Session::getBasket()),
      * passes action article/basket/country list to template engine. If
-     * available - loads user delivery address data (oxAddress). Returns
+     * available - loads user delivery address data (Address). Returns
      * name template file to render user::_sThisTemplate.
      *
      * @return  string  $this->_sThisTemplate   current template file name
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         if ($this->getIsOrderStep()) {
             if ($config->getConfigParam('blPsBasketReservationEnabled')) {
-                $this->getSession()->getBasketReservations()->renewExpiration();
+                Registry::getSession()->getBasketReservations()->renewExpiration();
             }
 
-            $basket = $this->getSession()->getBasket();
+            $basket = Registry::getSession()->getBasket();
             $isPsBasketReservationsEnabled = $config->getConfigParam('blPsBasketReservationEnabled');
             if (
                 $this->_blIsOrderStep && $isPsBasketReservationsEnabled &&
-                (!$basket || ($basket && !$basket->getProductsCount()))
+                (!$basket || !$basket->getProductsCount())
             ) {
                 Registry::getUtils()->redirect($config->getShopHomeUrl() . 'cl=basket', true, 302);
             }
@@ -126,7 +130,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     public function getShowNoRegOption()
     {
         if ($this->_blShowNoRegOpt === null) {
-            $this->_blShowNoRegOpt = !$this->getConfig()->getConfigParam('blOrderDisWithoutReg');
+            $this->_blShowNoRegOpt = !Registry::getConfig()->getConfigParam('blOrderDisWithoutReg');
         }
 
         return $this->_blShowNoRegOpt;
@@ -141,7 +145,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
     {
         if ($this->_iOption === null) {
             // passing user chosen option value to display correct content
-            $option = Registry::getConfig()->getRequestParameter('option');
+            $option = Registry::getRequest()->getRequestEscapedParameter('option');
             // if user chosen "Option 2"" - we should show user details only if he is authorized
             if ($option == 2 && !$this->getUser()) {
                 $option = 0;
@@ -159,17 +163,16 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      */
     public function getOrderRemark()
     {
-        $config = Registry::getConfig();
         if ($this->_sOrderRemark === null) {
             // if already connected, we can use the session
             if ($this->getUser()) {
                 $orderRemark = Registry::getSession()->getVariable('ordrem');
             } else {
-                // not connected so nowhere to save, we're gonna use what we get from post
-                $orderRemark = $config->getRequestParameter('order_remark', true);
+                // not connected so nowhere to save, we're going to use what we get from post
+                $orderRemark = Registry::getRequest()->getRequestEscapedParameter('order_remark', true);
             }
 
-            $this->_sOrderRemark = $orderRemark ? $config->checkParamSpecialChars($orderRemark) : false;
+            $this->_sOrderRemark = $orderRemark ? Registry::getConfig()->checkParamSpecialChars($orderRemark) : false;
         }
 
         return $this->_sOrderRemark;
@@ -179,11 +182,12 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      * Template variable getter. Returns if user subscribed for newsletter
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isNewsSubscribed()
     {
         if ($this->_blNewsSubscribed === null) {
-            if (($isSubscribedToNews = Registry::getConfig()->getRequestParameter('blnewssubscribed')) === null) {
+            if (($isSubscribedToNews = Registry::getRequest()->getRequestEscapedParameter('blnewssubscribed')) === null) {
                 $isSubscribedToNews = false;
             }
             if (($user = $this->getUser())) {
@@ -216,7 +220,7 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      */
     public function modifyBillAddress()
     {
-        return Registry::getConfig()->getRequestParameter('blnewssubscribed');
+        return Registry::getRequest()->getRequestEscapedParameter('blnewssubscribed');
     }
 
     /**
@@ -242,11 +246,15 @@ class UserController extends \OxidEsales\Eshop\Application\Controller\FrontendCo
      * Returns warning message if user want to buy downloadable product without registration.
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
      */
     public function isDownloadableProductWarning()
     {
-        $basket = $this->getSession()->getBasket();
-        if ($basket && $this->getConfig()->getConfigParam("blEnableDownloads")) {
+        $basket = Registry::getSession()->getBasket();
+        if ($basket && Registry::getConfig()->getConfigParam("blEnableDownloads")) {
             if ($basket->hasDownloadableProducts()) {
                 return true;
             }

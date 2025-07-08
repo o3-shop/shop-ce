@@ -21,15 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
+use OxidEsales\Eshop\Application\Controller\UserController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * User registration window.
  * Collects and arranges user object data (information, like shipping address, etc.).
  */
-class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserController
+class RegisterController extends UserController
 {
     /**
      * Current class template.
@@ -95,7 +96,7 @@ class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserCo
      */
     public function getRegistrationError()
     {
-        return Registry::getConfig()->getRequestParameter('newslettererror');
+        return Registry::getRequest()->getRequestEscapedParameter('newslettererror');
     }
 
     /**
@@ -105,37 +106,37 @@ class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserCo
      */
     public function getRegistrationStatus()
     {
-        return Registry::getConfig()->getRequestParameter('success');
+        return Registry::getRequest()->getRequestEscapedParameter('success');
     }
 
     /**
      * Check if field is required.
      *
-     * @param string $sField required field to check
+     * @param string $field required field to check
      *
      * @return bool
      */
-    public function isFieldRequired($sField)
+    public function isFieldRequired($field)
     {
-        return isset($this->getMustFillFields()[$sField]);
+        return isset($this->getMustFillFields()[$field]);
     }
 
     /**
      * Registration confirmation functionality. If registration
-     * succeded - redirects to success page, if not - returns
+     * succeeded - redirects to success page, if not - returns
      * exception informing about expired confirmation link
      *
-     * @return mixed
+     * @return string
      */
     public function confirmRegistration()
     {
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
         if ($oUser->loadUserByUpdateId($this->getUpdateId())) {
             // resetting update key parameter
             $oUser->setUpdateKey(true);
 
             // saving ..
-            $oUser->oxuser__oxactive = new \OxidEsales\Eshop\Core\Field(1);
+            $oUser->oxuser__oxactive = new Field(1);
             $oUser->save();
 
             // forcing user login
@@ -159,17 +160,17 @@ class RegisterController extends \OxidEsales\Eshop\Application\Controller\UserCo
      */
     public function getUpdateId()
     {
-        return Registry::getConfig()->getRequestParameter('uid');
+        return Registry::getRequest()->getRequestEscapedParameter('uid');
     }
 
     /**
      * Returns confirmation state: "1" - success, "-1" - error
      *
-     * @return int
+     * @return bool
      */
     public function isConfirmed()
     {
-        return (bool) Registry::getConfig()->getRequestParameter("confirmstate");
+        return (bool) Registry::getRequest()->getRequestEscapedParameter('confirmstate');
     }
 
     /**

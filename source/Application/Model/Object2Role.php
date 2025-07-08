@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
+use Exception;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 
-class Object2Role extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Object2Role extends BaseModel
 {
     /** @var boolean Load the relation even if from other shop */
     protected $_blDisableShopCheck = true;
@@ -48,19 +49,18 @@ class Object2Role extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Extends the default save method
      * to prevent from exception if same relationship already exist.
-     * The table oxobject2group has an UNIQUE index on (OXGROUPSID, OXOBJECTID, OXSHOPID)
+     * The table oxobject2group has a UNIQUE index on (OXGROUPSID, OXOBJECTID, OXSHOPID)
      * which ensures that a relationship would not be duplicated.
      *
-     * @throws DatabaseErrorException
-     *
-     * @return bool
+     * @return bool|void
+     * @throws Exception
      */
     public function save()
     {
         try {
             return parent::save();
-        } catch (\OxidEsales\Eshop\Core\Exception\DatabaseErrorException $exception) {
-            if ($exception->getCode() !== \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database::DUPLICATE_KEY_ERROR_CODE) {
+        } catch (DatabaseErrorException $exception) {
+            if ($exception->getCode() !== Database::DUPLICATE_KEY_ERROR_CODE) {
                 throw $exception;
             }
         }

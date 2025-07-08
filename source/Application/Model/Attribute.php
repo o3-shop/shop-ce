@@ -21,16 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
-use oxRegistry;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Article attributes manager.
  * Collects and keeps attributes of chosen article.
  *
  */
-class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Attribute extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -72,9 +79,11 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Removes attributes from articles, returns true on success.
      *
-     * @param string $sOXID Object ID
+     * @param null $sOXID Object ID
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -87,7 +96,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         }
 
         // remove attributes from articles also
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sDelete = "delete from oxobject2attribute where oxattrid = :oxattrid";
         $oDb->execute($sDelete, [
             ':oxattrid' => $sOXID
@@ -105,12 +114,13 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Assigns attribute to variant
      *
-     * @param array $aMDVariants article ids with selectionlist values
-     * @param array $aSelTitle   selection list titles
+     * @param array $aMDVariants article IDs with selection-list values
+     * @param array $aSelTitle selection list titles
+     * @throws Exception
      */
     public function assignVarToAttribute($aMDVariants, $aSelTitle)
     {
-        $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $myLang = Registry::getLang();
         $aConfLanguages = $myLang->getLanguageIds();
         $sAttrId = $this->_getAttrId($aSelTitle[0]);
         if (!$sAttrId) {
@@ -120,24 +130,24 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             if (strpos($sVarId, "mdvar_") === 0) {
                 foreach ($oValue as $sId) {
                     $sVarId = substr($sVarId, 6);
-                    $oNewAssign = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                    $oNewAssign = oxNew(BaseModel::class);
                     $oNewAssign->init("oxobject2attribute");
-                    $sNewId = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
+                    $sNewId = Registry::getUtilsObject()->generateUID();
                     if ($oNewAssign->load($sId)) {
-                        $oNewAssign->oxobject2attribute__oxobjectid = new \OxidEsales\Eshop\Core\Field($sVarId);
+                        $oNewAssign->oxobject2attribute__oxobjectid = new Field($sVarId);
                         $oNewAssign->setId($sNewId);
                         $oNewAssign->save();
                     }
                 }
             } else {
-                $oNewAssign = oxNew(\OxidEsales\Eshop\Core\Model\MultiLanguageModel::class);
+                $oNewAssign = oxNew(MultiLanguageModel::class);
                 $oNewAssign->setEnableMultilang(false);
                 $oNewAssign->init("oxobject2attribute");
-                $oNewAssign->oxobject2attribute__oxobjectid = new \OxidEsales\Eshop\Core\Field($sVarId);
-                $oNewAssign->oxobject2attribute__oxattrid = new \OxidEsales\Eshop\Core\Field($sAttrId);
+                $oNewAssign->oxobject2attribute__oxobjectid = new Field($sVarId);
+                $oNewAssign->oxobject2attribute__oxattrid = new Field($sAttrId);
                 foreach ($aConfLanguages as $sKey => $sLang) {
                     $sPrefix = $myLang->getLanguageTag($sKey);
-                    $oNewAssign->{'oxobject2attribute__oxvalue' . $sPrefix} = new \OxidEsales\Eshop\Core\Field($oValue[$sKey]->name);
+                    $oNewAssign->{'oxobject2attribute__oxvalue' . $sPrefix} = new Field($oValue[$sKey]->name);
                 }
                 $oNewAssign->save();
             }
@@ -149,16 +159,17 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param string $sSelTitle selection list title
      *
-     * @return mixed attribute id or false
+     * @return false|string attribute id or false
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAttrId" in next major
      */
     protected function _getAttrId($sSelTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDB();
-        $sAttViewName = getViewName('oxattribute');
+        $oDb = DatabaseProvider::getDB();
+        $sAttViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
 
         return $oDb->getOne("select oxid from $sAttViewName where LOWER(oxtitle) = :oxtitle ", [
-            ':oxtitle' => getStr()->strtolower($sSelTitle)
+            ':oxtitle' => Str::getStr()->strtolower($sSelTitle)
         ]);
     }
 
@@ -168,18 +179,19 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param array $aSelTitle selection list title
      *
      * @return string attribute id
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "createAttribute" in next major
      */
     protected function _createAttribute($aSelTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $myLang = Registry::getLang();
         $aConfLanguages = $myLang->getLanguageIds();
-        $oAttr = oxNew(\OxidEsales\Eshop\Core\Model\MultiLanguageModel::class);
+        $oAttr = oxNew(MultiLanguageModel::class);
         $oAttr->setEnableMultilang(false);
         $oAttr->init('oxattribute');
         foreach ($aConfLanguages as $sKey => $sLang) {
             $sPrefix = $myLang->getLanguageTag($sKey);
-            $oAttr->{'oxattribute__oxtitle' . $sPrefix} = new \OxidEsales\Eshop\Core\Field($aSelTitle[$sKey]);
+            $oAttr->{'oxattribute__oxtitle' . $sPrefix} = new Field($aSelTitle[$sKey]);
         }
         $oAttr->save();
 
@@ -191,12 +203,14 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      *
      * @param string $sArtId article ids
      *
-     * @return null;
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributeAssigns($sArtId)
     {
         if ($sArtId) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
 
             $sSelect = "select o2a.oxid from oxobject2attribute as o2a ";
             $sSelect .= "where o2a.oxobjectid = :oxobjectid order by o2a.oxpos";
@@ -205,7 +219,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             $rs = $oDb->select($sSelect, [
                 ':oxobjectid' => $sArtId
             ]);
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     $aIds[] = $rs->fields[0];
                     $rs->fetchRow();
@@ -224,7 +238,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function setTitle($sTitle)
     {
-        $this->_sTitle = getStr()->htmlspecialchars($sTitle);
+        $this->_sTitle = Str::getStr()->htmlspecialchars($sTitle);
     }
 
     /**
@@ -244,7 +258,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function addValue($sValue)
     {
-        $this->_aValues[] = getStr()->htmlspecialchars($sValue);
+        $this->_aValues[] = Str::getStr()->htmlspecialchars($sValue);
     }
 
     /**
@@ -254,7 +268,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function setActiveValue($sValue)
     {
-        $this->_sActiveValue = getStr()->htmlspecialchars($sValue);
+        $this->_sActiveValue = Str::getStr()->htmlspecialchars($sValue);
     }
 
     /**
@@ -270,7 +284,7 @@ class Attribute extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Get attribute values
      *
-     * @return Array
+     * @return array
      */
     public function getValues()
     {

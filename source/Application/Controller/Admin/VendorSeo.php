@@ -21,27 +21,33 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
+use OxidEsales\Eshop\Application\Model\SeoEncoderVendor;
+use OxidEsales\Eshop\Application\Model\Vendor;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Vendor seo config class
  */
-class VendorSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class VendorSeo extends ObjectSeo
 {
     /**
-     * Updating showsuffix field
+     * Updating oxshowsuffix field
      *
      * @return null
+     * @throws Exception
      */
     public function save()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oVendor = oxNew(BaseModel::class);
         $oVendor->init('oxvendor');
         if ($oVendor->load($this->getEditObjectId())) {
             $sShowSuffixField = 'oxvendor__oxshowsuffix';
-            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('blShowSuffix');
-            $oVendor->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
+            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
+            $oVendor->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oVendor->save();
         }
 
@@ -51,12 +57,12 @@ class VendorSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderVendor
+     * @return SeoEncoderVendor
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class);
+        return Registry::get(SeoEncoderVendor::class);
     }
 
     /**
@@ -72,11 +78,11 @@ class VendorSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
     /**
      * Returns true if SEO object id has suffix enabled
      *
-     * @return bool
+     * @return bool|void
      */
     public function isEntrySuffixed()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $oVendor = oxNew(Vendor::class);
         if ($oVendor->load($this->getEditObjectId())) {
             return (bool) $oVendor->oxvendor__oxshowsuffix->value;
         }
@@ -96,11 +102,11 @@ class VendorSeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
      */
     public function getEntryUri()
     {
-        $oVendor = oxNew(\OxidEsales\Eshop\Application\Model\Vendor::class);
+        $oVendor = oxNew(Vendor::class);
         if ($oVendor->load($this->getEditObjectId())) {
             return $this->_getEncoder()->getVendorUri($oVendor, $this->getEditLang());
         }

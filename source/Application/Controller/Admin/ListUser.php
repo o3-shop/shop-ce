@@ -21,12 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxAdminList;
+use OxidEsales\Eshop\Application\Controller\Admin\UserList;
 
 /**
  * user list "view" class.
  */
-class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
+class ListUser extends UserList
 {
     /**
      * Viewable list size getter
@@ -36,7 +36,7 @@ class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->_getUserDefListSize();
+        return $this->getViewListSize();
     }
 
     /**
@@ -45,7 +45,7 @@ class ListUser extends \OxidEsales\Eshop\Application\Controller\Admin\UserList
      */
     public function init()
     {
-        oxAdminList::init();
+        AdminListController::init();
     }
 
     /**

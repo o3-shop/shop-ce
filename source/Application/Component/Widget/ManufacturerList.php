@@ -30,7 +30,7 @@ class ManufacturerList extends \OxidEsales\Eshop\Application\Component\Widget\Wi
     /**
      * Names of components (classes) that are initiated and executed
      * before any other regular operation.
-     * Cartegory component used in template.
+     * Category component used in template.
      *
      * @var array
      */

@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
-use oxRegistry;
-use oxArticle;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Article box widget
@@ -48,18 +50,18 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     /**
      * Current article
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article|null
+     * @var Article|null
      */
     protected $_oArticle = null;
 
     /**
      * Returns active category
      *
-     * @return null|oxCategory
+     * @return null|Category
      */
     public function getActiveCategory()
     {
-        $oCategory = $this->getConfig()->getTopActiveView()->getActiveCategory();
+        $oCategory = Registry::getConfig()->getTopActiveView()->getActiveCategory();
         if ($oCategory) {
             $this->setActiveCategory($oCategory);
         }
@@ -94,7 +96,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     /**
      * Sets box product
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Box product
+     * @param Article $oArticle Box product
      */
     public function setProduct($oArticle)
     {
@@ -104,7 +106,8 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     /**
      * Get product article
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
+     * @throws DatabaseConnectionException
      */
     public function getProduct()
     {
@@ -112,12 +115,12 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
             if ($this->getViewParameter('_object')) {
                 $oArticle = $this->getViewParameter('_object');
             } else {
-                $sAddDynParams = $this->getConfig()->getTopActiveView()->getAddUrlParams();
+                $sAddDynParams = Registry::getConfig()->getTopActiveView()->getAddUrlParams();
 
                 $sAddDynParams = $this->updateDynamicParameters($sAddDynParams);
 
-                $oArticle = $this->_getArticleById($this->getViewParameter('anid'));
-                $this->_addDynParamsToLink($sAddDynParams, $oArticle);
+                $oArticle = $this->getArticleById($this->getViewParameter('anid'));
+                $this->addDynParamsToLink($sAddDynParams, $oArticle);
             }
 
             $this->setProduct($oArticle);
@@ -129,13 +132,13 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     /**
      * get link of current top view
      *
-     * @param int $iLang requested language
+     * @param int $languageId requested language
      *
      * @return string
      */
-    public function getLink($iLang = null)
+    public function getLink($languageId = null)
     {
-        return $this->getConfig()->getTopActiveView()->getLink($iLang);
+        return Registry::getConfig()->getTopActiveView()->getLink($languageId);
     }
 
     /**
@@ -259,18 +262,31 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      * Appends dyn params to url.
      *
      * @param string                                      $sAddDynParams Dyn params
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle      Article
+     * @param Article $oArticle      Article
      *
      * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "addDynParamsToLink" in next major
      */
     protected function _addDynParamsToLink($sAddDynParams, $oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->addDynParamsToLink($sAddDynParams, $oArticle);
+    }
+    
+    /**
+     * Appends dyn params to url.
+     *
+     * @param string                                      $sAddDynParams Dyn params
+     * @param Article $oArticle      Article
+     *
+     * @return bool
+     */
+    protected function addDynParamsToLink($sAddDynParams, $oArticle)
+    {
         $blAddedParams = false;
         if ($sAddDynParams) {
-            $blSeo = \OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive();
+            $blSeo = Registry::getUtils()->seoIsActive();
             if (!$blSeo) {
-                // only if seo is off..
+                // only if seo is off...
                 $oArticle->appendStdLink($sAddDynParams);
             }
             $oArticle->appendLink($sAddDynParams);
@@ -285,13 +301,27 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      *
      * @param string $sArticleId Article id
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getArticleById" in next major
      */
     protected function _getArticleById($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        /** @var \OxidEsales\Eshop\Application\Model\Article $oArticle */
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        return $this->getArticleById($sArticleId);
+    }
+
+    /**
+     * Returns prepared article by id.
+     *
+     * @param string $sArticleId Article id
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     */
+    protected function getArticleById($sArticleId)
+    {
+        /** @var Article $oArticle */
+        $oArticle = oxNew(Article::class);
         $oArticle->load($sArticleId);
         $iLinkType = $this->getViewParameter('iLinkType');
 

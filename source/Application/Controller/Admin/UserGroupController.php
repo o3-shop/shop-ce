@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+
 /**
  * Admin usergroup manager.
  * Returns template, that arranges two other templates ("usergroup_list.tpl"
  * and "usergroup_main.tpl") to frame.
  * Admin Menu: User Administration -> User Groups.
  */
-class UserGroupController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class UserGroupController extends AdminController
 {
     /**
      * Current class template name.

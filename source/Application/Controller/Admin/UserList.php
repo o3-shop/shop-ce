@@ -21,15 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxUser;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin user list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: User Administration -> Users.
  */
-class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class UserList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -60,14 +62,15 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
     protected $_sThisTemplate = 'user_list.tpl';
 
     /**
-     * Executes parent::render(), sets blacklist and preventdelete flag
+     * Executes parent::render(), sets blacklist and prevent delete flag
      *
      * @return null
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         foreach ($this->getItemList() as $itemId => $user) {
-            /** @var \OxidEsales\Eshop\Application\Model\User $user */
+            /** @var User $user */
             if ($user->inGroup("oxidblacklist") || $user->inGroup("oxidblocked")) {
                 $user->blacklist = "1";
             }
@@ -83,7 +86,7 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
     /**
      * Admin user is allowed to be deleted only by mall admin
      *
-     * @return null
+     * @return null|void
      */
     public function deleteEntry()
     {
@@ -99,17 +102,18 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
      * For each search value if german umlauts exist, adds them
      * and replaced by spec. char to query
      *
-     * @param array  $whereQuery SQL condition array
-     * @param string $fullQuery  SQL query string
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated will be renamed to "prepareWhereQuery" in next major
      */
     public function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $nameWhere = null;
         if (isset($whereQuery['oxuser.oxlname']) && ($name = $whereQuery['oxuser.oxlname'])) {
-            // check if this is search string (contains % sign at begining and end of string)
+            // check if this is search string (contains % sign at beginning and end of string)
             $isSearchValue = $this->_isSearchValue($name);
             $name = $this->_processFilter($name);
             $nameWhere['oxuser.oxfname'] = $nameWhere['oxuser.oxlname'] = $name;
@@ -122,7 +126,7 @@ class UserList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
             $values = explode(' ', $name);
             $query .= ' and (';
             $queryBoolAction = '';
-            $utilsString = \OxidEsales\Eshop\Core\Registry::getUtilsString();
+            $utilsString = Registry::getUtilsString();
 
             foreach ($nameWhere as $fieldName => $fieldValue) {
                 //for each search field using AND action

@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Cookie note widget
  */
@@ -34,7 +36,7 @@ class CookieNote extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     protected $_sThisTemplate = 'widget/header/cookienote.tpl';
 
     /**
-     * Executes parent::render(). Check if need to hide cookie note.
+     * Executes parent::render(). Check if we need to hide cookie note.
      * Returns name of template file to render.
      *
      * @return  string  current template file name
@@ -53,6 +55,6 @@ class CookieNote extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      */
     public function isEnabled()
     {
-        return (bool) $this->getConfig()->getConfigParam('blShowCookiesNotification');
+        return (bool) Registry::getConfig()->getConfigParam('blShowCookiesNotification');
     }
 }

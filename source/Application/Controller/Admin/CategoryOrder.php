@@ -21,29 +21,34 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article categories order manager.
  * There is possibility to change category sorting.
  * Admin Menu: Manage Products -> Categories -> Order.
  */
-class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CategoryOrder extends AdminDetailsController
 {
     /**
      * Loads article category ordering info, passes it to Smarty
      * engine and returns name of template file "category_order.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $this->_aViewData['edit'] = $oCategory = oxNew(Category::class);
 
         // resetting
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
+        Registry::getSession()->setVariable('neworder_sess', null);
 
         $soxId = $this->getEditObjectId();
 
@@ -56,8 +61,8 @@ class CategoryOrder extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
                 $this->_aViewData['readonly'] = true;
             }
         }
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
-            $oCategoryOrderAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\CategoryOrderAjax::class);
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
+            $oCategoryOrderAjax = oxNew(CategoryOrderAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
 
             return "popups/category_order.tpl";

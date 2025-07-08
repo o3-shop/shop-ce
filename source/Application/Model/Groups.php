@@ -21,14 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
 
 /**
  * Group manager.
  * Base class for user groups. Does nothing special yet.
  *
  */
-class Groups extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Groups extends MultiLanguageModel
 {
     /**
      * Name of current class
@@ -49,9 +52,11 @@ class Groups extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Deletes user group from database. Returns true/false, according to deleting status.
      *
-     * @param string $sOXID Object ID (default null)
+     * @param null $sOXID Object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -64,7 +69,7 @@ class Groups extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
 
         parent::delete($sOXID);
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         // deleting related data records
         $sDelete = 'delete from oxobject2group where oxobject2group.oxgroupsid = :oxid';

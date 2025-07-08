@@ -21,14 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
  * Base seo config class.
  */
-class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ObjectSeo extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(),
@@ -58,7 +60,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         }
 
         $iLang = $this->getEditLang();
-        $aLangs = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames();
+        $aLangs = Registry::getLang()->getLanguageNames();
         foreach ($aLangs as $sLangId => $sLanguage) {
             $oLang = new stdClass();
             $oLang->sLangDesc = $sLanguage;
@@ -76,8 +78,8 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     {
         // saving/updating seo params
         if (($sOxid = $this->_getSaveObjectId())) {
-            $aSeoData = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aSeoData');
-            $iShopId = $this->getConfig()->getShopId();
+            $aSeoData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
+            $iShopId = Registry::getConfig()->getShopId();
             $iLang = $this->getEditLang();
 
             // checkbox handling
@@ -115,6 +117,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
      * @param array $aSeoData Seo data array
      *
      * @return null|string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAdditionalParamsFromSeoData" in next major
      */
     protected function _getAdditionalParams($aSeoData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -122,7 +125,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
         $sParams = null;
         if (isset($aSeoData['oxparams'])) {
             if (preg_match('/([a-z]*#)?(?<objectseo>[a-z0-9]+)(#[0-9])?/i', $aSeoData['oxparams'], $aMatches)) {
-                $sQuotedObjectSeoId = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quote($aMatches['objectseo']);
+                $sQuotedObjectSeoId = DatabaseProvider::getDb()->quote($aMatches['objectseo']);
                 $sParams = "oxparams = {$sQuotedObjectSeoId}";
             }
         }
@@ -143,31 +146,32 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     /**
      * Returns object seo data
      *
-     * @param string $sMetaType meta data type (oxkeywords/oxdescription)
+     * @param string $sMetaType metadata type (oxkeywords/oxdescription)
      *
      * @return string
      */
     public function getEntryMetaData($sMetaType)
     {
-        return $this->_getEncoder()->getMetaData($this->getEditObjectId(), $sMetaType, $this->getConfig()->getShopId(), $this->getEditLang());
+        return $this->_getEncoder()->getMetaData($this->getEditObjectId(), $sMetaType, Registry::getConfig()->getShopId(), $this->getEditLang());
     }
 
     /**
      * Returns TRUE if current seo entry has fixed state
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isEntryFixed()
     {
         $iLang = (int) $this->getEditLang();
-        $iShopId = $this->getConfig()->getShopId();
+        $iShopId = Registry::getConfig()->getShopId();
 
         $sQ = "select oxfixed from oxseo where
                    oxseo.oxobjectid = :oxobjectid and
                    oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = '' ";
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ, [
+        return (bool) DatabaseProvider::getMaster()->getOne($sQ, [
             ':oxobjectid' => $this->getEditObjectId(),
             ':oxshopid' => $iShopId,
             ':oxlang' => $iLang
@@ -187,7 +191,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
      *
      * @param string $sOxid object id
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getStdUrl" in next major
      */
     protected function _getStdUrl($sOxid) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -221,7 +225,7 @@ class ObjectSeo extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDeta
     /**
      * Returns seo entry type
      *
-     * @return string
+     * @return string|null
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoEntryType" in next major
      */
     protected function _getSeoEntryType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

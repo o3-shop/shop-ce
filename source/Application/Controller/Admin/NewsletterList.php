@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+
 /**
  * @deprecated Functionality for Newsletter management will be removed.
  * Admin newsletter list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Customer Info -> Newsletter.
  */
-class NewsletterList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class NewsletterList extends AdminListController
 {
     /**
      * Current class template name.

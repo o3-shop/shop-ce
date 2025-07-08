@@ -21,18 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxConfig;
-use oxAdminDetails;
-use oxException;
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Theme;
 
 /**
  * Admin article main deliveryset manager.
- * There is possibility to change deliveryset name, article, user
- * and etc.
+ * There is possibility to change deliveryset name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
-class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ThemeConfiguration extends ShopConfiguration
 {
     protected $_sTheme = null;
 
@@ -44,16 +44,16 @@ class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         $sTheme = $this->_sTheme = $this->getEditObjectId();
         $sShopId = $myConfig->getShopId();
 
         if (!isset($sTheme)) {
-            $sTheme = $this->_sTheme = $this->getConfig()->getConfigParam('sTheme');
+            $sTheme = $this->_sTheme = Registry::getConfig()->getConfigParam('sTheme');
         }
 
-        $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
+        $oTheme = oxNew(Theme::class);
         if ($oTheme->load($sTheme)) {
             $this->_aViewData["oTheme"] = $oTheme;
 
@@ -64,12 +64,12 @@ class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\
                 foreach ($this->_aConfParams as $sType => $sParam) {
                     $this->_aViewData[$sParam] = $aDbVariables['vars'][$sType];
                 }
-            } catch (\OxidEsales\Eshop\Core\Exception\StandardException $oEx) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (StandardException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
                 $oEx->debugOut();
             }
         } else {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(oxNew(\OxidEsales\Eshop\Core\Exception\StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
+            Registry::getUtilsView()->addErrorToDisplay(oxNew(StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
         }
 
         return 'theme_config.tpl';
@@ -87,7 +87,7 @@ class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\
             $this->_sTheme = $this->getEditObjectId();
         }
 
-        return \OxidEsales\Eshop\Core\Config::OXMODULE_THEME_PREFIX . $this->_sTheme;
+        return Config::OXMODULE_THEME_PREFIX . $this->_sTheme;
     }
 
     /**
@@ -95,16 +95,16 @@ class ThemeConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function saveConfVars()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
-        oxAdminDetails::save();
+        AdminDetailsController::save();
 
         $sShopId = $myConfig->getShopId();
 
         $sModule = $this->_getModuleForConfigVars();
 
         foreach ($this->_aConfParams as $sType => $sParam) {
-            $aConfVars = $myConfig->getRequestParameter($sParam);
+            $aConfVars = Registry::getRequest()->getRequestEscapedParameter($sParam);
             if (is_array($aConfVars)) {
                 foreach ($aConfVars as $sName => $sValue) {
                     $myConfig->saveShopConfVar(

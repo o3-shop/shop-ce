@@ -21,16 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 
 /**
  * Admin article main deliveryset manager.
- * There is possibility to change deliveryset name, article, user
- * and etc.
+ * There is possibility to change deliveryset name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
-class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ModuleMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates deliveryset category tree,
@@ -40,23 +43,23 @@ class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
      */
     public function render()
     {
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("moduleId")) {
-            $sModuleId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("moduleId");
+        if (Registry::getRequest()->getRequestEscapedParameter('moduleId')) {
+            $sModuleId = Registry::getRequest()->getRequestEscapedParameter('moduleId');
         } else {
             $sModuleId = $this->getEditObjectId();
         }
 
-        $oModule = oxNew(\OxidEsales\Eshop\Core\Module\Module::class);
+        $oModule = oxNew(Module::class);
 
         if ($sModuleId) {
             if ($oModule->load($sModuleId)) {
-                $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getTplLanguage();
+                $iLang = Registry::getLang()->getTplLanguage();
 
                 $this->_aViewData["oModule"] = $oModule;
                 $this->_aViewData["sModuleName"] = basename($oModule->getInfo("title", $iLang));
                 $this->_aViewData["sModuleId"] = str_replace("/", "_", $oModule->getModulePath());
             } else {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(new \OxidEsales\Eshop\Core\Exception\StandardException('EXCEPTION_MODULE_NOT_LOADED'));
+                Registry::getUtilsView()->addErrorToDisplay(new StandardException('EXCEPTION_MODULE_NOT_LOADED'));
             }
         }
 
@@ -68,11 +71,11 @@ class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
     /**
      * Activate module
      *
-     * @return null
+     * @return void
      */
     public function activateModule()
     {
-        if ($this->getConfig()->isDemoShop()) {
+        if (Registry::getConfig()->isDemoShop()) {
             Registry::getUtilsView()->addErrorToDisplay('MODULE_ACTIVATION_NOT_POSSIBLE_IN_DEMOMODE');
             return;
         }
@@ -85,7 +88,7 @@ class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
             );
 
             $this->_aViewData['updatenav'] = '1';
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Registry::getUtilsView()->addErrorToDisplay($exception);
             Registry::getLogger()->error($exception->getMessage(), [$exception]);
         }
@@ -94,11 +97,11 @@ class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
     /**
      * Deactivate module
      *
-     * @return null
+     * @return void
      */
     public function deactivateModule()
     {
-        if ($this->getConfig()->isDemoShop()) {
+        if (Registry::getConfig()->isDemoShop()) {
             Registry::getUtilsView()->addErrorToDisplay('MODULE_ACTIVATION_NOT_POSSIBLE_IN_DEMOMODE');
             return;
         }
@@ -111,7 +114,7 @@ class ModuleMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDet
             );
 
             $this->_aViewData['updatenav'] = '1';
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Registry::getUtilsView()->addErrorToDisplay($exception);
             Registry::getLogger()->error($exception->getMessage(), [$exception]);
         }

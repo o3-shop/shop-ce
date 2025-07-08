@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Admin wrapping list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: User Administration -> Users.
  */
-class WrappingList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class WrappingList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -47,6 +50,7 @@ class WrappingList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminL
      * file "user_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

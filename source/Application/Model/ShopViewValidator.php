@@ -21,7 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 
 /**
  * Shop view validator.
@@ -152,12 +154,14 @@ class ShopViewValidator
      * Returns list of all shop views
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAllViews" in next major
      */
     protected function _getAllViews() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (empty($this->_aAllViews)) {
-            $this->_aAllViews = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol("SHOW TABLES LIKE  'oxv\_%'");
+            $this->_aAllViews = DatabaseProvider::getDb()->getCol("SHOW TABLES LIKE  'oxv\_%'");
         }
 
         return $this->_aAllViews;
@@ -194,6 +198,8 @@ class ShopViewValidator
      * Returns list of shop specific views currently in database
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getShopViews" in next major
      */
     protected function _getShopViews() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -277,6 +283,8 @@ class ShopViewValidator
      * Returns list of invalid views
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getInvalidViews()
     {

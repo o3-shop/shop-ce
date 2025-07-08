@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Current user Data Maintenance form.
@@ -32,7 +32,7 @@ use oxRegistry;
  * etc. Some fields must be entered. O3-Shop -> MY ACCOUNT
  * -> Update your billing and delivery settings.
  */
-class AccountUserController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountUserController extends AccountController
 {
     /**
      * Current class template name.
@@ -43,9 +43,9 @@ class AccountUserController extends \OxidEsales\Eshop\Application\Controller\Acc
 
     /**
      * If user is not logged in - returns name of template
-     * \OxidEsales\Eshop\Application\Controller\AccountUserController::_sThisLoginTemplate, or if user is already
+     * AccountUserController::_sThisLoginTemplate, or if user is already
      * logged in additionally loads user delivery address info and forms country list. Returns name of template
-     * \OxidEsales\Eshop\Application\Controller\AccountUserController::_sThisTemplate
+     * AccountUserController::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
      */

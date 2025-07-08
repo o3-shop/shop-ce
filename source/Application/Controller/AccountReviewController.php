@@ -21,19 +21,21 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\Review;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridgeInterface;
+use stdClass;
 
 /**
  * Class AccountReviewController
  *
  * @package OxidEsales\EshopCommunity\Application\Controller
  */
-class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountReviewController extends AccountController
 {
     protected $itemsPerPage = 10;
 
@@ -79,7 +81,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
      */
     public function deleteReviewAndRating()
     {
-        if ($this->getSession()->checkSessionChallenge()) {
+        if (Registry::getSession()->checkSessionChallenge()) {
             try {
                 $this->deleteReview();
                 $this->deleteRating();
@@ -111,7 +113,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Generates the pagination.
      *
-     * @return \stdClass
+     * @return stdClass
      */
     public function getPageNavigation()
     {
@@ -215,7 +217,7 @@ class AccountReviewController extends \OxidEsales\Eshop\Application\Controller\A
     /**
      * Returns pages count.
      *
-     * @return int
+     * @return false|float
      */
     private function getPagesCount()
     {

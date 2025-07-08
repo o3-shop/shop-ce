@@ -21,8 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin shop system RDFa manager.
@@ -30,7 +31,7 @@ use oxRegistry;
  * Admin Menu: Main Menu -> Core Settings -> RDFa.
  *
  */
-class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ShopRdfa extends ShopConfiguration
 {
     /**
      * Template name
@@ -44,21 +45,23 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      *
      * @var array
      */
-    protected $_aCustomers = ["Enduser"           => 0,
-                                   "Reseller"          => 0,
-                                   "Business"          => 0,
-                                   "PublicInstitution" => 0];
+    protected $_aCustomers = [
+        "Enduser"           => 0,
+        "Reseller"          => 0,
+        "Business"          => 0,
+        "PublicInstitution" => 0,
+    ];
 
     /**
      * Gets list of content pages which could be used for embedding
      * business entity, price specification, and delivery specification data
      *
-     * @return oxContentList
+     * @return ContentList
      */
     public function getContentList()
     {
         $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
-        $sTable = getViewName("oxcontents", $this->_iEditLang);
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxcontents", $this->_iEditLang);
         $oContentList->selectString(
             "SELECT * 
              FROM {$sTable} 
@@ -66,7 +69,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
                 AND OXLOADID IN ('oxagb', 'oxdeliveryinfo', 'oximpressum', 'oxrightofwithdrawal')
                 AND OXSHOPID = :OXSHOPID
              ORDER BY OXLOADID ASC",
-            [':OXSHOPID' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid")]
+            [':OXSHOPID' => Registry::getRequest()->getRequestEscapedParameter('oxid')]
         );
 
         return $oContentList;
@@ -79,7 +82,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      */
     public function getCustomers()
     {
-        $aCustomersConf = $this->getConfig()->getShopConfVar("aRDFaCustomers");
+        $aCustomersConf = Registry::getConfig()->getShopConfVar("aRDFaCustomers");
         if (isset($aCustomersConf)) {
             foreach ($this->_aCustomers as $sCustomer => $iValue) {
                 $aCustomers[$sCustomer] = (in_array($sCustomer, $aCustomersConf)) ? 1 : 0;
@@ -98,7 +101,7 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
      */
     public function submitUrl()
     {
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aSubmitUrl");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('aSubmitUrl');
         if ($aParams['url']) {
             $sNotificationUrl = "http://gr-notify.appspot.com/submit?uri=" . urlencode($aParams['url']) . "&agent=oxid";
             if ($aParams['email']) {
@@ -108,10 +111,10 @@ class ShopRdfa extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfig
             if (substr($aHeaders[2], -4) === "True") {
                 $this->_aViewData["submitMessage"] = 'SHOP_RDFA_SUBMITED_SUCCESSFULLY';
             } else {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay(substr($aHeaders[3], strpos($aHeaders[3], ":") + 2));
+                Registry::getUtilsView()->addErrorToDisplay(substr($aHeaders[3], strpos($aHeaders[3], ":") + 2));
             }
         } else {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('SHOP_RDFA_MESSAGE_NOURL');
+            Registry::getUtilsView()->addErrorToDisplay('SHOP_RDFA_MESSAGE_NOURL');
         }
     }
 

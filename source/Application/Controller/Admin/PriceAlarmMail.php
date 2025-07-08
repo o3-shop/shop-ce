@@ -21,25 +21,33 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main pricealarm manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Customer Info -> pricealarm -> Main.
  */
-class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class PriceAlarmMail extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxpricealarm object
-     * and passes it's data to Smarty engine. Returns name of template file
+     * and passes its data to Smarty engine. Returns name of template file
      * "pricealarm_main.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException|ObjectException
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         parent::render();
 
@@ -50,10 +58,10 @@ class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             SELECT oxprice, oxartid
             FROM oxpricealarm
             WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
-        $result = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select($query, [
+        $result = DatabaseProvider::getDb()->select($query, [
             ':oxshopid' => $shopId
         ]);
-        if ($result != false && $result->count() > 0) {
+        if ($result && $result->count() > 0) {
             $simpleCache = [];
             while (!$result->EOF) {
                 $price = $result->fields[0];
@@ -63,7 +71,7 @@ class PriceAlarmMail extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
                         $this->_aViewData['iAllCnt'] += 1;
                     }
                 } else {
-                    $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+                    $article = oxNew(Article::class);
                     if ($article->load($articleId)) {
                         $articlePrice = $simpleCache[$articleId] = $article->getPrice()->getBruttoPrice();
                         if ($articlePrice <= $price) {

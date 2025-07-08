@@ -21,12 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\SeoEncoder;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterAdminAjaxRequestProcessedEvent;
 
 /**
  * AJAX call processor class
  */
-class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
+class ListComponentAjax extends Base
 {
     /**
      * Possible sort keys
@@ -87,19 +95,33 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     /**
      * Required data fields are returned by indexes/position in _aColumns array. This method
      * translates "table_name.col_name" into index definition and fetches request data according
-     * to it. This is usefull while using AJAX across versions.
+     * to it. This is useful while using AJAX across versions.
      *
      * @param string $sId "table_name.col_name"
      *
-     * @return array
+     * @return array|null
      * @deprecated underscore prefix violates PSR12, will be renamed to "getActionIds" in next major
      */
     protected function _getActionIds($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aColumns = $this->_getColNames();
+        return $this->getActionIds($sId);
+    }
+
+    /**
+     * Required data fields are returned by indexes/position in _aColumns array. This method
+     * translates "table_name.col_name" into index definition and fetches request data according
+     * to it. This is useful while using AJAX across versions.
+     *
+     * @param string $sId "table_name.col_name"
+     *
+     * @return array|void
+     */
+    protected function getActionIds($sId)
+    {
+        $aColumns = $this->getColNames();
         foreach ($aColumns as $iPos => $aCol) {
             if (isset($aCol[4]) && $aCol[4] == 1 && $sId == $aCol[1] . '.' . $aCol[0]) {
-                return \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('_' . $iPos);
+                return Registry::getRequest()->getRequestEscapedParameter('_' . $iPos);
             }
         }
     }
@@ -122,6 +144,16 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Empty function, developer should override this method according requirements
+     *
+     * @return string
+     */
+    protected function getQuery()
+    {
         return '';
     }
 
@@ -135,7 +167,19 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getDataQuery($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return 'select ' . $this->_getQueryCols() . $sQ;
+        return $this->getDataQuery($sQ);
+    }
+
+    /**
+     * Return fully formatted query for data loading
+     *
+     * @param string $sQ part of initial query
+     *
+     * @return string
+     */
+    protected function getDataQuery($sQ)
+    {
+        return 'select ' . $this->getQueryCols() . $sQ;
     }
 
     /**
@@ -148,13 +192,27 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getCountQuery($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCountQuery($sQ);
+    }
+
+    /**
+     * Return fully formatted query for data records count
+     *
+     * @param string $sQ part of initial query
+     *
+     * @return string
+     */
+    protected function getCountQuery($sQ)
+    {
         return 'select count( * ) ' . $sQ;
     }
 
     /**
      * AJAX call processor function
      *
-     * @param string $function name of action to execute (optional)
+     * @param null $function name of action to execute (optional)
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function processRequest($function = null)
     {
@@ -162,13 +220,13 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             $this->$function();
             $this->dispatchEvent(new AfterAdminAjaxRequestProcessedEvent());
         } else {
-            $sQAdd = $this->_getQuery();
+            $sQAdd = $this->getQuery();
 
             // formatting SQL queries
-            $sQ = $this->_getDataQuery($sQAdd);
-            $sCountQ = $this->_getCountQuery($sQAdd);
+            $sQ = $this->getDataQuery($sQAdd);
+            $sCountQ = $this->getCountQuery($sQAdd);
 
-            $this->_outputResponse($this->_getData($sCountQ, $sQ));
+            $this->outputResponse($this->getData($sCountQ, $sQ));
         }
     }
 
@@ -180,17 +238,26 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getSortCol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aVisibleNames = $this->_getVisibleColNames();
-        $iCol = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('sort');
+        return $this->getSortCol();
+    }
+
+    /**
+     * Returns column id to sort
+     *
+     * @return int
+     */
+    protected function getSortCol()
+    {
+        $aVisibleNames = $this->getVisibleColNames();
+        $iCol = Registry::getRequest()->getRequestEscapedParameter('sort');
         $iCol = $iCol ? ((int) str_replace('_', '', $iCol)) : 0;
         $iCol = (!isset($aVisibleNames[$iCol])) ? 0 : $iCol;
 
         return $iCol;
     }
 
-
     /**
-     * Returns array of cotainer DB cols which must be loaded. If id is not
+     * Returns array of container DB cols which must be loaded. If id is not
      * passed - all possible containers cols will be returned
      *
      * @param string $sId container id (optional)
@@ -200,8 +267,21 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getColNames($sId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getColNames($sId);
+    }
+
+    /**
+     * Returns array of container DB cols which must be loaded. If id is not
+     * passed - all possible containers cols will be returned
+     *
+     * @param string $sId container id (optional)
+     *
+     * @return array
+     */
+    protected function getColNames($sId = null)
+    {
         if ($sId === null) {
-            $sId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('cmpid');
+            $sId = Registry::getRequest()->getRequestEscapedParameter('cmpid');
         }
 
         if ($sId && isset($this->_aColumns[$sId])) {
@@ -220,7 +300,18 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getIdentColNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aColNames = $this->_getColNames();
+        return $this->getIdentColNames();
+    }
+
+    /**
+     * Returns array of identifiers which are used as identifiers for specific actions
+     * in AJAX and further in this processor class
+     *
+     * @return array
+     */
+    protected function getIdentColNames()
+    {
+        $aColNames = $this->getColNames();
         $aCols = [];
         foreach ($aColNames as $iKey => $aCol) {
             // ident ?
@@ -240,13 +331,23 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getVisibleColNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aColNames = $this->_getColNames();
-        $aUserCols = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('aCols');
+        return $this->getVisibleColNames();
+    }
+
+    /**
+     * Returns array of col names which are requested by AJAX call and will be fetched from DB
+     *
+     * @return array
+     */
+    protected function getVisibleColNames()
+    {
+        $aColNames = $this->getColNames();
+        $aUserCols = Registry::getRequest()->getRequestEscapedParameter('aCols');
         $aVisibleCols = [];
 
         // user defined some cols to load ?
         if (is_array($aUserCols)) {
-            foreach ($aUserCols as $iKey => $sCol) {
+            foreach ($aUserCols as $sCol) {
                 $iCol = (int) str_replace('_', '', $sCol);
                 if (isset($aColNames[$iCol]) && !$aColNames[$iCol][4]) {
                     $aVisibleCols[$iCol] = $aColNames[$iCol];
@@ -254,11 +355,11 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-        // no user defined valid cols ? setting defauls ..
+        // no user defined valid cols ? setting defaults ..
         if (!count($aVisibleCols)) {
             foreach ($aColNames as $sName => $aCol) {
                 // visible ?
-                if ($aCol[1] && !$aColNames[$sName][4]) {
+                if ($aCol[1] && !$aCol[4]) {
                     $aVisibleCols[$sName] = $aCol;
                 }
             }
@@ -276,8 +377,19 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getQueryCols() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = $this->_buildColsQuery($this->_getVisibleColNames(), false) . ", ";
-        $sQ .= $this->_buildColsQuery($this->_getIdentColNames());
+        return $this->getQueryCols();
+    }
+
+    /**
+     * Formats and returns chunk of SQL query string with definition of
+     * fields to load from DB
+     *
+     * @return string
+     */
+    protected function getQueryCols()
+    {
+        $sQ = $this->buildColsQuery($this->getVisibleColNames(), false) . ", ";
+        $sQ .= $this->buildColsQuery($this->getIdentColNames());
 
         return " $sQ ";
     }
@@ -293,15 +405,28 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _buildColsQuery($aIdentCols, $blIdentCols = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->buildColsQuery($aIdentCols, $blIdentCols);
+    }
+
+    /**
+     * Builds column selection query
+     *
+     * @param array $aIdentCols  columns
+     * @param bool  $blIdentCols if true, means ident columns part is build
+     *
+     * @return string
+     */
+    protected function buildColsQuery($aIdentCols, $blIdentCols = true)
+    {
         $sQ = '';
         foreach ($aIdentCols as $iCnt => $aCol) {
             if ($sQ) {
                 $sQ .= ', ';
             }
 
-            $sViewTable = $this->_getViewName($aCol[1]);
-            if (!$blIdentCols && $this->_isExtendedColumn($aCol[0])) {
-                $sQ .= $this->_getExtendedColQuery($sViewTable, $aCol[0], $iCnt);
+            $sViewTable = $this->getViewName($aCol[1]);
+            if (!$blIdentCols && $this->isExtendedColumn($aCol[0])) {
+                $sQ .= $this->getExtendedColQuery($sViewTable, $aCol[0], $iCnt);
             } else {
                 $sQ .= $sViewTable . '.' . $aCol[0] . ' as _' . $iCnt;
             }
@@ -321,7 +446,20 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _isExtendedColumn($sColumn) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blVariantsSelectionParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blVariantsSelection');
+        return $this->isExtendedColumn($sColumn);
+    }
+
+    /**
+     * Checks if current column is extended
+     * (currently checks if variants must be shown in lists and column name is "oxtitle")
+     *
+     * @param string $sColumn column name
+     *
+     * @return bool
+     */
+    protected function isExtendedColumn($sColumn)
+    {
+        $blVariantsSelectionParameter = Registry::getConfig()->getConfigParam('blVariantsSelection');
 
         return $this->_blAllowExtColumns && $blVariantsSelectionParameter && $sColumn == 'oxtitle';
     }
@@ -339,6 +477,21 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getExtendedColQuery($sViewTable, $sColumn, $iCnt) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getExtendedColQuery($sViewTable, $sColumn, $iCnt);
+    }
+
+    /**
+     * Returns extended query part for given view/column combination
+     * (if variants must be shown in lists and column name is "oxtitle")
+     *
+     * @param string $sViewTable view name
+     * @param string $sColumn    column name
+     * @param int    $iCnt       column count
+     *
+     * @return string
+     */
+    protected function getExtendedColQuery($sViewTable, $sColumn, $iCnt)
+    {
         // multilanguage
         $sVarSelect = "$sViewTable.oxvarselect";
 
@@ -355,7 +508,17 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ' order by _' . $this->_getSortCol() . ' ' . $this->_getSortDir() . ' ';
+        return $this->getSorting();
+    }
+
+    /**
+     * Formats and returns part of SQL query for sorting
+     *
+     * @return string
+     */
+    protected function getSorting()
+    {
+        return ' order by _' . $this->getSortCol() . ' ' . $this->getSortDir() . ' ';
     }
 
     /**
@@ -368,7 +531,19 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getLimit($iStart) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iLimit = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("results");
+        return $this->getLimit($iStart);
+    }
+
+    /**
+     * Returns part of SQL query for limiting number of entries from DB
+     *
+     * @param int $iStart start position
+     *
+     * @return string
+     */
+    protected function getLimit($iStart)
+    {
+        $iLimit = (int) Registry::getRequest()->getRequestEscapedParameter('results');
         $iLimit = $iLimit ? $iLimit : $this->_iSqlLimit;
 
         return " limit $iStart, $iLimit ";
@@ -378,17 +553,28 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * Returns part of SQL query for filtering DB data
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFilter" in next major
      */
     protected function _getFilter() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getFilter();
+    }
+
+    /**
+     * Returns part of SQL query for filtering DB data
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getFilter()
+    {
         $sQ = '';
-        $oConfig = $this->getConfig();
-        $aFilter = $oConfig->getRequestParameter('aFilter');
+        $aFilter = Registry::getRequest()->getRequestEscapedParameter('aFilter');
         if (is_array($aFilter) && count($aFilter)) {
-            $aCols = $this->_getVisibleColNames();
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $oStr = getStr();
+            $aCols = $this->getVisibleColNames();
+            $oDb = DatabaseProvider::getDb();
+            $oStr = Str::getStr();
 
             foreach ($aFilter as $sCol => $sValue) {
                 // skipping empty filters
@@ -405,10 +591,10 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
                     // escaping special characters
                     $sValue = str_replace(['%', '_'], ['\%', '\_'], $sValue);
 
-                    // possibility to search in the middle ..
+                    // possibility to search in the middle ...
                     $sValue = $oStr->preg_replace('/^\*/', '%', $sValue);
 
-                    $sQ .= $this->_getViewName($aCols[$iCol][1]) . '.' . $aCols[$iCol][0];
+                    $sQ .= $this->getViewName($aCols[$iCol][1]) . '.' . $aCols[$iCol][0];
                     $sQ .= ' like ' . $oDb->Quote('%' . $sValue . '%') . ' ';
                 }
             }
@@ -423,11 +609,25 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($sQ && ($sFilter = $this->_getFilter())) {
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        if ($sQ && ($sFilter = $this->getFilter())) {
             $sQ .= ((stristr($sQ, 'where') === false) ? 'where' : ' and ') . $sFilter;
         }
 
@@ -440,13 +640,29 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ SQL query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getAll" in next major
      */
     protected function _getAll($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getAll($sQ);
+    }
+
+    /**
+     * Returns DB records as plain indexed array
+     *
+     * @param string $sQ SQL query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getAll($sQ)
+    {
         $aReturn = [];
-        $rs = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select($sQ);
-        if ($rs != false && $rs->count() > 0) {
+        $rs = DatabaseProvider::getDb()->select($sQ);
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $aReturn[] = $rs->fields[0];
                 $rs->fetchRow();
@@ -464,7 +680,17 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getSortDir() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDir = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('dir');
+        return $this->getSortDir();
+    }
+
+    /**
+     * Checks user input and returns SQL sorting direction key
+     *
+     * @return string
+     */
+    protected function getSortDir()
+    {
+        $sDir = Registry::getRequest()->getRequestEscapedParameter('dir');
         if (!in_array($sDir, $this->_aPosDir)) {
             $sDir = $this->_aPosDir[0];
         }
@@ -480,7 +706,17 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getStartIndex() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('startIndex');
+        return $this->getStartIndex();
+    }
+
+    /**
+     * Returns position from where data must be loaded
+     *
+     * @return int
+     */
+    protected function getStartIndex()
+    {
+        return (int) Registry::getRequest()->getRequestEscapedParameter('startIndex');
     }
 
     /**
@@ -489,9 +725,23 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ SQL query
      *
      * @return int
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getTotalCount" in next major
      */
     protected function _getTotalCount($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getTotalCount($sQ);
+    }
+
+    /**
+     * Returns amount of records which can be found according to passed SQL query
+     *
+     * @param string $sQ SQL query
+     *
+     * @return int
+     * @throws DatabaseConnectionException
+     */
+    protected function getTotalCount($sQ)
     {
         // TODO: implement caching here
 
@@ -500,7 +750,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         // $sCountCacheKey = md5( $sQ );
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (int) \OxidEsales\Eshop\Core\DatabaseProvider::getMaster()->getOne($sQ);
+        return (int) DatabaseProvider::getMaster()->getOne($sQ);
     }
 
     /**
@@ -509,12 +759,28 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param string $sQ SQL query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getDataFields" in next major
      */
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getDataFields($sQ);
+    }
+
+    /**
+     * Returns array with DB records
+     *
+     * @param string $sQ SQL query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getDataFields($sQ)
+    {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getMaster(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
+        return DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
     }
 
     /**
@@ -525,7 +791,17 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _outputResponse($aData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->_output(json_encode($aData));
+        $this->outputResponse($aData);
+    }
+
+    /**
+     * Outputs JSON encoded data
+     *
+     * @param array $aData data to output
+     */
+    protected function outputResponse($aData)
+    {
+        $this->output(json_encode($aData));
     }
 
     /**
@@ -535,6 +811,16 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "output" in next major
      */
     protected function _output($sOut) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->output($sOut);
+    }
+
+    /**
+     * Echoes given string
+     *
+     * @param string $sOut string to echo
+     */
+    protected function output($sOut)
     {
         echo $sOut;
     }
@@ -549,28 +835,57 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getViewName($sTable) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return getViewName($sTable, \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('editlanguage'));
+        return $this->getViewName($sTable);
+    }
+
+    /**
+     * Return the view name of the given table if a view exists, otherwise the table name itself
+     *
+     * @param string $sTable table name
+     *
+     * @return string
+     */
+    protected function getViewName($sTable)
+    {
+        return Registry::get(TableViewNameGenerator::class)->getViewName($sTable, Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
     }
 
     /**
      * Formats data array which later will be processed by _outputResponse method
      *
      * @param string $sCountQ count query
-     * @param string $sQ      data load query
+     * @param string $sQ data load query
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getData" in next major
      */
     protected function _getData($sCountQ, $sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = $this->_addFilter($sQ);
-        $sCountQ = $this->_addFilter($sCountQ);
+        return $this->getData($sCountQ, $sQ);
+    }
 
-        $aResponse['startIndex'] = $iStart = $this->_getStartIndex();
-        $aResponse['sort'] = '_' . $this->_getSortCol();
-        $aResponse['dir'] = $this->_getSortDir();
+    /**
+     * Formats data array which later will be processed by _outputResponse method
+     *
+     * @param string $sCountQ count query
+     * @param string $sQ data load query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function getData($sCountQ, $sQ)
+    {
+        $sQ = $this->addFilter($sQ);
+        $sCountQ = $this->addFilter($sCountQ);
 
-        $iDebug = $this->getConfig()->getConfigParam('iDebug');
+        $aResponse['startIndex'] = $iStart = $this->getStartIndex();
+        $aResponse['sort'] = '_' . $this->getSortCol();
+        $aResponse['dir'] = $this->getSortDir();
+
+        $iDebug = Registry::getConfig()->getConfigParam('iDebug');
         if ($iDebug) {
             $aResponse['countsql'] = $sCountQ;
         }
@@ -578,15 +893,15 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
         $aResponse['records'] = [];
 
         // skip further execution if no records were found ...
-        if (($iTotal = $this->_getTotalCount($sCountQ))) {
-            $sQ .= $this->_getSorting();
-            $sQ .= $this->_getLimit($iStart);
+        if (($iTotal = $this->getTotalCount($sCountQ))) {
+            $sQ .= $this->getSorting();
+            $sQ .= $this->getLimit($iStart);
 
             if ($iDebug) {
                 $aResponse['datasql'] = $sQ;
             }
 
-            $aResponse['records'] = $this->_getDataFields($sQ);
+            $aResponse['records'] = $this->getDataFields($sQ);
         }
 
         $aResponse['totalRecords'] = $iTotal;
@@ -600,7 +915,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      * @param array $aArtIds article id's
      * @param array $aCatIds ids if categories, which must be removed from oxseo
      *
-     * @return null
+     * @return void
      */
     public function resetArtSeoUrl($aArtIds, $aCatIds = null)
     {
@@ -612,10 +927,10 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
             $aArtIds = [$aArtIds];
         }
 
-        $sShopId = $this->getConfig()->getShopId();
+        $sShopId = Registry::getConfig()->getShopId();
         foreach ($aArtIds as $sArtId) {
-            /** @var \OxidEsales\Eshop\Core\SeoEncoder $oSeoEncoder */
-            \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
+            /** @var SeoEncoder $oSeoEncoder */
+            Registry::getSeoEncoder()->markAsExpired($sArtId, $sShopId, 1, null, "oxtype='oxarticle'");
         }
     }
 
@@ -624,12 +939,12 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     public function resetContentCache()
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
-            $this->_resetCaches();
+            $this->resetCaches();
 
-            \OxidEsales\Eshop\Core\Registry::getUtils()->oxResetFileCache();
+            Registry::getUtils()->oxResetFileCache();
         }
     }
 
@@ -642,10 +957,10 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
      */
     public function resetCounter($sCounterType, $sValue = null)
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
 
         if (!$blDeleteCacheOnLogout) {
-            $myUtilsCount = \OxidEsales\Eshop\Core\Registry::getUtilsCount();
+            $myUtilsCount = Registry::getUtilsCount();
             switch ($sCounterType) {
                 case 'priceCatArticle':
                     $myUtilsCount->resetPriceCatArticleCount($sValue);
@@ -661,7 +976,7 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
                     break;
             }
 
-            $this->_resetContentCache();
+            $this->resetContentCache();
         }
     }
 
@@ -680,4 +995,11 @@ class ListComponentAjax extends \OxidEsales\Eshop\Core\Base
     protected function _resetCaches() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
     }
+
+    /**
+     * Resets output caches
+     */
+    protected function resetCaches()
+    {
+    }    
 }

@@ -59,7 +59,7 @@ class FileCollector
     /**
      * get collection files
      *
-     * @return mixed
+     * @return array
      */
     public function getFiles()
     {
@@ -102,7 +102,7 @@ class FileCollector
      * @param boolean $blRecursive should directories be checked in recursive manner
      *
      * @throws exception
-     * @return null
+     * @return void
      */
     public function addDirectoryFiles($sFolder, $aExtensions = [], $blRecursive = false)
     {

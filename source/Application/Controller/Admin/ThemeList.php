@@ -21,22 +21,27 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Theme;
+
 /**
- * Admin actionss manager.
+ * Admin actions' manager.
  * Sets list template, list object class ('oxactions') and default sorting
  * field ('oxactions.oxtitle').
  * Admin Menu: Manage Products -> Actions.
  */
-class ThemeList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ThemeList extends AdminListController
 {
     /**
      * Calls parent::render() and returns name of template to render
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
-        $oTheme = oxNew(\OxidEsales\Eshop\Core\Theme::class);
+        $oTheme = oxNew(Theme::class);
 
         parent::render();
 

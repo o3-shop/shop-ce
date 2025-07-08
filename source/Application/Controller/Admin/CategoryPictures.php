@@ -21,24 +21,29 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Admin article categories thumbnail manager.
  * Category thumbnail manager (Previews assigned pictures).
  * Admin Menu: Manage Products -> Categories -> Thumbnail.
  */
-class CategoryPictures extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CategoryPictures extends AdminDetailsController
 {
     /**
      * Loads category object, passes it to Smarty engine and returns name
      * of template file "category_pictures.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
         parent::render();
 
-        $this->_aViewData['edit'] = $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $this->_aViewData['edit'] = $oCategory = oxNew(Category::class);
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != '-1') {

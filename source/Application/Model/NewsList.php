@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * News list manager.
  * Creates news objects, fetches its data.
  * @deprecated 6.5.6 "News" feature will be removed completely
  */
-class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
+class NewsList extends ListModel
 {
     /**
      * List Object class name
@@ -55,7 +59,7 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
             $this->setSqlLimit($iFrom, $iLimit);
         }
 
-        $sNewsViewName = getViewName('oxnews');
+        $sNewsViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxnews');
         $oBaseObject = $this->getBaseObject();
         $sSelectFields = $oBaseObject->getSelectFields();
         $params = [];
@@ -84,25 +88,25 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Returns count of all entries.
      *
      * @return integer $iRecCnt
+     * @throws DatabaseConnectionException
      */
     public function getCount()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
-        $sNewsViewName = getViewName('oxnews');
+        $sNewsViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxnews');
         $oBaseObject = $this->getBaseObject();
         $params = [];
 
+        $sSelect = "select COUNT($sNewsViewName.`oxid`) from $sNewsViewName ";
         if ($oUser = $this->getUser()) {
             // performance - only join if user is logged in
-            $sSelect = "select COUNT($sNewsViewName.`oxid`) from $sNewsViewName ";
             $sSelect .= "left join oxobject2group on oxobject2group.oxobjectid=$sNewsViewName.oxid where ";
             $sSelect .= "oxobject2group.oxgroupsid in ( select oxgroupsid from oxobject2group where oxobjectid = :oxobjectid ) or ";
             $sSelect .= "( oxobject2group.oxgroupsid is null ) ";
 
             $params[':oxobjectid'] = $oUser->getId();
         } else {
-            $sSelect = "select COUNT($sNewsViewName.`oxid`) from $sNewsViewName ";
             $sSelect .= "left join oxobject2group on oxobject2group.oxobjectid=$sNewsViewName.oxid where oxobject2group.oxgroupsid is null ";
         }
 
@@ -117,7 +121,7 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * News list user setter
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
+     * @param User $oUser user object
      */
     public function setUser($oUser)
     {
@@ -127,7 +131,7 @@ class NewsList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * News list user getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\User
+     * @return User
      */
     public function getUser()
     {

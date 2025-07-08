@@ -21,13 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article assignment to attributes
  */
-class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ArticleBundleAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -41,36 +43,51 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sView = $this->_getViewName('oxobject2category');
+        return $this->getQuery();
+    }
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $myConfig = Registry::getConfig();
+        $oDb = DatabaseProvider::getDb();
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sView = $this->getViewName('oxobject2category');
+
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $sQAdd = '';
 
         // category selected or not ?
         if (!$sSelId) {
-            $sQAdd = " from $sArticleTable where 1 ";
+            $sQAdd .= " from $sArticleTable where 1 ";
             $sQAdd .= $myConfig->getConfigParam('blVariantsSelection') ? '' : " and $sArticleTable.oxparentid = '' ";
         } else {
             // selected category ?
@@ -100,47 +117,61 @@ class ArticleBundleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sQ = parent::_addFilter($sQ);
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        $sArtTable = $this->getViewName('oxarticles');
+        $sQ = parent::addFilter($sQ);
 
         // display variants or not ?
-        $sQ .= $this->getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
+        $sQ .= Registry::getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
 
         return $sQ;
     }
 
     /**
-     * Removing article from corssselling list
+     * Removing article from cross-selling list
      */
     public function removeArticleBundle()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sQ = "update oxarticles set oxarticles.oxbundleid = '' where oxarticles.oxid = :oxid ";
         $oDb->Execute(
             $sQ,
-            [':oxid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid')]
+            [':oxid' => Registry::getRequest()->getRequestEscapedParameter('oxid')]
         );
     }
 
     /**
-     * Adding article to corssselling list
+     * Adding article to cross-selling list
      */
     public function addArticleBundle()
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $sQ = "update oxarticles set oxarticles.oxbundleid = :oxbundleid " .
               "where oxarticles.oxid  = :oxid ";
         $oDb->Execute(
             $sQ,
             [
-                ':oxbundleid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxbundleid'),
-                ':oxid' => \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid')
+                ':oxbundleid' => Registry::getRequest()->getRequestEscapedParameter('oxbundleid'),
+                ':oxid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
             ]
         );
     }

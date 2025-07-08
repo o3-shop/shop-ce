@@ -21,14 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * Content list manager.
  * Collects list of content
  *
  */
-class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
+class ContentList extends ListModel
 {
     /**
      * Information content type
@@ -129,12 +132,14 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param integer $iType - type of content
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb($iType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSql = $this->_getSQLByType($iType);
-        $aData = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sSql);
+        $aData = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sSql);
 
         return $aData;
     }
@@ -143,6 +148,8 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Load category list data
      *
      * @param integer $type - type of content
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "load" in next major
      */
     protected function _load($type) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -180,12 +187,13 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param integer $iType type.
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSQLByType" in next major
      */
     protected function _getSQLByType($iType) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSQLAdd = '';
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sSQLType = " AND `oxtype` = " . $oDb->quote($iType);
 
         if ($iType == self::TYPE_CATEGORY_MENU) {
@@ -193,7 +201,7 @@ class ContentList extends \OxidEsales\Eshop\Core\Model\ListModel
         }
 
         if ($iType == self::TYPE_SERVICE_LIST) {
-            $sIdents = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($this->getServiceKeys()));
+            $sIdents = implode(", ", DatabaseProvider::getDb()->quoteArray($this->getServiceKeys()));
             $sSQLAdd = " AND OXLOADID IN (" . $sIdents . ")";
             $sSQLType = '';
         }

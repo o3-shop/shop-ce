@@ -21,13 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Order delivery set manager.
  *
  */
-class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class DeliverySet extends MultiLanguageModel
 {
     /**
      * Current object class name
@@ -48,9 +53,11 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $sOxId Object ID(default null)
+     * @param null $sOxId Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOxId = null)
     {
@@ -61,7 +68,7 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
             return false;
         }
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $oDb->execute('delete from oxobject2payment where oxobjectid = :oxid', [
             ':oxid' => $sOxId
@@ -82,11 +89,12 @@ class DeliverySet extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param string $sTitle delivery name
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByName($sTitle)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "SELECT `oxid` FROM `" . getViewName('oxdeliveryset') . "` 
+        $oDb = DatabaseProvider::getDb();
+        $sQ = "SELECT `oxid` FROM `" . Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset') . "` 
             WHERE  `oxtitle` = :oxtitle";
         $sId = $oDb->getOne($sQ, [
             ':oxtitle' => $sTitle
