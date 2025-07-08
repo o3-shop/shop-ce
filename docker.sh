@@ -64,7 +64,7 @@ start_containers() {
 stop_containers() {
     # Change to the docker directory
     MY_DIR=$(getMyPath)
-    cd MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
+    cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
 
     check_docker_compose
 
