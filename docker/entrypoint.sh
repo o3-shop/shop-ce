@@ -146,12 +146,12 @@ setup_db() {
 main() {
     log "${GREEN}Starting shop setup...${NC}"
 
-    setup_environment
-    install_dependencies
-    install_demodata
-    setup_db
-    install_theme
-    start_apache
+    setup_environment || exit 127
+    install_dependencies || exit 127
+    install_demodata || exit 127
+    setup_db || exit 127
+    install_theme || exit 127
+    start_apache || exit 127
 }
 
 # Run the script
