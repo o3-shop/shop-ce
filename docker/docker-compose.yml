@@ -6,10 +6,10 @@ services:
     container_name: o3shop-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${O3SHOP_CONF_DBROOT}
+      MYSQL_DATABASE: ${O3SHOP_CONF_DBNAME}
+      MYSQL_USER: ${O3SHOP_CONF_DBUSER}
+      MYSQL_PASSWORD: ${O3SHOP_CONF_DBPWD}
     volumes:
       - ./data:/var/lib/mysql
     ports:

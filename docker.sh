@@ -30,7 +30,7 @@ check_docker_compose() {
 start_containers() {
     # Change to the docker directory
     MY_DIR=$(getMyPath)
-    cd MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
+    cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
 
     check_docker_compose
 
@@ -83,17 +83,20 @@ stop_containers() {
 
 rebuild_containers() {
       MY_DIR=$(getMyPath)
-      cd MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
+
+            rm -f $MY_DIR/runned.txt
+
+            rm -f $MY_DIR/source/tmp/*.txt
+
+            rm -f $MY_DIR/source/tmp/*.php
+
+            rm -f $MY_DIR/source/tmp/smarty/*.php
+
+
+      cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
 
       check_docker_compose
 
-      rm -f MY_DIR/runned.txt
-
-      rm -f MY_DIR/source/tmp/*.txt
-
-      rm -f MY_DIR/source/tmp/*.php
-
-      rm -f MY_DIR/source/tmp/smarty/*.php
 
       # Pull latest images before starting containers
       echo "Pulling latest Docker images..."
@@ -116,8 +119,22 @@ rebuild_containers() {
 }
 
 MY_DIR=$(getMyPath)
+
+
+if [ ! -f "$MY_DIR/.env" ]; then
+    cp .env.example .env || handle_error "Failed to copy .env.example to .env"
+    echo "Created .env file from example"
+else
+    echo ".env file already exists"
+fi
+
 if [ ! -f "$MY_DIR/docker/.env" ]; then
-    cp $MY_DIR/docker/.env.dev $MY_DIR/docker/.env
+    DOCKER_VARS=("O3SHOP_CONF_DBUSER" "O3SHOP_CONF_DBPWD" "O3SHOP_CONF_DBROOT" "O3SHOP_CONF_DBNAME")
+
+    # Extract and write only those variables
+    for var in "${DOCKER_VARS[@]}"; do
+        grep "^$var=" "$MY_DIR/.env.example" >> "$MY_DIR/docker/.env"
+    done
 fi
 
 # Main script execution
