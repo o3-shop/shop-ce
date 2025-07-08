@@ -6,15 +6,28 @@ if (!extension_loaded('mysqli')) {
     die("MySQLi extension not loaded. Install php8.2-mysql first.\n");
 }
 
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv->load();
+$dotenv->required([
+    'O3SHOP_CONF_DBHOST',
+    'O3SHOP_CONF_DBPORT',
+    'O3SHOP_CONF_DBNAME',
+    'O3SHOP_CONF_DBUSER',
+    'O3SHOP_CONF_DBPWD',
+    'O3SHOP_CONF_SHOPURL',
+    'O3SHOP_CONF_SHOPDIR',
+    'O3SHOP_CONF_COMPILEDIR'
+])->notEmpty();
+
 // Database credentials
-$dbHost = 'db';
-$dbUser = 'o3shop';
-$dbPwd  = 'o3shop';
-$dbName = 'o3shop';
-$dbPort = 3306;
+$dbHost = $_ENV['O3SHOP_CONF_DBHOST'];
+$dbUser = $_ENV['O3SHOP_CONF_DBUSER'];
+$dbPwd  = $_ENV['O3SHOP_CONF_DBUPWD'];
+$dbName = $_ENV['O3SHOP_CONF_DBNAME'];
+$dbPort = $_ENV['O3SHOP_CONF_DBPORT'];
 
 // Shop configuration
-$shopUrl = 'http://localhost:8080';
+$shopUrl = $_ENV['O3SHOP_CONF_SHOPURL'];
 $shopName = 'My O3 Shop';
 $adminEmail = 'admin@example.com';
 $adminPass = 'admin123';
@@ -71,7 +84,7 @@ if ($result->num_rows == 0) {
     $demodataCommand = __DIR__ . '/../vendor/bin/oe-eshop-demodata_install';
     if (file_exists($demodataCommand)) {
         exec("cd " . __DIR__ . " /.. && php $demodataCommand 2>&1", $output, $returnCode);
-        $command = "mysql --user=o3shop --password='o3shop' -h db -D o3shop < " . __DIR__ . "/../vendor/o3-shop/shop-demodata-ce/src/demodata.sql";
+        $command = "mysql --user=" . $dbUser . " --password='" . $dbPwd . "' -h " . $dbHost . " -D " . $dbName . " < " . __DIR__ . "/../vendor/o3-shop/shop-demodata-ce/src/demodata.sql";
         $output = shell_exec($command);
         if ($output === null) {
             echo "SQL script executed successfully.";
