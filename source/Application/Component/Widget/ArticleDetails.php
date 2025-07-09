@@ -898,7 +898,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      */
     public function getPriceAlarmStatus()
     {
-        return (int)$this->getViewParameter('iPriceAlarmStatus');
+        return $this->getViewParameter('iPriceAlarmStatus');
     }
 
     /**
