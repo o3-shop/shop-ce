@@ -512,7 +512,7 @@ class Basket extends Base
             }
         } else {
             //inserting new
-            $oBasketItem = oxNew(BasketItem::class);
+            $oBasketItem = oxNew('oxBasketItem');
             try {
                 $oBasketItem->setStockCheckStatus($this->getStockCheckMode());
                 $oBasketItem->init($sProductID, $dAmount, $aSel, $aPersParam, $blBundle);
