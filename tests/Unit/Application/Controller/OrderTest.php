@@ -86,7 +86,7 @@ class OrderHelper extends oxOrder
      *
      * @return boolean
      */
-    public function finalizeOrder(\OxidEsales\Eshop\Application\Model\Basket $oBasket, $oUser, $blRecalculatingOrder = false)
+    public function finalizeOrder(\OxidEsales\EshopCommunity\Application\Model\Basket $oBasket, $oUser, $blRecalculatingOrder = false)
     {
         return 1;
     }
