@@ -41,6 +41,18 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         exif \
         zip
 
+RUN echo "date.timezone = Europe/Berlin" > /usr/local/etc/php/conf.d/timezone.ini \
+    && echo "memory_limit = 11000M" > /usr/local/etc/php/conf.d/memory-limit.ini \
+    && echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/upload-size.ini \
+    && echo "post_max_size = 100M" > /usr/local/etc/php/conf.d/post-size.ini
+
+# Php Error Logging
+
+Run echo "error_reporting = E_ALL" > /usr/local/etc/php/conf.d/error-reporting.ini \
+    && echo "display_errors = On" >> /usr/local/etc/php/conf.d/error-reporting.ini \
+    && echo "log_errors = On" >> /usr/local/etc/php/conf.d/error-reporting.ini \
+    && echo "error_log = /tmp/php_errors.log" >> /usr/local/etc/php/conf.d/error-reporting.ini
+
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 

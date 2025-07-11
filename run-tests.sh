@@ -22,7 +22,7 @@ echo "$(date)"
 echo "----------------------------------------"
 
 # Run the tests and store exit code
-runtests tests/
+runtests /var/www/html/tests/Unit --colors=always
 TEST_EXIT_CODE=$?
 
 echo "----------------------------------------"
