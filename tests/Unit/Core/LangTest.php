@@ -1549,11 +1549,13 @@ class LangTest extends \OxidTestCase
     {
         $oLang = oxNew('oxLang');
         $aTable = $oLang->getMultiLangTables();
+        dumpVar($aTable);
         $this->assertTrue(count($aTable) == 22);
 
         $this->getConfig()->setConfigParam('aMultiLangTables', array('table1', 'table2'));
 
         $aTable = $oLang->getMultiLangTables();
+        dumpVar($aTable);
         $this->assertTrue(count($aTable) == 24);
     }
 

@@ -983,7 +983,7 @@ class NavigationTreeTest extends \OxidTestCase
         $oXPath = new DomXPath($oDom);
         $oNodeList = $oXPath->query("//*[@url=\"index.php?loaa\"]");
         $this->assertEquals(1, $oNodeList->length);
-        $oNodeList->item(0)->setAttribute('url', 'http://url/lala?stoken=TOKEN111454&loaa');
+        $oNodeList->item(0)->setAttribute('url', 'http://localhost:8090/lala?stoken=TOKEN111454&loaa');
         $this->assertEquals($oDom, $oCDom);
     }
 

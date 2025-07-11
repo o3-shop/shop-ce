@@ -117,7 +117,7 @@ class ConfigTest extends OxidTestCase
     /**
      * @var string
      */
-    private $shopUrl = 'http://localhost/';
+    private $shopUrl = 'http://localhost:8090/';
 
     /**
      * @return void
