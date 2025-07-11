@@ -37,6 +37,7 @@ use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\PriceList;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use OxidEsales\Eshop\Application\Model\BasketItem;
 use stdClass;
 
 /**
@@ -512,7 +513,7 @@ class Basket extends Base
             }
         } else {
             //inserting new
-            $oBasketItem = oxNew('oxBasketItem');
+            $oBasketItem = oxNew(BasketItem::class);
             try {
                 $oBasketItem->setStockCheckStatus($this->getStockCheckMode());
                 $oBasketItem->init($sProductID, $dAmount, $aSel, $aPersParam, $blBundle);
