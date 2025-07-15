@@ -76,7 +76,7 @@ install_theme() {
 # Function to install dependencies
 install_dependencies() {
     log "${YELLOW}Installing Composer dependencies...${NC}"
-    composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
+    COMPOSER_ROOT_VERSION=dev-main composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
     log "${GREEN}Dependencies installed successfully${NC}"
 }
 
