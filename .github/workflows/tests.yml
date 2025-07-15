@@ -133,5 +133,6 @@ jobs:
           O3SHOP_CONF_DBPWD: o3shop
           O3SHOP_CONF_DBROOT: root
         run: |
-          vendor/o3-shop/testing-library/bin/runtests /var/www/html/tests/Unit --colors=always
+          php -d display_errors=on -d display_startup_errors=on -d error_reporting=E_ALL vendor/o3-shop/testing-library/bin/runtests /var/www/html/tests/Unit --colors=always
+
 
