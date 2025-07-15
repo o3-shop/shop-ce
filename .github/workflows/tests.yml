@@ -16,6 +16,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: o3shop_test
+          MYSQL_USER: o3shop
+          MYSQL_PASSWORD: o3shop
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -76,7 +78,7 @@ jobs:
 
       - name: Copy config files
         run: |
-          cp .env.example .env
+          cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
 
       - name: Wait for MariaDB
