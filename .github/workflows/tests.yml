@@ -144,13 +144,24 @@ jobs:
           echo "Current directory: $CURRENT_DIR"
 
           php $CURRENT_DIR/vendor/bin/phpunit \
-            --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
-            -c $CURRENT_DIR/tests/phpunit.xml \
-            $CURRENT_DIR/tests/Unit \
-            --colors=always \
-            --coverage-clover=coverage.xml \
-            --coverage-html=coverage-html/ || exit 0
+          --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
+          -c $CURRENT_DIR/tests/phpunit.xml \
+          $CURRENT_DIR/tests/Unit \
+          --colors=always \
+          --coverage-clover="$CURRENT_DIR/coverage.xml" \
+          --coverage-html="$CURRENT_DIR/coverage-html/" || exit 0
 
+      - name: Find coverage files
+        run: |
+          echo "Searching for coverage files..."
+          find /home/runner/work -name "coverage.xml" -type f 2>/dev/null || echo "No coverage.xml found"
+          find /home/runner/work -name "coverage-html" -type d 2>/dev/null || echo "No coverage-html directory found"
+          
+          echo "Files in current directory:"
+          ls -la
+          
+          echo "Files in tests directory:"
+          ls -la tests/ || echo "No tests directory"
       - name: Check coverage files
         run: |
           echo "Checking for coverage files..."
