@@ -24,7 +24,7 @@ runned.txt
 
 # Composer
 /vendor/
-
+composer.lock
 # Testing library
 /test_config.yml
 /source/Services/
