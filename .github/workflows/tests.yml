@@ -81,15 +81,6 @@ jobs:
           done
           echo 'MySQL is ready!'
 
-      - name: Setup database
-        run: |
-          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "
-            CREATE DATABASE IF NOT EXISTS o3shop;
-            GRANT ALL PRIVILEGES ON *.* TO 'o3shop'@'%' IDENTIFIED BY 'o3shop';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;
-          "
-
       - name: Modify entrypoint script for GitHub Actions
         run: |
           # Create a backup of the original entrypoint
