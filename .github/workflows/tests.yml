@@ -10,116 +10,70 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mariadb:
-        image: mariadb:10
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: o3shop_test
-          MYSQL_USER: o3shop
-          MYSQL_PASSWORD: o3shop
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
-          coverage: xdebug
-
-      - name: Install Composer 2.2
+      - name: Create environment file
         run: |
-          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-          php composer-setup.php --version=2.2.21
-          php -r "unlink('composer-setup.php');"
-          sudo mv composer.phar /usr/local/bin/composer
-          composer --version
+          cat > .env << EOF
+          O3SHOP_CONF_DBHOST=db
+          O3SHOP_CONF_DBNAME=o3shop_test
+          O3SHOP_CONF_DBUSER=root
+          O3SHOP_CONF_DBPWD=root
+          O3SHOP_CONF_DBROOT=root
+          EOF
 
-      - name: Set dynamic version based on branch
+      - name: Build and start services
         run: |
-          BRANCH_NAME="${{ github.ref_name }}"
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            BRANCH_NAME="${{ github.head_ref }}"
-          fi
+          docker-compose -f docker-compose.yml up -d db
           
-          echo "Branch name: $BRANCH_NAME"
+          # Wait for database to be ready
+          docker-compose exec -T db bash -c "
+            until mysqladmin ping -h localhost -u root -proot --silent; do
+              echo 'Waiting for MariaDB...'
+              sleep 2
+            done
+          "
+
+      - name: Setup test database
+        run: |
+          docker-compose exec -T db mysql -u root -proot -e "
+            CREATE DATABASE IF NOT EXISTS o3shop_test;
+            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;
+          "
+
+      - name: Run PHPUnit tests in container
+        run: |
+          docker-compose run --rm web bash -c "
+            composer install --no-dev --prefer-dist --no-progress
           
-          if [[ "$BRANCH_NAME" == "main" ]]; then
-            VERSION="1.4.x-dev"
-          elif [[ "$BRANCH_NAME" == *"1.4"* ]]; then
-            VERSION="1.4.x-dev"
-          elif [[ "$BRANCH_NAME" == *"1.3"* ]]; then
-            VERSION="1.3.x-dev"
-          else
-            VERSION="1.4.x-dev"
-          fi
+            php vendor/bin/phpunit \
+              --bootstrap vendor/o3-shop/testing-library/bootstrap.php \
+              -c tests/phpunit.xml \
+              tests/Unit \
+              --colors=always \
+              --coverage-clover=coverage.xml \
+              --coverage-html=coverage-html \
+              --coverage-text
+          "
+
+      - name: Copy coverage files from container
+        run: |
+          docker-compose run --rm web bash -c "
+            cp coverage.xml /tmp/coverage.xml
+            cp -r coverage-html /tmp/coverage-html
+          "
           
-          echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Using version: $VERSION"
+          # Copy files to host
+          docker cp $(docker-compose ps -q web):/tmp/coverage.xml ./coverage.xml
+          docker cp $(docker-compose ps -q web):/tmp/coverage-html ./coverage-html
 
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
-
-      - name: Install dependencies
-        env:
-          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
-        run: composer install --prefer-dist --no-progress
-
-      - name: Copy config files
-        run: |
-          cp .env.ci .env
-          cp source/config.inc.php.dist source/config.inc.php
-
-      - name: Wait for MariaDB
-        run: |
-          until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
-            echo 'Waiting for MariaDB...'
-            sleep 1
-          done
-
-      - name: Setup database
-        run: |
-          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
-
-      - name: Run PHPUnit tests with coverage
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: o3shop_test
-          DB_USERNAME: root
-          DB_PASSWORD: root
-          OXID_THEME: flow
-          OXID_CUSTOM_THEME: flow
-        run: |
-          CURRENT_DIR=$(pwd)
-          echo "Current directory: $CURRENT_DIR"
-          
-          php $CURRENT_DIR/vendor/bin/phpunit \
-            --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
-            -c $CURRENT_DIR/tests/phpunit.xml \
-            $CURRENT_DIR/tests/Unit \
-            --colors=always \
-            --coverage-clover=coverage.xml \
-            --coverage-html=coverage-html \
-            --coverage-text
-
-      - name: Upload coverage reports to Codecov
+      - name: Upload coverage reports
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           flags: unittests
-          name: codecov-umbrella
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -129,43 +83,6 @@ jobs:
           name: coverage-report
           path: coverage-html/
 
-      - name: Generate coverage summary
-        run: |
-          if [ -f coverage.xml ]; then
-            COVERAGE=$(php -r "
-              \$xml = simplexml_load_file('coverage.xml');
-              \$metrics = \$xml->project->metrics;
-              \$covered = (int)\$metrics['coveredstatements'];
-              \$total = (int)\$metrics['statements'];
-              \$percentage = \$total > 0 ? round((\$covered / \$total) * 100, 2) : 0;
-              echo \$percentage;
-            ")
-            echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
-            echo "**Coverage: ${COVERAGE}%**" >> $GITHUB_STEP_SUMMARY
-            echo "COVERAGE_PERCENTAGE=${COVERAGE}" >> $GITHUB_ENV
-          else
-            echo "No coverage file found"
-          fi
-
-      - name: Comment coverage on PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const coverage = process.env.COVERAGE_PERCENTAGE;
-            if (coverage) {
-              const body = `## 📊 Coverage Report
-            
-              **Coverage: ${coverage}%**
-            
-              ${coverage >= 80 ? '✅ Great coverage!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage'}
-            
-              [View detailed coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-            
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: body
-              });
-            }
+      - name: Cleanup
+        if: always()
+        run: docker-compose down -v
