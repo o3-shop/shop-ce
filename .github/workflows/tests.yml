@@ -1,4 +1,4 @@
-name: PHPUnit Tests
+name: PHPUnit Tests (Container)
 
 on:
   push:
@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: composer:2.2
     
     services:
       mariadb:
@@ -16,15 +18,9 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: o3shop_test
-          MYSQL_USER: o3shop
-          MYSQL_PASSWORD: o3shop
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    
-    strategy:
-      matrix:
-        php-versions: ['8.1', '8.2', '8.3']
     
     steps:
     - uses: actions/checkout@v4
@@ -32,45 +28,16 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php-versions }}
+        php-version: '8.2'
         extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
         coverage: xdebug
     
-    - name: Install Composer 2.2
-      run: |
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php composer-setup.php --version=2.2.21
-        php -r "unlink('composer-setup.php');"
-        sudo mv composer.phar /usr/local/bin/composer
-        composer --version
-    
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v4
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-    
-    - name: Wait for MariaDB
-      run: |
-        until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
-          echo 'Waiting for MariaDB...'
-          sleep 1
-        done
-    
-    - name: Setup database
-      run: |
-        mysql -h 127.0.0.1 -P 3306 -u root -proot -e "SHOW DATABASES;"
-        mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
-    
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      run: composer install
     
     - name: Run PHPUnit tests with coverage
       env:
-        DB_HOST: 127.0.0.1
+        DB_HOST: mariadb
         DB_PORT: 3306
         DB_DATABASE: o3shop_test
         DB_USERNAME: root
@@ -81,21 +48,4 @@ jobs:
           -c '/var/www/html/tests/phpunit.xml' \
           '/var/www/html/tests/Unit' \
           --colors=always \
-          --coverage-clover=coverage.xml \
-          --coverage-html=coverage-html \
           --coverage-text
-    
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
-    
-    - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report-php${{ matrix.php-versions }}
-        path: coverage-html/
