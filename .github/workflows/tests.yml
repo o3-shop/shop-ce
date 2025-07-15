@@ -1,4 +1,4 @@
-name: PHPUnit Tests (Container)
+name: PHPUnit Tests
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       mariadb:
         image: mariadb:10
@@ -19,31 +19,65 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
-        coverage: xdebug
-    
-    - name: Install dependencies
-      run: composer install
-    
-    - name: Run PHPUnit tests with coverage
-      env:
-        DB_HOST: mariadb
-        DB_PORT: 3306
-        DB_DATABASE: o3shop_test
-        DB_USERNAME: root
-        DB_PASSWORD: root
-      run: |
-        php /var/www/html/vendor/o3-shop/testing-library/../../../vendor//bin/phpunit \
-          --bootstrap /var/www/html/vendor/o3-shop/testing-library/bin/../bootstrap.php \
-          -c '/var/www/html/tests/phpunit.xml' \
-          '/var/www/html/tests/Unit' \
-          --colors=always \
-          --coverage-text
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
+          coverage: xdebug
+
+      - name: Install Composer 2.2
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --version=2.2.21
+          php -r "unlink('composer-setup.php');"
+          sudo mv composer.phar /usr/local/bin/composer
+          composer --version
+
+      - name: Resolve dependency conflicts
+        run: |
+          echo "Attempting to install dependencies..."
+          
+          # Try normal install first
+          if composer install --prefer-dist --no-progress; then
+            echo "Dependencies installed successfully"
+          else
+            echo "Installation failed, updating lock file..."
+          
+            # Update the lock file to resolve version conflicts
+            composer update --lock --no-scripts
+          
+            # Try install again
+            if composer install --prefer-dist --no-progress; then
+              echo "Dependencies installed after lock update"
+            else
+              echo "Still failing, trying full update..."
+              composer update --prefer-dist --no-progress --with-dependencies
+            fi
+          fi
+
+      - name: Wait for MariaDB
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
+            echo 'Waiting for MariaDB...'
+            sleep 1
+          done
+
+      - name: Run PHPUnit tests with coverage
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: o3shop_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: |
+          php vendor/bin/phpunit \
+            --bootstrap vendor/o3-shop/testing-library/bootstrap.php \
+            -c tests/phpunit.xml \
+            tests/Unit \
+            --colors=always \
+            --coverage-text
