@@ -100,7 +100,8 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
         run: |
-          php /var/www/html/vendor/o3-shop/testing-library/../../../vendor//bin/phpunit \
+          pwd
+          php vendor/bin/phpunit \
             --bootstrap /var/www/html/vendor/o3-shop/testing-library/bin/../bootstrap.php \
             -c '/var/www/html/tests/phpunit.xml' \
             '/var/www/html/tests/Unit' \
