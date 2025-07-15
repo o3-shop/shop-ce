@@ -51,7 +51,8 @@
         "o3-shop/testing-library": "^v1.0.0",
         "incenteev/composer-parameter-handler": "~v2.0",
         "o3-shop/shop-ide-helper": "^v1.0.0",
-        "squizlabs/php_codesniffer": "^3.5.4"
+        "squizlabs/php_codesniffer": "^3.5.4",
+        "phpspec/prophecy": "^1.22"
     },
     "autoload": {
         "psr-4": {

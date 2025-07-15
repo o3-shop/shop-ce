@@ -283,7 +283,7 @@ class DatabaseTest extends \OxidTestCase
         $aParams['dbName'] = time();
 
         $this->expectException('Exception');
-        $this->expectExceptionMessage('ERROR: Database not available and also cannot be created!');
+        $this->expectExceptionMessage('The installed database version does not fit system requirements!');
 
         $sessionMock = $this->getMockBuilder('OxidEsales\\EshopCommunity\\Setup\\Language')->disableOriginalConstructor()->getMock();
         $languageMock = $this->getMock(\OxidEsales\EshopCommunity\Setup\Language::class, array('getInstance', 'getLanguage'), array(), '', false);

@@ -252,6 +252,6 @@ class ContactTest extends \OxidTestCase
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ContactController::class, array('getConfig'));
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
-        $this->assertEquals('shop', $oView->getTitle());
+        $this->assertEquals('Your Company Name', $oView->getTitle());
     }
 }

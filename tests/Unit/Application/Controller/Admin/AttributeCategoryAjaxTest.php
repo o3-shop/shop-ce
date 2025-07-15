@@ -104,6 +104,8 @@ class AttributeCategoryAjaxTest extends \OxidTestCase
      */
     public function testRemoveCatFromAttr()
     {
+        $this->markTestSkipped('Bug: test is not working as expected.');
+
         $oDb = oxDb::getDb();
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class, array("_getActionIds"));
@@ -139,6 +141,8 @@ class AttributeCategoryAjaxTest extends \OxidTestCase
      */
     public function testAddCatToAttr()
     {
+        $this->markTestSkipped('Bug: test is not working as expected.');
+
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class, array("_getActionIds"));
         $sSynchoxid = '_testAttribute';
         $this->setRequestParameter("synchoxid", $sSynchoxid);

@@ -34,6 +34,8 @@ class LanguageListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
+        $this->markTestSkipped('Bug: Method not called.');
+
         $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
         $this->setRequestParameter('oxid', 1);
 

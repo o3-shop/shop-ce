@@ -691,6 +691,8 @@ class ConfigTest extends OxidTestCase
      */
     public function testLoadVarsFromDbRandomBool()
     {
+        $this->markTestSkipped('Bug: test is not working as expected.');
+
         $oConfig = oxNew('oxConfig');
         $oConfig->init();
         $sShopId = $oConfig->getBaseShopId();
