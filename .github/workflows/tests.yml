@@ -142,17 +142,31 @@ jobs:
         run: |
           CURRENT_DIR=$(pwd)
           echo "Current directory: $CURRENT_DIR"
-          
+
           php $CURRENT_DIR/vendor/bin/phpunit \
             --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
             -c $CURRENT_DIR/tests/phpunit.xml \
             $CURRENT_DIR/tests/Unit \
             --colors=always \
-            --coverage-clover=coverage.xml \ || exit 0
+            --coverage-clover=coverage.xml \
+            --coverage-html=coverage-html/ || exit 0
+
+      - name: Check coverage files
+        run: |
+          echo "Checking for coverage files..."
+          if [ -f coverage.xml ]; then
+            echo "✅ coverage.xml exists"
+            ls -la coverage.xml
+          else
+            echo "❌ coverage.xml does not exist"
+          fi
           
-          ls -la
-          
-          cat coverage.xml || echo "No coverage file generated"
+          if [ -d coverage-html ]; then
+            echo "✅ coverage-html directory exists"
+            ls -la coverage-html/
+          else
+            echo "❌ coverage-html directory does not exist"
+          fi
 
       - name: Upload coverage HTML report
         uses: actions/upload-artifact@v4
