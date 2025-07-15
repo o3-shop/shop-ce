@@ -92,10 +92,6 @@ jobs:
         run: |
           mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
 
-      - name: Setup o3-shop
-        run: |
-          bin/o3-setup
-
       - name: Run PHPUnit tests with coverage
         env:
           DB_HOST: 127.0.0.1
