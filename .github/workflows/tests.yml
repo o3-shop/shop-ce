@@ -103,6 +103,8 @@ jobs:
           DB_DATABASE: o3shop_test
           DB_USERNAME: root
           DB_PASSWORD: root
+          OXID_THEME: flow
+          OXID_CUSTOM_THEME: flow
         run: |
           CURRENT_DIR=$(pwd)
           echo "Current directory: $CURRENT_DIR"
