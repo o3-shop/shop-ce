@@ -43,7 +43,7 @@ jobs:
           echo "Attempting to install dependencies..."
           
           # Try normal install first
-          if composer install --prefer-dist --no-progress; then
+          if COMPOSER_ROOT_VERSION=${{ github.ref_name }} composer install --prefer-dist --no-progress; then
             echo "Dependencies installed successfully"
           else
             echo "Installation failed, updating lock file..."
