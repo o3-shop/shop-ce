@@ -21,7 +21,8 @@ jobs:
 
       - name: Build and start services
         run: |
-          ./docker.sh start
+          cd docker
+          docker-compose up -d --build
           
           # Wait for database to be ready
           docker-compose exec -T db bash -c "
