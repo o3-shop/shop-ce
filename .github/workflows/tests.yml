@@ -47,21 +47,14 @@ jobs:
           
           echo "Branch name: $BRANCH_NAME"
           
-          # Set version based on branch pattern
           if [[ "$BRANCH_NAME" == "main" ]]; then
             VERSION="1.4.x-dev"
           elif [[ "$BRANCH_NAME" == *"1.4"* ]]; then
             VERSION="1.4.x-dev"
           elif [[ "$BRANCH_NAME" == *"1.3"* ]]; then
             VERSION="1.3.x-dev"
-          elif [[ "$BRANCH_NAME" == *"7.0"* ]]; then
-            VERSION="7.0.x-dev"
-          elif [[ "$BRANCH_NAME" == *"6.5"* ]]; then
-            VERSION="6.5.x-dev"
-          elif [[ "$BRANCH_NAME" == *"6.4"* ]]; then
-            VERSION="6.4.x-dev"
           else
-            VERSION="1.4.x-dev"  # Default version for all other branches
+            VERSION="1.4.x-dev"
           fi
           
           echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
@@ -100,11 +93,13 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
         run: |
-          pwd
-          php vendor/bin/phpunit \
-            --bootstrap /var/www/html/vendor/o3-shop/testing-library/bin/../bootstrap.php \
-            -c '/var/www/html/tests/phpunit.xml' \
-            '/var/www/html/tests/Unit' \
+          CURRENT_DIR=$(pwd)
+          echo "Current directory: $CURRENT_DIR"
+          
+          php $CURRENT_DIR/vendor/bin/phpunit \
+            --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
+            -c $CURRENT_DIR/tests/phpunit.xml \
+            $CURRENT_DIR/tests/Unit \
             --colors=always \
             --coverage-clover=coverage.xml \
             --coverage-html=coverage-html \
@@ -128,7 +123,6 @@ jobs:
       - name: Generate coverage summary
         run: |
           if [ -f coverage.xml ]; then
-            # Extract coverage percentage from coverage.xml
             COVERAGE=$(php -r "
               \$xml = simplexml_load_file('coverage.xml');
               \$metrics = \$xml->project->metrics;
