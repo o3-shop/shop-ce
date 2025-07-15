@@ -1,0 +1,104 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mariadb:
+        image: mariadb:10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: o3shop_test
+          MYSQL_USER: o3shop
+          MYSQL_PASSWORD: o3shop
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    strategy:
+      matrix:
+        php-versions: ['8.1', '8.2', '8.3']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
+        coverage: xdebug
+    
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+    
+    - name: Wait for MariaDB
+      run: |
+        until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
+          echo 'Waiting for MariaDB...'
+          sleep 1
+        done
+    
+    - name: Setup database
+      run: |
+        mysql -h 127.0.0.1 -P 3306 -u root -proot -e "SHOW DATABASES;"
+        mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+    
+    - name: Run PHPUnit tests with coverage
+      env:
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_DATABASE: o3shop_test
+        DB_USERNAME: root
+        DB_PASSWORD: root
+      run: |
+        php /var/www/html/vendor/o3-shop/testing-library/../../../vendor//bin/phpunit \
+          --bootstrap /var/www/html/vendor/o3-shop/testing-library/bin/../bootstrap.php \
+          -c '/var/www/html/tests/phpunit.xml' \
+          '/var/www/html/tests/Unit' \
+          --colors=always \
+          --coverage-clover=coverage.xml \
+          --coverage-html=coverage-html \
+          --coverage-text
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+    
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report-php${{ matrix.php-versions }}
+        path: coverage-html/
+    
+    - name: Coverage Badge
+      uses: tj-actions/coverage-badge-php@v1
+      with:
+        coverage: ./coverage.xml
+    
+    - name: Comment coverage on PR
+      if: github.event_name == 'pull_request'
+      uses: romeovs/lcov-reporter-action@v0.3.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ./coverage.xml
