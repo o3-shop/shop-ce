@@ -38,7 +38,7 @@ jobs:
     
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -78,27 +78,40 @@ jobs:
           --coverage-text
     
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: true
+        token: ${{ secrets.CODECOV_TOKEN }}
     
     - name: Upload coverage HTML report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report-php${{ matrix.php-versions }}
         path: coverage-html/
     
-    - name: Coverage Badge
-      uses: tj-actions/coverage-badge-php@v1
-      with:
-        coverage: ./coverage.xml
+    - name: Generate coverage badge
+      run: |
+        # Extract coverage percentage from coverage.xml
+        COVERAGE=$(php -r "
+          \$xml = simplexml_load_file('coverage.xml');
+          \$metrics = \$xml->project->metrics;
+          \$covered = (int)\$metrics['coveredstatements'];
+          \$total = (int)\$metrics['statements'];
+          \$percentage = \$total > 0 ? round((\$covered / \$total) * 100, 2) : 0;
+          echo \$percentage;
+        ")
+        echo "Coverage: ${COVERAGE}%"
+        echo "COVERAGE_PERCENTAGE=${COVERAGE}" >> $GITHUB_ENV
     
-    - name: Comment coverage on PR
-      if: github.event_name == 'pull_request'
-      uses: romeovs/lcov-reporter-action@v0.3.1
+    - name: Create coverage badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage.xml
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: your-gist-id
+        filename: coverage-badge.json
+        label: Coverage
+        message: ${{ env.COVERAGE_PERCENTAGE }}%
+        color: ${{ env.COVERAGE_PERCENTAGE > 80 && 'green' || env.COVERAGE_PERCENTAGE > 60 && 'yellow' || 'red' }}
