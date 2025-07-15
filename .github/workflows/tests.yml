@@ -130,5 +130,5 @@ jobs:
           O3SHOP_CONF_DBPWD: o3shop
           O3SHOP_CONF_DBROOT: root
         run: |
-          chmod +x ./run-tests.sh
-          ./run-tests.sh
+          vendor/o3-shop/testing-library/bin/runtests /var/www/html/tests/Unit --colors=always
+
