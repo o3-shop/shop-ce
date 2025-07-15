@@ -48,7 +48,7 @@
         "o3-shop/shop-facts": "^v1.0.0"
     },
     "require-dev": {
-        "o3-shop/testing-library": "^v1.0.0",
+        "o3-shop/testing-library": "dev-b-1.1",
         "incenteev/composer-parameter-handler": "~v2.0",
         "o3-shop/shop-ide-helper": "^v1.0.0",
         "squizlabs/php_codesniffer": "^3.5.4",
