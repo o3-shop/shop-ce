@@ -69,6 +69,9 @@ jobs:
             log_errors=On
             error_log=/tmp/php_errors.log
 
+      - name: Install Composer dependencies
+        run: COMPOSER_ROOT_VERSION=dev-main composer install --no-interaction --optimize-autoloader
+
       - name: Create environment file
         run: |
           cp .env.ci .env
