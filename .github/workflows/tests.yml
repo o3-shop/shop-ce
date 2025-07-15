@@ -10,6 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2']
+      fail-fast: false
+
     services:
       mariadb:
         image: mariadb:10
@@ -25,12 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
-          coverage: xdebug
+          coverage: pcov
 
       - name: Install Composer 2.2
         run: |
@@ -39,6 +44,7 @@ jobs:
           php -r "unlink('composer-setup.php');"
           sudo mv composer.phar /usr/local/bin/composer
           composer --version
+
       - name: Set dynamic version based on branch
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
@@ -60,14 +66,16 @@ jobs:
           
           echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Using version: $VERSION"
+
       - name: Cache Composer packages
         id: composer-cache
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-php-
+            ${{ runner.os }}-php-${{ matrix.php-version }}-
+
       - name: Install dependencies
         env:
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
@@ -77,6 +85,7 @@ jobs:
         run: |
           cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
+
       - name: Install theme
         run: |
           echo "${YELLOW}Installing Wave theme...${NC}"
@@ -117,11 +126,13 @@ jobs:
             echo 'Waiting for MariaDB...'
             sleep 1
           done
+
       - name: Setup database
         run: |
           mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+
       - name: Run PHPUnit tests with coverage
-        continue-on-error: true  # Add this line
+        continue-on-error: true
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
@@ -139,19 +150,15 @@ jobs:
             --colors=always \
             --coverage-clover=coverage.xml \
             --coverage-text
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          
+          ls -la
+          
+          cat coverage.xml || echo "No coverage file generated"
 
       - name: Upload coverage HTML report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-report-php-${{ matrix.php-version }}
           path: coverage-html/
 
       - name: Generate coverage summary
@@ -165,12 +172,13 @@ jobs:
               \$percentage = \$total > 0 ? round((\$covered / \$total) * 100, 2) : 0;
               echo \$percentage;
             ")
-            echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "## Coverage Report (PHP ${{ matrix.php-version }})" >> $GITHUB_STEP_SUMMARY
             echo "**Coverage: ${COVERAGE}%**" >> $GITHUB_STEP_SUMMARY
             echo "COVERAGE_PERCENTAGE=${COVERAGE}" >> $GITHUB_ENV
           else
             echo "No coverage file found"
           fi
+
       - name: Comment coverage on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -178,7 +186,7 @@ jobs:
           script: |
             const coverage = process.env.COVERAGE_PERCENTAGE;
             if (coverage) {
-              const body = `## 📊 Coverage Report
+              const body = `## 📊 Coverage Report (PHP ${{ matrix.php-version }})
             
               **Coverage: ${coverage}%**
             
