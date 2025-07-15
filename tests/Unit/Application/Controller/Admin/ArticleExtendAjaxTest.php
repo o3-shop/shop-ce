@@ -196,7 +196,7 @@ class ArticleExtendAjaxTest extends \OxidTestCase
     public function testGetDataFieldsFalse()
     {
         $oView = oxNew('article_extend_ajax');
-        $this->assertEquals(array(array('false' => 0)), $oView->UNITgetDataFields('select false'));
+        $this->assertEquals(array(array('FALSE' => 0)), $oView->UNITgetDataFields('select FALSE'));
     }
 
     /**
