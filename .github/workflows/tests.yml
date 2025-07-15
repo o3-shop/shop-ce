@@ -74,6 +74,11 @@ jobs:
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
         run: composer install --prefer-dist --no-progress
 
+      - name: Copy config files
+        run: |
+          cp .env.example .env
+          cp source/config.inc.php.dist source/config.inc.php
+
       - name: Wait for MariaDB
         run: |
           until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
