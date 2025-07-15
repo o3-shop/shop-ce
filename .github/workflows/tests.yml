@@ -13,19 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create environment file
+      - name: Install Docker Compose
         run: |
-          cat > .env << EOF
-          O3SHOP_CONF_DBHOST=db
-          O3SHOP_CONF_DBNAME=o3shop_test
-          O3SHOP_CONF_DBUSER=root
-          O3SHOP_CONF_DBPWD=root
-          O3SHOP_CONF_DBROOT=root
-          EOF
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
 
       - name: Build and start services
         run: |
-          docker-compose -f docker-compose.yml up -d db
+          ./docker.sh start
           
           # Wait for database to be ready
           docker-compose exec -T db bash -c "
@@ -34,54 +30,15 @@ jobs:
               sleep 2
             done
           "
-
-      - name: Setup test database
-        run: |
-          docker-compose exec -T db mysql -u root -proot -e "
-            CREATE DATABASE IF NOT EXISTS o3shop_test;
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;
-          "
+          
+          until [ "$(docker inspect --format='{{.State.Health.Status}}' o3shop-app)" == "healthy" ]; do
+            echo 'Waiting for O3-Shop setup to complete...'
+            sleep 10
+          done
 
       - name: Run PHPUnit tests in container
         run: |
-          docker-compose run --rm web bash -c "
-            composer install --no-dev --prefer-dist --no-progress
-          
-            php vendor/bin/phpunit \
-              --bootstrap vendor/o3-shop/testing-library/bootstrap.php \
-              -c tests/phpunit.xml \
-              tests/Unit \
-              --colors=always \
-              --coverage-clover=coverage.xml \
-              --coverage-html=coverage-html \
-              --coverage-text
-          "
-
-      - name: Copy coverage files from container
-        run: |
-          docker-compose run --rm web bash -c "
-            cp coverage.xml /tmp/coverage.xml
-            cp -r coverage-html /tmp/coverage-html
-          "
-          
-          # Copy files to host
-          docker cp $(docker-compose ps -q web):/tmp/coverage.xml ./coverage.xml
-          docker cp $(docker-compose ps -q web):/tmp/coverage-html ./coverage-html
-
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage.xml
-          flags: unittests
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload coverage HTML report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage-html/
+          docker exec o3shop-app ./run-tests.sh
 
       - name: Cleanup
         if: always()
