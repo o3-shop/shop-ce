@@ -79,7 +79,7 @@ jobs:
           cp source/config.inc.php.dist source/config.inc.php
       - name: Install theme
         run: |
-          log "${YELLOW}Installing Wave theme...${NC}"
+          echo "${YELLOW}Installing Wave theme...${NC}"
     
           # Check if theme is already installed
           if [ -d "source/Application/views/wave" ] && [ "$(ls -A source/Application/views/wave)" ]; then
@@ -109,7 +109,7 @@ jobs:
           rm -rf wave-theme-main
           rm main.zip
     
-          ehco "${GREEN}Wave theme installed successfully${NC}"
+          echo "${GREEN}Wave theme installed successfully${NC}"
       - name: Wait for MariaDB
         run: |
           until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
