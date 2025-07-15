@@ -149,7 +149,6 @@ jobs:
             $CURRENT_DIR/tests/Unit \
             --colors=always \
             --coverage-clover=coverage.xml \
-            --coverage-text
           
           ls -la
           
