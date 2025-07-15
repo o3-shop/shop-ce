@@ -21,22 +21,14 @@ jobs:
 
       - name: Build and start services
         run: |
-          echo 'O3SHOP_CONF_DBUSER="o3shop"' > docker/.env
-          echo 'O3SHOP_CONF_DBPWD="o3shop"'  > docker/.env
-          echo 'O3SHOP_CONF_DBROOT="supersecret"' > docker/.env
-          echo 'O3SHOP_CONF_DBNAME="o3shop"' > docker/.env
+          echo 'O3SHOP_CONF_DBUSER="o3shop"' >> docker/.env
+          echo 'O3SHOP_CONF_DBPWD="o3shop"'  >> docker/.env
+          echo 'O3SHOP_CONF_DBROOT="supersecret"' >> docker/.env
+          echo 'O3SHOP_CONF_DBNAME="o3shop"' >> docker/.env
           # Start Docker Compose services
 
           cd docker
           docker-compose up -d --build
-          
-          # Wait for database to be ready
-          docker-compose exec -T db bash -c "
-            until mysqladmin ping -h localhost -u root -proot --silent; do
-              echo 'Waiting for MariaDB...'
-              sleep 2
-            done
-          "
           
           until [ "$(docker inspect --format='{{.State.Health.Status}}' o3shop-app)" == "healthy" ]; do
             echo 'Waiting for O3-Shop setup to complete...'
