@@ -81,35 +81,46 @@ jobs:
           done
           echo 'MySQL is ready!'
 
-      - name: Modify entrypoint script for GitHub Actions
+      - name: Install theme
         run: |
-          # Create a backup of the original entrypoint
-          cp docker/entrypoint.sh docker/entrypoint.sh.backup
-          
-          # Replace DB_HOST="db" with DB_HOST="127.0.0.1"
-          sed -i 's/local DB_HOST="db"/local DB_HOST="127.0.0.1"/g' docker/entrypoint.sh
-          
-          # Make sure the script is executable
-          chmod +x docker/entrypoint.sh
-          
-          # Show what changed
-          echo "Entrypoint script modified:"
-          grep -n "DB_HOST" docker/entrypoint.sh || true
-
-      - name: Execute Docker entrypoint
-        env:
-          O3SHOP_CONF_DBHOST: 127.0.0.1
-          O3SHOP_CONF_DBNAME: o3shop
-          O3SHOP_CONF_DBUSER: o3shop
-          O3SHOP_CONF_DBPWD: o3shop
-          O3SHOP_CONF_DBROOT: root
-        run: |
-          ./docker/entrypoint.sh
+          CURRENT_DIR=$(pwd)
+          echo "Current directory: $CURRENT_DIR"
+          log "${YELLOW}Installing Wave theme...${NC}"
+    
+          # Check if theme is already installed
+          if [ -d "source/Application/views/wave" ] && [ "$(ls -A source/Application/views/wave)" ]; then
+            log "Wave theme appears to be already installed, skipping"
+            return 0
+          fi
+    
+          # Download theme
+          log "Downloading theme from GitHub..."
+          wget -q https://github.com/o3-shop/wave-theme/archive/refs/heads/main.zip -O main.zip || handle_error "Failed to download theme"
+    
+          # Extract theme
+          log "Extracting theme..."
+          unzip -q main.zip || handle_error "Failed to extract theme archive"
+    
+          # Copy theme files
+          log "Copying theme files to appropriate directories..."
+          mkdir -p source/out/ || handle_error "Failed to create out directory"
+          cp -r wave-theme-main/out/* source/out/ || handle_error "Failed to copy theme out files"
+    
+          mkdir -p source/Application/views/wave || handle_error "Failed to create theme views directory"
+          rm -rf wave-theme-main/out
+          cp -r wave-theme-main/* source/Application/views/wave || handle_error "Failed to copy theme view files"
+    
+          # Clean up
+          log "Cleaning up temporary files..."
+          rm -rf wave-theme-main
+          rm main.zip
+    
+          log "${GREEN}Wave theme installed successfully${NC}"
 
       - name: Run tests
         env:
           O3SHOP_CONF_DBHOST: 127.0.0.1
-          O3SHOP_CONF_DBNAME: o3shop_test
+          O3SHOP_CONF_DBNAME: o3shop
           O3SHOP_CONF_DBUSER: o3shop
           O3SHOP_CONF_DBPWD: o3shop
           O3SHOP_CONF_DBROOT: root
