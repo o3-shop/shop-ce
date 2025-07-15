@@ -48,9 +48,7 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        env:
-          COMPOSER_ROOT_VERSION: ${{ github.ref_name }}
-        run: composer install --prefer-dist --no-progress
+        run: COMPOSER_ROOT_VERSION=${{ github.ref_name }} composer install --prefer-dist --no-progress
 
       - name: Wait for MariaDB
         run: |
