@@ -1,138 +1,161 @@
-name: PHP Tests
+name: PHPUnit Tests
 
 on:
   push:
-    branches: [ "*" ]
+    branches: ['**']
   pull_request:
-    branches: [ "*" ]
+    branches: ['**']
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     services:
-      db:
-        image: mysql:8.0
+      mariadb:
+        image: mariadb:10
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: o3shop
+          MYSQL_DATABASE: o3shop_test
           MYSQL_USER: o3shop
           MYSQL_PASSWORD: o3shop
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y \
-            libjpeg-dev \
-            libpng-dev \
-            libfreetype6-dev \
-            libxml2-dev \
-            libcurl4-openssl-dev \
-            libonig-dev \
-            libzip-dev \
-            libssl-dev \
-            zlib1g-dev \
-            libicu-dev \
-            libxslt1-dev \
-            libbz2-dev \
-            libreadline-dev \
-            g++ \
-            unzip \
-            git \
-            nano \
-            wget \
-            default-mysql-client
-
-      - name: Setup PHP 8.2
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: pdo, pdo_mysql, mysqli, gd, mbstring, curl, bcmath, soap, bz2, intl, opcache, calendar, exif, zip
-          tools: composer:2.2
-          ini-values: |
-            date.timezone=Europe/Berlin
-            memory_limit=11000M
-            upload_max_filesize=100M
-            post_max_size=100M
-            error_reporting=E_ALL
-            display_errors=On
-            log_errors=On
-            error_log=/tmp/php_errors.log
+          extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
+          coverage: xdebug
 
-      - name: Install Composer dependencies
-        run: COMPOSER_ROOT_VERSION=dev-main composer install --no-interaction --optimize-autoloader
+      - name: Install Composer 2.2
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --version=2.2.21
+          php -r "unlink('composer-setup.php');"
+          sudo mv composer.phar /usr/local/bin/composer
+          composer --version
+      - name: Set dynamic version based on branch
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH_NAME="${{ github.head_ref }}"
+          fi
+          
+          echo "Branch name: $BRANCH_NAME"
+          
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            VERSION="1.4.x-dev"
+          elif [[ "$BRANCH_NAME" == *"1.4"* ]]; then
+            VERSION="1.4.x-dev"
+          elif [[ "$BRANCH_NAME" == *"1.3"* ]]; then
+            VERSION="1.3.x-dev"
+          else
+            VERSION="1.4.x-dev"
+          fi
+          
+          echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Using version: $VERSION"
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+      - name: Install dependencies
+        env:
+          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+        run: composer install --prefer-dist --no-progress
 
-      - name: Create environment file
+      - name: Copy config files
         run: |
           cp .env.ci .env
-
-      - name: Wait for MySQL to be ready
+          cp source/config.inc.php.dist source/config.inc.php
+      - name: Wait for MariaDB
         run: |
           until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
-            echo 'Waiting for MySQL to be ready...'
-            sleep 2
+            echo 'Waiting for MariaDB...'
+            sleep 1
           done
-          echo 'MySQL is ready!'
-
-      - name: Install theme
+      - name: Setup database
         run: |
-          GREEN='\033[0;32m'
-          BLUE='\033[0;34m'
-          YELLOW='\033[1;33m'
-          RED='\033[0;31m'
-          NC='\033[0m' # No Color
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+      - name: Run PHPUnit tests with coverage
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: o3shop_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: |
           CURRENT_DIR=$(pwd)
           echo "Current directory: $CURRENT_DIR"
-          echo "${YELLOW}Installing Wave theme...${NC}"
-    
-          # Check if theme is already installed
-          if [ -d "source/Application/views/wave" ] && [ "$(ls -A source/Application/views/wave)" ]; then
-            echo "Wave theme appears to be already installed, skipping"
-            return 0
-          fi
-    
-          # Download theme
-          echo "Downloading theme from GitHub..."
-          wget -q https://github.com/o3-shop/wave-theme/archive/refs/heads/main.zip -O main.zip || handle_error "Failed to download theme"
-    
-          # Extract theme
-          echo "Extracting theme..."
-          unzip -q main.zip || handle_error "Failed to extract theme archive"
-    
-          # Copy theme files
-          echo "Copying theme files to appropriate directories..."
-          mkdir -p source/out/ || handle_error "Failed to create out directory"
-          cp -r wave-theme-main/out/* source/out/ || handle_error "Failed to copy theme out files"
-    
-          mkdir -p source/Application/views/wave || handle_error "Failed to create theme views directory"
-          rm -rf wave-theme-main/out
-          cp -r wave-theme-main/* source/Application/views/wave || handle_error "Failed to copy theme view files"
-    
-          # Clean up
-          echo "Cleaning up temporary files..."
-          rm -rf wave-theme-main
-          rm main.zip
-    
-          echo "${GREEN}Wave theme installed successfully${NC}"
+          
+          php $CURRENT_DIR/vendor/bin/phpunit \
+            --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
+            -c $CURRENT_DIR/tests/phpunit.xml \
+            $CURRENT_DIR/tests/Unit \
+            --colors=always \
+            --coverage-clover=coverage.xml \
+            --coverage-html=coverage-html \
+            --coverage-text
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Run tests
-        env:
-          O3SHOP_CONF_DBHOST: 127.0.0.1
-          O3SHOP_CONF_DBNAME: o3shop
-          O3SHOP_CONF_DBUSER: o3shop
-          O3SHOP_CONF_DBPWD: o3shop
-          O3SHOP_CONF_DBROOT: root
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-html/
+
+      - name: Generate coverage summary
         run: |
-          php -d display_errors=on -d display_startup_errors=on -d error_reporting=E_ALL vendor/o3-shop/testing-library/bin/runtests /var/www/html/tests/Unit --colors=always
-
-
+          if [ -f coverage.xml ]; then
+            COVERAGE=$(php -r "
+              \$xml = simplexml_load_file('coverage.xml');
+              \$metrics = \$xml->project->metrics;
+              \$covered = (int)\$metrics['coveredstatements'];
+              \$total = (int)\$metrics['statements'];
+              \$percentage = \$total > 0 ? round((\$covered / \$total) * 100, 2) : 0;
+              echo \$percentage;
+            ")
+            echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage: ${COVERAGE}%**" >> $GITHUB_STEP_SUMMARY
+            echo "COVERAGE_PERCENTAGE=${COVERAGE}" >> $GITHUB_ENV
+          else
+            echo "No coverage file found"
+          fi
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const coverage = process.env.COVERAGE_PERCENTAGE;
+            if (coverage) {
+              const body = `## 📊 Coverage Report
+            
+              **Coverage: ${coverage}%**
+            
+              ${coverage >= 80 ? '✅ Great coverage!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage'}
+            
+              [View detailed coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
