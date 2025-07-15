@@ -54,6 +54,7 @@ start_containers() {
 | Admin URL      | http://localhoat:8080/admin/ |
 | Admin Login    | admin@example.com            |
 | Admin Password | admin123                     |"
+      return 0
     else
         echo "Error: Failed to start Docker containers"
         exit 1
