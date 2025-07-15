@@ -38,27 +38,19 @@ jobs:
           sudo mv composer.phar /usr/local/bin/composer
           composer --version
 
-      - name: Resolve dependency conflicts
-        run: |
-          echo "Attempting to install dependencies..."
-          
-          # Try normal install first
-          if COMPOSER_ROOT_VERSION=${{ github.ref_name }} composer install --prefer-dist --no-progress; then
-            echo "Dependencies installed successfully"
-          else
-            echo "Installation failed, updating lock file..."
-          
-            # Update the lock file to resolve version conflicts
-            composer update --lock --no-scripts
-          
-            # Try install again
-            if composer install --prefer-dist --no-progress; then
-              echo "Dependencies installed after lock update"
-            else
-              echo "Still failing, trying full update..."
-              composer update --prefer-dist --no-progress --with-dependencies
-            fi
-          fi
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        env:
+          COMPOSER_ROOT_VERSION: ${{ github.ref_name }}
+        run: composer install --prefer-dist --no-progress
 
       - name: Wait for MariaDB
         run: |
@@ -66,6 +58,10 @@ jobs:
             echo 'Waiting for MariaDB...'
             sleep 1
           done
+
+      - name: Setup database
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
 
       - name: Run PHPUnit tests with coverage
         env:
@@ -75,9 +71,68 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
         run: |
-          php vendor/bin/phpunit \
-            --bootstrap vendor/o3-shop/testing-library/bootstrap.php \
-            -c tests/phpunit.xml \
-            tests/Unit \
+          php /var/www/html/vendor/o3-shop/testing-library/../../../vendor//bin/phpunit \
+            --bootstrap /var/www/html/vendor/o3-shop/testing-library/bin/../bootstrap.php \
+            -c '/var/www/html/tests/phpunit.xml' \
+            '/var/www/html/tests/Unit' \
             --colors=always \
+            --coverage-clover=coverage.xml \
+            --coverage-html=coverage-html \
             --coverage-text
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-html/
+
+      - name: Generate coverage summary
+        run: |
+          if [ -f coverage.xml ]; then
+            # Extract coverage percentage from coverage.xml
+            COVERAGE=$(php -r "
+              \$xml = simplexml_load_file('coverage.xml');
+              \$metrics = \$xml->project->metrics;
+              \$covered = (int)\$metrics['coveredstatements'];
+              \$total = (int)\$metrics['statements'];
+              \$percentage = \$total > 0 ? round((\$covered / \$total) * 100, 2) : 0;
+              echo \$percentage;
+            ")
+            echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage: ${COVERAGE}%**" >> $GITHUB_STEP_SUMMARY
+            echo "COVERAGE_PERCENTAGE=${COVERAGE}" >> $GITHUB_ENV
+          else
+            echo "No coverage file found"
+          fi
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const coverage = process.env.COVERAGE_PERCENTAGE;
+            if (coverage) {
+              const body = `## 📊 Coverage Report
+            
+              **Coverage: ${coverage}%**
+            
+              ${coverage >= 80 ? '✅ Great coverage!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage'}
+            
+              [View detailed coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
