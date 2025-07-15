@@ -38,6 +38,35 @@ jobs:
           sudo mv composer.phar /usr/local/bin/composer
           composer --version
 
+      - name: Set dynamic version based on branch
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH_NAME="${{ github.head_ref }}"
+          fi
+          
+          echo "Branch name: $BRANCH_NAME"
+          
+          # Set version based on branch pattern
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            VERSION="1.4.x-dev"
+          elif [[ "$BRANCH_NAME" == *"1.4"* ]]; then
+            VERSION="1.4.x-dev"
+          elif [[ "$BRANCH_NAME" == *"1.3"* ]]; then
+            VERSION="1.3.x-dev"
+          elif [[ "$BRANCH_NAME" == *"7.0"* ]]; then
+            VERSION="7.0.x-dev"
+          elif [[ "$BRANCH_NAME" == *"6.5"* ]]; then
+            VERSION="6.5.x-dev"
+          elif [[ "$BRANCH_NAME" == *"6.4"* ]]; then
+            VERSION="6.4.x-dev"
+          else
+            VERSION="1.4.x-dev"  # Default version for all other branches
+          fi
+          
+          echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Using version: $VERSION"
+
       - name: Cache Composer packages
         id: composer-cache
         uses: actions/cache@v4
@@ -48,7 +77,9 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: COMPOSER_ROOT_VERSION=${{ github.ref_name }} composer install --prefer-dist --no-progress
+        env:
+          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+        run: composer install --prefer-dist --no-progress
 
       - name: Wait for MariaDB
         run: |
