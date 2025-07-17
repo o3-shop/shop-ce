@@ -149,7 +149,7 @@ class UtilitiesTest extends \OxidTestCase
 
         print_r($_ENV);
         print_r($_SERVER);
-        echo getenv('YOUR_VAR');
+        echo getenv('O3SHOP_CONF_DBHOST');
 
         // ENV is not always filled in..
         if (count($_ENV)) {

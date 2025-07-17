@@ -344,6 +344,8 @@ class Utilities extends Core
      */
     public function getEnvVar($sVarName)
     {
+        print_r($_ENV);
+        echo getenv('O3SHOP_CONF_DBHOST');
         var_dump(getenv($sVarName));
         var_dump($sVarName);
         if (($sVarVal = getenv($sVarName)) !== false) {
