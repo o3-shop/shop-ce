@@ -85,6 +85,8 @@ jobs:
         run: |
           cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
+          
+          cat .env
 
       - name: Install theme
         run: |
@@ -133,8 +135,6 @@ jobs:
 
       - name: Run PHPUnit tests with coverage
         continue-on-error: true
-        env:
-          O3SHOP_CONF_DBHOST: 127.0.0.1
         run: |
           CURRENT_DIR=$(pwd)
           echo "Current directory: $CURRENT_DIR"
@@ -145,7 +145,7 @@ jobs:
           $CURRENT_DIR/tests/Unit \
           --colors=always \
           --coverage-clover="$CURRENT_DIR/coverage.xml" \
-          --coverage-html="$CURRENT_DIR/coverage-html/" 
+          --coverage-html="$CURRENT_DIR/coverage-html/" \
           --filter testGetEnvVar || exit 0
 
       - name: Find coverage files
