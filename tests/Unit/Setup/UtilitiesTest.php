@@ -146,6 +146,11 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testGetEnvVar()
     {
+
+        print_r($_ENV);
+        print_r($_SERVER);
+        echo getenv('YOUR_VAR');
+
         // ENV is not always filled in..
         if (count($_ENV)) {
             $sValue = current($_ENV);
