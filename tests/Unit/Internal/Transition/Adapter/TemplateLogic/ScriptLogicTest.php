@@ -64,8 +64,18 @@ class ScriptLogicTest extends TestCase
 
     public function testIncludeFileNotExists(): void
     {
-        $this->expectException(\Exception::class); // or specific exception type
+        $triggeredWarning = false;
+
+        set_error_handler(function($errno, $errstr) use (&$triggeredWarning) {
+            if ($errno === E_USER_WARNING && strpos($errstr, '{oxscript}') !== false) {
+                $triggeredWarning = true;
+            }
+        });
+
         $this->scriptLogic->include('somescript.js');
+        restore_error_handler();
+
+        $this->assertTrue($triggeredWarning, 'Expected warning was not triggered.');
     }
 
 

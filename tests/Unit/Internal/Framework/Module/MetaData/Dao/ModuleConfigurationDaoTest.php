@@ -28,9 +28,11 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfi
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataToModuleConfigurationDataMapperInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProviderInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class ModuleConfigurationDaoTest extends TestCase
 {
+    use ProphecyTrait;
     /**
      * @var string
      */

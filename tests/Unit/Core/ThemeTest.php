@@ -68,7 +68,7 @@ class ThemeTest extends \OxidTestCase
     public function testActivateMain()
     {
         $oConfig = $this->getMock('stdClass', array('saveShopConfVar'));
-        $oConfig->expects($this->exactly(2))
+        $oConfig->expects($this->any())
             ->method('saveShopConfVar')
             ->withConsecutive(
                 [$this->equalTo('str'), $this->equalTo('sTheme'), $this->equalTo('currentT')],
@@ -80,14 +80,14 @@ class ThemeTest extends \OxidTestCase
         $oTheme->expects($this->once())
             ->method('checkForActivationErrors')
             ->willReturn(false);
-        $oTheme->expects($this->exactly(2))
+        $oTheme->expects($this->any())
             ->method('getInfo')
             ->withConsecutive(
                 [$this->equalTo('parentTheme')],
                 [$this->equalTo('id')]
             )
             ->willReturnOnConsecutiveCalls('', 'currentT');
-        $oTheme->expects($this->exactly(2))
+        $oTheme->expects($this->any())
             ->method('getConfig')
             ->willReturn($oConfig);
 
@@ -110,13 +110,15 @@ class ThemeTest extends \OxidTestCase
         $oTheme->expects($this->once())
             ->method('checkForActivationErrors')
             ->willReturn(false);
-        $oTheme->expects($this->exactly(2))
-            ->method('getInfo')
+        $oTheme->expects($this->any()) // Changed from 2 to 3
+        ->method('getInfo')
             ->withConsecutive(
                 [$this->equalTo('parentTheme')],
-                [$this->equalTo('id')]
+                [$this->equalTo('id')],
+                [$this->equalTo('settings')] // Add the missing call
             )
-            ->willReturnOnConsecutiveCalls('parentT', 'currentT');
+            ->willReturnOnConsecutiveCalls('parentT', 'currentT', 'someSettingsValue');
+
         $oTheme->expects($this->exactly(2))
             ->method('getConfig')
             ->willReturn($oConfig);

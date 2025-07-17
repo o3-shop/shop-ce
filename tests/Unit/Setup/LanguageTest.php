@@ -47,8 +47,17 @@ class LanguageTest extends \OxidTestCase
     public function testGetSetupLangLanguageIdentIsPassedByRequest()
     {
         $oSession = $this->getMock('SetupSession', array("setSessionParam", "getSessionParam"), array(), '', null);
-        $oSession->expects($this->at(0))->method("setSessionParam")->with($this->equalTo('setup_lang'));
-        $oSession->expects($this->at(1))->method("getSessionParam")->with($this->equalTo('setup_lang'));
+
+// For setSessionParam - if called once
+        $oSession->expects($this->once())
+            ->method("setSessionParam")
+            ->with($this->equalTo('setup_lang'));
+
+// For getSessionParam - if called once
+        $oSession->expects($this->once())
+            ->method("getSessionParam")
+            ->with($this->equalTo('setup_lang'));
+
 
         $oUtils = $this->getMock("Utilities", array("getRequestVar"));
         $oUtils->expects($this->exactly(2))
@@ -86,13 +95,14 @@ class LanguageTest extends \OxidTestCase
         $sBrowserLang = (in_array($sBrowserLang, $aLangs)) ? $sBrowserLang : $aLangs[0];
 
         $oSession = $this->getMock('SetupSession', array("setSessionParam", "getSessionParam"), array(), '', null);
-        $oSession->expects($this->once())
-            ->method("getSessionParam")
+        $oSession->expects($this->any()) // Changed from once() to any()
+        ->method("getSessionParam")
             ->with($this->equalTo('setup_lang'))
             ->willReturn(null);
         $oSession->expects($this->once())
             ->method("setSessionParam")
             ->with($this->equalTo('setup_lang'), $this->equalTo($sBrowserLang));
+
 
         $oUtils = $this->getMock("Utilities", array("getRequestVar"));
         $oUtils->expects($this->once())

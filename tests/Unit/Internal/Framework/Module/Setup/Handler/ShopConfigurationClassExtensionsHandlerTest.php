@@ -34,10 +34,12 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Handler\ShopConfigurationClassExtensionsHandler;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /** @internal */
 final class ShopConfigurationClassExtensionsHandlerTest extends TestCase
 {
+    use ProphecyTrait;
     public function testHandleOnModuleActivationWithInvalidConfigWillSkipExecution(): void
     {
         $shopId = 1;

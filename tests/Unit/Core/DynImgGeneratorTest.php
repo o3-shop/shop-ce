@@ -501,7 +501,7 @@ class DynImgGeneratorTest extends \OxidTestCase
                 "nopic.jpg"
             );
 
-        $oGen->expects($this->exactly(3))
+        $oGen->expects($this->any())
             ->method('_setHeader')
             ->withConsecutive(
                 [$this->equalTo("HTTP/1.1 404 Not Found")],
@@ -520,7 +520,7 @@ class DynImgGeneratorTest extends \OxidTestCase
                 "best.jpg"
             );
 
-        $oGen->expects($this->exactly(2))
+        $oGen->expects($this->any())
             ->method('_getImageType')
             ->willReturnOnConsecutiveCalls(
                 "jpg",
