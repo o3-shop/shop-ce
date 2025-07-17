@@ -345,6 +345,7 @@ class Utilities extends Core
     public function getEnvVar($sVarName)
     {
         var_dump(getenv($sVarName));
+        var_dump($sVarName);
         if (($sVarVal = getenv($sVarName)) !== false) {
             return $sVarVal;
         }
