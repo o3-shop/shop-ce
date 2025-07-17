@@ -220,8 +220,13 @@ class ConfigTest extends OxidTestCase
         oxTestModules::addFunction("oxUtilsServer", "getServerVar", '{ if ( isset($aA[0]) && $aA[0] == "HTTPS" ) { return 1; } else { return array(); } }');
 
         $oConfig = $this->getMock(Config::class, array('getConfigParam'));
-        $oConfig->expects($this->at(0))->method('getConfigParam')->with($this->equalTo('sSSLShopURL'))->will($this->returnValue(''));
-        $oConfig->expects($this->at(1))->method('getConfigParam')->with($this->equalTo('sMallSSLShopURL'))->will($this->returnValue(''));
+        $oConfig->expects($this->exactly(2))
+            ->method('getConfigParam')
+            ->withConsecutive(
+                [$this->equalTo('sSSLShopURL')],
+                [$this->equalTo('sMallSSLShopURL')]
+            )
+            ->willReturnOnConsecutiveCalls('', '');
 
         $this->assertFalse($oConfig->isSsl());
     }
@@ -256,8 +261,13 @@ class ConfigTest extends OxidTestCase
         oxTestModules::addFunction("oxUtilsServer", "getServerVar", '{ if ( isset($aA[0]) && $aA[0] == "HTTPS" ) { return 1; } else { return array(); } }');
 
         $oConfig = $this->getMock(Config::class, array('getConfigParam'));
-        $oConfig->expects($this->at(0))->method('getConfigParam')->with($this->equalTo('sSSLShopURL'))->will($this->returnValue(''));
-        $oConfig->expects($this->at(1))->method('getConfigParam')->with($this->equalTo('sMallSSLShopURL'))->will($this->returnValue('https://subshop/'));
+        $oConfig->expects($this->exactly(2))
+            ->method('getConfigParam')
+            ->withConsecutive(
+                [$this->equalTo('sSSLShopURL')],
+                [$this->equalTo('sMallSSLShopURL')]
+            )
+            ->willReturnOnConsecutiveCalls('', 'https://subshop/');
 
         $this->assertTrue($oConfig->isSsl());
     }
@@ -276,12 +286,16 @@ class ConfigTest extends OxidTestCase
         oxTestModules::addFunction("oxUtilsServer", "getServerVar", '{ if ( isset($aA[0]) && $aA[0] == "HTTPS" ) { return 1; } else { return array(); } }');
 
         $oConfig = $this->getMock(Config::class, array('getConfigParam'));
-        $oConfig->expects($this->at(0))->method('getConfigParam')->with($this->equalTo('sSSLShopURL'))->will($this->returnValue('https://eshop'));
+        $oConfig->expects($this->once())
+            ->method('getConfigParam')
+            ->with($this->equalTo('sSSLShopURL'))
+            ->willReturn('https://eshop');
         $this->assertTrue($oConfig->isSsl());
 
         oxTestModules::cleanUp();
         oxTestModules::addFunction("oxUtilsServer", "getServerVar", '{ if ( isset($aA[0]) && $aA[0] == "HTTPS" ) { return "on"; } else { return array(); } }');
         $this->assertTrue($oConfig->isSsl());
+
     }
 
     /**
@@ -777,31 +791,16 @@ class ConfigTest extends OxidTestCase
     {
         /** @var oxConfig|PHPUnit\Framework\MockObject\MockObject $oConfig */
         $oConfig = $this->getMock(Config::class, array("setConfigParam"));
-        $oConfig->expects($this->at(0))->method('setConfigParam')
-            ->with(
-                $this->equalTo("test1"),
-                $this->equalTo("t1")
+        $oConfig->expects($this->exactly(5))
+            ->method('setConfigParam')
+            ->withConsecutive(
+                [$this->equalTo("test1"), $this->equalTo("t1")],
+                [$this->equalTo("test2"), $this->equalTo(array('x'))],
+                [$this->equalTo("test3"), $this->equalTo(array('x' => 'y'))],
+                [$this->equalTo("test4"), $this->equalTo(true)],
+                [$this->equalTo("test5"), $this->equalTo(false)]
             );
-        $oConfig->expects($this->at(1))->method('setConfigParam')
-            ->with(
-                $this->equalTo("test2"),
-                $this->equalTo(array('x'))
-            );
-        $oConfig->expects($this->at(2))->method('setConfigParam')
-            ->with(
-                $this->equalTo("test3"),
-                $this->equalTo(array('x' => 'y'))
-            );
-        $oConfig->expects($this->at(3))->method('setConfigParam')
-            ->with(
-                $this->equalTo("test4"),
-                $this->equalTo(true)
-            );
-        $oConfig->expects($this->at(4))->method('setConfigParam')
-            ->with(
-                $this->equalTo("test5"),
-                $this->equalTo(false)
-            );
+
 
         $oConfig->_setConfVarFromDb('test1', 'blabla', 't1');
         $oConfig->_setConfVarFromDb('test2', 'arr', serialize(array('x')));

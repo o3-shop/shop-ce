@@ -781,8 +781,13 @@ class DynExportBaseTest extends \OxidTestCase
         $this->setRequestParameter("blAppendCatToCampaign", 1);
 
         $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array("appendLink"));
-        $oArticle->expects($this->at(0))->method('appendLink')->with($this->equalTo("campaign=testCampaign"));
-        $oArticle->expects($this->at(1))->method('appendLink')->with($this->equalTo("/testCat"));
+        $oArticle->expects($this->exactly(2))
+            ->method('appendLink')
+            ->withConsecutive(
+                [$this->equalTo("campaign=testCampaign")],
+                [$this->equalTo("/testCat")]
+            );
+
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController::class, array("getCategoryString"));
         $oView->expects($this->once())->method('getCategoryString')->with($this->isInstanceOf('\OxidEsales\EshopCommunity\Application\Model\Article'))->will($this->returnValue("testCat"));

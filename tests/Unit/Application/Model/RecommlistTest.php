@@ -286,7 +286,7 @@ class RecommlistTest extends \OxidTestCase
                 break;
             } catch (Exception $oException) {
                 $sGot = '[';
-                foreach ($aLists as $key => $oList) {
+                foreach ($aLists as $oList) {
                     if ($sGot != '[') {
                         $sGot .= ', ';
                     }

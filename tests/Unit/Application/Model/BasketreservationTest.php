@@ -399,9 +399,16 @@ class BasketreservationTest extends \OxidTestCase
             array('_getReservedItems', 'discardArticleReservation')
         );
         $oR->setR($oUB);
-        $oR->expects($this->at(0))->method('_getReservedItems')->will($this->returnValue(array('a1' => 3, 'a2' => 5)));
-        $oR->expects($this->at(1))->method('discardArticleReservation')->with($this->equalTo('a1'))->will($this->returnValue(null));
-        $oR->expects($this->at(2))->method('discardArticleReservation')->with($this->equalTo('a2'))->will($this->returnValue(null));
+        $oR->expects($this->once())
+            ->method('_getReservedItems')
+            ->willReturn(array('a1' => 3, 'a2' => 5));
+        $oR->expects($this->exactly(2))
+            ->method('discardArticleReservation')
+            ->withConsecutive(
+                [$this->equalTo('a1')],
+                [$this->equalTo('a2')]
+            )
+            ->willReturnOnConsecutiveCalls(null, null);
 
         $oR->discardReservations();
 

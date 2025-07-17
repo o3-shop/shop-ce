@@ -124,9 +124,13 @@ class DatabaseTest extends \OxidTestCase
         /** @var Database|PHPUnit\Framework\MockObject\MockObject $database */
         $database = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Database', array("getInstance"));
 
-        $at = 0;
-        $database->expects($this->at($at++))->method("getInstance")->with($this->equalTo("Setup"))->will($this->returnValue($setup));
-        $database->expects($this->at($at++))->method("getInstance")->with($this->equalTo("Language"))->will($this->returnValue($language));
+        $database->expects($this->exactly(2))
+            ->method("getInstance")
+            ->withConsecutive(
+                [$this->equalTo("Setup")],
+                [$this->equalTo("Language")]
+            )
+            ->willReturnOnConsecutiveCalls($setup, $language);
 
         $this->expectException('Exception');
         $database->queryFile(time());
@@ -140,16 +144,26 @@ class DatabaseTest extends \OxidTestCase
         /** @var Database|PHPUnit\Framework\MockObject\MockObject $database */
         $database = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Database', array("getDatabaseVersion", "parseQuery", "execSql"));
 
-        $at = 0;
-        $database->expects($this->at($at++))->method("getDatabaseVersion")->will($this->returnValue("5.1"));
-        $database->expects($this->at($at++))->method("execSql")->with($this->equalTo("SET @@session.sql_mode = ''"));
-        $database->expects($this->at($at++))->method("parseQuery")->will($this->returnValue(array(1, 2, 3)));
-        $database->expects($this->at($at++))->method("execSql")->with($this->equalTo(1));
-        $database->expects($this->at($at++))->method("execSql")->with($this->equalTo(2));
-        $database->expects($this->at($at++))->method("execSql")->with($this->equalTo(3));
+        $database->expects($this->once())
+            ->method("getDatabaseVersion")
+            ->willReturn("5.1");
+
+        $database->expects($this->once())
+            ->method("parseQuery")
+            ->willReturn(array(1, 2, 3));
+
+        $database->expects($this->exactly(4))
+            ->method("execSql")
+            ->withConsecutive(
+                [$this->equalTo("SET @@session.sql_mode = ''")],
+                [$this->equalTo(1)],
+                [$this->equalTo(2)],
+                [$this->equalTo(3)]
+            );
 
         $database->queryFile(getShopBasePath() . '/config.inc.php');
     }
+
 
     /**
      * Testing SetupDb::getDatabaseVersion()
@@ -326,9 +340,16 @@ class DatabaseTest extends \OxidTestCase
 
         /** @var Database|PHPUnit\Framework\MockObject\MockObject $database */
         $database = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Database', array("execSql", "getInstance"));
-        $database->expects($this->at(0))->method("execSql")->will($this->throwException(new Exception()));
-        $database->expects($this->at(1))->method("getInstance")->with($this->equalTo("Setup"))->will($this->returnValue($oSetup));
-        $database->expects($this->at(2))->method("getInstance")->with($this->equalTo("Language"))->will($this->returnValue($oLang));
+        $database->expects($this->once())
+            ->method("execSql")
+            ->willThrowException(new Exception());
+        $database->expects($this->exactly(2))
+            ->method("getInstance")
+            ->withConsecutive(
+                [$this->equalTo("Setup")],
+                [$this->equalTo("Language")]
+            )
+            ->willReturnOnConsecutiveCalls($oSetup, $oLang);
 
         $this->expectException('Exception');
 
@@ -390,9 +411,16 @@ class DatabaseTest extends \OxidTestCase
         $at = 0;
         /** @var Database|PHPUnit\Framework\MockObject\MockObject $database */
         $database = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Database', array("getInstance", "execSql"));
-        $database->expects($this->at($at++))->method("getInstance")->with($this->equalTo("Utilities"))->will($this->returnValue($oUtils));
-        $database->expects($this->at($at++))->method("execSql")->with($this->equalTo("update oxuser set oxusername='{$loginName}', oxpassword='" . hash('sha512', $password . $passwordSalt) . "', oxpasssalt='{$passwordSalt}' where OXUSERNAME='admin'"));
-        $database->expects($this->at($at++))->method("execSql")->with($this->equalTo("update oxnewssubscribed set oxemail='{$loginName}' where OXEMAIL='admin'"));
+        $database->expects($this->once())
+            ->method("getInstance")
+            ->with($this->equalTo("Utilities"))
+            ->willReturn($oUtils);
+        $database->expects($this->exactly(2))
+            ->method("execSql")
+            ->withConsecutive(
+                [$this->equalTo("update oxuser set oxusername='{$loginName}', oxpassword='" . hash('sha512', $password . $passwordSalt) . "', oxpasssalt='{$passwordSalt}' where OXUSERNAME='admin'")],
+                [$this->equalTo("update oxnewssubscribed set oxemail='{$loginName}' where OXEMAIL='admin'")]
+            );
         $database->writeAdminLoginData($loginName, $password);
     }
 
@@ -431,7 +459,7 @@ class DatabaseTest extends \OxidTestCase
         $loggedQueries = $this->loggedQueries;
         $pdoMock->expects($this->any())
             ->method('exec')
-            ->will($this->returnCallback(function ($query) use ($loggedQueries) {
+            ->will($this->returnCallback(function ($query) use ($loggedQueries): void {
                 $loggedQueries->queries[] = $query;
             }));
 

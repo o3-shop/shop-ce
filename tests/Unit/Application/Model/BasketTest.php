@@ -2437,7 +2437,7 @@ class BasketTest extends \OxidTestCase
         foreach ($oBasket->getBasketArticles() as $oArticle) {
 
             // selection list check
-            $blSelNotSet = $blSelNotSet & !isset($oArticle->selectlist);
+            $blSelNotSet &= !isset($oArticle->selectlist);
 
             $this->assertTrue(in_array($oArticle->getId(), $aIds));
         }

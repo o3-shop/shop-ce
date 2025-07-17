@@ -83,7 +83,7 @@ class ListTest extends \OxidTestCase
         $this->_oList[] = $oTest;
 
         $sTest = '';
-        foreach ($this->_oList as $key => $oObject) {
+        foreach ($this->_oList as $oObject) {
             $sTest .= $oObject->sTest;
         }
 

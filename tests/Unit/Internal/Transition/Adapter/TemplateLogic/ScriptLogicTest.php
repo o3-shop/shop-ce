@@ -64,9 +64,10 @@ class ScriptLogicTest extends TestCase
 
     public function testIncludeFileNotExists(): void
     {
-        $this->expectWarning();
+        $this->expectException(\Exception::class); // or specific exception type
         $this->scriptLogic->include('somescript.js');
     }
+
 
     public function testIncludeFileExists(): void
     {

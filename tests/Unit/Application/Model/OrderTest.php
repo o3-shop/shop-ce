@@ -1701,7 +1701,7 @@ class OrderTest extends \OxidTestCase
         $testMethods[] = '_setOrderStatus';
         $order = $this->getMock(Order::class, $testMethods);
 
-        foreach ($methods as $key => $method) {
+        foreach ($methods as $method) {
             $order->expects($this->once())
                 ->method($method)
                 ->will($this->returnValue(true));
@@ -1740,7 +1740,7 @@ class OrderTest extends \OxidTestCase
         $order = $this->getMock(Order::class, $testMethods);
 
 
-        foreach ($methods as $key => $method) {
+        foreach ($methods as $method) {
             $order
                 ->method($method)
                 ->will($this->returnValue(true));

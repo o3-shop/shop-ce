@@ -459,8 +459,12 @@ class NavigationTreeTest extends \OxidTestCase
         $oDomElemFrom->attributes = array($oAttr1, $oAttr2);
 
         $oDomElemTo = $this->getMock("stdClass", array("setAttribute"));
-        $oDomElemTo->expects($this->at(0))->method('setAttribute')->with($this->equalTo('nodeName1'), $this->equalTo('nodeValue1'));
-        $oDomElemTo->expects($this->at(1))->method('setAttribute')->with($this->equalTo('nodeName2'), $this->equalTo('nodeValue2'));
+        $oDomElemTo->expects($this->exactly(2))
+            ->method('setAttribute')
+            ->withConsecutive(
+                [$this->equalTo('nodeName1'), $this->equalTo('nodeValue1')],
+                [$this->equalTo('nodeName2'), $this->equalTo('nodeValue2')]
+            );
 
         $oNavTree = oxNew('oxnavigationtree');
         $oNavTree->UNITcopyAttributes($oDomElemTo, $oDomElemFrom);
