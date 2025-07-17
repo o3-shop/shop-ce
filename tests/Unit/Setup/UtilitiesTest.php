@@ -151,6 +151,8 @@ class UtilitiesTest extends \OxidTestCase
             $sValue = current($_ENV);
             $sName = key($_ENV);
 
+            var_dump($sValue, $sName);
+
             $oUtils = new Utilities();
             $this->assertEquals($sValue, $oUtils->getEnvVar($sName));
         }
