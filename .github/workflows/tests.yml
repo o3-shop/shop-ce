@@ -17,7 +17,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:10
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: o3shop_test
