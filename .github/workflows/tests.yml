@@ -133,12 +133,6 @@ jobs:
 
       - name: Run PHPUnit tests with coverage
         continue-on-error: true
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: o3shop_test
-          DB_USERNAME: root
-          DB_PASSWORD: root
         run: |
           CURRENT_DIR=$(pwd)
           echo "Current directory: $CURRENT_DIR"
