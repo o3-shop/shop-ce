@@ -76,17 +76,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-version }}-
 
-      - name: Install dependencies
-        env:
-          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
-        run: composer install --prefer-dist --no-progress
-
       - name: Copy config files
         run: |
           cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
           
           cat .env
+
+      - name: Install dependencies
+        env:
+          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+        run: composer install --prefer-dist --no-progress
+
+
 
       - name: Install theme
         run: |
