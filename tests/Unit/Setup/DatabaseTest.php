@@ -106,7 +106,7 @@ class DatabaseTest extends \OxidTestCase
         $database->expects($this->once())->method("getConnection")->will($this->returnValue($this->createConnection()));
 
         $result = $database->execSql("select 1 + 1")->fetch();
-        $this->assertSame(2, $result[0]);
+        $this->assertSame(2, (int)$result[0]);
     }
 
     /**
