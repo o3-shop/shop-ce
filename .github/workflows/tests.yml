@@ -147,8 +147,7 @@ jobs:
           $CURRENT_DIR/tests/Unit \
           --colors=always \
           --coverage-clover="$CURRENT_DIR/coverage.xml" \
-          --coverage-html="$CURRENT_DIR/coverage-html/" \
-          --filter testGetEnvVar || exit 0
+          --coverage-html="$CURRENT_DIR/coverage-html/" || exit 0
 
       - name: Find coverage files
         run: |
