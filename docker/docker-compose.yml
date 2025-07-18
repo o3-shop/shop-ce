@@ -9,7 +9,8 @@ services:
       MYSQL_USER: ${O3SHOP_CONF_DBUSER}
       MYSQL_PASSWORD: ${O3SHOP_CONF_DBPWD}
     volumes:
-      - ./data:/var/lib/mysql
+      - ./database/data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
 
@@ -38,7 +39,7 @@ services:
     container_name: mailpit
     restart: unless-stopped
     volumes:
-      - ./data-mailpit:/data
+      - ./mailpit/data:/data
     ports:
       - 8025:8025
       - 1025:1025
