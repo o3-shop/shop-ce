@@ -18,8 +18,7 @@ fi
 
 # Display start message
 echo -e "${YELLOW}Changing to testing config${NC}"
-mv .env .env.default
-mv .env.testing .env
+sed -i 's/^O3SHOP_CONF_DBNAME="o3shop"$/O3SHOP_CONF_DBNAME="o3shop-test"/' .env
 echo -e "${GREEN}Changed to testing config${NC}"
 echo "----------------------------------------"
 
@@ -74,8 +73,7 @@ echo "Test run completed at: $(date)"
 # Display start message
 echo "----------------------------------------"
 echo -e "${YELLOW}Changing to normal config${NC}"
-mv .env .env.testing
-mv .env.default .env
+sed -i 's/^O3SHOP_CONF_DBNAME="o3shop-test"$/O3SHOP_CONF_DBNAME="o3shop"/' .env
 echo -e "${GREEN}Changed to normal config${NC}"
 echo "----------------------------------------"
 
