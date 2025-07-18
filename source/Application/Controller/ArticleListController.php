@@ -21,11 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxArticleList;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\RssFeed;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * List of articles for a selected product group.
@@ -33,7 +39,7 @@ use OxidEsales\Eshop\Core\Request;
  * meta tags (for search engines). Result - "list.tpl" template.
  * O3-Shop -> (Any selected shop product category).
  */
-class ArticleListController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ArticleListController extends FrontendController
 {
     /**
      * Count of all articles in list.
@@ -159,7 +165,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     protected function generateViewId()
     {
-        $categoryId = Registry::getConfig()->getRequestParameter('cnid');
+        $categoryId = Registry::getRequest()->getRequestEscapedParameter('cnid');
         $activePage = $this->getActPage();
         $articlesPerPage = Registry::getSession()->getVariable('_artperpage');
         $listDisplayType = $this->_getListDisplayType();
@@ -173,29 +179,31 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Executes parent::render(), loads active category, prepares article
      * list sorting rules. According to category type loads list of
-     * articles - regular (oxArticleList::LoadCategoryArticles()) or price
-     * dependent (oxArticleList::LoadPriceArticles()). Generates page navigation data
+     * articles - regular (ArticleList::LoadCategoryArticles()) or price
+     * dependent (ArticleList::LoadPriceArticles()). Generates page navigation data
      * such as previous/next window URL, number of available pages, generates
-     * meta tags info (\OxidEsales\Eshop\Application\Controller\FrontendController::_convertForMetaTags()) and returns
+     * meta tags info (FrontendController::_convertForMetaTags()) and returns
      * name of template to render. Also checks if actual pages count does not exceed real
      * articles page count. If yes - calls error_404_handler().
      *
      * @return  string  $this->_sThisTemplate   current template file name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $category = $this->getCategoryToRender();
 
-        $isCategoryActive = $category && (bool) $category->oxcategories__oxactive->value;
+        $isCategoryActive = $category && $category->oxcategories__oxactive->value;
         if (!$isCategoryActive) {
             Registry::getUtils()->redirect($config->getShopURL() . 'index.php', true, 302);
         }
 
         $activeCategory = $this->getActiveCategory();
         if ($activeCategory && $config->getConfigParam('bl_rssCategories')) {
-            $rss = oxNew(\OxidEsales\Eshop\Application\Model\RssFeed::class);
+            $rss = oxNew(RssFeed::class);
             $this->addRssFeed(
                 $rss->getCategoryArticlesTitle($activeCategory),
                 $rss->getCategoryArticlesUrl($activeCategory),
@@ -224,15 +232,14 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * sets empty category as active category and returns it.
      *
      * @return Category
+     * @throws DatabaseConnectionException
      */
     protected function getCategoryToRender()
     {
-        $config = $this->getConfig();
-
         $this->_blIsCat = false;
 
         // A. checking for fake "more" category
-        if ('oxmore' == $config->getRequestParameter('cnid')) {
+        if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
             // overriding some standard value and parameters
             $this->_sThisTemplate = $this->_sThisMoreTemplate;
             $category = oxNew(Category::class);
@@ -281,7 +288,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
             $seoParameters = $this->getAddSeoUrlParams();
 
             foreach ($articleList as $article) {
-                /** @var \OxidEsales\Eshop\Application\Model\Article $article */
+                /** @var Article $article */
                 $article->setLinkType($linkType);
 
                 if ($dynamicParameters) {
@@ -304,7 +311,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     {
         $dynamicParameters = parent::getAddUrlParams();
         if (!Registry::getUtils()->seoIsActive()) {
-            $pageNumber = (int) Registry::getConfig()->getRequestParameter('pgNr');
+            $pageNumber = (int) Registry::getRequest()->getRequestEscapedParameter('pgNr');
             if ($pageNumber > 0) {
                 $dynamicParameters .= ($dynamicParameters ? '&amp;' : '') . "pgNr={$pageNumber}";
             }
@@ -329,6 +336,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *  - OXARTICLE_LINKTYPE_CATEGORY - when active category is regular category
      *
      * @return int
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getProductLinkType" in next major
      */
     protected function _getProductLinkType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -351,8 +359,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     {
         $baseLanguageId = Registry::getLang()->getBaseLanguage();
         // store this into session
-        $attributeFilter = Registry::getConfig()->getRequestParameter('attrfilter', true);
-        $activeCategory = Registry::getConfig()->getRequestParameter('cnid');
+        $attributeFilter = Registry::getRequest()->getRequestEscapedParameter('attrfilter', true);
+        $activeCategory = Registry::getRequest()->getRequestEscapedParameter('cnid');
 
         if (!empty($attributeFilter)) {
             $sessionFilter = Registry::getSession()->getVariable('session_attrfilter');
@@ -369,7 +377,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function resetFilter()
     {
-        $activeCategory = Registry::getConfig()->getRequestParameter('cnid');
+        $activeCategory = Registry::getRequest()->getRequestEscapedParameter('cnid');
         $sessionFilter = Registry::getSession()->getVariable('session_attrfilter');
 
         unset($sessionFilter[$activeCategory]);
@@ -381,18 +389,20 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      *
      * @param Category $category category object
      *
-     * @return oxArticleList
+     * @return ArticleList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadArticles" in next major
      */
     protected function _loadArticles($category) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $numberOfCategoryArticles = (int) $config->getConfigParam('iNrofCatArticles');
         $numberOfCategoryArticles = $numberOfCategoryArticles ? $numberOfCategoryArticles : 1;
 
         // load only articles which we show on screen
-        $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $articleList = oxNew(ArticleList::class);
         $articleList->setSqlLimit($numberOfCategoryArticles * $this->_getRequestPageNr(), $numberOfCategoryArticles);
         $articleList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
 
@@ -420,8 +430,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function getActPage()
     {
-        //Fake oxmore category has no subpages so we can set the page number to zero
-        if ('oxmore' == Registry::get(Request::class)->getRequestParameter('cnid')) {
+        // Fake oxmore category has no subpages, so we can set the page number to zero
+        if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
             return 0;
         }
 
@@ -431,7 +441,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Calls parent::getActPage();
      *
-     * @todo this function is a temporary solution and should be rmeoved as
+     * @todo this function is a temporary solution and should be removed as
      * soon product list loading is refactored
      *
      * @return int
@@ -462,7 +472,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Returns active product id to load its seo meta info
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -486,7 +497,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
 
             //fetching category path
             if (is_array($categoryTreePath = $this->getCatTreePath())) {
-                $stringModifier = getStr();
+                $stringModifier = Str::getStr();
                 $this->_sCatPathString = '';
                 foreach ($categoryTreePath as $category) {
                     if ($this->_sCatPathString) {
@@ -503,14 +514,15 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Returns current view meta description data.
      *
-     * @param string $meta           Category path.
-     * @param int    $length         Max length of result, -1 for no truncation.
-     * @param bool   $descriptionTag If true - performs additional duplicate cleaning.
+     * @param string $meta Category path.
+     * @param int $length Max length of result, -1 for no truncation.
+     * @param bool $removeDuplicatedWords If true - performs additional duplicate cleaning.
      *
      * @return  string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $description = '';
         // appending parent title
@@ -523,17 +535,17 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
             $description .= " {$activeCategory->oxcategories__oxtitle->value}.";
         }
 
-        // and final component ..
+        // and final component ...
         //changed for #2776
-        if (($suffix = $this->getConfig()->getActiveShop()->oxshops__oxtitleprefix->value)) {
+        if (($suffix = Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value)) {
             $description .= " {$suffix}";
         }
 
         // making safe for output
-        $description = getStr()->html_entity_decode($description);
-        $description = getStr()->strip_tags($description);
-        $description = getStr()->cleanStr($description);
-        $description = getStr()->htmlspecialchars($description);
+        $description = Str::getStr()->html_entity_decode($description);
+        $description = Str::getStr()->strip_tags($description);
+        $description = Str::getStr()->cleanStr($description);
+        $description = Str::getStr()->htmlspecialchars($description);
 
         return trim($description);
     }
@@ -563,11 +575,13 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * string duplicates, special chars. Also removes strings defined
      * in $config->aSkipTags (Admin area).
      *
-     * @param string $meta           Category path
-     * @param int    $length         Max length of result, -1 for no truncation
-     * @param bool   $descriptionTag If true - performs additional duplicate cleaning
+     * @param string $meta Category path
+     * @param int $length Max length of result, -1 for no truncation
+     * @param bool $descriptionTag If true - performs additional duplicate cleaning
      *
      * @return  string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "collectMetaDescription" in next major
      */
     protected function _collectMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -603,10 +617,11 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Returns current view keywords separated by comma
      *
-     * @param string $keywords              Data to use as keywords
-     * @param bool   $removeDuplicatedWords Remove duplicated words
+     * @param string $keywords Data to use as keywords
+     * @param bool $removeDuplicatedWords Remove duplicated words
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
     protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -645,6 +660,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * @param string $keywords category path
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "collectMetaKeyword" in next major
      */
     protected function _collectMetaKeyword($keywords) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -653,9 +670,9 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
         $text = '';
 
         if (count($articleList = $this->getArticleList())) {
-            $stringModifier = getStr();
+            $stringModifier = Str::getStr();
             foreach ($articleList as $article) {
-                /** @var \OxidEsales\Eshop\Application\Model\Article $article */
+                /** @var Article $article */
                 $description = $stringModifier->strip_tags(
                     trim($stringModifier->strtolower($article->getLongDescription()->value))
                 );
@@ -695,11 +712,12 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * URL ("tpl" variable).
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTemplateName()
     {
         // assign template name
-        if (($templateName = basename(Registry::getConfig()->getRequestParameter('tpl')))) {
+        if (($templateName = basename(Registry::getRequest()->getRequestEscapedParameter('tpl')))) {
             $this->_sThisTemplate = 'custom/' . $templateName;
         } elseif (($category = $this->getActiveCategory()) && $category->oxcategories__oxtemplate->value) {
             $this->_sThisTemplate = $category->oxcategories__oxtemplate->value;
@@ -711,22 +729,23 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Adds page number parameter to current Url and returns formatted url
      *
-     * @param string $url         Url to append page numbers
-     * @param int    $currentPage Current page number
-     * @param int    $languageId  Requested language
+     * @param string $url Url to append page numbers
+     * @param int $page Current page number
+     * @param int $languageId Requested language
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
-    protected function _addPageNrParam($url, $currentPage, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addPageNrParam($url, $page, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (Registry::getUtils()->seoIsActive() && ($category = $this->getActiveCategory())) {
-            if ($currentPage) {
+            if ($page) {
                 // only if page number > 0
-                $url = $category->getBaseSeoLink($languageId, $currentPage);
+                $url = $category->getBaseSeoLink($languageId, $page);
             }
         } else {
-            $url = parent::_addPageNrParam($url, $currentPage, $languageId);
+            $url = parent::_addPageNrParam($url, $page, $languageId);
         }
 
         return $url;
@@ -747,6 +766,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * Generates Url for page navigation
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function generatePageNavigationUrl()
     {
@@ -761,15 +781,16 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * Returns default category sorting for selected category
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDefaultSorting()
     {
         $sorting = parent::getDefaultSorting();
 
         $category = $this->getActiveCategory();
-        if ($category && $category instanceof Category) {
+        if ($category instanceof Category) {
             if ($defaultSorting = $category->getDefaultSorting()) {
-                $articleViewName = getViewName('oxarticles');
+                $articleViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
                 $sortBy = $articleViewName . '.' . $defaultSorting;
                 $sortDirection = ($category->getDefaultSortingMode()) ? "desc" : "asc";
                 $sorting = ['sortby' => $sortBy, 'sortdir' => $sortDirection];
@@ -783,19 +804,20 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Returns title suffix used in template
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getTitleSuffix()
     {
         if ($this->getActiveCategory()->oxcategories__oxshowsuffix->value) {
-            return $this->getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
+            return Registry::getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
         }
     }
 
     /**
      * Returns title page suffix used in template
      *
-     * @return string
+     * @return string|void
      */
     public function getTitlePageSuffix()
     {
@@ -811,6 +833,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * @param int $languageId Language id
      *
      * @return object
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
     protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -823,6 +846,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * we do have here in this category
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAttributes()
     {
@@ -841,7 +866,9 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Template variable getter. Returns category's article list
      *
-     * @return oxArticleList|null
+     * @return ArticleList|null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getArticleList()
     {
@@ -870,9 +897,11 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Return array of id to form recommend list.
      *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
      */
     public function getSimilarRecommListIds()
     {
@@ -908,7 +937,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Template variable getter. Returns category path array
      *
-     * @return array
+     * @return array|void
      */
     public function getTreePath()
     {
@@ -926,7 +955,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     {
         $paths = [];
 
-        if ('oxmore' == Registry::getConfig()->getRequestParameter('cnid')) {
+        if ('oxmore' == Registry::getRequest()->getRequestEscapedParameter('cnid')) {
             $path = [];
             $path['title'] = Registry::getLang()->translateString(
                 'CATEGORY_OVERVIEW',
@@ -960,6 +989,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * subcategories.
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function hasVisibleSubCats()
     {
@@ -977,6 +1007,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * Template variable getter. Returns list of subcategories.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getSubCatList()
     {
@@ -1008,6 +1039,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * Template variable getter. Returns category title.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getTitle()
     {
@@ -1035,8 +1067,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     {
         if ($this->_aBargainArticleList === null) {
             $this->_aBargainArticleList = [];
-            if ($this->getConfig()->getConfigParam('bl_perfLoadAktion') && $this->_isActCategory()) {
-                $articleList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion') && $this->_isActCategory()) {
+                $articleList = oxNew(ArticleList::class);
                 $articleList->loadActionArticles('OXBARGAIN');
                 if ($articleList->count()) {
                     $this->_aBargainArticleList = $articleList;
@@ -1051,6 +1083,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      * Template variable getter. Returns active search
      *
      * @return Category
+     * @throws DatabaseConnectionException
      */
     public function getActiveCategory()
     {
@@ -1068,7 +1101,8 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
     /**
      * Returns view canonical url
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getCanonicalUrl()
     {
@@ -1095,7 +1129,7 @@ class ArticleListController extends \OxidEsales\Eshop\Application\Controller\Fro
      */
     public function canSelectDisplayType()
     {
-        return $this->getConfig()->getConfigParam('blShowListDisplayType');
+        return Registry::getConfig()->getConfigParam('blShowListDisplayType');
     }
 
     /**

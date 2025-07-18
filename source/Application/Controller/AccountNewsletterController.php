@@ -21,16 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Current user newsletter manager.
- * When user is logged in in this manager window he can modify
- * his newletter subscription status - simply register or
+ * When user is logged-in in this manager window he can modify
+ * his newsletter subscription status - simply register or
  * unregister from newsletter. O3-Shop -> MY ACCOUNT -> Newsletter.
  */
-class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountNewsletterController extends AccountController
 {
     /**
      * Current class template name.
@@ -78,6 +80,7 @@ class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controll
      * Template variable getter. Returns 0 when newsletter had been changed.
      *
      * @return int
+     * @throws DatabaseConnectionException
      */
     public function isNewsletter()
     {
@@ -93,7 +96,9 @@ class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controll
      * Removes or adds user to newsletter group according to
      * current subscription status. Returns true on success.
      *
-     * @return bool
+     * @return bool|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function subscribe()
     {
@@ -107,8 +112,8 @@ class AccountNewsletterController extends \OxidEsales\Eshop\Application\Controll
             return false;
         }
 
-        $iStatus = $this->getConfig()->getRequestParameter('status');
-        if ($oUser->setNewsSubscription($iStatus, $this->getConfig()->getConfigParam('blOrderOptInEmail'))) {
+        $iStatus = Registry::getRequest()->getRequestEscapedParameter('status');
+        if ($oUser->setNewsSubscription($iStatus, Registry::getConfig()->getConfigParam('blOrderOptInEmail'))) {
             $this->_iSubscriptionStatus = ($iStatus == 0 && $iStatus !== null) ? -1 : 1;
         }
     }

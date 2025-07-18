@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxStr;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Company VAT identification number (VATIN)
@@ -52,7 +52,8 @@ class CompanyVatIn
      */
     public function getCountryCode()
     {
-        return (string) \OxidEsales\Eshop\Core\Str::getStr()->strtoupper(\OxidEsales\Eshop\Core\Str::getStr()->substr($this->_cleanUp($this->_sCompanyVatNumber), 0, 2));
+        return (string) Str::getStr()->strtoupper(
+            Str::getStr()->substr($this->_cleanUp($this->_sCompanyVatNumber), 0, 2));
     }
 
     /**
@@ -62,7 +63,7 @@ class CompanyVatIn
      */
     public function getNumbers()
     {
-        return (string) \OxidEsales\Eshop\Core\Str::getStr()->substr($this->_cleanUp($this->_sCompanyVatNumber), 2);
+        return (string) Str::getStr()->substr($this->_cleanUp($this->_sCompanyVatNumber), 2);
     }
 
     /**
@@ -75,7 +76,7 @@ class CompanyVatIn
      */
     protected function _cleanUp($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (string) \OxidEsales\Eshop\Core\Str::getStr()->preg_replace("/\s|-/", '', $sValue);
+        return (string) Str::getStr()->preg_replace("/\s|-/", '', $sValue);
     }
 
 

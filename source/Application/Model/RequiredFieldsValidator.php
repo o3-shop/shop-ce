@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Model\BaseModel;
+
 /**
  * Class for validating address
  *
@@ -44,19 +46,19 @@ class RequiredFieldsValidator
     /**
      * Required Field validator.
      *
-     * @var \OxidEsales\Eshop\Application\Model\RequiredFieldValidator
+     * @var RequiredFieldValidator
      */
     private $_oFieldValidator = [];
 
     /**
      * Sets dependencies.
      *
-     * @param \OxidEsales\Eshop\Application\Model\RequiredFieldValidator $oFieldValidator
+     * @param RequiredFieldValidator $oFieldValidator
      */
     public function __construct($oFieldValidator = null)
     {
         if (is_null($oFieldValidator)) {
-            $oFieldValidator = oxNew(\OxidEsales\Eshop\Application\Model\RequiredFieldValidator::class);
+            $oFieldValidator = oxNew(RequiredFieldValidator::class);
         }
         $this->setFieldValidator($oFieldValidator);
     }
@@ -84,7 +86,7 @@ class RequiredFieldsValidator
     /**
      * Returns required fields for address.
      *
-     * @return \OxidEsales\Eshop\Application\Model\RequiredFieldValidator
+     * @return RequiredFieldValidator
      */
     public function getFieldValidator()
     {
@@ -94,7 +96,7 @@ class RequiredFieldsValidator
     /**
      * Sets required fields array
      *
-     * @param \OxidEsales\Eshop\Application\Model\RequiredFieldValidator $oFieldValidator
+     * @param RequiredFieldValidator $oFieldValidator
      */
     public function setFieldValidator($oFieldValidator)
     {
@@ -115,7 +117,7 @@ class RequiredFieldsValidator
      * Checks if all required fields are filled.
      * Returns array of invalid fields or empty array if all fields are fine.
      *
-     * @param \OxidEsales\Eshop\Core\Model\BaseModel $oObject Address fields with values.
+     * @param BaseModel $oObject Address fields with values.
      *
      * @return bool If any invalid field exist.
      */

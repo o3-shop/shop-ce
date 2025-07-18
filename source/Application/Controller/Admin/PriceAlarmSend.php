@@ -21,15 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * pricealarm sending manager.
  * Performs sending of pricealarm to selected iAllCnt groups.
  */
-class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class PriceAlarmSend extends AdminListController
 {
     /**
      * Default tab number
@@ -44,18 +52,21 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * file "pricealarm_send.tpl"/"pricealarm_done.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function render()
     {
         parent::render();
 
-        $config = $this->getConfig();
+        $oRequest = Registry::getRequest();
 
         ini_set("session.gc_maxlifetime", 36000);
 
-        $start = (int) $config->getRequestParameter("iStart");
-        $limit = $config->getConfigParam('iCntofMails');
-        $activeAlertsAmount = $config->getRequestParameter("iAllCnt");
+        $start = (int)$oRequest->getRequestEscapedParameter('iStart');
+        $limit = Registry::getConfig()->getConfigParam('iCntofMails');
+        $activeAlertsAmount = $oRequest->getRequestEscapedParameter('iAllCnt');
         if (!isset($activeAlertsAmount)) {
             $activeAlertsAmount = $this->countActivePriceAlerts();
         }
@@ -67,7 +78,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
 
         $this->_aViewData["iStart"] = $start;
         $this->_aViewData["iAllCnt"] = $activeAlertsAmount;
-        $this->_aViewData["actlang"] = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+        $this->_aViewData["actlang"] = Registry::getLang()->getBaseLanguage();
 
         if ($start < $activeAlertsAmount) {
             $template = "pricealarm_send.tpl";
@@ -81,10 +92,10 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     /**
      * Overrides parent method to pass referred id.
      *
-     * @param string $sId Class name
+     * @param string $node Class name
      * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
      */
-    protected function _setupNavigation($sId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setupNavigation($node) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         parent::_setupNavigation('pricealarm_list');
     }
@@ -93,11 +104,14 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * Counts active price alerts and returns this number.
      *
      * @return int
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     protected function countActivePriceAlerts()
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $config = $this->getConfig();
+        $database = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
+        $config = Registry::getConfig();
         $shopId = $config->getShopId();
 
         $activeAlarmsQuery =
@@ -109,7 +123,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         $count = 0;
         while ($result != false && !$result->EOF) {
             $alarmPrice = $result->fields['oxprice'];
-            $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $article = oxNew(Article::class);
             $article->load($result->fields['oxartid']);
             if ($article->getPrice()->getBruttoPrice() <= $alarmPrice) {
                 $count++;
@@ -125,11 +139,14 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      *
      * @param int $start How much price alerts was already sent.
      * @param int $limit How much price alerts to send.
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     protected function sendPriceChangeNotifications($start, $limit)
     {
-        $config = $this->getConfig();
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+        $config = Registry::getConfig();
+        $database = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $shopId = $config->getShopId();
 
         $alarmsQuery =
@@ -139,7 +156,7 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
             ':oxshopid' => $shopId
         ]);
         while ($result != false && !$result->EOF) {
-            $article = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $article = oxNew(Article::class);
             $article->load($result->fields['oxartid']);
             if ($article->getPrice()->getBruttoPrice() <= $result->fields['oxprice']) {
                 $this->sendeMail(
@@ -157,28 +174,29 @@ class PriceAlarmSend extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * Creates and sends email with price alarm information.
      *
      * @param string $emailAddress Email address
-     * @param string $productID    Product id
+     * @param string $productID Product id
      * @param string $priceAlarmId Price alarm id
-     * @param string $bidPrice     Bid price
+     * @param string $bidPrice Bid price
+     * @throws Exception
      */
     public function sendeMail($emailAddress, $productID, $priceAlarmId, $bidPrice)
     {
-        $alarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
+        $alarm = oxNew(PriceAlarm::class);
         $alarm->load($priceAlarmId);
 
-        $language = \OxidEsales\Eshop\Core\Registry::getLang();
+        $language = Registry::getLang();
         $languageId = (int) $alarm->oxpricealarm__oxlang->value;
 
         $oldLanguageId = $language->getTplLanguage();
         $language->setTplLanguage($languageId);
 
-        $email = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $email = oxNew(Email::class);
         $success = (int) $email->sendPricealarmToCustomer($emailAddress, $alarm);
 
         $language->setTplLanguage($oldLanguageId);
 
         if ($success) {
-            $alarm->oxpricealarm__oxsended = new \OxidEsales\Eshop\Core\Field(date("Y-m-d H:i:s"));
+            $alarm->oxpricealarm__oxsended = new Field(date("Y-m-d H:i:s"));
             $alarm->save();
         }
     }

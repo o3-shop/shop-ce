@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Admin shop list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Main Menu -> Core Settings.
  */
-class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class ShopList extends AdminListController
 {
     /** New Shop indicator. */
     const NEW_SHOP_ID = '-1';
@@ -66,17 +70,18 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
      * file "shop_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         parent::render();
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != self::NEW_SHOP_ID) {
             // load object
-            $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+            $oShop = oxNew(Shop::class);
             if (!$oShop->load($soxId)) {
                 $soxId = $myConfig->getBaseShopId();
                 $oShop->load($soxId);
@@ -92,13 +97,13 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
 
         if ($this->_aViewData['updatenav']) {
             //skipping requirements checking when reloading nav frame
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("navReload", true);
+            Registry::getSession()->setVariable("navReload", true);
         }
 
         //making sure we really change shops on low level
         if ($soxId && $soxId != self::NEW_SHOP_ID) {
             $myConfig->setShopId($soxId);
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('currentadminshop', $soxId);
+            Registry::getSession()->setVariable('currentadminshop', $soxId);
         }
 
         return 'shop_list.tpl';
@@ -108,14 +113,15 @@ class ShopList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListC
      * Sets SQL WHERE condition. Returns array of conditions.
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {
         // we override this to add our shop if we are not malladmin
         $this->_aWhere = parent::buildWhere();
-        if (!\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('malladmin')) {
+        if (!Registry::getSession()->getVariable('malladmin')) {
             // we only allow to see our shop
-            $this->_aWhere[getViewName("oxshops") . ".oxid"] = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("actshop");
+            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName("oxshops") . ".oxid"] = Registry::getSession()->getVariable("actshop");
         }
 
         return $this->_aWhere;

@@ -21,23 +21,25 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\SystemEventHandler;
 
 /**
  * Encapsulates methods for application initialization.
  */
-class OxidStartController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class OxidStartController extends FrontendController
 {
     /**
      * Initializes globals and environment vars
      *
-     * @return null
+     * @return void
      */
     public function appInit()
     {
         $this->pageStart();
 
-        if ('oxstart' == \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestControllerId() || $this->isAdmin()) {
+        if ('oxstart' == Registry::getConfig()->getRequestControllerId() || $this->isAdmin()) {
             return;
         }
 
@@ -54,7 +56,7 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
     {
         parent::render();
 
-        $errorNumber = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('execerror');
+        $errorNumber = Registry::getRequest()->getRequestEscapedParameter('execerror');
         $templates = $this->getErrorTemplates();
 
         if (array_key_exists($errorNumber, $templates)) {
@@ -69,7 +71,7 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
      */
     public function pageStart()
     {
-        $config = $this->getConfig();
+        $config = Registry::getConfig();
 
         $config->setConfigParam('iMaxMandates', $config->getConfigParam('IMS'));
         $config->setConfigParam('iMaxArticles', $config->getConfigParam('IMA'));
@@ -83,14 +85,14 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
         $systemEventHandler = $this->_getSystemEventHandler();
         $systemEventHandler->onShopEnd();
 
-        $mySession = $this->getSession();
+        $mySession = Registry::getSession();
 
         if (isset($mySession)) {
             $mySession->freeze();
         }
 
         //commit file cache
-        \OxidEsales\Eshop\Core\Registry::getUtils()->commitFileCache();
+        Registry::getUtils()->commitFileCache();
     }
 
     /**
@@ -100,7 +102,7 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
      */
     public function getErrorNumber()
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('errornr');
+        return Registry::getRequest()->getRequestEscapedParameter('errornr');
     }
 
     /**
@@ -123,6 +125,6 @@ class OxidStartController extends \OxidEsales\Eshop\Application\Controller\Front
      */
     protected function _getSystemEventHandler() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return oxNew(\OxidEsales\Eshop\Core\SystemEventHandler::class);
+        return oxNew(SystemEventHandler::class);
     }
 }

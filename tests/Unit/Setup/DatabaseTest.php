@@ -106,7 +106,7 @@ class DatabaseTest extends \OxidTestCase
         $database->expects($this->once())->method("getConnection")->will($this->returnValue($this->createConnection()));
 
         $result = $database->execSql("select 1 + 1")->fetch();
-        $this->assertSame('2', $result[0]);
+        $this->assertSame(2, $result[0]);
     }
 
     /**
@@ -253,7 +253,7 @@ class DatabaseTest extends \OxidTestCase
         $aParams['dbPwd'] = $myConfig->getConfigParam('dbPwd');
         $aParams['dbName'] = time();
 
-        $message = 'WARNING: A bug in MySQL 5.6 may lead to problems in O3-Shop . Hence, we do not recommend MySQL 5.6.';
+        $message = 'The installed database version does not fit system requirements!';
         $this->expectException('Exception');
         $this->expectExceptionMessage($message);
 

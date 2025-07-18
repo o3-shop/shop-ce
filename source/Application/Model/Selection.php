@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Str;
+
 /**
  * Variant selection container class
  *
@@ -88,7 +90,7 @@ class Selection
      */
     public function getName()
     {
-        return getStr()->htmlspecialchars($this->_sName);
+        return Str::getStr()->htmlspecialchars($this->_sName);
     }
 
     /**

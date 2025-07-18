@@ -21,20 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Newsletter;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article main newsletter manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  * Admin Menu: Customer Info -> Newsletter -> Main.
  *
  * @deprecated Will be removed in next major
  */
-class NewsletterMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class NewsletterMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxnewsletter object
-     * and passes it's data to Smarty engine. Returns name of template file
+     * and passes its data to Smarty engine. Returns name of template file
      * "newsletter_main.tpl".
      *
      * @return string
@@ -44,7 +46,7 @@ class NewsletterMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         parent::render();
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+        $oNewsletter = oxNew(Newsletter::class);
 
         if (isset($soxId) && $soxId != "-1") {
             $oNewsletter->load($soxId);
@@ -52,7 +54,7 @@ class NewsletterMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
         }
 
         // generate editor
-        $this->_aViewData["editor"] = $this->_generateTextEditor(
+        $this->_aViewData["editor"] = $this->generateTextEditor(
             "100%",
             255,
             $oNewsletter,
@@ -69,13 +71,13 @@ class NewsletterMain extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     public function save()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // shopid
-        $sShopID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("actshop");
+        $sShopID = Registry::getSession()->getVariable("actshop");
         $aParams['oxnewsletter__oxshopid'] = $sShopID;
 
-        $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+        $oNewsletter = oxNew(Newsletter::class);
         if ($soxId != "-1") {
             $oNewsletter->load($soxId);
         } else {

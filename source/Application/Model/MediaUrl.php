@@ -21,11 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Media URL handler
  *
  */
-class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class MediaUrl extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -86,7 +89,7 @@ class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     public function getLink()
     {
         if ($this->oxmediaurls__oxisuploaded->value) {
-            $sUrl = $this->getConfig()->isSsl() ? $this->getConfig()->getSslShopUrl() : $this->getConfig()->getShopUrl();
+            $sUrl = Registry::getConfig()->isSsl() ? Registry::getConfig()->getSslShopUrl() : Registry::getConfig()->getShopUrl();
             $sUrl .= 'out/media/';
             $sUrl .= basename($this->oxmediaurls__oxurl->value);
         } else {
@@ -115,7 +118,7 @@ class MediaUrl extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function delete($sOXID = null)
     {
-        $sFilePath = $this->getConfig()->getConfigParam('sShopDir') . "/out/media/" .
+        $sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . "/out/media/" .
                      basename($this->oxmediaurls__oxurl->value);
 
         if ($this->oxmediaurls__oxisuploaded->value) {

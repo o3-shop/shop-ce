@@ -21,17 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 use stdClass;
 
 /**
  * Admin content manager.
  * There is possibility to change content description, enter page text etc.
- * Admin Menu: Customerinformations -> Content.
+ * Admin Menu: Customer-Information -> Content.
  */
-class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ContentMain extends AdminDetailsController
 {
     /**
      * Loads contents info, passes it to Smarty engine and
@@ -41,17 +47,17 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         parent::render();
 
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
 
-        // categorie tree
-        $oCatTree = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        // category-tree
+        $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
 
-        $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oContent = oxNew(Content::class);
         if (isset($soxId) && $soxId != "-1") {
             // load object
             $oContent->loadInLang($this->_iEditLang, $soxId);
@@ -63,7 +69,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             }
 
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
                 $this->_aViewData["posslang"] = $aLang;
             }
@@ -79,8 +85,8 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             }
         } else {
             // create ident to make life easier
-            $sUId = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUId();
-            $oContent->oxcontents__oxloadid = new \OxidEsales\Eshop\Core\Field($sUId);
+            $sUId = Registry::getUtilsObject()->generateUId();
+            $oContent->oxcontents__oxloadid = new Field($sUId);
         }
 
         $this->_aViewData["edit"] = $oContent;
@@ -93,7 +99,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $sCSS = null;
         }
 
-        $this->_aViewData["editor"] = $this->_generateTextEditor("100%", 300, $oContent, "oxcontents__oxcontent", $sCSS);
+        $this->_aViewData["editor"] = $this->generateTextEditor("100%", 300, $oContent, "oxcontents__oxcontent", $sCSS);
         $this->_aViewData["afolder"] = $myConfig->getConfigParam('aCMSfolder');
 
         return "content_main.tpl";
@@ -102,25 +108,26 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     /**
      * Saves content contents.
      *
-     * @return mixed
+     * @return void
+     * @throws DatabaseConnectionException|DatabaseErrorException
      */
     public function save()
     {
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (isset($aParams['oxcontents__oxloadid'])) {
-            $aParams['oxcontents__oxloadid'] = $this->_prepareIdent($aParams['oxcontents__oxloadid']);
+            $aParams['oxcontents__oxloadid'] = $this->prepareIdent($aParams['oxcontents__oxloadid']);
         }
 
         // check if loadid is unique
-        if ($this->_checkIdent($aParams['oxcontents__oxloadid'], $soxId)) {
+        if ($this->checkIdent($aParams['oxcontents__oxloadid'], $soxId)) {
             // loadid already used, display error message
             $this->_aViewData["blLoadError"] = true;
 
-            $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+            $oContent = oxNew(Content::class);
             if ($soxId != '-1') {
                 $oContent->load($soxId);
             }
@@ -147,7 +154,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $aParams['oxcontents__oxfolder'] = '';
         }
 
-        $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oContent = oxNew(Content::class);
 
         if ($soxId != "-1") {
             $oContent->loadInLang($this->_iEditLang, $soxId);
@@ -174,10 +181,10 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (isset($aParams['oxcontents__oxloadid'])) {
-            $aParams['oxcontents__oxloadid'] = $this->_prepareIdent($aParams['oxcontents__oxloadid']);
+            $aParams['oxcontents__oxloadid'] = $this->prepareIdent($aParams['oxcontents__oxloadid']);
         }
 
         // checkbox handling
@@ -185,7 +192,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $aParams['oxcontents__oxactive'] = 0;
         }
 
-        $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oContent = oxNew(Content::class);
 
         if ($soxId != "-1") {
             $oContent->loadInLang($this->_iEditLang, $soxId);
@@ -197,7 +204,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oContent->assign($aParams);
 
         // apply new language
-        $oContent->setLanguage(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("new_lang"));
+        $oContent->setLanguage(Registry::getRequest()->getRequestEscapedParameter('new_lang'));
         $oContent->save();
 
         // set oxid if inserted
@@ -205,17 +212,29 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
-     * Prepares ident (removes bad chars, leaves only thoose that fits in a-zA-Z0-9_ range)
+     * Prepares ident (removes bad chars, leaves only those that fits in a-zA-Z0-9_ range)
      *
      * @param string $sIdent ident to filter
      *
-     * @return string
+     * @return string|null
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareIdent" in next major
      */
     protected function _prepareIdent($sIdent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->prepareIdent($sIdent);
+    }
+
+    /**
+     * Prepares ident (removes bad chars, leaves only those that fits in a-zA-Z0-9_ range)
+     *
+     * @param string $sIdent ident to filter
+     *
+     * @return string|void
+     */
+    protected function prepareIdent($sIdent)
+    {
         if ($sIdent) {
-            return getStr()->preg_replace("/[^a-zA-Z0-9_]*/", "", $sIdent);
+            return Str::getStr()->preg_replace("/[^a-zA-Z0-9_]*/", "", $sIdent);
         }
     }
 
@@ -223,15 +242,30 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
      * Check if ident is unique
      *
      * @param string $sIdent ident
-     * @param string $sOxId  Object id
+     * @param string $sOxId Object id
      *
      * @return null
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkIdent" in next major
      */
     protected function _checkIdent($sIdent, $sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->checkIdent($sIdent, $sOxId);
+    }
+
+    /**
+     * Check if ident is unique
+     *
+     * @param string $sIdent ident
+     * @param string $sOxId Object id
+     *
+     * @return null
+     * @throws DatabaseConnectionException
+     */
+    protected function checkIdent($sIdent, $sOxId)
+    {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        $masterDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+        $masterDb = DatabaseProvider::getMaster();
 
         $blAllow = false;
 
@@ -243,7 +277,7 @@ class ContentMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $masterDb->getOne("select oxid from oxcontents where oxloadid = :oxloadid and oxid != :oxid and oxshopid = :oxshopid", [
             ':oxloadid' => $sIdent,
             ':oxid' => $sOxId,
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
             ])
         ) {
             $blAllow = true;

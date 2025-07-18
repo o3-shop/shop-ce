@@ -21,10 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController;
+
 /**
  * Admin general export manager.
  */
-class GenericExportMain extends \OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController
+class GenericExportMain extends DynamicExportBaseController
 {
     /**
      * Export class name

@@ -21,10 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Application\Model\CategoryList;
+
 /**
  * Class for updating category tree structure in DB.
  */
-class CategoryUpdate extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class CategoryUpdate extends AdminController
 {
     /**
      * Current class template name.
@@ -36,20 +40,32 @@ class CategoryUpdate extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     /**
      * Category list object
      *
-     * @var oxCategoryList
+     * @var CategoryList
      */
     protected $_oCatList = null;
 
     /**
      * Returns category list object
      *
-     * @return oxCategoryList
+     * @return CategoryList
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
      */
     protected function _getCategoryList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCategoryList();
+    }
+
+    /**
+     * Returns category list object
+     *
+     * @return CategoryList
+     * @throws Exception
+     */
+    protected function getCategoryList()
+    {
         if ($this->_oCatList == null) {
-            $this->_oCatList = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+            $this->_oCatList = oxNew(CategoryList::class);
             $this->_oCatList->updateCategoryTree(false);
         }
 
@@ -60,9 +76,10 @@ class CategoryUpdate extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * Returns category list object
      *
      * @return array
+     * @throws Exception
      */
     public function getCatListUpdateInfo()
     {
-        return $this->_getCategoryList()->getUpdateInfo();
+        return $this->getCategoryList()->getUpdateInfo();
     }
 }

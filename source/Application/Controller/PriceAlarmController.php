@@ -21,11 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * PriceAlarm window.
@@ -35,7 +38,7 @@ use oxRegistry;
  * email.
  * O3-Shop -> pricealarm.
  */
-class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class PriceAlarmController extends FrontendController
 {
     /**
      * Current class template name.
@@ -68,18 +71,19 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
     /**
      * Validates email
      * address. If email is wrong - returns false and exits. If email
-     * address is OK - creates prcealarm object and saves it
+     * address is OK - creates pricealarm object and saves it
      * (oxpricealarm::save()). Sends pricealarm notification mail
      * to shop owner.
      *
-     * @return  bool    false on error
+     * @return void
+     * @throws Exception
      */
     public function addme()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $myUtils = Registry::getUtils();
 
-        $aParams = Registry::getConfig()->getRequestParameter('pa');
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('pa');
         if (!isset($aParams['email']) || !oxNew(MailValidator::class)->isValidEmail($aParams['email'])) {
             $this->_iPriceAlarmStatus = 0;
 
@@ -90,7 +94,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
         // convert currency to default
         $dPrice = $myUtils->currency2Float($aParams['price']);
 
-        $oAlarm = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
+        $oAlarm = oxNew(PriceAlarm::class);
         $oAlarm->oxpricealarm__oxuserid = new Field(Registry::getSession()->getVariable('usr'));
         $oAlarm->oxpricealarm__oxemail = new Field($aParams['email']);
         $oAlarm->oxpricealarm__oxartid = new Field($aParams['aid']);
@@ -103,7 +107,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
         $oAlarm->save();
 
         // Send Email
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
         $this->_iPriceAlarmStatus = (int) $oEmail->sendPricealarmNotification($aParams, $oAlarm);
     }
 
@@ -118,7 +122,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
             $this->_sBidPrice = false;
 
             $aParams = $this->_getParams();
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
             $iPrice = Registry::getUtils()->currency2Float($aParams['price']);
             $this->_sBidPrice = Registry::getLang()->formatCurrency($iPrice, $oCur);
         }
@@ -136,7 +140,7 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
         if ($this->_oArticle === null) {
             $this->_oArticle = false;
             $aParams = $this->_getParams();
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $oArticle = oxNew(Article::class);
             $oArticle->load($aParams['aid']);
             $this->_oArticle = $oArticle;
         }
@@ -151,11 +155,11 @@ class PriceAlarmController extends \OxidEsales\Eshop\Application\Controller\Fron
      */
     private function _getParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return Registry::getConfig()->getRequestParameter('pa');
+        return Registry::getRequest()->getRequestEscapedParameter('pa');
     }
 
     /**
-     * Return pricealarm status (if it was send)
+     * Return pricealarm status (if it was sent)
      *
      * @return integer
      */

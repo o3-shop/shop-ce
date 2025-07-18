@@ -21,26 +21,32 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxBasket;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Basket;
 use OxidEsales\Eshop\Application\Model\DeliverySetList;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Model\PaymentList;
+use OxidEsales\Eshop\Application\Model\UserPayment;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Payment manager.
  * Customer payment manager class. Performs payment validation function, etc.
  */
-class PaymentController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class PaymentController extends FrontendController
 {
     /**
-     * Paymentlist
+     * Payment-list
      *
      * @var object
      */
     protected $_oPaymentList = null;
 
     /**
-     * Paymentlist count
+     * Payment-list count
      *
      * @var integer
      */
@@ -126,20 +132,22 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Executes parent::render(), checks if this connection secure
      * (if not - redirects to secure payment page), loads user object
-     * (if user object loading was not successfull - redirects to start
+     * (if user object loading was not successful - redirects to start
      * page), loads user delivery/shipping information. According
      * to configuration in admin, user profile data loads delivery sets,
      * and possible payment methods. Returns name of template to render
      * payment::_sThisTemplate.
      *
      * @return  string  current template file name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         if ($myConfig->getConfigParam('blPsBasketReservationEnabled')) {
-            $this->getSession()->getBasketReservations()->renewExpiration();
+            Registry::getSession()->getBasketReservations()->renewExpiration();
         }
 
         parent::render();
@@ -149,29 +157,29 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         //but first checking maybe there were redirection already to prevent infinite redirections
         //due to possible buggy ssl detection on server
-        $blAlreadyRedirected = Registry::getConfig()->getRequestParameter('sslredirect') == 'forced';
+        $blAlreadyRedirected = Registry::getRequest()->getRequestEscapedParameter('sslredirect') == 'forced';
 
         if ($this->getIsOrderStep()) {
-            //additional check if we really really have a user now
+            //additional check if we really have a user now
             //and the basket is not empty
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
             $blPsBasketReservationEnabled = $myConfig->getConfigParam('blPsBasketReservationEnabled');
-            if ($blPsBasketReservationEnabled && (!$oBasket || ($oBasket && !$oBasket->getProductsCount()))) {
+            if ($blPsBasketReservationEnabled && (!$oBasket || !$oBasket->getProductsCount())) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', true, 302);
             }
 
             $oUser = $this->getUser();
             if (!$oUser && ($oBasket && $oBasket->getProductsCount() > 0)) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=basket', false, 302);
-            } elseif (!$oBasket || !$oUser || ($oBasket && !$oBasket->getProductsCount())) {
+            } elseif (!$oBasket || !$oUser || !$oBasket->getProductsCount()) {
                 Registry::getUtils()->redirect($myConfig->getShopHomeUrl() . 'cl=start', false, 302);
             }
         }
 
-        $sFncParameter = Registry::getConfig()->getRequestParameter('fnc');
+        $sFncParameter = Registry::getRequest()->getRequestEscapedParameter('fnc');
         if ($myConfig->getCurrentShopURL() != $myConfig->getSSLShopURL() && !$blAlreadyRedirected && !$sFncParameter) {
-            $sPayErrorParameter = Registry::getConfig()->getRequestParameter('payerror');
-            $sPayErrorTextParameter = Registry::getConfig()->getRequestParameter('payerrortext');
+            $sPayErrorParameter = Registry::getRequest()->getRequestEscapedParameter('payerror');
+            $sPayErrorTextParameter = Registry::getRequest()->getRequestEscapedParameter('payerrortext');
             $shopSecureHomeURL = $myConfig->getShopSecureHomeURL();
 
             $sPayError = $sPayErrorParameter ? 'payerror=' . $sPayErrorParameter : '';
@@ -200,8 +208,8 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     protected function _setDefaultEmptyPayment() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // no shipping method there !!
-        if ($this->getConfig()->getConfigParam('blOtherCountryOrder')) {
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        if (Registry::getConfig()->getConfigParam('blOtherCountryOrder')) {
+            $oPayment = oxNew(Payment::class);
             if ($oPayment->load('oxempty')) {
                 $this->_oEmptyPayment = $oPayment;
             } else {
@@ -219,8 +227,8 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     protected function _unsetPaymentErrors() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $iPayError = Registry::getConfig()->getRequestParameter('payerror');
-        $sPayErrorText = Registry::getConfig()->getRequestParameter('payerrortext');
+        $iPayError = Registry::getRequest()->getRequestEscapedParameter('payerror');
+        $sPayErrorText = Registry::getRequest()->getRequestEscapedParameter('payerrortext');
 
         if (!($iPayError || $sPayErrorText)) {
             $iPayError = Registry::getSession()->getVariable('payerror');
@@ -243,29 +251,31 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function changeshipping()
     {
-        $oSession = $this->getSession();
+        $oSession = Registry::getSession();
 
         $oBasket = $oSession->getBasket();
         $oBasket->setShipping(null);
         $oBasket->onUpdate();
-        $oSession->setVariable('sShipSet', $this->getConfig()->getRequestParameter('sShipSet'));
+        $oSession->setVariable('sShipSet', Registry::getRequest()->getRequestEscapedParameter('sShipSet'));
     }
 
     /**
      * Validates oxiddebitnote user payment data.
-     * Returns null if problems on validating occured. If everything
+     * Returns null if problems on validating occurred. If everything
      * is OK - returns "order" and redirects to payment confirmation
      * page.
      *
      * Session variables:
      * <b>paymentid</b>, <b>dynvalue</b>, <b>payerror</b>
      *
-     * @return  mixed
+     * @return string|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function validatePayment()
     {
-        $myConfig = $this->getConfig();
-        $oSession = $this->getSession();
+        $myConfig = Registry::getConfig();
+        $oSession = Registry::getSession();
 
         //#1308C - check user. Function is executed before render(), and oUser is not set!
         // Set it manually for use in methods getPaymentList(), getShippingSetList()...
@@ -276,13 +286,13 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             return;
         }
 
-        if (!($sShipSetId = Registry::getConfig()->getRequestParameter('sShipSet'))) {
+        if (!($sShipSetId = Registry::getRequest()->getRequestEscapedParameter('sShipSet'))) {
             $sShipSetId = $oSession->getVariable('sShipSet');
         }
-        if (!($sPaymentId = Registry::getConfig()->getRequestParameter('paymentid'))) {
+        if (!($sPaymentId = Registry::getRequest()->getRequestEscapedParameter('paymentid'))) {
             $sPaymentId = $oSession->getVariable('paymentid');
         }
-        if (!($aDynvalue = Registry::getConfig()->getRequestParameter('dynvalue'))) {
+        if (!($aDynvalue = Registry::getRequest()->getRequestEscapedParameter('dynvalue'))) {
             $aDynvalue = $oSession->getVariable('dynvalue');
         }
 
@@ -300,7 +310,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         $oBasket = $oSession->getBasket();
         $oBasket->setPayment(null);
-        $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+        $oPayment = oxNew(Payment::class);
         $oPayment->load($sPaymentId);
 
         // getting basket price for payment calculation
@@ -321,27 +331,27 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             //#1308C - delete paymentid from session, and save selected it just for view
             $oSession->deleteVariable('paymentid');
             $oSession->setVariable('_selected_paymentid', $sPaymentId);
-
-            return;
         }
     }
 
     /**
-     * Template variable getter. Returns paymentlist
+     * Template variable getter. Returns payment-list
      *
-     * @return object
+     * @return PaymentList
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getPaymentList()
     {
         if ($this->_oPaymentList === null) {
             $this->_oPaymentList = false;
 
-            $sActShipSet = Registry::getConfig()->getRequestParameter('sShipSet');
+            $sActShipSet = Registry::getRequest()->getRequestEscapedParameter('sShipSet');
             if (!$sActShipSet) {
                 $sActShipSet = Registry::getSession()->getVariable('sShipSet');
             }
 
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
 
             // load sets, active set, and active set payment list
             list($aAllSets, $sActShipSet, $aPaymentList) =
@@ -349,7 +359,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
             $oBasket->setShipping($sActShipSet);
 
-            // calculating payment expences for preview for each payment
+            // calculating payment expenses for preview for each payment
             $this->_setValues($aPaymentList, $oBasket);
             $this->_oPaymentList = $aPaymentList;
             $this->_aAllSets = $aAllSets;
@@ -362,6 +372,8 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Template variable getter. Returns all delivery sets
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAllSets()
     {
@@ -380,6 +392,8 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Template variable getter. Returns number of delivery sets
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getAllSetsCnt()
     {
@@ -395,13 +409,13 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Calculate payment cost for each payment. Sould be removed later
+     * Calculate payment cost for each payment. Should be removed later
      *
      * @param array                                      $aPaymentList payments array
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket      basket object
+     * @param Basket $oBasket      basket object
      * @deprecated underscore prefix violates PSR12, will be renamed to "setValues" in next major
      */
-    protected function _setValues(&$aPaymentList, $oBasket = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setValues($aPaymentList, $oBasket = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($aPaymentList)) {
             foreach ($aPaymentList as $oPayment) {
@@ -451,13 +465,15 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function isOldDebitValidationEnabled()
     {
-        return !$this->getConfig()->getConfigParam('blSkipDebitOldBankInfo');
+        return !Registry::getConfig()->getConfigParam('blSkipDebitOldBankInfo');
     }
 
     /**
      * Template variable getter. Returns dyn values
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDynValue()
     {
@@ -468,7 +484,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             if (($aDynValue = Registry::getSession()->getVariable('dynvalue'))) {
                 $this->_aDynValue = $aDynValue;
             } else {
-                $this->_aDynValue = Registry::getConfig()->getRequestParameter("dynvalue");
+                $this->_aDynValue = Registry::getRequest()->getRequestEscapedParameter('dynvalue');
             }
 
             // #701A
@@ -490,13 +506,13 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     protected function _assignDebitNoteParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // #701A
-        $oUserPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
+        $oUserPayment = oxNew(UserPayment::class);
         //such info available ?
         if ($oUserPayment->getPaymentByPaymentType($this->getUser(), 'oxiddebitnote')) {
             $sUserPaymentField = 'oxuserpayments__oxvalue';
             $aAddPaymentData = Registry::getUtils()->assignValuesFromText($oUserPayment->$sUserPaymentField->value);
 
-            //checking if some of values is allready set in session - leave it
+            //checking if some of the values is already set in session - leave it
             foreach ($aAddPaymentData as $oData) {
                 if (
                     !isset($this->_aDynValue[$oData->name]) ||
@@ -513,11 +529,13 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * if fails, then tries to get payment ID from last order.
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCheckedPaymentId()
     {
         if ($this->_sCheckedPaymentId === null) {
-            if (!($sPaymentID = Registry::getConfig()->getRequestParameter('paymentid'))) {
+            if (!($sPaymentID = Registry::getRequest()->getRequestEscapedParameter('paymentid'))) {
                 $sPaymentID = Registry::getSession()->getVariable('paymentid');
             }
             if ($sPaymentID) {
@@ -527,7 +545,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
             } else {
                 // #1010A.
                 if ($oUser = $this->getUser()) {
-                    $oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+                    $oOrder = oxNew(Order::class);
                     if (($sLastPaymentId = $oOrder->getLastUserPaymentType($oUser->getId()))) {
                         $sCheckedId = $sLastPaymentId;
                     }
@@ -555,6 +573,8 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Template variable getter. Returns payment list count
      *
      * @return integer
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getPaymentCnt()
     {
@@ -570,7 +590,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Function to check if array values are empty againts given array keys
+     * Function to check if array values are empty against given array keys
      *
      * @param array $aData array of data to check
      * @param array $aKeys array of array indexes
@@ -585,7 +605,7 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         }
 
         foreach ($aKeys as $sKey) {
-            if (isset($aData[$sKey]) && !empty($aData[$sKey])) {
+            if (!empty($aData[$sKey])) {
                 return false;
             }
         }
@@ -614,12 +634,12 @@ class PaymentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * Retuns config true if Vat is splitted
+     * Returns config true if Vat is split
      *
      * @return array
      */
     public function isPaymentVatSplitted()
     {
-        return $this->getConfig()->getConfigParam('blShowVATForPayCharge');
+        return Registry::getConfig()->getConfigParam('blShowVATForPayCharge');
     }
 }

@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Current user order history review.
@@ -32,7 +34,7 @@ use oxRegistry;
  * ordered articles information, button to add article to basket.
  * O3-Shop -> MY ACCOUNT -> Newsletter.
  */
-class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountOrderController extends AccountController
 {
     /**
      * Count of all articles in list.
@@ -92,6 +94,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
      * Template variable getter. Returns orders
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getOrderList()
     {
@@ -100,7 +103,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
 
             // Load user Orderlist
             if ($oUser = $this->getUser()) {
-                $iNrofCatArticles = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+                $iNrofCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
                 $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 1;
                 $this->_iAllArtCnt = $oUser->getOrderCount();
                 if ($this->_iAllArtCnt && $this->_iAllArtCnt > 0) {
@@ -116,7 +119,8 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
     /**
      * Template variable getter. Returns ordered articles
      *
-     * @return \OxidEsales\Eshop\Application\Model\ArticleList | false
+     * @return ArticleList|false
+     * @throws DatabaseConnectionException
      */
     public function getOrderArticleList()
     {
@@ -125,7 +129,7 @@ class AccountOrderController extends \OxidEsales\Eshop\Application\Controller\Ac
             $this->_aArticlesList = false;
             $oOrdersList = $this->getOrderList();
             if ($oOrdersList && $oOrdersList->count()) {
-                $this->_aArticlesList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $this->_aArticlesList = oxNew(ArticleList::class);
                 $this->_aArticlesList->loadOrderArticles($oOrdersList);
             }
         }

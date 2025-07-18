@@ -21,17 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxArticleInputException;
-use oxOutOfStockException;
-use oxNoArticleException;
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
  * UserBasketItem class, responsible for storing most important fields
  *
  */
-class BasketItem extends \OxidEsales\Eshop\Core\Base
+class BasketItem extends Base
 {
     /**
      * Product ID
@@ -71,14 +76,14 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Item price
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oPrice = null;
 
     /**
      * Item unit price
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oUnitPrice = null;
 
@@ -111,7 +116,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     protected $_sShopId = null;
 
     /**
-     * Native product shop Id
+     * Native product shop ID
      *
      * @var string
      */
@@ -132,7 +137,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     protected $_aPersistentParameters = [];
 
     /**
-     * Buundle marker - marks if item is bundle or not
+     * Bundle marker - marks if item is bundle or not
      *
      * @var boolean
      */
@@ -148,7 +153,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * This item article
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oArticle = null;
 
@@ -174,7 +179,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     protected $_aChosenSelectlist = [];
 
     /**
-     * Used wrapping paper Id
+     * Used wrapping paper ID
      *
      * @var string
      */
@@ -188,7 +193,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     protected $_sWishId = null;
 
     /**
-     * Wish article Id
+     * Wish article ID
      *
      * @var string
      */
@@ -227,7 +232,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Regular Item unit price - price without basket item discounts
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oRegularUnitPrice = null;
 
@@ -239,7 +244,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     protected $basketItemKey = null;
 
     /**
-     * Getter for basketItemkey.
+     * Getter for basketItemKey.
      *
      * @return string | null
      */
@@ -249,7 +254,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Setter for basketItemkey.
+     * Setter for basketItemKey.
      *
      * @param string $itemKey
      */
@@ -261,7 +266,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Return regular unit price
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getRegularUnitPrice()
     {
@@ -271,7 +276,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Set regular unit price
      *
-     * @param \OxidEsales\Eshop\Core\Price $oRegularUnitPrice regular price
+     * @param Price $oRegularUnitPrice regular price
      */
     public function setRegularUnitPrice($oRegularUnitPrice)
     {
@@ -281,19 +286,24 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
 
     /**
      * Assigns basic params to basket item
-     *  - oxbasketitem::_setArticle();
-     *  - oxbasketitem::setAmount();
-     *  - oxbasketitem::_setSelectList();
-     *  - oxbasketitem::setPersParams();
-     *  - oxbasketitem::setBundle().
+     *  - BasketItem::_setArticle();
+     *  - BasketItem::setAmount();
+     *  - BasketItem::_setSelectList();
+     *  - BasketItem::setPersParams();
+     *  - BasketItem::setBundle().
      *
      * @param string $sProductID product id
-     * @param double $dAmount    amount
-     * @param array  $aSel       selection
-     * @param array  $aPersParam persistent params
-     * @param bool   $blBundle   bundle
+     * @param double $dAmount amount
+     * @param array|null $aSel selection
+     * @param array|null $aPersParam persistent params
+     * @param bool|null $blBundle bundle
      *
-     * @throws oxNoArticleException, oxOutOfStockException, oxArticleInputException
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function init($sProductID, $dAmount, $aSel = null, $aPersParam = null, $blBundle = null)
     {
@@ -302,19 +312,25 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
         $this->_setSelectList($aSel);
         $this->setPersParams($aPersParam);
         $this->setBundle($blBundle);
-        $this->setLanguageId(\OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage());
+        $this->setLanguageId(Registry::getLang()->getBaseLanguage());
     }
 
     /**
-     * Initializes basket item from oxorderarticle object
-     *  - oxbasketitem::_setFromOrderArticle() - assigns $oOrderArticle parameter
-     *  to oxBasketItem::_oArticle. Thus oxOrderArticle is used as oxArticle (calls
+     * Initializes basket item from OrderArticle-object
+     *  - basketItem::_setFromOrderArticle() - assigns $oOrderArticle parameter
+     *  to BasketItem::_oArticle. Thus, oxOrderArticle is used as oxArticle (calls
      *  standard methods implemented by oxIArticle interface);
-     *  - oxbasketitem::setAmount();
-     *  - oxbasketitem::_setSelectList();
-     *  - oxbasketitem::setPersParams().
+     *  - basketItem::setAmount();
+     *  - basketItem::_setSelectList();
+     *  - basketItem::setPersParams().
      *
-     * @param \OxidEsales\Eshop\Application\Model\OrderArticle $oOrderArticle order article to load info from
+     * @param OrderArticle $oOrderArticle order article to load info from
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function initFromOrderArticle($oOrderArticle)
     {
@@ -326,7 +342,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Marks if item is discount bundle ( oxbasketitem::_blIsDiscountArticle )
+     * Marks if item is discount bundle ( BasketItem::_blIsDiscountArticle )
      *
      * @param bool $blIsDiscountArticle if item is discount bundle
      */
@@ -357,21 +373,25 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
 
     /**
      * Sets item amount and weight which depends on amount
-     * ( oxbasketitem::dAmount, oxbasketitem::dWeight )
+     * ( BasketItem::dAmount, BasketItem::dWeight )
      *
-     * @param double $dAmount    amount
-     * @param bool   $blOverride Whether to override current amount.
-     * @param string $sItemKey   item key
+     * @param double $dAmount amount
+     * @param bool $blOverride Whether to override current amount.
+     * @param null $sItemKey item key
      *
-     * @throws oxArticleInputException
-     * @throws oxOutOfStockException
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws NoArticleException
+     * @throws OutOfStockException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setAmount($dAmount, $blOverride = true, $sItemKey = null)
     {
         try {
             //validating amount
-            $dAmount = \OxidEsales\Eshop\Core\Registry::getInputValidator()->validateBasketAmount($dAmount);
-        } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+            $dAmount = Registry::getInputValidator()->validateBasketAmount($dAmount);
+        } catch (ArticleInputException $oEx) {
             $oEx->setArticleNr($this->getProductId());
             $oEx->setProductId($this->getProductId());
             // setting additional information for exception and then rethrowing
@@ -391,10 +411,10 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
         }
 
         // checking for stock
-        if ($this->getStockCheckStatus() == true) {
-            $dArtStockAmount = $this->getSession()->getBasket()->getArtStockInBasket($oArticle->getId(), $sItemKey);
+        if ($this->getStockCheckStatus()) {
+            $dArtStockAmount = Registry::getSession()->getBasket()->getArtStockInBasket($oArticle->getId(), $sItemKey);
             $selectForUpdate = false;
-            if ($this->getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
+            if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
                 $selectForUpdate = true;
             }
             $iOnStock = $oArticle->checkForStock($this->_dAmount, $dArtStockAmount, $selectForUpdate);
@@ -413,8 +433,8 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
         $this->_dWeight = $oArticle->oxarticles__oxweight->value * $this->_dAmount;
 
         if ($iOnStock !== true) {
-            /** @var \OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx */
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\OutOfStockException::class);
+            /** @var OutOfStockException $oEx */
+            $oEx = oxNew(OutOfStockException::class);
             $oEx->setMessage('ERROR_MESSAGE_OUTOFSTOCK_OUTOFSTOCK');
             $oEx->setArticleNr($oArticle->oxarticles__oxartnum->value);
             $oEx->setProductId($oArticle->getProductId());
@@ -427,7 +447,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Apply checks for package on amount
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param Article $article
      * @param double                                      $amount
      *
      * @return double
@@ -454,11 +474,15 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      * Returns article icon picture url
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function getIconUrl()
     {
-        // icon url must be (re)loaded in case icon is not set or shop was switched between ssl/nonssl
-        if ($this->_sIconUrl === null || $this->_blSsl != $this->getConfig()->isSsl()) {
+        // icon url must be (re)loaded in case icon is not set or shop was switched between ssl/non-ssl
+        if ($this->_sIconUrl === null || $this->_blSsl != Registry::getConfig()->isSsl()) {
             $this->_sIconUrl = $this->getArticle()->getIconUrl();
         }
 
@@ -469,15 +493,15 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      * Retrieves the article .Throws an exception if article does not exist,
      * is not buyable or visible.
      *
-     * @param bool   $blCheckProduct       checks if product is buyable and visible
-     * @param string $sProductId           product id
-     * @param bool   $blDisableLazyLoading disable lazy loading
+     * @param bool $blCheckProduct checks if product is buyable and visible
+     * @param null $sProductId product id
+     * @param bool $blDisableLazyLoading disable lazy loading
      *
-     * @throws oxArticleException exception in case of no current object product id is set
-     * @throws oxNoArticleException exception in case if product not exitst or not visible
-     * @throws oxArticleInputException exception if product is not buyable (stock and so on)
-     *
-     * @return \OxidEsales\Eshop\Application\Model\Article|oxOrderArticle
+     * @return Article|OrderArticle
+     * @throws ArticleException exception in case of no current object product id is set
+     * @throws ArticleInputException exception if product is not buyable (stock and so on)
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException exception in case if product not exists or not visible
      */
     public function getArticle($blCheckProduct = false, $sProductId = null, $blDisableLazyLoading = false)
     {
@@ -485,13 +509,13 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
             $sProductId = $sProductId ? $sProductId : $this->_sProductId;
             if (!$sProductId) {
                 //this exception may not be caught, anyhow this is a critical exception
-                /** @var \OxidEsales\Eshop\Core\Exception\ArticleException $oEx */
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleException::class);
+                /** @var ArticleException $oEx */
+                $oEx = oxNew(ArticleException::class);
                 $oEx->setMessage('EXCEPTION_ARTICLE_NOPRODUCTID');
                 throw $oEx;
             }
 
-            $this->_oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $this->_oArticle = oxNew(Article::class);
             // #M773 Do not use article lazy loading on order save
             if ($blDisableLazyLoading) {
                 $this->_oArticle->modifyCacheKey('_allviews');
@@ -505,9 +529,9 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
             $this->_oArticle->setNoVariantLoading(true);
             $this->_oArticle->setLoadParentData(true);
             if (!$this->_oArticle->load($sProductId)) {
-                /** @var \OxidEsales\Eshop\Core\Exception\NoArticleException $oEx */
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\NoArticleException::class);
-                $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+                /** @var NoArticleException $oEx */
+                $oEx = oxNew(NoArticleException::class);
+                $oLang = Registry::getLang();
                 $oEx->setMessage(sprintf($oLang->translateString('ERROR_MESSAGE_ARTICLE_ARTICLE_DOES_NOT_EXIST', $oLang->getBaseLanguage()), $sProductId));
                 $oEx->setArticleNr($sProductId);
                 $oEx->setProductId($sProductId);
@@ -516,9 +540,9 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
 
             // cant put not visible product to basket (M:1286)
             if ($blCheckProduct && !$this->_oArticle->isVisible()) {
-                /** @var \OxidEsales\Eshop\Core\Exception\NoArticleException $oEx */
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\NoArticleException::class);
-                $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+                /** @var NoArticleException $oEx */
+                $oEx = oxNew(NoArticleException::class);
+                $oLang = Registry::getLang();
                 $oEx->setMessage(sprintf($oLang->translateString('ERROR_MESSAGE_ARTICLE_ARTICLE_DOES_NOT_EXIST', $oLang->getBaseLanguage()), $this->_oArticle->oxarticles__oxartnum->value));
                 $oEx->setArticleNr($sProductId);
                 $oEx->setProductId($sProductId);
@@ -527,8 +551,8 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
 
             // cant put not buyable product to basket
             if ($blCheckProduct && !$this->_oArticle->isBuyable()) {
-                /** @var \OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx */
-                $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleInputException::class);
+                /** @var ArticleInputException $oEx */
+                $oEx = oxNew(ArticleInputException::class);
                 $oEx->setMessage('ERROR_MESSAGE_ARTICLE_ARTICLE_NOT_BUYABLE');
                 $oEx->setArticleNr($sProductId);
                 $oEx->setProductId($sProductId);
@@ -552,7 +576,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns the price.
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getPrice()
     {
@@ -562,7 +586,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns the price.
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getUnitPrice()
     {
@@ -593,10 +617,14 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      * Returns product title
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function getTitle()
     {
-        if ($this->_sTitle === null || $this->getLanguageId() != \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage()) {
+        if ($this->_sTitle === null || $this->getLanguageId() != Registry::getLang()->getBaseLanguage()) {
             $oArticle = $this->getArticle();
             $this->_sTitle = $oArticle->oxarticles__oxtitle->value;
 
@@ -612,14 +640,19 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      * Returns product details URL
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
+     * @throws DatabaseErrorException
      */
     public function getLink()
     {
-        if ($this->_sLink === null || $this->getLanguageId() != \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage()) {
-            $this->_sLink = \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->cleanUrl($this->getArticle()->getLink(), ['force_sid']);
+        if ($this->_sLink === null || $this->getLanguageId() != Registry::getLang()->getBaseLanguage()) {
+            $this->_sLink = Registry::getUtilsUrl()->cleanUrl($this->getArticle()->getLink(), ['force_sid']);
         }
 
-        return $this->getSession()->processUrl($this->_sLink);
+        return Registry::getSession()->processUrl($this->_sLink);
     }
 
     /**
@@ -689,7 +722,11 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sName parameter name
      *
-     * @return mixed
+     * @return Article|void
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function __get($sName)
     {
@@ -716,11 +753,11 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Assigns general product parameters to oxbasketitem object :
+     * Assigns general product parameters to BasketItem object :
      *  - sProduct    - oxarticle object ID;
      *  - title       - products title;
      *  - icon        - icon name;
-     *  - link        - details URL's;
+     *  - link        - details URLs;
      *  - sShopId     - current shop ID;
      *  - sNativeShopId  - article shop ID;
      *  - _sDimageDirNoSsl - NON SSL mode image path;
@@ -728,12 +765,16 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sProductId product id
      *
-     * @throws oxNoArticleException exception
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException exception
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setArticle" in next major
      */
     protected function _setArticle($sProductId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $oArticle = $this->getArticle(true, $sProductId);
 
         // product ID
@@ -743,13 +784,13 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
         $this->_sVarSelect = null;
         $this->getTitle();
 
-        // icon and details URL's
+        // icon and details URLs
         $this->_sIcon = $oArticle->oxarticles__oxicon->value;
         $this->_sIconUrl = $oArticle->getIconUrl();
         $this->_blSsl = $oConfig->isSsl();
 
         // removing force_sid from the link (in case it'll change)
-        $this->_sLink = \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->cleanUrl($oArticle->getLink(), ['force_sid']);
+        $this->_sLink = Registry::getUtilsUrl()->cleanUrl($oArticle->getLink(), ['force_sid']);
 
         // shop Ids
         $this->_sShopId = $oConfig->getShopId();
@@ -761,13 +802,13 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Assigns general product parameters to oxbasketitem object:
+     * Assigns general product parameters to BasketItem object:
      *  - sProduct    - oxarticle object ID;
      *  - title       - products title;
      *  - sShopId     - current shop ID;
      *  - sNativeShopId  - article shop ID;
      *
-     * @param \OxidEsales\Eshop\Application\Model\OrderArticle $oOrderArticle order article
+     * @param OrderArticle $oOrderArticle order article
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFromOrderArticle" in next major
      */
     protected function _setFromOrderArticle($oOrderArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -782,14 +823,18 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
         $this->_sTitle = $oOrderArticle->oxarticles__oxtitle->value;
 
         // shop Ids
-        $this->_sShopId = $this->getConfig()->getShopId();
+        $this->_sShopId = Registry::getConfig()->getShopId();
         $this->_sNativeShopId = $oOrderArticle->oxarticles__oxshopid->value;
     }
 
     /**
-     * Stores item select lists ( oxbasketitem::aSelList )
+     * Stores item select lists ( BasketItem::aSelList )
      *
      * @param array $aSelList item select lists
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setSelectList" in next major
      */
     protected function _setSelectList($aSelList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -806,16 +851,16 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
 
         //
         if (is_array($this->_aSelList) && count($this->_aSelList)) {
-            foreach ($this->_aSelList as $conkey => $iSel) {
-                $this->_aChosenSelectlist[$conkey] = new stdClass();
-                $this->_aChosenSelectlist[$conkey]->name = $aSelectLists[$conkey]['name'];
-                $this->_aChosenSelectlist[$conkey]->value = $aSelectLists[$conkey][$iSel]->name;
+            foreach ($this->_aSelList as $key => $iSel) {
+                $this->_aChosenSelectlist[$key] = new stdClass();
+                $this->_aChosenSelectlist[$key]->name = $aSelectLists[$key]['name'];
+                $this->_aChosenSelectlist[$key]->value = $aSelectLists[$key][$iSel]->name;
             }
         }
     }
 
     /**
-     * Get persistent parameters ( oxbasketitem::_aPersistentParameters )
+     * Get persistent parameters ( BasketItem::_aPersistentParameters )
      *
      * @return array
      */
@@ -825,7 +870,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Stores items persistent parameters ( oxbasketitem::_aPersistentParameters )
+     * Stores items persistent parameters ( BasketItem::_aPersistentParameters )
      *
      * @param array $aPersParam items persistent parameters
      */
@@ -835,7 +880,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Marks if item is bundle ( oxbasketitem::blBundle )
+     * Marks if item is bundle ( BasketItem::blBundle )
      *
      * @param bool $blBundle if item is bundle
      */
@@ -887,13 +932,13 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns basket item wrapping object
      *
-     * @return oxwrapping
+     * @return Wrapping
      */
     public function getWrapping()
     {
         $oWrap = null;
         if ($sWrapId = $this->getWrappingId()) {
-            $oWrap = oxNew(\OxidEsales\Eshop\Application\Model\Wrapping::class);
+            $oWrap = oxNew(Wrapping::class);
             $oWrap->load($sWrapId);
         }
 
@@ -921,7 +966,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Wish article Id setter
+     * Wish article ID setter
      *
      * @param string $sArticleId wish article id
      */
@@ -931,7 +976,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Returns wish article Id
+     * Returns wish article ID
      *
      * @return string
      */
@@ -949,7 +994,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      */
     public function getFRegularUnitPrice()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getRegularUnitPrice()->getPrice());
+        return Registry::getLang()->formatCurrency($this->getRegularUnitPrice()->getPrice());
     }
 
     /**
@@ -961,7 +1006,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      */
     public function getFUnitPrice()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getUnitPrice()->getPrice());
+        return Registry::getLang()->formatCurrency($this->getUnitPrice()->getPrice());
     }
 
     /**
@@ -973,7 +1018,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      */
     public function getFTotalPrice()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getPrice()->getPrice());
+        return Registry::getLang()->formatCurrency($this->getPrice()->getPrice());
     }
 
     /**
@@ -983,17 +1028,21 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
      */
     public function getVatPercent()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatVat($this->getPrice()->getVat());
+        return Registry::getLang()->formatVat($this->getPrice()->getVat());
     }
 
     /**
      * Returns varselect value
      *
      * @return string
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function getVarSelect()
     {
-        if ($this->_sVarSelect === null || $this->getLanguageId() != \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage()) {
+        if ($this->_sVarSelect === null || $this->getLanguageId() != Registry::getLang()->getBaseLanguage()) {
             $oArticle = $this->getArticle();
             $sVarSelectValue = $oArticle->oxarticles__oxvarselect->value;
             $this->_sVarSelect = (!empty($sVarSelectValue) || $sVarSelectValue === '0') ? $sVarSelectValue : '';
@@ -1005,7 +1054,7 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     /**
      * Get language id
      *
-     * @return integer
+     * @return bool|null
      */
     public function getLanguageId()
     {
@@ -1013,9 +1062,12 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Set language Id, reload basket content on language change.
+     * Set language ID, reload basket content on language change.
      *
      * @param integer $iLanguageId language id
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function setLanguageId($iLanguageId)
     {
@@ -1026,10 +1078,10 @@ class BasketItem extends \OxidEsales\Eshop\Core\Base
         if ($iOldLang !== null && $iOldLang != $iLanguageId) {
             try {
                 $this->_setArticle($this->getProductId());
-            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (NoArticleException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (ArticleInputException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
     }

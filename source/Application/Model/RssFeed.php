@@ -21,8 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use OxidEsales\Eshop\Core\Edition\EditionSelector;
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\MailValidator;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Facts\Facts;
 use stdClass;
 
 /**
@@ -30,7 +36,7 @@ use stdClass;
  * loads needed rss data
  *
  */
-class RssFeed extends \OxidEsales\Eshop\Core\Base
+class RssFeed extends Base
 {
     /**
      * timeout in seconds for regenerating data (3h)
@@ -60,7 +66,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * Give back the cache file name for the given oxActionId.
      *
-     * @param string $sOxActionId The oxaction we want the cache file name for.
+     * @param string $sOxActionId The action we want the cache file name for.
      *
      * @return string The name of the corresponding file cache file.
      */
@@ -113,16 +119,16 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
      */
     protected function _loadBaseChannel() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oShop = $this->getConfig()->getActiveShop();
+        $oShop = Registry::getConfig()->getActiveShop();
         $this->_aChannel['title'] = $oShop->oxshops__oxname->value;
-        $this->_aChannel['link'] = Registry::getUtilsUrl()->prepareUrlForNoSession($this->getConfig()->getShopUrl());
+        $this->_aChannel['link'] = Registry::getUtilsUrl()->prepareUrlForNoSession(Registry::getConfig()->getShopUrl());
         $this->_aChannel['description'] = '';
         $oLang = Registry::getLang();
         $aLangIds = $oLang->getLanguageIds();
         $this->_aChannel['language'] = $aLangIds[$oLang->getBaseLanguage()];
         $this->_aChannel['copyright'] = $oShop->oxshops__oxname->value;
         $this->_aChannel['selflink'] = '';
-        if (oxNew(\OxidEsales\Eshop\Core\MailValidator::class)->isValidEmail($oShop->oxshops__oxinfoemail->value)) {
+        if (oxNew(MailValidator::class)->isValidEmail($oShop->oxshops__oxinfoemail->value)) {
             $this->_aChannel['managingEditor'] = $oShop->oxshops__oxinfoemail->value;
             if ($oShop->oxshops__oxfname) {
                 $this->_aChannel['managingEditor'] .= " ({$oShop->oxshops__oxfname} {$oShop->oxshops__oxlname})";
@@ -131,9 +137,9 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
 
         $this->_aChannel['generator'] = $oShop->oxshops__oxname->value;
 
-        $editionSelector = new EditionSelector();
-        $this->_aChannel['image']['url'] = $this->getConfig()->getImageUrl()
-            . 'logo_' . strtolower($editionSelector->getEdition()) . '.png';
+        $oFacts = new Facts();
+        $this->_aChannel['image']['url'] = Registry::getConfig()->getImageUrl()
+            . 'logo_' . strtolower($oFacts->getEdition()) . '.png';
 
         $this->_aChannel['image']['title'] = $this->_aChannel['title'];
         $this->_aChannel['image']['link'] = $this->_aChannel['link'];
@@ -150,7 +156,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getCacheId($name) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
         return $name . '_' . $oConfig->getShopId() . '_' . Registry::getLang()->getBaseLanguage() . '_' . (int) $oConfig->getShopCurrency();
     }
@@ -161,7 +167,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
      * @param string $name Rss data Id
      *
      * @access protected
-     * @return array
+     * @return array|bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromCache" in next major
      */
     protected function _loadFromCache($name) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -203,15 +209,15 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
 
     /**
      * _saveToCache writes generated rss data to cache
-     * returns true on successfull write, false otherwise
-     * A successfull write means only write ok AND data has actually changed
-     * if give
+     * returns true on successful write, false otherwise
+     * A successful write means only write ok AND data has actually changed
+     * if given
      *
      * @param string $name     cache name
      * @param array  $aContent data to be saved
      *
      * @access protected
-     * @return void
+     * @return bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "saveToCache" in next major
      */
     protected function _saveToCache($name, $aContent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -225,22 +231,22 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * _getArticleItems create channel items from article list
      *
-     * @param \OxidEsales\Eshop\Application\Model\ArticleList $oList article list
+     * @param ArticleList $oList article list
      *
      * @access protected
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getArticleItems" in next major
      */
-    protected function _getArticleItems(\OxidEsales\Eshop\Application\Model\ArticleList $oList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getArticleItems(ArticleList $oList) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myUtilsUrl = Registry::getUtilsUrl();
         $aItems = [];
         $oLang = Registry::getLang();
-        $oStr = getStr();
+        $oStr = Str::getStr();
 
         foreach ($oList as $oArticle) {
             $oItem = new stdClass();
-            $oActCur = $this->getConfig()->getActShopCurrencyObject();
+            $oActCur = Registry::getConfig()->getActShopCurrencyObject();
             $sPrice = '';
 
             // check if article is a variant
@@ -259,7 +265,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
             $oItem->guid = $oItem->link = $myUtilsUrl->prepareUrlForNoSession($oArticle->getLink());
             $oItem->isGuidPermalink = true;
             // $oItem->description             = $oArticle->getLongDescription()->value; //oxarticles__oxshortdesc->value;
-            //#4038: Smarty not parsed in RSS, although smarty parsing activated for longdescriptions
+            //#4038: Smarty not parsed in RSS, although smarty parsing activated for long-descriptions
             if (Registry::getConfig()->getConfigParam('bl_perfParseLongDescinSmarty')) {
                 $oItem->description = $oArticle->getLongDesc();
             } else {
@@ -272,7 +278,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
 
             $oItem->description = trim($oItem->description);
             if ($sThumb = $oArticle->getThumbnailUrl()) {
-                $oItem->description = "<img src='$sThumb' border=0 align='left' hspace=5>" . $oItem->description;
+                $oItem->description = "<img src='$sThumb' border='0' align='left' hspace='5'>" . $oItem->description;
             }
             $oItem->description = $oStr->htmlspecialchars($oItem->description);
 
@@ -328,7 +334,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
      */
     protected function _prepareFeedName($sTitle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oShop = $this->getConfig()->getActiveShop();
+        $oShop = Registry::getConfig()->getActiveShop();
 
         return $oShop->oxshops__oxname->value . "/" . $sTitle;
     }
@@ -342,8 +348,8 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getShopUrl() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sUrl = $this->getConfig()->getShopUrl();
-        $oStr = getStr();
+        $sUrl = Registry::getConfig()->getShopUrl();
+        $oStr = Str::getStr();
         if ($oStr->strpos($sUrl, '?') !== false) {
             if (!$oStr->preg_match('/[?&](amp;)?$/i', $sUrl)) {
                 $sUrl .= '&amp;';
@@ -431,8 +437,8 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
             return;
         }
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oArtList->loadTop5Articles($this->getConfig()->getConfigParam('iRssItemsCount'));
+        $oArtList = oxNew(ArticleList::class);
+        $oArtList->loadTop5Articles(Registry::getConfig()->getConfigParam('iRssItemsCount'));
 
         $oLang = Registry::getLang();
         $this->_loadData(
@@ -484,8 +490,8 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
         if (($this->_aChannel = $this->_loadFromCache(self::RSS_NEWARTS))) {
             return;
         }
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oArtList->loadNewestArticles($this->getConfig()->getConfigParam('iRssItemsCount'));
+        $oArtList = oxNew(ArticleList::class);
+        $oArtList->loadNewestArticles(Registry::getConfig()->getConfigParam('iRssItemsCount'));
 
         $oLang = Registry::getLang();
         $this->_loadData(
@@ -501,13 +507,14 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * get title for 'Category Articles' rss feed
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCat category object
-     *
-     * @access public
+     * @param Category $oCat category object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @access public
+     *
      */
-    public function getCategoryArticlesTitle(\OxidEsales\Eshop\Application\Model\Category $oCat)
+    public function getCategoryArticlesTitle(Category $oCat)
     {
         $oLang = Registry::getLang();
         $iLang = $oLang->getBaseLanguage();
@@ -519,9 +526,10 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns string built from category titles
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCat category object
+     * @param Category $oCat category object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCatPath" in next major
      */
     protected function _getCatPath($oCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -542,13 +550,13 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * getCategoryArticlesUrl get url for 'Category Articles' rss feed
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCat category object
+     * @param Category $oCat category object
      *
      * @access public
      *
      * @return string
      */
-    public function getCategoryArticlesUrl(\OxidEsales\Eshop\Application\Model\Category $oCat)
+    public function getCategoryArticlesUrl(Category $oCat)
     {
         $oLang = Registry::getLang();
 
@@ -561,22 +569,24 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * loadCategoryArticles loads 'Category Articles' rss data
      *
-     * @param \OxidEsales\Eshop\Application\Model\Category $oCat category object
-     *
-     * @access public
+     * @param Category $oCat category object
      *
      * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @access public
+     *
      */
-    public function loadCategoryArticles(\OxidEsales\Eshop\Application\Model\Category $oCat)
+    public function loadCategoryArticles(Category $oCat)
     {
         $sId = $oCat->getId();
         if (($this->_aChannel = $this->_loadFromCache(self::RSS_CATARTS . $sId))) {
             return;
         }
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $oArtList = oxNew(ArticleList::class);
         $oArtList->setCustomSorting('oc.oxtimestamp desc');
-        $oArtList->loadCategoryArticles($oCat->getId(), null, $this->getConfig()->getConfigParam('iRssItemsCount'));
+        $oArtList->loadCategoryArticles($oCat->getId(), null, Registry::getConfig()->getConfigParam('iRssItemsCount'));
 
         $oLang = Registry::getLang();
         $this->_loadData(
@@ -604,7 +614,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
      */
     public function getSearchArticlesTitle($sSearch, $sCatId, $sVendorId, $sManufacturerId)
     {
-        return $this->_prepareFeedName(getStr()->htmlspecialchars($this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', $sSearch, $sCatId, $sVendorId, $sManufacturerId)));
+        return $this->_prepareFeedName(Str::getStr()->htmlspecialchars($this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', $sSearch, $sCatId, $sVendorId, $sManufacturerId)));
     }
 
     /**
@@ -729,31 +739,32 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * loadSearchArticles loads 'Search Articles' rss data
      *
-     * @param string $sSearch         search string
-     * @param string $sCatId          category id
-     * @param string $sVendorId       vendor id
+     * @param string $sSearch search string
+     * @param string $sCatId category id
+     * @param string $sVendorId vendor id
      * @param string $sManufacturerId Manufacturer id
      *
      * @access public
+     * @throws DatabaseConnectionException
      */
     public function loadSearchArticles($sSearch, $sCatId, $sVendorId, $sManufacturerId)
     {
-        // dont use cache for search
+        // don't use cache for search
         //if ($this->_aChannel = $this->_loadFromCache(self::RSS_SEARCHARTS.md5($sSearch.$sCatId.$sVendorId))) {
         //    return;
         //}
 
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $oConfig->setConfigParam('iNrofCatArticles', $oConfig->getConfigParam('iRssItemsCount'));
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\Search::class)->getSearchArticles($sSearch, $sCatId, $sVendorId, $sManufacturerId, oxNew(\OxidEsales\Eshop\Application\Model\Article::class)->getViewName() . '.oxtimestamp desc');
+        $oArtList = oxNew(Search::class)->getSearchArticles($sSearch, $sCatId, $sVendorId, $sManufacturerId, oxNew(Article::class)->getViewName() . '.oxtimestamp desc');
 
         $this->_loadData(
-            // dont use cache for search
+            // don't use cache for search
             null,
             //self::RSS_SEARCHARTS.md5($sSearch.$sCatId.$sVendorId),
             $this->getSearchArticlesTitle($sSearch, $sCatId, $sVendorId, $sManufacturerId),
-            $this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', getStr()->htmlspecialchars($sSearch), $sCatId, $sVendorId, $sManufacturerId),
+            $this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', Str::getStr()->htmlspecialchars($sSearch), $sCatId, $sVendorId, $sManufacturerId),
             $this->_getArticleItems($oArtList),
             $this->getSearchArticlesUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId),
             $this->_getShopUrl() . "cl=search&amp;" . $this->_getSearchParamsUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId)
@@ -763,13 +774,13 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * get title for 'Recommendation lists' rss feed
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle load lists for this article
+     * @param Article $oArticle load lists for this article
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      * @return string
      */
-    public function getRecommListsTitle(\OxidEsales\Eshop\Application\Model\Article $oArticle)
+    public function getRecommListsTitle(Article $oArticle)
     {
         $oLang = Registry::getLang();
         $iLang = $oLang->getBaseLanguage();
@@ -780,13 +791,13 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * get url for 'Recommendation lists' rss feed
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle load lists for this article
+     * @param Article $oArticle load lists for this article
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      * @return string
      */
-    public function getRecommListsUrl(\OxidEsales\Eshop\Application\Model\Article $oArticle)
+    public function getRecommListsUrl(Article $oArticle)
     {
         $oLang = Registry::getLang();
         $iLang = $oLang->getBaseLanguage();
@@ -800,7 +811,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * make rss data array from given oxlist
      *
-     * @param \OxidEsales\Eshop\Core\Model\ListModel $oList recommlist object
+     * @param ListModel $oList recommlist object
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
@@ -826,24 +837,26 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * loads 'Recommendation lists' rss data
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle load lists for this article
+     * @param Article $oArticle load lists for this article
      *
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return null
      */
-    public function loadRecommLists(\OxidEsales\Eshop\Application\Model\Article $oArticle)
+    public function loadRecommLists(Article $oArticle)
     {
         if (($this->_aChannel = $this->_loadFromCache(self::RSS_ARTRECOMMLISTS . $oArticle->getId()))) {
             return;
         }
 
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
         $oConfig->setConfigParam('iNrofCrossellArticles', $oConfig->getConfigParam('iRssItemsCount'));
 
-        $oList = oxNew(\OxidEsales\Eshop\Application\Model\RecommendationList::class)->getRecommListsByIds([$oArticle->getId()]);
+        $oList = oxNew(RecommendationList::class)->getRecommListsByIds([$oArticle->getId()]);
         if ($oList == null) {
-            $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+            $oList = oxNew(ListModel::class);
         }
 
         $oLang = Registry::getLang();
@@ -860,13 +873,13 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * get title for 'Recommendation list articles' rss feed
      *
-     * @param \OxidEsales\Eshop\Application\Model\RecommendationList $oRecommList recomm list to load articles from
+     * @param RecommendationList $oRecommList recomm list to load articles from
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      * @return string
      */
-    public function getRecommListArticlesTitle(\OxidEsales\Eshop\Application\Model\RecommendationList $oRecommList)
+    public function getRecommListArticlesTitle(RecommendationList $oRecommList)
     {
         $oLang = Registry::getLang();
         $iLang = $oLang->getBaseLanguage();
@@ -877,13 +890,13 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * get url for 'Recommendation lists' rss feed
      *
-     * @param \OxidEsales\Eshop\Application\Model\RecommendationList $oRecommList recomm list to load articles from
+     * @param RecommendationList $oRecommList recomm list to load articles from
      *
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
      * @return string
      */
-    public function getRecommListArticlesUrl(\OxidEsales\Eshop\Application\Model\RecommendationList $oRecommList)
+    public function getRecommListArticlesUrl(RecommendationList $oRecommList)
     {
         $oLang = Registry::getLang();
         $iLang = $oLang->getBaseLanguage();
@@ -897,20 +910,21 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     /**
      * loads 'Recommendation lists' rss data
      *
+     * @param RecommendationList $oRecommList recomm list to load articles from
+     *
+     * @return void
+     * @throws DatabaseConnectionException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @param \OxidEsales\Eshop\Application\Model\RecommendationList $oRecommList recomm list to load articles from
-     *
-     * @return null
      */
-    public function loadRecommListArticles(\OxidEsales\Eshop\Application\Model\RecommendationList $oRecommList)
+    public function loadRecommListArticles(RecommendationList $oRecommList)
     {
         if (($this->_aChannel = $this->_loadFromCache(self::RSS_RECOMMLISTARTS . $oRecommList->getId()))) {
             return;
         }
 
-        $oList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oList->loadRecommArticles($oRecommList->getId(), ' order by oxobject2list.oxtimestamp desc limit ' . $this->getConfig()->getConfigParam('iRssItemsCount'));
+        $oList = oxNew(ArticleList::class);
+        $oList->loadRecommArticles($oRecommList->getId(), ' order by oxobject2list.oxtimestamp desc limit ' . Registry::getConfig()->getConfigParam('iRssItemsCount'));
 
         $oLang = Registry::getLang();
         $this->_loadData(
@@ -963,8 +977,8 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
             return;
         }
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
-        $oArtList->loadActionArticles('OXBARGAIN', $this->getConfig()->getConfigParam('iRssItemsCount'));
+        $oArtList = oxNew(ArticleList::class);
+        $oArtList->loadActionArticles('OXBARGAIN', Registry::getConfig()->getConfigParam('iRssItemsCount'));
 
         $oLang = Registry::getLang();
         $this->_loadData(
@@ -977,7 +991,7 @@ class RssFeed extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Returns timestamp of defind cache time to live
+     * Returns timestamp of defined cache time to live
      *
      * @return integer
      */

@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\AttributeList;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Comparing Products.
  * Takes a few products and show attribute values to compare them.
  */
-class CompareController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class CompareController extends FrontendController
 {
     /**
      * Number of possible compare pages.
@@ -122,7 +125,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function moveLeft() //#777C
     {
-        $sArticleId = Registry::getConfig()->getRequestParameter('aid');
+        $sArticleId = Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sArticleId && ($aItems = $this->getCompareItems())) {
             $sPrevArticleId = null;
 
@@ -158,7 +161,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function moveRight() //#777C
     {
-        $sArticleId = Registry::getConfig()->getRequestParameter('aid');
+        $sArticleId = Registry::getRequest()->getRequestEscapedParameter('aid');
         if ($sArticleId && ($aItems = $this->getCompareItems())) {
             $sNextArticleId = 0;
 
@@ -284,7 +287,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
         if ($this->_oArtList === null) {
             if (($aItems = $this->getCompareItems())) {
                 // counts how many pages
-                $oList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+                $oList = oxNew(ArticleList::class);
                 $oList->loadIds(array_keys($aItems));
 
                 // cut page articles
@@ -316,7 +319,7 @@ class CompareController extends \OxidEsales\Eshop\Application\Controller\Fronten
                         $aProductIds[] = $oArticle->getParentId();
                     }
                 }
-                $oAttributeList = oxNew(\OxidEsales\Eshop\Application\Model\AttributeList::class);
+                $oAttributeList = oxNew(AttributeList::class);
                 $this->_oAttributeList = $oAttributeList->loadAttributesByIds($aProductIds);
             }
         }

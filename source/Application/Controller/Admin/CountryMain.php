@@ -21,18 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 /**
  * Admin article main selectlist manager.
- * Performs collection and updatind (on user submit) main item information.
+ * Performs collection and updating (on user submit) main item information.
  */
-class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class CountryMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxCategoryList object,
-     * passes it's data to Smarty engine and returns name of template file
+     * passes its data to Smarty engine and returns name of template file
      * "selectlist_main.tpl".
      *
      * @return string
@@ -44,7 +46,7 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
+            $oCountry = oxNew(Country::class);
             $oCountry->loadInLang($this->_iEditLang, $soxId);
 
             if ($oCountry->isForeignCountry()) {
@@ -61,7 +63,7 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
             $this->_aViewData["edit"] = $oCountry;
 
             // remove already created languages
-            $aLang = array_diff(\OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
                 $this->_aViewData["posslang"] = $aLang;
             }
@@ -87,13 +89,13 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxcountry__oxactive'])) {
             $aParams['oxcountry__oxactive'] = 0;
         }
 
-        $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
+        $oCountry = oxNew(Country::class);
 
         if ($soxId != "-1") {
             $oCountry->loadInLang($this->_iEditLang, $soxId);
@@ -105,7 +107,7 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $oCountry->setLanguage(0);
         $oCountry->assign($aParams);
         $oCountry->setLanguage($this->_iEditLang);
-        $oCountry = \OxidEsales\Eshop\Core\Registry::getUtilsFile()->processFiles($oCountry);
+        $oCountry = Registry::getUtilsFile()->processFiles($oCountry);
         $oCountry->save();
 
         // set oxid if inserted
@@ -113,18 +115,18 @@ class CountryMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     }
 
     /**
-     * Saves selection list parameters changes in different language (eg. english).
+     * Saves selection list parameters changes in different language (e.g. english).
      */
     public function saveinnlang()
     {
         $soxId = $this->getEditObjectId();
-        $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (!isset($aParams['oxcountry__oxactive'])) {
             $aParams['oxcountry__oxactive'] = 0;
         }
 
-        $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
+        $oCountry = oxNew(Country::class);
 
         if ($soxId != "-1") {
             $oCountry->loadInLang($this->_iEditLang, $soxId);

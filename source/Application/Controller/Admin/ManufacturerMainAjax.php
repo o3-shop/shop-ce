@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages manufacturer assignment to articles
  */
-class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ManufacturerMainAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -49,7 +52,7 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
+            ['oxid', 'oxarticles', 0, 0, 1],
         ],
         'container2' => [
             ['oxartnum', 'oxarticles', 1, 0, 0],
@@ -58,27 +61,40 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxmpn', 'oxarticles', 0, 0, 0],
             ['oxprice', 'oxarticles', 0, 0, 0],
             ['oxstock', 'oxarticles', 0, 0, 0],
-            ['oxid', 'oxarticles', 0, 0, 1]
-        ]
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $config = $this->getConfig();
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $config = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         // looking for table/view
-        $articlesViewName = $this->_getViewName('oxarticles');
-        $objectToCategoryViewName = $this->_getViewName('oxobject2category');
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $articlesViewName = $this->getViewName('oxarticles');
+        $objectToCategoryViewName = $this->getViewName('oxobject2category');
+        $database = DatabaseProvider::getDb();
 
-        $manufacturerId = $config->getRequestParameter('oxid');
-        $syncedManufacturerId = $config->getRequestParameter('synchoxid');
+        $manufacturerId = $oRequest->getRequestEscapedParameter('oxid');
+        $syncedManufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // Manufacturer selected or not ?
         if (!$manufacturerId) {
@@ -102,16 +118,30 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
     /**
      * Adds filter SQL to current query
      *
-     * @param string $query query to add filter condition
+     * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
-    protected function _addFilter($query) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $config = $this->getConfig();
-        $articleViewName = $this->_getViewName('oxarticles');
-        $query = parent::_addFilter($query);
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        $config = Registry::getConfig();
+        $articleViewName = $this->getViewName('oxarticles');
+        $query = parent::addFilter($sQ);
 
         // display variants or not ?
         $query .= $config->getConfigParam('blVariantsSelection') ? ' group by ' . $articleViewName . '.oxid ' : '';
@@ -124,18 +154,17 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function removeManufacturer()
     {
-        $config = $this->getConfig();
-        $articleIds = $this->_getActionIds('oxarticles.oxid');
-        $manufacturerId = $config->getRequestParameter('oxid');
+        $articleIds = $this->getActionIds('oxarticles.oxid');
+        $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
-        if ($this->getConfig()->getRequestParameter("all")) {
-            $articleViewTable = $this->_getViewName('oxarticles');
-            $articleIds = $this->_getAll($this->_addFilter("select $articleViewTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $articleViewTable = $this->getViewName('oxarticles');
+            $articleIds = $this->getAll($this->addFilter("select $articleViewTable.oxid " . $this->getQuery()));
         }
 
         if (is_array($articleIds) && !empty($articleIds)) {
             $query = $this->formManufacturerRemovalQuery($articleIds);
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute($query);
+            DatabaseProvider::getDb()->execute($query);
 
             $this->resetCounter("manufacturerArticle", $manufacturerId);
         }
@@ -147,13 +176,14 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      * @param array $articlesToRemove Ids of manufacturers which should be removed.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formManufacturerRemovalQuery($articlesToRemove)
     {
         return "
           UPDATE oxarticles
           SET oxmanufacturerid = null
-          WHERE oxid IN ( " . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ") ";
+          WHERE oxid IN ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ") ";
     }
 
     /**
@@ -161,18 +191,18 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addManufacturer()
     {
-        $config = $this->getConfig();
+        $oRequest = Registry::getRequest();
 
-        $articleIds = $this->_getActionIds('oxarticles.oxid');
-        $manufacturerId = $config->getRequestParameter('synchoxid');
+        $articleIds = $this->getActionIds('oxarticles.oxid');
+        $manufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($config->getRequestParameter('all')) {
-            $articleViewName = $this->_getViewName('oxarticles');
-            $articleIds = $this->_getAll($this->_addFilter("select $articleViewName.oxid " . $this->_getQuery()));
+        if ($oRequest->getRequestEscapedParameter('all')) {
+            $articleViewName = $this->getViewName('oxarticles');
+            $articleIds = $this->getAll($this->addFilter("select $articleViewName.oxid " . $this->getQuery()));
         }
 
         if ($manufacturerId && $manufacturerId != "-1" && is_array($articleIds)) {
-            $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $database = DatabaseProvider::getDb();
 
             $query = $this->formArticleToManufacturerAdditionQuery($manufacturerId, $articleIds);
             $database->execute($query);
@@ -184,13 +214,14 @@ class ManufacturerMainAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      * Forms and returns query for articles addition to manufacturer.
      *
      * @param string $manufacturerId Manufacturer id.
-     * @param array  $articlesToAdd  Array of article ids to be added to manufacturer.
+     * @param array $articlesToAdd Array of article ids to be added to manufacturer.
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formArticleToManufacturerAdditionQuery($manufacturerId, $articlesToAdd)
     {
-        $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $database = DatabaseProvider::getDb();
 
         return "
             UPDATE oxarticles

@@ -21,13 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
 
 /**
  * General export class.
  */
-class GenericExportDo extends \OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController
+class GenericExportDo extends DynamicExportBaseController
 {
     /**
      * Export class name
@@ -63,15 +68,18 @@ class GenericExportDo extends \OxidEsales\Eshop\Application\Controller\Admin\Dyn
      * @param integer $iCnt export position
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function nextTick($iCnt)
     {
         $iExportedItems = $iCnt;
         $blContinue = false;
         if ($oArticle = $this->getOneArticle($iCnt, $blContinue)) {
-            $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+            $myConfig = Registry::getConfig();
             $context = [
-                "sCustomHeader" => \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("sExportCustomHeader"),
+                "sCustomHeader" => Registry::getSession()->getVariable("sExportCustomHeader"),
                 "linenr"        => $iCnt,
                 "article"       => $oArticle,
                 "spr"           => $myConfig->getConfigParam('sCSVSign'),

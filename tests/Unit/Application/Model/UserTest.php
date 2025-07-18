@@ -1988,7 +1988,7 @@ class UserTest extends \OxidTestCase
 
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('getNewsSubscription', 'addToGroup', 'removeFromGroup'));
         $oUser->expects($this->once())->method('getNewsSubscription')->will($this->returnValue($oSubscription));
-        $oUser->expects($this->once())->method('addToGroup')->with($this->equalTo('o3newsletter'));
+        $oUser->expects($this->once())->method('addToGroup')->with($this->equalTo('oxidnewsletter'));
         $oUser->expects($this->never())->method('removeFromGroup');
         $oUser->setConfig($oConfig);
 
@@ -2058,7 +2058,7 @@ class UserTest extends \OxidTestCase
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('getNewsSubscription', 'addToGroup', 'removeFromGroup'));
         $oUser->expects($this->once())->method('getNewsSubscription')->will($this->returnValue($oSubscription));
         $oUser->expects($this->never())->method('addToGroup');
-        $oUser->expects($this->once())->method('removeFromGroup')->with($this->equalTo('o3newsletter'));
+        $oUser->expects($this->once())->method('removeFromGroup')->with($this->equalTo('oxidnewsletter'));
         $oUser->setConfig($oConfig);
 
         $this->assertTrue($oUser->setNewsSubscription(false, false));

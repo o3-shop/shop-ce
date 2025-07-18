@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Defines and returns delivery and billing required fields.
@@ -57,7 +57,7 @@ class RequiredAddressFields
     {
         $this->setRequiredFields($this->_aDefaultRequiredFields);
 
-        $aRequiredFields = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('aMustFillFields');
+        $aRequiredFields = Registry::getConfig()->getConfigParam('aMustFillFields');
         if (is_array($aRequiredFields)) {
             $this->setRequiredFields($aRequiredFields);
         }
@@ -86,7 +86,7 @@ class RequiredAddressFields
     /**
      * Returns required fields for user address validation.
      *
-     * @return mixed
+     * @return array
      */
     public function getBillingFields()
     {
@@ -98,7 +98,7 @@ class RequiredAddressFields
     /**
      * Returns required fields for delivery address validation.
      *
-     * @return mixed
+     * @return array
      */
     public function getDeliveryFields()
     {
@@ -113,7 +113,7 @@ class RequiredAddressFields
      * @param array  $aFields
      * @param string $sPrefix
      *
-     * @return mixed
+     * @return array
      */
     private function _filterFields($aFields, $sPrefix) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {

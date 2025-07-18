@@ -21,14 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Core\Contract\ISelectList;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
 
 /**
  * Select list manager
  *
  */
-class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\ISelectList
+class SelectList extends MultiLanguageModel implements ISelectList
 {
     /**
      * Select list fields array
@@ -61,7 +66,7 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
     /**
      * Active selection object
      *
-     * @var oxSelection
+     * @var Selection
      */
     protected $_oActiveSelection = null;
 
@@ -84,9 +89,9 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
     public function getFieldList($dVat = null)
     {
         if ($this->_aFieldList == null && $this->oxselectlist__oxvaldesc->value) {
-            $this->_aFieldList = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->value, $dVat);
+            $this->_aFieldList = Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->value, $dVat);
             foreach ($this->_aFieldList as $sKey => $oField) {
-                $this->_aFieldList[$sKey]->name = getStr()->strip_tags($this->_aFieldList[$sKey]->name);
+                $this->_aFieldList[$sKey]->name = Str::getStr()->strip_tags($this->_aFieldList[$sKey]->name);
             }
         }
 
@@ -96,9 +101,11 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
     /**
      * Removes selectlists from articles.
      *
-     * @param string $sOXID object ID (default null)
+     * @param null $sOXID object ID (default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($sOXID = null)
     {
@@ -111,7 +118,7 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
 
         // remove selectlists from articles also
         if ($blRemove = parent::delete($sOXID)) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $oDb->execute("delete from oxobject2selectlist where oxselnid = :oxselnid", [
                 ':oxselnid' => $sOXID
             ]);
@@ -159,10 +166,10 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
     {
         if ($this->_aList === null && $this->oxselectlist__oxvaldesc->value) {
             $this->_aList = false;
-            $aList = \OxidEsales\Eshop\Core\Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->getRawValue(), $this->getVat());
+            $aList = Registry::getUtils()->assignValuesFromText($this->oxselectlist__oxvaldesc->getRawValue(), $this->getVat());
             foreach ($aList as $sKey => $oField) {
                 if ($oField->name) {
-                    $this->_aList[$sKey] = oxNew(\OxidEsales\Eshop\Application\Model\Selection::class, getStr()->strip_tags($oField->name), $sKey, false, $this->_aList === false ? true : false);
+                    $this->_aList[$sKey] = oxNew(Selection::class, Str::getStr()->strip_tags($oField->name), $sKey, false, $this->_aList === false ? true : false);
                 }
             }
         }
@@ -173,13 +180,13 @@ class SelectList extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel impleme
     /**
      * Returns active selection object
      *
-     * @return oxSelection
+     * @return Selection
      */
     public function getActiveSelection()
     {
         if ($this->_oActiveSelection === null) {
             if (($aSelections = $this->getSelections())) {
-                // first is allways active
+                // first is always active
                 $this->_oActiveSelection = reset($aSelections);
             }
         }

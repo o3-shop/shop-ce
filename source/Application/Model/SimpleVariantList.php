@@ -21,11 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Model\ListModel;
+
 /**
  * Simple variant list.
  *
  */
-class SimpleVariantList extends \OxidEsales\Eshop\Core\Model\ListModel
+class SimpleVariantList extends ListModel
 {
     /**
      * Parent article for list variants
@@ -42,7 +44,7 @@ class SimpleVariantList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Sets parent variant
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oParent Parent article
+     * @param Article $oParent Parent article
      */
     public function setParent($oParent)
     {
@@ -52,7 +54,7 @@ class SimpleVariantList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Sets parent for variant. This method is invoked for each element in oxList::assign() loop.
      *
-     * @param oxSimleVariant $oListObject Simple variant
+     * @param SimpleVariant $oListObject Simple variant
      * @param array          $aDbFields   Array of available
      * @deprecated underscore prefix violates PSR12, will be renamed to "assignElement" in next major
      */

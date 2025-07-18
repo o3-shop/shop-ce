@@ -21,17 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\InputValidator;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Password reminder page.
- * Collects toparticle, bargain article list. There is a form with entry
+ * Collects top-article-list, bargain article list. There is a form with entry
  * field to enter login name (usually email). After user enters required
  * information and submits "Request Password" button mail is sent to users email.
  * O3-Shop -> MY ACCOUNT -> "Forgot your password? - click here."
  */
-class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ForgotPasswordController extends FrontendController
 {
     /**
      * Current class template name.
@@ -77,9 +80,9 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function forgotPassword()
     {
-        $sEmail = Registry::getConfig()->getRequestParameter('lgn_usr');
+        $sEmail = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
         $this->_sForgotEmail = $sEmail;
-        $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+        $oEmail = oxNew(Email::class);
 
         // problems sending passwd reminder ?
         $iSuccess = false;
@@ -101,20 +104,20 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function updatePassword()
     {
-        $sNewPass = Registry::getConfig()->getRequestParameter('password_new', true);
-        $sConfPass = Registry::getConfig()->getRequestParameter('password_new_confirm', true);
+        $sNewPass = Registry::getRequest()->getRequestEscapedParameter('password_new', true);
+        $sConfPass = Registry::getRequest()->getRequestEscapedParameter('password_new_confirm', true);
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
 
-        /** @var \OxidEsales\Eshop\Core\InputValidator $oInputValidator */
+        /** @var InputValidator $oInputValidator */
         $oInputValidator = Registry::getInputValidator();
         if (($oExcp = $oInputValidator->checkPassword($oUser, $sNewPass, $sConfPass, true))) {
             return Registry::getUtilsView()->addErrorToDisplay($oExcp->getMessage(), false, true);
         }
 
-        // passwords are fine - updating and loggin user in
+        // passwords are fine - updating and login user in
         if ($oUser->loadUserByUpdateId($this->getUpdateId())) {
-            // setting new pass ..
+            // setting new pass ...
             $oUser->setPassword($sNewPass);
 
             // resetting update pass params
@@ -136,13 +139,13 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
     }
 
     /**
-     * If user password update was successfull - setting success status
+     * If user password update was successful - setting success status
      *
      * @return bool
      */
     public function updateSuccess()
     {
-        return (bool) Registry::getConfig()->getRequestParameter('success');
+        return (bool) Registry::getRequest()->getRequestEscapedParameter('success');
     }
 
     /**
@@ -162,7 +165,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
      */
     public function getUpdateId()
     {
-        return Registry::getConfig()->getRequestParameter('uid');
+        return Registry::getRequest()->getRequestEscapedParameter('uid');
     }
 
     /**
@@ -173,7 +176,7 @@ class ForgotPasswordController extends \OxidEsales\Eshop\Application\Controller\
     public function isExpiredLink()
     {
         if (($sKey = $this->getUpdateId())) {
-            $blExpired = oxNew(\OxidEsales\Eshop\Application\Model\User::class)->isExpiredUpdateId($sKey);
+            $blExpired = oxNew(User::class)->isExpiredUpdateId($sKey);
         }
 
         return $blExpired;

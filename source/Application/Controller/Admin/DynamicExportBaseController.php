@@ -21,8 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Language;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
@@ -38,7 +47,7 @@ DEFINE("ERR_FILEIO", 1);
  *
  * @subpackage dyn
  */
-class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class DynamicExportBaseController extends AdminDetailsController
 {
     /**
      * Export class name
@@ -78,7 +87,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Export file resource
      *
-     * @var object
+     * @var resource
      */
     public $fpFile = null;
 
@@ -126,14 +135,14 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     protected $_aCatLvlCache = null;
 
     /**
-     * Calls parent costructor and initializes $this->_sFilePath parameter
+     * Calls parent constructor and initializes $this->_sFilePath parameter
      */
     public function __construct()
     {
         parent::__construct();
 
         // set generic frame template
-        $this->_sFilePath = $this->getConfig()->getConfigParam('sShopDir') . "/" . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
+        $this->_sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . "/" . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
     }
 
     /**
@@ -153,7 +162,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         }
 
         $this->_aViewData['sOutputFile'] = $this->_sFilePath;
-        $this->_aViewData['sDownloadFile'] = $this->getConfig()->getConfigParam('sShopURL') . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
+        $this->_aViewData['sDownloadFile'] = Registry::getConfig()->getConfigParam('sShopURL') . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
 
         return $this->_sThisTemplate;
     }
@@ -163,11 +172,11 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     public function createMainExportView()
     {
-        // parent categorie tree
+        // parent category-tree
         $this->_aViewData["cattree"] = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
         $this->_aViewData["cattree"]->loadList();
 
-        $oLangObj = oxNew(\OxidEsales\Eshop\Core\Language::class);
+        $oLangObj = oxNew(Language::class);
         $aLangs = $oLangObj->getLanguageArray();
         foreach ($aLangs as $id => $language) {
             $language->selected = ($id == $this->_iEditLang);
@@ -180,7 +189,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     public function start()
     {
-        // delete file, if its already there
+        // delete file, if it's already there
         $this->fpFile = @fopen($this->_sFilePath, "w");
         if (!isset($this->fpFile) || !$this->fpFile) {
             // we do have an error !
@@ -192,7 +201,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
 
             // prepare it
             $iEnd = $this->prepareExport();
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("iEnd", $iEnd);
+            Registry::getSession()->setVariable("iEnd", $iEnd);
             $this->_aViewData['iEnd'] = $iEnd;
         }
     }
@@ -201,6 +210,8 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      * Stops Export
      *
      * @param integer $iError error number
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function stop($iError = 0)
     {
@@ -209,7 +220,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         }
 
         // delete temporary heap table
-        \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->execute("drop TABLE if exists " . $this->_getHeapTableName());
+        DatabaseProvider::getDb()->execute("drop TABLE if exists " . $this->getHeapTableName());
     }
 
     /**
@@ -250,9 +261,9 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
             $this->stop(ERR_FILEIO);
         } else {
             // file is open
-            $iStart = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iStart");
+            $iStart = Registry::getRequest()->getRequestEscapedParameter('iStart');
             // load from session
-            $this->_aExportResultset = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aExportResultset");
+            $this->_aExportResultset = Registry::getRequest()->getRequestEscapedParameter('aExportResultset');
             $iExportPerTick = $this->getExportPerTick();
             for ($i = $iStart; $i < $iStart + $iExportPerTick; $i++) {
                 if (($iExportedItems = $this->nextTick($i)) === false) {
@@ -280,7 +291,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     public function getExportPerTick()
     {
         if ($this->_iExportPerTick === null) {
-            $this->_iExportPerTick = (int) \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("iExportNrofLines");
+            $this->_iExportPerTick = (int) Registry::getConfig()->getConfigParam("iExportNrofLines");
             if (!$this->_iExportPerTick) {
                 $this->_iExportPerTick = $this->iExportPerTick;
             }
@@ -308,7 +319,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     public function removeSid($sInput)
     {
-        $sSid = $this->getSession()->getId();
+        $sSid = Registry::getSession()->getId();
 
         // remove sid from link
         $sOutput = str_replace("sid={$sSid}/", "", $sInput);
@@ -339,9 +350,9 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         $sInput = str_replace("\t", "    ", $sInput);
 
         // remove html entities, remove html tags
-        $sInput = $this->_unHTMLEntities(strip_tags($sInput));
+        $sInput = $this->unHTMLEntities(strip_tags($sInput));
 
-        $oStr = getStr();
+        $oStr = Str::getStr();
         if ($oStr->strlen($sInput) > $iMaxSize - 3) {
             $sInput = $oStr->substr($sInput, 0, $iMaxSize - 5) . "...";
         }
@@ -352,20 +363,22 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Loads all article parent categories and returns titles separated by "/"
      *
-     * @param object $oArticle   Article object
+     * @param object $oArticle Article object
      * @param string $sSeparator separator (default "/")
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryString($oArticle, $sSeparator = "/")
     {
         $sCatStr = '';
 
-        $sLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-        $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sLang = Registry::getLang()->getBaseLanguage();
+        $oDB = DatabaseProvider::getDb();
 
-        $sCatView = getViewName('oxcategories', $sLang);
-        $sO2CView = getViewName('oxobject2category', $sLang);
+        $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories', $sLang);
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $sLang);
 
         //selecting category
         $sQ = "select $sCatView.oxleft, $sCatView.oxright, $sCatView.oxrootid from $sO2CView as oxobject2category left join $sCatView on $sCatView.oxid = oxobject2category.oxcatnid ";
@@ -374,7 +387,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         $oRs = $oDB->select($sQ, [
             ':oxobjectid' => $oArticle->getId()
         ]);
-        if ($oRs != false && $oRs->count() > 0) {
+        if ($oRs && $oRs->count() > 0) {
             $sLeft = $oRs->fields[0];
             $sRight = $oRs->fields[1];
             $sRootId = $oRs->fields[2];
@@ -387,7 +400,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
                 ':oxleft' => $sLeft,
                 ':oxrootid' => $sRootId
             ]);
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     if ($sCatStr) {
                         $sCatStr .= $sSeparator;
@@ -404,17 +417,18 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Loads article default category
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article object
+     * @param Article $oArticle Article object
      *
-     * @return record set
+     * @return string
+     * @throws DatabaseConnectionException
      */
     public function getDefaultCategoryString($oArticle)
     {
-        $sLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-        $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sLang = Registry::getLang()->getBaseLanguage();
+        $oDB = DatabaseProvider::getDb();
 
-        $sCatView = getViewName('oxcategories', $sLang);
-        $sO2CView = getViewName('oxobject2category', $sLang);
+        $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories', $sLang);
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $sLang);
 
         //selecting category
         $sQ = "select $sCatView.oxtitle from $sO2CView as oxobject2category left join $sCatView on $sCatView.oxid = oxobject2category.oxcatnid ";
@@ -434,7 +448,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     public function prepareCSV($sInput)
     {
-        $sInput = \OxidEsales\Eshop\Core\Registry::getUtilsString()->prepareCSVField($sInput);
+        $sInput = Registry::getUtilsString()->prepareCSVField($sInput);
 
         return str_replace(["&nbsp;", "&euro;", "|"], [" ", "", ""], $sInput);
     }
@@ -458,70 +472,77 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     }
 
     /**
-     * Searches for deepest path to a categorie this article is assigned to
+     * Searches for deepest path to a category this article is assigned to
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
+     * @param Article $oArticle article object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getDeepestCategoryPath($oArticle)
     {
-        return $this->_findDeepestCatPath($oArticle);
+        return $this->findDeepestCatPath($oArticle);
     }
 
     /**
      * create export resultset
      *
-     * @return int
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function prepareExport()
     {
-        $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sHeapTable = $this->_getHeapTableName();
+        $oDB = DatabaseProvider::getDb();
+        $sHeapTable = $this->getHeapTableName();
 
         // #1070 Saulius 2005.11.28
         // check mySQL version
         $oRs = $oDB->select("SHOW VARIABLES LIKE 'version'");
-        $sTableCharset = $this->_generateTableCharSet($oRs->fields[1]);
+        $sTableCharset = $this->generateTableCharSet($oRs->fields[1]);
 
         // create heap table
-        if (!($this->_createHeapTable($sHeapTable, $sTableCharset))) {
+        if (!($this->createHeapTable($sHeapTable, $sTableCharset))) {
             // error
-            \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Could not create HEAP Table {$sHeapTable}\n<br>");
+            Registry::getUtils()->showMessageAndExit("Could not create HEAP Table {$sHeapTable}\n<br>");
         }
 
-        $sCatAdd = $this->_getCatAdd(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("acat"));
-        if (!$this->_insertArticles($sHeapTable, $sCatAdd)) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Could not insert Articles in Table {$sHeapTable}\n<br>");
+        $sCatAdd = $this->getCatAdd(Registry::getRequest()->getRequestEscapedParameter('acat'));
+        if (!$this->insertArticles($sHeapTable, $sCatAdd)) {
+            Registry::getUtils()->showMessageAndExit("Could not insert Articles in Table {$sHeapTable}\n<br>");
         }
 
-        $this->_removeParentArticles($sHeapTable);
-        $this->_setSessionParams();
+        $this->removeParentArticles($sHeapTable);
+        $this->setSessionParams();
 
         // get total cnt
         return $oDB->getOne("select count(*) from {$sHeapTable}");
     }
 
     /**
-     * get's one oxid for exporting
+     * gets one oxid for exporting
      *
-     * @param integer $iCnt       counter
-     * @param bool    $blContinue false is used to stop exporting
+     * @param integer $iCnt counter
+     * @param bool $blContinue false is used to stop exporting
      *
-     * @return mixed
+     * @return Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      */
     public function getOneArticle($iCnt, &$blContinue)
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         //[Alfonsas 2006-05-31] setting specific parameter
         //to be checked in oxarticle.php init() method
         $myConfig->setConfigParam('blExport', true);
         $blContinue = false;
 
-        if (($oArticle = $this->_initArticle($this->_getHeapTableName(), $iCnt, $blContinue))) {
+        if (($oArticle = $this->initArticle($this->getHeapTableName(), $iCnt, $blContinue))) {
             $blContinue = true;
-            $oArticle = $this->_setCampaignDetailLink($oArticle);
+            $oArticle = $this->setCampaignDetailLink($oArticle);
         }
 
         //[Alfonsas 2006-05-31] unsetting specific parameter
@@ -541,7 +562,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     public function assureContent($sInput, $sReplace = null)
     {
-        $oStr = getStr();
+        $oStr = Str::getStr();
         if (!$oStr->strlen($sInput)) {
             if (!isset($sReplace) || !$oStr->strlen($sReplace)) {
                 $sReplace = "-";
@@ -563,6 +584,19 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     protected function _unHtmlEntities($sInput) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->unHtmlEntities($sInput);
+    }
+
+    /**
+     * Replace HTML Entities
+     * Replacement for html_entity_decode which is only available from PHP 4.3.0 onj
+     *
+     * @param string $sInput string to replace
+     *
+     * @return string
+     */
+    protected function unHtmlEntities($sInput)
+    {
         $aTransTbl = array_flip(get_html_translation_table(HTML_ENTITIES));
 
         return strtr($sInput, $aTransTbl);
@@ -576,8 +610,18 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     protected function _getHeapTableName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getHeapTableName();
+    }
+
+    /**
+     * Create valid Heap table name
+     *
+     * @return string
+     */
+    protected function getHeapTableName()
+    {
         // table name must not start with any digit
-        return "tmp_" . str_replace("0", "", md5($this->getSession()->getId()));
+        return "tmp_" . str_replace("0", "", md5(Registry::getSession()->getId()));
     }
 
     /**
@@ -586,15 +630,31 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      * @param string $sMysqlVersion MySql version
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "generateTableCharSet" in next major
      */
     protected function _generateTableCharSet($sMysqlVersion) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->generateTableCharSet($sMysqlVersion);
+    }
+
+    /**
+     * generates table charset
+     *
+     * @param string $sMysqlVersion MySql version
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function generateTableCharSet($sMysqlVersion)
     {
         $sTableCharset = "";
 
         //if MySQL >= 4.1.0 set charsets and collations
         if (version_compare($sMysqlVersion, '4.1.0', '>=') > 0) {
-            $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+            $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
             $oRs = $oDB->select("SHOW FULL COLUMNS FROM `oxarticles` WHERE field like 'OXID'");
             if (isset($oRs->fields['Collation']) && ($sMysqlCollation = $oRs->fields['Collation'])) {
                 $oRs = $oDB->select("SHOW COLLATION LIKE '{$sMysqlCollation}'");
@@ -608,20 +668,37 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     }
 
     /**
-     * creates heaptable
+     * creates heap-table
      *
-     * @param string $sHeapTable    table name
+     * @param string $sHeapTable table name
      * @param string $sTableCharset table charset
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createHeapTable" in next major
      */
     protected function _createHeapTable($sHeapTable, $sTableCharset) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->createHeapTable($sHeapTable, $sTableCharset);
+    }
+
+    /**
+     * creates heap-table
+     *
+     * @param string $sHeapTable table name
+     * @param string $sTableCharset table charset
+     *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function createHeapTable($sHeapTable, $sTableCharset)
+    {
         $blDone = false;
-        $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDB = DatabaseProvider::getDb();
         $sQ = "CREATE TABLE IF NOT EXISTS {$sHeapTable} ( `oxid` CHAR(32) NOT NULL default '' ) ENGINE=InnoDB {$sTableCharset}";
-        if (($oDB->execute($sQ)) !== false) {
+        if ($oDB->execute($sQ)) {
             $blDone = true;
             $oDB->execute("TRUNCATE TABLE {$sHeapTable}");
         }
@@ -635,13 +712,27 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      * @param array $aChosenCat Selected category array
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCatAdd" in next major
      */
     protected function _getCatAdd($aChosenCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getCatAdd($aChosenCat);
+    }
+
+    /**
+     * creates additional cat string
+     *
+     * @param array $aChosenCat Selected category array
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getCatAdd($aChosenCat)
+    {
         $sCatAdd = null;
         if (is_array($aChosenCat) && count($aChosenCat)) {
-            $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDB = DatabaseProvider::getDb();
             $sCatAdd = " and ( ";
             $blSep = false;
             foreach ($aChosenCat as $sCat) {
@@ -658,39 +749,56 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     }
 
     /**
-     * inserts articles into heaptable
+     * inserts articles into heap-table
      *
      * @param string $sHeapTable heap table name
-     * @param string $sCatAdd    category id filter (part of sql)
+     * @param string $sCatAdd category id filter (part of sql)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "insertArticles" in next major
      */
     protected function _insertArticles($sHeapTable, $sCatAdd) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        return $this->insertArticles($sHeapTable, $sCatAdd);
+    }
 
-        $iExpLang = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iExportLanguage");
+    /**
+     * inserts articles into heap-table
+     *
+     * @param string $sHeapTable heap table name
+     * @param string $sCatAdd category id filter (part of sql)
+     *
+     * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function insertArticles($sHeapTable, $sCatAdd)
+    {
+        $oDB = DatabaseProvider::getDb();
+
+        $iExpLang = Registry::getRequest()->getRequestEscapedParameter('iExportLanguage');
         if (!isset($iExpLang)) {
-            $iExpLang = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("iExportLanguage");
+            $iExpLang = Registry::getSession()->getVariable("iExportLanguage");
         }
 
-        $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $oArticle = oxNew(Article::class);
         $oArticle->setLanguage($iExpLang);
 
-        $sO2CView = getViewName('oxobject2category', $iExpLang);
-        $sArticleTable = getViewName("oxarticles", $iExpLang);
+        $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $iExpLang);
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles", $iExpLang);
 
         $insertQuery = "insert into {$sHeapTable} select {$sArticleTable}.oxid from {$sArticleTable}, {$sO2CView} as oxobject2category where ";
         $insertQuery .= $oArticle->getSqlActiveSnippet();
 
-        if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("blExportVars")) {
+        if (!Registry::getRequest()->getRequestEscapedParameter('blExportVars')) {
             $insertQuery .= " and {$sArticleTable}.oxid = oxobject2category.oxobjectid and {$sArticleTable}.oxparentid = '' ";
         } else {
             $insertQuery .= " and ( {$sArticleTable}.oxid = oxobject2category.oxobjectid or {$sArticleTable}.oxparentid = oxobject2category.oxobjectid ) ";
         }
 
-        $sSearchString = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("search");
+        $sSearchString = Registry::getRequest()->getRequestEscapedParameter('search');
         if (isset($sSearchString)) {
             $insertQuery .= "and ( {$sArticleTable}.OXTITLE like " . $oDB->quote("%{$sSearchString}%");
             $insertQuery .= " or {$sArticleTable}.OXSHORTDESC like " . $oDB->quote("%$sSearchString%");
@@ -702,27 +810,41 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
         }
 
         // add minimum stock value
-        if ($this->getConfig()->getConfigParam('blUseStock') && ($dMinStock = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportMinStock"))) {
+        if (Registry::getConfig()->getConfigParam('blUseStock') && ($dMinStock = Registry::getRequest()->getRequestEscapedParameter('sExportMinStock'))) {
             $dMinStock = str_replace([";", " ", "/", "'"], "", $dMinStock);
             $insertQuery .= " and {$sArticleTable}.oxstock >= " . $oDB->quote($dMinStock);
         }
 
         $insertQuery .= " group by {$sArticleTable}.oxid";
 
-        return $oDB->execute($insertQuery) ? true : false;
+        return (bool)$oDB->execute($insertQuery);
     }
 
     /**
      * removes parent articles so that we only have variants itself
      *
      * @param string $sHeapTable table name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "removeParentArticles" in next major
      */
     protected function _removeParentArticles($sHeapTable) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("blExportMainVars"))) {
-            $oDB = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-            $sArticleTable = getViewName('oxarticles');
+        $this->removeParentArticles($sHeapTable);
+    }
+
+    /**
+     * removes parent articles so that we only have variants itself
+     *
+     * @param string $sHeapTable table name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function removeParentArticles($sHeapTable)
+    {
+        if (!(Registry::getRequest()->getRequestEscapedParameter('blExportMainVars'))) {
+            $oDB = DatabaseProvider::getDb();
+            $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
             // we need to remove again parent articles so that we only have the variants itself
             $sQ = "select $sHeapTable.oxid from $sHeapTable, $sArticleTable where
@@ -731,7 +853,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
             $oRs = $oDB->select($sQ);
             $sDel = "delete from $sHeapTable where oxid in ( ";
             $blSep = false;
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     if ($blSep) {
                         $sDel .= ",";
@@ -752,65 +874,87 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      */
     protected function _setSessionParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setSessionParams();
+    }
+
+    /**
+     * stores some info in session
+     */
+    protected function setSessionParams()
+    {
         // reset it from session
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("sExportDelCost");
-        $dDelCost = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportDelCost");
+        Registry::getSession()->deleteVariable("sExportDelCost");
+        $dDelCost = Registry::getRequest()->getRequestEscapedParameter('sExportDelCost');
         if (isset($dDelCost)) {
             $dDelCost = str_replace([";", " ", "/", "'"], "", $dDelCost);
             $dDelCost = str_replace(",", ".", $dDelCost);
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("sExportDelCost", $dDelCost);
+            Registry::getSession()->setVariable("sExportDelCost", $dDelCost);
         }
 
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("sExportMinPrice");
-        $dMinPrice = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportMinPrice");
+        Registry::getSession()->deleteVariable("sExportMinPrice");
+        $dMinPrice = Registry::getRequest()->getRequestEscapedParameter('sExportMinPrice');
         if (isset($dMinPrice)) {
             $dMinPrice = str_replace([";", " ", "/", "'"], "", $dMinPrice);
             $dMinPrice = str_replace(",", ".", $dMinPrice);
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("sExportMinPrice", $dMinPrice);
+            Registry::getSession()->setVariable("sExportMinPrice", $dMinPrice);
         }
 
         // #827
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("sExportCampaign");
-        $sCampaign = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportCampaign");
+        Registry::getSession()->deleteVariable("sExportCampaign");
+        $sCampaign = Registry::getRequest()->getRequestEscapedParameter('sExportCampaign');
         if (isset($sCampaign)) {
             $sCampaign = str_replace([";", " ", "/", "'"], "", $sCampaign);
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("sExportCampaign", $sCampaign);
+            Registry::getSession()->setVariable("sExportCampaign", $sCampaign);
         }
 
         // reset it from session
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("blAppendCatToCampaign");
+        Registry::getSession()->deleteVariable("blAppendCatToCampaign");
         // now retrieve it from get or post.
-        $blAppendCatToCampaign = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("blAppendCatToCampaign");
+        $blAppendCatToCampaign = Registry::getRequest()->getRequestEscapedParameter('blAppendCatToCampaign');
         if ($blAppendCatToCampaign) {
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("blAppendCatToCampaign", $blAppendCatToCampaign);
+            Registry::getSession()->setVariable("blAppendCatToCampaign", $blAppendCatToCampaign);
         }
 
         // reset it from session
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("iExportLanguage");
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("iExportLanguage", \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("iExportLanguage"));
+        Registry::getSession()->deleteVariable("iExportLanguage");
+        Registry::getSession()->setVariable("iExportLanguage", Registry::getRequest()->getRequestEscapedParameter('iExportLanguage'));
 
         //setting the custom header
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("sExportCustomHeader", \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportCustomHeader"));
+        Registry::getSession()->setVariable("sExportCustomHeader", Registry::getRequest()->getRequestEscapedParameter('sExportCustomHeader'));
     }
 
     /**
      * Load all root cat's == all trees
      *
      * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadRootCats" in next major
      */
     protected function _loadRootCats() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->loadRootCats();
+    }
+
+    /**
+     * Load all root cat's == all trees
+     *
+     * @return null
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function loadRootCats()
+    {
         if ($this->_aCatLvlCache === null) {
             $this->_aCatLvlCache = [];
 
-            $sCatView = getViewName('oxcategories');
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $sCatView = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
+            $oDb = DatabaseProvider::getDb();
 
             // Load all root cat's == all trees
             $sSQL = "select oxid from $sCatView where oxparentid = 'oxrootid'";
             $oRs = $oDb->select($sSQL);
-            if ($oRs != false && $oRs->count() > 0) {
+            if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     // now load each tree
                     $sSQL = "SELECT s.oxid, s.oxtitle,
@@ -822,7 +966,7 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
                     $oRs2 = $oDb->select($sSQL, [
                         ':oxrootid' => $oRs->fields[0]
                     ]);
-                    if ($oRs2 != false && $oRs2->count() > 0) {
+                    if ($oRs2 && $oRs2->count() > 0) {
                         while (!$oRs2->EOF) {
                             // store it
                             $oCat = new stdClass();
@@ -846,19 +990,35 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * finds deepest category path
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
+     * @param Article $oArticle article object
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "findDeepestCatPath" in next major
      */
     protected function _findDeepestCatPath($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->findDeepestCatPath($oArticle);
+    }
+
+    /**
+     * finds deepest category path
+     *
+     * @param Article $oArticle article object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function findDeepestCatPath($oArticle)
     {
         $sRet = "";
 
         // find deepest
         $aIds = $oArticle->getCategoryIds();
         if (is_array($aIds) && count($aIds)) {
-            if ($aCatLvlCache = $this->_loadRootCats()) {
+            if ($aCatLvlCache = $this->loadRootCats()) {
                 $sIdMax = null;
                 $dMaxLvl = 0;
                 foreach ($aIds as $sCatId) {
@@ -887,34 +1047,52 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
      * initialize article
      *
      * @param string $sHeapTable heap table name
-     * @param int    $iCnt       record number
-     * @param bool   $blContinue false is used to stop exporting
+     * @param int $iCnt record number
+     * @param bool $blContinue false is used to stop exporting
      *
-     * @return object
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
      * @deprecated underscore prefix violates PSR12, will be renamed to "initArticle" in next major
      */
     protected function _initArticle($sHeapTable, $iCnt, &$blContinue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->initArticle($sHeapTable, $iCnt, $blContinue);
+    }
+
+    /**
+     * initialize article
+     *
+     * @param string $sHeapTable heap table name
+     * @param int $iCnt record number
+     * @param bool $blContinue false is used to stop exporting
+     *
+     * @return Article|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws ObjectException
+     */
+    protected function initArticle($sHeapTable, $iCnt, &$blContinue)
+    {
         $oRs = $this->getDb()->selectLimit("select oxid from $sHeapTable", 1, $iCnt);
-        if ($oRs != false && $oRs->count() > 0) {
-            $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        if ($oRs && $oRs->count() > 0) {
+            $oArticle = oxNew(Article::class);
             $oArticle->setLoadParentData(true);
 
-            $oArticle->setLanguage(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable("iExportLanguage"));
+            $oArticle->setLanguage(Registry::getSession()->getVariable("iExportLanguage"));
 
             if ($oArticle->load($oRs->fields[0])) {
                 // if article exists, do not stop export
                 $blContinue = true;
                 // check price
-                $dMinPrice = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportMinPrice");
-                if (!isset($dMinPrice) || (isset($dMinPrice) && ($oArticle->getPrice()->getBruttoPrice() >= $dMinPrice))) {
+                $dMinPrice = Registry::getRequest()->getRequestEscapedParameter('sExportMinPrice');
+                if (!isset($dMinPrice) || ($oArticle->getPrice()->getBruttoPrice() >= $dMinPrice)) {
                     //Saulius: variant title added
                     $sTitle = $oArticle->oxarticles__oxvarselect->value ? " " . $oArticle->oxarticles__oxvarselect->value : "";
                     $oArticle->oxarticles__oxtitle->setValue($oArticle->oxarticles__oxtitle->value . $sTitle);
 
-                    $oArticle = $this->updateArticle($oArticle);
-
-                    return $oArticle;
+                    return $this->updateArticle($oArticle);
                 }
             }
         }
@@ -923,21 +1101,37 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * sets detail link for campaigns
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle article object
+     * @param Article $oArticle article object
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "setCampaignDetailLink" in next major
      */
     protected function _setCampaignDetailLink($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->setCampaignDetailLink($oArticle);
+    }
+
+    /**
+     * sets detail link for campaigns
+     *
+     * @param Article $oArticle article object
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     */
+    protected function setCampaignDetailLink($oArticle)
+    {
         // #827
-        if ($sCampaign = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("sExportCampaign")) {
-            // modify detaillink
+        if ($sCampaign = Registry::getRequest()->getRequestEscapedParameter('sExportCampaign')) {
+            // modify detail-link
             //#1166R - pangora - campaign
             $oArticle->appendLink("campaign={$sCampaign}");
 
             if (
-                \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("blAppendCatToCampaign") &&
+                Registry::getRequest()->getRequestEscapedParameter('blAppendCatToCampaign') &&
                 ($sCat = $this->getCategoryString($oArticle))
             ) {
                 $oArticle->appendLink("/$sCat");
@@ -960,9 +1154,9 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Updates Article object. Method is used for overriding.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param Article $article
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     protected function updateArticle($article)
     {
@@ -972,10 +1166,11 @@ class DynamicExportBaseController extends \OxidEsales\Eshop\Application\Controll
     /**
      * Get the actual database.
      *
-     * @return \OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface The database.
+     * @return DatabaseInterface The database.
+     * @throws DatabaseConnectionException
      */
     protected function getDb()
     {
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        return DatabaseProvider::getDb();
     }
 }

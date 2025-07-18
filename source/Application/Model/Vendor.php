@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxField;
+use OxidEsales\Eshop\Core\Contract\IUrl;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Vendor manager
  *
  */
-class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements \OxidEsales\Eshop\Core\Contract\IUrl
+class Vendor extends MultiLanguageModel implements IUrl
 {
     protected static $_aRootVendor = [];
 
@@ -61,14 +65,14 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
     /**
      * Visibility of a vendor
      *
-     * @var int
+     * @var bool
      */
     protected $_blIsVisible;
 
     /**
-     * has visible endors state of a category
+     * has visible vendors state of a category
      *
-     * @var int
+     * @var bool
      */
     protected $_blHasVisibleSubCats;
 
@@ -84,7 +88,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      */
     public function __construct()
     {
-        $this->setShowArticleCnt($this->getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
+        $this->setShowArticleCnt(Registry::getConfig()->getConfigParam('bl_perfShowActionCatArticleCnt'));
         parent::__construct();
         $this->init('oxvendor');
     }
@@ -110,10 +114,10 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
 
         // vendor article count is stored in cache
         if ($this->_blShowArticleCnt && !$this->isAdmin()) {
-            $this->_iNrOfArticles = \OxidEsales\Eshop\Core\Registry::getUtilsCount()->getVendorArticleCount($this->getId());
+            $this->_iNrOfArticles = Registry::getUtilsCount()->getVendorArticleCount($this->getId());
         }
 
-        $this->oxvendor__oxnrofarticles = new \OxidEsales\Eshop\Core\Field($this->_iNrOfArticles, \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxnrofarticles = new Field($this->_iNrOfArticles, Field::T_RAW);
     }
 
     /**
@@ -142,9 +146,10 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
     protected function _setRootObjectData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $this->setId('root');
-        $this->oxvendor__oxicon = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxvendor__oxtitle = new \OxidEsales\Eshop\Core\Field(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false), \OxidEsales\Eshop\Core\Field::T_RAW);
-        $this->oxvendor__oxshortdesc = new \OxidEsales\Eshop\Core\Field('', \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxvendor__oxicon = new Field('', Field::T_RAW);
+        $this->oxvendor__oxtitle = new Field(
+            Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false), Field::T_RAW);
+        $this->oxvendor__oxshortdesc = new Field('', Field::T_RAW);
 
         return true;
     }
@@ -159,7 +164,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      */
     public function getBaseSeoLink($iLang, $iPage = 0)
     {
-        $oEncoder = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class);
+        $oEncoder = Registry::get(SeoEncoderVendor::class);
         if (!$iPage) {
             return $oEncoder->getVendorUrl($this, $iLang);
         }
@@ -176,7 +181,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
      */
     public function getLink($iLang = null)
     {
-        if (!\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive()) {
+        if (!Registry::getUtils()->seoIsActive()) {
             return $this->getStdLink($iLang);
         }
 
@@ -205,7 +210,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
         $sUrl = '';
         if ($blFull) {
             //always returns shop url, not admin
-            $sUrl = $this->getConfig()->getShopUrl($iLang, false);
+            $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
         return $sUrl . "index.php?cl=vendorlist" . ($blAddId ? "&amp;cnid=v_" . $this->getId() : "");
@@ -225,7 +230,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
             $iLang = $this->getLanguage();
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
+        return Registry::getUtilsUrl()->processUrl($this->getBaseStdLink($iLang), true, $aParams, $iLang);
     }
 
     /**
@@ -260,7 +265,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
     }
 
     /**
-     * sets the visibilty of a category
+     * sets the visibility of a category
      *
      * @param bool $blVisible vendors visibility status setter
      */
@@ -303,9 +308,11 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
     /**
      * Delete this object from the database, returns true on success.
      *
-     * @param string $oxid Object ID(default null)
+     * @param null $oxid Object ID(default null)
      *
      * @return bool
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function delete($oxid = null)
     {
@@ -316,7 +323,7 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
         }
 
         if (parent::delete($oxid)) {
-            \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class)->onDeleteVendor($this);
+            Registry::get(SeoEncoderVendor::class)->onDeleteVendor($this);
 
             return true;
         }
@@ -328,25 +335,25 @@ class Vendor extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel implements 
     /**
      * Returns article picture
      *
-     * @return string
+     * @return string|void
      */
     public function getIconUrl()
     {
         if (($sIcon = $this->oxvendor__oxicon->value)) {
-            $oConfig = $this->getConfig();
+            $oConfig = Registry::getConfig();
             $sSize = $oConfig->getConfigParam('sManufacturerIconsize');
             if (!isset($sSize)) {
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return \OxidEsales\Eshop\Core\Registry::getPictureHandler()->getPicUrl("vendor/icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl("vendor/icon/", $sIcon, $sSize);
         }
     }
 
     /**
-     * Returns category thumbnail picture url if exist, false - if not
+     * Returns category thumbnail picture url if exists, false - if not
      *
-     * @return mixed
+     * @return false
      */
     public function getThumbUrl()
     {

@@ -20,17 +20,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\NavigationTree;
 use OxidEsales\EshopCommunity\Application\Model\RightsRoles;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 use OxidEsales\EshopCommunity\Core\Registry;
+use stdClass;
 
-class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AdminRightsMain extends AdminDetailsController
 {
     public function render()
     {
         parent::render();
 
-        if (Registry::getRequest()->getRequestEscapedParameter("aoc")) {
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $rightsUserAjax = oxNew(AdminRightsMainAjax::class);
             $this->addTplParam('oxajax', $rightsUserAjax->getColumns());
 
@@ -57,7 +60,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             }
 
             foreach ($oOtherLang as $id => $language) {
-                $oLang = new \stdClass();
+                $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
                 $this->_aViewData["otherlang"][$id] = clone $oLang;
@@ -75,7 +78,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         $rightsRole = oxNew(RightsRoles::class);
         $rightsRole->setLanguage(0);
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if ($soxId != "-1") {
             $rightsRole->loadInLang($this->_iEditLang, $soxId);
@@ -117,7 +120,7 @@ class AdminRightsMain extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
     public function getMenuTree()
     {
-        $navTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
+        $navTree = oxNew(NavigationTree::class);
         return $navTree->getDomXml()->documentElement->childNodes;
     }
 }

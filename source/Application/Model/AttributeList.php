@@ -21,15 +21,19 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
-use oxRegistry;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
 
 /**
  * Attribute list manager.
  *
  */
-class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
+class AttributeList extends ListModel
 {
     /**
      * Class constructor
@@ -40,11 +44,13 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * Load all attributes by article Id's
+     * Load all attributes by article IDs
      *
      * @param array $aIds article id's
      *
-     * @return array $aAttributes;
+     * @return array|void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAttributesByIds($aIds)
     {
@@ -52,10 +58,10 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
             return;
         }
 
-        $sAttrViewName = getViewName('oxattribute');
-        $sViewName = getViewName('oxobject2attribute');
+        $sAttrViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
-        $oxObjectIdsSql = implode(',', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds));
+        $oxObjectIdsSql = implode(',', DatabaseProvider::getDb()->quoteArray($aIds));
 
         $sSelect = "select $sAttrViewName.oxid, $sAttrViewName.oxtitle, {$sViewName}.oxvalue, {$sViewName}.oxobjectid ";
         $sSelect .= "from {$sViewName} left join $sAttrViewName on $sAttrViewName.oxid = {$sViewName}.oxattrid ";
@@ -71,13 +77,15 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
      * @param string $sSelect SQL select
      *
      * @return array $aAttributes
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "createAttributeListFromSql" in next major
      */
     protected function _createAttributeListFromSql($sSelect) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aAttributes = [];
-        $rs = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->select($sSelect);
-        if ($rs != false && $rs->count() > 0) {
+        $rs = DatabaseProvider::getDb()->select($sSelect);
+        if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
                 if (!isset($aAttributes[$rs->fields[0]])) {
                     $aAttributes[$rs->fields[0]] = new stdClass();
@@ -96,18 +104,20 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * Load attributes by article Id
+     * Load attributes by article ID
      *
      * @param string $sArticleId article id
-     * @param string $sParentId  article parent id
+     * @param null $sParentId article parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAttributes($sArticleId, $sParentId = null)
     {
         if ($sArticleId) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+            $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sAttrViewName = getViewName('oxattribute');
-            $sViewName = getViewName('oxobject2attribute');
+            $sAttrViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
             $sSelect = "select {$sAttrViewName}.`oxid`, {$sAttrViewName}.`oxtitle`, o2a.`oxvalue` from {$sViewName} as o2a ";
             $sSelect .= "left join {$sAttrViewName} on {$sAttrViewName}.oxid = o2a.oxattrid ";
@@ -130,18 +140,20 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * Load displayable in baskte/order attributes by article Id
+     * Load displayable in basket/order attributes by article ID
      *
-     * @param string $sArtId    article ids
-     * @param string $sParentId parent id
+     * @param string $sArtId article ids
+     * @param null $sParentId parent id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function loadAttributesDisplayableInBasket($sArtId, $sParentId = null)
     {
         if ($sArtId) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+            $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sAttrViewName = getViewName('oxattribute');
-            $sViewName = getViewName('oxobject2attribute');
+            $sAttrViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute');
 
             $sSelect = "select o2a.*, {$sAttrViewName}.* from $sViewName as o2a ";
             $sSelect .= "left join {$sAttrViewName} on {$sAttrViewName}.oxid = o2a.oxattrid ";
@@ -164,23 +176,25 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
     }
 
     /**
-     * get category attributes by category Id
+     * get category attributes by category ID
      *
-     * @param string  $sCategoryId category Id
-     * @param integer $iLang       language No
+     * @param string $sCategoryId category Id
+     * @param integer $iLang language No
      *
      * @return object;
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCategoryAttributes($sCategoryId, $iLang)
     {
-        $aSessionFilter = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('session_attrfilter');
+        $aSessionFilter = Registry::getSession()->getVariable('session_attrfilter');
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $oArtList = oxNew(ArticleList::class);
         $oArtList->loadCategoryIDs($sCategoryId, $aSessionFilter);
 
         // Only if we have articles
         if (count($oArtList) > 0) {
-            $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+            $oDb = DatabaseProvider::getDb();
             $sArtIds = '';
             foreach (array_keys($oArtList->getArray()) as $sId) {
                 if ($sArtIds) {
@@ -189,9 +203,9 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
                 $sArtIds .= $oDb->quote($sId);
             }
 
-            $sAttTbl = getViewName('oxattribute', $iLang);
-            $sO2ATbl = getViewName('oxobject2attribute', $iLang);
-            $sC2ATbl = getViewName('oxcategory2attribute', $iLang);
+            $sAttTbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute', $iLang);
+            $sO2ATbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute', $iLang);
+            $sC2ATbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategory2attribute', $iLang);
 
             $sSelect = "SELECT DISTINCT att.oxid, att.oxtitle, o2a.oxvalue " .
                        "FROM $sAttTbl as att, $sO2ATbl as o2a ,$sC2ATbl as c2a " .
@@ -202,14 +216,14 @@ class AttributeList extends \OxidEsales\Eshop\Core\Model\ListModel
                 ':oxobjectid' => $sCategoryId
             ]);
 
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF && list($sAttId, $sAttTitle, $sAttValue) = $rs->fields) {
                     if (!$this->offsetExists($sAttId)) {
-                        $oAttribute = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
+                        $oAttribute = oxNew(Attribute::class);
                         $oAttribute->setTitle($sAttTitle);
 
                         $this->offsetSet($sAttId, $oAttribute);
-                        $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
+                        $iLang = Registry::getLang()->getBaseLanguage();
                         if (isset($aSessionFilter[$sCategoryId][$iLang][$sAttId])) {
                             $oAttribute->setActiveValue($aSessionFilter[$sCategoryId][$iLang][$sAttId]);
                         }

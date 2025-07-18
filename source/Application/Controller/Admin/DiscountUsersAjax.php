@@ -21,59 +21,78 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages discount users
  */
-class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DiscountUsersAjax extends ListComponentAjax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,  visible, multilanguage, ident
-        ['oxusername', 'oxuser', 1, 0, 0],
-        ['oxlname', 'oxuser', 0, 0, 0],
-        ['oxfname', 'oxuser', 0, 0, 0],
-        ['oxstreet', 'oxuser', 0, 0, 0],
-        ['oxstreetnr', 'oxuser', 0, 0, 0],
-        ['oxcity', 'oxuser', 0, 0, 0],
-        ['oxzip', 'oxuser', 0, 0, 0],
-        ['oxfon', 'oxuser', 0, 0, 0],
-        ['oxbirthdate', 'oxuser', 0, 0, 0],
-        ['oxid', 'oxuser', 0, 0, 1],
-    ],
-                                 'container2' => [
-                                     ['oxusername', 'oxuser', 1, 0, 0],
-                                     ['oxlname', 'oxuser', 0, 0, 0],
-                                     ['oxfname', 'oxuser', 0, 0, 0],
-                                     ['oxstreet', 'oxuser', 0, 0, 0],
-                                     ['oxstreetnr', 'oxuser', 0, 0, 0],
-                                     ['oxcity', 'oxuser', 0, 0, 0],
-                                     ['oxzip', 'oxuser', 0, 0, 0],
-                                     ['oxfon', 'oxuser', 0, 0, 0],
-                                     ['oxbirthdate', 'oxuser', 0, 0, 0],
-                                     ['oxid', 'oxobject2discount', 0, 0, 1],
-                                 ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field, table, visible, multilanguage, ident
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxuser', 0, 0, 1],
+        ],
+        'container2' => [
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxobject2discount', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        return $this->getQuery();
+    }
 
-        $sUserTable = $this->_getViewName('oxuser');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $oConfig->getRequestParameter('oxid');
-        $sSynchId = $oConfig->getRequestParameter('synchoxid');
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
+
+        $sUserTable = $this->getViewName('oxuser');
+        $oDb = DatabaseProvider::getDb();
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         // category selected or not ?
         if (!$sId) {
@@ -107,14 +126,13 @@ class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function removeDiscUser()
     {
-        $oConfig = $this->getConfig();
-        $aRemoveGroups = $this->_getActionIds('oxobject2discount.oxid');
-        if ($oConfig->getRequestParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2discount.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        $aRemoveGroups = $this->getActionIds('oxobject2discount.oxid');
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -123,21 +141,21 @@ class DiscountUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function addDiscUser()
     {
-        $oConfig = $this->getConfig();
-        $aChosenUsr = $this->_getActionIds('oxuser.oxid');
-        $soxId = $oConfig->getRequestParameter('synchoxid');
+        $oRequest = Registry::getRequest();
+        $aChosenUsr = $this->getActionIds('oxuser.oxid');
+        $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
-        if ($oConfig->getRequestParameter('all')) {
-            $sUserTable = $this->_getViewName('oxuser');
-            $aChosenUsr = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
+        if ($oRequest->getRequestEscapedParameter('all')) {
+            $sUserTable = $this->getViewName('oxuser');
+            $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
-                $oObject2Discount = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Discount = oxNew(BaseModel::class);
                 $oObject2Discount->init('oxobject2discount');
-                $oObject2Discount->oxobject2discount__oxdiscountid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Discount->oxobject2discount__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenUsr);
-                $oObject2Discount->oxobject2discount__oxtype = new \OxidEsales\Eshop\Core\Field("oxuser");
+                $oObject2Discount->oxobject2discount__oxdiscountid = new Field($soxId);
+                $oObject2Discount->oxobject2discount__oxobjectid = new Field($sChosenUsr);
+                $oObject2Discount->oxobject2discount__oxtype = new Field("oxuser");
                 $oObject2Discount->save();
             }
         }

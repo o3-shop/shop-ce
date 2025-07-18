@@ -21,10 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+
 /**
  * Address handler
  */
-class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
+class Address extends BaseModel
 {
     /**
      * Current class name
@@ -41,20 +44,20 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected $_blSelected = false;
 
     /**
-     * @var oxState
+     * @var State
      */
     protected $_oStateObject = null;
 
     /**
      * Returns oxState object
      *
-     * @return oxState
+     * @return State
      * @deprecated underscore prefix violates PSR12, will be renamed to "getStateObject" in next major
      */
     protected function _getStateObject() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_null($this->_oStateObject)) {
-            $this->_oStateObject = oxNew(\OxidEsales\Eshop\Application\Model\State::class);
+            $this->_oStateObject = oxNew(State::class);
         }
 
         return $this->_oStateObject;
@@ -126,9 +129,10 @@ class Address extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Get state title
      *
-     * @param string $sId state ID
+     * @param null $sId state ID
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getStateTitle($sId = null)
     {

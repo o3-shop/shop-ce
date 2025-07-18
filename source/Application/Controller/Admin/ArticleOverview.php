@@ -21,30 +21,37 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin article overview manager.
  * Collects and previews such article information as article creation date,
- * last modification date, sales rating and etc.
+ * last modification date, sales rating etc.
  * Admin Menu: Manage Products -> Articles -> Overview.
  */
-class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ArticleOverview extends AdminDetailsController
 {
     /**
      * Loads article overview data, passes to Smarty engine and returns name
      * of template file "article_overview.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
 
         parent::render();
 
-        $this->_aViewData['edit'] = $oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+        $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
@@ -76,7 +83,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             ]);
             $iTopPos = 0;
             $iPos = 0;
-            if ($rs != false && $rs->count() > 0) {
+            if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     $iPos++;
                     if ($rs->fields[0] == $soxId) {
@@ -98,10 +105,11 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
     /**
      * @return DatabaseInterface
+     * @throws DatabaseConnectionException
      */
     protected function getDatabase()
     {
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        return DatabaseProvider::getDb();
     }
 
     /**
@@ -110,6 +118,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * @param string $oxId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formOrderAmountQuery($oxId)
     {
@@ -125,6 +134,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * @param string $oxId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formSoldOutAmountQuery($oxId)
     {
@@ -140,6 +150,7 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
      * @param string $soxId
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     protected function formCanceledAmountQuery($soxId)
     {
@@ -150,14 +161,14 @@ class ArticleOverview extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
     /**
      * Loads language for article object.
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article
+     * @param Article $article
      * @param string                                      $oxId
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article
+     * @return Article
      */
     protected function updateArticle($article, $oxId)
     {
-        $article->loadInLang(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editlanguage"), $oxId);
+        $article->loadInLang(Registry::getRequest()->getRequestEscapedParameter('editlanguage'), $oxId);
 
         return $article;
     }

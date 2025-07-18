@@ -20,12 +20,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 
 class RightsRoles extends MultiLanguageModel
 {

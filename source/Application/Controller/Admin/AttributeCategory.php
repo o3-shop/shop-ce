@@ -21,15 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax;
+use OxidEsales\Eshop\Application\Model\Attribute;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Admin category main attributes manager.
+ * Admin category main attributes' manager.
  * There is possibility to change attribute description, assign categories to
  * this attribute, etc.
- * Admin Menu: Manage Products -> Attributes -> Gruppen.
+ * Admin Menu: Manage Products -> Attributes -> Groups.
  */
-class AttributeCategory extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class AttributeCategory extends AdminDetailsController
 {
     /**
      * Loads Attribute categories info, passes it to Smarty engine and
@@ -45,13 +48,13 @@ class AttributeCategory extends \OxidEsales\Eshop\Application\Controller\Admin\A
 
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oAttr = oxNew(\OxidEsales\Eshop\Application\Model\Attribute::class);
+            $oAttr = oxNew(Attribute::class);
             $oAttr->load($soxId);
             $this->_aViewData["edit"] = $oAttr;
         }
 
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("aoc")) {
-            $oAttributeCategoryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class);
+        if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
+            $oAttributeCategoryAjax = oxNew(AttributeCategoryAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeCategoryAjax->getColumns();
 
             return "popups/attribute_category.tpl";

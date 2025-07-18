@@ -21,22 +21,20 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use OxidEsales\Eshop\Core\AdminNaviRights;
+use DOMNodeList;
+use Exception;
+use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\AdminViewSetting;
-use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use DOMXPath;
 use DOMDocument;
 use DOMElement;
-use RecursiveTreeIterator;
+use OxidEsales\Eshop\Core\Str;
 use stdClass;
 
 /**
  * Navigation tree control class
  */
-class NavigationTree extends \OxidEsales\Eshop\Core\Base
+class NavigationTree extends Base
 {
     /**
      * stores DOM object for all navigation tree
@@ -49,7 +47,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     protected $_oInitialDom = null;
 
     /**
-     * Dynamix XML path
+     * Dynamic XML path
      *
      * @deprecated 6.6.0 dynpages will be removed on the next major
      *
@@ -64,15 +62,28 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected $_aSupportedExpathXmlEncodings = ['utf-8', 'utf-16', 'iso-8859-1', 'us-ascii'];
 
+    protected $sDynIncludeUrl = null;
     /**
      * clean empty nodes from tree
      *
-     * @param object $dom         dom object
+     * @param DOMDocument $dom         dom object
      * @param string $parentXPath parent xpath
      * @param string $childXPath  child xpath from parent
      * @deprecated underscore prefix violates PSR12, will be renamed to "cleanEmptyParents" in next major
      */
     protected function _cleanEmptyParents($dom, $parentXPath, $childXPath) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->cleanEmptyParents($dom, $parentXPath, $childXPath);
+    }
+
+    /**
+     * clean empty nodes from tree
+     *
+     * @param DOMDocument $dom         dom object
+     * @param string $parentXPath parent xpath
+     * @param string $childXPath  child xpath from parent
+     */
+    protected function cleanEmptyParents($dom, $parentXPath, $childXPath)
     {
         $xPath = new DomXPath($dom);
         $nodeList = $xPath->query($parentXPath);
@@ -93,6 +104,16 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "addLinks" in next major
      */
     protected function _addLinks($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->addLinks($dom);
+    }
+
+    /**
+     * Adds links to xml nodes to resolve paths
+     *
+     * @param DomDocument $dom where to add links
+     */
+    protected function addLinks($dom)
     {
         $url = 'index.php?'; // session parameters will be included later (after cache processor)
         $xPath = new DomXPath($dom);
@@ -122,14 +143,25 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _loadFromFile($menuFile, $dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->loadFromFile($menuFile, $dom);
+    }
+
+    /**
+     * Loads data form XML file, and merges it with main oDomXML.
+     *
+     * @param string      $menuFile which file to load
+     * @param DomDocument $dom      where to load
+     */
+    protected function loadFromFile($menuFile, $dom)
+    {
         $merge = false;
         $domFile = new DomDocument();
         $domFile->preserveWhiteSpace = false;
         if (!@$domFile->load($menuFile)) {
             $merge = true;
         } elseif (is_readable($menuFile) && ($xml = @file_get_contents($menuFile))) {
-            // looking for non supported character encoding
-            if (getStr()->preg_match("/encoding\=(.*)\?\>/", $xml, $matches) !== 0) {
+            // looking for non-supported character encoding
+            if (Str::getStr()->preg_match("/encoding\=(.*)\?\>/", $xml, $matches) !== 0) {
                 if (isset($matches[1])) {
                     $currEncoding = trim($matches[1], "\"");
                     if (!in_array(strtolower($currEncoding), $this->_aSupportedExpathXmlEncodings)) {
@@ -146,7 +178,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
         }
 
         if ($merge) {
-            $this->_merge($domFile, $dom);
+            $this->merge($domFile, $dom);
         }
     }
 
@@ -155,11 +187,11 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      *
      * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
      *
-     * @param object $dom dom element to add links
+     * @param DOMDocument $dom dom element to add links
      */
     protected function _addDynLinks($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myUtilsFile = \OxidEsales\Eshop\Core\Registry::getUtilsFile();
+        $myUtilsFile = Registry::getUtilsFile();
 
         $url = 'index.php?'; // session parameters will be included later (after cache processor)
 
@@ -194,20 +226,20 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
 
             // always display the "about" tab no matter what licence
 
-            if ($myUtilsFile->checkFile("{$this->_sDynIncludeUrl}pages/{$class}_about.php")) {
+            if ($myUtilsFile->checkFile("{$this->sDynIncludeUrl}pages/{$class}_about.php")) {
                 $tabElem = new DOMElement('TAB');
                 $node->appendChild($tabElem);
                 $tabElem->setAttribute('external', 'true');
-                $tabElem->setAttribute('location', "{$this->_sDynIncludeUrl}pages/{$class}_about.php");
+                $tabElem->setAttribute('location', "{$this->sDynIncludeUrl}pages/{$class}_about.php");
                 $tabElem->setAttribute('id', 'dyn_about');
             }
 
             // checking for technics page
-            if ($myUtilsFile->checkFile("{$this->_sDynIncludeUrl}pages/{$class}_technics.php")) {
+            if ($myUtilsFile->checkFile("{$this->sDynIncludeUrl}pages/{$class}_technics.php")) {
                 $tabElem = new DOMElement('TAB');
                 $node->appendChild($tabElem);
                 $tabElem->setAttribute('external', 'true');
-                $tabElem->setAttribute('location', "{$this->_sDynIncludeUrl}pages/{$class}_technics.php");
+                $tabElem->setAttribute('location', "{$this->sDynIncludeUrl}pages/{$class}_technics.php");
                 $tabElem->setAttribute('id', 'dyn_interface');
             }
 
@@ -224,14 +256,24 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     /**
      * add session parameters to local urls
      *
-     * @param object $dom dom element to add links
+     * @param DOMDocument $dom dom element to add links
      * @deprecated underscore prefix violates PSR12, will be renamed to "sessionizeLocalUrls" in next major
      */
     protected function _sessionizeLocalUrls($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $url = $this->_getAdminUrl();
+        $this->sessionizeLocalUrls($dom);
+    }
+
+    /**
+     * add session parameters to local urls
+     *
+     * @param DOMDocument $dom dom element to add links
+     */
+    protected function sessionizeLocalUrls($dom)
+    {
+        $url = $this->getAdminUrl();
         $xPath = new DomXPath($dom);
-        $str = getStr();
+        $str = Str::getStr();
         foreach (['url', 'link'] as $attrType) {
             foreach ($xPath->query("//OXMENU//*[@$attrType]") as $node) {
                 $localUrl = $node->getAttribute($attrType);
@@ -246,10 +288,20 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     /**
      * Removes form tree elements which does not have required user rights
      *
-     * @param object $dom DOMDocument
+     * @param DOMDocument $dom DOMDocument
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkRights" in next major
      */
     protected function _checkRights($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->checkRights($dom);
+    }
+
+    /**
+     * Removes form tree elements which does not have required user rights
+     *
+     * @param DOMDocument $dom DOMDocument
+     */
+    protected function checkRights($dom)
     {
         $xPath = new DomXPath($dom);
         $nodeList = $xPath->query('//*[@rights or @norights]');
@@ -259,7 +311,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             if (($req = $node->getAttribute('rights'))) {
                 $perms = explode(',', $req);
                 foreach ($perms as $perm) {
-                    if ($perm && !$this->_hasRights($perm)) {
+                    if ($perm && !$this->hasRights($perm)) {
                         $node->parentNode->removeChild($node);
                     }
                 }
@@ -267,7 +319,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             } elseif (($noReq = $node->getAttribute('norights'))) {
                 $perms = explode(',', $noReq);
                 foreach ($perms as $perm) {
-                    if ($perm && $this->_hasRights($perm)) {
+                    if ($perm && $this->hasRights($perm)) {
                         $node->parentNode->removeChild($node);
                     }
                 }
@@ -283,6 +335,16 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _checkGroups($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->checkGroups($dom);
+    }
+
+        /**
+     * Removes from tree elements which don't have required groups
+     *
+     * @param DOMDocument $dom document to check group
+     */
+    protected function checkGroups($dom)
+    {
         $xPath = new DomXPath($dom);
         $nodeList = $xPath->query("//*[@nogroup or @group]");
 
@@ -291,7 +353,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             if (($req = $node->getAttribute('group'))) {
                 $perms = explode(',', $req);
                 foreach ($perms as $perm) {
-                    if ($perm && !$this->_hasGroup($perm)) {
+                    if ($perm && !$this->hasGroup($perm)) {
                         $node->parentNode->removeChild($node);
                     }
                 }
@@ -299,7 +361,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             } elseif (($noReq = $node->getAttribute('nogroup'))) {
                 $perms = explode(',', $noReq);
                 foreach ($perms as $perm) {
-                    if ($perm && $this->_hasGroup($perm)) {
+                    if ($perm && $this->hasGroup($perm)) {
                         $node->parentNode->removeChild($node);
                     }
                 }
@@ -312,12 +374,24 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      *
      * @param DOMDocument $dom document to check group
      *
-     * @return null
+     * @return void
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkDemoShopDenials" in next major
      */
     protected function _checkDemoShopDenials($dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$this->getConfig()->isDemoShop()) {
+        $this->checkDemoShopDenials($dom);
+    }
+
+        /**
+     * Removes form tree elements if this is demo shop and elements have disableForDemoShop="1"
+     *
+     * @param DOMDocument $dom document to check group
+     *
+     * @return void
+     */
+    protected function checkDemoShopDenials($dom)
+    {
+        if (!Registry::getConfig()->isDemoShop()) {
             // nothing to check for non demo shop
             return;
         }
@@ -348,13 +422,23 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Copys attributes form one element to another
+     * Copies attributes form one element to another
      *
      * @param object $domElemTo   DOMElement
      * @param object $domElemFrom DOMElement
      * @deprecated underscore prefix violates PSR12, will be renamed to "copyAttributes" in next major
      */
     protected function _copyAttributes($domElemTo, $domElemFrom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->copyAttributes($domElemTo, $domElemFrom);
+    }
+
+    /**
+     * Copies attributes form one element to another
+     *
+     * @param object $domElemTo   DOMElement
+     * @param object $domElemFrom DOMElement
+     */    protected function copyAttributes($domElemTo, $domElemFrom)
     {
         foreach ($domElemFrom->attributes as $attr) {
             $domElemTo->setAttribute($attr->nodeName, $attr->nodeValue);
@@ -373,6 +457,20 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _mergeNodes($domElemTo, $domElemFrom, $xPathTo, $domDocTo, $queryStart) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->mergeNodes($domElemTo, $domElemFrom, $xPathTo, $domDocTo, $queryStart);
+    }
+
+    /**
+     * Merges nodes of newly added menu xml file
+     *
+     * @param object $domElemTo   merge target
+     * @param object $domElemFrom merge source
+     * @param object $xPathTo     node path
+     * @param object $domDocTo    node to append child
+     * @param string $queryStart  node query
+     */
+    protected function mergeNodes($domElemTo, $domElemFrom, $xPathTo, $domDocTo, $queryStart)
+    {
         foreach ($domElemFrom->childNodes as $fromNode) {
             if ($fromNode->nodeType === XML_ELEMENT_NODE) {
                 $fromAttrName = $fromNode->getAttribute('id');
@@ -388,19 +486,19 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
                 } else {
                     $curNode = $curNode->item(0);
 
-                    // if found copy all attributes and check childnodes
-                    $this->_copyAttributes($curNode, $fromNode);
+                    // if found copy all attributes and check child-nodes
+                    $this->copyAttributes($curNode, $fromNode);
 
                     if ($fromNode->childNodes->length) {
-                        $this->_mergeNodes($curNode, $fromNode, $xPathTo, $domDocTo, $query);
+                        $this->mergeNodes($curNode, $fromNode, $xPathTo, $domDocTo, $query);
                     }
                 }
             }
         }
     }
-
+    
     /**
-     * If oDomXML exist meges nodes
+     * If oDomXML exists merges nodes
      *
      * @param DomDocument $domNew what to merge
      * @param DomDocument $dom    where to merge
@@ -408,8 +506,19 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _merge($domNew, $dom) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->merge($domNew, $dom);
+    }
+
+    /**
+     * If oDomXML exists merges nodes
+     *
+     * @param DomDocument $domNew what to merge
+     * @param DomDocument $dom    where to merge
+     */
+    protected function merge($domNew, $dom)
+    {
         $xPath = new DOMXPath($dom);
-        $this->_mergeNodes($dom->documentElement, $domNew->documentElement, $xPath, $dom, '/OX');
+        $this->mergeNodes($dom->documentElement, $domNew->documentElement, $xPath, $dom, '/OX');
     }
 
     /**
@@ -447,7 +556,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      * @param string $id  class name
      * @param int    $act active tab number
      *
-     * @return string
+     * @return string|void
      */
     public function getActiveTab($id, $act)
     {
@@ -463,7 +572,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $class class name
      *
-     * @return mixed
+     * @return stdClass
      */
     public function getBtn($class)
     {
@@ -488,6 +597,16 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMenuFiles" in next major
      */
     protected function _getMenuFiles() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getMenuFiles();
+    }
+
+    /**
+     * Returns array with paths + names ox menu xml files. Paths are checked
+     *
+     * @return array
+     */
+    protected function getMenuFiles()
     {
         $adminNavigationFileLocator = $this->getContainer()->get('oxid_esales.templating.admin.navigation.file.locator');
         $filesToLoad = $adminNavigationFileLocator->locate();
@@ -516,17 +635,16 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     /**
      * Checks if dyn file is valid for inclusion
      *
-     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
-     *
      * @param string $dynFilePath dyn file path
      *
-     * @return bool
+     * @return string|null
+     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
+     *
      */
     protected function _checkDynFile($dynFilePath) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $dynFile = null;
         if (file_exists($dynFilePath)) {
-            $line = null;
             if (($handle = @fopen($dynFilePath, 'r'))) {
                 $line = stream_get_line($handle, 100, "?>");
                 fclose($handle);
@@ -556,6 +674,18 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _processCachedFile($cacheContents) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->processCachedFile($cacheContents);
+    }
+
+    /**
+     * Method is used for overriding.
+     *
+     * @param string $cacheContents
+     *
+     * @return string
+     */
+    protected function processCachedFile($cacheContents)
+    {
         return $cacheContents;
     }
 
@@ -567,18 +697,28 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getInitialDom() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($this->_oInitialDom === null) {
-            $myOxUtlis = \OxidEsales\Eshop\Core\Registry::getUtils();
+        return $this->getInitialDom();
+    }
 
-            if (is_array($filesToLoad = $this->_getMenuFiles())) {
+    /**
+     * get initial dom, not modified by init method
+     *
+     * @return DOMDocument
+     */
+    protected function getInitialDom()
+    {
+        if ($this->_oInitialDom === null) {
+            $oUtils = Registry::getUtils();
+
+            if (is_array($filesToLoad = $this->getMenuFiles())) {
                 // now checking if xml files are newer than cached file
                 $reload = false;
                 $dynLang = $this->_getDynMenuLang();
 
-                $shopId = $this->getConfig()->getActiveShop()->getShopId();
+                $shopId = Registry::getConfig()->getActiveShop()->getShopId();
                 $cacheName = 'menu_' . $dynLang . $shopId . '_xml';
-                $cacheFile = $myOxUtlis->getCacheFilePath($cacheName);
-                $cacheContents = $myOxUtlis->fromFileCache($cacheName);
+                $cacheFile = $oUtils->getCacheFilePath($cacheName);
+                $cacheContents = $oUtils->fromFileCache($cacheName);
                 if ($cacheContents && file_exists($cacheFile) && ($cacheModTime = filemtime($cacheFile))) {
                     foreach ($filesToLoad as $dynPath) {
                         if ($cacheModTime < filemtime($dynPath)) {
@@ -591,15 +731,15 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
 
                 $this->_oInitialDom = new DOMDocument();
                 if ($reload) {
-                    // fully reloading and building pathes
+                    // fully reloading and building paths
                     $this->_oInitialDom->appendChild(new DOMElement('OX'));
 
                     foreach ($filesToLoad as $dynPath) {
-                        $this->_loadFromFile($dynPath, $this->_oInitialDom);
+                        $this->loadFromFile($dynPath, $this->_oInitialDom);
                     }
 
                     // adds links to menu items
-                    $this->_addLinks($this->_oInitialDom);
+                    $this->addLinks($this->_oInitialDom);
 
                     // @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
                     // adds links to dynamic parts
@@ -607,16 +747,16 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
                     // END deprecated
 
                     // writing to cache
-                    $myOxUtlis->toFileCache($cacheName, $this->_oInitialDom->saveXML());
+                    $oUtils->toFileCache($cacheName, $this->_oInitialDom->saveXML());
                 } else {
-                    $cacheContents = $this->_processCachedFile($cacheContents);
+                    $cacheContents = $this->processCachedFile($cacheContents);
                     // loading from cached file
                     $this->_oInitialDom->preserveWhiteSpace = false;
                     $this->_oInitialDom->loadXML($cacheContents);
                 }
 
                 // add session params
-                $this->_sessionizeLocalUrls($this->_oInitialDom);
+                $this->sessionizeLocalUrls($this->_oInitialDom);
             }
         }
 
@@ -631,22 +771,22 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     public function getDomXml()
     {
         if ($this->_oDom === null) {
-            $this->_oDom = clone $this->_getInitialDom();
+            $this->_oDom = clone $this->getInitialDom();
 
             // removes items denied by user group
-            $this->_checkGroups($this->_oDom);
+            $this->checkGroups($this->_oDom);
 
             // removes items denied by user rights
-            $this->_checkRights($this->_oDom);
+            $this->checkRights($this->_oDom);
 
             // removes items marked as not visible
             $this->removeInvisibleMenuNodes($this->_oDom);
 
             // check config params
-            $this->_checkDemoShopDenials($this->_oDom);
+            $this->checkDemoShopDenials($this->_oDom);
             $this->onGettingDomXml();
-            $this->_cleanEmptyParents($this->_oDom, '//SUBMENU[@id][@list]', 'TAB');
-            $this->_cleanEmptyParents($this->_oDom, '//MAINMENU[@id]', 'SUBMENU');
+            $this->cleanEmptyParents($this->_oDom, '//SUBMENU[@id][@list]', 'TAB');
+            $this->cleanEmptyParents($this->_oDom, '//MAINMENU[@id]', 'SUBMENU');
         }
 
         return $this->_oDom;
@@ -691,7 +831,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $id tab related class
      *
-     * @return string
+     * @return string|void
      */
     public function getListUrl($id)
     {
@@ -714,7 +854,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      * @param string $id     tab related class
      * @param int    $actTab active tab
      *
-     * @return string
+     * @return string|void
      */
     public function getEditUrl($id, $actTab)
     {
@@ -745,7 +885,17 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getAdminUrl() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        return $this->getAdminUrl();
+    }
+
+    /**
+     * Admin url getter
+     *
+     * @return string
+     */
+    protected function getAdminUrl()
+    {
+        $myConfig = Registry::getConfig();
 
         if (($adminSslUrl = $myConfig->getConfigParam('sAdminSSLURL'))) {
             $url = trim($adminSslUrl, '/');
@@ -753,7 +903,7 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             $url = trim($myConfig->getConfigParam('sShopURL'), '/') . '/admin';
         }
 
-        return \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl("{$url}/index.php", false);
+        return Registry::getUtilsUrl()->processUrl("{$url}/index.php", false);
     }
 
     /**
@@ -765,6 +915,18 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      * @deprecated underscore prefix violates PSR12, will be renamed to "hasRights" in next major
      */
     protected function _hasRights($rights) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->hasRights($rights);
+    }
+
+    /**
+     * Checks if user has required rights
+     *
+     * @param string $rights session user rights
+     *
+     * @return bool
+     */
+    protected function hasRights($rights)
     {
         return $this->getUser()->oxuser__oxrights->value == $rights;
     }
@@ -779,6 +941,18 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _hasGroup($groupId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->hasGroup($groupId);
+    }
+
+    /**
+     * Checks if user in required group
+     *
+     * @param string $groupId active group id
+     *
+     * @return bool
+     */
+    protected function hasGroup($groupId)
+    {
         return $this->getUser()->inGroup($groupId);
     }
 
@@ -787,11 +961,11 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $className active class name
      *
-     * @return string
+     * @return string|void
      */
     public function getClassId($className)
     {
-        $xPath = new DOMXPath($this->_getInitialDom());
+        $xPath = new DOMXPath($this->getInitialDom());
         $nodeList = $xPath->query("//*[@cl='{$className}' or @list='{$className}']");
         if ($nodeList->length && ($firstItem = $nodeList->item(0))) {
             return $firstItem->getAttribute('id');
@@ -802,12 +976,13 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
     /**
      * Get dynamic pages url or local path
      *
-     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
-     *
-     * @param int    $lang            language id
+     * @param int $lang language id
      * @param string $loadDynContents get local or remote content path
      *
      * @return string
+     * @throws Exception
+     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
+     *
      */
     protected function _getDynMenuUrl($lang, $loadDynContents) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -818,9 +993,9 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
             return $fullAdminDir . "/dynscreen_local.xml";
         }
         $adminView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class);
-        $this->_sDynIncludeUrl = $adminView->getServiceUrl($lang);
+        $this->sDynIncludeUrl = $adminView->getServiceUrl($lang);
 
-        return $this->_sDynIncludeUrl . "menue/dynscreen.xml";
+        return $this->sDynIncludeUrl . "menue/dynscreen.xml";
     }
 
     /**
@@ -832,8 +1007,8 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getDynMenuLang() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
-        $lang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $myConfig = Registry::getConfig();
+        $lang = Registry::getLang();
 
         $dynLang = $myConfig->getConfigParam('iDynInterfaceLanguage');
         $dynLang = isset($dynLang) ? $dynLang : ($lang->getTplLanguage());
@@ -853,14 +1028,6 @@ class NavigationTree extends \OxidEsales\Eshop\Core\Base
 
     public function getAdminNaviRights()
     {
-        $rightsRolesConfiguration = (int) Registry::getConfig()->getConfigParam('blUseRightsRoles');
-        if ($rightsRolesConfiguration && self::$rights === null) {
-            self::$rights = oxNew(AdminNaviRights::class);
-            if ($this->isAdmin() && ($rightsRolesConfiguration & 1)) {
-                self::$rights->load();
-            }
-        }
-
         return self::$rights;
     }
 }

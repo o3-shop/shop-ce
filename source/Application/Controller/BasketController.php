@@ -21,13 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxArticle;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator;
+use OxidEsales\Eshop\Application\Model\ListObject;
 use OxidEsales\Eshop\Application\Model\Wrapping;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
-use oxList;
-use oxBasketContentMarkGenerator;
-use oxBasket;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -36,7 +40,7 @@ use Psr\Log\LoggerInterface;
  * similar products, top offer articles.
  * O3-Shop -> SHOPPING CART.
  */
-class BasketController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class BasketController extends FrontendController
 {
     /**
      * Current class template name.
@@ -79,7 +83,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * First basket product object. It is used to load
      * recommendation list info and similar product list
      *
-     * @var oxArticle
+     * @var Article
      */
     protected $_oFirstBasketProduct = null;
 
@@ -93,14 +97,14 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Wrapping objects list
      *
-     * @var oxList
+     * @var ListModel
      */
     protected $_oWrappings = null;
 
     /**
      * Card objects list
      *
-     * @var oxList
+     * @var ListModel
      */
     protected $_oCards = null;
 
@@ -116,14 +120,14 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Executes parent::render(), creates list with basket articles
      * Returns name of template file basket::_sThisTemplate (for Search
-     * engines return "content.tpl" template to avoid fake orders etc).
+     * engines return "content.tpl" template to avoid fake orders etc.).
      *
      * @return  string   $this->_sThisTemplate  current template file name
      */
     public function render()
     {
-        if ($this->getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            $this->getSession()->getBasketReservations()->renewExpiration();
+        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
+            Registry::getSession()->getBasketReservations()->renewExpiration();
         }
 
         parent::render();
@@ -135,6 +139,9 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * Return the current articles from the basket
      *
      * @return object | bool
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketArticles()
     {
@@ -142,7 +149,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
             $this->_oBasketArticles = false;
 
             // passing basket articles
-            if ($oBasket = $this->getSession()->getBasket()) {
+            if ($oBasket = Registry::getSession()->getBasket()) {
                 $this->_oBasketArticles = $oBasket->getBasketArticles();
             }
         }
@@ -154,6 +161,9 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * return the basket articles
      *
      * @return object | bool
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getFirstBasketProduct()
     {
@@ -173,6 +183,9 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * return the similar articles
      *
      * @return object | bool
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketSimilarList()
     {
@@ -191,9 +204,12 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Return array of id to form recommend list.
      *
+     * @return array
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
      *
-     * @return array
      */
     public function getSimilarRecommListIds()
     {
@@ -215,8 +231,8 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      */
     public function showBackToShop()
     {
-        $iNewBasketItemMessage = $this->getConfig()->getConfigParam('iNewBasketItemMessage');
-        $sBackToShop = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('_backtoshop');
+        $iNewBasketItemMessage = Registry::getConfig()->getConfigParam('iNewBasketItemMessage');
+        $sBackToShop = Registry::getSession()->getVariable('_backtoshop');
 
         return ($iNewBasketItemMessage == 3 && $sBackToShop);
     }
@@ -224,7 +240,9 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Assigns voucher to current basket
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function addVoucher()
     {
@@ -238,14 +256,14 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
             return;
         }
 
-        $oBasket = $this->getSession()->getBasket();
-        $oBasket->addVoucher(Registry::getConfig()->getRequestParameter('voucherNr'));
+        $oBasket = Registry::getSession()->getBasket();
+        $oBasket->addVoucher(Registry::getRequest()->getRequestEscapedParameter('voucherNr'));
     }
 
     /**
-     * Removes voucher from basket (calls \OxidEsales\Eshop\Application\Model\Basket::removeVoucher())
+     * Removes voucher from basket (calls Basket::removeVoucher())
      *
-     * @return null
+     * @return void
      */
     public function removeVoucher()
     {
@@ -259,8 +277,8 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
             return;
         }
 
-        $oBasket = $this->getSession()->getBasket();
-        $oBasket->removeVoucher(Registry::getConfig()->getRequestParameter('voucherId'));
+        $oBasket = Registry::getSession()->getBasket();
+        $oBasket->removeVoucher(Registry::getRequest()->getRequestEscapedParameter('voucherId'));
     }
 
     /**
@@ -268,12 +286,12 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * Used with option "Display Message when Product is added to Cart" set to "Open Basket"
      * ($myConfig->iNewBasketItemMessage == 3)
      *
-     * @return string   $sBackLink  back link
+     * @return string|void   $sBackLink  back link
      */
     public function backToShop()
     {
-        if ($this->getConfig()->getConfigParam('iNewBasketItemMessage') == 3) {
-            $oSession = \OxidEsales\Eshop\Core\Registry::getSession();
+        if (Registry::getConfig()->getConfigParam('iNewBasketItemMessage') == 3) {
+            $oSession = Registry::getSession();
             if ($sBackLink = $oSession->getVariable('_backtoshop')) {
                 $oSession->deleteVariable('_backtoshop');
 
@@ -296,6 +314,7 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
      * Returns wrapping options availability state (TRUE/FALSE)
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function isWrapping()
     {
@@ -317,12 +336,12 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Return basket wrappings list if available
      *
-     * @return oxlist
+     * @return ListObject
      */
     public function getWrappingList()
     {
         if ($this->_oWrappings === null) {
-            $this->_oWrappings = new \OxidEsales\Eshop\Core\Model\ListModel();
+            $this->_oWrappings = new ListModel();
 
             // load wrapping papers
             if ($this->getViewConfig()->getShowGiftWrapping()) {
@@ -336,12 +355,12 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Returns greeting cards list if available
      *
-     * @return oxlist
+     * @return ListObject
      */
     public function getCardList()
     {
         if ($this->_oCards === null) {
-            $this->_oCards = new \OxidEsales\Eshop\Core\Model\ListModel();
+            $this->_oCards = new ListModel();
 
             // load gift cards
             if ($this->getViewConfig()->getShowGiftWrapping()) {
@@ -354,11 +373,11 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
 
     /**
      * Updates wrapping data in session basket object
-     * (\OxidEsales\Eshop\Core\Session::getBasket()) - adds wrapping info to
+     * (Session::getBasket()) - adds wrapping info to
      * each article in basket (if possible). Plus adds
      * gift message and chosen card ( takes from GET/POST/session;
      * oBasket::giftmessage, oBasket::chosencard). Then sets
-     * basket back to session (\OxidEsales\Eshop\Core\Session::setBasket()).
+     * basket back to session (Session::setBasket()).
      */
     public function changeWrapping()
     {
@@ -368,15 +387,15 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
             return;
         }
 
-        $oConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
 
         if ($this->getViewConfig()->getShowGiftWrapping()) {
-            $oBasket = $this->getSession()->getBasket();
+            $oBasket = Registry::getSession()->getBasket();
 
-            $this->_setWrappingInfo($oBasket, $oConfig->getRequestParameter('wrapping'));
+            $this->setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
 
-            $oBasket->setCardMessage($oConfig->getRequestParameter('giftmessage'));
-            $oBasket->setCardId($oConfig->getRequestParameter('chosencard'));
+            $oBasket->setCardMessage($oRequest->getRequestEscapedParameter('giftmessage'));
+            $oBasket->setCardId($oRequest->getRequestEscapedParameter('chosencard'));
             $oBasket->onUpdate();
         }
     }
@@ -391,8 +410,8 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
         $aPaths = [];
         $aPath = [];
 
-        $iBaseLanguage = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
-        $aPath['title'] = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('CART', $iBaseLanguage, false);
+        $iBaseLanguage = Registry::getLang()->getBaseLanguage();
+        $aPath['title'] = Registry::getLang()->translateString('CART', $iBaseLanguage, false);
         $aPath['link']  = $this->getLink();
         $aPaths[] = $aPath;
 
@@ -402,22 +421,33 @@ class BasketController extends \OxidEsales\Eshop\Application\Controller\Frontend
     /**
      * Method returns object with explanation marks for articles in basket.
      *
-     * @return \OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator
+     * @return BasketContentMarkGenerator
      */
     public function getBasketContentMarkGenerator()
     {
-        /** @var \OxidEsales\Eshop\Application\Model\BasketContentMarkGenerator $oBasketContentMarkGenerator */
-        return oxNew('oxBasketContentMarkGenerator', $this->getSession()->getBasket());
+        /** @var BasketContentMarkGenerator $oBasketContentMarkGenerator */
+        return oxNew(BasketContentMarkGenerator::class, Registry::getSession()->getBasket());
     }
 
     /**
      * Sets basket wrapping
      *
-     * @param \OxidEsales\Eshop\Application\Model\Basket $oBasket
+     * @param Basket $oBasket
      * @param array                                      $aWrapping
      * @deprecated underscore prefix violates PSR12, will be renamed to "setWrappingInfo" in next major
      */
     protected function _setWrappingInfo($oBasket, $aWrapping) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $this->setWrappingInfo($oBasket, $aWrapping);
+    }
+
+    /**
+     * Sets basket wrapping
+     *
+     * @param Basket $oBasket
+     * @param array $aWrapping
+     */
+    protected function setWrappingInfo($oBasket, $aWrapping)
     {
         if (is_array($aWrapping) && count($aWrapping)) {
             foreach ($oBasket->getContents() as $sKey => $oBasketItem) {

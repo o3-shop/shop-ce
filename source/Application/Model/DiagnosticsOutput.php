@@ -21,8 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Core\Registry;
+
 /**
- * Diagnostic tool result outputer
+ * Diagnostic tool result output
  * Performs OutputKey check of shop files and generates report file.
  *
  */
@@ -55,7 +57,7 @@ class DiagnosticsOutput
      */
     public function __construct()
     {
-        $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $this->_oUtils = Registry::getUtils();
     }
 
     /**
@@ -135,7 +137,7 @@ class DiagnosticsOutput
     {
         $sCurrentKey = (empty($sOutputKey)) ? $this->_sOutputKey : $sOutputKey;
 
-        $this->_oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $this->_oUtils = Registry::getUtils();
         $iFileSize = filesize($this->_oUtils->getCacheFilePath($sCurrentKey));
 
         $this->_oUtils->setHeader("Pragma: public");

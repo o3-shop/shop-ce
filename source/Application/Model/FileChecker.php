@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
+use OxidEsales\Eshop\Core\Curl;
+use OxidEsales\Eshop\Core\Registry;
+use SimpleXMLElement;
+
 /**
  * Shop file checker
  * Performs version check of shop file
@@ -53,7 +58,7 @@ class FileChecker
     /**
      * CURL handler
      *
-     * @var \oxCurl
+     * @var Curl
      */
     protected $_oCurlHandler = null;
 
@@ -212,7 +217,7 @@ class FileChecker
     /**
      * Error status getter
      *
-     * @return string
+     * @return bool
      */
     public function hasError()
     {
@@ -233,10 +238,11 @@ class FileChecker
      * Initializes object and checks web service availability
      *
      * @return boolean
+     * @throws Exception
      */
     public function init()
     {
-        $this->_oCurlHandler = oxNew(\OxidEsales\Eshop\Core\Curl::class);
+        $this->_oCurlHandler = oxNew(Curl::class);
 
         if (!$this->checkSystemRequirements()) {
             $this->_blError = true;
@@ -253,6 +259,7 @@ class FileChecker
      * Checks system requirements and builds error messages if there are some
      *
      * @return boolean
+     * @throws Exception
      */
     public function checkSystemRequirements()
     {
@@ -262,7 +269,7 @@ class FileChecker
     /**
      * in case if a general error is thrown by webservice
      *
-     * @return string error
+     * @return bool error
      * @deprecated underscore prefix violates PSR12, will be renamed to "isWebServiceOnline" in next major
      */
     protected function _isWebServiceOnline() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -280,19 +287,19 @@ class FileChecker
 
         if (empty($sXML)) {
             $this->_blError = true;
-            $this->_sErrorMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEWEBSERVICEISNOTREACHABLE');
+            $this->_sErrorMessage = Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEWEBSERVICEISNOTREACHABLE');
         }
 
         try {
-            $oXML = new \SimpleXMLElement($sXML);
-        } catch (\Exception $ex) {
+            $oXML = new SimpleXMLElement($sXML);
+        } catch (Exception $ex) {
             $this->_blError = true;
-            $this->_sErrorMessage .= \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEWEBSERVICERETURNEDNOXML');
+            $this->_sErrorMessage .= Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEWEBSERVICERETURNEDNOXML');
         }
 
         if (!is_object($oXML)) {
             $this->_blError = true;
-            $this->_sErrorMessage .= \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEVERSIONDOESNOTEXIST');
+            $this->_sErrorMessage .= Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEVERSIONDOESNOTEXIST');
         }
 
         return !$this->_blError;
@@ -303,6 +310,7 @@ class FileChecker
      * asks the webservice, if the shop version is known.
      *
      * @return boolean
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "isShopVersionIsKnown" in next major
      */
     protected function _isShopVersionIsKnown() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -317,7 +325,7 @@ class FileChecker
         $sURL = $this->_sWebServiceUrl . "?" . http_build_query($aParams);
 
         if ($sXML = @file_get_contents($sURL)) {
-            $oXML = new \SimpleXMLElement($sXML);
+            $oXML = new SimpleXMLElement($sXML);
             if (is_object($oXML)) {
                 if ($oXML->exists == 1) {
                     return true;
@@ -327,7 +335,7 @@ class FileChecker
 
         $this->_blError = true;
         $sError = sprintf(
-            \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEVERSIONDOESNOTEXIST'),
+            Registry::getLang()->translateString('OXDIAG_ERRORMESSAGEVERSIONDOESNOTEXIST'),
             $this->getEdition(),
             $this->getVersion(),
             $this->getRevision()
@@ -344,7 +352,7 @@ class FileChecker
      *
      * @param string $sFile File
      *
-     * @return mixed
+     * @return array
      */
     public function checkFile($sFile)
     {
@@ -364,7 +372,7 @@ class FileChecker
         $oXML = $this->_getFileVersion($sMD5, $sFile);
         $sColor = "blue";
         $blOk = true;
-        $sMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_ERRORVERSIONCOMPARE');
+        $sMessage = Registry::getLang()->translateString('OXDIAG_ERRORVERSIONCOMPARE');
 
         if (is_object($oXML)) {
             if ($oXML->res == 'OK') {
@@ -376,23 +384,23 @@ class FileChecker
                     $sMessage = 'SOURCE|SNAPSHOT';
                     $sColor = 'red';
                 } else {
-                    $sMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_OK');
+                    $sMessage = Registry::getLang()->translateString('OXDIAG_OK');
                     $sColor = "green";
                 }
             } elseif ($oXML->res == 'VERSIONMISMATCH') {
-                $sMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_VERSION_MISMATCH');
+                $sMessage = Registry::getLang()->translateString('OXDIAG_VERSION_MISMATCH');
                 $sColor = 'red';
                 $blOk = false;
             } elseif ($oXML->res == 'MODIFIED') {
-                $sMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_MODIFIED');
+                $sMessage = Registry::getLang()->translateString('OXDIAG_MODIFIED');
                 $sColor = 'red';
                 $blOk = false;
             } elseif ($oXML->res == 'OBSOLETE') {
-                $sMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_OBSOLETE');
+                $sMessage = Registry::getLang()->translateString('OXDIAG_OBSOLETE');
                 $sColor = 'red';
                 $blOk = false;
             } elseif ($oXML->res == 'UNKNOWN') {
-                $sMessage = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('OXDIAG_UNKNOWN');
+                $sMessage = Registry::getLang()->translateString('OXDIAG_UNKNOWN');
                 $sColor = "green";
             }
         }
@@ -416,7 +424,7 @@ class FileChecker
      * @param string $sMD5  MD5 to check
      * @param string $sFile File to check
      *
-     * @return \SimpleXMLElement
+     * @return SimpleXMLElement
      * @deprecated underscore prefix violates PSR12, will be renamed to "getFileVersion" in next major
      */
     protected function _getFileVersion($sMD5, $sFile) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -437,8 +445,8 @@ class FileChecker
         $sXML = $this->_oCurlHandler->execute();
         $oXML = null;
         try {
-            $oXML = new \SimpleXMLElement($sXML);
-        } catch (\Exception $ex) {
+            $oXML = new SimpleXMLElement($sXML);
+        } catch (Exception $ex) {
             $oXML = null;
         }
 

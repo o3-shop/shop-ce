@@ -21,13 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages deliveryset users
  */
-class DeliverySetUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class DeliverySetUsersAjax extends ListComponentAjax
 {
     /**
      * Columns array
@@ -48,34 +52,48 @@ class DeliverySetUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admi
             ['oxbirthdate', 'oxuser', 0, 0, 0],
             ['oxid', 'oxuser', 0, 0, 1],
         ],
-         'container2' => [
-             ['oxusername', 'oxuser', 1, 0, 0],
-             ['oxlname', 'oxuser', 0, 0, 0],
-             ['oxfname', 'oxuser', 0, 0, 0],
-             ['oxstreet', 'oxuser', 0, 0, 0],
-             ['oxstreetnr', 'oxuser', 0, 0, 0],
-             ['oxcity', 'oxuser', 0, 0, 0],
-             ['oxzip', 'oxuser', 0, 0, 0],
-             ['oxfon', 'oxuser', 0, 0, 0],
-             ['oxbirthdate', 'oxuser', 0, 0, 0],
-             ['oxid', 'oxobject2delivery', 0, 0, 1],
-         ]
+        'container2' => [
+            ['oxusername', 'oxuser', 1, 0, 0],
+            ['oxlname', 'oxuser', 0, 0, 0],
+            ['oxfname', 'oxuser', 0, 0, 0],
+            ['oxstreet', 'oxuser', 0, 0, 0],
+            ['oxstreetnr', 'oxuser', 0, 0, 0],
+            ['oxcity', 'oxuser', 0, 0, 0],
+            ['oxzip', 'oxuser', 0, 0, 0],
+            ['oxfon', 'oxuser', 0, 0, 0],
+            ['oxbirthdate', 'oxuser', 0, 0, 0],
+            ['oxid', 'oxobject2delivery', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sId = $myConfig->getRequestParameter('oxid');
-        $sSynchId = $myConfig->getRequestParameter('synchoxid');
+        return $this->getQuery();
+    }
 
-        $sUserTable = $this->_getViewName('oxuser');
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $myConfig = Registry::getConfig();
+        $oRequest = Registry::getRequest();
+        
+        $oDb = DatabaseProvider::getDb();
+        $sId = $oRequest->getRequestEscapedParameter('oxid');
+        $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
+
+        $sUserTable = $this->getViewName('oxuser');
 
         // category selected or not ?
         if (!$sId) {
@@ -111,13 +129,13 @@ class DeliverySetUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function removeUserFromSet()
     {
-        $aRemoveGroups = $this->_getActionIds('oxobject2delivery.oxid');
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2delivery.* " . $this->_getQuery());
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+        $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
-            \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->Execute($sQ);
+            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            DatabaseProvider::getDb()->Execute($sQ);
         }
     }
 
@@ -126,21 +144,21 @@ class DeliverySetUsersAjax extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function addUserToSet()
     {
-        $aChosenUsr = $this->_getActionIds('oxuser.oxid');
-        $soxId = $this->getConfig()->getRequestParameter('synchoxid');
+        $aChosenUsr = $this->getActionIds('oxuser.oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
-        if ($this->getConfig()->getRequestParameter('all')) {
-            $sUserTable = $this->_getViewName('oxuser');
-            $aChosenUsr = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
+        if (Registry::getRequest()->getRequestEscapedParameter('all')) {
+            $sUserTable = $this->getViewName('oxuser');
+            $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
-                $oObject2Delivery = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+                $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
-                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new \OxidEsales\Eshop\Core\Field($soxId);
-                $oObject2Delivery->oxobject2delivery__oxobjectid = new \OxidEsales\Eshop\Core\Field($sChosenUsr);
-                $oObject2Delivery->oxobject2delivery__oxtype = new \OxidEsales\Eshop\Core\Field("oxdelsetu");
+                $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
+                $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenUsr);
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxdelsetu");
                 $oObject2Delivery->save();
             }
         }

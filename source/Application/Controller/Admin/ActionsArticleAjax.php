@@ -21,14 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxDb;
-use oxField;
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class controls article assignment to attributes
  */
-class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class ActionsArticleAjax extends ListComponentAjax
 {
     /**
      * If true extended column selection will be build
@@ -42,36 +45,51 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxean', 'oxarticles', 1, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table,         visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxean', 'oxarticles', 1, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $myConfig = $this->getConfig();
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sArticleTable = $this->_getViewName('oxarticles');
-        $sViewName = $this->_getViewName('oxobject2category');
+    {        
+        return $this->getQuery();
+    }
 
-        $sSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $sSynchSelId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
+        $myConfig = Registry::getConfig();
+        $oDb = DatabaseProvider::getDb();
+        $sArticleTable = $this->getViewName('oxarticles');
+        $sViewName = $this->getViewName('oxobject2category');
+
+        $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $sSynchSelId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
+        $sQAdd = '';
 
         // category selected or not ?
         if (!$sSelId) {
-            $sQAdd = " from $sArticleTable where 1 ";
+            $sQAdd .= " from $sArticleTable where 1 ";
             $sQAdd .= $myConfig->getConfigParam('blVariantsSelection') ? '' : " and $sArticleTable.oxparentid = '' ";
         } else {
             // selected category ?
@@ -100,15 +118,29 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      * @param string $sQ query to add filter condition
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sQ = parent::_addFilter($sQ);
+        return $this->addFilter($sQ);
+    }
+
+    /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function addFilter($sQ)
+    {
+        $sArtTable = $this->getViewName('oxarticles');
+        $sQ = parent::addFilter($sQ);
 
         // display variants or not ?
-        $sQ .= $this->getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
+        $sQ .= Registry::getConfig()->getConfigParam('blVariantsSelection') ? ' group by ' . $sArtTable . '.oxid ' : '';
 
         return $sQ;
     }
@@ -118,10 +150,10 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function removeActionArticle()
     {
-        $sActionId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        //$sActionId = $this->getConfig()->getConfigParam( 'oxid' );
+        $sActionId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        //$sActionId = Registry::getConfig()->getConfigParam( 'oxid' );
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         $oDb->Execute(
             'delete from oxobject2action '
@@ -136,9 +168,9 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
      */
     public function setActionArticle()
     {
-        $sArticleId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxarticleid');
-        $sActionId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $sArticleId = Registry::getRequest()->getRequestEscapedParameter('oxarticleid');
+        $sActionId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $oDb = DatabaseProvider::getDb();
 
         $oDb->Execute(
             'delete from oxobject2action '
@@ -147,11 +179,11 @@ class ActionsArticleAjax extends \OxidEsales\Eshop\Application\Controller\Admin\
             [':oxactionid' => $sActionId]
         );
 
-        $oObject2Promotion = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oObject2Promotion = oxNew(BaseModel::class);
         $oObject2Promotion->init('oxobject2action');
-        $oObject2Promotion->oxobject2action__oxactionid = new \OxidEsales\Eshop\Core\Field($sActionId);
-        $oObject2Promotion->oxobject2action__oxobjectid = new \OxidEsales\Eshop\Core\Field($sArticleId);
-        $oObject2Promotion->oxobject2action__oxclass = new \OxidEsales\Eshop\Core\Field("oxarticle");
+        $oObject2Promotion->oxobject2action__oxactionid = new Field($sActionId);
+        $oObject2Promotion->oxobject2action__oxobjectid = new Field($sArticleId);
+        $oObject2Promotion->oxobject2action__oxclass = new Field("oxarticle");
         $oObject2Promotion->save();
     }
 }

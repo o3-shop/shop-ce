@@ -21,10 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\User;
+
 /**
  * Class for extending
  */
-class UserOverview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class UserOverview extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), passes data to Smarty engine and
@@ -39,7 +42,7 @@ class UserOverview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminD
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser = oxNew(User::class);
             $oUser->load($soxId);
             $this->_aViewData["edit"] = $oUser;
         }

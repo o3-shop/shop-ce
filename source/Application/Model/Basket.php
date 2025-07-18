@@ -21,16 +21,33 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\ArticleInputException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\NoArticleException;
+use OxidEsales\Eshop\Core\Exception\ObjectException;
+use OxidEsales\Eshop\Core\Exception\OutOfStockException;
+use OxidEsales\Eshop\Core\Exception\VoucherException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\PriceList;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use OxidEsales\Eshop\Application\Model\BasketItem;
 use stdClass;
 
 /**
  * Basket manager
  *
  */
-class Basket extends \OxidEsales\Eshop\Core\Base
+class Basket extends Base
 {
     /**
-     * Array or oxbasketitem objects
+     * Array or BasketItem objects
      *
      * @var array
      */
@@ -69,7 +86,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Total basket price
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oPrice = null;
 
@@ -97,7 +114,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * The list of all basket item prices
      *
-     * @var \OxidEsales\Eshop\Core\PriceList
+     * @var PriceList
      */
     protected $_oProductsPriceList = null;
 
@@ -130,7 +147,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     protected $_aVouchers = [];
 
     /**
-     * Additional costs array of \OxidEsales\Eshop\Core\Price objects
+     * Additional costs array of Price objects
      *
      * @var array
      */
@@ -139,14 +156,14 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Sum price of articles applicable to discounts
      *
-     * @var \OxidEsales\Eshop\Core\PriceList
+     * @var PriceList
      */
     protected $_oDiscountProductsPriceList = null;
 
     /**
      * Sum price of articles not applicable to discounts
      *
-     * @var \OxidEsales\Eshop\Core\PriceList
+     * @var PriceList
      */
     protected $_oNotDiscountedProductsPriceList = null;
 
@@ -181,21 +198,21 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Ref. to session user
      *
-     * @var \OxidEsales\Eshop\Application\Model\User
+     * @var User
      */
     protected $_oUser = null;
 
     /**
      * Total basket products discount price object (does not include voucher discount)
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oTotalDiscount = null;
 
     /**
      * Basket voucher discount price object
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oVoucherDiscount = null;
 
@@ -237,7 +254,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * User set delivery costs
      *
-     * @var \OxidEsales\Eshop\Core\Price
+     * @var Price
      */
     protected $_oDeliveryPrice = null;
 
@@ -285,7 +302,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
 
     /**
-     * Save basket to data base if user is logged in
+     * Save basket to database if user is logged in
      *
      * @var bool
      */
@@ -323,7 +340,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function isSaveToDataBaseEnabled()
     {
         if (is_null($this->_blSaveToDataBase)) {
-            $this->_blSaveToDataBase = (bool) !$this->getConfig()->getConfigParam('blPerfNoBasketSaving');
+            $this->_blSaveToDataBase = (bool) !Registry::getConfig()->getConfigParam('blPerfNoBasketSaving');
         }
 
         return $this->_blSaveToDataBase;
@@ -401,7 +418,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function isEnabled()
     {
-        return !\OxidEsales\Eshop\Core\Registry::getUtils()->isSearchEngine();
+        return !Registry::getUtils()->isSearchEngine();
     }
 
     /**
@@ -428,21 +445,23 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Adds user item to basket. Returns oxBasketItem object if adding succeeded
+     * Adds user item to basket. Returns BasketItem object if adding succeeded
      *
-     * @param string $sProductID       id of product
-     * @param double $dAmount          product amount
-     * @param mixed  $aSel             product select lists (default null)
-     * @param mixed  $aPersParam       product persistent parameters (default null)
-     * @param bool   $blOverride       marker to accumulate passed amount or renew (default false)
-     * @param bool   $blBundle         marker if product is bundle or not (default false)
-     * @param mixed  $sOldBasketItemId id if old basket item if to change it
+     * @param string $sProductID id of product
+     * @param double $dAmount product amount
+     * @param mixed $aSel product select lists (default null)
+     * @param mixed $aPersParam product persistent parameters (default null)
+     * @param bool $blOverride marker to accumulate passed amount or renew (default false)
+     * @param bool $blBundle marker if product is bundle or not (default false)
+     * @param mixed $sOldBasketItemId id if old basket item if to change it
      *
-     * @throws \OxidEsales\Eshop\Core\Exception\ArticleInputException
-     * @throws \OxidEsales\Eshop\Core\Exception\NoArticleException
-     * @throws \OxidEsales\Eshop\Core\Exception\OutOfStockException
-     *
-     * @return object oxArticleInputException, oxNoArticleException
+     * @return object ArticleInputException, NoArticleException
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function addToBasket($sProductID, $dAmount, $aSel = null, $aPersParam = null, $blOverride = false, $blBundle = false, $sOldBasketItemId = null)
     {
@@ -452,7 +471,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         }
 
         // basket exclude
-        if ($this->getConfig()->getConfigParam('blBasketExcludeEnabled')) {
+        if (Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
             if (!$this->canAddProductToBasket($sProductID)) {
                 $this->setCatChangeWarningState(true);
 
@@ -489,22 +508,22 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                 //validate amount
                 //possibly throws exception
                 $this->_aBasketContents[$sItemId]->setAmount($dAmount, $blOverride, $sItemId);
-            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+            } catch (OutOfStockException $oEx) {
                 // rethrow later
             }
         } else {
             //inserting new
-            $oBasketItem = oxNew(\OxidEsales\Eshop\Application\Model\BasketItem::class);
+            $oBasketItem = oxNew(BasketItem::class);
             try {
                 $oBasketItem->setStockCheckStatus($this->getStockCheckMode());
                 $oBasketItem->init($sProductID, $dAmount, $aSel, $aPersParam, $blBundle);
-            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
+            } catch (NoArticleException $oEx) {
                 // in this case that the article does not exist remove the item from the basket by setting its amount to 0
                 //$oBasketItem->dAmount = 0;
                 $blRemoveItem = true;
-            } catch (\OxidEsales\Eshop\Core\Exception\OutOfStockException $oEx) {
+            } catch (OutOfStockException $oEx) {
                 // rethrow later
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+            } catch (ArticleInputException $oEx) {
                 // rethrow later
                 $blRemoveItem = true;
             }
@@ -533,7 +552,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         }
 
         // returning basket item object
-        if ($this->_aBasketContents[$sItemId] instanceof \OxidEsales\Eshop\Application\Model\BasketItem) {
+        if ($this->_aBasketContents[$sItemId] instanceof BasketItem) {
             $this->_aBasketContents[$sItemId]->setBasketItemKey($sItemId);
         }
         return $this->_aBasketContents[$sItemId];
@@ -542,9 +561,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Adds order article to basket (method normally used while recalculating order)
      *
-     * @param \OxidEsales\Eshop\Application\Model\OrderArticle $oOrderArticle order article to store in basket
+     * @param OrderArticle $oOrderArticle order article to store in basket
      *
-     * @return \OxidEsales\Eshop\Application\Model\BasketItem
+     * @return BasketItem|void
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws OutOfStockException
      */
     public function addOrderArticleToBasket($oOrderArticle)
     {
@@ -554,7 +579,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
             $sItemId = $oOrderArticle->getId();
 
             //inserting new
-            $this->_aBasketContents[$sItemId] = oxNew(\OxidEsales\Eshop\Application\Model\BasketItem::class);
+            $this->_aBasketContents[$sItemId] = oxNew(BasketItem::class);
             $this->_aBasketContents[$sItemId]->initFromOrderArticle($oOrderArticle);
             $this->_aBasketContents[$sItemId]->setWrapping($oOrderArticle->oxorderarticles__oxwrapid->value);
             $this->_aBasketContents[$sItemId]->setBundle($oOrderArticle->isBundle());
@@ -618,11 +643,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function removeItem($sItemKey)
     {
-        if ($this->getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
+        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
             if (isset($this->_aBasketContents[$sItemKey])) {
                 $sArticleId = $this->_aBasketContents[$sItemKey]->getProductId();
                 if ($sArticleId) {
-                    $this->getSession()
+                    Registry::getSession()
                         ->getBasketReservations()
                         ->discardArticleReservation($sArticleId);
                 }
@@ -631,7 +656,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         unset($this->_aBasketContents[$sItemKey]);
 
         // basket exclude
-        if (!count($this->_aBasketContents) && $this->getConfig()->getConfigParam('blBasketExcludeEnabled')) {
+        if (!count($this->_aBasketContents) && Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
             $this->setBasketRootCatId(null);
         }
     }
@@ -678,9 +703,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Returns array of bundled discount articles
      *
      * @param object $oBasketItem basket item object
-     * @param array  $aBundles    array of found bundles
+     * @param array $aBundles array of found bundles
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getItemBundles" in next major
      */
     protected function _getItemBundles($oBasketItem, $aBundles = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -691,7 +718,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         // does this object still exists ?
         if ($oArticle = $oBasketItem->getArticle()) {
-            $aDiscounts = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->getBasketItemBundleDiscounts($oArticle, $this, $this->getBasketUser());
+            $aDiscounts = Registry::get(DiscountList::class)->getBasketItemBundleDiscounts($oArticle, $this, $this->getBasketUser());
 
             foreach ($aDiscounts as $oDiscount) {
                 $iAmnt = $oDiscount->getBundleAmount($oBasketItem->getAmount());
@@ -719,11 +746,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * @param array $aBundles array of found bundles
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getBasketBundles" in next major
      */
     protected function _getBasketBundles($aBundles = []) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $aDiscounts = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->getBasketBundleDiscounts($this, $this->getBasketUser());
+        $aDiscounts = Registry::get(DiscountList::class)->getBasketBundleDiscounts($this, $this->getBasketUser());
 
         // calculating amount of non bundled/discount items
         $dAmount = 0;
@@ -768,12 +797,12 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                 $aArtBundles = $this->_getArticleBundles($oBasketItem);
                 // adding bundles to basket
                 $this->_addBundlesToBasket($aArtBundles);
-            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
+            } catch (NoArticleException $oEx) {
                 $this->removeItem($key);
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (ArticleInputException $oEx) {
                 $this->removeItem($key);
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
 
@@ -790,6 +819,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Adds bundles to basket
      *
      * @param array $aBundles added bundle articles
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "addBundlesToBasket" in next major
      */
     protected function _addBundlesToBasket($aBundles) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -800,9 +831,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                     if ($oBundleItem = $this->addToBasket($sBundleId, $dAmount, null, null, false, true)) {
                         $oBundleItem->setAsDiscountArticle(true);
                     }
-                } catch (\OxidEsales\Eshop\Core\Exception\ArticleException $oEx) {
+                } catch (ArticleException $oEx) {
                     // caught and ignored
-                    if ($oEx instanceof \OxidEsales\Eshop\Core\Exception\OutOfStockException && $oEx->getRemainingAmount() > 0) {
+                    if ($oEx instanceof OutOfStockException && $oEx->getRemainingAmount() > 0) {
                         $sItemId = $this->getItemKey($sBundleId, null, null, true);
                         $this->_aBasketContents[$sItemId]->setAsDiscountArticle(true);
                     }
@@ -823,13 +854,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $this->_dItemsCnt = 0; // count of item units
         $this->_dWeight = 0; // basket weight
 
-        $this->_oProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
-        $this->_oDiscountProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
-        $this->_oNotDiscountedProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
+        $this->_oProductsPriceList = oxNew(PriceList::class);
+        $this->_oDiscountProductsPriceList = oxNew(PriceList::class);
+        $this->_oNotDiscountedProductsPriceList = oxNew(PriceList::class);
 
-        $oDiscountList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class);
+        $oDiscountList = Registry::get(DiscountList::class);
 
-        /** @var \oxBasketItem $oBasketItem */
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $oBasketItem) {
             $this->_iProductsCnt++;
             $this->_dItemsCnt += $oBasketItem->getAmount();
@@ -843,7 +874,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                     // apply basket type discounts for item
                     $aDiscounts = $oDiscountList->getBasketItemDiscounts($oArticle, $this, $this->getBasketUser());
                     reset($aDiscounts);
-                    /** @var \oxDiscount $oDiscount */
+                    /** @var Discount $oDiscount */
                     foreach ($aDiscounts as $oDiscount) {
                         $oBasketPrice->setDiscount($oDiscount->getAddSum(), $oDiscount->getAddSumType());
                     }
@@ -866,7 +897,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                 }
             } elseif ($oBasketItem->isBundle()) {
                 // if bundles price is set to zero
-                $oPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+                $oPrice = oxNew(Price::class);
                 $oBasketItem->setPrice($oPrice);
             }
         }
@@ -919,7 +950,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Iterates through basket items and calculates its delivery costs
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcDeliveryCost" in next major
      */
     protected function _calcDeliveryCost() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -927,10 +960,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         if ($this->_oDeliveryPrice !== null) {
             return $this->_oDeliveryPrice;
         }
-        $myConfig = $this->getConfig();
-        $oDeliveryPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $myConfig = Registry::getConfig();
+        $oDeliveryPrice = oxNew(Price::class);
 
-        if ($this->getConfig()->getConfigParam('blDeliveryVatOnTop')) {
+        if (Registry::getConfig()->getConfigParam('blDeliveryVatOnTop')) {
             $oDeliveryPrice->setNettoPriceMode();
         } else {
             $oDeliveryPrice->setBruttoPriceMode();
@@ -948,7 +981,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         // list of active delivery costs
         if ($myConfig->getConfigParam('bl_perfLoadDelivery')) {
-            $aDeliveryList = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliveryList::class)->getDeliveryList(
+            $aDeliveryList = Registry::get(DeliveryList::class)->getDeliveryList(
                 $this,
                 $oUser,
                 $this->_findDelivCountry(),
@@ -972,7 +1005,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Basket user getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\User
+     * @return User
      */
     public function getBasketUser()
     {
@@ -986,7 +1019,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Basket user setter
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser Basket user
+     * @param User|null $oUser Basket user
      */
     public function setBasketUser($oUser)
     {
@@ -996,7 +1029,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Get most used vat percent:
      *
-     * @return double
+     * @return double|void
      */
     public function getMostUsedVatPercent()
     {
@@ -1008,12 +1041,12 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Get most used vat percent:
      *
-     * @return double
+     * @return double|void
      */
     public function getAdditionalServicesVatPercent()
     {
         if ($this->_oProductsPriceList) {
-            if ($this->getConfig()->getConfigParam('sAdditionalServVATCalcMethod') == 'proportional') {
+            if (Registry::getConfig()->getConfigParam('sAdditionalServVATCalcMethod') == 'proportional') {
                 return $this->_oProductsPriceList->getProportionalVatPercent();
             } else {
                 return $this->_oProductsPriceList->getMostUsedVatPercent();
@@ -1024,11 +1057,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Get most used vat percent:
      *
-     * @return double
+     * @return bool
      */
     public function isProportionalCalculationOn()
     {
-        if ($this->getConfig()->getConfigParam('sAdditionalServVATCalcMethod') == 'proportional') {
+        if (Registry::getConfig()->getConfigParam('sAdditionalServVATCalcMethod') == 'proportional') {
             return true;
         }
 
@@ -1047,8 +1080,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $dPrice = $this->_dBruttoSum;
 
 
-        /** @var \OxidEsales\Eshop\Core\Price $oTotalPrice */
-        $oTotalPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        /** @var Price $oTotalPrice */
+        $oTotalPrice = oxNew(Price::class);
         $oTotalPrice->setBruttoPriceMode();
         $oTotalPrice->setPrice($dPrice);
 
@@ -1091,7 +1124,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function setVoucherDiscount($dDiscount)
     {
-        $this->_oVoucherDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $this->_oVoucherDiscount = oxNew(Price::class);
         $this->_oVoucherDiscount->setBruttoPriceMode();
         $this->_oVoucherDiscount->add($dDiscount);
     }
@@ -1102,7 +1135,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     protected function _calcVoucherDiscount() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($this->getConfig()->getConfigParam('bl_showVouchers') && ($this->_oVoucherDiscount === null || ($this->_blUpdateNeeded && !$this->isAdmin()))) {
+        if (Registry::getConfig()->getConfigParam('bl_showVouchers') && ($this->_oVoucherDiscount === null || ($this->_blUpdateNeeded && !$this->isAdmin()))) {
             $this->_oVoucherDiscount = $this->_getPriceObject();
 
             // calculating price to apply discount
@@ -1110,9 +1143,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
             // recalculating
             if (count($this->_aVouchers)) {
-                $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+                $oLang = Registry::getLang();
                 foreach ($this->_aVouchers as $sVoucherId => $oStdVoucher) {
-                    $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
+                    $oVoucher = oxNew(Voucher::class);
                     try { // checking
                         $oVoucher->load($oStdVoucher->sVoucherId);
 
@@ -1123,10 +1156,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                         }
 
                         // assigning real voucher discount value as this is the only place where real value is calculated
-                        $dVoucherdiscount = $oVoucher->getDiscountValue($dPrice);
+                        $dVoucherDiscount = $oVoucher->getDiscountValue($dPrice);
 
-                        if ($dVoucherdiscount > 0) {
-                            $dVatPart = ($dPrice - $dVoucherdiscount) / $dPrice * 100;
+                        if ($dVoucherDiscount > 0) {
+                            $dVatPart = ($dPrice - $dVoucherDiscount) / $dPrice * 100;
 
                             if (!$this->_aDiscountedVats) {
                                 if ($oPriceList = $this->getDiscountProductsPrice()) {
@@ -1136,26 +1169,26 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
                             // apply discount to vat
                             foreach ($this->_aDiscountedVats as $sKey => $dVat) {
-                                $this->_aDiscountedVats[$sKey] = \OxidEsales\Eshop\Core\Price::percent($dVat, $dVatPart);
+                                $this->_aDiscountedVats[$sKey] = Price::percent($dVat, $dVatPart);
                             }
                         }
 
                         // accumulating discount value
-                        $this->_oVoucherDiscount->add($dVoucherdiscount);
+                        $this->_oVoucherDiscount->add($dVoucherDiscount);
 
                         // collecting formatted for preview
-                        $oStdVoucher->fVoucherdiscount = $oLang->formatCurrency($dVoucherdiscount, $this->getBasketCurrency());
-                        $oStdVoucher->dVoucherdiscount = $dVoucherdiscount;
+                        $oStdVoucher->fVoucherdiscount = $oLang->formatCurrency($dVoucherDiscount, $this->getBasketCurrency());
+                        $oStdVoucher->dVoucherdiscount = $dVoucherDiscount;
 
                         // subtracting voucher discount
-                        $dPrice = $dPrice - $dVoucherdiscount;
-                    } catch (\OxidEsales\Eshop\Core\Exception\VoucherException $oEx) {
+                        $dPrice = $dPrice - $dVoucherDiscount;
+                    } catch (VoucherException $oEx) {
                         // removing voucher on error
                         $oVoucher->unMarkAsReserved();
                         unset($this->_aVouchers[$sVoucherId]);
 
                         // storing voucher error info
-                        \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false, true);
+                        Registry::getUtilsView()->addErrorToDisplay($oEx, false, true);
                     }
                 }
             }
@@ -1171,7 +1204,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         //apply discounts for brutto price
         $dDiscountedSum = $this->_getDiscountedProductsSum();
 
-        $oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $oUtils = Registry::getUtils();
         $dVatSum = 0;
         foreach ($this->_aDiscountedVats as $dVat) {
             $dVatSum += $oUtils->fRound($dVat, $this->_oCurrency);
@@ -1197,7 +1230,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function isPriceViewModeNetto()
     {
-        $blResult = (bool) $this->getConfig()->getConfigParam('blShowNetPrice');
+        $blResult = (bool) Registry::getConfig()->getConfigParam('blShowNetPrice');
         $oUser = $this->getBasketUser();
         if ($oUser) {
             $blResult = $oUser->isPriceViewModeNetto();
@@ -1209,12 +1242,12 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns prepared price object depending on view mode
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      * @deprecated underscore prefix violates PSR12, will be renamed to "getPriceObject" in next major
      */
     protected function _getPriceObject() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $oPrice = oxNew(Price::class);
 
         if ($this->isCalculationModeNetto()) {
             $oPrice->setNettoPriceMode();
@@ -1241,20 +1274,20 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         if ($this->_oTotalDiscount !== null && isset($this->_isForOrderRecalculation) && $this->_isForOrderRecalculation) {
             //if total discount was set on order recalculation
             $oTotalPrice = $this->getTotalDiscount();
-            $oDiscount = oxNew(\OxidEsales\Eshop\Application\Model\Discount::class);
-            $oDiscount->oxdiscount__oxaddsum = new \OxidEsales\Eshop\Core\Field($oTotalPrice->getPrice());
-            $oDiscount->oxdiscount__oxaddsumtype = new \OxidEsales\Eshop\Core\Field('abs');
+            $oDiscount = oxNew(Discount::class);
+            $oDiscount->oxdiscount__oxaddsum = new Field($oTotalPrice->getPrice());
+            $oDiscount->oxdiscount__oxaddsumtype = new Field('abs');
             $aDiscounts[] = $oDiscount;
         } else {
             // discounts for basket
-            $aDiscounts = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DiscountList::class)->getBasketDiscounts($this, $this->getBasketUser());
+            $aDiscounts = Registry::get(DiscountList::class)->getBasketDiscounts($this, $this->getBasketUser());
         }
 
         if ($oPriceList = $this->getDiscountProductsPrice()) {
             $this->_aDiscountedVats = $oPriceList->getVatInfo($this->isCalculationModeNetto());
         }
 
-        /** @var \oxDiscount $oDiscount */
+        /** @var Discount $oDiscount */
         foreach ($aDiscounts as $oDiscount) {
             // storing applied discounts
             $oStdDiscount = $oDiscount->getSimpleDiscount();
@@ -1277,7 +1310,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
             // apply discount to vat
             foreach ($this->_aDiscountedVats as $sKey => $dVat) {
-                $this->_aDiscountedVats[$sKey] = \OxidEsales\Eshop\Core\Price::percent($dVat, $dVatPart);
+                $this->_aDiscountedVats[$sKey] = Price::percent($dVat, $dVatPart);
             }
 
             //storing discount
@@ -1318,14 +1351,14 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * wrapping data, updates if available and stores back into
      * $this->oBasket. Returns price object for wrapping.
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcBasketWrapping" in next major
      */
     protected function _calcBasketWrapping() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oWrappingPrices = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
+        $oWrappingPrices = oxNew(PriceList::class);
 
-        /** @var \oxBasketItem $oBasketItem */
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $oBasketItem) {
             if (($oWrapping = $oBasketItem->getWrapping())) {
                 $oWrappingPrice = $oWrapping->getWrappingPrice($oBasketItem->getAmount());
@@ -1345,14 +1378,14 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * wrapping data, updates if available and stores back into
      * $this->oBasket. Returns oxprice object for wrapping.
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcBasketGiftCard" in next major
      */
     protected function _calcBasketGiftCard() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oGiftCardPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $oGiftCardPrice = oxNew(Price::class);
 
-        if ($this->getConfig()->getConfigParam('blWrappingVatOnTop')) {
+        if (Registry::getConfig()->getConfigParam('blWrappingVatOnTop')) {
             $oGiftCardPrice->setNettoPriceMode();
         } else {
             $oGiftCardPrice->setBruttoPriceMode();
@@ -1376,17 +1409,17 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Payment cost calculation, applying payment discount if available.
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      * @deprecated underscore prefix violates PSR12, will be renamed to "calcPaymentCost" in next major
      */
     protected function _calcPaymentCost() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // resetting values
-        $oPaymentPrice = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $oPaymentPrice = oxNew(Price::class);
 
         // payment
         if (($this->_sPaymentId = $this->getPaymentId())) {
-            $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\Payment::class);
+            $oPayment = oxNew(Payment::class);
             $oPayment->load($this->_sPaymentId);
 
             $oPayment->calculate($this);
@@ -1400,7 +1433,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Sets basket additional costs
      *
      * @param string $sCostName additional costs
-     * @param object $oPrice    \OxidEsales\Eshop\Core\Price
+     * @param object $oPrice    Price
      */
     public function setCost($sCostName, $oPrice = null)
     {
@@ -1413,7 +1446,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @param bool $blForceUpdate set this parameter to TRUE to force basket recalculation
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function calculateBasket($blForceUpdate = false)
     {
@@ -1465,7 +1500,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         //  7. check for vouchers
         $this->_calcVoucherDiscount();
 
-        //  8. applies all discounts to pricelist
+        //  8. applies all discounts to price-list
         $this->_applyDiscounts();
 
         //  9. calculating additional costs:
@@ -1509,9 +1544,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Function collects summary information about basket. Usually this info
      * is used while calculating discounts or so. Data is stored in static
-     * class parameter \OxidEsales\Eshop\Application\Model\Basket::$_aBasketSummary
+     * class parameter Basket::$_aBasketSummary
      *
      * @return object
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @throws NoArticleException
+     * @throws ObjectException
      */
     public function getBasketSummary()
     {
@@ -1528,8 +1569,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
             return $this->_aBasketSummary;
         }
 
-        $myConfig = $this->getConfig();
-        /** @var \OxidEsales\EshopCommunity\Application\Model\BasketItem $oBasketItem */
+        $myConfig = Registry::getConfig();
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $oBasketItem) {
             if (!$oBasketItem->isBundle() && $oArticle = $oBasketItem->getArticle(false)) {
                 $aCatIds = $oArticle->getCategoryIds();
@@ -1583,13 +1624,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Checks and sets voucher information. Checks it's availability according
+     * Checks and sets voucher information. Checks its availability according
      * to few conditions: oxvoucher::checkVoucherAvailability(),
      * oxvoucher::checkUserAvailability(). Errors are stored in
-     * \OxidEsales\Eshop\Application\Model\Basket::voucherErrors array. After all voucher is marked as reserved
+     * Basket::voucherErrors array. After all voucher is marked as reserved
      * (oxvoucher::MarkAsReserved())
      *
      * @param string $sVoucherId voucher ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function addVoucher($sVoucherId)
     {
@@ -1601,10 +1644,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         }
 
         try { // trying to load voucher and apply it
-            $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
+            $oVoucher = oxNew(Voucher::class);
 
             if (!$this->_blSkipVouchersAvailabilityChecking) {
-                $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getMaster();
+                $oDb = DatabaseProvider::getMaster();
 
                 $oDb->startTransaction();
 
@@ -1613,13 +1656,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                     $oVoucher->checkVoucherAvailability($this->_aVouchers, $dPrice);
                     $oVoucher->checkUserAvailability($this->getBasketUser());
                     $oVoucher->markAsReserved();
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $oDb->rollbackTransaction();
 
-                    if ($exception instanceof \OxidEsales\Eshop\Core\Exception\VoucherException) {
+                    if ($exception instanceof VoucherException) {
                         throw $exception;
                     } else {
-                        $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\VoucherException::class);
+                        $oEx = oxNew(VoucherException::class);
                         $oEx->setMessage('Something went wrong, please try again');
                         $oEx->setVoucherNr($oVoucher->oxvouchers__oxvouchernr->value);
                         throw $oEx;
@@ -1633,9 +1676,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
             // saving voucher info
             $this->_aVouchers[$oVoucher->oxvouchers__oxid->value] = $oVoucher->getSimpleVoucher();
-        } catch (\OxidEsales\Eshop\Core\Exception\VoucherException $oEx) {
+        } catch (VoucherException $oEx) {
             // problems adding voucher
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx, false, true);
+            Registry::getUtilsView()->addErrorToDisplay($oEx, false, true);
         }
 
         $this->onUpdate();
@@ -1650,7 +1693,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         // removing if it exists
         if (isset($this->_aVouchers[$sVoucherId])) {
-            $oVoucher = oxNew(\OxidEsales\Eshop\Application\Model\Voucher::class);
+            $oVoucher = oxNew(Voucher::class);
             $oVoucher->load($sVoucherId);
 
             $oVoucher->unMarkAsReserved();
@@ -1679,7 +1722,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         // formatting discount value
         $this->aDiscounts = $this->getDiscounts();
         if (is_array($this->aDiscounts) && count($this->aDiscounts) > 0) {
-            $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+            $oLang = Registry::getLang();
             foreach ($this->aDiscounts as $oDiscount) {
                 $oDiscount->fDiscount = $oLang->formatCurrency($oDiscount->dDiscount, $this->getBasketCurrency());
             }
@@ -1689,7 +1732,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Checks whether basket can be saved
      *
-     * @deprecated in v5.2.0 on 2013-04-28; use \OxidEsales\Eshop\Application\Model\Basket::isSaveToDataBaseEnabled()
+     * @deprecated in v5.2.0 on 2013-04-28; use Basket::isSaveToDataBaseEnabled()
      *
      * @return bool
      */
@@ -1701,7 +1744,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Populates current basket from the saved one.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function load()
     {
@@ -1719,7 +1764,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                 $oSelList = $oItem->getSelList();
 
                 $this->addToBasket($oItem->oxuserbasketitems__oxartid->value, $oItem->oxuserbasketitems__oxamount->value, $oSelList, $oItem->getPersParams(), true);
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleException $oEx) {
+            } catch (ArticleException $oEx) {
                 // caught and ignored
             }
         }
@@ -1739,7 +1784,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
                 $oSavedBasket->delete();
 
                 //then save
-                /** @var \oxBasketItem $oBasketItem */
+                /** @var BasketItem $oBasketItem */
                 foreach ($this->_aBasketContents as $oBasketItem) {
                     // discount or bundled products will be added automatically if available
                     if (!$oBasketItem->isBundle() && !$oBasketItem->isDiscountArticle()) {
@@ -1752,7 +1797,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
     /**
      * Cleans up saved basket data. This method usually is initiated by
-     * \OxidEsales\Eshop\Application\Model\Basket::deleteBasket() method which cleans up basket data when
+     * Basket::deleteBasket() method which cleans up basket data when
      * user completes order.
      * @deprecated underscore prefix violates PSR12, will be renamed to "deleteSavedBasket" in next major
      */
@@ -1764,7 +1809,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         }
 
         // basket exclude
-        if ($this->getConfig()->getConfigParam('blBasketExcludeEnabled')) {
+        if (Registry::getConfig()->getConfigParam('blBasketExcludeEnabled')) {
             $this->setBasketRootCatId(null);
         }
     }
@@ -1777,7 +1822,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     protected function _findDelivCountry() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $oUser = $this->getBasketUser();
 
         $sDeliveryCountry = null;
@@ -1792,8 +1837,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
             // ok, logged in
             if ($sCountryId = $myConfig->getGlobalParameter('delcountryid')) {
                 $sDeliveryCountry = $sCountryId;
-            } elseif ($sAddressId = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('deladrid')) {
-                $oDeliveryAddress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
+            } elseif ($sAddressId = Registry::getSession()->getVariable('deladrid')) {
+                $oDeliveryAddress = oxNew(Address::class);
                 if ($oDeliveryAddress->load($sAddressId)) {
                     $sDeliveryCountry = $oDeliveryAddress->oxaddress__oxcountryid->value;
                 }
@@ -1814,10 +1859,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function deleteBasket()
     {
         $this->_aBasketContents = [];
-        $this->getSession()->delBasket();
+        Registry::getSession()->delBasket();
 
-        if ($this->getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
-            $this->getSession()->getBasketReservations()->discardReservations();
+        if (Registry::getConfig()->getConfigParam('blPsBasketReservationEnabled')) {
+            Registry::getSession()->getBasketReservations()->discardReservations();
         }
 
         // merging basket history
@@ -1842,7 +1887,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getPaymentId()
     {
         if (!$this->_sPaymentId) {
-            $this->_sPaymentId = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('paymentid');
+            $this->_sPaymentId = Registry::getSession()->getVariable('paymentid');
         }
 
         return $this->_sPaymentId;
@@ -1856,13 +1901,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function setShipping($sShippingSetId = null)
     {
         $this->_sShippingSetId = $sShippingSetId;
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('sShipSet', $sShippingSetId);
+        Registry::getSession()->setVariable('sShipSet', $sShippingSetId);
     }
 
     /**
      * Set basket shipping price
      *
-     * @param \OxidEsales\Eshop\Core\Price $oShippingPrice delivery costs
+     * @param Price $oShippingPrice delivery costs
      */
     public function setDeliveryPrice($oShippingPrice = null)
     {
@@ -1873,11 +1918,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Get basket shipping set, if shipping set id is not set, try to get it from session
      *
      * @return string oxDeliverySet
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getShippingId()
     {
         if (!$this->_sShippingSetId) {
-            $this->_sShippingSetId = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('sShipSet');
+            $this->_sShippingSetId = Registry::getSession()->getVariable('sShipSet');
         }
 
         $sActPaymentId = $this->getPaymentId();
@@ -1886,7 +1933,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
             $oUser = $this->getUser();
 
             // choosing first preferred delivery set
-            list(, $sActShipSet) = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\DeliverySetList::class)->getDeliverySetData(null, $oUser, $this);
+            list(, $sActShipSet) = Registry::get(DeliverySetList::class)->getDeliverySetData(null, $oUser, $this);
             // in case nothing was found and no user set - choosing default
             $this->_sShippingSetId = $sActShipSet ? $sActShipSet : ($oUser ? null : 'oxidstandard');
         } elseif (!$this->isAdmin() && $sActPaymentId == 'oxempty') {
@@ -1901,33 +1948,36 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Returns array of basket oxarticle objects
      *
      * @return array
+     * @throws ArticleException
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBasketArticles()
     {
         $aBasketArticles = [];
-        /** @var \oxBasketItem $oBasketItem */
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $sItemKey => $oBasketItem) {
             try {
                 $oProduct = $oBasketItem->getArticle(true);
 
-                if ($this->getConfig()->getConfigParam('bl_perfLoadSelectLists')) {
+                if (Registry::getConfig()->getConfigParam('bl_perfLoadSelectLists')) {
                     // marking chosen select list
                     $aSelList = $oBasketItem->getSelList();
                     if (is_array($aSelList) && ($aSelectlist = $oProduct->getSelectLists($sItemKey))) {
                         reset($aSelList);
-                        foreach ($aSelList as $conkey => $iSel) {
-                            $aSelectlist[$conkey][$iSel]->selected = 1;
+                        foreach ($aSelList as $key => $iSel) {
+                            $aSelectlist[$key][$iSel]->selected = 1;
                         }
                         $oProduct->setSelectlist($aSelectlist);
                     }
                 }
-            } catch (\OxidEsales\Eshop\Core\Exception\NoArticleException $oEx) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (NoArticleException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
                 $this->removeItem($sItemKey);
                 $this->calculateBasket(true);
                 continue;
-            } catch (\OxidEsales\Eshop\Core\Exception\ArticleInputException $oEx) {
-                \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($oEx);
+            } catch (ArticleInputException $oEx) {
+                Registry::getUtilsView()->addErrorToDisplay($oEx);
                 $this->removeItem($sItemKey);
                 $this->calculateBasket(true);
                 continue;
@@ -1942,7 +1992,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns price list object of discounted products
      *
-     * @return \OxidEsales\Eshop\Core\PriceList
+     * @return PriceList
      */
     public function getDiscountProductsPrice()
     {
@@ -1952,12 +2002,12 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns basket products price list object
      *
-     * @return \OxidEsales\Eshop\Core\PriceList
+     * @return PriceList
      */
     public function getProductsPrice()
     {
         if (is_null($this->_oProductsPriceList)) {
-            $this->_oProductsPriceList = oxNew(\OxidEsales\Eshop\Core\PriceList::class);
+            $this->_oProductsPriceList = oxNew(PriceList::class);
         }
 
         return $this->_oProductsPriceList;
@@ -1966,13 +2016,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns basket price object
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getPrice()
     {
         if (is_null($this->_oPrice)) {
-            /** @var \OxidEsales\Eshop\Core\Price $price */
-            $price = oxNew(\OxidEsales\Eshop\Core\Price::class);
+            /** @var Price $price */
+            $price = oxNew(Price::class);
             $this->setPrice($price);
         }
 
@@ -1982,7 +2032,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Set basket total sum price object
      *
-     * @param \OxidEsales\Eshop\Core\Price $oPrice Price object
+     * @param Price $oPrice Price object
      */
     public function setPrice($oPrice)
     {
@@ -2017,7 +2067,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sId cost id ( optional )
      *
-     * @return array|\OxidEsales\Eshop\Core\Price|null
+     * @return array|Price|null
      */
     public function getCosts($sId = null)
     {
@@ -2106,7 +2156,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
         $aVats = $this->_oNotDiscountedProductsPriceList->getVatInfo($this->isCalculationModeNetto());
 
-        $oUtils = \OxidEsales\Eshop\Core\Registry::getUtils();
+        $oUtils = Registry::getUtils();
         foreach ((array)$this->_aDiscountedVats as $sKey => $dVat) {
             if (!isset($aVats[$sKey])) {
                 $aVats[$sKey] = 0;
@@ -2116,7 +2166,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         }
 
         if ($blFormatCurrency) {
-            $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+            $oLang = Registry::getLang();
             foreach ($aVats as $sKey => $dVat) {
                 $aVats[$sKey] = $oLang->formatCurrency($dVat, $this->getBasketCurrency());
             }
@@ -2168,13 +2218,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns gift card object (if available)
      *
-     * @return oxWrapping
+     * @return Wrapping
      */
     public function getCard()
     {
         $oCard = null;
         if ($sCardId = $this->getCardId()) {
-            $oCard = oxNew(\OxidEsales\Eshop\Application\Model\Wrapping::class);
+            $oCard = oxNew(Wrapping::class);
             $oCard->load($sCardId);
             $oCard->setWrappingVat($this->getAdditionalServicesVatPercent());
         }
@@ -2185,7 +2235,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns total basket discount Price object
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getTotalDiscount()
     {
@@ -2209,11 +2259,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns basket voucher discount price object
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getVoucherDiscount()
     {
-        if ($this->getConfig()->getConfigParam('bl_showVouchers')) {
+        if (Registry::getConfig()->getConfigParam('bl_showVouchers')) {
             return $this->_oVoucherDiscount;
         }
 
@@ -2238,7 +2288,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getBasketCurrency()
     {
         if ($this->_oCurrency === null) {
-            $this->_oCurrency = $this->getConfig()->getActShopCurrencyObject();
+            $this->_oCurrency = Registry::getConfig()->getActShopCurrencyObject();
         }
 
         return $this->_oCurrency;
@@ -2283,7 +2333,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function getProductsNetPrice()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getNettoSum(), $this->getBasketCurrency());
+        return Registry::getLang()->formatCurrency($this->getNettoSum(), $this->getBasketCurrency());
     }
 
     /**
@@ -2295,7 +2345,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function getFProductsPrice()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getBruttoSum(), $this->getBasketCurrency());
+        return Registry::getLang()->formatCurrency($this->getBruttoSum(), $this->getBasketCurrency());
     }
 
     /**
@@ -2322,8 +2372,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $dDelVAT = $this->getCosts('oxdelivery')->getVatValue();
 
         // blShowVATForDelivery option will be used, only for displaying, but not calculation
-        if ($dDelVAT > 0 && $this->getConfig()->getConfigParam('blShowVATForDelivery')) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dDelVAT, $this->getBasketCurrency());
+        if ($dDelVAT > 0 && Registry::getConfig()->getConfigParam('blShowVATForDelivery')) {
+            return Registry::getLang()->formatCurrency($dDelVAT, $this->getBasketCurrency());
         }
 
         return false;
@@ -2338,13 +2388,13 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function getDelCostNet()
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
         // blShowVATForDelivery option will be used, only for displaying, but not calculation
         if ($oConfig->getConfigParam('blShowVATForDelivery') && ($this->getBasketUser() || $oConfig->getConfigParam('blCalculateDelCostIfNotLoggedIn'))) {
             $dNetPrice = $this->getCosts('oxdelivery')->getNettoPrice();
             if ($dNetPrice > 0) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dNetPrice, $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($dNetPrice, $this->getBasketCurrency());
             }
         }
 
@@ -2375,8 +2425,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $dPayVAT = $this->getCosts('oxpayment')->getVatValue();
 
         // blShowVATForPayCharge option will be used, only for displaying, but not calculation
-        if ($dPayVAT > 0 && $this->getConfig()->getConfigParam('blShowVATForPayCharge')) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dPayVAT, $this->getBasketCurrency());
+        if ($dPayVAT > 0 && Registry::getConfig()->getConfigParam('blShowVATForPayCharge')) {
+            return Registry::getLang()->formatCurrency($dPayVAT, $this->getBasketCurrency());
         }
 
         return false;
@@ -2392,10 +2442,10 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getPayCostNet()
     {
         // blShowVATForPayCharge option will be used, only for displaying, but not calculation
-        if ($this->getConfig()->getConfigParam('blShowVATForPayCharge')) {
+        if (Registry::getConfig()->getConfigParam('blShowVATForPayCharge')) {
             $oPaymentCost = $this->getCosts('oxpayment');
             if ($oPaymentCost && $oPaymentCost->getNettoPrice()) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getCosts('oxpayment')->getNettoPrice(), $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($this->getCosts('oxpayment')->getNettoPrice(), $this->getBasketCurrency());
             }
         }
 
@@ -2407,7 +2457,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      *
      * @deprecated in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
      *
-     * @return double | bool
+     * @return double|void
      */
     public function getPaymentCosts()
     {
@@ -2420,7 +2470,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns payment costs
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getPaymentCost()
     {
@@ -2438,7 +2488,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         $oPaymentCost = $this->getCosts('oxpayment');
         if ($oPaymentCost && $oPaymentCost->getBruttoPrice()) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPaymentCost->getBruttoPrice(), $this->getBasketCurrency());
+            return Registry::getLang()->formatCurrency($oPaymentCost->getBruttoPrice(), $this->getBasketCurrency());
         }
 
         return false;
@@ -2469,7 +2519,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         if ($oVoucherDiscount = $this->getVoucherDiscount()) {
             if ($oVoucherDiscount->getBruttoPrice()) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oVoucherDiscount->getBruttoPrice(), $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($oVoucherDiscount->getBruttoPrice(), $this->getBasketCurrency());
             }
         }
 
@@ -2512,11 +2562,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getWrappCostVat()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if ($this->getConfig()->getConfigParam('blShowVATForWrapping')) {
+        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
             $oPrice = $this->getCosts('oxwrapping');
 
             if ($oPrice && $oPrice->getVatValue() > 0) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getVatValue(), $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($oPrice->getVatValue(), $this->getBasketCurrency());
             }
         }
 
@@ -2533,11 +2583,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getWrappCostNet()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if ($this->getConfig()->getConfigParam('blShowVATForWrapping')) {
+        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
             $oPrice = $this->getCosts('oxwrapping');
 
             if ($oPrice && $oPrice->getNettoPrice() > 0) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getNettoPrice(), $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($oPrice->getNettoPrice(), $this->getBasketCurrency());
             }
         }
 
@@ -2556,7 +2606,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $oPrice = $this->getCosts('oxwrapping');
 
         if ($oPrice && $oPrice->getBruttoPrice()) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
+            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
         }
 
         return false;
@@ -2582,11 +2632,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getGiftCardCostVat()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if ($this->getConfig()->getConfigParam('blShowVATForWrapping')) {
+        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
             $oPrice = $this->getCosts('oxgiftcard');
 
             if ($oPrice && $oPrice->getVatValue() > 0) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getVatValue(), $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($oPrice->getVatValue(), $this->getBasketCurrency());
             }
         }
 
@@ -2603,11 +2653,11 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function getGiftCardCostNet()
     {
         // blShowVATForWrapping option will be used, only for displaying, but not calculation
-        if ($this->getConfig()->getConfigParam('blShowVATForWrapping')) {
+        if (Registry::getConfig()->getConfigParam('blShowVATForWrapping')) {
             $oPrice = $this->getCosts('oxgiftcard');
 
             if ($oPrice && $oPrice->getNettoPrice() > 0) {
-                return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getNettoPrice(), $this->getBasketCurrency());
+                return Registry::getLang()->formatCurrency($oPrice->getNettoPrice(), $this->getBasketCurrency());
             }
         }
 
@@ -2626,7 +2676,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
         $oPrice = $this->getCosts('oxgiftcard');
 
         if ($oPrice && $oPrice->getBruttoPrice()) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
+            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
         }
 
         return false;
@@ -2635,7 +2685,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Gets gift card cost.
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getGiftCardCost()
     {
@@ -2651,7 +2701,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function getFPrice()
     {
-        return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($this->getPrice()->getBruttoPrice(), $this->getBasketCurrency());
+        return Registry::getLang()->formatCurrency($this->getPrice()->getBruttoPrice(), $this->getBasketCurrency());
     }
 
     /**
@@ -2665,8 +2715,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         $oPrice = $this->getCosts('oxdelivery');
 
-        if ($oPrice && ($this->getBasketUser() || $this->getConfig()->getConfigParam('blCalculateDelCostIfNotLoggedIn'))) {
-            return \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
+        if ($oPrice && ($this->getBasketUser() || Registry::getConfig()->getConfigParam('blCalculateDelCostIfNotLoggedIn'))) {
+            return Registry::getLang()->formatCurrency($oPrice->getBruttoPrice(), $this->getBasketCurrency());
         }
 
         return false;
@@ -2691,7 +2741,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns delivery costs
      *
-     * @return \OxidEsales\Eshop\Core\Price
+     * @return Price
      */
     public function getDeliveryCost()
     {
@@ -2705,7 +2755,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function setTotalDiscount($dDiscount)
     {
-        $this->_oTotalDiscount = oxNew(\OxidEsales\Eshop\Core\Price::class);
+        $this->_oTotalDiscount = oxNew(Price::class);
         $this->_oTotalDiscount->setBruttoPriceMode();
         $this->_oTotalDiscount->add($dDiscount);
     }
@@ -2808,9 +2858,9 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function isBelowMinOrderPrice()
     {
         $blIsBelowMinOrderPrice = false;
-        $sConfValue = $this->getConfig()->getConfigParam('iMinOrderPrice');
+        $sConfValue = Registry::getConfig()->getConfigParam('iMinOrderPrice');
         if (is_numeric($sConfValue) && $this->getProductsCount()) {
-            $dMinOrderPrice = \OxidEsales\Eshop\Core\Price::getPriceInActCurrency((double) $sConfValue);
+            $dMinOrderPrice = Price::getPriceInActCurrency((double) $sConfValue);
             $dNotDiscountedProductPrice = 0;
             if ($oPrice = $this->getNotDiscountProductsPrice()) {
                 $dNotDiscountedProductPrice = $oPrice->getBruttoSum();
@@ -2849,17 +2899,18 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * @param string $sProductId product id
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function canAddProductToBasket($sProductId)
     {
         $blCanAdd = null;
 
-        // if basket category is not set..
+        // if basket category is not set...
         if ($this->_sBasketCategoryId === null) {
             $oCat = null;
 
             // request category
-            if ($oView = $this->getConfig()->getActiveView()) {
+            if ($oView = Registry::getConfig()->getActiveView()) {
                 if ($oCat = $oView->getActiveCategory()) {
                     if (!$this->_isProductInRootCategory($sProductId, $oCat->oxcategories__oxrootid->value)) {
                         $oCat = null;
@@ -2871,7 +2922,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
 
             // product main category
             if (!$oCat) {
-                $oProduct = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+                $oProduct = oxNew(Article::class);
                 if ($oProduct->load($sProductId)) {
                     $oCat = $oProduct->getCategory();
                 }
@@ -2883,7 +2934,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-        // avoiding double check..
+        // avoiding double check...
         if ($blCanAdd === null) {
             $blCanAdd = $this->_sBasketCategoryId ? $this->_isProductInRootCategory($sProductId, $this->getBasketRootCatId()) : true;
         }
@@ -2898,14 +2949,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * @param string $sRootCatId root category id
      *
      * @return bool
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "isProductInRootCategory" in next major
      */
     protected function _isProductInRootCategory($sProductId, $sRootCatId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sO2CTable = getViewName('oxobject2category');
-        $sCatTable = getViewName('oxcategories');
+        $sO2CTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
+        $sCatTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
         $sParentId = $oDb->getOne("select oxparentid from oxarticles where oxid = :oxid", [
             ':oxid' => $sProductId
         ]);
@@ -2965,7 +3017,7 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns price list object of not discounted products
      *
-     * @return \OxidEsales\Eshop\Core\PriceList in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
+     * @return PriceList in v4.8/5.1 on 2013-10-14; for formatting use oxPrice smarty plugin
      */
     public function getNotDiscountProductsPrice()
     {
@@ -2999,12 +3051,12 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     {
         if (!$blOverride) {
             $this->_blNewITemAdded = null;
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("blAddedNewItem", true);
+            Registry::getSession()->setVariable("blAddedNewItem", true);
         }
     }
 
     /**
-     * Resets new basket item addition state on unserialization
+     * Resets new basket item addition state on deserialization
      */
     public function __wakeUp()
     {
@@ -3020,8 +3072,8 @@ class Basket extends \OxidEsales\Eshop\Core\Base
     public function isNewItemAdded()
     {
         if ($this->_blNewITemAdded == null) {
-            $this->_blNewITemAdded = (bool) \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("blAddedNewItem");
-            \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("blAddedNewItem");
+            $this->_blNewITemAdded = (bool) Registry::getSession()->getVariable("blAddedNewItem");
+            Registry::getSession()->deleteVariable("blAddedNewItem");
         }
 
         return $this->_blNewITemAdded;
@@ -3031,11 +3083,15 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Returns true if at least one product is downloadable in basket
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function hasDownloadableProducts()
     {
         $this->_blDownloadableProducts = false;
-        /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $oBasketItem) {
             if ($oBasketItem->getArticle(false) && $oBasketItem->getArticle(false)->isDownloadable()) {
                 $this->_blDownloadableProducts = true;
@@ -3050,12 +3106,16 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Returns whether there are any articles in basket with intangible products agreement enabled.
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function hasArticlesWithIntangibleAgreement()
     {
         $blHasArticlesWithIntangibleAgreement = false;
 
-        /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $oBasketItem) {
             if ($oBasketItem->getArticle(false) && $oBasketItem->getArticle(false)->hasIntangibleAgreement()) {
                 $blHasArticlesWithIntangibleAgreement = true;
@@ -3070,12 +3130,16 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      * Returns whether there are any articles in basket with downloadable products agreement enabled.
      *
      * @return bool
+     * @throws ArticleException
+     * @throws ArticleInputException
+     * @throws DatabaseConnectionException
+     * @throws NoArticleException
      */
     public function hasArticlesWithDownloadableAgreement()
     {
         $blHasArticlesWithIntangibleAgreement = false;
 
-        /** @var \OxidEsales\Eshop\Application\Model\BasketItem $oBasketItem */
+        /** @var BasketItem $oBasketItem */
         foreach ($this->_aBasketContents as $oBasketItem) {
             if ($oBasketItem->getArticle(false) && $oBasketItem->getArticle(false)->hasDownloadableAgreement()) {
                 $blHasArticlesWithIntangibleAgreement = true;
@@ -3093,6 +3157,6 @@ class Basket extends \OxidEsales\Eshop\Core\Base
      */
     public function getMinOrderPrice()
     {
-        return \OxidEsales\Eshop\Core\Price::getPriceInActCurrency($this->getConfig()->getConfigParam('iMinOrderPrice'));
+        return Price::getPriceInActCurrency(Registry::getConfig()->getConfigParam('iMinOrderPrice'));
     }
 }

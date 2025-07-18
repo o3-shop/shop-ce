@@ -21,13 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Article amount price list
  *
  */
-class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
+class AmountPriceList extends ListModel
 {
     /**
      * List Object class name
@@ -39,7 +43,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * oxArticle object
      *
-     * @var \OxidEsales\Eshop\Application\Model\Article
+     * @var Article
      */
     protected $_oArticle = null;
 
@@ -55,7 +59,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      *  Article getter
      *
-     * @return \OxidEsales\Eshop\Application\Model\Article $_oArticle
+     * @return Article $_oArticle
      */
     public function getArticle()
     {
@@ -65,7 +69,7 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Article setter
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $oArticle Article
+     * @param Article $oArticle Article
      */
     public function setArticle($oArticle)
     {
@@ -75,7 +79,9 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Load category list data
      *
-     * @param \OxidEsales\Eshop\Application\Model\Article $article Article
+     * @param Article $article Article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function load($article)
     {
@@ -90,14 +96,16 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Get data from db
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "loadFromDb" in next major
      */
     protected function _loadFromDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sArticleId = $this->getArticle()->getId();
-        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
+        $db = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-        if ($this->getConfig()->getConfigParam('blVariantInheritAmountPrice') && $this->getArticle()->getParentId()) {
+        if (Registry::getConfig()->getConfigParam('blVariantInheritAmountPrice') && $this->getArticle()->getParentId()) {
             $sArticleId = $this->getArticle()->getParentId();
         }
 
@@ -105,11 +113,11 @@ class AmountPriceList extends \OxidEsales\Eshop\Core\Model\ListModel
             ':oxartid' => $sArticleId
         ];
 
-        if ($this->getConfig()->getConfigParam('blMallInterchangeArticles')) {
+        if (Registry::getConfig()->getConfigParam('blMallInterchangeArticles')) {
             $sShopSelect = '1';
         } else {
             $sShopSelect = " `oxshopid` = :oxshopid ";
-            $params[':oxshopid'] = $this->getConfig()->getShopId();
+            $params[':oxshopid'] = Registry::getConfig()->getShopId();
         }
 
         $sSql = "SELECT * FROM `oxprice2article` 

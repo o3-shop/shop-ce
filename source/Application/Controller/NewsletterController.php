@@ -21,10 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxField;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\MailValidator;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Newsletter opt-in/out.
@@ -32,7 +34,7 @@ use oxRegistry;
  * user opt-in or remove user from newsletter list. O3-Shop ->
  * (Newsletter).
  */
-class NewsletterController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class NewsletterController extends FrontendController
 {
     /**
      * Action articlelist
@@ -56,7 +58,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     protected $_sHomeCountryId = null;
 
     /**
-     * Newletter status.
+     * Newsletter status.
      *
      * @var integer
      */
@@ -65,7 +67,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     /**
      * User newsletter registration data.
      *
-     * @var object
+     * @var array
      */
     protected $_aRegParams = null;
 
@@ -92,7 +94,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     public function fill()
     {
         // loads submited values
-        $this->_aRegParams = Registry::getConfig()->getRequestParameter("editval");
+        $this->_aRegParams = Registry::getRequest()->getRequestEscapedParameter('editval');
     }
 
     /**
@@ -103,11 +105,11 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
      * Template variables:
      * <b>success</b>, <b>error</b>, <b>aRegParams</b>
      *
-     * @return bool
+     * @return void
      */
     public function send()
     {
-        $aParams = Registry::getConfig()->getRequestParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // loads submited values
         $this->_aRegParams = $aParams;
@@ -116,16 +118,16 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
             Registry::getUtilsView()->addErrorToDisplay('ERROR_MESSAGE_COMPLETE_FIELDS_CORRECTLY');
 
             return;
-        } elseif (!oxNew(\OxidEsales\Eshop\Core\MailValidator::class)->isValidEmail($aParams['oxuser__oxusername'])) {
+        } elseif (!oxNew(MailValidator::class)->isValidEmail($aParams['oxuser__oxusername'])) {
             // #1052C - eMail validation added
             Registry::getUtilsView()->addErrorToDisplay('MESSAGE_INVALID_EMAIL');
 
             return;
         }
 
-        $blSubscribe = Registry::getConfig()->getRequestParameter("subscribeStatus");
+        $blSubscribe = Registry::getRequest()->getRequestEscapedParameter('subscribeStatus');
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
         $oUser->oxuser__oxusername = new Field($aParams['oxuser__oxusername'], Field::T_RAW);
 
         // if such user does not exist
@@ -138,7 +140,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
             } else {
                 $oUser->oxuser__oxactive = new Field(1, Field::T_RAW);
                 $oUser->oxuser__oxrights = new Field('user', Field::T_RAW);
-                $oUser->oxuser__oxshopid = new Field($this->getConfig()->getShopId(), Field::T_RAW);
+                $oUser->oxuser__oxshopid = new Field(Registry::getConfig()->getShopId(), Field::T_RAW);
                 $oUser->oxuser__oxfname = new Field($aParams['oxuser__oxfname'], Field::T_RAW);
                 $oUser->oxuser__oxlname = new Field($aParams['oxuser__oxlname'], Field::T_RAW);
                 $oUser->oxuser__oxsal = new Field($aParams['oxuser__oxsal'], Field::T_RAW);
@@ -155,7 +157,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
             //removing user from subscribe list before adding
             $oUser->setNewsSubscription(false, false);
 
-            $blOrderOptInEmail = $this->getConfig()->getConfigParam('blOrderOptInEmail');
+            $blOrderOptInEmail = Registry::getConfig()->getConfigParam('blOrderOptInEmail');
             if ($oUser->setNewsSubscription(true, $blOrderOptInEmail)) {
                 // done, confirmation required?
                 if ($blOrderOptInEmail) {
@@ -182,11 +184,11 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     public function addme()
     {
         // user exists ?
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        if ($oUser->load(Registry::getConfig()->getRequestParameter('uid'))) {
+        $oUser = oxNew(User::class);
+        if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {
             $sConfirmCode = md5($oUser->oxuser__oxusername->value . $oUser->oxuser__oxpasssalt->value);
-            // is confirm code ok?
-            if (Registry::getConfig()->getRequestParameter('confirm') == $sConfirmCode) {
+            // is confirmed code ok?
+            if (Registry::getRequest()->getRequestEscapedParameter('confirm') == $sConfirmCode) {
                 $oUser->getNewsSubscription()->setOptInStatus(1);
                 $oUser->addToGroup('oxidnewsletter');
                 $this->_iNewsletterStatus = 2;
@@ -200,11 +202,11 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     public function removeme()
     {
         // existing user ?
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
-        if ($oUser->load(Registry::getConfig()->getRequestParameter('uid'))) {
+        $oUser = oxNew(User::class);
+        if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {
             $oUser->getNewsSubscription()->setOptInStatus(0);
 
-            // removing from group ..
+            // removing from group ...
             $oUser->removeFromGroup('oxidnewsletter');
 
             $this->_iNewsletterStatus = 3;
@@ -212,7 +214,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     }
 
     /**
-     * simlink to function removeme bug fix #0002894
+     * symlink to function removeme bug fix #0002894
      */
     public function rmvm()
     {
@@ -228,8 +230,8 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     {
         if ($this->_oActionArticles === null) {
             $this->_oActionArticles = false;
-            if ($this->getConfig()->getConfigParam('bl_perfLoadAktion')) {
-                $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+            if (Registry::getConfig()->getConfigParam('bl_perfLoadAktion')) {
+                $oArtList = oxNew(ArticleList::class);
                 $oArtList->loadActionArticles('OXTOPSTART');
                 if ($oArtList->count()) {
                     $this->_oTopArticle = $oArtList->current();
@@ -267,7 +269,7 @@ class NewsletterController extends \OxidEsales\Eshop\Application\Controller\Fron
     {
         if ($this->_sHomeCountryId === null) {
             $this->_sHomeCountryId = false;
-            $aHomeCountry = $this->getConfig()->getConfigParam('aHomeCountry');
+            $aHomeCountry = Registry::getConfig()->getConfigParam('aHomeCountry');
             if (is_array($aHomeCountry)) {
                 $this->_sHomeCountryId = current($aHomeCountry);
             }

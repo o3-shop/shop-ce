@@ -21,13 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Model\MultiLanguageModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Country manager
  *
  */
-class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
+class Country extends MultiLanguageModel
 {
     /**
      * Current class name
@@ -39,7 +44,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
     /**
      * State list
      *
-     * @var oxStateList
+     * @var array
      */
     protected $_aStates = null;
 
@@ -59,7 +64,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function isForeignCountry()
     {
-        return !in_array($this->getId(), $this->getConfig()->getConfigParam('aHomeCountry'));
+        return !in_array($this->getId(), Registry::getConfig()->getConfigParam('aHomeCountry'));
     }
 
     /**
@@ -69,7 +74,7 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      */
     public function isInEU()
     {
-        return (bool) ($this->oxcountry__oxvatstatus->value == 1);
+        return ($this->oxcountry__oxvatstatus->value == 1);
     }
 
     /**
@@ -84,9 +89,9 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
         }
 
         $sCountryId = $this->getId();
-        $sViewName = getViewName("oxstates", $this->getLanguage());
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxstates", $this->getLanguage());
         $sQ = "select * from {$sViewName} where `oxcountryid` = :oxcountryid order by `oxtitle`  ";
-        $this->_aStates = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+        $this->_aStates = oxNew(ListModel::class);
         $this->_aStates->init("oxstate");
         $this->_aStates->selectString($sQ, [
             ':oxcountryid' => $sCountryId
@@ -101,10 +106,11 @@ class Country extends \OxidEsales\Eshop\Core\Model\MultiLanguageModel
      * @param string $sCode country code
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function getIdByCode($sCode)
     {
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        $oDb = DatabaseProvider::getDb();
 
         return $oDb->getOne("select oxid from oxcountry where oxisoalpha2 = :oxisoalpha2", [
             ':oxisoalpha2' => $sCode

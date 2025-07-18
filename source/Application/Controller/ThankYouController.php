@@ -21,22 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
-use oxUBase;
-use oxBasket;
-use oxOrder;
 
 /**
  * Thankyou page.
  * Arranges Thankyou page, sets ordering status, other parameters
  */
-class ThankYouController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ThankYouController extends FrontendController
 {
     /**
      * User basket object
      *
-     * @var object
+     * @var Basket
      */
     protected $_oBasket = null;
 
@@ -69,7 +70,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     protected $_sIPaymentAccount = null;
 
     /**
-     * IPayment user name
+     * IPayment username
      *
      * @var string
      */
@@ -105,16 +106,16 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
 
     /**
      * Executes parent::init(), loads basket from session
-     * (thankyou::_oBasket = \OxidEsales\Eshop\Core\Session::getBasket()) then destroys
-     * it (\OxidEsales\Eshop\Core\Session::delBasket()), unsets user session ID, if
-     * this user didn't entered password while ordering.
+     * (thankyou::_oBasket = Session::getBasket()) then destroys
+     * it (Session::delBasket()), unsets user session ID, if
+     * this user didn't enter password while ordering.
      */
     public function init()
     {
         parent::init();
 
         // get basket we might need some information from it here
-        $oBasket = $this->getSession()->getBasket();
+        $oBasket = Registry::getSession()->getBasket();
         $oBasket->setOrderId(Registry::getSession()->getVariable('sess_challenge'));
 
         // copying basket object
@@ -127,7 +128,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
         // if not in order-context, redirect to start
         $order = $this->getOrder();
         if (!$order || !$order->getFieldData('oxordernr')) {
-            Registry::getUtils()->redirect($this->getConfig()->getShopHomeURL() . '&cl=start');
+            Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeURL() . '&cl=start');
         }
     }
 
@@ -141,7 +142,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     public function render()
     {
         if (!$this->_oBasket || !$this->_oBasket->getProductsCount()) {
-            Registry::getUtils()->redirect($this->getConfig()->getShopHomeUrl() . '&cl=start', true, 302);
+            Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl() . '&cl=start', true, 302);
         }
 
         parent::render();
@@ -157,7 +158,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
         // loading order sometimes needed in template
         if ($this->_oBasket->getOrderId()) {
             // owners stock reminder
-            $oEmail = oxNew(\OxidEsales\Eshop\Core\Email::class);
+            $oEmail = oxNew(Email::class);
             $oEmail->sendStockReminder($this->_oBasket->getContents());
         }
 
@@ -170,7 +171,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Template variable getter. Returns active basket
      *
-     * @return oxBasket
+     * @return Basket
      */
     public function getBasket()
     {
@@ -201,13 +202,13 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Template variable getter. Returns currency conversion index value
      *
-     * @return object
+     * @return float
      */
     public function getCurrencyCovIndex()
     {
         if ($this->_dConvIndex === null) {
             // currency conversion index value
-            $oCur = $this->getConfig()->getActShopCurrencyObject();
+            $oCur = Registry::getConfig()->getActShopCurrencyObject();
             $this->_dConvIndex = 1 / $oCur->rate;
         }
 
@@ -237,7 +238,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         if ($this->_sIPaymentAccount === null) {
             $this->_sIPaymentAccount = false;
-            $this->_sIPaymentAccount = $this->getConfig()->getConfigParam('iShopID_iPayment_Account');
+            $this->_sIPaymentAccount = Registry::getConfig()->getConfigParam('iShopID_iPayment_Account');
         }
 
         return $this->_sIPaymentAccount;
@@ -252,7 +253,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         if ($this->_sIPaymentUser === null) {
             $this->_sIPaymentUser = false;
-            $this->_sIPaymentUser = $this->getConfig()->getConfigParam('iShopID_iPayment_User');
+            $this->_sIPaymentUser = Registry::getConfig()->getConfigParam('iShopID_iPayment_User');
         }
 
         return $this->_sIPaymentUser;
@@ -267,7 +268,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         if ($this->_sIPaymentPassword === null) {
             $this->_sIPaymentPassword = false;
-            $this->_sIPaymentPassword = $this->getConfig()->getConfigParam('iShopID_iPayment_Passwort');
+            $this->_sIPaymentPassword = Registry::getConfig()->getConfigParam('iShopID_iPayment_Passwort');
         }
 
         return $this->_sIPaymentPassword;
@@ -282,7 +283,7 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     {
         if ($this->_sMailError === null) {
             $this->_sMailError = false;
-            $this->_sMailError = Registry::getConfig()->getRequestParameter('mailerror');
+            $this->_sMailError = Registry::getRequest()->getRequestEscapedParameter('mailerror');
         }
 
         return $this->_sMailError;
@@ -291,12 +292,12 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Template variable getter. Returns order
      *
-     * @return oxOrder
+     * @return Order
      */
     public function getOrder()
     {
         if ($this->_oOrder === null) {
-            $this->_oOrder = oxNew(\OxidEsales\Eshop\Application\Model\Order::class);
+            $this->_oOrder = oxNew(Order::class);
             // loading order sometimes needed in template
             if ($sOrderId = $this->getBasket()->getOrderId()) {
                 $this->_oOrder->load($sOrderId);
@@ -309,13 +310,13 @@ class ThankYouController extends \OxidEsales\Eshop\Application\Controller\Fronte
     /**
      * Template variable getter. Returns country ISO 3
      *
-     * @return string
+     * @return string|void
      */
     public function getCountryISO3()
     {
         $oOrder = $this->getOrder();
         if ($oOrder) {
-            $oCountry = oxNew(\OxidEsales\Eshop\Application\Model\Country::class);
+            $oCountry = oxNew(Country::class);
             $oCountry->load($oOrder->oxorder__oxbillcountryid->value);
 
             return $oCountry->oxcountry__oxisoalpha3->value;

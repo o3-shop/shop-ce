@@ -21,12 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+
 /**
  * Admin pricealarm list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: Customer Info -> pricealarm.
  */
-class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class PriceAlarmList extends AdminListController
 {
     /**
      * Current class template name.
@@ -52,14 +57,14 @@ class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
     /**
      * Modifying SQL query to load additional article and customer data
      *
-     * @param object $oListObject list main object
+     * @param object $listObject list main object
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
      */
-    protected function _buildSelectString($oListObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sViewName = getViewName("oxarticles", (int) $this->getConfig()->getConfigParam("sDefaultLang"));
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles", (int) Registry::getConfig()->getConfigParam("sDefaultLang"));
         $sSql = "select oxpricealarm.*, {$sViewName}.oxtitle AS articletitle, ";
         $sSql .= "oxuser.oxlname as userlname, oxuser.oxfname as userfname ";
         $sSql .= "from oxpricealarm left join {$sViewName} on {$sViewName}.oxid = oxpricealarm.oxartid ";
@@ -72,12 +77,13 @@ class PriceAlarmList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * Builds and returns array of SQL WHERE conditions
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function buildWhere()
     {
         $this->_aWhere = parent::buildWhere();
-        $sViewName = getViewName("oxpricealarm");
-        $sArtViewName = getViewName("oxarticles");
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxpricealarm");
+        $sArtViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles");
 
         // updating price fields values for correct search in DB
         if (isset($this->_aWhere[$sViewName . '.oxprice'])) {

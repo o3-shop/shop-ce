@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\OrderArticleList;
+
 /**
  * Admin user articles setting manager.
  * Collects user articles settings, updates it on user submit, etc.
  * Admin Menu: User Administration -> Users -> Articles.
  */
-class UserArticle extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class UserArticle extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxlist object and returns name
@@ -41,7 +44,7 @@ class UserArticle extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $soxId = $this->getEditObjectId();
         if ($soxId && $soxId != '-1') {
             // load object
-            $oArticlelist = oxNew(\OxidEsales\Eshop\Application\Model\OrderArticleList::class);
+            $oArticlelist = oxNew(OrderArticleList::class);
             $oArticlelist->loadOrderArticlesForUser($soxId);
 
             $this->_aViewData['oArticlelist'] = $oArticlelist;

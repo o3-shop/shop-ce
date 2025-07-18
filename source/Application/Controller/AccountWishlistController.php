@@ -21,20 +21,25 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use Exception;
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Application\Model\UserBasket;
+use OxidEsales\Eshop\Application\Model\UserList;
+use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
-use oxField;
 
 /**
  * Current user wishlist manager.
- * When user is logged in in this manager window he can modify his
+ * When user is logged-in in this manager window he can modify his
  * own wishlist status - remove articles from wishlist or store
- * them to shopping basket, view detail information. Additionally
+ * them to shopping basket, view detail information. Additionally,
  * user can view wishlist of some other user by entering users
  * login name in special field. O3-Shop -> MY ACCOUNT
  *  -> Newsletter.
  */
-class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountWishlistController extends AccountController
 {
     /**
      * Current class template name.
@@ -51,23 +56,25 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     protected $_blShowSuggest = null;
 
     /**
-     * Wheter the var is false the wishlist will be shown
+     * Whether the var is false the wishlist will be shown
      *
-     * @var wishlist
+     * @var UserBasket
      */
     protected $_oWishList = null;
+
+    protected $_aWishProductList = null;
 
     /**
      * list the wishlist items
      *
-     * @var wishlist
+     * @var UserBasket
      */
     protected $_aRecommList = null;
 
     /**
-     * Wheter the var is false the productlist will not be list
+     * Whether the var is false the product-list will not be list
      *
-     * @var wishlist
+     * @var UserBasket
      */
     protected $_oEditval = null;
 
@@ -88,7 +95,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     /**
      * List of users which were found according to search condition
      *
-     * @var \OxidEsales\Eshop\Core\Model\ListModel
+     * @var ListModel
      */
     protected $_oWishListUsers = false;
 
@@ -122,9 +129,9 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
 
     /**
      * If user is logged in loads his wishlist articles (articles may be accessed by
-     * \OxidEsales\Eshop\Application\Model\User::GetBasket()), loads similar articles (is available) for
-     * the last article in list loaded by \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts() and returns
-     * name of template to render \OxidEsales\Eshop\Application\Controller\AccountWishlistController::_sThisTemplate
+     * User::GetBasket()), loads similar articles (is available) for
+     * the last article in list loaded by Article::GetSimilarProducts() and returns
+     * name of template to render AccountWishlistController::_sThisTemplate
      *
      * @return  string  $_sThisTemplate current template file name
      */
@@ -149,7 +156,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     public function showSuggest()
     {
         if ($this->_blShowSuggest === null) {
-            $this->_blShowSuggest = (bool) Registry::getConfig()->getRequestParameter('blshowsuggest');
+            $this->_blShowSuggest = (bool) Registry::getRequest()->getRequestEscapedParameter('blshowsuggest');
         }
 
         return $this->_blShowSuggest;
@@ -158,7 +165,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     /**
      * Show the Wishlist
      *
-     * @return \OxidEsales\Eshop\Application\Model\UserBasket | bool
+     * @return UserBasket | bool
      */
     public function getWishList()
     {
@@ -176,7 +183,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     }
 
     /**
-     * Returns array of producst assigned to user wish list
+     * Returns array of products assigned to user wish list
      *
      * @return array | bool
      */
@@ -214,7 +221,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     /**
      * Sends wishlist mail to recipient. On errors returns false.
      *
-     * @return bool
+     * @return bool|void
      */
     public function sendWishList()
     {
@@ -222,11 +229,11 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
             return false;
         }
 
-        $aParams = Registry::getConfig()->getRequestParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
         if (is_array($aParams)) {
             $oUtilsView = Registry::getUtilsView();
             $oParams = (object) $aParams;
-            $this->setEnteredData((object) Registry::getConfig()->getRequestParameter('editval'));
+            $this->setEnteredData((object) Registry::getRequest()->getRequestEscapedParameter('editval'));
 
             if (
                 !isset($aParams['rec_name']) || !isset($aParams['rec_email']) ||
@@ -246,7 +253,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
                     $oParams->$sSendName = $oUser->$sFirstName->getRawValue() . ' ' . $oUser->$sLastName->getRawValue();
                     $oParams->$sSendId = $oUser->getId();
 
-                    $this->_blEmailSent = oxNew(\OxidEsales\Eshop\Core\Email::class)->sendWishlistMail($oParams);
+                    $this->_blEmailSent = oxNew(Email::class)->sendWishlistMail($oParams);
                     if (!$this->_blEmailSent) {
                         return $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_CHECK_EMAIL', false, true);
                     }
@@ -276,7 +283,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     }
 
     /**
-     * Terurns user entered values for sending email.
+     * Returns user entered values for sending email.
      *
      * @return array
      */
@@ -286,10 +293,11 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
     }
 
     /**
-     * Changes wishlist status - public/non public. Returns false on
+     * Changes wishlist status - public/non-public. Returns false on
      * error (if user is not logged in).
      *
-     * @return bool
+     * @return bool|void
+     * @throws Exception
      */
     public function togglePublic()
     {
@@ -298,9 +306,9 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
         }
 
         if ($oUser = $this->getUser()) {
-            $blPublic = (int) Registry::getConfig()->getRequestParameter('blpublic');
+            $blPublic = (int) Registry::getRequest()->getRequestEscapedParameter('blpublic');
             $oBasket = $oUser->getBasket('wishlist');
-            $oBasket->oxuserbaskets__oxpublic = new \OxidEsales\Eshop\Core\Field(($blPublic == 1) ? $blPublic : 0);
+            $oBasket->oxuserbaskets__oxpublic = new Field(($blPublic == 1) ? $blPublic : 0);
             $oBasket->save();
         }
     }
@@ -311,9 +319,9 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      */
     public function searchForWishList()
     {
-        if ($sSearch = Registry::getConfig()->getRequestParameter('search')) {
+        if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('search')) {
             // search for baskets
-            $oUserList = oxNew(\OxidEsales\Eshop\Application\Model\UserList::class);
+            $oUserList = oxNew(UserList::class);
             $oUserList->loadWishlistUsers($sSearch);
             if ($oUserList->count()) {
                 $this->_oWishListUsers = $oUserList;
@@ -327,7 +335,7 @@ class AccountWishlistController extends \OxidEsales\Eshop\Application\Controller
      * Returns a list of users which were found according to search condition.
      * If no users were found - false is returned
      *
-     * @return \OxidEsales\Eshop\Core\Model\ListModel | bool
+     * @return ListModel | bool
      */
     public function getWishListUsers()
     {

@@ -21,16 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxException;
-use oxExceptionToDisplay;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\File;
+use OxidEsales\Eshop\Application\Model\OrderFile;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use oxRegistry;
 
 /**
  * Article file download page.
  *
  */
-class DownloadController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class DownloadController extends FrontendController
 {
     /**
      * Prevents from loading any component as this controller
@@ -49,13 +51,13 @@ class DownloadController extends \OxidEsales\Eshop\Application\Controller\Fronte
      */
     public function render()
     {
-        $sFileOrderId = Registry::getConfig()->getRequestParameter('sorderfileid');
+        $sFileOrderId = Registry::getRequest()->getRequestEscapedParameter('sorderfileid');
 
         if ($sFileOrderId) {
-            $oArticleFile = oxNew(\OxidEsales\Eshop\Application\Model\File::class);
+            $oArticleFile = oxNew(File::class);
             try {
-                /** @var \OxidEsales\Eshop\Application\Model\OrderFile $oOrderFile */
-                $oOrderFile = oxNew(\OxidEsales\Eshop\Application\Model\OrderFile::class);
+                /** @var OrderFile $oOrderFile */
+                $oOrderFile = oxNew(OrderFile::class);
                 if ($oOrderFile->load($sFileOrderId)) {
                     $sFileId = $oOrderFile->getFileId();
                     $blLoadedAndExists = $oArticleFile->load($sFileId) && $oArticleFile->exist();
@@ -65,14 +67,14 @@ class DownloadController extends \OxidEsales\Eshop\Application\Controller\Fronte
                         $sError = "ERROR_MESSAGE_FILE_DOESNOT_EXIST";
                     }
                 }
-            } catch (\OxidEsales\Eshop\Core\Exception\StandardException $oEx) {
+            } catch (StandardException $oEx) {
                 $sError = "ERROR_MESSAGE_FILE_DOWNLOAD_FAILED";
             }
         } else {
             $sError = "ERROR_MESSAGE_WRONG_DOWNLOAD_LINK";
         }
         if ($sError) {
-            $oEx = new \OxidEsales\Eshop\Core\Exception\ExceptionToDisplay();
+            $oEx = new ExceptionToDisplay();
             $oEx->setMessage($sError);
             Registry::getUtilsView()->addErrorToDisplay($oEx, false);
             Registry::getUtils()->redirect(Registry::getConfig()->getShopUrl() . 'index.php?cl=account_downloads');

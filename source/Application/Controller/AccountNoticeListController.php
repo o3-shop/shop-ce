@@ -21,16 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\AccountController;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Current user notice list manager.
- * When user is logged in in this manager window he can modify
+ * When user is logged-in in this manager window he can modify
  * his notice list status - remove articles from notice list or
  * store them to shopping basket, view detail information.
  * O3-Shop -> MY ACCOUNT -> Newsletter.
  */
-class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controller\AccountController
+class AccountNoticeListController extends AccountController
 {
     /**
      * Current class template name.
@@ -40,14 +41,14 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
     protected $_sThisTemplate = 'page/account/noticelist.tpl';
 
     /**
-     * Check if there is an product in the noticelist.
+     * Check if there is a product in the noticelist.
      *
      * @var array
      */
     protected $_aNoticeProductList = null;
 
     /**
-     * return the similar prodcuts from the notice list.
+     * return the similar products from the notice list.
      *
      * @var array
      */
@@ -76,10 +77,10 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
 
     /**
      * If user is not logged in - returns name of template
-     * \OxidEsales\Eshop\Application\Controller\AccountNoticeListController::_sThisLoginTemplate, or if user is already
+     * AccountNoticeListController::_sThisLoginTemplate, or if user is already
      * logged in - loads notice list articles (articles may be accessed
-     * by \OxidEsales\Eshop\Application\Model\User::getBasket()), loads similar articles (if available) for
-     * the last article in list \OxidEsales\Eshop\Application\Model\Article::GetSimilarProducts() and returns name of
+     * by User::getBasket()), loads similar articles (if available) for
+     * the last article in list Article::GetSimilarProducts() and returns name of
      * template to render AccountNoticeListController::_sThisTemplate
      *
      * @return string current template file name
@@ -163,12 +164,12 @@ class AccountNoticeListController extends \OxidEsales\Eshop\Application\Controll
         $aPaths = [];
         $aPath = [];
 
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
         $sSelfLink = $this->getViewConfig()->getSelfLink();
 
         $iBaseLanguage = $oLang->getBaseLanguage();
         $aPath['title'] = $oLang->translateString('MY_ACCOUNT', $iBaseLanguage, false);
-        $aPath['link'] = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->getStaticUrl($sSelfLink . "cl=account");
+        $aPath['link'] = Registry::getSeoEncoder()->getStaticUrl($sSelfLink . "cl=account");
         $aPaths[] = $aPath;
 
         $aPath['title'] = $oLang->translateString('MY_WISH_LIST', $iBaseLanguage, false);

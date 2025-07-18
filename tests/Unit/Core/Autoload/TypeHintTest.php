@@ -19,6 +19,7 @@
  */
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Autoload;
 
+use OxidEsales\EshopCommunity\Application\Model\Basket;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use oxBasket;
 use OxidEsales\Eshop\Application\Model\User;
@@ -40,7 +41,7 @@ class TypeHintTestOrder extends \OxidEsales\Eshop\Application\Model\Order
      *
      * @return integer
      */
-    public function finalizeOrder(oxBasket $basket, $user, $recalculatingOrder = false)
+    public function finalizeOrder(Basket $basket, $user, $recalculatingOrder = false)
     {
         return parent::finalizeOrder($basket, $user, $recalculatingOrder);
     }

@@ -22,27 +22,33 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
+use OxidEsales\Facts\Facts;
 
 /**
  * Administrator GUI navigation manager class.
  */
-class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admin\AdminController
+class NavigationController extends AdminController
 {
     /**
      * Executes parent method parent::render(), generates menu HTML code,
      * passes data to Smarty engine, returns name of template file "nav_frame.tpl".
      *
      * @return string
+     * @throws Exception
      */
     public function render()
     {
         parent::render();
-        $myUtilsServer = Registry::getUtilsServer();
 
-        $sItem = Registry::getConfig()->getRequestParameter("item");
+        $sItem = Registry::getRequest()->getRequestEscapedParameter('item');
         $sItem = $sItem ? basename($sItem) : false;
         if (!$sItem) {
             $sItem = "nav_frame.tpl";
@@ -53,13 +59,13 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
             $this->_aViewData["menustructure"] = $oNavTree->getDomXml()->documentElement->childNodes;
 
             // version patch string
-            $this->_aViewData["sVersion"] = $this->_sShopVersion;
+            $this->_aViewData["sVersion"] = oxNew(ShopVersion::class)->getVersion();
 
             //checking requirements if this is not nav frame reload
-            if (!Registry::getConfig()->getRequestParameter("navReload")) {
+            if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
-                    $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
+                    $this->_aViewData['aMessage'] = $this->doStartUpChecks();
                 }
             } else {
                 //removing reload param to force requirements checking next time
@@ -72,7 +78,7 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
         if (!$blisMallAdmin) {
             // we only allow to see our shop
             $iShopId = Registry::getSession()->getVariable("actshop");
-            $oShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+            $oShop = oxNew(Shop::class);
             $oShop->load($iShopId);
             $oShoplist->add($oShop);
         } else {
@@ -92,9 +98,9 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
 
         // informing about basefrm parameters
         $this->_aViewData['loadbasefrm'] = true;
-        $this->_aViewData['listview'] = Registry::getConfig()->getRequestParameter('listview');
-        $this->_aViewData['editview'] = Registry::getConfig()->getRequestParameter('editview');
-        $this->_aViewData['actedit'] = Registry::getConfig()->getRequestParameter('actedit');
+        $this->_aViewData['listview'] = Registry::getRequest()->getRequestEscapedParameter('listview');
+        $this->_aViewData['editview'] = Registry::getRequest()->getRequestEscapedParameter('editview');
+        $this->_aViewData['actedit'] = Registry::getRequest()->getRequestEscapedParameter('actedit');
     }
 
     /**
@@ -102,10 +108,10 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      */
     public function logout()
     {
-        $mySession = $this->getSession();
-        $myConfig = $this->getConfig();
+        $mySession = Registry::getSession();
+        $myConfig = Registry::getConfig();
 
-        $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oUser = oxNew(User::class);
         $oUser->logout();
 
         // kill session
@@ -120,12 +126,12 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
     }
 
     /**
-     * Caches external url file locally, adds <base> tag with original url to load images and other links correcly
+     * Caches external url file locally, adds <base> tag with original url to load images and other links correctly
      */
     public function exturl()
     {
         $myUtils = Registry::getUtils();
-        if ($sUrl = Registry::getConfig()->getRequestParameter("url")) {
+        if ($sUrl = Registry::getRequest()->getRequestEscapedParameter('url')) {
             // Caching not allowed, redirecting
             $myUtils->redirect($sUrl, true, 302);
         }
@@ -138,46 +144,59 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      * returns some messages if there is something to display
      *
      * @return array
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "doStartUpChecks" in next major
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->doStartUpChecks();
+    }
+
+    /**
+     * Every Time Admin starts we perform these checks
+     * returns some messages if there is something to display
+     *
+     * @return array
+     * @throws Exception
+     */
+    protected function doStartUpChecks()
+    {
         $messages = [];
 
-        if ($this->getConfig()->getConfigParam('blCheckSysReq') !== false) {
+        if (Registry::getConfig()->getConfigParam('blCheckSysReq') !== false) {
             // check if system requirements are ok
             $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
             if (!$oSysReq->getSysReqStatus()) {
                 $messages['warning'] = Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE');
-                $messages['warning'] .= '<a href="?cl=sysreq&amp;stoken=' . $this->getSession()->getSessionChallengeToken() . '" target="basefrm">';
+                $messages['warning'] .= '<a href="?cl=sysreq&amp;stoken=' . Registry::getSession()->getSessionChallengeToken() . '" target="basefrm">';
                 $messages['warning'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
             }
         } else {
             $messages['message'] = Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE_INACTIVE');
-            $messages['message'] .= '<a href="?cl=sysreq&amp;stoken=' . $this->getSession()->getSessionChallengeToken() . '" target="basefrm">';
+            $messages['message'] .= '<a href="?cl=sysreq&amp;stoken=' . Registry::getSession()->getSessionChallengeToken() . '" target="basefrm">';
             $messages['message'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
         }
 
         // version check
-        if ($this->getConfig()->getConfigParam('blCheckForUpdates')) {
-            if ($sVersionNotice = $this->_checkVersion()) {
+        if (Registry::getConfig()->getConfigParam('blCheckForUpdates')) {
+            if ($sVersionNotice = $this->checkVersion()) {
                 $messages['message'] .= $sVersionNotice;
             }
         }
 
         // check if setup dir is deleted
-        if (file_exists($this->getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
+        if (file_exists(Registry::getConfig()->getConfigParam('sShopDir') . '/Setup/index.php')) {
             $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('SETUP_DIRNOTDELETED_WARNING');
         }
 
         // check if updateApp dir is deleted or empty
-        $sUpdateDir = $this->getConfig()->getConfigParam('sShopDir') . '/updateApp/';
+        $sUpdateDir = Registry::getConfig()->getConfigParam('sShopDir') . '/updateApp/';
         if (file_exists($sUpdateDir) && !(count(glob("$sUpdateDir/*")) === 0)) {
             $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('UPDATEAPP_DIRNOTDELETED_WARNING');
         }
 
         // check if config file is writable
-        $sConfPath = $this->getConfig()->getConfigParam('sShopDir') . "/config.inc.php";
+        $sConfPath = Registry::getConfig()->getConfigParam('sShopDir') . "/config.inc.php";
         if (!is_readable($sConfPath) || is_writable($sConfPath)) {
             $messages['warning'] .= ((!empty($messages['warning'])) ? "<br>" : '') . Registry::getLang()->translateString('SETUP_CONFIGPERMISSIONS_WARNING');
         }
@@ -189,15 +208,27 @@ class NavigationController extends \OxidEsales\Eshop\Application\Controller\Admi
      * Checks if newer shop version available. If true - returns message
      *
      * @return string
+     * @throws Exception
      * @deprecated underscore prefix violates PSR12, will be renamed to "checkVersion" in next major
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $edition = $this->getConfig()->getEdition();
+        return $this->checkVersion();
+    }
+
+    /**
+     * Checks if newer shop version available. If true - returns message
+     *
+     * @return string|void
+     * @throws Exception
+     */
+    protected function checkVersion()
+    {
+        $edition = (new Facts())->getEdition();
         $query = 'http://admin.oxid-esales.com/' . $edition . '/onlinecheck.php?getlatestversion';
         $latestVersion = Registry::getUtilsFile()->readRemoteFileAsString($query);
         if ($latestVersion) {
-            $currentVersion = $this->getConfig()->getVersion();
+            $currentVersion = oxNew(ShopVersion::class)->getVersion();
             if (version_compare($currentVersion, $latestVersion, '<')) {
                 return sprintf(
                     Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),

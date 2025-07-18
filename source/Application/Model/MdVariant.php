@@ -21,13 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
+use OxidEsales\Eshop\Core\Base;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
- * Defines an element of multidimentional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
+ * Defines an element of multidimensional variant name tree structure. Contains article id, variant name, URL, price, price text, and a subset of MD variants.
  *
  */
-class MdVariant extends \OxidEsales\Eshop\Core\Base
+class MdVariant extends Base
 {
     /**
      * MD variant identifier
@@ -72,7 +73,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     protected $_dPrice = null;
 
     /**
-     * Variant Price text represenatation. Eg. "10,00 EUR" or "from 8,00 EUR"
+     * Variant Price text representation. E.g. "10,00 EUR" or "from 8,00 EUR"
      *
      * @var string
      */
@@ -128,7 +129,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     /**
      * Sets MD subvariants
      *
-     * @param \OxidEsales\Eshop\Application\Model\MdVariant[] $aSubvariants Subvariants
+     * @param MdVariant[] $aSubvariants Subvariants
      */
     public function setMdSubvariants($aSubvariants)
     {
@@ -148,7 +149,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns first MD subvariant from subvariant set or null in case variant has no subvariants.
      *
-     * @return \OxidEsales\Eshop\Application\Model\MdVariant
+     * @return MdVariant
      */
     public function getFirstMdSubvariant()
     {
@@ -165,7 +166,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
      *
      * @param string $sName Subvariant name
      *
-     * @return \OxidEsales\Eshop\Application\Model\MdVariant
+     * @return MdVariant
      */
     public function getMdSubvariantByName($sName)
     {
@@ -176,7 +177,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-        $oNewSubvariant = oxNew(\OxidEsales\Eshop\Application\Model\MdVariant::class);
+        $oNewSubvariant = oxNew(MdVariant::class);
         $oNewSubvariant->setName($sName);
         $oNewSubvariant->setId(md5($sName . $this->getId()));
         $oNewSubvariant->setParentId($this->getId());
@@ -186,7 +187,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Returns corresponding article URL or recusively first variant URL from subvariant set
+     * Returns corresponding article URL or recursively first variant URL from subvariant set
      *
      * @return string
      */
@@ -278,11 +279,11 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     /**
      * Returns MD variant price as a text.
      *
-     * @return string
+     * @return string|void
      */
     public function getFPrice()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         // 0002030 No need to return price if it disabled for better performance.
         if (!$myConfig->getConfigParam('bl_perfLoadPrice')) {
             return;
@@ -295,12 +296,12 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
         $sFromPrefix = '';
 
         if (!$this->_isFixedPrice()) {
-            $sFromPrefix = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('PRICE_FROM') . ' ';
+            $sFromPrefix = Registry::getLang()->translateString('PRICE_FROM') . ' ';
         }
 
         $dMinPrice = $this->getMinDPrice();
-        $sFMinPrice = \OxidEsales\Eshop\Core\Registry::getLang()->formatCurrency($dMinPrice);
-        $sCurrency = ' ' . $this->getConfig()->getActShopCurrencyObject()->sign;
+        $sFMinPrice = Registry::getLang()->formatCurrency($dMinPrice);
+        $sCurrency = ' ' . Registry::getConfig()->getActShopCurrencyObject()->sign;
         $this->_sFPrice = $sFromPrefix . $sFMinPrice . $sCurrency;
 
         return $this->_sFPrice;
@@ -333,7 +334,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Returns corresponding article id or recusively first variant id from subvariant set
+     * Returns corresponding article id or recursively first variant id from subvariant set
      *
      * @return string
      */
@@ -374,7 +375,7 @@ class MdVariant extends \OxidEsales\Eshop\Core\Base
     /**
      * Adds one subvariant to subvariant set
      *
-     * @param \OxidEsales\Eshop\Application\Model\MdVariant $oSubvariant Subvariant
+     * @param MdVariant $oSubvariant Subvariant
      * @deprecated underscore prefix violates PSR12, will be renamed to "addMdSubvariant" in next major
      */
     protected function _addMdSubvariant($oSubvariant) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore

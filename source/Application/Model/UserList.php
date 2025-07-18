@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxDb;
+use OxidEsales\Eshop\Core\Model\ListModel;
 
 /**
  * User list manager.
  *
  */
-class UserList extends \OxidEsales\Eshop\Core\Model\ListModel
+class UserList extends ListModel
 {
     /**
      * Class constructor
@@ -43,7 +43,7 @@ class UserList extends \OxidEsales\Eshop\Core\Model\ListModel
      *
      * @param string $sSearchStr Search string
      *
-     * @return null;
+     * @return void
      */
     public function loadWishlistUsers($sSearchStr)
     {

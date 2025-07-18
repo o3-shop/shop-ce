@@ -21,13 +21,16 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Admin links collection.
  * Collects list of admin links. Links may be viewed by language, sorted by date,
  * url or any keyword.
  * Admin Menu: Customer Info -> Links.
  */
-class AdminlinksList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class AdminlinksList extends AdminListController
 {
     /**
      * Current class template name.
@@ -54,6 +57,7 @@ class AdminlinksList extends \OxidEsales\Eshop\Application\Controller\Admin\Admi
      * Returns sorting fields array
      *
      * @return array
+     * @throws DatabaseConnectionException
      */
     public function getListSorting()
     {

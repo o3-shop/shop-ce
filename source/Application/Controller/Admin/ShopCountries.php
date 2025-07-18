@@ -38,7 +38,7 @@ $aLocationCountries['en'] = [
 
 $aLocationCountries['de'] = [
 
-    'de' => 'Deutschland, &Ouml;sterreich, Schweiz',
+    'de' => 'Deutschland, Österreich, Schweiz',
     'en' => 'Andere Region',
 
 ];

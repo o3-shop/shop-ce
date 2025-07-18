@@ -21,7 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Newsletter;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * @deprecated Functionality for Newsletter management will be removed.
@@ -29,14 +33,16 @@ use oxRegistry;
  * Creates plaintext and HTML format newsletter preview.
  * Admin Menu: Customer Info -> Newsletter -> Preview.
  */
-class NewsletterPreview extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class NewsletterPreview extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), creates oxnewsletter object
-     * and passes it's data to Smarty engine, returns name of template file
+     * and passes its data to Smarty engine, returns name of template file
      * "newsletter_preview.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -45,15 +51,15 @@ class NewsletterPreview extends \OxidEsales\Eshop\Application\Controller\Admin\A
         $soxId = $this->getEditObjectId();
         if ($soxId != "-1" && isset($soxId)) {
             // load object
-            $oNewsletter = oxNew(\OxidEsales\Eshop\Application\Model\Newsletter::class);
+            $oNewsletter = oxNew(Newsletter::class);
             $oNewsletter->load($soxId);
             $this->_aViewData["edit"] = $oNewsletter;
 
             // user
-            $sUserID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("auth");
+            $sUserID = Registry::getSession()->getVariable("auth");
 
             // assign values to the newsletter and show it
-            $oNewsletter->prepare($sUserID, $this->getConfig()->getConfigParam('bl_perfLoadAktion'));
+            $oNewsletter->prepare($sUserID, Registry::getConfig()->getConfigParam('bl_perfLoadAktion'));
 
             $this->_aViewData["previewhtml"] = $oNewsletter->getHtmlText();
             $this->_aViewData["previewtext"] = $oNewsletter->getPlainText();

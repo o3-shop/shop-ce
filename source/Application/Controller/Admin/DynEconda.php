@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
+
 /**
  * Admin Econda manager.
  *
@@ -28,18 +33,20 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
  *
  * @deprecated v5.3 (2016-05-10); Econda will be moved to own module.
  */
-class DynEconda extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class DynEconda extends ShopConfiguration
 {
     /**
      * Creates shop object, passes shop data to Smarty engine and returns name of
      * template file "dyn_trusted.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
         parent::render();
-        $this->_aViewData['oxid'] = $this->getConfig()->getShopId();
+        $this->_aViewData['oxid'] = Registry::getConfig()->getShopId();
 
         return "dyn_econda.tpl";
     }

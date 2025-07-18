@@ -32,7 +32,6 @@ DEFINE('ACTION_UPDATE_STOCK', 4);
 
 use Exception;
 use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
-use oxObjectException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeModelUpdateEvent;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeModelDeleteEvent;
@@ -678,7 +677,6 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
     /**
      * Loads object data from DB (object data ID is passed to method). Returns
      * true on success.
-     * could throw oxObjectException F ?
      *
      * @param string $oxid Object ID
      *
@@ -1446,7 +1444,6 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
      * the main table, it will not save any dependent tables, which might
      * be loaded through oxList.
      *
-     * @throws oxObjectException Throws on failure inserting
      * @throws DatabaseException On database errors
      *
      * @return bool Will always return true. On failure an exception is thrown.

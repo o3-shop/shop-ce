@@ -21,14 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxRegistry;
-use oxDb;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Model\ListModel;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
  * Promotion List manager.
  *
  */
-class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
+class ActionList extends ListModel
 {
     /**
      * List Object class name
@@ -41,14 +44,15 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Loads x last finished promotions
      *
      * @param int $iCount count to load
+     * @throws DatabaseConnectionException
      */
     public function loadFinishedByCount($iCount)
     {
         $sViewName = $this->getBaseObject()->getViewName();
-        $sDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
+        $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
 
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . $this->getConfig()->getShopId() . "' and oxactiveto>0 and oxactiveto < " . $oDb->quote($sDate) . "
+        $oDb = DatabaseProvider::getDb();
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and oxactiveto>0 and oxactiveto < " . $oDb->quote($sDate) . "
                " . $this->_getUserGroupFilter() . "
                order by oxactiveto desc, oxactivefrom desc limit " . (int) $iCount;
         $this->selectString($sQ);
@@ -59,14 +63,15 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Loads last finished promotions after given timespan
      *
      * @param int $iTimespan timespan to load
+     * @throws DatabaseConnectionException
      */
     public function loadFinishedByTimespan($iTimespan)
     {
         $sViewName = $this->getBaseObject()->getViewName();
-        $sDateTo = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-        $sDateFrom = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() - $iTimespan);
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . $this->getConfig()->getShopId() . "' and oxactiveto < " . $oDb->quote($sDateTo) . " and oxactiveto > " . $oDb->quote($sDateFrom) . "
+        $sDateTo = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+        $sDateFrom = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() - $iTimespan);
+        $oDb = DatabaseProvider::getDb();
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and oxactiveto < " . $oDb->quote($sDateTo) . " and oxactiveto > " . $oDb->quote($sDateFrom) . "
                " . $this->_getUserGroupFilter() . "
                order by oxactiveto, oxactivefrom";
         $this->selectString($sQ);
@@ -78,25 +83,26 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
     public function loadCurrent()
     {
         $sViewName = $this->getBaseObject()->getViewName();
-        $sDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . $this->getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom != 0 and oxactivefrom < " . $oDb->quote($sDate) . "
+        $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+        $oDb = DatabaseProvider::getDb();
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom != 0 and oxactivefrom < " . $oDb->quote($sDate) . "
                " . $this->_getUserGroupFilter() . "
                order by oxactiveto, oxactivefrom";
         $this->selectString($sQ);
     }
 
     /**
-     * Loads next not yet started promotions by cound
+     * Loads next not yet started promotions by count
      *
      * @param int $iCount count to load
+     * @throws DatabaseConnectionException
      */
     public function loadFutureByCount($iCount)
     {
         $sViewName = $this->getBaseObject()->getViewName();
-        $sDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . $this->getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom > " . $oDb->quote($sDate) . "
+        $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+        $oDb = DatabaseProvider::getDb();
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom > " . $oDb->quote($sDate) . "
                " . $this->_getUserGroupFilter() . "
                order by oxactiveto, oxactivefrom limit " . (int) $iCount;
         $this->selectString($sQ);
@@ -106,14 +112,15 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Loads next not yet started promotions before the given timespan
      *
      * @param int $iTimespan timespan to load
+     * @throws DatabaseConnectionException
      */
     public function loadFutureByTimespan($iTimespan)
     {
         $sViewName = $this->getBaseObject()->getViewName();
-        $sDate = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime());
-        $sDateTo = date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $iTimespan);
-        $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . $this->getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom > " . $oDb->quote($sDate) . " and oxactivefrom < " . $oDb->quote($sDateTo) . "
+        $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
+        $sDateTo = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() + $iTimespan);
+        $oDb = DatabaseProvider::getDb();
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom > " . $oDb->quote($sDate) . " and oxactivefrom < " . $oDb->quote($sDateTo) . "
                " . $this->_getUserGroupFilter() . "
                order by oxactiveto, oxactivefrom";
         $this->selectString($sQ);
@@ -122,16 +129,17 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
     /**
      * Returns part of user group filter query
      *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
+     * @param null $oUser user object
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getUserGroupFilter" in next major
      */
     protected function _getUserGroupFilter($oUser = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oUser = ($oUser == null) ? $this->getUser() : $oUser;
-        $sTable = getViewName('oxactions');
-        $sGroupTable = getViewName('oxgroups');
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxactions');
+        $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
 
         $aIds = [];
         // checking for current session user which gives additional restrictions for user itself, users group and country
@@ -141,7 +149,7 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
             }
         }
 
-        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2action.oxid from oxobject2action where oxobject2action.oxactionid=$sTable.OXID and oxobject2action.oxclass='oxgroups' and oxobject2action.OXOBJECTID in (" . implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($aIds)) . ") )" : '0';
+        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2action.oxid from oxobject2action where oxobject2action.oxactionid=$sTable.OXID and oxobject2action.oxclass='oxgroups' and oxobject2action.OXOBJECTID in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ") )" : '0';
         return " and (
                 if(EXISTS(select 1 from oxobject2action, $sGroupTable where $sGroupTable.oxid=oxobject2action.oxobjectid and oxobject2action.oxactionid=$sTable.OXID and oxobject2action.oxclass='oxgroups' LIMIT 1),
                     $sGroupSql,
@@ -153,6 +161,7 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
      * return true if there are any active promotions
      *
      * @return boolean
+     * @throws DatabaseConnectionException
      */
     public function areAnyActivePromotions()
     {
@@ -164,17 +173,18 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
      * Fetch the information, if there is an active promotion.
      *
      * @return string One, if there is an active promotion.
+     * @throws DatabaseConnectionException
      */
     protected function fetchExistsActivePromotion()
     {
-        $query = "select 1 from " . getViewName('oxactions') . " 
+        $query = "select 1 from " . Registry::get(TableViewNameGenerator::class)->getViewName('oxactions') . " 
             where oxtype = :oxtype and oxactive = :oxactive and oxshopid = :oxshopid 
             limit 1";
 
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($query, [
+        return DatabaseProvider::getDb()->getOne($query, [
             ':oxtype' => 2,
             ':oxactive' => 1,
-            ':oxshopid' => $this->getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId()
         ]);
     }
 
@@ -186,7 +196,7 @@ class ActionList extends \OxidEsales\Eshop\Core\Model\ListModel
         $oBaseObject = $this->getBaseObject();
         $oViewName = $oBaseObject->getViewName();
         $sQ = "select * from {$oViewName} where oxtype=3 and " . $oBaseObject->getSqlActiveSnippet()
-              . " and oxshopid='" . $this->getConfig()->getShopId() . "' " . $this->_getUserGroupFilter()
+              . " and oxshopid='" . Registry::getConfig()->getShopId() . "' " . $this->_getUserGroupFilter()
               . " order by oxsort";
         $this->selectString($sQ);
     }

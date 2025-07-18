@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+
 /**
  * Admin usergroup list manager.
  * Performs collection and managing (such as filtering or deleting) function.
  * Admin Menu: User Administration -> User Groups.
  */
-class UserGroupList extends \OxidEsales\Eshop\Application\Controller\Admin\AdminListController
+class UserGroupList extends AdminListController
 {
     /**
      * Name of chosen object class (default null).
@@ -47,6 +50,7 @@ class UserGroupList extends \OxidEsales\Eshop\Application\Controller\Admin\Admin
      * file "usergroup_list.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
      */
     public function render()
     {

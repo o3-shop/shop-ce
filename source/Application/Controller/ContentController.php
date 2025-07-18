@@ -21,12 +21,21 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Application\Model\DeliveryList;
+use OxidEsales\Eshop\Application\Model\DeliverySetList;
+use OxidEsales\Eshop\Application\Model\PaymentList;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Str;
+use OxidEsales\Eshop\Core\UtilsView;
 
 /**
  * CMS - loads pages and displays it
  */
-class ContentController extends \OxidEsales\Eshop\Application\Controller\FrontendController
+class ContentController extends FrontendController
 {
     /**
      * Content id.
@@ -59,7 +68,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Current view content category (if available)
      *
-     * @var oxcontent
+     * @var Content
      */
     protected $_oContentCat = null;
 
@@ -73,7 +82,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Current view content title
      *
-     * @var sting
+     * @var string
      */
     protected $_sContentTitle = null;
 
@@ -127,7 +136,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     public function getViewId()
     {
         if (!isset($this->_sViewId)) {
-            $this->_sViewId = parent::getViewId() . '|' . Registry::getConfig()->getRequestParameter('oxcid');
+            $this->_sViewId = parent::getViewId() . '|' . Registry::getRequest()->getRequestEscapedParameter('oxcid');
         }
 
         return $this->_sViewId;
@@ -139,6 +148,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * of template to render content::_sThisTemplate
      *
      * @return  string  $this->_sThisTemplate   current template file name
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
@@ -146,7 +157,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
         $oContent = $this->getContent();
         if ($oContent && !$this->_canShowContent($oContent->oxcontents__oxloadid->value)) {
-            Registry::getUtils()->redirect($this->getConfig()->getShopHomeUrl() . 'cl=account');
+            Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl() . 'cl=account');
         }
 
         $sTpl = false;
@@ -190,47 +201,53 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
 
     /**
      * Returns current view meta data
-     * If $sMeta parameter comes empty, sets to it current content title
+     * If $meta parameter comes empty, sets to it current content title
      *
-     * @param string $sMeta     category path
-     * @param int    $iLength   max length of result, -1 for no truncation
-     * @param bool   $blDescTag if true - performs additional duplicate cleaning
+     * @param string $meta category path
+     * @param int $length max length of result, -1 for no truncation
+     * @param bool $removeDuplicatedWords if true - performs additional duplicate cleaning
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($sMeta, $iLength = 200, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 200, $removeDuplicatedWords = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$sMeta) {
-            $sMeta = $this->getContent()->oxcontents__oxtitle->value;
+        if (!$meta) {
+            $meta = $this->getContent()->oxcontents__oxtitle->value;
         }
 
-        return parent::_prepareMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::_prepareMetaDescription($meta, $length, $removeDuplicatedWords);
     }
 
     /**
      * Returns current view keywords seperated by comma
-     * If $sKeywords parameter comes empty, sets to it current content title
+     * If $keywords parameter comes empty, sets to it current content title
      *
-     * @param string $sKeywords               data to use as keywords
-     * @param bool   $blRemoveDuplicatedWords remove duplicated words
+     * @param string $keywords data to use as keywords
+     * @param bool $removeDuplicatedWords remove duplicated words
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (!$sKeywords) {
-            $sKeywords = $this->getContent()->oxcontents__oxtitle->value;
+        if (!$keywords) {
+            $keywords = $this->getContent()->oxcontents__oxtitle->value;
         }
 
-        return parent::_prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords);
+        return parent::_prepareMetaKeyword($keywords, $removeDuplicatedWords);
     }
 
     /**
      * If current content is assigned to category returns its object
      *
-     * @return oxcontent
+     * @return Content
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentCategory()
     {
@@ -250,15 +267,16 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * if private sales switched ON and user is not logged in
      *
      * @return bool
+     * @throws DatabaseConnectionException
      */
     public function showPlainTemplate()
     {
-        $blPlain = (bool) Registry::getConfig()->getRequestParameter('plain');
+        $blPlain = (bool) Registry::getRequest()->getRequestEscapedParameter('plain');
         if ($blPlain === false) {
             $oUser = $this->getUser();
             if (
                 $this->isEnabledPrivateSales() &&
-                (!$oUser || ($oUser && !$oUser->isTermsAccepted()))
+                (!$oUser || !$oUser->isTermsAccepted())
             ) {
                 $blPlain = true;
             }
@@ -275,7 +293,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return Registry::getConfig()->getRequestParameter('oxcid');
+        return Registry::getRequest()->getRequestEscapedParameter('oxcid');
     }
 
     /**
@@ -283,15 +301,17 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * If no content id specified, uses "impressum" content id
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentId()
     {
         if ($this->_sContentId === null) {
-            $sContentId = Registry::getConfig()->getRequestParameter('oxcid');
-            $sLoadId = Registry::getConfig()->getRequestParameter('oxloadid');
+            $sContentId = Registry::getRequest()->getRequestEscapedParameter('oxcid');
+            $sLoadId = Registry::getRequest()->getRequestEscapedParameter('oxloadid');
 
             $this->_sContentId = false;
-            $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+            $oContent = oxNew(Content::class);
 
             if ($sLoadId) {
                 $blRes = $oContent->loadByIdent($sLoadId);
@@ -315,6 +335,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Template variable getter. Returns active content
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContent()
     {
@@ -329,15 +351,17 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     }
 
     /**
-     * returns object, assosiated with current view.
+     * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
-     * @param int $iLang language id
+     * @param int $languageId language id
      *
      * @return object
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
-    protected function _getSubject($iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getContent();
     }
@@ -351,14 +375,14 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     protected function _getTplName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // assign template name
-        $sTplName = Registry::getConfig()->getRequestParameter('tpl');
+        $sTplName = Registry::getRequest()->getRequestEscapedParameter('tpl');
 
         if ($sTplName) {
             // security fix so that you cant access files from outside template dir
             $sTplName = basename($sTplName);
 
             //checking if it is template name, not content id
-            if (!getStr()->preg_match("/\.tpl$/", $sTplName)) {
+            if (!Str::getStr()->preg_match("/\.tpl$/", $sTplName)) {
                 $sTplName = null;
             } else {
                 $sTplName = 'message/' . $sTplName;
@@ -372,6 +396,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getBreadCrumb()
     {
@@ -391,6 +417,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Template variable getter. Returns tag title
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getTitle()
     {
@@ -409,20 +437,22 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function showRdfa()
     {
-        return $this->getConfig()->getConfigParam('blRDFaEmbedding');
+        return Registry::getConfig()->getConfigParam('blRDFaEmbedding');
     }
 
     /**
-     * Returns template name wich content page to specify:
+     * Returns template name which content page to specify:
      * business entity data, payment charge specifications or delivery charge
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getContentPageTpl()
     {
         $aTemplate = [];
         $sContentId = $this->getContent()->oxcontents__oxloadid->value;
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         if ($sContentId == $myConfig->getConfigParam('sRDFaBusinessEntityLoc')) {
             $aTemplate[] = $this->_sBusinessTemplate;
         }
@@ -439,11 +469,11 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Gets extended business entity data
      *
-     * @return object
+     * @return array
      */
     public function getBusinessEntityExtends()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $aExtends = [];
 
         foreach ($this->_aBusinessEntityExtends as $sExtend) {
@@ -462,7 +492,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getNotMappedToRDFaPayments()
     {
-        $oPayments = oxNew(\OxidEsales\Eshop\Application\Model\PaymentList::class);
+        $oPayments = oxNew(PaymentList::class);
         $oPayments->loadNonRDFaPaymentList();
 
         return $oPayments;
@@ -477,7 +507,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getNotMappedToRDFaDeliverySets()
     {
-        $oDelSets = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
+        $oDelSets = oxNew(DeliverySetList::class);
         $oDelSets->loadNonRDFaDeliverySetList();
 
         return $oDelSets;
@@ -486,7 +516,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     /**
      * Returns delivery methods with assigned deliverysets.
      *
-     * @return object
+     * @return array
+     * @throws DatabaseConnectionException
      */
     public function getDeliveryChargeSpecs()
     {
@@ -494,7 +525,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
         $oDeliveryChargeSpecs = $this->getDeliveryList();
         foreach ($oDeliveryChargeSpecs as $oDeliveryChargeSpec) {
             if ($oDeliveryChargeSpec->oxdelivery__oxaddsumtype->value == "abs") {
-                $oDelSets = oxNew(\OxidEsales\Eshop\Application\Model\DeliverySetList::class);
+                $oDelSets = oxNew(DeliverySetList::class);
                 $oDelSets->loadRDFaDeliverySetList($oDeliveryChargeSpec->getId());
                 $oDeliveryChargeSpec->deliverysetmethods = $oDelSets;
                 $aDeliveryChargeSpecs[] = $oDeliveryChargeSpec;
@@ -512,7 +543,7 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
     public function getDeliveryList()
     {
         if ($this->_oDelList === null) {
-            $this->_oDelList = oxNew(\OxidEsales\Eshop\Application\Model\DeliveryList::class);
+            $this->_oDelList = oxNew(DeliveryList::class);
             $this->_oDelList->getList();
         }
 
@@ -526,34 +557,36 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      */
     public function getRdfaVAT()
     {
-        return $this->getConfig()->getConfigParam('iRDFaVAT');
+        return Registry::getConfig()->getConfigParam('iRDFaVAT');
     }
 
     /**
      * Returns rdfa VAT
      *
-     * @return bool
+     * @return array
      */
     public function getRdfaPriceValidity()
     {
-        $iDays = $this->getConfig()->getConfigParam('iRDFaPriceValidity');
+        $iDays = Registry::getConfig()->getConfigParam('iRDFaPriceValidity');
         $iFrom = Registry::getUtilsDate()->getTime();
         $iThrough = $iFrom + ($iDays * 24 * 60 * 60);
-        $oPriceValidity = [];
-        $oPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . "Z";
-        $oPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . "Z";
+        $aPriceValidity = [];
+        $aPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . "Z";
+        $aPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . "Z";
 
-        return $oPriceValidity;
+        return $aPriceValidity;
     }
 
     /**
      * Returns content parsed through smarty
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getParsedContent()
     {
-        /** @var \OxidEsales\Eshop\Core\UtilsView $oUtilsView */
+        /** @var UtilsView $oUtilsView */
         $oUtilsView = Registry::getUtilsView();
         return $oUtilsView->parseThroughSmarty(
             $this->getContent()->oxcontents__oxcontent->value,
@@ -567,6 +600,8 @@ class ContentController extends \OxidEsales\Eshop\Application\Controller\Fronten
      * Returns view canonical url
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function getCanonicalUrl()
     {

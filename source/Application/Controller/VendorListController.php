@@ -21,9 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use oxRegistry;
-use oxUBase;
-use oxVendorList;
+use OxidEsales\Eshop\Application\Controller\ArticleListController;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\VendorList;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * List of articles for a selected vendor.
@@ -31,7 +33,7 @@ use oxVendorList;
  * meta tags (for search engines). Result - "vendorlist.tpl" template.
  * O3-Shop -> (Any selected shop product category).
  */
-class VendorListController extends \OxidEsales\Eshop\Application\Controller\ArticleListController
+class VendorListController extends ArticleListController
 {
     /**
      * List type
@@ -101,14 +103,14 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      * list sorting rules. Loads list of articles which belong to this vendor
      * Generates page navigation data
      * such as previous/next window URL, number of available pages, generates
-     * meta tags info (\OxidEsales\Eshop\Application\Controller\FrontendController::_convertForMetaTags()) and returns
+     * meta tags info (FrontendController::_convertForMetaTags()) and returns
      * name of template to render.
      *
      * @return  string  $this->_sThisTemplate   current template file name
      */
     public function render()
     {
-        \OxidEsales\Eshop\Application\Controller\FrontendController::render();
+        FrontendController::render();
 
         // load vendor
         if (($this->_getVendorId() && $this->getVendorTree())) {
@@ -153,10 +155,10 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
         $sVendorId = $oVendor->getId();
 
         // load only articles which we show on screen
-        $iNrOfCatArticles = (int) $this->getConfig()->getConfigParam('iNrofCatArticles');
+        $iNrOfCatArticles = (int) Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $iNrOfCatArticles = $iNrOfCatArticles ? $iNrOfCatArticles : 1;
 
-        $oArtList = oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class);
+        $oArtList = oxNew(ArticleList::class);
         $oArtList->setSqlLimit($iNrOfCatArticles * $this->_getRequestPageNr(), $iNrOfCatArticles);
         $oArtList->setCustomSorting($this->getSortingSql($this->getSortIdent()));
 
@@ -172,7 +174,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     /**
      * Returns active product id to load its seo meta info
      *
-     * @return string
+     * @return string|void
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSeoObjectId" in next major
      */
     protected function _getSeoObjectId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
@@ -186,25 +188,25 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      * Modifies url by adding page parameters. When seo is on, url is additionally
      * formatted by SEO engine
      *
-     * @param string $sUrl  current url
-     * @param int    $iPage page number
-     * @param int    $iLang active language id
+     * @param string $url  current url
+     * @param int    $currentPage page number
+     * @param int    $languageId active language id
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "addPageNrParam" in next major
      */
-    protected function _addPageNrParam($sUrl, $iPage, $iLang = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addPageNrParam($url, $currentPage, $languageId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor())) {
-            if ($iPage) {
+        if (Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor())) {
+            if ($currentPage) {
                 // only if page number > 0
-                $sUrl = $oVendor->getBaseSeoLink($iLang, $iPage);
+                $url = $oVendor->getBaseSeoLink($languageId, $currentPage);
             }
         } else {
-            $sUrl = \OxidEsales\Eshop\Application\Controller\FrontendController::_addPageNrParam($sUrl, $iPage, $iLang);
+            $url = FrontendController::_addPageNrParam($url, $currentPage, $languageId);
         }
 
-        return $sUrl;
+        return $url;
     }
 
     /**
@@ -214,7 +216,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      */
     public function generatePageNavigationUrl()
     {
-        if ((\OxidEsales\Eshop\Core\Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor()))) {
+        if ((Registry::getUtils()->seoIsActive() && ($oVendor = $this->getActVendor()))) {
             return $oVendor->getLink();
         } else {
             return parent::generatePageNavigationUrl();
@@ -300,7 +302,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     /**
      * Template variable getter. Returns category path array
      *
-     * @return array
+     * @return array|void
      */
     public function getTreePath()
     {
@@ -317,7 +319,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      */
     protected function _getVendorId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('cnid');
+        return Registry::getRequest()->getRequestEscapedParameter('cnid');
     }
 
     /**
@@ -329,7 +331,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     {
         if ($this->_oActCategory === null) {
             $this->_oActCategory = false;
-            if (($this->_getVendorId() && $oVendorTree = $this->getVendorTree())) {
+            if (($this->_getVendorId() && $this->getVendorTree())) {
                 if ($oVendor = $this->getActVendor()) {
                     $this->_oActCategory = $oVendor;
                 }
@@ -359,12 +361,12 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     /**
      * Returns title suffix used in template
      *
-     * @return string
+     * @return string|void
      */
     public function getTitleSuffix()
     {
         if ($this->getActVendor()->oxvendor__oxshowsuffix->value) {
-            return $this->getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
+            return Registry::getConfig()->getActiveShop()->oxshops__oxtitlesuffix->value;
         }
     }
 
@@ -372,43 +374,43 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      * Returns current view keywords separated by comma
      * (calls parent::_collectMetaKeyword())
      *
-     * @param string $sKeywords               data to use as keywords
-     * @param bool   $blRemoveDuplicatedWords remove duplicated words
+     * @param string $keywords               data to use as keywords
+     * @param bool   $removeDuplicatedWords remove duplicated words
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaKeyword" in next major
      */
-    protected function _prepareMetaKeyword($sKeywords, $blRemoveDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaKeyword($keywords, $removeDuplicatedWords = true) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return parent::_collectMetaKeyword($sKeywords);
+        return parent::_collectMetaKeyword($keywords);
     }
 
     /**
      * Returns current view meta description data
      * (calls parent::_collectMetaDescription())
      *
-     * @param string $sMeta     category path
-     * @param int    $iLength   max length of result, -1 for no truncation
-     * @param bool   $blDescTag if true - performs additional duplicate cleaning
+     * @param string $meta     category path
+     * @param int    $length   max length of result, -1 for no truncation
+     * @param bool   $descriptionTag if true - performs additional duplicate cleaning
      *
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "prepareMetaDescription" in next major
      */
-    protected function _prepareMetaDescription($sMeta, $iLength = 1024, $blDescTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _prepareMetaDescription($meta, $length = 1024, $descriptionTag = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return parent::_collectMetaDescription($sMeta, $iLength, $blDescTag);
+        return parent::_collectMetaDescription($meta, $length, $descriptionTag);
     }
 
     /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
      *
-     * @param int $iLang language id
+     * @param int $languageId language id
      *
      * @return object
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
      */
-    protected function _getSubject($iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $this->getActVendor();
     }
@@ -457,17 +459,17 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     /**
      * Returns vendor tree
      *
-     * @return \OxidEsales\Eshop\Application\Model\VendorList
+     * @return VendorList
      */
     public function getVendorTree()
     {
         if ($this->_getVendorId() && $this->_oVendorTree === null) {
-            /** @var \OxidEsales\Eshop\Application\Model\VendorList $oVendorTree */
-            $oVendorTree = oxNew(\OxidEsales\Eshop\Application\Model\VendorList::class);
+            /** @var VendorList $oVendorTree */
+            $oVendorTree = oxNew(VendorList::class);
             $oVendorTree->buildVendorTree(
                 'vendorlist',
                 $this->getActVendor()->getId(),
-                $this->getConfig()->getShopHomeUrl()
+                Registry::getConfig()->getShopHomeUrl()
             );
             $this->_oVendorTree = $oVendorTree;
         }
@@ -478,7 +480,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
     /**
      * Vendor tree setter
      *
-     * @param \OxidEsales\Eshop\Application\Model\VendorList $oVendorTree vendor tree
+     * @param VendorList $oVendorTree vendor tree
      */
     public function setVendorTree($oVendorTree)
     {
@@ -489,7 +491,7 @@ class VendorListController extends \OxidEsales\Eshop\Application\Controller\Arti
      * Template variable getter. Returns array of attribute values
      * we do have here in this category
      *
-     * @return array
+     * @return array|null
      */
     public function getAttributes()
     {

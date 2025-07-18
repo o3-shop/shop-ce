@@ -21,64 +21,83 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
+use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Class manages category articles order
  */
-class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax
+class CategoryOrderAjax extends ListComponentAjax
 {
     /**
      * Columns array
      *
      * @var array
      */
-    protected $_aColumns = ['container1' => [ // field , table,         visible, multilanguage, ident
-        ['oxartnum', 'oxarticles', 1, 0, 0],
-        ['oxtitle', 'oxarticles', 1, 1, 0],
-        ['oxpos', 'oxobject2category', 1, 0, 0],
-        ['oxean', 'oxarticles', 0, 0, 0],
-        ['oxmpn', 'oxarticles', 0, 0, 0],
-        ['oxprice', 'oxarticles', 0, 0, 0],
-        ['oxstock', 'oxarticles', 0, 0, 0],
-        ['oxid', 'oxarticles', 0, 0, 1]
-    ],
-                                 'container2' => [
-                                     ['oxartnum', 'oxarticles', 1, 0, 0],
-                                     ['oxtitle', 'oxarticles', 1, 1, 0],
-                                     ['oxean', 'oxarticles', 0, 0, 0],
-                                     ['oxmpn', 'oxarticles', 0, 0, 0],
-                                     ['oxprice', 'oxarticles', 0, 0, 0],
-                                     ['oxstock', 'oxarticles', 0, 0, 0],
-                                     ['oxid', 'oxarticles', 0, 0, 1]
-                                 ]
+    protected $_aColumns = [
+        'container1' => [ 
+            // field , table, visible, multilanguage, ident
+            ['oxartnum', 'oxarticles', 1, 0, 0],
+            ['oxtitle', 'oxarticles', 1, 1, 0],
+            ['oxpos', 'oxobject2category', 1, 0, 0],
+            ['oxean', 'oxarticles', 0, 0, 0],
+            ['oxmpn', 'oxarticles', 0, 0, 0],
+            ['oxprice', 'oxarticles', 0, 0, 0],
+            ['oxstock', 'oxarticles', 0, 0, 0],
+            ['oxid', 'oxarticles', 0, 0, 1],
+        ],
+         'container2' => [
+             ['oxartnum', 'oxarticles', 1, 0, 0],
+             ['oxtitle', 'oxarticles', 1, 1, 0],
+             ['oxean', 'oxarticles', 0, 0, 0],
+             ['oxmpn', 'oxarticles', 0, 0, 0],
+             ['oxprice', 'oxarticles', 0, 0, 0],
+             ['oxstock', 'oxarticles', 0, 0, 0],
+             ['oxid', 'oxarticles', 0, 0, 1],
+         ],
     ];
 
     /**
-     * Returns SQL query for data to fetc
+     * Returns SQL query for data to fetch
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getQuery();
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getQuery()
+    {
         // looking for table/view
-        $sArtTable = $this->_getViewName('oxarticles');
-        $sO2CView = $this->_getViewName('oxobject2category');
+        $sArtTable = $this->getViewName('oxarticles');
+        $sO2CView = $this->getViewName('oxobject2category');
         $oDb = DatabaseProvider::getDb();
 
         // category selected or not ?
-        if ($sSynchOxid = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid')) {
+        if ($sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
             $sQAdd = " from $sArtTable left join $sO2CView on $sArtTable.oxid=$sO2CView.oxobjectid where $sO2CView.oxcatnid = " . $oDb->quote($sSynchOxid);
-            if ($aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess')) {
+            if ($aSkipArt = Registry::getSession()->getVariable('neworder_sess')) {
                 $sQAdd .= " and $sArtTable.oxid not in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aSkipArt)) . " ) ";
             }
         } else {
             // which fields to load ?
             $sQAdd = " from $sArtTable where ";
-            if ($aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess')) {
+            if ($aSkipArt = Registry::getSession()->getVariable('neworder_sess')) {
                 $sQAdd .= " $sArtTable.oxid in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aSkipArt)) . " ) ";
             } else {
                 $sQAdd .= " 1 = 0 ";
@@ -92,16 +111,28 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      * Returns SQL query addon for sorting
      *
      * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getSorting();
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getSorting()
+    {
         $sOrder = '';
-        if (\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid')) {
-            $sOrder = parent::_getSorting();
-        } elseif (($aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess'))) {
+        if (Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
+            $sOrder = parent::getSorting();
+        } elseif (($aSkipArt = Registry::getSession()->getVariable('neworder_sess'))) {
             $sOrderBy = '';
-            $sArtTable = $this->_getViewName('oxarticles');
+            $sArtTable = $this->getViewName('oxarticles');
             $sSep = '';
             foreach ($aSkipArt as $sId) {
                 $sOrderBy = " $sArtTable.oxid=" . DatabaseProvider::getDb()->quote($sId) . " " . $sSep . $sOrderBy;
@@ -118,9 +149,9 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function removeCatOrderArticle()
     {
-        $aRemoveArt = $this->_getActionIds('oxarticles.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxid');
-        $aSkipArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess');
+        $aRemoveArt = $this->getActionIds('oxarticles.oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
+        $aSkipArt = Registry::getSession()->getVariable('neworder_sess');
 
         if (is_array($aRemoveArt) && is_array($aSkipArt)) {
             foreach ($aRemoveArt as $sRem) {
@@ -128,10 +159,10 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                     unset($aSkipArt[$iKey]);
                 }
             }
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', $aSkipArt);
+            Registry::getSession()->setVariable('neworder_sess', $aSkipArt);
 
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $sO2CView = $this->_getViewName('oxobject2category');
+            $sArticleTable = $this->getViewName('oxarticles');
+            $sO2CView = $this->getViewName('oxobject2category');
 
             // checking if all articles were moved from one
             $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid ";
@@ -154,10 +185,10 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
      */
     public function addCatOrderArticle()
     {
-        $aAddArticle = $this->_getActionIds('oxarticles.oxid');
-        $soxId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('synchoxid');
+        $aAddArticle = $this->getActionIds('oxarticles.oxid');
+        $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
-        $aOrdArt = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('neworder_sess');
+        $aOrdArt = Registry::getSession()->getVariable('neworder_sess');
         if (!is_array($aOrdArt)) {
             $aOrdArt = [];
         }
@@ -165,14 +196,14 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
         if (is_array($aAddArticle)) {
             // storing newly ordered article seq.
             foreach ($aAddArticle as $sAdd) {
-                if (array_search($sAdd, $aOrdArt) === false) {
+                if (!in_array($sAdd, $aOrdArt)) {
                     $aOrdArt[] = $sAdd;
                 }
             }
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', $aOrdArt);
+            Registry::getSession()->setVariable('neworder_sess', $aOrdArt);
 
-            $sArticleTable = $this->_getViewName('oxarticles');
-            $sO2CView = $this->_getViewName('oxobject2category');
+            $sArticleTable = $this->getViewName('oxarticles');
+            $sO2CView = $this->getViewName('oxobject2category');
 
             // checking if all articles were moved from one
             $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid ";
@@ -190,12 +221,13 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Saves category articles ordering.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
      */
     public function saveNewOrder()
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $sId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid");
+        $oCategory = oxNew(Category::class);
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         if ($oCategory->load($sId)) {
             //Disable editing for derived items
             if ($oCategory->isDerived()) {
@@ -204,11 +236,11 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
 
             $this->resetContentCache();
 
-            $aNewOrder = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("neworder_sess");
+            $aNewOrder = Registry::getSession()->getVariable("neworder_sess");
             if (is_array($aNewOrder) && count($aNewOrder)) {
-                $sO2CView = $this->_getViewName('oxobject2category');
+                $sO2CView = $this->getViewName('oxobject2category');
                 $sSelect = "select * from $sO2CView where $sO2CView.oxcatnid = :oxcatnid and $sO2CView.oxobjectid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aNewOrder)) . " )";
-                $oList = oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class);
+                $oList = oxNew(ListModel::class);
                 $oList->init($this->getObject2CategoryClass(), 'oxobject2category');
                 $oList->selectString($sSelect, [
                     ':oxcatnid' => $oCategory->getId()
@@ -222,7 +254,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
                     }
                 }
 
-                \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
+                Registry::getSession()->setVariable('neworder_sess', null);
             }
 
             $this->onCategoryChange($sId);
@@ -232,12 +264,14 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
     /**
      * Removes category articles ordering set by saveneworder() method.
      *
-     * @return null
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function remNewOrder()
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
-        $sId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid");
+        $oCategory = oxNew(Category::class);
+        $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         if ($oCategory->load($sId)) {
             //Disable editing for derived items
             if ($oCategory->isDerived()) {
@@ -250,7 +284,7 @@ class CategoryOrderAjax extends \OxidEsales\Eshop\Application\Controller\Admin\L
             $sSelect = "update oxobject2category set oxpos = '0' where oxobject2category.oxcatnid = :id {$sSqlShopFilter}";
             $oDb->execute($sSelect, [':id' => $oCategory->getId()]);
 
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('neworder_sess', null);
+            Registry::getSession()->setVariable('neworder_sess', null);
 
             $this->onCategoryChange($sId);
         }

@@ -21,14 +21,17 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Admin user address setting manager.
  * Collects user address settings, updates it on user submit, etc.
  * Admin Menu: User Administration -> Users -> Addresses.
  */
-class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class UserAddress extends AdminDetailsController
 {
     /**
      * If true, means that address was deleted
@@ -51,24 +54,24 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != "-1") {
             // load object
-            $oUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+            $oUser = oxNew(User::class);
             $oUser->load($soxId);
 
-            // load adress
-            $sAddressIdParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxaddressid");
-            $soxAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
-            if ($soxAddressId != "-1" && isset($soxAddressId)) {
-                $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
-                $oAdress->load($soxAddressId);
-                $this->_aViewData["edit"] = $oAdress;
+            // load address
+            $sAddressIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
+            $sAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
+            if ($sAddressId != "-1" && isset($sAddressId)) {
+                $oAddress = oxNew(Address::class);
+                $oAddress->load($sAddressId);
+                $this->_aViewData["edit"] = $oAddress;
             }
 
-            $this->_aViewData["oxaddressid"] = $soxAddressId;
+            $this->_aViewData["oxaddressid"] = $sAddressId;
 
             // generate selected
             $oAddressList = $oUser->getUserAddresses();
             foreach ($oAddressList as $oAddress) {
-                if ($oAddress->oxaddress__oxid->value == $soxAddressId) {
+                if ($oAddress->oxaddress__oxid->value == $sAddressId) {
                     $oAddress->selected = 1;
                     break;
                 }
@@ -78,7 +81,7 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         }
 
         $oCountryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
-        $oCountryList->loadActiveCountries(\OxidEsales\Eshop\Core\Registry::getLang()->getObjectTplLanguage());
+        $oCountryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
 
         $this->_aViewData["countrylist"] = $oCountryList;
 
@@ -97,18 +100,18 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
         parent::save();
 
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
-            $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
-            $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
+            $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
+            $oAddress = oxNew(Address::class);
             if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] == "-1") {
                 $aParams['oxaddress__oxid'] = null;
             } else {
-                $oAdress->load($aParams['oxaddress__oxid']);
+                $oAddress->load($aParams['oxaddress__oxid']);
             }
 
-            $oAdress->assign($aParams);
-            $oAdress->save();
+            $oAddress->assign($aParams);
+            $oAddress->save();
 
-            $this->sSavedOxid = $oAdress->getId();
+            $this->sSavedOxid = $oAddress->getId();
         }
     }
 
@@ -119,10 +122,10 @@ class UserAddress extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDe
     {
         $this->_blDelete = false;
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
-            $aParams = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("editval");
+            $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
             if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] != "-1") {
-                $oAdress = oxNew(\OxidEsales\Eshop\Application\Model\Address::class);
-                $this->_blDelete = $oAdress->delete($aParams['oxaddress__oxid']);
+                $oAddress = oxNew(Address::class);
+                $this->_blDelete = $oAddress->delete($aParams['oxaddress__oxid']);
             }
         }
     }

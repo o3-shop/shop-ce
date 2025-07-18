@@ -561,7 +561,7 @@ class ViewTest extends \OxidTestCase
 
     public function testGetFullEdition()
     {
-        $expected = 'Community Edition';
+        $expected = 'O3-Shop';
 
         //edition is always set
         $oView = oxNew('oxView');

@@ -21,16 +21,22 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use OxidEsales\Eshop\Core\Edition\EditionSelector;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\NavigationTree;
+use OxidEsales\Eshop\Application\Model\Shop;
+use OxidEsales\Eshop\Core\Controller\BaseController;
+use OxidEsales\Eshop\Core\DatabaseProvider;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\NamespaceInformationProvider;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
-use oxDb;
-use oxNavigationTree;
-use oxShop;
+use OxidEsales\Eshop\Core\TableViewNameGenerator;
+use OxidEsales\Facts\Facts;
 
 /**
  * Main Controller class for admin area.
  */
-class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
+class AdminController extends BaseController
 {
     /**
      * Fixed types - enums in database.
@@ -61,7 +67,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Navigation tree object
      *
-     * @var oxnavigationtree
+     * @var NavigationTree
      */
     protected static $_oNaviTree = null;
 
@@ -130,11 +136,11 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function __construct()
     {
-        $myConfig = $this->getConfig();
+        $myConfig = Registry::getConfig();
         $myConfig->setConfigParam('blAdmin', true);
         $this->setAdminMode(true);
 
-        if ($oShop = $this->_getEditShop($myConfig->getShopId())) {
+        if ($oShop = $this->getEditShop($myConfig->getShopId())) {
             // passing shop info
             $this->_sShopTitle = $oShop->oxshops__oxname->getRawValue();
             $this->_sShopVersion = oxNew(ShopVersion::class)->getVersion();
@@ -144,17 +150,29 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Returns (cached) shop object
      *
-     * @param object $sShopId shop id
+     * @param string $sShopId shop id
      *
-     * @return oxshop
+     * @return Shop
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEditShop" in next major
      */
     protected function _getEditShop($sShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getEditShop($sShopId);
+    }
+
+    /**
+     * Returns (cached) shop object
+     *
+     * @param string $sShopId shop id
+     *
+     * @return Shop
+     */
+    protected function getEditShop($sShopId)
+    {
         if (!$this->_oEditShop) {
-            $this->_oEditShop = $this->getConfig()->getActiveShop();
+            $this->_oEditShop = Registry::getConfig()->getActiveShop();
             if ($this->_oEditShop->getId() != $sShopId) {
-                $oEditShop = oxNew(\OxidEsales\Eshop\Application\Model\Shop::class);
+                $oEditShop = oxNew(Shop::class);
                 if ($oEditShop->load($sShopId)) {
                     $this->_oEditShop = $oEditShop;
                 }
@@ -172,12 +190,12 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     public function init()
     {
         // authorization check
-        if (!$this->_authorize()) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->redirect('index.php?cl=login', true, 302);
+        if (!$this->authorize()) {
+            Registry::getUtils()->redirect('index.php?cl=login', true, 302);
             exit('Authorization error occurred!');
         }
 
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $oLang = Registry::getLang();
 
         // language handling
         $this->_iEditLang = $oLang->getEditLanguage();
@@ -185,7 +203,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
 
         parent::init();
 
-        $this->_aViewData['malladmin'] = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('malladmin');
+        $this->_aViewData['malladmin'] = Registry::getSession()->getVariable('malladmin');
     }
 
     /**
@@ -195,11 +213,12 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      * @param object $oShop Object to modify some parameters
      *
      * @return object
+     * @throws Exception
      */
     public function addGlobalParams($oShop = null)
     {
-        $myConfig = $this->getConfig();
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $myConfig = Registry::getConfig();
+        $oLang = Registry::getLang();
 
         $oShop = parent::addGlobalParams($oShop);
 
@@ -211,11 +230,11 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         }
 
         $oViewConf = $this->getViewConfig();
-        $oViewConf->setViewConfigParam('selflink', \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($sURL . 'index.php?editlanguage=' . $this->_iEditLang, false));
-        $oViewConf->setViewConfigParam('ajaxlink', str_replace('&amp;', '&', \OxidEsales\Eshop\Core\Registry::getUtilsUrl()->processUrl($sURL . 'oxajax.php?editlanguage=' . $this->_iEditLang, false)));
+        $oViewConf->setViewConfigParam('selflink', Registry::getUtilsUrl()->processUrl($sURL . 'index.php?editlanguage=' . $this->_iEditLang, false));
+        $oViewConf->setViewConfigParam('ajaxlink', str_replace('&amp;', '&', Registry::getUtilsUrl()->processUrl($sURL . 'oxajax.php?editlanguage=' . $this->_iEditLang, false)));
         $oViewConf->setViewConfigParam('sServiceUrl', $this->getServiceUrl());
 
-        // set langugae in admin
+        // set language in admin
         $iDynInterfaceLanguage = $myConfig->getConfigParam('iDynInterfaceLanguage');
         //$this->_aViewData['adminlang'] = isset( $iDynInterfaceLanguage )?$iDynInterfaceLanguage:$myConfig->getConfigParam( 'iAdminLanguage' );
         $this->_aViewData['adminlang'] = isset($iDynInterfaceLanguage) ? $iDynInterfaceLanguage : $oLang->getTplLanguage();
@@ -235,30 +254,41 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function _getServiceProtocol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getConfig()->isSsl() ? 'https' : 'http';
+        return $this->getServiceProtocol();
+    }
+
+    /**
+     * Returns service url protocol: "https" is admin works in ssl mode, "http" if no ssl
+     *
+     * @return string
+     */
+    protected function getServiceProtocol()
+    {
+        return Registry::getConfig()->isSsl() ? 'https' : 'http';
     }
 
     /**
      * Returns service URL
      *
-     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
-     *
      * @param string $sLangAbbr language abbr.
      *
      * @return string
+     * @throws Exception
+     * @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
+     *
      */
     public function getServiceUrl($sLangAbbr = null)
     {
         if ($this->_sServiceUrl === null) {
-            $sProtocol = $this->_getServiceProtocol();
+            $sProtocol = $this->getServiceProtocol();
 
-            $editionSelector = new EditionSelector();
-            $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $editionSelector->getEdition() . '/';
+            $oFacts = new Facts();
+            $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $oFacts->getEdition() . '/';
 
             $sCountry = 'international';
 
             if (!$sLangAbbr) {
-                $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+                $oLang = Registry::getLang();
                 $sLangAbbr = $oLang->getLanguageAbbr($oLang->getTplLanguage());
             }
 
@@ -266,7 +296,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
                 $sLangAbbr = "en";
             }
 
-            $this->_sServiceUrl = $sUrl . $this->_getShopVersionNr() . "/{$sCountry}/{$sLangAbbr}/";
+            $this->_sServiceUrl = $sUrl . ShopVersion::getVersion() . "/{$sCountry}/{$sLangAbbr}/";
         }
 
         return $this->_sServiceUrl;
@@ -292,12 +322,22 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        $this->setupNavigation($sNode);
+    }
+
+    /**
+     * Sets-up navigation parameters
+     *
+     * @param string $sNode active view id
+     */
+    protected function setupNavigation($sNode)
+    {
         // navigation according to class
         if ($sNode) {
             $myAdminNavig = $this->getNavigation();
 
             // active tab
-            $iActTab = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('actedit');
+            $iActTab = Registry::getRequest()->getRequestEscapedParameter('actedit');
             $iActTab = $iActTab ? $iActTab : $this->_iDefEdit;
 
             $sActTab = $iActTab ? "&actedit=$iActTab" : '';
@@ -320,11 +360,11 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     {
         $sReturn = parent::render();
 
-        $myConfig = $this->getConfig();
-        $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $myConfig = Registry::getConfig();
+        $oLang = Registry::getLang();
 
         // sets up navigation data
-        $this->_setupNavigation(\OxidEsales\Eshop\Core\Registry::getConfig()->getRequestControllerId());
+        $this->setupNavigation(Registry::getConfig()->getRequestControllerId());
 
         // active object id
         $sOxId = $this->getEditObjectId();
@@ -337,9 +377,9 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         $this->_aViewData["shopid"] = $myConfig->getShopId();
 
         // loading active shop
-        if ($sActShopId = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('actshop')) {
+        if ($sActShopId = Registry::getSession()->getVariable('actshop')) {
             // load object
-            $this->_aViewData['actshopobj'] = $this->_getEditShop($sActShopId);
+            $this->_aViewData['actshopobj'] = $this->getEditShop($sActShopId);
         }
 
         // add language data to all templates
@@ -348,11 +388,11 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
         $this->_aViewData['languages'] = $oLang->getLanguageArray($iLanguage);
 
         // setting maximum upload size
-        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->_getMaxUploadFileInfo(@ini_get("upload_max_filesize"));
+        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->getMaxUploadFileInfo(@ini_get("upload_max_filesize"));
 
         // "save-on-tab"
         if (!isset($this->_aViewData['updatelist'])) {
-            $this->_aViewData['updatelist'] = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('updatelist');
+            $this->_aViewData['updatelist'] = Registry::getRequest()->getRequestEscapedParameter('updatelist');
         }
 
         return $sReturn;
@@ -361,13 +401,26 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     /**
      * Returns maximum allowed size of upload file and formatted size equivalent
      *
-     * @param int  $iMaxFileSize recommended maximum size of file (normalu value is taken from php ini, otherwise sets 2MB)
-     * @param bool $blFormatted  Return formated
+     * @param int  $maxFileSize recommended maximum size of file (normal value is taken from php ini, otherwise sets 2MB)
+     * @param bool $isFormatted  Return formatted
      *
      * @return array
      * @deprecated underscore prefix violates PSR12, will be renamed to "getMaxUploadFileInfo" in next major
      */
     protected function _getMaxUploadFileInfo($maxFileSize, $isFormatted = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getMaxUploadFileInfo($maxFileSize, $isFormatted);
+    }
+
+    /**
+     * Returns maximum allowed size of upload file and formatted size equivalent
+     *
+     * @param int  $maxFileSize recommended maximum size of file (normal value is taken from php ini, otherwise sets 2MB)
+     * @param bool $isFormatted  Return formatted
+     *
+     * @return array
+     */
+    protected function getMaxUploadFileInfo($maxFileSize, $isFormatted = false)
     {
         $maxFileSize = $maxFileSize ? trim($maxFileSize) : '2M';
 
@@ -414,9 +467,9 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function resetContentCache($blForceReset = null)
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
         if (!$blDeleteCacheOnLogout || $blForceReset) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->oxResetFileCache();
+            Registry::getUtils()->oxResetFileCache();
         }
     }
 
@@ -429,8 +482,8 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function resetCounter($sCounterType, $sValue = null)
     {
-        $blDeleteCacheOnLogout = $this->getConfig()->getConfigParam('blClearCacheOnLogout');
-        $myUtilsCount = \OxidEsales\Eshop\Core\Registry::getUtilsCount();
+        $blDeleteCacheOnLogout = Registry::getConfig()->getConfigParam('blClearCacheOnLogout');
+        $myUtilsCount = Registry::getUtilsCount();
 
         if (!$blDeleteCacheOnLogout) {
             switch ($sCounterType) {
@@ -447,7 +500,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
                     $myUtilsCount->resetManufacturerArticleCount($sValue);
                     break;
             }
-            $this->_resetContentCache();
+            $this->resetContentCache();
         }
     }
 
@@ -460,7 +513,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     }
 
     /**
-     * Checks if current $sUserId user is not an admin and checks if user is able to be edited by logged in user.
+     * Checks if current $sUserId user is not an admin and checks if user can be edited by logged-in user.
      * This method does not perform full rights check.
      *
      * @param string $sUserId user id
@@ -470,6 +523,19 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function _allowAdminEdit($sUserId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->allowAdminEdit($sUserId);
+    }
+
+    /**
+     * Checks if current $sUserId user is not an admin and checks if user can be edited by logged-in user.
+     * This method does not perform full rights check.
+     *
+     * @param string $sUserId user id
+     *
+     * @return bool
+     */
+    protected function allowAdminEdit($sUserId)
+    {
         return true;
     }
 
@@ -478,22 +544,36 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      *
      * @param string $sCountryCode Country code
      *
-     * @return boolean
+     * @return string
+     * @throws DatabaseConnectionException
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCountryByCode" in next major
      */
     protected function _getCountryByCode($sCountryCode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->getCountryByCode($sCountryCode);
+    }
+
+    /**
+     * Get english country name by country iso alpha 2 code
+     *
+     * @param string $sCountryCode Country code
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getCountryByCode($sCountryCode)
     {
         //default country
         $sCountry = 'international';
 
         if (!empty($sCountryCode)) {
-            $aLangIds = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageIds();
+            $aLangIds = Registry::getLang()->getLanguageIds();
             $iEnglishId = array_search("en", $aLangIds);
             if (false !== $iEnglishId) {
-                $sViewName = getViewName("oxcountry", $iEnglishId);
+                $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxcountry", $iEnglishId);
                 $sQ = "select oxtitle from {$sViewName} where oxisoalpha2 = :oxisoalpha2";
                 // Value does not change that often, reading from slave is ok here (see ESDEV-3804 and ESDEV-3822).
-                $sCountryName = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, [
+                $sCountryName = DatabaseProvider::getDb()->getOne($sQ, [
                     ':oxisoalpha2' => $sCountryCode
                 ]);
                 if ($sCountryName) {
@@ -521,22 +601,32 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     protected function _authorize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (bool) (
-            $this->getSession()->checkSessionChallenge()
-            && count(\OxidEsales\Eshop\Core\Registry::getUtilsServer()->getOxCookie())
-            && \OxidEsales\Eshop\Core\Registry::getUtils()->checkAccessRights()
+        return $this->authorize();
+    }
+
+    /**
+     * performs authorization of admin user
+     *
+     * @return boolean
+     */
+    protected function authorize()
+    {
+        return (
+            Registry::getSession()->checkSessionChallenge()
+            && count(Registry::getUtilsServer()->getOxCookie())
+            && Registry::getUtils()->checkAccessRights()
         );
     }
 
     /**
      * Returns navigation object
      *
-     * @return oxnavigationtree
+     * @return NavigationTree
      */
     public function getNavigation()
     {
         if (self::$_oNaviTree == null) {
-            self::$_oNaviTree = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class);
+            self::$_oNaviTree = oxNew(NavigationTree::class);
         }
 
         return self::$_oNaviTree;
@@ -558,20 +648,20 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function chshp()
     {
-        $sActShop = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('shp');
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("shp", $sActShop);
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('currentadminshop', $sActShop);
+        $sActShop = Registry::getRequest()->getRequestEscapedParameter('shp');
+        Registry::getSession()->setVariable("shp", $sActShop);
+        Registry::getSession()->setVariable('currentadminshop', $sActShop);
     }
 
     /**
-     * Marks seo entires as expired.
+     * Marks seo entries as expired.
      *
      * @param string $sShopId Shop id
      */
     public function resetSeoData($sShopId)
     {
         $aTypes = ['oxarticle', 'oxcategory', 'oxvendor', 'oxcontent', 'dynamic', 'oxmanufacturer'];
-        $oEncoder = \OxidEsales\Eshop\Core\Registry::getSeoEncoder();
+        $oEncoder = Registry::getSeoEncoder();
         foreach ($aTypes as $sType) {
             $oEncoder->markAsExpired(null, $sShopId, 1, null, "oxtype = '{$sType}'");
         }
@@ -584,7 +674,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
      */
     public function getPreviewId()
     {
-        return \OxidEsales\Eshop\Core\Registry::getUtils()->getPreviewId();
+        return Registry::getUtils()->getPreviewId();
     }
 
     /**
@@ -595,8 +685,8 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     public function getEditObjectId()
     {
         if (null === ($sId = $this->_sEditObjectId)) {
-            if (null === ($sId = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter("oxid"))) {
-                $sId = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("saved_oxid");
+            if (null === ($sId = Registry::getRequest()->getRequestEscapedParameter('oxid'))) {
+                $sId = Registry::getSession()->getVariable("saved_oxid");
             }
         }
 
@@ -632,10 +722,10 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     protected function getControllerKey()
     {
         $actualClass = get_class($this);
-        $controllerKey = \OxidEsales\Eshop\Core\Registry::getControllerClassNameResolver()->getIdByClassName($actualClass);
+        $controllerKey = Registry::getControllerClassNameResolver()->getIdByClassName($actualClass);
         if (is_null($controllerKey)) {
             //we might not have found a class key because class is a module chain extended class
-            $controllerKey = \OxidEsales\Eshop\Core\Registry::getControllerClassNameResolver()->getIdByClassName($this->getShopParentClass());
+            $controllerKey = Registry::getControllerClassNameResolver()->getIdByClassName($this->getShopParentClass());
         }
         return $controllerKey;
     }
@@ -648,7 +738,7 @@ class AdminController extends \OxidEsales\Eshop\Core\Controller\BaseController
     protected function getShopParentClass()
     {
         $className = get_class($this); //actual class, might be shop class chain extended by module
-        while ($className && !\OxidEsales\Eshop\Core\NamespaceInformationProvider::classBelongsToShopUnifiedNamespace($className)) {
+        while ($className && !NamespaceInformationProvider::classBelongsToShopUnifiedNamespace($className)) {
             $className = get_parent_class($className);
         }
         return $className;

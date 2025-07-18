@@ -21,23 +21,30 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use InvalidArgumentException;
+use OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration;
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Module\Module;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
+use Throwable;
 
 /**
  * Admin article main deliveryset manager.
- * There is possibility to change deliveryset name, article, user
- * and etc.
+ * There is possibility to change deliveryset name, article, user etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
-class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration
+class ModuleConfiguration extends ShopConfiguration
 {
     /** @var string Template name. */
     protected $_sModule = 'shop_config.tpl';
+
+    protected $_sModuleId = null;
 
     /**
      * Add additional config type for modules.
@@ -71,7 +78,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
                     $this->_aViewData[$sParam] = $formatModuleSettings['vars'][$sType];
                 }
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Registry::getUtilsView()->addErrorToDisplay($throwable);
             Registry::getLogger()->error($throwable->getMessage());
         }
@@ -93,7 +100,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Config::OXMODULE_MODULE_PREFIX . $this->_sModuleId;
+        return Config::OXMODULE_MODULE_PREFIX . $this->_sModuleId;
     }
 
     /**
@@ -103,15 +110,17 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
      *      'constraints' => constraints list as array[name] = constraint
      *      'grouping'    => grouping info as array[name] = grouping
      *
-     * @deprecated since v6.4.0 (2019-04-08); it moved to Internal\Framework\Module package
-     *
      * @param array $aModuleSettings settings array from module metadata
      *
      * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     * @deprecated since v6.4.0 (2019-04-08); it moved to Internal\Framework\Module package
+     *
      */
     public function _loadMetadataConfVars($aModuleSettings) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oConfig = $this->getConfig();
+        $oConfig = Registry::getConfig();
 
         $aConfVars = [
             "bool"     => [],
@@ -124,7 +133,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
         $aVarConstraints = [];
         $aGrouping = [];
 
-        $aDbVariables = $this->loadConfVars($oConfig->getShopId(), $this->_getModuleForConfigVars());
+        $aDbVariables = $this->loadConfVars($oConfig->getShopId(), $this->getModuleForConfigVars());
 
         if (is_array($aModuleSettings)) {
             foreach ($aModuleSettings as $aValue) {
@@ -134,10 +143,10 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
                 if (is_null($oConfig->getConfigParam($sName))) {
                     switch ($aValue["type"]) {
                         case "arr":
-                            $sValue = $this->_arrayToMultiline($aValue["value"]);
+                            $sValue = $this->arrayToMultiline($aValue["value"]);
                             break;
                         case "aarr":
-                            $sValue = $this->_aarrayToMultiline($aValue["value"]);
+                            $sValue = $this->aarrayToMultiline($aValue["value"]);
                             break;
                         case "bool":
                             $sValue = filter_var($aValue["value"], FILTER_VALIDATE_BOOLEAN);
@@ -146,7 +155,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
                             $sValue = $aValue["value"];
                             break;
                     }
-                    $sValue = getStr()->htmlentities($sValue);
+                    $sValue = Str::getStr()->htmlentities($sValue);
                 } else {
                     $sDbType = $this->_getDbConfigTypeName($sType);
                     $sValue = $aDbVariables['vars'][$sDbType][$sName];
@@ -203,7 +212,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             if ($moduleWasActiveBeforeSaving) {
                 $this->getContainer()->get(ModuleActivationBridgeInterface::class)->activate($moduleId, $shopId);
             }
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Registry::getUtilsView()->addErrorToDisplay($throwable);
             Registry::getLogger()->error($throwable->getMessage());
         }
@@ -219,7 +228,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             ?? Registry::getSession()->getVariable('saved_oxid');
 
         if ($moduleId === null) {
-            throw new \InvalidArgumentException('Module id not found.');
+            throw new InvalidArgumentException('Module id not found.');
         }
 
         return $moduleId;
@@ -239,10 +248,10 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
                 foreach ($moduleConfiguration->getModuleSettings() as $moduleSetting) {
                     if ($moduleSetting->getName() === $name) {
                         if ($moduleSetting->getType() === 'aarr') {
-                            $value = $this->_multilineToAarray($value);
+                            $value = $this->multilineToAarray($value);
                         }
                         if ($moduleSetting->getType() === 'arr') {
-                            $value = $this->_multilineToArray($value);
+                            $value = $this->multilineToArray($value);
                         }
                         if ($moduleSetting->getType() === 'bool') {
                             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -266,7 +275,7 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
         foreach ($this->_aConfParams as $requestParameterKey) {
             $settingsFromRequest = Registry::getRequest()->getRequestEscapedParameter($requestParameterKey);
 
-            if (\is_array($settingsFromRequest)) {
+            if (is_array($settingsFromRequest)) {
                 foreach ($settingsFromRequest as $name => $value) {
                     $settings[$name] = $value;
                 }
@@ -301,10 +310,10 @@ class ModuleConfiguration extends \OxidEsales\Eshop\Application\Controller\Admin
             if ($setting->getValue() !== null) {
                 switch ($setting->getType()) {
                     case 'arr':
-                        $value = $this->_arrayToMultiline($setting->getValue());
+                        $value = $this->arrayToMultiline($setting->getValue());
                         break;
                     case 'aarr':
-                        $value = $this->_aarrayToMultiline($setting->getValue());
+                        $value = $this->aarrayToMultiline($setting->getValue());
                         break;
                     case 'bool':
                         $value = filter_var($setting->getValue(), FILTER_VALIDATE_BOOLEAN);

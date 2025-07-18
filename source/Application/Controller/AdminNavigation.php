@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\EshopCommunity\Application\Model\RightsRoles;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 use OxidEsales\EshopCommunity\Core\Registry;
+use stdClass;
 
 class AdminNavigation extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
 {
@@ -50,7 +51,7 @@ class AdminNavigation extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
             }
 
             foreach ($oOtherLang as $id => $language) {
-                $oLang = new \stdClass();
+                $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
                 $this->_aViewData["otherlang"][$id] = clone $oLang;
@@ -68,7 +69,7 @@ class AdminNavigation extends \OxidEsales\Eshop\Application\Controller\Admin\Adm
 
         $rightsRole = oxNew(RightsRoles::class);
         $rightsRole->setLanguage(0);
-        $aParams = Registry::getRequest()->getRequestEscapedParameter("editval");
+        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if ($soxId != "-1") {
             $rightsRole->loadInLang($this->_iEditLang, $soxId);

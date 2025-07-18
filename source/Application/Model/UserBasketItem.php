@@ -21,14 +21,18 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
-use oxField;
+use OxidEsales\Eshop\Core\Exception\ArticleException;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Model\BaseModel;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Shopping basket item manager.
- * Manager class for shopping basket item (class may be overriden).
+ * Manager class for shopping basket item (class may be overridden).
  *
  */
-class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
+class UserBasketItem extends BaseModel
 {
     /**
      * Current class name
@@ -38,9 +42,9 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected $_sClassName = 'oxuserbasketitem';
 
     /**
-     * Article object assigned to userbasketitem
+     * Article object assigned to user-basket-item
      *
-     * @var oxArticle
+     * @var Article
      */
     protected $_oArticle = null;
 
@@ -70,7 +74,7 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function __construct()
     {
-        $this->setVariantParentBuyable($this->getConfig()->getConfigParam('blVariantParentBuyable'));
+        $this->setVariantParentBuyable(Registry::getConfig()->getConfigParam('blVariantParentBuyable'));
         parent::__construct();
         $this->init('oxuserbasketitems');
     }
@@ -90,21 +94,21 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      *
      * @param string $sItemKey the key that will be given to oxarticle setItemKey
      *
-     * @throws oxArticleException article exception
-     *
-     * @return oxArticle
+     * @return Article|bool
+     * @throws ArticleException article exception
+     * @throws DatabaseConnectionException
      */
     public function getArticle($sItemKey)
     {
         if (!$this->oxuserbasketitems__oxartid->value) {
             //this exception may not be caught, anyhow this is a critical exception
-            $oEx = oxNew(\OxidEsales\Eshop\Core\Exception\ArticleException::class);
+            $oEx = oxNew(ArticleException::class);
             $oEx->setMessage('EXCEPTION_ARTICLE_NOPRODUCTID');
             throw $oEx;
         }
 
         if ($this->_oArticle === null) {
-            $this->_oArticle = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
+            $this->_oArticle = oxNew(Article::class);
 
             // performance
             /* removed due to #4178
@@ -174,7 +178,7 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
      */
     public function setSelList($aSelList)
     {
-        $this->oxuserbasketitems__oxsellist = new \OxidEsales\Eshop\Core\Field(serialize($aSelList), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxuserbasketitems__oxsellist = new Field(serialize($aSelList), Field::T_RAW);
     }
 
     /**
@@ -194,30 +198,30 @@ class UserBasketItem extends \OxidEsales\Eshop\Core\Model\BaseModel
     /**
      * Basket item persistent parameters setter
      *
-     * @param string $sPersParams persistent parameters
+     * @param array $aPersParams persistent parameters
      */
-    public function setPersParams($sPersParams)
+    public function setPersParams($aPersParams)
     {
-        $this->oxuserbasketitems__oxpersparam = new \OxidEsales\Eshop\Core\Field(serialize($sPersParams), \OxidEsales\Eshop\Core\Field::T_RAW);
+        $this->oxuserbasketitems__oxpersparam = new Field(serialize($aPersParams), Field::T_RAW);
     }
 
     /**
      * Sets data field value
      *
-     * @param string $sFieldName index OR name (eg. 'oxarticles__oxtitle') of a data field to set
+     * @param string $sFieldName index OR name (e.g. 'oxarticles__oxtitle') of a data field to set
      * @param string $sValue     value of data field
      * @param int    $iDataType  field type
      *
      * @return null
      * @deprecated underscore prefix violates PSR12, will be renamed to "setFieldData" in next major
      */
-    protected function _setFieldData($sFieldName, $sValue, $iDataType = \OxidEsales\Eshop\Core\Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setFieldData($sFieldName, $sValue, $iDataType = Field::T_TEXT) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (
             'oxsellist' === strtolower($sFieldName) || 'oxuserbasketitems__oxsellist' === strtolower($sFieldName)
             || 'oxpersparam' === strtolower($sFieldName) || 'oxuserbasketitems__oxpersparam' === strtolower($sFieldName)
         ) {
-            $iDataType = \OxidEsales\Eshop\Core\Field::T_RAW;
+            $iDataType = Field::T_RAW;
         }
 
         return parent::_setFieldData($sFieldName, $sValue, $iDataType);

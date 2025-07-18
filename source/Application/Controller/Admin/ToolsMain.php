@@ -21,35 +21,41 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
+use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * CVS export manager.
  * Performs export function according to user chosen categories.
- * Admin Menu: Maine Menu -> Im/Export -> Export.
+ * Admin Menu: Maine Menu -> In-/Export -> Export.
  */
-class ToolsMain extends \OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController
+class ToolsMain extends AdminDetailsController
 {
     /**
      * Executes parent method parent::render(), passes data to Smarty engine
      * and returns name of template file "imex_export.tpl".
      *
      * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      */
     public function render()
     {
-        if ($this->getConfig()->isDemoShop()) {
-            \OxidEsales\Eshop\Core\Registry::getUtils()->showMessageAndExit("Access denied !");
+        if (Registry::getConfig()->isDemoShop()) {
+            Registry::getUtils()->showMessageAndExit("Access denied !");
         }
 
         parent::render();
 
-        $oAuthUser = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
         $this->_aViewData["blIsMallAdmin"] = $oAuthUser->oxuser__oxrights->value == "malladmin";
 
-        $blShowUpdateViews = $this->getConfig()->getConfigParam('blShowUpdateViews');
-        $this->_aViewData['showViewUpdate'] = (isset($blShowUpdateViews) && !$blShowUpdateViews) ? false : true;
+        $blShowUpdateViews = Registry::getConfig()->getConfigParam('blShowUpdateViews');
+        $this->_aViewData['showViewUpdate'] = !(isset($blShowUpdateViews) && !$blShowUpdateViews);
 
         return "tools_main.tpl";
     }

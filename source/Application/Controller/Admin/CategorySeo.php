@@ -21,30 +21,36 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
-use oxRegistry;
-use oxField;
+use Exception;
+use OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo;
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\SeoEncoderCategory;
+use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Category seo config class
  */
-class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo
+class CategorySeo extends ObjectSeo
 {
     /**
-     * Updating showsuffix field
+     * Updating oxshowsuffix field
      *
      * @return null
+     * @throws Exception
      */
     public function save()
     {
         $sOxid = $this->getEditObjectId();
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCategory = oxNew(Category::class);
         if ($oCategory->load($sOxid)) {
-            $blShowSuffixParameter = \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('blShowSuffix');
+            $blShowSuffixParameter = Registry::getRequest()->getRequestEscapedParameter('blShowSuffix');
             $sShowSuffixField = 'oxcategories__oxshowsuffix';
-            $oCategory->$sShowSuffixField = new \OxidEsales\Eshop\Core\Field((int) $blShowSuffixParameter);
+            $oCategory->$sShowSuffixField = new Field((int) $blShowSuffixParameter);
             $oCategory->save();
 
-            $this->_getEncoder()->markRelatedAsExpired($oCategory);
+            $this->getEncoder()->markRelatedAsExpired($oCategory);
         }
 
         return parent::save();
@@ -53,12 +59,22 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
     /**
      * Returns current object type seo encoder object
      *
-     * @return oxSeoEncoderCategory
+     * @return SeoEncoderCategory
      * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class);
+        return $this->getEncoder();
+    }
+
+    /**
+     * Returns current object type seo encoder object
+     *
+     * @return SeoEncoderCategory
+     */
+    protected function getEncoder()
+    {
+        return Registry::get(SeoEncoderCategory::class);
     }
 
     /**
@@ -79,17 +95,28 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        return $this->getType();
+    }
+
+    /**
+     * Returns url type
+     *
+     * @return string
+     */
+    protected function getType()
+    {
         return 'oxcategory';
     }
 
     /**
      * Returns true if SEO object id has suffix enabled
      *
-     * @return bool
+     * @return bool|void
+     * @throws DatabaseConnectionException
      */
     public function isEntrySuffixed()
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCategory = oxNew(Category::class);
         if ($oCategory->load($this->getEditObjectId())) {
             return (bool) $oCategory->oxcategories__oxshowsuffix->value;
         }
@@ -98,13 +125,14 @@ class CategorySeo extends \OxidEsales\Eshop\Application\Controller\Admin\ObjectS
     /**
      * Returns seo uri
      *
-     * @return string
+     * @return string|void
+     * @throws DatabaseConnectionException
      */
     public function getEntryUri()
     {
-        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
+        $oCategory = oxNew(Category::class);
         if ($oCategory->load($this->getEditObjectId())) {
-            return $this->_getEncoder()->getCategoryUri($oCategory, $this->getEditLang());
+            return $this->getEncoder()->getCategoryUri($oCategory, $this->getEditLang());
         }
     }
 }

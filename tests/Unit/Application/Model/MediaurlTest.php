@@ -69,8 +69,8 @@ class MediaurlTest extends \OxidTestCase
     {
         $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(0));
-        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://shop/'));
-        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://shop/'));
+        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://localhost:8090/'));
+        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://locahost:8090/'));
 
         $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
         $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
@@ -132,8 +132,8 @@ class MediaurlTest extends \OxidTestCase
     {
         $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(0));
-        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://shop/'));
-        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://shop/'));
+        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://localhost:8090/'));
+        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://localhost:8090/'));
 
         $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
         $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
@@ -197,8 +197,8 @@ class MediaurlTest extends \OxidTestCase
         file_put_contents($sFilePath, 'test jpg file');
         $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(0));
-        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://shop/'));
-        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://shop/'));
+        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://localhost:8090/'));
+        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://localhost:8090/'));
 
         $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
         $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
