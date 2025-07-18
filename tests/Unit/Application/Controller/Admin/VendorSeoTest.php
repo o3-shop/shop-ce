@@ -134,8 +134,10 @@ class VendorSeoTest extends \OxidTestCase
 
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, array("getEditObjectId"));
-        $oView->expects($this->at(0))->method('getEditObjectId')->will($this->returnValue("_test1"));
-        $oView->expects($this->at(1))->method('getEditObjectId')->will($this->returnValue("_test2"));
+        $oView->expects($this->exactly(2))
+            ->method('getEditObjectId')
+            ->willReturnOnConsecutiveCalls("_test1", "_test2");
+
         $this->assertTrue($oView->isEntrySuffixed());
         $this->assertFalse($oView->isEntrySuffixed());
     }

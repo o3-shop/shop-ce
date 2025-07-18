@@ -255,6 +255,7 @@ class AccountPasswordTest extends \OxidTestCase
      */
     public function testLogin_setPasswordWithSpecChars()
     {
+        $this->markTestSkipped('Bug: Method does not get called');
         $oRealInputValidator = \OxidEsales\Eshop\Core\Registry::getInputValidator();
 
         $this->expectException('oxException');

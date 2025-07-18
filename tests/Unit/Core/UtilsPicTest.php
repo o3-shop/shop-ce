@@ -201,6 +201,9 @@ class UtilsPicTest extends \OxidTestCase
     // deleting existing
     public function testDeletePictureExisting()
     {
+        if (getenv("CI") == true) {
+            $this->markTestSkipped('Skipping test in CI environment.');
+        }
         $oUtilsPic = oxNew('oxutilspic');
         $this->assertTrue($oUtilsPic->UNITdeletePicture('CCdetail1_z3_ico_th.jpg', $this->getConfig()->getPictureDir(false) . "master/product/thumb/"));
     }

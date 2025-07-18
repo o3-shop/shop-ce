@@ -174,9 +174,17 @@ class ViewConfigTest extends \OxidTestCase
         $oView->expects($this->once())->method('getIsOrderStep')->will($this->returnValue(true));
 
         $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getConfigParam', 'getActiveView'));
-        $oCfg->expects($this->at(0))->method('getConfigParam')->with($this->equalTo('bl_showCompareList'))->will($this->returnValue(true));
-        $oCfg->expects($this->at(1))->method('getConfigParam')->with($this->equalTo('blDisableNavBars'))->will($this->returnValue(true));
-        $oCfg->expects($this->at(2))->method('getActiveView')->will($this->returnValue($oView));
+        $oCfg->expects($this->exactly(2))
+            ->method('getConfigParam')
+            ->withConsecutive(
+                [$this->equalTo('bl_showCompareList')],
+                [$this->equalTo('blDisableNavBars')]
+            )
+            ->willReturnOnConsecutiveCalls(true, true);
+        $oCfg->expects($this->once())
+            ->method('getActiveView')
+            ->willReturn($oView);
+
 
         $oVC = $this->getMock(\OxidEsales\Eshop\Core\ViewConfig::class, array('getConfig'));
         $oVC->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));

@@ -19,8 +19,8 @@
  */
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use OxidEsales\Eshop\Core\PasswordHasher;
-use \oxPasswordHasher;
+use OxidEsales\EshopCommunity\Core\Sha512Hasher;
+use OxidEsales\EshopCommunity\Core\PasswordHasher;
 
 class PasswordHasherTest extends \OxidTestCase
 {
@@ -29,9 +29,8 @@ class PasswordHasherTest extends \OxidTestCase
         $sPassword = 'password';
         $sSalt = 'salt';
 
-        $oHasher = $this->getMock('oxSha512Hasher');
+        $oHasher = $this->createMock(Sha512Hasher::class);
         $oHasher->expects($this->once())->method('hash')->with($this->equalTo($sPassword . $sSalt));
-
         $oPasswordHasher = new PasswordHasher($oHasher);
 
         $oPasswordHasher->hash($sPassword, $sSalt);

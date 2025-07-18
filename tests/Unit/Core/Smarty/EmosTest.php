@@ -104,15 +104,21 @@ class EmosTest extends \OxidTestCase
         $oItem->variant3 = 'var3';
 
         $oEmos = $this->getMock(\OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty\EmosHelper::class, array('_emos_DataFormat'));
-        $oEmos->expects($this->at(0))->method('_emos_DataFormat')->with($this->equalTo('prodid'))->will($this->returnValue('prodid'));
-        $oEmos->expects($this->at(1))->method('_emos_DataFormat')->with($this->equalTo('prodname'))->will($this->returnValue('prodname'));
-        $oEmos->expects($this->at(2))->method('_emos_DataFormat')->with($this->equalTo('prodgrp'))->will($this->returnValue('prodgrp'));
-        $oEmos->expects($this->at(3))->method('_emos_DataFormat')->with($this->equalTo('var1'))->will($this->returnValue('var1'));
-        $oEmos->expects($this->at(4))->method('_emos_DataFormat')->with($this->equalTo('var2'))->will($this->returnValue('var2'));
-        $oEmos->expects($this->at(5))->method('_emos_DataFormat')->with($this->equalTo('var3'))->will($this->returnValue('var3'));
+        $oEmos->expects($this->exactly(6))
+            ->method('_emos_DataFormat')
+            ->withConsecutive(
+                [$this->equalTo('prodid')],
+                [$this->equalTo('prodname')],
+                [$this->equalTo('prodgrp')],
+                [$this->equalTo('var1')],
+                [$this->equalTo('var2')],
+                [$this->equalTo('var3')]
+            )
+            ->willReturnOnConsecutiveCalls('prodid', 'prodname', 'prodgrp', 'var1', 'var2', 'var3');
 
         $this->assertEquals($oItem, $oEmos->call_emos_ItemFormat($oItem));
     }
+
 
     /**
      * Test data formating.

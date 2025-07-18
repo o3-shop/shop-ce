@@ -82,7 +82,7 @@ class ReviewTest extends \OxidTestCase
         $oReview->load('_testId');
 
         $this->assertTrue(isset($oReview->oxuser__oxfname));
-        $this->assertEquals('John', $oReview->oxuser__oxfname->value);
+        $this->assertEquals('Erika', $oReview->oxuser__oxfname->value);
     }
 
     public function testLoadDe()

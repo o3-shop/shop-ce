@@ -47,8 +47,10 @@ class VoucherSerieGenerateTest extends \OxidTestCase
     public function testNextTick()
     {
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, array("generateVoucher"));
-        $oView->expects($this->at(0))->method('generateVoucher')->will($this->returnValue(0));
-        $oView->expects($this->at(1))->method('generateVoucher')->will($this->returnValue(1));
+        $oView->expects($this->exactly(2))
+            ->method('generateVoucher')
+            ->willReturnOnConsecutiveCalls(0, 1);
+
 
         $this->assertFalse($oView->nextTick(1));
         $this->assertEquals(1, $oView->nextTick(1));

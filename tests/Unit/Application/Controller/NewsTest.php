@@ -118,7 +118,7 @@ class NewsTest extends \OxidTestCase
         $aResult = array();
         $aResults = array();
 
-        $aResult["title"] = oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' shop';
+        $aResult["title"] = oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' O3-Shop';
         $aResult["link"] = $oNews->getLink();
 
         $aResults[] = $aResult;
@@ -152,6 +152,6 @@ class NewsTest extends \OxidTestCase
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, array('getConfig'));
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
-        $this->assertEquals(oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' shop', $oView->getTitle());
+        $this->assertEquals(oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' O3-Shop', $oView->getTitle());
     }
 }

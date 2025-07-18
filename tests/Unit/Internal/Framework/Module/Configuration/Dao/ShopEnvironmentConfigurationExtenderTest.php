@@ -27,11 +27,13 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEn
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentWithOrphanSettingEvent;
 use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentConfigurationExtender;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ShopEnvironmentConfigurationExtenderTest extends TestCase
 {
+    use ProphecyTrait;
     /** @var ShopEnvironmentConfigurationDaoInterface|ObjectProphecy */
     private $environmentDao;
     /** @var ShopEnvironmentConfigurationExtender */

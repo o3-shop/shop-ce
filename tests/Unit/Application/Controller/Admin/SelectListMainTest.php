@@ -127,9 +127,11 @@ class SelectListMainTest extends \OxidTestCase
 
         // testing..
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\SelectListMain::class, array("parseFieldName", "save"));
-        $oView->expects($this->at(0))->method('parseFieldName')->will($this->returnValue("testField2"));
-        $oView->expects($this->at(1))->method('parseFieldName')->will($this->returnValue("testField1"));
-        $oView->expects($this->at(2))->method('save');
+        $oView->expects($this->exactly(2))
+            ->method('parseFieldName')
+            ->willReturnOnConsecutiveCalls("testField2", "testField1");
+        $oView->expects($this->once())
+            ->method('save');
         $oView->delFields();
     }
 

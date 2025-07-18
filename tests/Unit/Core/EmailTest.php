@@ -813,13 +813,18 @@ class EmailTest extends \OxidTestCase
     public function testSendMailErrorMsg()
     {
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("getRecipient", "getMailer", "_sendMail", "_sendMailErrorMsg"));
-        $oEmail->expects($this->at(0))->method('getRecipient')->will($this->returnValue([1]));
-        $oEmail->expects($this->at(1))->method('getMailer')->will($this->returnValue("smtp"));
-        $oEmail->expects($this->at(2))->method('_sendMail')->will($this->returnValue(false));
-        $oEmail->expects($this->at(3))->method('_sendMailErrorMsg');
-        $oEmail->expects($this->at(4))->method('_sendMail')->will($this->returnValue(false));
-        $oEmail->expects($this->exactly(2))->method('_sendMail');
-        $oEmail->expects($this->exactly(2))->method('_sendMailErrorMsg');
+        $oEmail->expects($this->once())
+            ->method('getRecipient')
+            ->willReturn([1]);
+        $oEmail->expects($this->once())
+            ->method('getMailer')
+            ->willReturn("smtp");
+        $oEmail->expects($this->exactly(2))
+            ->method('_sendMail')
+            ->willReturnOnConsecutiveCalls(false, false);
+        $oEmail->expects($this->exactly(2))
+            ->method('_sendMailErrorMsg');
+
 
         $this->assertFalse($oEmail->send());
     }
@@ -830,13 +835,18 @@ class EmailTest extends \OxidTestCase
     public function testSendMailErrorMsg_failsOnlySmtp()
     {
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("getRecipient", "getMailer", "_sendMail", "_sendMailErrorMsg"));
-        $oEmail->expects($this->at(0))->method('getRecipient')->will($this->returnValue([1]));
-        $oEmail->expects($this->at(1))->method('getMailer')->will($this->returnValue("smtp"));
-        $oEmail->expects($this->at(2))->method('_sendMail')->will($this->returnValue(false));
-        $oEmail->expects($this->at(3))->method('_sendMailErrorMsg');
-        $oEmail->expects($this->at(4))->method('_sendMail')->will($this->returnValue(true));
-        $oEmail->expects($this->exactly(2))->method('_sendMail');
-        $oEmail->expects($this->exactly(1))->method('_sendMailErrorMsg');
+        $oEmail->expects($this->once())
+            ->method('getRecipient')
+            ->willReturn([1]);
+        $oEmail->expects($this->once())
+            ->method('getMailer')
+            ->willReturn("smtp");
+        $oEmail->expects($this->exactly(2))
+            ->method('_sendMail')
+            ->willReturnOnConsecutiveCalls(false, true);
+        $oEmail->expects($this->once())
+            ->method('_sendMailErrorMsg');
+
 
         $this->assertTrue($oEmail->send());
     }
@@ -847,12 +857,18 @@ class EmailTest extends \OxidTestCase
     public function testSendMailErrorMsg_failsMail()
     {
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("getRecipient", "getMailer", "_sendMail", "_sendMailErrorMsg"));
-        $oEmail->expects($this->at(0))->method('getRecipient')->will($this->returnValue([1]));
-        $oEmail->expects($this->at(1))->method('getMailer')->will($this->returnValue("mail"));
-        $oEmail->expects($this->at(2))->method('_sendMail')->will($this->returnValue(false));
-        $oEmail->expects($this->at(3))->method('_sendMailErrorMsg');
-        $oEmail->expects($this->exactly(1))->method('_sendMail');
-        $oEmail->expects($this->exactly(1))->method('_sendMailErrorMsg');
+        $oEmail->expects($this->once())
+            ->method('getRecipient')
+            ->willReturn([1]);
+        $oEmail->expects($this->once())
+            ->method('getMailer')
+            ->willReturn("mail");
+        $oEmail->expects($this->once())
+            ->method('_sendMail')
+            ->willReturn(false);
+        $oEmail->expects($this->once())
+            ->method('_sendMailErrorMsg');
+
 
         $this->assertFalse($oEmail->send());
     }
@@ -1076,16 +1092,13 @@ class EmailTest extends \OxidTestCase
     public function testSetSmtpProtocol()
     {
         $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array('set'));
-        $oEmail->expects($this->at(0))->method('set')
-            ->with(
-                $this->equalTo('SMTPSecure'),
-                $this->equalTo('ssl')
+        $oEmail->expects($this->exactly(2))
+            ->method('set')
+            ->withConsecutive(
+                [$this->equalTo('SMTPSecure'), $this->equalTo('ssl')],
+                [$this->equalTo('SMTPSecure'), $this->equalTo('tls')]
             );
-        $oEmail->expects($this->at(1))->method('set')
-            ->with(
-                $this->equalTo('SMTPSecure'),
-                $this->equalTo('tls')
-            );
+
         $this->assertEquals("hostname:23", $oEmail->UNITsetSmtpProtocol('ssl://hostname:23'));
         $this->assertEquals("hostname:23", $oEmail->UNITsetSmtpProtocol('tls://hostname:23'));
         $this->assertEquals("ssx://hostname:23", $oEmail->UNITsetSmtpProtocol('ssx://hostname:23'));

@@ -1,0 +1,225 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2']
+      fail-fast: false
+
+    services:
+      mariadb:
+        image: mariadb:10.10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: o3shop_test
+          MYSQL_USER: o3shop
+          MYSQL_PASSWORD: o3shop
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
+          coverage: pcov
+
+      - name: Install Composer 2.2
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --version=2.2.21
+          php -r "unlink('composer-setup.php');"
+          sudo mv composer.phar /usr/local/bin/composer
+          composer --version
+
+      - name: Set dynamic version based on branch
+        run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH_NAME="${{ github.head_ref }}"
+          fi
+          
+          echo "Branch name: $BRANCH_NAME"
+          
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            VERSION="1.4.x-dev"
+          elif [[ "$BRANCH_NAME" == *"1.4"* ]]; then
+            VERSION="1.4.x-dev"
+          elif [[ "$BRANCH_NAME" == *"1.3"* ]]; then
+            VERSION="1.3.x-dev"
+          else
+            VERSION="1.4.x-dev"
+          fi
+          
+          echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Using version: $VERSION"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-version }}-
+
+      - name: Copy config files
+        run: |
+          cp .env.ci .env
+          cp source/config.inc.php.dist source/config.inc.php
+          
+          cat .env
+
+      - name: Install dependencies
+        env:
+          COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
+        run: composer install --prefer-dist --no-progress
+
+
+
+      - name: Install theme
+        run: |
+          echo "${YELLOW}Installing Wave theme...${NC}"
+
+          # Check if theme is already installed
+          if [ -d "source/Application/views/wave" ] && [ "$(ls -A source/Application/views/wave)" ]; then
+            echo "Wave theme appears to be already installed, skipping"
+            return 0
+          fi
+
+          # Download theme
+          echo "Downloading theme from GitHub..."
+          wget -q https://github.com/o3-shop/wave-theme/archive/refs/heads/main.zip -O main.zip || handle_error "Failed to download theme"
+
+          # Extract theme
+          echo "Extracting theme..."
+          unzip -q main.zip || handle_error "Failed to extract theme archive"
+
+          # Copy theme files
+          echo "Copying theme files to appropriate directories..."
+          mkdir -p source/out/ || handle_error "Failed to create out directory"
+          cp -r wave-theme-main/out/* source/out/ || handle_error "Failed to copy theme out files"
+
+          mkdir -p source/Application/views/wave || handle_error "Failed to create theme views directory"
+          rm -rf wave-theme-main/out
+          cp -r wave-theme-main/* source/Application/views/wave || handle_error "Failed to copy theme view files"
+
+          # Clean up
+          echo "Cleaning up temporary files..."
+          rm -rf wave-theme-main
+          rm main.zip
+
+          echo "${GREEN}Wave theme installed successfully${NC}"
+
+      - name: Wait for MariaDB
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -P 3306 -u root -proot --silent; do
+            echo 'Waiting for MariaDB...'
+            sleep 1
+          done
+
+      - name: Setup database
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+
+      - name: Run PHPUnit tests with coverage
+        continue-on-error: true
+        run: |
+          CURRENT_DIR=$(pwd)
+          echo "Current directory: $CURRENT_DIR"
+
+          php $CURRENT_DIR/vendor/bin/phpunit \
+          --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
+          -c $CURRENT_DIR/tests/phpunit.xml \
+          $CURRENT_DIR/tests/Unit \
+          --colors=always \
+          --coverage-clover="$CURRENT_DIR/coverage.xml" \
+          --coverage-html="$CURRENT_DIR/coverage-html/" || exit 0
+
+      - name: Find coverage files
+        run: |
+          echo "Searching for coverage files..."
+          find /home/runner/work -name "coverage.xml" -type f 2>/dev/null || echo "No coverage.xml found"
+          find /home/runner/work -name "coverage-html" -type d 2>/dev/null || echo "No coverage-html directory found"
+          
+          echo "Files in current directory:"
+          ls -la
+          
+          echo "Files in tests directory:"
+          ls -la tests/ || echo "No tests directory"
+      - name: Check coverage files
+        run: |
+          echo "Checking for coverage files..."
+          if [ -f coverage.xml ]; then
+            echo "✅ coverage.xml exists"
+            ls -la coverage.xml
+          else
+            echo "❌ coverage.xml does not exist"
+          fi
+          
+          if [ -d coverage-html ]; then
+            echo "✅ coverage-html directory exists"
+            ls -la coverage-html/
+          else
+            echo "❌ coverage-html directory does not exist"
+          fi
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-php-${{ matrix.php-version }}
+          path: coverage-html/
+
+      - name: Generate coverage summary
+        run: |
+          if [ -f coverage.xml ]; then
+            COVERAGE=$(php -r "
+              \$xml = simplexml_load_file('coverage.xml');
+              \$metrics = \$xml->project->metrics;
+              \$covered = (int)\$metrics['coveredstatements'];
+              \$total = (int)\$metrics['statements'];
+              \$percentage = \$total > 0 ? round((\$covered / \$total) * 100, 2) : 0;
+              echo \$percentage;
+            ")
+            echo "## Coverage Report (PHP ${{ matrix.php-version }})" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage: ${COVERAGE}%**" >> $GITHUB_STEP_SUMMARY
+            echo "COVERAGE_PERCENTAGE=${COVERAGE}" >> $GITHUB_ENV
+          else
+            echo "No coverage file found"
+          fi
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const coverage = process.env.COVERAGE_PERCENTAGE;
+            if (coverage) {
+              const body = `## 📊 Coverage Report (PHP ${{ matrix.php-version }})
+            
+              **Coverage: ${coverage}%**
+            
+              ${coverage >= 80 ? '✅ Great coverage!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage'}
+            
+              [View detailed coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }

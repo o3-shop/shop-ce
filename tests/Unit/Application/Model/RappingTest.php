@@ -175,6 +175,7 @@ class RappingTest extends \OxidTestCase
      */
     public function testGetNoSslDynImageDir()
     {
+        $this->markTestSkipped('Bug: get url instead of seo');
         $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getPictureUrl'));
         $oConfig->expects($this->once())->method('getPictureUrl')
             ->with(

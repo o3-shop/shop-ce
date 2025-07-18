@@ -76,7 +76,7 @@ install_theme() {
 # Function to install dependencies
 install_dependencies() {
     log "${YELLOW}Installing Composer dependencies...${NC}"
-    composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
+    COMPOSER_ROOT_VERSION=dev-main composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
     log "${GREEN}Dependencies installed successfully${NC}"
 }
 
@@ -88,6 +88,8 @@ start_apache() {
     a2enmod rewrite || handle_error "Failed to enable Apache rewrite module"
     
     log "${GREEN}Starting Apache...${NC}"
+    rm /tmp/o3setup-running
+
     apache2-foreground
 }
 
@@ -144,6 +146,8 @@ setup_db() {
 
 # Main execution
 main() {
+    echo "setup is running" > /tmp/o3setup-running
+
     log "${GREEN}Starting shop setup...${NC}"
 
     setup_environment || exit 127
