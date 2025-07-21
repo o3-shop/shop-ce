@@ -74,7 +74,7 @@ $this->sO3SHOPPHP = "o3shop.php";
 /**
  * String PSR3 log level Psr\Log\LogLevel
  */
-$this->sLogLevel = 'error';
+$this->sLogLevel = $_ENV['O3SHOP_CONF_LOG_LEVEL'];
 
 /**
  * Log all modifications performed in Admin
