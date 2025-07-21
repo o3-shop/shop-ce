@@ -62,3 +62,4 @@ composer.lock
 /var/generated/generated_services.yaml
 docker/database/data
 docker/mailpit/data
+coverage
