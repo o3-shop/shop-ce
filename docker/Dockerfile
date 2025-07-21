@@ -41,6 +41,10 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         exif \
         zip
 
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && echo "xdebug.mode=coverage,debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 RUN echo "date.timezone = Europe/Berlin" > /usr/local/etc/php/conf.d/timezone.ini \
     && echo "memory_limit = 11000M" > /usr/local/etc/php/conf.d/memory-limit.ini \
     && echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/upload-size.ini \
@@ -48,7 +52,7 @@ RUN echo "date.timezone = Europe/Berlin" > /usr/local/etc/php/conf.d/timezone.in
 
 # Php Error Logging
 
-Run echo "error_reporting = E_ALL" > /usr/local/etc/php/conf.d/error-reporting.ini \
+RUN echo "error_reporting = E_ALL" > /usr/local/etc/php/conf.d/error-reporting.ini \
     && echo "display_errors = On" >> /usr/local/etc/php/conf.d/error-reporting.ini \
     && echo "log_errors = On" >> /usr/local/etc/php/conf.d/error-reporting.ini \
     && echo "error_log = /tmp/php_errors.log" >> /usr/local/etc/php/conf.d/error-reporting.ini
