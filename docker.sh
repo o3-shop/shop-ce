@@ -146,7 +146,7 @@ run_tests() {
   # Check if containers are running
   MY_DIR=$(getMyPath)
 
-  containers=(o3shop-app o3shop-db mailpit)
+  containers=(o3shop-app o3shop-db o3shop-mailpit)
   target_container="o3shop-app"
 
   # ---------- check loop ----------
