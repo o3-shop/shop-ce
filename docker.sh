@@ -53,7 +53,12 @@ start_containers() {
 | Shop URL       | http://localhost:8080        |
 | Admin URL      | http://localhoat:8080/admin/ |
 | Admin Login    | admin@example.com            |
-| Admin Password | admin123                     |"
+| Admin Password | admin123                     |
+| -------------- | ---------------------------- |
+| Adminer URL    | http://localhost:8081        |
+| DB Root User   | root                         |
+| DB Root PW     | supersecret                  |
+"
       return 0
     else
         echo "Error: Failed to start Docker containers"
@@ -113,6 +118,19 @@ rebuild_containers() {
       if [ $? -eq 0 ]; then
           echo "Docker containers started successfully"
           $DOCKER_COMPOSE ps
+          echo "
+| Credentials    |
+| -------------- | ---------------------------- |
+| Shop URL       | http://localhost:8080        |
+| Admin URL      | http://localhoat:8080/admin/ |
+| Admin Login    | admin@example.com            |
+| Admin Password | admin123                     |
+| -------------- | ---------------------------- |
+| Adminer URL    | http://localhost:8081        |
+| DB Root User   | root                         |
+| DB Root PW     | supersecret                  |
+          "
+          return 0;
       else
           echo "Error: Failed to start Docker containers"
           exit 1
