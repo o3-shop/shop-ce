@@ -163,7 +163,7 @@ class NavigationController extends AdminController
     {
         $messages = [];
 
-        if (Registry::getConfig()->getConfigParam('blCheckSysReq') !== false) {
+        if (!empty(Registry::getConfig()->getConfigParam('blCheckSysReq'))) {
             // check if system requirements are ok
             $oSysReq = oxNew(\OxidEsales\Eshop\Core\SystemRequirements::class);
             if (!$oSysReq->getSysReqStatus()) {
