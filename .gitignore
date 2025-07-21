@@ -52,6 +52,7 @@ runned.txt
 .env
 /.phpstorm.meta.php/oxid.meta.php
 /source/Application/views/wave/*
+/source/Application/views/o3-theme/*
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
 /source/out/pictures/master/manufacturer/*
@@ -59,6 +60,7 @@ runned.txt
 /source/out/pictures/master/wrapping/img_ecard_03_wp.jpg
 /source/out/pictures/promo/*
 /source/out/wave/*
+/source/out/o3-theme/*
 /var/configuration/shops/1.yaml
 /var/generated/generated_services.yaml
 docker/data
