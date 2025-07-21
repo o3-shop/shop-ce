@@ -68,7 +68,7 @@ class RatingTest extends \OxidTestCase
     {
         $oRating = oxNew('oxwRating');
         $oRating->setViewParameters(array("blCanRate" => true));
-        $this->assertTrue($oRating->canRate());
+        $this->assertTrue((bool)$oRating->canRate());
     }
 
     /**

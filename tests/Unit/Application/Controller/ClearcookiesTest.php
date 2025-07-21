@@ -60,9 +60,14 @@ class ClearcookiesTest extends \OxidTestCase
         $oView = oxNew('ClearCookies');
 
         $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, array('setOxCookie'));
-        $oUtilsServer->expects($this->at(0))->method('setOxCookie')->with($this->equalTo('shop'));
-        $oUtilsServer->expects($this->at(1))->method('setOxCookie')->with($this->equalTo('language'));
-        $oUtilsServer->expects($this->at(2))->method('setOxCookie')->with($this->equalTo('displayedCookiesNotification'));
+        $oUtilsServer->expects($this->exactly(3))
+            ->method('setOxCookie')
+            ->withConsecutive(
+                [$this->equalTo('shop')],
+                [$this->equalTo('language')],
+                [$this->equalTo('displayedCookiesNotification')]
+            );
+
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
 
         $this->assertEquals('page/info/clearcookies.tpl', $oView->render());

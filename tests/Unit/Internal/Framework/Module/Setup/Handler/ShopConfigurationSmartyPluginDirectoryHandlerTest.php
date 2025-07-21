@@ -34,10 +34,12 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Handler\ShopConfigurationSmartyPluginDirectoryHandler;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 /** @internal */
 final class ShopConfigurationSmartyPluginDirectoryHandlerTest extends TestCase
 {
+    use ProphecyTrait;
     public function testHandleOnModuleActivationWithInvalidConfigWillSkipExecution(): void
     {
         $shopId = 1;
@@ -143,8 +145,11 @@ final class ShopConfigurationSmartyPluginDirectoryHandlerTest extends TestCase
             'another-key' => 'another-value',
         ];
         $shopConfig = (new ShopConfigurationSetting())->setValue($initialConfig);
+
+        // Now you can use prophesize() via the trait
         $daoMock = $this->prophesize(ShopConfigurationSettingDaoInterface::class);
         $daoMock->get(ShopConfigurationSetting::MODULE_SMARTY_PLUGIN_DIRECTORIES, $shopId)->willReturn($shopConfig);
+
         $moduleConfig = (new ModuleConfiguration())
             ->setId($moduleId)
             ->addSmartyPluginDirectory(new SmartyPluginDirectory('some-dir'));

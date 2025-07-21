@@ -24,8 +24,7 @@ runned.txt
 
 # Composer
 /vendor/
-/composer.lock
-
+composer.lock
 # Testing library
 /test_config.yml
 /source/Services/
@@ -63,4 +62,6 @@ runned.txt
 /source/out/o3-theme/*
 /var/configuration/shops/1.yaml
 /var/generated/generated_services.yaml
-docker/data
+docker/database/data
+docker/mailpit/data
+coverage

@@ -39,10 +39,23 @@ class PluginSmartyOxScriptTest extends \OxidTestCase
     {
         $this->getConfig()->setConfigParam("iDebug", -1);
 
-        $this->expectWarning();
+        $warningTriggered = false;
+
+        set_error_handler(function($errno, $errstr) use (&$warningTriggered) {
+            if ($errno === E_WARNING || $errno === E_USER_WARNING) {
+                $warningTriggered = true;
+            }
+            return true; // Don't execute PHP's internal error handler
+        });
+
         $oSmarty = new Smarty();
         $this->assertEquals('', smarty_function_oxscript(array('include' => 'somescript.js'), $oSmarty));
+
+        restore_error_handler();
+
+        $this->assertTrue($warningTriggered, 'Expected warning was not triggered');
     }
+
 
     /**
      * Check oxscript include

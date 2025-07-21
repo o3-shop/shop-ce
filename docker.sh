@@ -53,7 +53,13 @@ start_containers() {
 | Shop URL       | http://localhost:8080        |
 | Admin URL      | http://localhoat:8080/admin/ |
 | Admin Login    | admin@example.com            |
-| Admin Password | admin123                     |"
+| Admin Password | admin123                     |
+| -------------- | ---------------------------- |
+| Adminer URL    | http://localhost:8081        |
+| DB Root User   | root                         |
+| DB Root PW     | supersecret                  |
+"
+      return 0
     else
         echo "Error: Failed to start Docker containers"
         exit 1
@@ -112,11 +118,51 @@ rebuild_containers() {
       if [ $? -eq 0 ]; then
           echo "Docker containers started successfully"
           $DOCKER_COMPOSE ps
+          echo "
+| Credentials    |
+| -------------- | ---------------------------- |
+| Shop URL       | http://localhost:8080        |
+| Admin URL      | http://localhoat:8080/admin/ |
+| Admin Login    | admin@example.com            |
+| Admin Password | admin123                     |
+| -------------- | ---------------------------- |
+| Adminer URL    | http://localhost:8081        |
+| DB Root User   | root                         |
+| DB Root PW     | supersecret                  |
+          "
+          return 0;
       else
           echo "Error: Failed to start Docker containers"
           exit 1
       fi
 }
+
+run_tests() {
+  # Define colors for output
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+
+  # Check if containers are running
+  MY_DIR=$(getMyPath)
+
+  containers=(o3shop-app o3shop-db o3shop-mailpit)
+  target_container="o3shop-app"
+
+  # ---------- check loop ----------
+  for c in "${containers[@]}"; do
+      if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
+          echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
+          exit 1
+      fi
+  done
+
+  echo -e "${GREEN}✓ All containers are running – executing tests${NC}"
+
+  # Execute the test script inside the container using here document
+  docker exec -i "$target_container" ./run-tests.sh
+}
+
 
 MY_DIR=$(getMyPath)
 
@@ -149,11 +195,15 @@ case "$1" in
     rebuild)
         rebuild_containers || exit 127
         ;;
+    test)
+        run_tests || exit 127
+        ;;
     *)
         echo "Usage: $0 {start|stop}"
         echo "  start - Start Docker containers"
         echo "  stop  - Stop Docker containers"
         echo "  rebuild  - Rebuild Docker containers"
+        echo "  test  - Run the tests"
         exit
         ;;
 esac

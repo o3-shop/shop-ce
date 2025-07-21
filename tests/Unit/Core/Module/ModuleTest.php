@@ -65,14 +65,21 @@ class ModuleTest extends \OxidTestCase
     {
         $aModulesPaths = array("testModuleId" => "test/path");
         $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array("load", "getModulePaths"));
-        $oModule->expects($this->at(0))->method('getModulePaths')->will($this->returnValue($aModulesPaths));
-        $oModule->expects($this->at(1))->method('load')->with($this->equalTo("noSuchTest/path"))->will($this->returnValue(false));
-        $oModule->expects($this->at(2))->method('getModulePaths')->will($this->returnValue($aModulesPaths));
-        $oModule->expects($this->at(3))->method('load')->with($this->equalTo("testModuleId"))->will($this->returnValue(true));
+        $oModule->expects($this->exactly(2))
+            ->method('getModulePaths')
+            ->willReturn($aModulesPaths);
+        $oModule->expects($this->exactly(2))
+            ->method('load')
+            ->withConsecutive(
+                [$this->equalTo("noSuchTest/path")],
+                [$this->equalTo("testModuleId")]
+            )
+            ->willReturnOnConsecutiveCalls(false, true);
 
         $this->assertFalse($oModule->loadByDir("noSuchTest/path"));
         $this->assertTrue($oModule->loadByDir("test/path"));
     }
+
 
     /**
      * oxModule::getInfo() test case

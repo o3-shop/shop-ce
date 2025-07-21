@@ -41,13 +41,31 @@ And just if you missed the docker log message:
 
 If you finish the setup, all emails are being sent to mailpit. You reach it at http://localhost:8025.
 
-### adminer
+#### adminer
 
 Also, an adminer comes with the standard installation. Try http://localhost:8081.
 
+### Testing 
+
+To run the tests, you have 2 choices. 
+1. Just run `./docker.sh test` in your terminal.
+<br>or 
+2. Run `./run-tests.sh` inside the docker container
+
+This will run all tests in the shop core package.
+
+#### Coverage HTML report
+The Code Coverage is inside `coverage/html/index.html`. You can open it in your browser to see the results.
+
+#### Coverage PhpStorm report
+To view your coverage report directly in PhpStorm:
+1.	Open the Coverage tab in PhpStorm
+2.	Select “Import a report collected in CI from disk”
+3.	Choose `coverage/coverage.xml`
+Your coverage report will now display within the IDE.
 # Bugs and issues
 
-If you experience any bugs or issues, please report them in the section **O3-Shop (all versions)** of [https://github.com/o3-shop/shop-ce/issues](https://github.com/o3-shop/shop-ce/issues).
+If you experience any bugs or issues, please report them in the section **O3-Shop (all versions)** of [https://github.com/o3-shop/o3-shop/issues](https://github.com/o3-shop/shop-ce/issues).
 
 Even better: Fix them on your on and open a pull request. 🥳
 

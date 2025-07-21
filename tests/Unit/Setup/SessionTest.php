@@ -53,7 +53,9 @@ class SessionTest extends \OxidTestCase
     {
         $oSession = $this->_getSessionMock(array('setSessionParam', '_getNewSessionID'));
         $oSession->setIsNewSession(true);
-        $oSession->expects($this->at(0))->method('setSessionParam')->with($this->equalTo('setup_session'), $this->equalTo(true));
+        $oSession->expects($this->once())
+            ->method('setSessionParam')
+            ->with($this->equalTo('setup_session'), $this->equalTo(true));
         $oSession->expects($this->never())->method('_getNewSessionID');
         $oSession->UNITvalidateSession();
     }
@@ -65,9 +67,14 @@ class SessionTest extends \OxidTestCase
     {
         $oSession = $this->_getSessionMock(array('setSessionParam', 'getSessionParam', '_getNewSessionID'));
         $oSession->setIsNewSession(null);
-        $oSession->expects($this->at(0))->method('getSessionParam')->with($this->equalTo('setup_session'))->will($this->returnValue(null));
-        $oSession->expects($this->at(1))->method('_getNewSessionID')->will($this->returnValue($this->generateUniqueSessionId()));
-        $oSession->expects($this->at(2))->method('setSessionParam')->with($this->equalTo('setup_session'), $this->equalTo(true));
+        $oSession->expects($this->exactly(3))
+            ->method($this->logicalOr('getSessionParam', '_getNewSessionID', 'setSessionParam'))
+            ->withConsecutive(
+                [$this->equalTo('setup_session')],
+                [],
+                [$this->equalTo('setup_session'), $this->equalTo(true)]
+            )
+            ->willReturnOnConsecutiveCalls(null, $this->generateUniqueSessionId(), null);
         $oSession->UNITvalidateSession();
     }
 
@@ -78,7 +85,10 @@ class SessionTest extends \OxidTestCase
     {
         $oSession = $this->_getSessionMock(array('setSessionParam', 'getSessionParam', '_getNewSessionID'));
         $oSession->setIsNewSession(null);
-        $oSession->expects($this->at(0))->method('getSessionParam')->with($this->equalTo('setup_session'))->will($this->returnValue(true));
+        $oSession->expects($this->once())
+            ->method('getSessionParam')
+            ->with($this->equalTo('setup_session'))
+            ->willReturn(true);
         $oSession->expects($this->never())->method('_getNewSessionID');
         $oSession->expects($this->never())->method('setSessionParam');
         $oSession->UNITvalidateSession();
@@ -139,7 +149,9 @@ class SessionTest extends \OxidTestCase
         $aParams = array('testKey' => 'testParam');
 
         $oSession = $this->_getSessionMock(array('_getSessionData'));
-        $oSession->expects($this->at(0))->method('_getSessionData')->will($this->returnValue($aParams));
+        $oSession->expects($this->once())
+            ->method('_getSessionData')
+            ->willReturn($aParams);
 
         $this->assertSame(null, $oSession->getSessionParam('testBadKey'), 'Incorrect not found response.');
     }
@@ -152,7 +164,9 @@ class SessionTest extends \OxidTestCase
         $aParams = array('testKey' => 'testParam');
 
         $oSession = $this->_getSessionMock(array('_getSessionData'));
-        $oSession->expects($this->at(0))->method('_getSessionData')->will($this->returnValue($aParams));
+        $oSession->expects($this->once())
+            ->method('_getSessionData')
+            ->willReturn($aParams);
 
         $this->assertSame('testParam', $oSession->getSessionParam('testKey'), 'Incorrect found response.');
     }
