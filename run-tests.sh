@@ -32,7 +32,7 @@ echo "----------------------------------------"
 START_TIME=$(date +%s)
 
 # Run the tests and store exit code
-runtests /var/www/html/tests/Unit --colors=always
+runtests /var/www/html/tests/Unit --colors=always --coverage-clover /var/www/html/coverage/coverage.xml --coverage-html /var/www/html/coverage/html --log-junit /var/www/html/coverage/junit.xml
 TEST_EXIT_CODE=$?
 
 # Record end time
