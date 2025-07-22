@@ -444,7 +444,9 @@ class AjaxListComponentTest extends \OxidTestCase
 
         $oComponent = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax::class, array("getConfig", "_output"));
         $oComponent->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
+        ob_start();
         $oComponent->UNIToutputResponse($aData);
+        $output = ob_get_clean();
     }
 
     /**
