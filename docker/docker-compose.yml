@@ -24,6 +24,7 @@ services:
       - ./../:/var/www/html
     environment:
       PATH: /var/www/html/vendor/o3-shop/testing-library/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      TZ: Europe/Berlin
     ports:
       - "8080:80"
     working_dir: /var/www/html
