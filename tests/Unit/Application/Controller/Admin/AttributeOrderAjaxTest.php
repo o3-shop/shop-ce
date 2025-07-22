@@ -121,8 +121,9 @@ class AttributeOrderAjaxTest extends \OxidTestCase
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, array("_output"));
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
+        ob_start();
         $oView->setsorting();
-
+        $output = ob_get_clean();
         $this->assertEquals(1, oxDb::getDb()->getOne("select sum(oxsort) from oxcategory2attribute where oxobjectid='_testObject'"));
     }
 

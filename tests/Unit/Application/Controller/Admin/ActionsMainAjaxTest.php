@@ -323,7 +323,9 @@ class ActionsMainAjaxTest extends \OxidTestCase
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class, array("_output"));
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
+        ob_start();
         $oView->setsorting();
+        $output = ob_get_clean();
     }
 
     /**
@@ -343,7 +345,9 @@ class ActionsMainAjaxTest extends \OxidTestCase
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class, array("_output"));
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
+        ob_start();
         $oView->setsorting();
+        $output = ob_get_clean();
     }
 
     public function getArticleViewTable()
