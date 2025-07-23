@@ -239,7 +239,7 @@ class NavigationController extends AdminController
 
         $latestVersion = $data['name'] ?? null;
 
-        Registry::getLogger()->alert("Release name: " . $latestVersion, $data);
+        Registry::getLogger()->debug("Latest Release name: " . $latestVersion);
 
         if ($latestVersion) {
             $currentVersion = oxNew(ShopVersion::class)->getVersion();
