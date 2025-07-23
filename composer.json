@@ -103,7 +103,7 @@
             }
         },
         "branch-alias": {
-            "dev-main": "1.4.x-dev"
+            "dev-main": "dev-b-1.5-changes"
         }
     },
     "config": {
