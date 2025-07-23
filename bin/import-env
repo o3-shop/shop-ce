@@ -1,0 +1,67 @@
+#!/usr/bin/env php
+<?php
+
+// Step 1: Load config.inc.php values via a dummy class
+class ConfigLoader {
+    public $dbHost;
+    public $dbPort;
+    public $dbName;
+    public $dbUser;
+    public $dbPwd;
+    public $sShopURL;
+    public $sShopDir;
+    public $sCompileDir;
+
+    public function load($path) {
+        if (!file_exists($path)) {
+            throw new RuntimeException("Config file not found at $path");
+        }
+        include $path;
+    }
+}
+
+$configPath = __DIR__ . '/../config.inc.php';
+$config = new ConfigLoader();
+$config->load($configPath);
+
+// Step 2: Build env replacements map
+$configUpdates = [
+    "O3SHOP_CONF_DBHOST"        => $config->dbHost,
+    "O3SHOP_CONF_DBPORT"        => $config->dbPort,
+    "O3SHOP_CONF_DBNAME"        => $config->dbName,
+    "O3SHOP_CONF_DBUSER"        => $config->dbUser,
+    "O3SHOP_CONF_DBPWD"         => $config->dbPwd,
+    "O3SHOP_CONF_SHOPURL"       => $config->sShopURL,
+    "O3SHOP_CONF_SHOPDIR"       => $config->sShopDir,
+    "O3SHOP_CONF_COMPILEDIR"    => $config->sCompileDir,
+];
+
+// Step 3: Read existing .env file
+$envPath = __DIR__ . '/../../.env';
+$envLines = file_exists($envPath) ? file($envPath, FILE_IGNORE_NEW_LINES) : [];
+
+$processedKeys = [];
+foreach ($envLines as &$line) {
+    if (preg_match('/^([A-Z0-9_]+)=/', $line, $matches)) {
+        $key = $matches[1];
+        if (isset($configUpdates[$key])) {
+            $line = $key . '="' . $configUpdates[$key] . '"';
+            $processedKeys[] = $key;
+        }
+    }
+}
+unset($line); // break reference
+
+// Step 4: Add missing keys
+foreach ($configUpdates as $key => $value) {
+    if (!in_array($key, $processedKeys)) {
+        $envLines[] = $key . '="' . $value . '"';
+    }
+}
+
+// Step 5: Write back .env file
+if (file_put_contents($envPath, implode(PHP_EOL, $envLines) . PHP_EOL)) {
+    echo "✅ .env file successfully updated at: $envPath\n";
+} else {
+    echo "❌ Failed to update .env file.\n";
+}
