@@ -165,7 +165,7 @@ jobs:
             --colors=always \
             --coverage-clover="$CURRENT_DIR/coverage.xml" \
             --coverage-html="$CURRENT_DIR/coverage-html/" \
-            --log-junit $CURRENT_DIR/junit.xml
+            --log-junit="$CURRENT_DIR/junit.xml"
           echo "::endgroup::"
 
       - name: ☁️ Upload Coverage Report (HTML)
