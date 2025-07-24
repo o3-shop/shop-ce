@@ -86,10 +86,10 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testInitInv()
     {
-        $this->getConfig()->setConfigParam("blInvitationsEnabled", true);
+        $this->getConfig()->setConfigParam('blInvitationsEnabled', true);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getInvitor"), array(), '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getInvitor'], [], '', false);
         $oView->expects($this->atLeastOnce())->method('getInvitor');
         $oView->init();
     }
@@ -117,26 +117,26 @@ class UserComponentTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtils', 'redirect', '{ throw new Exception($aA[0]); }');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("getShopHomeURL"));
-        $oConfig->expects($this->atLeastOnce())->method('getShopHomeURL')->will($this->returnValue("testUrl"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopHomeURL']);
+        $oConfig->expects($this->atLeastOnce())->method('getShopHomeURL')->will($this->returnValue('testUrl'));
 
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("getClassName", "isEnabledPrivateSales"));
-        $oParent->expects($this->atLeastOnce())->method('getClassName')->will($this->returnValue("test"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['getClassName', 'isEnabledPrivateSales']);
+        $oParent->expects($this->atLeastOnce())->method('getClassName')->will($this->returnValue('test'));
         $oParent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(true));
 
         try {
             // testing..
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getUser", "getConfig", "getParent"), array(), '', false);
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', 'getConfig', 'getParent'], [], '', false);
             $oView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(false));
             $oView->expects($this->atLeastOnce())->method('getParent')->will($this->returnValue($oParent));
             $oView->expects($this->atLeastOnce())->method('getConfig')->will($this->returnValue($oConfig));
             $oView->render();
         } catch (Exception $oExcp) {
-            $this->assertEquals("testUrlcl=account", $oExcp->getMessage(), "Error in oxscloginoxcmpuser::render()");
+            $this->assertEquals('testUrlcl=account', $oExcp->getMessage(), 'Error in oxscloginoxcmpuser::render()');
 
             return;
         }
-        $this->fail("Error in oxscloginoxcmpuser::render()");
+        $this->fail('Error in oxscloginoxcmpuser::render()');
     }
 
     /**
@@ -149,18 +149,18 @@ class UserComponentTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtils', 'redirect', '{ throw new Exception($aA[0]); }');
         $this->setRequestParameter('cl', 'register');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("getShopHomeURL"));
-        $oConfig->expects($this->any())->method('getShopHomeURL')->will($this->returnValue("testUrl"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopHomeURL']);
+        $oConfig->expects($this->any())->method('getShopHomeURL')->will($this->returnValue('testUrl'));
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("isTermsAccepted"));
-        $oUser->expects($this->any())->method('isTermsAccepted')->will($this->throwException(new Exception("isTermsAccepted")));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['isTermsAccepted']);
+        $oUser->expects($this->any())->method('isTermsAccepted')->will($this->throwException(new Exception('isTermsAccepted')));
 
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("getClassName", "isEnabledPrivateSales"));
-        $oParent->expects($this->atLeastOnce())->method('getClassName')->will($this->returnValue("test"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['getClassName', 'isEnabledPrivateSales']);
+        $oParent->expects($this->atLeastOnce())->method('getClassName')->will($this->returnValue('test'));
         $oParent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(true));
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getUser", "getConfig", "_checkTermVersion", "getParent"), array(), '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', 'getConfig', '_checkTermVersion', 'getParent'], [], '', false);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
         $oView->expects($this->any())->method('getParent')->will($this->returnValue($oParent));
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
@@ -168,11 +168,11 @@ class UserComponentTest extends \OxidTestCase
         try {
             $this->assertFalse($oView->render());
         } catch (Exception $oExcp) {
-            $this->assertEquals("isTermsAccepted", $oExcp->getMessage(), "Error in testRenderRegistration");
+            $this->assertEquals('isTermsAccepted', $oExcp->getMessage(), 'Error in testRenderRegistration');
 
             return;
         }
-        $this->fail("Error in testRenderRegistration");
+        $this->fail('Error in testRenderRegistration');
     }
 
     /**
@@ -183,31 +183,31 @@ class UserComponentTest extends \OxidTestCase
     public function testRenderConfirmTerms()
     {
         oxTestModules::addFunction('oxUtils', 'redirect', '{ throw new Exception($aA[0]); }');
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", true);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', true);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("getShopHomeURL", "getConfigParam"));
-        $oConfig->expects($this->any())->method('getShopHomeURL')->will($this->returnValue("testUrl"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopHomeURL', 'getConfigParam']);
+        $oConfig->expects($this->any())->method('getShopHomeURL')->will($this->returnValue('testUrl'));
         $oConfig->expects($this->any())->method('getConfigParam')->will($this->returnValue(true));
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("isTermsAccepted"));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['isTermsAccepted']);
         $oUser->expects($this->any())->method('isTermsAccepted')->will($this->returnValue(false));
 
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("getClassName"));
-        $oParent->expects($this->atLeastOnce())->method('getClassName')->will($this->returnValue("test"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['getClassName']);
+        $oParent->expects($this->atLeastOnce())->method('getClassName')->will($this->returnValue('test'));
 
         try {
             // testing..
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getUser", "getConfig", "getParent"), array(), '', false);
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', 'getConfig', 'getParent'], [], '', false);
             $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
             $oView->expects($this->any())->method('getParent')->will($this->returnValue($oParent));
             $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
             $oView->render();
         } catch (Exception $oExcp) {
-            $this->assertEquals("testUrlcl=account&term=1", $oExcp->getMessage(), "Error in oxscloginoxcmpuser::render()");
+            $this->assertEquals('testUrlcl=account&term=1', $oExcp->getMessage(), 'Error in oxscloginoxcmpuser::render()');
 
             return;
         }
-        $this->fail("Error in oxscloginoxcmpuser::render()");
+        $this->fail('Error in oxscloginoxcmpuser::render()');
     }
 
     /**
@@ -218,19 +218,19 @@ class UserComponentTest extends \OxidTestCase
     public function testLogoutForLoginFeature()
     {
         if ($this->getConfig()->getEdition() === 'EE') {
-            $this->markTestSkipped("Skip CE/PE related tests for EE edition");
+            $this->markTestSkipped('Skip CE/PE related tests for EE edition');
         }
 
-        oxTestModules::addFunction("oxUser", "logout", "{ return true;}");
+        oxTestModules::addFunction('oxUser', 'logout', '{ return true;}');
 
-        $aMockFnc = array('_afterLogout', '_getLogoutLink', 'getParent');
+        $aMockFnc = ['_afterLogout', '_getLogoutLink', 'getParent'];
 
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $oParent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(true));
 
         $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, $aMockFnc);
         $oUserView->expects($this->once())->method('_afterLogout');
-        $oUserView->expects($this->any())->method('_getLogoutLink')->will($this->returnValue("testurl"));
+        $oUserView->expects($this->any())->method('_getLogoutLink')->will($this->returnValue('testurl'));
         $oUserView->expects($this->any())->method('getParent')->will($this->returnValue($oParent));
 
         $this->assertEquals('account', $oUserView->logout());
@@ -246,13 +246,13 @@ class UserComponentTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('blConfirmAGB', true);
         $this->setRequestParameter('ord_agb', true);
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("acceptTerms"));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['acceptTerms']);
         $oUser->expects($this->once())->method('acceptTerms');
 
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $oParent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(true));
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('login', 'getUser', 'getParent'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['login', 'getUser', 'getParent']);
         $oUserView->expects($this->never())->method('login');
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($oUser));
         $oUserView->expects($this->atLeastOnce())->method('getParent')->will($this->returnValue($oParent));
@@ -266,29 +266,29 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUserForLoginFeature()
     {
-        oxTestModules::addFunction("oxemail", "sendRegisterEmail", "{ return true;}");
+        oxTestModules::addFunction('oxemail', 'sendRegisterEmail', '{ return true;}');
         $this->setRequestParameter('lgn_usr', 'test@oxid-esales.com');
         $this->setRequestParameter('lgn_pwd', 'Test@oxid-esales.com');
         $this->setRequestParameter('lgn_pwd2', 'Test@oxid-esales.com');
         $this->setRequestParameter('ord_agb', true);
         $this->setRequestParameter('option', 3);
-        $rawVal = array('oxuser__oxfname'     => 'fname',
+        $rawVal = ['oxuser__oxfname'     => 'fname',
                          'oxuser__oxlname'     => 'lname',
                          'oxuser__oxstreetnr'  => 'nr',
                          'oxuser__oxstreet'    => 'street',
                          'oxuser__oxzip'       => 'zip',
                          'oxuser__oxcity'      => 'city',
-                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984');
+                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'];
         $this->setRequestParameter('invadr', $rawVal);
 
-        $this->getConfig()->setConfigParam("blInvitationsEnabled", false);
+        $this->getConfig()->setConfigParam('blInvitationsEnabled', false);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(true));
 
-        $userView = $this->getMock($this->getProxyClassName("oxcmp_user"), array('login', 'getParent'));
+        $userView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['login', 'getParent']);
         $userView->expects($this->any())->method('login')->will($this->returnValue('payment'));
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
 
@@ -303,34 +303,34 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUserForInvitationFeature()
     {
-        oxTestModules::addFunction("oxuser", "checkValues", "{ return true;}");
-        oxTestModules::addFunction("oxuser", "setPassword", "{ return true;}");
-        oxTestModules::addFunction("oxuser", "createUser", "{ return true;}");
-        oxTestModules::addFunction("oxuser", "load", "{ return true;}");
-        oxTestModules::addFunction("oxuser", "changeUserData", "{ return true;}");
-        oxTestModules::addFunction("oxuser", "setCreditPointsForRegistrant", "{ throw new Exception('setCreditPointsForRegistrant');}");
+        oxTestModules::addFunction('oxuser', 'checkValues', '{ return true;}');
+        oxTestModules::addFunction('oxuser', 'setPassword', '{ return true;}');
+        oxTestModules::addFunction('oxuser', 'createUser', '{ return true;}');
+        oxTestModules::addFunction('oxuser', 'load', '{ return true;}');
+        oxTestModules::addFunction('oxuser', 'changeUserData', '{ return true;}');
+        oxTestModules::addFunction('oxuser', 'setCreditPointsForRegistrant', "{ throw new Exception('setCreditPointsForRegistrant');}");
 
         $this->getSession()->setVariable('su', 'testUser');
         $this->getSession()->setVariable('re', 'testUser');
-        $this->getConfig()->setConfigParam("blInvitationsEnabled", true);
+        $this->getConfig()->setConfigParam('blInvitationsEnabled', true);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_getDelAddressData', 'getParent'));
+        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_getDelAddressData', 'getParent']);
         $userView->expects($this->atLeastOnce())->method('_getDelAddressData');
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
 
         try {
             $userView->createUser();
         } catch (Exception $oExcp) {
-            $this->assertEquals('setCreditPointsForRegistrant', $oExcp->getMessage(), "Error while running testCreateUserForInvitationFeature");
+            $this->assertEquals('setCreditPointsForRegistrant', $oExcp->getMessage(), 'Error while running testCreateUserForInvitationFeature');
 
             return;
         }
-        $this->fail("Error while running testCreateUserForInvitationFeature");
+        $this->fail('Error while running testCreateUserForInvitationFeature');
     }
 
     /**
@@ -344,14 +344,14 @@ class UserComponentTest extends \OxidTestCase
 
         $this->mockSessionChallenge();
 
-        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array("addErrorToDisplay"));
+        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['addErrorToDisplay']);
         $utilsView->expects($this->once())->method('addErrorToDisplay')->with($this->equalTo('READ_AND_CONFIRM_TERMS'), $this->equalTo(false), $this->equalTo(true));
         Registry::set(\OxidEsales\Eshop\Core\UtilsView::class, $utilsView);
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(true));
 
-        $userView = $this->getMock($this->getProxyClassName("oxcmp_user"), array('getParent'));
+        $userView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getParent']);
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
         $this->assertFalse($userView->createUser());
     }
@@ -370,11 +370,11 @@ class UserComponentTest extends \OxidTestCase
     public function testGetLogoutLink()
     {
         // note: modConfig mock fails for php 520
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getShopHomeUrl', 'isSsl'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopHomeUrl', 'isSsl']);
         $oConfig->expects($this->any())->method('getShopHomeUrl')->will($this->returnValue('shopurl/?'));
         $oConfig->expects($this->any())->method('isSsl')->will($this->returnValue(false));
 
-        $oView = $this->getMock(\OxidEsales\EshopCommunity\Tests\Integration\Application\Component\modcmp_user::class, array('getConfig'));
+        $oView = $this->getMock(\OxidEsales\EshopCommunity\Tests\Integration\Application\Component\modcmp_user::class, ['getConfig']);
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->setRequestParameter('cl', 'testclass');
@@ -385,19 +385,19 @@ class UserComponentTest extends \OxidTestCase
         $this->setRequestParameter('oxloadid', 'test');
         $this->setRequestParameter('recommid', 'recommid');
         $sLink = $oView->getLogoutLink();
-        $sExpLink = "shopurl/?cl=testclass&amp;searchparam=a&amp;anid=artid&amp;cnid=catid&amp;mnid=manId" .
-                    "&amp;tpl=test&amp;oxloadid=test&amp;recommid=recommid&amp;fnc=logout";
+        $sExpLink = 'shopurl/?cl=testclass&amp;searchparam=a&amp;anid=artid&amp;cnid=catid&amp;mnid=manId' .
+                    '&amp;tpl=test&amp;oxloadid=test&amp;recommid=recommid&amp;fnc=logout';
 
         $this->assertEquals($sExpLink, $sLink);
     }
 
     public function testGetLogoutLinkIfSsl()
     {
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getShopSecureHomeUrl', 'getShopHomeUrl', 'isSsl'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopSecureHomeUrl', 'getShopHomeUrl', 'isSsl']);
         $oConfig->expects($this->any())->method('getShopSecureHomeUrl')->will($this->returnValue('sslshopurl/?'));
         $oConfig->expects($this->any())->method('isSsl')->will($this->returnValue(true));
 
-        $oView = $this->getMock(\OxidEsales\EshopCommunity\Tests\Integration\Application\Component\modcmp_user::class, array('getConfig'));
+        $oView = $this->getMock(\OxidEsales\EshopCommunity\Tests\Integration\Application\Component\modcmp_user::class, ['getConfig']);
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
         $this->setRequestParameter('cl', 'testclass');
         $this->setRequestParameter('cnid', 'catid');
@@ -405,29 +405,29 @@ class UserComponentTest extends \OxidTestCase
         $this->setRequestParameter('anid', 'artid');
         $this->setRequestParameter('tpl', 'test');
         $sLink = $oView->getLogoutLink();
-        $sExpLink = "sslshopurl/?cl=testclass&amp;searchparam=a&amp;anid=artid&amp;cnid=catid&amp;mnid=manId" .
-                    "&amp;tpl=test&amp;fnc=logout";
+        $sExpLink = 'sslshopurl/?cl=testclass&amp;searchparam=a&amp;anid=artid&amp;cnid=catid&amp;mnid=manId' .
+                    '&amp;tpl=test&amp;fnc=logout';
 
         $this->assertEquals($sExpLink, $sLink);
     }
 
     public function testChangeUserNoRedirectChecksSessionChallenge()
     {
-        $oS = $this->getMock(Session::class, array('checkSessionChallenge'));
+        $oS = $this->getMock(Session::class, ['checkSessionChallenge']);
         $oS->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(false));
         Registry::set(Session::class, $oS);
 
-        $oCU = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getUser', 'getSession'));
+        $oCU = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', 'getSession']);
         $oCU->expects($this->never())->method('getUser')->will($this->returnValue(false));
         $oCU->method('getSession')->will($this->returnValue($oS));
 
         $this->assertSame(null, $oCU->UNITchangeUser_noRedirect());
 
-        $oS = $this->getMock(Session::class, array('checkSessionChallenge'));
+        $oS = $this->getMock(Session::class, ['checkSessionChallenge']);
         $oS->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oS);
 
-        $oCU = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getUser', 'getSession'));
+        $oCU = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', 'getSession']);
         $oCU->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(false));
         $oCU->method('getSession')->will($this->returnValue($oS));
 
@@ -452,12 +452,12 @@ class UserComponentTest extends \OxidTestCase
         $oUser->oxuser__oxpassword = new oxField($paswordHash);
         $oUser->oxuser__oxpasssalt = new oxField($salt, oxField::T_RAW);
         $oUser->oxuser__oxcustnr = new oxField($iLastCustNr + 1, oxField::T_RAW);
-        $oUser->oxuser__oxcountryid = new oxField("testCountry", oxField::T_RAW);
+        $oUser->oxuser__oxcountryid = new oxField('testCountry', oxField::T_RAW);
         $oUser->save();
         $sQ = 'insert into oxaddress ( oxid, oxuserid, oxaddressuserid, oxcountryid ) values ( "test_user", "' . $oUser->getId() . '", "' . $oUser->getId() . '", "testCountry" ) ';
         $myDB->Execute($sQ);
 
-        oxTestModules::addFunction("oxUtils", "redirect", "{ throw new exception( 'testBlockedUser', 123 );}");
+        oxTestModules::addFunction('oxUtils', 'redirect', "{ throw new exception( 'testBlockedUser', 123 );}");
 
         $oUser2 = oxNew('oxuser');
         $oUser2->load($oUser->getId());
@@ -491,13 +491,13 @@ class UserComponentTest extends \OxidTestCase
         $this->setRequestParameter('deladr', 'testdeladr');
         $this->setRequestParameter('reloadaddress', false);
         $this->setRequestParameter('lgn_usr', 'testuser');
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", false);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', false);
 
         $oParent = oxNew('oxUbase');
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getParent', 'getUser'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getParent', 'getUser']);
         $oUserView->expects($this->atLeastOnce())->method('getParent')->will($this->returnValue($oParent));
-        $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue("testUser"));
+        $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue('testUser'));
         $this->assertEquals('testUser', $oUserView->render());
     }
 
@@ -509,14 +509,14 @@ class UserComponentTest extends \OxidTestCase
     public function testLoadSessionUser()
     {
         $this->setRequestParameter('blPerfNoBasketSaving', false);
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('onUpdate'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['onUpdate']);
         $oBasket->expects($this->once())->method('onUpdate');
-        $oSession = $this->getMock(Session::class, array('getBasket'));
+        $oSession = $this->getMock(Session::class, ['getBasket']);
         $oSession->expects($this->atLeastOnce())->method('getBasket')->will($this->returnValue($oBasket));
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('inGroup', 'isLoadedFromCookie'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['inGroup', 'isLoadedFromCookie']);
         $oUser->expects($this->once())->method('inGroup')->will($this->returnValue(false));
-        $oUser->expects($this->atLeastOnce())->method('isLoadedFromCookie')->will($this->returnValue("testUser"));
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getSession', 'getUser'));
+        $oUser->expects($this->atLeastOnce())->method('isLoadedFromCookie')->will($this->returnValue('testUser'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getSession', 'getUser']);
         $oUserView->expects($this->atLeastOnce())->method('getSession')->will($this->returnValue($oSession));
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($oUser));
         $oUserView->UNITloadSessionUser();
@@ -529,7 +529,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testLoadSessionUserIfUserIsNotSet()
     {
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getSession', 'getUser'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getSession', 'getUser']);
         $oUserView->expects($this->never())->method('getSession');
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(false));
         $this->assertNull($oUserView->UNITloadSessionUser());
@@ -542,12 +542,12 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testLogin()
     {
-        oxTestModules::addFunction("oxUser", "login", "{ return true;}");
+        oxTestModules::addFunction('oxUser', 'login', '{ return true;}');
         $this->setRequestParameter('lgn_usr', 'test@oxid-esales.com');
         $this->setRequestParameter('lgn_pwd', crc32('Test@oxid-esales.com'));
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_afterLogin'));
-        $oUserView->expects($this->atLeastOnce())->method('_afterLogin')->will($this->returnValue("nextStep"));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_afterLogin']);
+        $oUserView->expects($this->atLeastOnce())->method('_afterLogin')->will($this->returnValue('nextStep'));
         $this->assertEquals('nextStep', $oUserView->login());
     }
 
@@ -558,7 +558,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testLoginUserException()
     {
-        oxTestModules::addFunction("oxUser", "login", "{ throw new oxUserException( 'testWrongUser', 123 );}");
+        oxTestModules::addFunction('oxUser', 'login', "{ throw new oxUserException( 'testWrongUser', 123 );}");
 
         $oUserView = oxNew('oxcmp_user');
         $this->assertEquals('user', $oUserView->login());
@@ -571,7 +571,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testLoginCookieException()
     {
-        oxTestModules::addFunction("oxUser", "login", "{ throw new oxCookieException( 'testWrongUser', 123 );}");
+        oxTestModules::addFunction('oxUser', 'login', "{ throw new oxCookieException( 'testWrongUser', 123 );}");
 
         $oUserView = oxNew('oxcmp_user');
         $this->assertEquals('user', $oUserView->login());
@@ -585,21 +585,21 @@ class UserComponentTest extends \OxidTestCase
     public function testAfterLogin()
     {
         if ($this->getConfig()->getEdition() === 'EE') {
-            $this->markTestSkipped("Skip CE/PE related tests for EE edition");
+            $this->markTestSkipped('Skip CE/PE related tests for EE edition');
         }
 
         $this->setRequestParameter('blPerfNoBasketSaving', true);
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('onUpdate'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['onUpdate']);
         $oBasket->expects($this->once())->method('onUpdate');
 
         $oSession = $this->getMock(Session::class, [
-            'getBasket', 'regenerateSessionId', 'isSessionStarted'
+            'getBasket', 'regenerateSessionId', 'isSessionStarted',
         ]);
         $oSession->expects($this->atLeastOnce())->method('getBasket')->will($this->returnValue($oBasket));
         $oSession->method('isSessionStarted')->willReturn(true);
         $oSession->expects($this->once())->method('regenerateSessionId');
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('inGroup'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['inGroup']);
         $oUser->expects($this->once())->method('inGroup')->will($this->returnValue(false));
 
         $aMockFnc = ['getSession'];
@@ -615,8 +615,8 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testAfterLoginIfBlockedUser()
     {
-        oxTestModules::addFunction("oxUtils", "redirect", "{ throw new exception( 'testBlockedUser', 123 );}");
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('inGroup'));
+        oxTestModules::addFunction('oxUtils', 'redirect', "{ throw new exception( 'testBlockedUser', 123 );}");
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['inGroup']);
         $oUser->expects($this->once())->method('inGroup')->will($this->returnValue(true));
 
         try {
@@ -637,11 +637,11 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testLoginNoRedirect()
     {
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $oParent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('login', 'getParent'));
-        $oUserView->expects($this->once())->method('login')->will($this->returnValue("nextStep"));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['login', 'getParent']);
+        $oUserView->expects($this->once())->method('login')->will($this->returnValue('nextStep'));
         $oUserView->expects($this->any())->method('getParent')->will($this->returnValue($oParent));
         $this->assertNull($oUserView->login_noredirect());
     }
@@ -657,12 +657,12 @@ class UserComponentTest extends \OxidTestCase
         $this->getSession()->setVariable('sShipSet', 'test');
         $this->getSession()->setVariable('deladrid', 'test');
         $this->getSession()->setVariable('dynvalue', 'test');
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('onUpdate', 'resetUserInfo'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['onUpdate', 'resetUserInfo']);
         $oBasket->expects($this->once())->method('onUpdate');
         $oBasket->expects($this->once())->method('resetUserInfo');
-        $oSession = $this->getMock(Session::class, array('getBasket'));
+        $oSession = $this->getMock(Session::class, ['getBasket']);
         $oSession->expects($this->atLeastOnce())->method('getBasket')->will($this->returnValue($oBasket));
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getSession'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getSession']);
         $oUserView->expects($this->atLeastOnce())->method('getSession')->will($this->returnValue($oSession));
         $oUserView->UNITafterLogout();
         $this->assertNull(oxRegistry::getSession()->getVariable('paymentid'));
@@ -679,22 +679,22 @@ class UserComponentTest extends \OxidTestCase
     public function testLogout()
     {
         if ($this->getConfig()->getEdition() === 'EE') {
-            $this->markTestSkipped("Skip CE/PE related tests for EE edition");
+            $this->markTestSkipped('Skip CE/PE related tests for EE edition');
         }
 
-        oxTestModules::addFunction("oxUtils", "redirect", "{ return true;}");
-        oxTestModules::addFunction("oxUser", "logout", "{ return true;}");
+        oxTestModules::addFunction('oxUtils', 'redirect', '{ return true;}');
+        oxTestModules::addFunction('oxUser', 'logout', '{ return true;}');
         $this->setRequestParameter('redirect', true);
         $blParam = $this->getConfig()->getConfigParam('sSSLShopURL');
         $this->getConfig()->setConfigParam('sSSLShopURL', true);
 
-        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $oParent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $oParent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $aMockFnc = array('_afterLogout', '_getLogoutLink', 'getParent');
+        $aMockFnc = ['_afterLogout', '_getLogoutLink', 'getParent'];
         $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, $aMockFnc);
         $oUserView->expects($this->once())->method('_afterLogout');
-        $oUserView->expects($this->once())->method('_getLogoutLink')->will($this->returnValue("testurl"));
+        $oUserView->expects($this->once())->method('_getLogoutLink')->will($this->returnValue('testurl'));
         $oUserView->expects($this->any())->method('getParent')->will($this->returnValue($oParent));
 
         $oUserView->logout();
@@ -709,7 +709,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUser()
     {
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_changeUser_noRedirect'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_changeUser_noRedirect']);
         $oUserView->expects($this->once())->method('_changeUser_noRedirect')->will($this->returnValue(true));
         $this->assertEquals('payment', $oUserView->changeUser());
     }
@@ -721,7 +721,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUserIfNotRegisteredUser()
     {
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_changeUser_noRedirect'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_changeUser_noRedirect']);
         $oUserView->expects($this->once())->method('_changeUser_noRedirect')->will($this->returnValue(false));
         $this->assertFalse($oUserView->changeUser());
     }
@@ -733,7 +733,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUserTestValues()
     {
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_changeUser_noRedirect'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_changeUser_noRedirect']);
         $oUserView->expects($this->once())->method('_changeUser_noRedirect')->will($this->returnValue(true));
         $this->assertEquals('account_user', $oUserView->changeuser_testvalues());
     }
@@ -745,7 +745,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUserTestValuesOnError()
     {
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_changeUser_noRedirect'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_changeUser_noRedirect']);
         $oUserView->expects($this->once())->method('_changeUser_noRedirect')->will($this->returnValue(null));
         $this->assertEquals(null, $oUserView->changeuser_testvalues());
     }
@@ -755,29 +755,29 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUser()
     {
-        oxTestModules::addFunction("oxemail", "sendRegisterEmail", "{ return true;}");
+        oxTestModules::addFunction('oxemail', 'sendRegisterEmail', '{ return true;}');
         $this->setRequestParameter('lgn_usr', 'test@oxid-esales.com');
         $this->setRequestParameter('lgn_pwd', 'Test@oxid-esales.com');
         $this->setRequestParameter('lgn_pwd2', 'Test@oxid-esales.com');
         $this->setRequestParameter('order_remark', 'TestRemark');
         $this->setRequestParameter('option', 3);
-        $rawVal = array('oxuser__oxfname'     => 'fname',
+        $rawVal = ['oxuser__oxfname'     => 'fname',
                          'oxuser__oxlname'     => 'lname',
                          'oxuser__oxstreetnr'  => 'nr',
                          'oxuser__oxstreet'    => 'street',
                          'oxuser__oxzip'       => 'zip',
                          'oxuser__oxcity'      => 'city',
-                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984');
+                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'];
         $this->setRequestParameter('invadr', $rawVal);
 
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", false);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', false);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $userView = $this->getMock($this->getProxyClassName("oxcmp_user"), array('getParent'));
+        $userView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getParent']);
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
         $this->assertEquals('payment?new_user=1&success=1', $userView->createUser());
         $this->assertEquals('TestRemark', oxRegistry::getSession()->getVariable('ordrem'));
@@ -792,22 +792,22 @@ class UserComponentTest extends \OxidTestCase
     public function testCreateUserWithoutPassword()
     {
         $this->setRequestParameter('lgn_usr', 'test@oxid-esales.com');
-        $rawVal = array('oxuser__oxfname'     => 'fname',
+        $rawVal = ['oxuser__oxfname'     => 'fname',
                          'oxuser__oxlname'     => 'lname',
                          'oxuser__oxstreetnr'  => 'nr',
                          'oxuser__oxstreet'    => 'street',
                          'oxuser__oxzip'       => 'zip',
                          'oxuser__oxcity'      => 'city',
-                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984');
+                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'];
         $this->setRequestParameter('invadr', $rawVal);
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", false);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', false);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $userView = $this->getMock($this->getProxyClassName("oxcmp_user"), array('_afterLogin', 'getParent'));
+        $userView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['_afterLogin', 'getParent']);
         $userView->expects($this->once())->method('_afterLogin');
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
         $this->assertEquals('payment?new_user=1&success=1', $userView->createUser());
@@ -822,15 +822,15 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUserUserException()
     {
-        oxTestModules::addFunction("oxuser", "checkValues", "{ throw new oxUserException( 'testBlockedUser', 123 );}");
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", false);
+        oxTestModules::addFunction('oxuser', 'checkValues', "{ throw new oxUserException( 'testBlockedUser', 123 );}");
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', false);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getParent"));
+        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getParent']);
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
         $this->assertFalse($userView->createUser());
     }
@@ -842,16 +842,16 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUseroxInputException()
     {
-        oxTestModules::addFunction("oxuser", "checkValues", "{ throw new oxInputException( 'testBlockedUser', 123 );}");
+        oxTestModules::addFunction('oxuser', 'checkValues', "{ throw new oxInputException( 'testBlockedUser', 123 );}");
 
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", false);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', false);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getParent"));
+        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getParent']);
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
         $this->assertFalse($userView->createUser());
     }
@@ -863,16 +863,16 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUserConnectionException()
     {
-        oxTestModules::addFunction("oxuser", "checkValues", "{ throw new oxConnectionException( 'testBlockedUser', 123 );}");
+        oxTestModules::addFunction('oxuser', 'checkValues', "{ throw new oxConnectionException( 'testBlockedUser', 123 );}");
 
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", false);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', false);
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, array("isEnabledPrivateSales"));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class, ['isEnabledPrivateSales']);
         $parent->expects($this->atLeastOnce())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
-        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getParent"));
+        $userView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getParent']);
         $userView->expects($this->any())->method('getParent')->will($this->returnValue($parent));
         $this->assertFalse($userView->createUser());
     }
@@ -884,7 +884,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testRegisterUserWithProblems()
     {
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('createuser', 'logout'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['createuser', 'logout']);
         $oUserView->expects($this->once())->method('createuser')->will($this->returnValue(false));
         $oUserView->expects($this->once())->method('logout')->will($this->returnValue(false));
         $this->assertNull($oUserView->registerUser());
@@ -897,8 +897,8 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testRegisterUser()
     {
-        $oUserView = $this->getMock($this->getProxyClassName("oxcmp_user"), array('createuser', 'logout'));
-        $oUserView->expects($this->once())->method('createuser')->will($this->returnValue("payment"));
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['createuser', 'logout']);
+        $oUserView->expects($this->once())->method('createuser')->will($this->returnValue('payment'));
         $oUserView->setNonPublicVar('_blIsNewUser', true);
         $this->assertEquals('register?success=1', $oUserView->registerUser());
     }
@@ -910,8 +910,8 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testRegisterUserWithNewsletterError()
     {
-        $oUserView = $this->getMock($this->getProxyClassName("oxcmp_user"), array('createuser', 'logout'));
-        $oUserView->expects($this->once())->method('createuser')->will($this->returnValue("payment"));
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['createuser', 'logout']);
+        $oUserView->expects($this->once())->method('createuser')->will($this->returnValue('payment'));
         $oUserView->setNonPublicVar('_blIsNewUser', true);
         $oUserView->setNonPublicVar('_blNewsSubscriptionStatus', false);
         $this->assertEquals('register?success=1&newslettererror=4', $oUserView->registerUser());
@@ -925,21 +925,21 @@ class UserComponentTest extends \OxidTestCase
     public function testChangeUserNoRedirect()
     {
         if ($this->getConfig()->getEdition() === 'EE') {
-            $this->markTestSkipped("Skip CE/PE related tests for EE edition");
+            $this->markTestSkipped('Skip CE/PE related tests for EE edition');
         }
 
         $this->setRequestParameter('order_remark', 'TestRemark');
         $this->setRequestParameter('blnewssubscribed', null);
-        $aRawVal = array('oxuser__oxfname'     => 'fname',
+        $aRawVal = ['oxuser__oxfname'     => 'fname',
                          'oxuser__oxlname'     => 'lname',
                          'oxuser__oxstreetnr'  => 'nr',
                          'oxuser__oxstreet'    => 'street',
                          'oxuser__oxzip'       => 'zip',
                          'oxuser__oxcity'      => 'city',
-                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984');
+                         'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'];
         $this->setRequestParameter('invadr', $aRawVal);
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('changeUserData', 'getNewsSubscription', 'setNewsSubscription'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['changeUserData', 'getNewsSubscription', 'setNewsSubscription']);
         $oUser->expects($this->once())->method('changeUserData')->with(
             $this->equalTo('test@oxid-esales.com'),
             $this->equalTo(crc32('Test@oxid-esales.com')),
@@ -951,16 +951,16 @@ class UserComponentTest extends \OxidTestCase
         $oUser->expects($this->once())->method('setNewsSubscription')->will($this->returnValue(1));
         $oUser->oxuser__oxusername = new oxField('test@oxid-esales.com');
         $oUser->oxuser__oxpassword = new oxField(crc32('Test@oxid-esales.com'));
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('onUpdate'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['onUpdate']);
         $oBasket->expects($this->once())->method('onUpdate');
 
-        $oSession = $this->getMock(Session::class, array('getBasket', 'checkSessionChallenge'));
+        $oSession = $this->getMock(Session::class, ['getBasket', 'checkSessionChallenge']);
         Registry::set(Session::class, $oSession);
 
         $oSession->expects($this->atLeastOnce())->method('getBasket')->will($this->returnValue($oBasket));
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
 
-        $oUserView = $this->getMock($this->getProxyClassName("oxcmp_user"), ['getUser', '_getDelAddressData']);
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getUser', '_getDelAddressData']);
         $oUserView->setSession(null);
         $oUserView->expects($this->atLeastOnce())->method('_getDelAddressData')->will($this->returnValue(null));
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($oUser));
@@ -977,12 +977,12 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUserNoRedirectConnectionException()
     {
-        oxTestModules::addFunction("oxuser", "changeUserData", "{ throw new oxConnectionException( 'testBlockedUser', 123 );}");
-        $oSession = $this->getMock(Session::class, array('checkSessionChallenge'));
+        oxTestModules::addFunction('oxuser', 'changeUserData', "{ throw new oxConnectionException( 'testBlockedUser', 123 );}");
+        $oSession = $this->getMock(Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getUser', '_getDelAddressData', 'getSession'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', '_getDelAddressData', 'getSession']);
         $oUserView->expects($this->atLeastOnce())->method('_getDelAddressData');
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(new oxUser()));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
@@ -996,12 +996,12 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUserNoRedirectInputException()
     {
-        oxTestModules::addFunction("oxuser", "changeUserData", "{ throw new oxInputException( 'testBlockedUser', 123 );}");
-        $oSession = $this->getMock(Session::class, array('checkSessionChallenge'));
+        oxTestModules::addFunction('oxuser', 'changeUserData', "{ throw new oxInputException( 'testBlockedUser', 123 );}");
+        $oSession = $this->getMock(Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getUser', '_getDelAddressData', 'getSession'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', '_getDelAddressData', 'getSession']);
         $oUserView->expects($this->atLeastOnce())->method('_getDelAddressData');
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(new oxUser()));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
@@ -1015,12 +1015,12 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testChangeUserNoRedirectUserException()
     {
-        oxTestModules::addFunction("oxuser", "changeUserData", "{ throw new oxUserException( 'testBlockedUser', 123 );}");
-        $oSession = $this->getMock(Session::class, array('checkSessionChallenge'));
+        oxTestModules::addFunction('oxuser', 'changeUserData', "{ throw new oxUserException( 'testBlockedUser', 123 );}");
+        $oSession = $this->getMock(Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getUser', '_getDelAddressData', 'getSession'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', '_getDelAddressData', 'getSession']);
         $oUserView->expects($this->atLeastOnce())->method('_getDelAddressData');
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(new oxUser()));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
@@ -1037,16 +1037,16 @@ class UserComponentTest extends \OxidTestCase
         // Any big number, bigger then possible test data. Row will be deleted in teardown.
         $iLastCustNr = 999;
         $sPassword = $sPassword2 = crc32('_Test@oxid.de');
-        $aInvAddress = array(
+        $aInvAddress = [
             'oxuser__oxfname'     => 'fname',
             'oxuser__oxlname'     => 'lname',
             'oxuser__oxstreet'    => 'street',
             'oxuser__oxstreetnr'  => 'nr',
             'oxuser__oxzip'       => 'zip',
             'oxuser__oxcity'      => 'city',
-            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'
-        );
-        $aDelAddress = array(
+            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984',
+        ];
+        $aDelAddress = [
             'oxaddress__oxfname'     => 'fname',
             'oxaddress__oxlname'     => 'lname',
             'oxaddress__oxstreetnr'  => 'nr',
@@ -1054,8 +1054,8 @@ class UserComponentTest extends \OxidTestCase
             'oxaddress__oxzip'       => 'zip',
             'oxaddress__oxcity'      => 'city',
             'oxaddress__oxsal'       => 'MSR',
-            'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984'
-        );
+            'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984',
+        ];
         $sUser = '_test@oxid.de';
         $oUser = oxNew('oxUser');
         $oUser->setId('_test_oxuserid');
@@ -1065,7 +1065,7 @@ class UserComponentTest extends \OxidTestCase
         $oUser->oxuser__oxpassword = new oxField($sPassword);
         $oUser->oxuser__oxcustnr = new oxField($iLastCustNr, oxField::T_RAW);
         $oUser->oxuser__oxshopid = new oxField($this->getConfig()->getShopId(), oxField::T_RAW);
-        $oUser->oxuser__oxcountryid = new oxField("testCountry", oxField::T_RAW);
+        $oUser->oxuser__oxcountryid = new oxField('testCountry', oxField::T_RAW);
         $oUser->oxuser__oxcreate = new oxField(date('Y-m-d'), oxField::T_RAW);
         $oUser->oxuser__oxregister = new oxField(date('Y-m-d'), oxField::T_RAW);
         $oUser->save();
@@ -1095,16 +1095,16 @@ class UserComponentTest extends \OxidTestCase
         // Any big number, bigger then possible test data. Row will be deleted in teardown.
         $iLastCustNr = 999;
         $sPassword = $sPassword2 = crc32('_Test@oxid.de');
-        $aInvAddress = array(
+        $aInvAddress = [
             'oxuser__oxfname'        => 'fname',
             'oxuser__oxlname'        => 'lname',
             'oxuser__oxstreet'       => 'street',
             'oxuser__oxstreetnr'     => 'nr',
             'oxuser__oxzip'          => 'zip',
             'oxuser__oxcity'         => 'city',
-            'oxuser__oxcountryid'    => 'a7c40f631fc920687.20179984'
-        );
-        $aDelAddress = array(
+            'oxuser__oxcountryid'    => 'a7c40f631fc920687.20179984',
+        ];
+        $aDelAddress = [
             'oxaddress__oxfname'     => 'fname',
             'oxaddress__oxlname'     => 'lname',
             'oxaddress__oxstreetnr'  => 'nr',
@@ -1112,8 +1112,8 @@ class UserComponentTest extends \OxidTestCase
             'oxaddress__oxzip'       => 'zip',
             'oxaddress__oxcity'      => 'city',
             'oxaddress__oxsal'       => 'MSR',
-            'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984'
-        );
+            'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984',
+        ];
         $sUser = '_test@oxid.de';
         $oUser = oxNew('oxUser');
         $oUser->setId('_test_oxuserid');
@@ -1123,7 +1123,7 @@ class UserComponentTest extends \OxidTestCase
         $oUser->oxuser__oxpassword = new oxField($sPassword);
         $oUser->oxuser__oxcustnr = new oxField($iLastCustNr, oxField::T_RAW);
         $oUser->oxuser__oxshopid = new oxField($this->getConfig()->getShopId(), oxField::T_RAW);
-        $oUser->oxuser__oxcountryid = new oxField("testCountry", oxField::T_RAW);
+        $oUser->oxuser__oxcountryid = new oxField('testCountry', oxField::T_RAW);
         $oUser->oxuser__oxcreate = new oxField(date('Y-m-d'), oxField::T_RAW);
         $oUser->oxuser__oxregister = new oxField(date('Y-m-d'), oxField::T_RAW);
         $oUser->save();
@@ -1150,7 +1150,7 @@ class UserComponentTest extends \OxidTestCase
     public function testChangeUserNoRedirectCanNotChangeBlackListedData()
     {
         $this->setRequestParameter('blnewssubscribed', false);
-        $aRawVal = array(
+        $aRawVal = [
             // Existing fields which users should not be able to change.
             'oxuser__oxid'        => 'newId',
             'oxid'                => 'newId',
@@ -1166,22 +1166,22 @@ class UserComponentTest extends \OxidTestCase
             'oxuser__oxstreet'    => 'street',
             'oxuser__oxzip'       => 'zip',
             'oxuser__oxcity'      => 'city',
-            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'
-        );
+            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984',
+        ];
         $this->setRequestParameter('invadr', $aRawVal);
 
-        $oUser = $this->getMock($this->getProxyClassName('oxUser'), array('getNewsSubscription', 'setNewsSubscription'));
+        $oUser = $this->getMock($this->getProxyClassName('oxUser'), ['getNewsSubscription', 'setNewsSubscription']);
         $oUser->oxuser__oxid = new oxField('oldId');
         $oUser->oxuser__oxpoints = new oxField('oldPoints');
         $oUser->oxuser__oxboni = new oxField('oldBoni');
         $oUser->oxuser__oxusername = new oxField('test@oxid-esales.com');
         $oUser->oxuser__oxpassword = new oxField(crc32('Test@oxid-esales.com'));
 
-        $oSession = $this->getMock(Session::class, array('getBasket', 'checkSessionChallenge'));
+        $oSession = $this->getMock(Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), array('getSession', 'getUser', '_getDelAddressData'));
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getSession', 'getUser', '_getDelAddressData']);
         $oUserView->expects($this->atLeastOnce())->method('_getDelAddressData')->will($this->returnValue(null));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($oUser));
@@ -1200,7 +1200,7 @@ class UserComponentTest extends \OxidTestCase
     public function testChangeUserNoRedirectCanNotChangeBlackListedDataUsingUppercaseLetters()
     {
         $this->setRequestParameter('blnewssubscribed', false);
-        $aRawVal = array(
+        $aRawVal = [
             'OXID'                => 'newId',
             'oxuser__oxfname'     => 'fname',
             'oxuser__oxlname'     => 'lname',
@@ -1208,20 +1208,20 @@ class UserComponentTest extends \OxidTestCase
             'oxuser__oxstreet'    => 'street',
             'oxuser__oxzip'       => 'zip',
             'oxuser__oxcity'      => 'city',
-            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'
-        );
+            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984',
+        ];
         $this->setRequestParameter('invadr', $aRawVal);
-        $oUser = $this->getMock($this->getProxyClassName('oxUser'), array('getNewsSubscription', 'setNewsSubscription'));
+        $oUser = $this->getMock($this->getProxyClassName('oxUser'), ['getNewsSubscription', 'setNewsSubscription']);
         $oUser->oxuser__oxid = new oxField('oldId');
         $oUser->oxuser__oxpoints = new oxField('oldPoints');
         $oUser->oxuser__oxboni = new oxField('oldBoni');
         $oUser->oxuser__oxusername = new oxField('test@oxid-esales.com');
         $oUser->oxuser__oxpassword = new oxField(crc32('Test@oxid-esales.com'));
-        $oSession = $this->getMock(Session::class, array('getBasket', 'checkSessionChallenge'));
+        $oSession = $this->getMock(Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), array('getSession', 'getUser', '_getDelAddressData'));
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getSession', 'getUser', '_getDelAddressData']);
         $oUserView->expects($this->atLeastOnce())->method('_getDelAddressData')->will($this->returnValue(null));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($oUser));
@@ -1236,18 +1236,18 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testGetDelAddressData()
     {
-        $aRawVal = array('oxaddress__oxfname'     => 'fname',
+        $aRawVal = ['oxaddress__oxfname'     => 'fname',
                          'oxaddress__oxlname'     => 'lname',
                          'oxaddress__oxstreetnr'  => 'nr',
                          'oxaddress__oxstreet'    => 'street',
                          'oxaddress__oxzip'       => 'zip',
                          'oxaddress__oxcity'      => 'city',
                          'oxaddress__oxsal'       => 'MSR',
-                         'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984');
+                         'oxaddress__oxcountryid' => 'a7c40f631fc920687.20179984'];
 
         $this->setRequestParameter('deladr', $aRawVal);
         $this->setRequestParameter('blshowshipaddress', true);
-        $oUserView = $this->getProxyClass("oxcmp_user");
+        $oUserView = $this->getProxyClass('oxcmp_user');
         $this->assertEquals($aRawVal, $oUserView->UNITgetDelAddressData());
     }
 
@@ -1258,17 +1258,17 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testGetDelAddressDataIfDataNotSet()
     {
-        $aRawVal = array('oxaddress__oxsal' => 'MSR');
+        $aRawVal = ['oxaddress__oxsal' => 'MSR'];
         $this->setRequestParameter('deladr', $aRawVal);
-        $oUserView = $this->getProxyClass("oxcmp_user");
-        $this->assertEquals(array(), $oUserView->UNITgetDelAddressData());
+        $oUserView = $this->getProxyClass('oxcmp_user');
+        $this->assertEquals([], $oUserView->UNITgetDelAddressData());
     }
 
     public function testChangeUserBillingAddress()
     {
         $this->setRequestParameter('blnewssubscribed', false);
         $this->setRequestParameter('blshowshipaddress', true);
-        $formFields = array(
+        $formFields = [
             // Existing fields which users should not be able to change.
             'oxuser__oxid'        => 'newId',
             'oxid'                => 'newId',
@@ -1288,8 +1288,8 @@ class UserComponentTest extends \OxidTestCase
             'oxuser__oxstreet'    => 'street',
             'oxuser__oxzip'       => 'zip',
             'oxuser__oxcity'      => 'city',
-            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'
-        );
+            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984',
+        ];
         $this->setRequestParameter('invadr', $formFields);
 
         $expectedUserData = [
@@ -1299,7 +1299,7 @@ class UserComponentTest extends \OxidTestCase
             'oxuser__oxstreet'    => 'street',
             'oxuser__oxzip'       => 'zip',
             'oxuser__oxcity'      => 'city',
-            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'
+            'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984',
         ];
 
         $user = $this->getMock($this->getProxyClassName('oxUser'), ['changeUserData']);
@@ -1311,11 +1311,11 @@ class UserComponentTest extends \OxidTestCase
             $this->anything()
         );
 
-        $oSession = $this->getMock(Session::class, array('getBasket', 'checkSessionChallenge'));
+        $oSession = $this->getMock(Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), array('getSession', 'getUser', '_getBillingAddressData'));
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getSession', 'getUser', '_getBillingAddressData']);
         $oUserView->expects($this->any())->method('_getBillingAddressData')->will($this->returnValue(null));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($user));
@@ -1326,7 +1326,7 @@ class UserComponentTest extends \OxidTestCase
     {
         $this->setRequestParameter('blnewssubscribed', false);
         $this->setRequestParameter('blshowshipaddress', true);
-        $formFields = array(
+        $formFields = [
             // Existing fields which users should not be able to change.
             'oxaddress__oxid'            => 'newId',
             'oxid'                       => 'newId',
@@ -1346,8 +1346,8 @@ class UserComponentTest extends \OxidTestCase
             'oxaddress__oxstreet'        => 'street',
             'oxaddress__oxzip'           => 'zip',
             'oxaddress__oxcity'          => 'city',
-            'oxaddress__oxcountryid'     => 'a7c40f631fc920687.20179984'
-        );
+            'oxaddress__oxcountryid'     => 'a7c40f631fc920687.20179984',
+        ];
         $this->setRequestParameter('deladr', $formFields);
 
         $expectedUserData = [
@@ -1357,7 +1357,7 @@ class UserComponentTest extends \OxidTestCase
             'oxaddress__oxstreet'        => 'street',
             'oxaddress__oxzip'           => 'zip',
             'oxaddress__oxcity'          => 'city',
-            'oxaddress__oxcountryid'     => 'a7c40f631fc920687.20179984'
+            'oxaddress__oxcountryid'     => 'a7c40f631fc920687.20179984',
         ];
 
         $user = $this->getMock($this->getProxyClassName('oxUser'), ['changeUserData']);
@@ -1369,11 +1369,11 @@ class UserComponentTest extends \OxidTestCase
             $this->equalTo($expectedUserData)
         );
 
-        $oSession = $this->getMock(Session::class, array('getBasket', 'checkSessionChallenge'));
+        $oSession = $this->getMock(Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('checkSessionChallenge')->will($this->returnValue(true));
         Registry::set(Session::class, $oSession);
 
-        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), array('getSession', 'getUser', '_getBillingAddressData'));
+        $oUserView = $this->getMock($this->getProxyClassName('oxcmp_user'), ['getSession', 'getUser', '_getBillingAddressData']);
         $oUserView->expects($this->any())->method('_getBillingAddressData')->will($this->returnValue(null));
         $oUserView->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
         $oUserView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue($user));
@@ -1387,9 +1387,9 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testInit()
     {
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", true);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', true);
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_loadSessionUser'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_loadSessionUser']);
         $oUserView->expects($this->any())->method('_loadSessionUser');
         $oUserView->init();
     }
@@ -1403,16 +1403,16 @@ class UserComponentTest extends \OxidTestCase
     public function testCheckPsState()
     {
         $oConfig = $this->getConfig();
-        $sPageUrl = $oConfig->getShopHomeURL() . "cl=account";
-        $oConfig->setConfigParam("blPsLoginEnabled", true);
+        $sPageUrl = $oConfig->getShopHomeURL() . 'cl=account';
+        $oConfig->setConfigParam('blPsLoginEnabled', true);
 
-        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $oUtils->expects($this->once())->method('redirect')->with($this->equalTo($sPageUrl), $this->equalTo(false));
         oxTestModules::addModuleObject('oxUtils', $oUtils);
 
-        $oTestView = oxNew("account");
+        $oTestView = oxNew('account');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('getUser', 'getParent'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getUser', 'getParent']);
         $oView->expects($this->atLeastOnce())->method('getUser')->will($this->returnValue(null));
         $oView->expects($this->atLEastOnce())->method('getParent')->will($this->returnValue($oTestView));
 
@@ -1436,7 +1436,7 @@ class UserComponentTest extends \OxidTestCase
         $this->setRequestParameter('lgn_pwd2', $pass);
         $this->setRequestParameter('invadr', null);
 
-        $user = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('checkValues'));
+        $user = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkValues']);
         $user->expects($this->once())
             ->method('checkValues')
             ->with($this->equalTo('test_username'), $this->equalTo($pass), $this->equalTo($pass), $this->equalTo(null), $this->equalTo(null))
@@ -1445,9 +1445,9 @@ class UserComponentTest extends \OxidTestCase
 
         $this->mockSessionChallenge();
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, array('isEnabledPrivateSales'));
+        $parent = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['isEnabledPrivateSales']);
 
-        $view = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('_getDelAddressData', 'getParent'));
+        $view = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['_getDelAddressData', 'getParent']);
         $view->expects($this->atLeastOnce())->method('getParent')->will($this->returnValue($parent));
         $view->createUser();
     }
@@ -1505,14 +1505,14 @@ class UserComponentTest extends \OxidTestCase
         $this->setRequestParameter('lgn_pwd', $sPass);
         $this->setRequestParameter('lgn_cook', null);
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('login'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['login']);
         $oUser->expects($this->once())
             ->method('login')
             ->with($this->equalTo('test_username'), $this->equalTo($sPass), $this->equalTo(null))
             ->will($this->throwException(new oxException('Login user test')));
         oxTestModules::addModuleObject('oxuser', $oUser);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array('setLoginStatus'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['setLoginStatus']);
         $oView->login();
     }
 
@@ -1524,7 +1524,7 @@ class UserComponentTest extends \OxidTestCase
     public function testChangeUserNoRedirectAddressTrimming()
     {
         if ($this->getConfig()->getEdition() === 'EE') {
-            $this->markTestSkipped("Skip CE/PE related tests for EE edition");
+            $this->markTestSkipped('Skip CE/PE related tests for EE edition');
         }
 
         $untrimmedInvoiceAddress = [
@@ -1559,11 +1559,10 @@ class UserComponentTest extends \OxidTestCase
 
         Registry::set(Session::class, $session);
 
-
         $userComponent = $this->getMock(
-            $this->getProxyClassName("oxcmp_user"),
+            $this->getProxyClassName('oxcmp_user'),
             [
-                'getUser'
+                'getUser',
             ]
         );
         $userComponent->setSession(null);
@@ -1595,7 +1594,7 @@ class UserComponentTest extends \OxidTestCase
      */
     public function testCreateUserAddressTrimming()
     {
-        oxTestModules::addFunction("oxemail", "sendRegisterEmail", "{ return true;}");
+        oxTestModules::addFunction('oxemail', 'sendRegisterEmail', '{ return true;}');
 
         $this->setRequestParameter('lgn_usr', 'testAddressTrimming@oxid-esales.com');
         $this->setRequestParameter('lgn_pwd', 'Test@oxid-esales.com');
@@ -1634,7 +1633,7 @@ class UserComponentTest extends \OxidTestCase
         $parent = $this->getMock(\OxidEsales\Eshop\Application\Controller\FrontendController::class);
 
         $userComponent = $this->getMock(
-            $this->getProxyClassName("oxcmp_user"),
+            $this->getProxyClassName('oxcmp_user'),
             ['getParent']
         );
 

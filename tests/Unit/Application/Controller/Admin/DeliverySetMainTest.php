@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\DeliverySet;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for DeliverySet_Main class
  */
 class DeliverySetMainTest extends \OxidTestCase
 {
-
     /**
      * DeliverySet_Main::Render() test case
      *
@@ -37,8 +37,8 @@ class DeliverySetMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxdeliveryset", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxdeliveryset', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('DeliverySet_Main');
@@ -55,14 +55,14 @@ class DeliverySetMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('DeliverySet_Main');
         $this->assertEquals('deliveryset_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -74,18 +74,18 @@ class DeliverySetMainTest extends \OxidTestCase
     {
         // testing..
         oxTestModules::addFunction('oxdeliveryset', 'save', '{ throw new Exception( "save" ); }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('DeliverySet_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in DeliverySet_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in DeliverySet_Main::save()');
 
             return;
         }
-        $this->fail("error in DeliverySet_Main::save()");
+        $this->fail('error in DeliverySet_Main::save()');
     }
 
     /**
@@ -96,17 +96,17 @@ class DeliverySetMainTest extends \OxidTestCase
     public function testSaveinnlang()
     {
         oxTestModules::addFunction('oxdeliveryset', 'save', '{ throw new Exception( "save" ); }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('DeliverySet_Main');
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in DeliverySet_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in DeliverySet_Main::save()');
 
             return;
         }
-        $this->fail("error in DeliverySet_Main::save()");
+        $this->fail('error in DeliverySet_Main::save()');
     }
 }

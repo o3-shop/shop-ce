@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 use Exception;
+use oxDb;
+use oxEmail;
 use oxException;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
-use \oxNewsLetter;
-use \oxEmail;
-use \oxDb;
+use oxNewsLetter;
 
 class modOxNewsLetter extends oxNewsLetter
 {
@@ -93,7 +95,6 @@ class oxnewsletterForUnit_oxnewsletterTest extends oxnewsletter
 
 class NewsletterTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -248,7 +249,7 @@ class NewsletterTest extends \OxidTestCase
      */
     public function testDelete()
     {
-        $oTestNews = oxNew("oxNewsLetter");
+        $oTestNews = oxNew('oxNewsLetter');
         $this->assertEquals(true, $oTestNews->delete('newstest'));
 
         $oDB = oxDb::getDb();
@@ -262,7 +263,7 @@ class NewsletterTest extends \OxidTestCase
 
     public function testDeleteLoadedNews()
     {
-        $oTestNews = oxNew("oxNewsLetter");
+        $oTestNews = oxNew('oxNewsLetter');
         $oTestNews->load('newstest');
         $this->assertEquals($oTestNews->delete('newstest'), true);
 
@@ -279,7 +280,7 @@ class NewsletterTest extends \OxidTestCase
 
     public function testDeleteNotExistingNewsletter()
     {
-        $oTestNews = oxNew("oxNewsLetter");
+        $oTestNews = oxNew('oxNewsLetter');
         $oTestNews->load('111111');
         try {
             $this->assertEquals($oTestNews->delete(), true);
@@ -298,7 +299,7 @@ class NewsletterTest extends \OxidTestCase
         $oUser = oxNew('oxuser');
         $oUser->load('oxdefaultadmin');
 
-        $oTestNews = $this->getMock(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\oxnewsletterForUnit_oxnewsletterTest::class, array('_assignProducts'));
+        $oTestNews = $this->getMock(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\oxnewsletterForUnit_oxnewsletterTest::class, ['_assignProducts']);
         $oTestNews->expects($this->once())->method('_assignProducts')->with($this->isInstanceOf('\OxidEsales\EshopCommunity\Application\Controller\FrontendController'), $this->equalTo(true));
         $oTestNews->load('newstest');
         $oTestNews->setNonPublicVar('_oUser', $oUser);
@@ -339,7 +340,7 @@ class NewsletterTest extends \OxidTestCase
         $oTestNews->load('newstest');
         $oGroup = oxNew('oxgroups');
         $oGroup->load('oxidcustomer');
-        $oTestNews->setNonPublicVar('_oGroups', array($oGroup));
+        $oTestNews->setNonPublicVar('_oGroups', [$oGroup]);
         $oGroups = $oTestNews->getGroups();
         foreach ($oGroups as $sInGroup) {
             if (strpos($sInGroup->getId(), 'oxidcustomer') == 0) {
@@ -356,10 +357,10 @@ class NewsletterTest extends \OxidTestCase
     {
         $oTestNews = $this->getMock(
             'oxNewsLetter',
-            array('isAdmin',
+            ['isAdmin',
                   'setAdminMode',
                   '_setUser',
-                  '_setParams')
+                  '_setParams']
         );
         $oTestNews->expects($this->once())->method('isAdmin')->will($this->returnValue('false'));
         $oTestNews->expects($this->exactly(2))->method('setAdminMode');
@@ -386,7 +387,7 @@ class NewsletterTest extends \OxidTestCase
     public function testSetUserObject()
     {
         $oTestNews = new modOxNewsLetter();
-        $oUser = oxNew("oxUser");
+        $oUser = oxNew('oxUser');
         $oUser->load('oxdefaultadmin');
         $oTestNews->UNITsetUser($oUser);
         $oNewsUser = $oTestNews->getUser();
@@ -436,7 +437,7 @@ class NewsletterTest extends \OxidTestCase
     {
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\modEmailOxNewsLetter2::class, 'oxEmail');
 
-        $oTestNews = oxNew("oxNewsLetter");
+        $oTestNews = oxNew('oxNewsLetter');
         if (!$oTestNews->load('o3newsletter')) {
             $this->fail('can not load news');
         }
@@ -455,15 +456,15 @@ class NewsletterTest extends \OxidTestCase
     {
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\modEmailOxNewsLetterSubject::class, 'oxEmail');
 
-        $oTestNews = oxNew("oxNewsLetter");
+        $oTestNews = oxNew('oxNewsLetter');
         if (!$oTestNews->load('o3newsletter')) {
             $this->fail('can not load news');
         }
 
-        $oTestNews->oxnewsletter__oxsubject->value = "TestSubject";
+        $oTestNews->oxnewsletter__oxsubject->value = 'TestSubject';
 
         $this->expectException('oxException');
-        $this->expectExceptionMessage("TestSubject");
+        $this->expectExceptionMessage('TestSubject');
 
         $oTestNews->UNITsetUser('oxdefaultadmin');
         $blMailWasSent = $oTestNews->send();
@@ -471,7 +472,7 @@ class NewsletterTest extends \OxidTestCase
 
     public function testSendMailAndFail()
     {
-        $oTestNews = oxNew("oxNewsLetter");
+        $oTestNews = oxNew('oxNewsLetter');
         if (!$oTestNews->load('o3newsletter')) {
             $this->fail('can not load news');
         }
@@ -492,15 +493,15 @@ class NewsletterTest extends \OxidTestCase
 <head>
 <title>O3-Shop Newsletter</title>
 <style media="screen" type="text/css">';
-        $sHtmlData = str_replace("\r", "", $sHtmlData);
+        $sHtmlData = str_replace("\r", '', $sHtmlData);
         $sHtmlData = str_replace("\n", "\r\n", $sHtmlData);
         $sPlainData = 'O3-Shop Newsletter
 
 Hallo, [{ $myuser->oxuser__oxsal->value|oxmultilangsal }] [{ $myuser->oxuser__oxfname->getRawValue() }] [{ $myuser->oxuser__oxlname->getRawValue() }],';
-        $sPlainData = str_replace("\r", "", $sPlainData);
+        $sPlainData = str_replace("\r", '', $sPlainData);
         $sPlainData = str_replace("\n", "\r\n", $sPlainData);
 
-        $oNewsletter = oxNew("oxNewsLetter");
+        $oNewsletter = oxNew('oxNewsLetter');
         $oNewsletter->load('o3newsletter');
 
         $this->assertEquals($sHtmlData, substr($oNewsletter->oxnewsletter__oxtemplate->value, 0, strlen($sHtmlData)));

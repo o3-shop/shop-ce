@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,8 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
-namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxRegistry;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
 /**
  * Tests for content class
@@ -55,11 +55,11 @@ class ClearcookiesTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $_SERVER['HTTP_COOKIE'] = "shop=1";
+        $_SERVER['HTTP_COOKIE'] = 'shop=1';
 
         $oView = oxNew('ClearCookies');
 
-        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, array('setOxCookie'));
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['setOxCookie']);
         $oUtilsServer->expects($this->exactly(3))
             ->method('setOxCookie')
             ->withConsecutive(

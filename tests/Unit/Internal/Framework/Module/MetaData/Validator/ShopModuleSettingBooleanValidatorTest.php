@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,8 +22,8 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\MetaData\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\SettingNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\SettingNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\ModuleSettingBooleanValidator;
 use PHPUnit\Framework\TestCase;
 
@@ -99,9 +101,9 @@ class SettingBooleanValidatorTest extends TestCase
                 MetaDataProvider::METADATA_ID => 'test_id',
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                    'type' => 'str', 'value' => 'String value'
+                    'type' => 'str', 'value' => 'String value',
                     ],
-                ]
+                ],
             ];
         $validator = new ModuleSettingBooleanValidator();
 
@@ -115,9 +117,9 @@ class SettingBooleanValidatorTest extends TestCase
                 MetaDataProvider::METADATA_ID => 'test_id',
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'value' => 'Any value'
+                        'value' => 'Any value',
                     ],
-                ]
+                ],
             ];
         $validator = new ModuleSettingBooleanValidator();
 
@@ -131,9 +133,9 @@ class SettingBooleanValidatorTest extends TestCase
                 MetaDataProvider::METADATA_ID => 'test_id',
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'type' => 'bool', 'value' => $value
+                        'type' => 'bool', 'value' => $value,
                     ],
-                ]
+                ],
             ];
 
         $validator = new ModuleSettingBooleanValidator();

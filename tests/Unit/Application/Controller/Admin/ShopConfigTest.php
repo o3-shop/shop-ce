@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Shop_Config class
@@ -55,61 +57,61 @@ class ShopConfigTest extends \OxidTestCase
         $this->markTestSkipped('Bug: Method not called.');
 
         $this->setAdminMode(true);
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("confbools", array("varnamebool" => true));
-        $this->setRequestParameter("confstrs", array("varnamestr" => "string"));
-        $this->setRequestParameter("confarrs", array("varnamearr" => "a\nb\nc"));
-        $this->setRequestParameter("confaarrs", array("varnameaarr" => "a => b\nc => d"));
-        $this->setRequestParameter("confselects", array("varnamesel" => "a"));
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('confbools', ['varnamebool' => true]);
+        $this->setRequestParameter('confstrs', ['varnamestr' => 'string']);
+        $this->setRequestParameter('confarrs', ['varnamearr' => "a\nb\nc"]);
+        $this->setRequestParameter('confaarrs', ['varnameaarr' => "a => b\nc => d"]);
+        $this->setRequestParameter('confselects', ['varnamesel' => 'a']);
 
-        $aTasks[] = "getConfig";
-        $aTasks[] = "resetContentCache";
-        $aTasks[] = "_getModuleForConfigVars";
+        $aTasks[] = 'getConfig';
+        $aTasks[] = 'resetContentCache';
+        $aTasks[] = '_getModuleForConfigVars';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("saveShopConfVar"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['saveShopConfVar']);
         $oConfig->expects($this->at(0))->method('saveShopConfVar')
             ->with(
-                $this->equalTo("bool"),
-                $this->equalTo("varnamebool"),
+                $this->equalTo('bool'),
+                $this->equalTo('varnamebool'),
                 $this->equalTo(true),
-                $this->equalTo("testId"),
+                $this->equalTo('testId'),
                 $this->equalTo('theme:mytheme')
             );
         $oConfig->expects($this->at(1))->method('saveShopConfVar')
             ->with(
-                $this->equalTo("str"),
-                $this->equalTo("varnamestr"),
-                $this->equalTo("string"),
-                $this->equalTo("testId"),
+                $this->equalTo('str'),
+                $this->equalTo('varnamestr'),
+                $this->equalTo('string'),
+                $this->equalTo('testId'),
                 $this->equalTo('theme:mytheme')
             );
         $oConfig->expects($this->at(2))->method('saveShopConfVar')
             ->with(
-                $this->equalTo("arr"),
-                $this->equalTo("varnamearr"),
-                $this->equalTo(array("a", "b", "c")),
-                $this->equalTo("testId"),
+                $this->equalTo('arr'),
+                $this->equalTo('varnamearr'),
+                $this->equalTo(['a', 'b', 'c']),
+                $this->equalTo('testId'),
                 $this->equalTo('theme:mytheme')
             );
         $oConfig->expects($this->at(3))->method('saveShopConfVar')
             ->with(
-                $this->equalTo("aarr"),
-                $this->equalTo("varnameaarr"),
-                $this->equalTo(array("a" => "b", "c" => "d")),
-                $this->equalTo("testId"),
+                $this->equalTo('aarr'),
+                $this->equalTo('varnameaarr'),
+                $this->equalTo(['a' => 'b', 'c' => 'd']),
+                $this->equalTo('testId'),
                 $this->equalTo('theme:mytheme')
             );
         $oConfig->expects($this->at(4))->method('saveShopConfVar')
             ->with(
-                $this->equalTo("select"),
-                $this->equalTo("varnamesel"),
-                $this->equalTo("a"),
-                $this->equalTo("testId"),
+                $this->equalTo('select'),
+                $this->equalTo('varnamesel'),
+                $this->equalTo('a'),
+                $this->equalTo('testId'),
                 $this->equalTo('theme:mytheme')
             );
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration::class, $aTasks, array(), '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration::class, $aTasks, [], '', false);
         $oView->expects($this->atLeastOnce())->method('getConfig')->will($this->returnValue($oConfig));
         $oView->expects($this->once())->method('resetContentCache');
         $oView->expects($this->atLeastOnce())->method('_getModuleForConfigVars')
@@ -121,7 +123,7 @@ class ShopConfigTest extends \OxidTestCase
     public function testGetModuleForConfigVars()
     {
         $sCl = oxTestModules::publicize('Shop_Config', '_getModuleForConfigVars');
-        $oTest = new $sCl;
+        $oTest = new $sCl();
         $this->assertEquals('', $oTest->p_getModuleForConfigVars());
     }
 
@@ -132,7 +134,7 @@ class ShopConfigTest extends \OxidTestCase
      */
     public function testSave()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration::class, array("saveConfVars"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration::class, ['saveConfVars']);
         $oView->expects($this->once())->method('saveConfVars');
         $oView->save();
     }
@@ -145,7 +147,7 @@ class ShopConfigTest extends \OxidTestCase
     public function testArrayToMultiline()
     {
         // defining parameters
-        $aInput = array("a", "b", "c");
+        $aInput = ['a', 'b', 'c'];
 
         // testing..
         $oView = oxNew('Shop_Config');
@@ -166,7 +168,7 @@ class ShopConfigTest extends \OxidTestCase
 
         // testing..
         $oView = oxNew('Shop_Config');
-        $this->assertEquals(array(0 => "a", 1 => "b", 3 => "c"), $oView->UNITmultilineToArray($sMultiline));
+        $this->assertEquals([0 => 'a', 1 => 'b', 3 => 'c'], $oView->UNITmultilineToArray($sMultiline));
     }
 
     /**
@@ -179,7 +181,7 @@ class ShopConfigTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         // defining parameters
-        $aInput = array("a" => "b", "c" => "d");
+        $aInput = ['a' => 'b', 'c' => 'd'];
 
         // testing..
         $oView = oxNew('Shop_Config');
@@ -198,7 +200,7 @@ class ShopConfigTest extends \OxidTestCase
 
         // testing..
         $oView = oxNew('Shop_Config');
-        $this->assertEquals(array("a" => "b", "c" => "d"), $oView->UNITmultilineToAarray($sMultiline));
+        $this->assertEquals(['a' => 'b', 'c' => 'd'], $oView->UNITmultilineToAarray($sMultiline));
     }
 
     /**
@@ -209,11 +211,11 @@ class ShopConfigTest extends \OxidTestCase
     public function testParseConstraint()
     {
         $sCl = oxTestModules::publicize('Shop_Config', '_parseConstraint');
-        $oTest = new $sCl;
+        $oTest = new $sCl();
         $this->assertEquals('', $oTest->p_parseConstraint('sometype', 'asdd'));
         $this->assertEquals('', $oTest->p_parseConstraint('bool', 'asdd'));
         $this->assertEquals('', $oTest->p_parseConstraint('string', 'asdd'));
-        $this->assertEquals(array('a', 'bc', 'd'), $oTest->p_parseConstraint('select', 'a|bc|d'));
+        $this->assertEquals(['a', 'bc', 'd'], $oTest->p_parseConstraint('select', 'a|bc|d'));
     }
 
     /**
@@ -224,11 +226,11 @@ class ShopConfigTest extends \OxidTestCase
     public function testSerializeConstraint()
     {
         $sCl = oxTestModules::publicize('Shop_Config', '_serializeConstraint');
-        $oTest = new $sCl;
+        $oTest = new $sCl();
         $this->assertEquals('', $oTest->p_serializeConstraint('sometype', 'asdd'));
         $this->assertEquals('', $oTest->p_serializeConstraint('bool', 'asdd'));
         $this->assertEquals('', $oTest->p_serializeConstraint('string', 'asdd'));
-        $this->assertEquals('a|bc|d', $oTest->p_serializeConstraint('select', array('a', 'bc', 'd')));
+        $this->assertEquals('a|bc|d', $oTest->p_serializeConstraint('select', ['a', 'bc', 'd']));
     }
 
     /**
@@ -239,7 +241,7 @@ class ShopConfigTest extends \OxidTestCase
     public function testSerializeConfVar()
     {
         $sCl = oxTestModules::publicize('Shop_Config', '_serializeConfVar');
-        $oTest = new $sCl;
+        $oTest = new $sCl();
         $this->assertEquals('1.1', $oTest->p_serializeConfVar('str', 'iMinOrderPrice', '1,1'));
         $this->assertEquals('2,2', $oTest->p_serializeConfVar('str', 'shouldNotChange', '2,2'));
     }
@@ -252,11 +254,10 @@ class ShopConfigTest extends \OxidTestCase
     public function testUnserializeConfVar()
     {
         $sCl = oxTestModules::publicize('Shop_Config', '_unserializeConfVar');
-        $oTest = new $sCl;
+        $oTest = new $sCl();
         $this->assertEquals('1.1', $oTest->p_unserializeConfVar('str', 'iMinOrderPrice', '1,1'));
         $this->assertEquals('2,2', $oTest->p_unserializeConfVar('str', 'shouldNotChange', '2,2'));
     }
-
 
     /**
      * loadConfVars test
@@ -269,7 +270,7 @@ class ShopConfigTest extends \OxidTestCase
         $aDbConfig = $oTest->loadConfVars($this->getConfig()->getShopId(), '');
 
         $this->assertEquals(
-            array('vars', 'constraints', 'grouping'),
+            ['vars', 'constraints', 'grouping'],
             array_keys($aDbConfig)
         );
 

@@ -22,12 +22,12 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -83,9 +83,9 @@ class ArticleList extends ListModel
      */
     public function selectString($sql, array $parameters = [])
     {
-        startProfile("loadinglists");
+        startProfile('loadinglists');
         parent::selectString($sql, $parameters);
-        stopProfile("loadinglists");
+        stopProfile('loadinglists');
     }
 
     /**
@@ -232,7 +232,7 @@ class ArticleList extends ListModel
                 if (!($iLimit = (int) $iLimit)) {
                     $iLimit = $myConfig->getConfigParam('iNrofNewcomerArticles');
                 }
-                $sSelect .= "limit " . $iLimit;
+                $sSelect .= 'limit ' . $iLimit;
 
                 $this->selectString($sSelect);
                 break;
@@ -265,10 +265,10 @@ class ArticleList extends ListModel
                 $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
                 //by default limit 5
-                $sLimit = ($iLimit > 0) ? "limit " . $iLimit : 'limit 5';
+                $sLimit = ($iLimit > 0) ? 'limit ' . $iLimit : 'limit 5';
 
                 $sSelect = "select * from $sArticleTable ";
-                $sSelect .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . " and $sArticleTable.oxissearch = 1 ";
+                $sSelect .= 'where ' . $this->getBaseObject()->getSqlActiveSnippet() . " and $sArticleTable.oxissearch = 1 ";
                 $sSelect .= "and $sArticleTable.oxparentid = '' and $sArticleTable.oxsoldamount > 0 ";
                 $sSelect .= "order by $sArticleTable.oxsoldamount desc $sLimit";
 
@@ -304,7 +304,7 @@ class ArticleList extends ListModel
         $sActiveSql = $oBase->getSqlActiveSnippet();
         $sViewName = $oBase->getViewName();
 
-        $sLimit = ($iLimit > 0) ? "limit " . $iLimit : '';
+        $sLimit = ($iLimit > 0) ? 'limit ' . $iLimit : '';
 
         $sSelect = "select $sArticleFields from oxactions2article
                               left join $sArticleTable on $sArticleTable.oxid = oxactions2article.oxartid
@@ -317,7 +317,7 @@ class ArticleList extends ListModel
 
         $this->selectString($sSelect, [
             ':oxshopid' => $sShopID,
-            ':oxactionid' => $sActionID
+            ':oxactionid' => $sActionID,
         ]);
     }
 
@@ -371,7 +371,7 @@ class ArticleList extends ListModel
 
         $this->setSqlLimit(0, $myConfig->getConfigParam('iNrofCrossellArticles'));
         $this->selectString($sSelect, [
-            ':oxarticlenid' => $sArticleId
+            ':oxarticlenid' => $sArticleId,
         ]);
     }
 
@@ -396,13 +396,13 @@ class ArticleList extends ListModel
 
         $sSelect = "select $sArticleTable.* from oxaccessoire2article 
             left join $sArticleTable on oxaccessoire2article.oxobjectid=$sArticleTable.oxid ";
-        $sSelect .= "where oxaccessoire2article.oxarticlenid = :oxarticlenid ";
+        $sSelect .= 'where oxaccessoire2article.oxarticlenid = :oxarticlenid ';
         $sSelect .= " and $sArticleTable.oxid is not null and " . $oBaseObject->getSqlActiveSnippet();
         //sorting articles
-        $sSelect .= " order by oxaccessoire2article.oxsort";
+        $sSelect .= ' order by oxaccessoire2article.oxsort';
 
         $this->selectString($sSelect, [
-            ':oxarticlenid' => $sArticleId
+            ':oxarticlenid' => $sArticleId,
         ]);
     }
 
@@ -553,18 +553,18 @@ class ArticleList extends ListModel
         if ($sSearchCat) {
             $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
             $sSelect = "select $sArticleTable.oxid from $sO2CView as oxobject2category, $sArticleTable $sDescJoin ";
-            $sSelect .= "where oxobject2category.oxcatnid=" . $oDb->quote($sSearchCat) . " and oxobject2category.oxobjectid=$sArticleTable.oxid and ";
+            $sSelect .= 'where oxobject2category.oxcatnid=' . $oDb->quote($sSearchCat) . " and oxobject2category.oxobjectid=$sArticleTable.oxid and ";
         }
         $sSelect .= $this->getBaseObject()->getSqlActiveSnippet();
         $sSelect .= " and $sArticleTable.oxparentid = '' and $sArticleTable.oxissearch = 1 ";
 
         // #671
         if ($sSearchVendor) {
-            $sSelect .= " and $sArticleTable.oxvendorid = " . $oDb->quote($sSearchVendor) . " ";
+            $sSelect .= " and $sArticleTable.oxvendorid = " . $oDb->quote($sSearchVendor) . ' ';
         }
 
         if ($sSearchManufacturer) {
-            $sSelect .= " and $sArticleTable.oxmanufacturerid = " . $oDb->quote($sSearchManufacturer) . " ";
+            $sSelect .= " and $sArticleTable.oxmanufacturerid = " . $oDb->quote($sSearchManufacturer) . ' ';
         }
         $sSelect .= $sWhere;
 
@@ -603,9 +603,9 @@ class ArticleList extends ListModel
     {
         $sSelect = $this->_getPriceSelect($dPriceFrom, $dPriceTo);
 
-        startProfile("loadPriceArticles");
+        startProfile('loadPriceArticles');
         $this->selectString($sSelect);
-        stopProfile("loadPriceArticles");
+        stopProfile('loadPriceArticles');
 
         if (!$oCategory) {
             return $this->count();
@@ -699,7 +699,7 @@ class ArticleList extends ListModel
         $oxIdsSql = implode(',', DatabaseProvider::getDb()->quoteArray($aIds));
 
         $sSelect = "select $sArticleFields from $sArticleTable ";
-        $sSelect .= "where $sArticleTable.oxid in ( " . $oxIdsSql . " ) and ";
+        $sSelect .= "where $sArticleTable.oxid in ( " . $oxIdsSql . ' ) and ';
         $sSelect .= $oBaseObject->getSqlActiveSnippet();
 
         $this->selectString($sSelect);
@@ -727,7 +727,7 @@ class ArticleList extends ListModel
         $oBaseObject = $this->getBaseObject();
         $sArticleTable = $oBaseObject->getViewName();
         $sArticleFields = $oBaseObject->getSelectFields();
-        $sArticleFields = str_replace("`$sArticleTable`.`oxid`", "`oxorderarticles`.`oxartid` AS `oxid`", $sArticleFields);
+        $sArticleFields = str_replace("`$sArticleTable`.`oxid`", '`oxorderarticles`.`oxartid` AS `oxid`', $sArticleFields);
 
         $sSelect = "SELECT $sArticleFields FROM oxorderarticles ";
         $sSelect .= "left join $sArticleTable on oxorderarticles.oxartid = $sArticleTable.oxid ";
@@ -772,13 +772,13 @@ class ArticleList extends ListModel
             $sTable = $oBaseObject->getViewName();
 
             // fetching actual db stock state and reminder status
-            $sQ = "select {$sFieldNames} from {$sTable} where {$sTable}.oxid in ( " . implode(",", $aArtIds) . " ) and
+            $sQ = "select {$sFieldNames} from {$sTable} where {$sTable}.oxid in ( " . implode(',', $aArtIds) . " ) and
                           oxremindactive = '1' and oxstock <= oxremindamount";
             $this->selectString($sQ);
 
             // updating stock reminder state
             if ($this->count()) {
-                $sQ = "update {$sTable} set oxremindactive = '2' where :tableName in ( " . implode(",", $aArtIds) . " ) and 
+                $sQ = "update {$sTable} set oxremindactive = '2' where :tableName in ( " . implode(',', $aArtIds) . " ) and 
                               oxremindactive = '1' and oxstock <= oxremindamount";
                 $oDb->execute($sQ, [':tableName' => $sTable . '.oxid']);
             }
@@ -804,7 +804,7 @@ class ArticleList extends ListModel
             $iTimeToUpdate = $iNextUpdateTime;
         }
 
-        Registry::getConfig()->saveShopConfVar("num", "iTimeToUpdatePrices", $iTimeToUpdate);
+        Registry::getConfig()->saveShopConfVar('num', 'iTimeToUpdatePrices', $iTimeToUpdate);
 
         return $iTimeToUpdate;
     }
@@ -829,14 +829,14 @@ class ArticleList extends ListModel
 
             $database->startTransaction();
             try {
-                $sCurrUpdateTime = date("Y-m-d H:i:s", Registry::getUtilsDate()->getTime());
+                $sCurrUpdateTime = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
 
                 // Collect article id's for later recalculation.
-                $sQ = "SELECT `oxid` FROM `oxarticles`
-                   WHERE `oxupdatepricetime` > 0 AND `oxupdatepricetime` <= :oxupdatepricetime";
+                $sQ = 'SELECT `oxid` FROM `oxarticles`
+                   WHERE `oxupdatepricetime` > 0 AND `oxupdatepricetime` <= :oxupdatepricetime';
 
                 $aUpdatedArticleIds = $database->getCol($sQ, [
-                    ':oxupdatepricetime' => $sCurrUpdateTime
+                    ':oxupdatepricetime' => $sCurrUpdateTime,
                 ]);
 
                 // updating oxarticles
@@ -923,7 +923,7 @@ class ArticleList extends ListModel
             $sFilter = "WHERE $sFilter ";
         }
 
-        $sFilterSelect = "select oc.oxobjectid as oxobjectid, count(*) as cnt from ";
+        $sFilterSelect = 'select oc.oxobjectid as oxobjectid, count(*) as cnt from ';
         $sFilterSelect .= "(SELECT * FROM $sO2CView WHERE $sO2CView.oxcatnid = '$sCatId' GROUP BY $sO2CView.oxobjectid, $sO2CView.oxcatnid) as oc ";
         $sFilterSelect .= "INNER JOIN $sO2AView as oa ON ( oa.oxobjectid = oc.oxobjectid ) ";
 
@@ -960,7 +960,7 @@ class ArticleList extends ListModel
             }
             // bug fix #0001695: if no articles found return false
         } elseif (!(current($aFilter) == '' && count(array_unique($aFilter)) == 1)) {
-            $sFilterSql = " and false ";
+            $sFilterSql = ' and false ';
         }
 
         return $sFilterSql;
@@ -1023,7 +1023,6 @@ class ArticleList extends ListModel
     {
         $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
         $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
-
 
         // ----------------------------------
         // filtering ?
@@ -1127,10 +1126,10 @@ class ArticleList extends ListModel
         $sSelectFields = $oBaseObject->getSelectFields();
 
         $sSelect = "select {$sSelectFields} from {$sArticleTable} where oxvarminprice >= 0 ";
-        $sSelect .= $dPriceTo ? "and oxvarminprice <= " . (double) $dPriceTo . " " : " ";
-        $sSelect .= $dPriceFrom ? "and oxvarminprice  >= " . (double) $dPriceFrom . " " : " ";
+        $sSelect .= $dPriceTo ? 'and oxvarminprice <= ' . (float) $dPriceTo . ' ' : ' ';
+        $sSelect .= $dPriceFrom ? 'and oxvarminprice  >= ' . (float) $dPriceFrom . ' ' : ' ';
 
-        $sSelect .= " and " . $oBaseObject->getSqlActiveSnippet() . " and {$sArticleTable}.oxissearch = 1";
+        $sSelect .= ' and ' . $oBaseObject->getSqlActiveSnippet() . " and {$sArticleTable}.oxissearch = 1";
 
         if (!$this->_sCustomSorting) {
             $sSelect .= " order by {$sArticleTable}.oxvarminprice asc , {$sArticleTable}.oxid";
@@ -1156,8 +1155,8 @@ class ArticleList extends ListModel
         $oBaseObject = $this->getBaseObject();
         $sFieldNames = $oBaseObject->getSelectFields();
         $sSelect = "select $sFieldNames from $sArticleTable ";
-        $sSelect .= "where $sArticleTable.oxvendorid = " . DatabaseProvider::getDb()->quote($sVendorId) . " ";
-        $sSelect .= " and " . $oBaseObject->getSqlActiveSnippet() . " and $sArticleTable.oxparentid = ''  ";
+        $sSelect .= "where $sArticleTable.oxvendorid = " . DatabaseProvider::getDb()->quote($sVendorId) . ' ';
+        $sSelect .= ' and ' . $oBaseObject->getSqlActiveSnippet() . " and $sArticleTable.oxparentid = ''  ";
 
         if ($this->_sCustomSorting) {
             $sSelect .= " ORDER BY {$this->_sCustomSorting} ";
@@ -1181,8 +1180,8 @@ class ArticleList extends ListModel
         $oBaseObject = $this->getBaseObject();
         $sFieldNames = $oBaseObject->getSelectFields();
         $sSelect = "select $sFieldNames from $sArticleTable ";
-        $sSelect .= "where $sArticleTable.oxmanufacturerid = " . DatabaseProvider::getDb()->quote($sManufacturerId) . " ";
-        $sSelect .= " and " . $oBaseObject->getSqlActiveSnippet() . " and $sArticleTable.oxparentid = ''  ";
+        $sSelect .= "where $sArticleTable.oxmanufacturerid = " . DatabaseProvider::getDb()->quote($sManufacturerId) . ' ';
+        $sSelect .= ' and ' . $oBaseObject->getSqlActiveSnippet() . " and $sArticleTable.oxparentid = ''  ";
 
         if ($this->_sCustomSorting) {
             $sSelect .= " ORDER BY {$this->_sCustomSorting} ";
@@ -1203,8 +1202,8 @@ class ArticleList extends ListModel
         $blCan = false;
 
         // crontab is off?
-        if (!$oConfig->getConfigParam("blUseCron")) {
-            $iTimeToUpdate = $oConfig->getConfigParam("iTimeToUpdatePrices");
+        if (!$oConfig->getConfigParam('blUseCron')) {
+            $iTimeToUpdate = $oConfig->getConfigParam('iTimeToUpdatePrices');
             if (!$iTimeToUpdate || $iTimeToUpdate <= Registry::getUtilsDate()->getTime()) {
                 $blCan = true;
             }
@@ -1228,7 +1227,7 @@ class ArticleList extends ListModel
         // fetching next update time
         $sQ = $this->getQueryToFetchNextUpdateTime();
 
-        $iTimeToUpdate = $database->getOne(sprintf($sQ, "`oxarticles`"));
+        $iTimeToUpdate = $database->getOne(sprintf($sQ, '`oxarticles`'));
 
         return $iTimeToUpdate;
     }
@@ -1240,7 +1239,7 @@ class ArticleList extends ListModel
      */
     protected function getQueryToFetchNextUpdateTime()
     {
-        return "select unix_timestamp( oxupdatepricetime ) from %s where oxupdatepricetime > 0 order by oxupdatepricetime asc";
+        return 'select unix_timestamp( oxupdatepricetime ) from %s where oxupdatepricetime > 0 order by oxupdatepricetime asc';
     }
 
     /**
@@ -1255,7 +1254,7 @@ class ArticleList extends ListModel
     protected function updateOxArticles($sCurrUpdateTime, $oDb)
     {
         $sQ = $this->getQueryToUpdateOxArticle($sCurrUpdateTime);
-        $blUpdated = $oDb->execute(sprintf($sQ, "`oxarticles`"));
+        $blUpdated = $oDb->execute(sprintf($sQ, '`oxarticles`'));
 
         return $blUpdated;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\Discount;
-
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Discount_Articles class
  */
 class DiscountArticlesTest extends \OxidTestCase
 {
-
     /**
      * Discount_Articles::Render() test case
      *
@@ -36,8 +36,8 @@ class DiscountArticlesTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxdiscount", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxdiscount', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Discount_Articles');

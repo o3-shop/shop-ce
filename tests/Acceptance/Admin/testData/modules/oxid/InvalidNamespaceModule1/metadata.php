@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -23,7 +24,7 @@ $sMetadataVersion = '1.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'          => 'InvalidNamespaceModule1',
     'title'       => 'Invalid Namespaced Module #1',
     'description' => 'Test module validation for modules, which use namespaces',
@@ -39,6 +40,6 @@ $aModule = array(
         /**
          * In this test case the class file does not exist at all and thus the class cannot be loaded
          */
-        \OxidEsales\Eshop\Application\Model\Article::class                => \OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\oxid\InvalidNamespaceModule1\Model\NonExistentFile::class
+        \OxidEsales\Eshop\Application\Model\Article::class                => \OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\oxid\InvalidNamespaceModule1\Model\NonExistentFile::class,
     ],
-);
+];

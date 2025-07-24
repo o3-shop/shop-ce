@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -29,8 +31,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleServ
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleServicesActivationServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateService;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
-use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\SomeModuleService;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Event\TestEventSubscriber;
+use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\SomeModuleService;
 use OxidEsales\EshopCommunity\Tests\Unit\Internal\ContextStub;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -139,7 +141,7 @@ class ModuleServicesActivationServiceTest extends TestCase
 
         $projectConfig = new DIConfigWrapper([
             'imports' => [
-                ['resource' => $this->getTestModuleServiceYamlPath()]
+                ['resource' => $this->getTestModuleServiceYamlPath()],
             ],
             'services' => [
                 'testEventSubscriber' => [
@@ -147,15 +149,15 @@ class ModuleServicesActivationServiceTest extends TestCase
                     'calls' => [
                         [
                             'method' => 'setActiveShops',
-                            'arguments' => [[1,5]]
+                            'arguments' => [[1,5]],
                         ],
                         [
                             'method' => 'setContext',
-                            'arguments' => [DIServiceWrapper::SET_CONTEXT_PARAMETER]
-                        ]
-                    ]
-                ]
-            ]
+                            'arguments' => [DIServiceWrapper::SET_CONTEXT_PARAMETER],
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $moduleConfig = new DIConfigWrapper([
@@ -182,7 +184,7 @@ class ModuleServicesActivationServiceTest extends TestCase
 
         $projectConfig = new DIConfigWrapper([
             'imports' => [
-                ['resource' => $this->getRelativeTestServiceYamlPath()]
+                ['resource' => $this->getRelativeTestServiceYamlPath()],
             ],
             'services' => [
                 'testEventSubscriber' => [
@@ -190,22 +192,22 @@ class ModuleServicesActivationServiceTest extends TestCase
                     'calls' => [
                         [
                             'method' => 'setActiveShops',
-                            'arguments' => [[1,5]]
+                            'arguments' => [[1,5]],
                         ],
                         [
                             'method' => 'setContext',
-                            'arguments' => [DIServiceWrapper::SET_CONTEXT_PARAMETER]
-                        ]
-                    ]
-                ]
-            ]
+                            'arguments' => [DIServiceWrapper::SET_CONTEXT_PARAMETER],
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
         $moduleConfig = new DIConfigWrapper([
             'services' => [
                 'testEventSubscriber'   => ['class' => $shopAwareService],
                 'otherService'          => ['class' => SomeModuleService::class],
-            ]
+            ],
         ]);
 
         $this->projectYamlDao->method('loadProjectConfigFile')->willReturn($projectConfig);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 class VoucherexceptionTest extends \OxidTestCase
 {
     public function testSetGetVoucherNr()
     {
-        $sVoucher = "a voucher nr.";
+        $sVoucher = 'a voucher nr.';
         $oTestObject = oxNew('oxVoucherException');
         $this->assertEquals('OxidEsales\Eshop\Core\Exception\VoucherException', get_class($oTestObject));
         $oTestObject->setVoucherNr($sVoucher);
@@ -34,7 +36,7 @@ class VoucherexceptionTest extends \OxidTestCase
     public function testGetString()
     {
         $sMsg = 'Erik was here..';
-        $sVoucher = "a voucher nr.";
+        $sVoucher = 'a voucher nr.';
         $oTestObject = oxNew('oxVoucherException', $sMsg);
         $this->assertEquals('OxidEsales\Eshop\Core\Exception\VoucherException', get_class($oTestObject));
         $oTestObject->setVoucherNr($sVoucher);
@@ -47,7 +49,7 @@ class VoucherexceptionTest extends \OxidTestCase
     public function testGetValues()
     {
         $oTestObject = oxNew('oxVoucherException');
-        $sVoucher = "a voucher nr.";
+        $sVoucher = 'a voucher nr.';
         $oTestObject->setVoucherNr($sVoucher);
         $aRes = $oTestObject->getValues();
         $this->assertArrayHasKey('voucherNr', $aRes);

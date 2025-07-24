@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -37,17 +38,17 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
     /**
      * @var string The name of the class, including the complete namespace.
      */
-    const CLASS_NAME_WITH_PATH = 'OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\ResultSet';
+    public const CLASS_NAME_WITH_PATH = 'OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\ResultSet';
 
     /**
      * @var string The database exception class to be thrown
      */
-    const DATABASE_EXCEPTION_CLASS = 'OxidEsales\EshopCommunity\Core\Exception\DatabaseException';
+    public const DATABASE_EXCEPTION_CLASS = 'OxidEsales\EshopCommunity\Core\Exception\DatabaseException';
 
     /**
      * @var string The result set class class
      */
-    const RESULT_SET_CLASS = 'OxidEsales\Eshop\Core\Database\Adapter\Doctrine\ResultSet';
+    public const RESULT_SET_CLASS = 'OxidEsales\Eshop\Core\Database\Adapter\Doctrine\ResultSet';
 
     /**
      * @return string The name of the database exception class
@@ -80,10 +81,10 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
      */
     public function dataProviderTestFieldCount()
     {
-        return array(
-            array('SELECT OXID FROM ' . self::TABLE_NAME, 1),
-            array('SELECT * FROM ' . self::TABLE_NAME, 2)
-        );
+        return [
+            ['SELECT OXID FROM ' . self::TABLE_NAME, 1],
+            ['SELECT * FROM ' . self::TABLE_NAME, 2],
+        ];
     }
 
     /**
@@ -100,7 +101,6 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
 
         $this->assertSame($expectedCount, $resultSet->fieldCount());
     }
-
 
     /**
      * Test, that an empty resultSet leads to zero iterations.
@@ -127,11 +127,11 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
      */
     public function dataProviderTestFields()
     {
-        return array(
-            array('SELECT OXID FROM ' . self::TABLE_NAME, false, false),
-            array('SELECT OXID FROM ' . self::TABLE_NAME . ' ORDER BY OXID', true, array(self::FIXTURE_OXID_1)),
-            array('SELECT OXID,OXUSERID FROM ' . self::TABLE_NAME . ' ORDER BY OXID', true, array('OXID' => self::FIXTURE_OXID_1, 'OXUSERID' => self::FIXTURE_OXUSERID_1), true),
-        );
+        return [
+            ['SELECT OXID FROM ' . self::TABLE_NAME, false, false],
+            ['SELECT OXID FROM ' . self::TABLE_NAME . ' ORDER BY OXID', true, [self::FIXTURE_OXID_1]],
+            ['SELECT OXID,OXUSERID FROM ' . self::TABLE_NAME . ' ORDER BY OXID', true, ['OXID' => self::FIXTURE_OXID_1, 'OXUSERID' => self::FIXTURE_OXUSERID_1], true],
+        ];
     }
 
     /**
@@ -213,19 +213,19 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
         $resultSet = $this->testCreationWithRealNonEmptyResult();
 
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array(self::FIXTURE_OXID_1), $resultSet->fields);
+        $this->assertSame([self::FIXTURE_OXID_1], $resultSet->fields);
 
         $methodResult = $resultSet->fetchRow();
 
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array(self::FIXTURE_OXID_2), $resultSet->fields);
-        $this->assertSame(array(self::FIXTURE_OXID_2), $methodResult);
+        $this->assertSame([self::FIXTURE_OXID_2], $resultSet->fields);
+        $this->assertSame([self::FIXTURE_OXID_2], $methodResult);
 
         $methodResult = $resultSet->fetchRow();
 
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array(self::FIXTURE_OXID_3), $resultSet->fields);
-        $this->assertSame(array(self::FIXTURE_OXID_3), $methodResult);
+        $this->assertSame([self::FIXTURE_OXID_3], $resultSet->fields);
+        $this->assertSame([self::FIXTURE_OXID_3], $methodResult);
     }
 
     /**
@@ -263,19 +263,19 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
         $this->initializeDatabase();
 
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array('OXID' => self::FIXTURE_OXID_1), $resultSet->fields);
+        $this->assertSame(['OXID' => self::FIXTURE_OXID_1], $resultSet->fields);
 
         $methodResult = $resultSet->fetchRow();
 
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array('OXID' => self::FIXTURE_OXID_2), $resultSet->fields);
-        $this->assertSame(array('OXID' => self::FIXTURE_OXID_2), $methodResult);
+        $this->assertSame(['OXID' => self::FIXTURE_OXID_2], $resultSet->fields);
+        $this->assertSame(['OXID' => self::FIXTURE_OXID_2], $methodResult);
 
         $methodResult = $resultSet->fetchRow();
 
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array('OXID' => self::FIXTURE_OXID_3), $resultSet->fields);
-        $this->assertSame(array('OXID' => self::FIXTURE_OXID_3), $methodResult);
+        $this->assertSame(['OXID' => self::FIXTURE_OXID_3], $resultSet->fields);
+        $this->assertSame(['OXID' => self::FIXTURE_OXID_3], $methodResult);
     }
 
     /**
@@ -298,7 +298,7 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
     {
         $resultSet = $this->testCreationWithRealNonEmptyResult();
 
-        $this->assertSame(array(self::FIXTURE_OXID_1), $resultSet->fields);
+        $this->assertSame([self::FIXTURE_OXID_1], $resultSet->fields);
         $rows = $resultSet->fetchAll();
 
         $this->assertIsArray($rows);
@@ -321,11 +321,11 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
 
         $rows = $resultSet->fetchAll();
 
-        $expectedRows = array(
-            array('OXID' => self::FIXTURE_OXID_1, self::FIXTURE_OXID_1),
-            array('OXID' => self::FIXTURE_OXID_2, self::FIXTURE_OXID_2),
-            array('OXID' => self::FIXTURE_OXID_3, self::FIXTURE_OXID_3)
-        );
+        $expectedRows = [
+            ['OXID' => self::FIXTURE_OXID_1, self::FIXTURE_OXID_1],
+            ['OXID' => self::FIXTURE_OXID_2, self::FIXTURE_OXID_2],
+            ['OXID' => self::FIXTURE_OXID_3, self::FIXTURE_OXID_3],
+        ];
 
         $this->assertArrayContentSame($rows, $expectedRows);
     }
@@ -360,7 +360,7 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
         $resultSet->close();
 
         $this->assertTrue($resultSet->EOF);
-        $this->assertSame(array(), $resultSet->fields);
+        $this->assertSame([], $resultSet->fields);
     }
 
     /**
@@ -390,9 +390,9 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
 
         $resultSet->close();
 
-        $this->assertSame(array(self::FIXTURE_OXID_1), $firstRow);
+        $this->assertSame([self::FIXTURE_OXID_1], $firstRow);
         $this->assertFalse($resultSet->EOF);
-        $this->assertSame(array(), $resultSet->fields);
+        $this->assertSame([], $resultSet->fields);
     }
 
     /**
@@ -402,12 +402,11 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
     {
         $resultSet = $this->testCreationWithRealNonEmptyResult();
 
-        $expectedResults = array(
+        $expectedResults = [
             [self::FIXTURE_OXID_1],
             [self::FIXTURE_OXID_2],
             [self::FIXTURE_OXID_3],
-        );
-
+        ];
 
         $this->assertSame($expectedResults[0], $resultSet->getFields());
         $counter = 1;
@@ -418,7 +417,6 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
         $resultSet->close();
     }
 
-
     /**
      *
      */
@@ -428,13 +426,13 @@ class ResultSetTest extends DatabaseInterfaceImplementationBaseTest
 
         $resultSet = $this->database->select(
             'SELECT * FROM ' . self::TABLE_NAME . ' WHERE OXID in (?, ?)',
-            array(self::FIXTURE_OXID_2, self::FIXTURE_OXID_3)
+            [self::FIXTURE_OXID_2, self::FIXTURE_OXID_3]
         );
         $this->assertSame(
-            array(
+            [
                 0 => 'OXID_2',
                 1 => 'OXUSERID_2',
-            ),
+            ],
             $resultSet->fields
         );
     }

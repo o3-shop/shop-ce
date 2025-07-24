@@ -67,14 +67,14 @@ class FileChecker
      *
      * @var string
      */
-    protected $_sEdition = "";
+    protected $_sEdition = '';
 
     /**
      * Version of THIS O3-Shop
      *
      * @var string
      */
-    protected $_sVersion = "";
+    protected $_sVersion = '';
 
     /**
      * Revision of THIS O3-Shop
@@ -83,7 +83,7 @@ class FileChecker
      *
      * @var string
      */
-    protected $_sRevision = "";
+    protected $_sRevision = '';
 
     /**
      * base directory
@@ -91,7 +91,6 @@ class FileChecker
      * @var mixed
      */
     protected $_sBaseDirectory = '';
-
 
     /**
      * If the variable is true, the script will show all files, even they are ok.
@@ -246,14 +245,13 @@ class FileChecker
 
         if (!$this->checkSystemRequirements()) {
             $this->_blError = true;
-            $this->_sErrorMessage .= "Error: requirements are not met.";
+            $this->_sErrorMessage .= 'Error: requirements are not met.';
 
             return false;
         }
 
         return true;
     }
-
 
     /**
      * Checks system requirements and builds error messages if there are some
@@ -280,8 +278,8 @@ class FileChecker
         ];
 
         $this->_oCurlHandler->setUrl($this->_sWebServiceUrl);
-        $this->_oCurlHandler->setMethod("GET");
-        $this->_oCurlHandler->setOption("CURLOPT_CONNECTTIMEOUT", 30);
+        $this->_oCurlHandler->setMethod('GET');
+        $this->_oCurlHandler->setOption('CURLOPT_CONNECTTIMEOUT', 30);
         $this->_oCurlHandler->setParameters($aParams);
         $sXML = $this->_oCurlHandler->execute();
 
@@ -305,7 +303,6 @@ class FileChecker
         return !$this->_blError;
     }
 
-
     /**
      * asks the webservice, if the shop version is known.
      *
@@ -322,7 +319,7 @@ class FileChecker
             'edi' => $this->getEdition(),
         ];
 
-        $sURL = $this->_sWebServiceUrl . "?" . http_build_query($aParams);
+        $sURL = $this->_sWebServiceUrl . '?' . http_build_query($aParams);
 
         if ($sXML = @file_get_contents($sURL)) {
             $oXML = new SimpleXMLElement($sXML);
@@ -370,7 +367,7 @@ class FileChecker
 
         usleep(10);
         $oXML = $this->_getFileVersion($sMD5, $sFile);
-        $sColor = "blue";
+        $sColor = 'blue';
         $blOk = true;
         $sMessage = Registry::getLang()->translateString('OXDIAG_ERRORVERSIONCOMPARE');
 
@@ -385,7 +382,7 @@ class FileChecker
                     $sColor = 'red';
                 } else {
                     $sMessage = Registry::getLang()->translateString('OXDIAG_OK');
-                    $sColor = "green";
+                    $sColor = 'green';
                 }
             } elseif ($oXML->res == 'VERSIONMISMATCH') {
                 $sMessage = Registry::getLang()->translateString('OXDIAG_VERSION_MISMATCH');
@@ -401,17 +398,17 @@ class FileChecker
                 $blOk = false;
             } elseif ($oXML->res == 'UNKNOWN') {
                 $sMessage = Registry::getLang()->translateString('OXDIAG_UNKNOWN');
-                $sColor = "green";
+                $sColor = 'green';
             }
         }
 
         if ($sMessage) {
             $aResult = [
-                "result"  => strval($oXML->res),
-                "ok"      => $blOk,
-                "file"    => $sFile,
-                "color"   => $sColor,
-                "message" => $sMessage
+                'result'  => strval($oXML->res),
+                'ok'      => $blOk,
+                'file'    => $sFile,
+                'color'   => $sColor,
+                'message' => $sMessage,
             ];
         }
 
@@ -439,8 +436,8 @@ class FileChecker
         ];
 
         $this->_oCurlHandler->setUrl($this->_sWebServiceUrl);
-        $this->_oCurlHandler->setMethod("GET");
-        $this->_oCurlHandler->setOption("CURLOPT_CONNECTTIMEOUT", 30);
+        $this->_oCurlHandler->setMethod('GET');
+        $this->_oCurlHandler->setOption('CURLOPT_CONNECTTIMEOUT', 30);
         $this->_oCurlHandler->setParameters($aParams);
         $sXML = $this->_oCurlHandler->execute();
         $oXML = null;

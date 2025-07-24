@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Discount_Groups_Ajax class
  */
 class DiscountGroupsAjaxTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -60,7 +61,7 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
      */
     public function testGetQuery()
     {
-        $sGroupTable = getViewName("oxgroups");
+        $sGroupTable = getViewName('oxgroups');
 
         $oView = oxNew('discount_groups_ajax');
         $sQuery = "from $sGroupTable where 1";
@@ -76,9 +77,9 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
     {
         $sOxid = '_testOxid';
         $sSynchoxid = '_testSynchoxid';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $sGroupTable = getViewName("oxgroups");
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $sGroupTable = getViewName('oxgroups');
 
         $oView = oxNew('discount_groups_ajax');
         $sQuery = "from oxobject2discount, $sGroupTable where $sGroupTable.oxid=oxobject2discount.oxobjectid ";
@@ -96,8 +97,8 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testSynchoxid';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $sGroupTable = getViewName("oxgroups");
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $sGroupTable = getViewName('oxgroups');
 
         $oView = oxNew('discount_groups_ajax');
         $sQuery = "from $sGroupTable where 1  and";
@@ -115,8 +116,8 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testO2DRemove1', '_testO2DRemove2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testO2DRemove1', '_testO2DRemove2']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->removeDiscGroup();
@@ -131,8 +132,8 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
     public function testRemoveDiscGroupAll()
     {
         $sOxid = '_testDiscount';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
 
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
@@ -151,9 +152,9 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         $sSynchoxid = '_testDiscount';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('oxidmiddlecust', 'oxidgoodcust')));
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['oxidmiddlecust', 'oxidgoodcust']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->addDiscGroup();
@@ -168,10 +169,10 @@ class DiscountGroupsAjaxTest extends \OxidTestCase
     public function testAddDiscGroupAll()
     {
         $sSynchoxid = '_testDiscountNew';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $this->setRequestParameter('all', true);
 
-        $iCount = oxDb::getDb()->getOne("select count(oxid) from oxgroups");
+        $iCount = oxDb::getDb()->getOne('select count(oxid) from oxgroups');
 
         $oView = oxNew('discount_groups_ajax');
         $this->assertGreaterThan(0, $iCount);

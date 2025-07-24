@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use DOMDocument;
@@ -26,7 +28,6 @@ use DOMDocument;
  */
 class ListUserTest extends \OxidTestCase
 {
-
     /**
      * List_User::GetViewListSize() test case
      *
@@ -37,7 +38,7 @@ class ListUserTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListUser::class, array("_getUserDefListSize"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListUser::class, ['_getUserDefListSize']);
         $oView->expects($this->once())->method('_getUserDefListSize')->will($this->returnValue(999));
         $this->assertEquals(999, $oView->UNITgetViewListSize());
     }
@@ -49,11 +50,11 @@ class ListUserTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array("getDomXml"));
-        $oNavTree->expects($this->once())->method('getDomXml')->will($this->returnValue(new DOMDocument));
+        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getDomXml']);
+        $oNavTree->expects($this->once())->method('getDomXml')->will($this->returnValue(new DOMDocument()));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListUser::class, array("getNavigation"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListUser::class, ['getNavigation']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavTree));
-        $this->assertEquals("list_user.tpl", $oView->render());
+        $this->assertEquals('list_user.tpl', $oView->render());
     }
 }

@@ -119,8 +119,8 @@ class SelectList extends MultiLanguageModel implements ISelectList
         // remove selectlists from articles also
         if ($blRemove = parent::delete($sOXID)) {
             $oDb = DatabaseProvider::getDb();
-            $oDb->execute("delete from oxobject2selectlist where oxselnid = :oxselnid", [
-                ':oxselnid' => $sOXID
+            $oDb->execute('delete from oxobject2selectlist where oxselnid = :oxselnid', [
+                ':oxselnid' => $sOXID,
             ]);
         }
 

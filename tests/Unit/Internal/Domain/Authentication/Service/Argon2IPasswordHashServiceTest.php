@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,11 +22,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Authentication\Service;
 
-use Exception;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\PasswordHashException;
+use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\Argon2IPasswordHashService;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordHashServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,7 +32,6 @@ use PHPUnit\Framework\TestCase;
  */
 class Argon2IPasswordHashServiceTest extends TestCase
 {
-
     /**
      * Currently, Continuous Integration does not have Argon2I compiled into PHP 7.2. This leads to failing tests
      * due to skipTestIfArgon2IAvailable(). As a fast solution we skip all
@@ -40,7 +39,7 @@ class Argon2IPasswordHashServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->markTestSkipped("Argon2I not available currently on PHP 7.2.");
+        $this->markTestSkipped('Argon2I not available currently on PHP 7.2.');
     }
 
     /**
@@ -135,7 +134,7 @@ class Argon2IPasswordHashServiceTest extends TestCase
             [
                 'memory_cost' => PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
                 'time_cost' => PASSWORD_ARGON2_DEFAULT_TIME_COST,
-                'threads' => PASSWORD_ARGON2_DEFAULT_THREADS
+                'threads' => PASSWORD_ARGON2_DEFAULT_THREADS,
             ],
             $info['options']
         );

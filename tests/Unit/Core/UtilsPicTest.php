@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use oxField;
-use OxidEsales\EshopCommunity\Core\DatabaseProvider;
-use oxRegistry;
 use oxTestModules;
 use stdClass;
 
 class UtilsPicTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -38,24 +37,22 @@ class UtilsPicTest extends \OxidTestCase
         parent::setUp();
         // preparing data for spec test
         switch ($this->getName()) {
-
-            case "testDeletePictureExisting":
+            case 'testDeletePictureExisting':
 
                 $myConfig = $this->getConfig();
 
                 // setup-> create a copy of a picture and delete this one for successful test
-                $sOrigTestPicFile  = "01_10.jpg";
-                $sOrigTestIconFile = "01_10.jpg"; // we simply fake an icon file by copying the same
-                $sCloneTestPicFile = "CCdetail1_z3_ico_th.jpg";
-                $sCloneTestIconFile = "CCdetail1_z3_ico_th.jpg";
+                $sOrigTestPicFile = '01_10.jpg';
+                $sOrigTestIconFile = '01_10.jpg'; // we simply fake an icon file by copying the same
+                $sCloneTestPicFile = 'CCdetail1_z3_ico_th.jpg';
+                $sCloneTestIconFile = 'CCdetail1_z3_ico_th.jpg';
 
-                $sDir = $myConfig->getPictureDir(false) . "master/product/thumb/";
+                $sDir = $myConfig->getPictureDir(false) . 'master/product/thumb/';
 
                 copy($sDir . $sOrigTestPicFile, $sDir . $sCloneTestPicFile);
                 copy($sDir . $sOrigTestIconFile, $sDir . $sCloneTestIconFile);
 
                 break;
-
         }
     }
 
@@ -68,16 +65,15 @@ class UtilsPicTest extends \OxidTestCase
     {
         // preparing data for spec test
         switch ($this->getName()) {
-
-            case "testDeletePictureExisting":
+            case 'testDeletePictureExisting':
 
                 $myConfig = $this->getConfig();
 
                 // setup-> create a copy of a picture and delete this one for successful test
-                $sCloneTestPicFile = "CC1672_th.jpg";
-                $sCloneTestIconFile = "CC1672_th_ico.jpg";
+                $sCloneTestPicFile = 'CC1672_th.jpg';
+                $sCloneTestIconFile = 'CC1672_th_ico.jpg';
 
-                $sDir = $myConfig->getPictureDir(false) . "/master/product/thumb/";
+                $sDir = $myConfig->getPictureDir(false) . '/master/product/thumb/';
 
                 @unlink($sDir . $sCloneTestPicFile);
                 @unlink($sDir . $sCloneTestIconFile);
@@ -89,10 +85,10 @@ class UtilsPicTest extends \OxidTestCase
 
     public function testResizeImage()
     {
-        $sTestImageFileJPG = "test.jpg";
-        $sTestImageFileJPGSmall = "test_smaller.jpg";
-        $sTestImageFileResizedJPG = "test_resized.jpg";
-        $sTestImageFileSmallResizedJPG = "test_smallresized.jpg";
+        $sTestImageFileJPG = 'test.jpg';
+        $sTestImageFileJPGSmall = 'test_smaller.jpg';
+        $sTestImageFileResizedJPG = 'test_resized.jpg';
+        $sTestImageFileSmallResizedJPG = 'test_smallresized.jpg';
 
         // actual test
         $this->assertTrue($this->_resizeImageTest($sTestImageFileJPG, $sTestImageFileResizedJPG));
@@ -100,10 +96,10 @@ class UtilsPicTest extends \OxidTestCase
         // do not resize smaller pics
         $this->assertFalse($this->_resizeImageTest($sTestImageFileJPGSmall, $sTestImageFileSmallResizedJPG));
 
-        $sTestImageFileGIF = "test.gif";
-        $sTestImageFileGIFSmall = "test_smaller.gif";
-        $sTestImageFileResizedGIF = "test_resized.gif";
-        $sTestImageFileSmallResizedGIF = "test_smallresized.gif";
+        $sTestImageFileGIF = 'test.gif';
+        $sTestImageFileGIFSmall = 'test_smaller.gif';
+        $sTestImageFileResizedGIF = 'test_resized.gif';
+        $sTestImageFileSmallResizedGIF = 'test_smallresized.gif';
 
         // actual test
         $this->assertTrue($this->_resizeImageTest($sTestImageFileGIF, $sTestImageFileResizedGIF));
@@ -111,10 +107,10 @@ class UtilsPicTest extends \OxidTestCase
         // do not resize smaller pics
         $this->assertFalse($this->_resizeImageTest($sTestImageFileGIFSmall, $sTestImageFileSmallResizedGIF));
 
-        $sTestImageFilePNG = "test.png";
-        $sTestImageFilePNGSmall = "test_smaller.png";
-        $sTestImageFileResizedPNG = "test_resized.png";
-        $sTestImageFileSmallResizedPNG = "test_smallresized.png";
+        $sTestImageFilePNG = 'test.png';
+        $sTestImageFilePNGSmall = 'test_smaller.png';
+        $sTestImageFileResizedPNG = 'test_resized.png';
+        $sTestImageFileSmallResizedPNG = 'test_smallresized.png';
 
         // actual test
         $this->assertTrue($this->_resizeImageTest($sTestImageFilePNG, $sTestImageFileResizedPNG));
@@ -128,18 +124,18 @@ class UtilsPicTest extends \OxidTestCase
 
     protected function _resizeImageTest($sTestImageFile, $sTestImageFileResized, $iWidth = 100, $iHeight = 48)
     {
-        $sDir = __DIR__ ."/../testData/misc" . DIRECTORY_SEPARATOR;
+        $sDir = __DIR__ . '/../testData/misc' . DIRECTORY_SEPARATOR;
         if (!file_exists($sDir . $sTestImageFile)) {
-            $sMsg = "Failed to find the image file: " . $sDir . $sTestImageFile;
+            $sMsg = 'Failed to find the image file: ' . $sDir . $sTestImageFile;
             $this->fail($sMsg);
         }
         //actual test
         if (!(\OxidEsales\Eshop\Core\Registry::getUtilsPic()->resizeImage($sDir . $sTestImageFile, $sDir . $sTestImageFileResized, $iWidth, $iHeight))) {
-            $this->fail("Failed to call resizeImage()");
+            $this->fail('Failed to call resizeImage()');
         }
 
         if (!is_file($sDir . $sTestImageFileResized)) {
-            $this->fail("Failed to find the resized image file.");
+            $this->fail('Failed to find the resized image file.');
         }
 
         $aImageSizeResized = getImageSize($sDir . $sTestImageFileResized);
@@ -165,7 +161,7 @@ class UtilsPicTest extends \OxidTestCase
         //$oConfig = $this->getMock( 'oxconfig', array( 'hasModule' ) );
         $oConfig = $this->getMock('oxconfig');
 
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('getConfig'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['getConfig']);
         $oUtilsPic->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->assertFalse($oUtilsPic->UNITdeletePicture('xxx', 'yyy'));
@@ -178,7 +174,7 @@ class UtilsPicTest extends \OxidTestCase
         //$oConfig->expects( $this->exactly( 2 ) )->method( 'hasModule')->will( $this->returnValue( false ) );
         $oConfig = $this->getMock('oxconfig');
 
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('getConfig'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['getConfig']);
         $oUtilsPic->expects($this->exactly(2))->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->assertFalse($oUtilsPic->UNITdeletePicture('nopic.jpg', 'yyy'));
@@ -192,7 +188,7 @@ class UtilsPicTest extends \OxidTestCase
         //$oConfig->expects( $this->once() )->method( 'hasModule')->will( $this->returnValue( false ) );
         $oConfig = $this->getMock('oxconfig');
 
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('getConfig'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['getConfig']);
         $oUtilsPic->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->assertFalse($oUtilsPic->UNITdeletePicture(time(), 'yyy'));
@@ -201,11 +197,11 @@ class UtilsPicTest extends \OxidTestCase
     // deleting existing
     public function testDeletePictureExisting()
     {
-        if (getenv("CI") == true) {
+        if (getenv('CI') == true) {
             $this->markTestSkipped('Skipping test in CI environment.');
         }
         $oUtilsPic = oxNew('oxutilspic');
-        $this->assertTrue($oUtilsPic->UNITdeletePicture('CCdetail1_z3_ico_th.jpg', $this->getConfig()->getPictureDir(false) . "master/product/thumb/"));
+        $this->assertTrue($oUtilsPic->UNITdeletePicture('CCdetail1_z3_ico_th.jpg', $this->getConfig()->getPictureDir(false) . 'master/product/thumb/'));
     }
 
     /**
@@ -215,10 +211,10 @@ class UtilsPicTest extends \OxidTestCase
      */
     public function testIsPicDeletableDataProvider()
     {
-        return array(
-            array('testOK.jpg', 1, true),
-            array('testFail.jpg', 2, false),
-        );
+        return [
+            ['testOK.jpg', 1, true],
+            ['testFail.jpg', 2, false],
+        ];
     }
 
     /**
@@ -232,7 +228,7 @@ class UtilsPicTest extends \OxidTestCase
      */
     public function testIsPicDeletable($filename, $response, $expectedResult)
     {
-        $utilsPicMock = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('fetchIsImageDeletable'));
+        $utilsPicMock = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['fetchIsImageDeletable']);
         $utilsPicMock->method('fetchIsImageDeletable')->willReturn($response);
 
         $this->assertEquals($expectedResult, $utilsPicMock->UNITisPicDeletable($filename, 'test', 'file'));
@@ -243,7 +239,7 @@ class UtilsPicTest extends \OxidTestCase
      */
     public function testIsPicDeletableNoPic()
     {
-        $utilsPicMock = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('fetchIsImageDeletable'));
+        $utilsPicMock = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['fetchIsImageDeletable']);
         $utilsPicMock->expects($this->never())->method('fetchIsImageDeletable');
 
         $this->assertEquals(false, $utilsPicMock->UNITisPicDeletable('nopic.jpg', 'test', 'file'));
@@ -255,7 +251,7 @@ class UtilsPicTest extends \OxidTestCase
     // bad input
     public function testOverwritePicBadInput()
     {
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('safePictureDelete'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['safePictureDelete']);
         $oUtilsPic->expects($this->never())->method('safePictureDelete');
 
         $blFalse = $oUtilsPic->overwritePic(new stdClass(), 'xxx', 'xxx', '', '', '', '');
@@ -265,47 +261,47 @@ class UtilsPicTest extends \OxidTestCase
     // params are not ok
     public function testOverwritePicBadParams()
     {
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('safePictureDelete'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['safePictureDelete']);
         $oUtilsPic->expects($this->never())->method('safePictureDelete');
 
         $oObject = new stdClass();
         $oObject->oxtbl__oxpic = new oxField('yyy', oxField::T_RAW);
 
-        $blFalse = $oUtilsPic->overwritePic($oObject, 'oxtbl', 'oxpic', '', '', array('oxtbl__oxpic' => 'yyy'), '');
+        $blFalse = $oUtilsPic->overwritePic($oObject, 'oxtbl', 'oxpic', '', '', ['oxtbl__oxpic' => 'yyy'], '');
         $this->assertFalse($blFalse);
     }
 
     // all is fine
     public function testOverwritePicGoodParams()
     {
-        $oFiles = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array('getImageDirByType'));
+        $oFiles = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['getImageDirByType']);
         $oFiles->expects($this->atLeastOnce())->method('getImageDirByType')->will($this->returnValue('/test_image_dir/'));
         oxTestModules::addModuleObject('oxUtilsFile', $oFiles);
 
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('safePictureDelete'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['safePictureDelete']);
         $oUtilsPic->expects($this->once())->method('safePictureDelete')->with($this->equalTo('yyy'), $this->equalTo('yyy/test_image_dir/'), $this->equalTo('oxtbl'), $this->equalTo('oxpic'))->will($this->returnValue(true));
 
         $oObject = new stdClass();
         $oObject->oxtbl__oxpic = new oxField('yyy', oxField::T_RAW);
 
-        $blTrue = $oUtilsPic->overwritePic($oObject, 'oxtbl', 'oxpic', 'TEST_TYPE', '', array('oxtbl__oxpic' => 'xxx'), 'yyy');
+        $blTrue = $oUtilsPic->overwritePic($oObject, 'oxtbl', 'oxpic', 'TEST_TYPE', '', ['oxtbl__oxpic' => 'xxx'], 'yyy');
         $this->assertTrue($blTrue);
     }
 
     // Test if corect path to file is generated (M:1268)
     public function testOverwritePic_generatesCorectFilePath()
     {
-        $oFiles = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, array('getImageDirByType'));
+        $oFiles = $this->getMock(\OxidEsales\Eshop\Core\UtilsFile::class, ['getImageDirByType']);
         $oFiles->expects($this->atLeastOnce())->method('getImageDirByType')->will($this->returnValue('/testType_dir/'));
         oxTestModules::addModuleObject('oxUtilsFile', $oFiles);
 
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('safePictureDelete'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['safePictureDelete']);
         $oUtilsPic->expects($this->once())->method('safePictureDelete')->with($this->equalTo('testPictureName'), $this->equalTo('testAbsPath/testType_dir/'));
 
         $oObject = new stdclass();
         $oObject->oxtbl__oxpic = new oxField('testPictureName', oxField::T_RAW);
 
-        $blTrue = $oUtilsPic->overwritePic($oObject, 'oxtbl', 'oxpic', 'testType', 'testPath', array('oxtbl__oxpic' => 'xxx'), 'testAbsPath');
+        $blTrue = $oUtilsPic->overwritePic($oObject, 'oxtbl', 'oxpic', 'testType', 'testPath', ['oxtbl__oxpic' => 'xxx'], 'testAbsPath');
     }
 
     /**
@@ -314,7 +310,7 @@ class UtilsPicTest extends \OxidTestCase
     // deeper code must not allow deletion
     public function testSafePictureDeleteMustFailDeletion()
     {
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('_isPicDeletable', '_deletePicture'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['_isPicDeletable', '_deletePicture']);
         $oUtilsPic->expects($this->once())->method('_isPicDeletable')->will($this->returnValue(false));
         $oUtilsPic->expects($this->never())->method('_deletePicture');
 
@@ -324,7 +320,7 @@ class UtilsPicTest extends \OxidTestCase
     //
     public function testSafePictureDeleteMustSucceed()
     {
-        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, array('_isPicDeletable', '_deletePicture'));
+        $oUtilsPic = $this->getMock(\OxidEsales\Eshop\Core\UtilsPic::class, ['_isPicDeletable', '_deletePicture']);
         $oUtilsPic->expects($this->once())->method('_isPicDeletable')->will($this->returnValue(true));
         $oUtilsPic->expects($this->once())->method('_deletePicture')->will($this->returnValue(true));
 
@@ -333,8 +329,8 @@ class UtilsPicTest extends \OxidTestCase
 
     public function testResizeGif()
     {
-        $sTestImageFileGIF = "test.gif";
-        $sTestImageFileResizedGIF = "test_resized_ResizeGIF.gif";
+        $sTestImageFileGIF = 'test.gif';
+        $sTestImageFileResizedGIF = 'test_resized_ResizeGIF.gif';
 
         // actual test
         $this->assertTrue($this->_resizeGIFTest($sTestImageFileGIF, $sTestImageFileResizedGIF));
@@ -346,11 +342,11 @@ class UtilsPicTest extends \OxidTestCase
     protected function _resizeGIFTest($sTestImageFile, $sTestImageFileResized, $gdver = 2)
     {
         $myUtils = oxNew('oxUtilsPic');
-        $sDir = __DIR__ ."/../testData/misc" . DIRECTORY_SEPARATOR;
+        $sDir = __DIR__ . '/../testData/misc' . DIRECTORY_SEPARATOR;
         $iWidth = 100;
         $iHeight = 48;
         if (!file_exists($sDir . $sTestImageFile)) {
-            $sMsg = "Failed to find the GIF file: " . $sDir . $sTestImageFile;
+            $sMsg = 'Failed to find the GIF file: ' . $sDir . $sTestImageFile;
             $this->fail($sMsg);
         }
         $aImageSizeOriginal = getImageSize($sDir . $sTestImageFile);
@@ -358,10 +354,10 @@ class UtilsPicTest extends \OxidTestCase
         $iImageOriginalHeight = $aImageSizeOriginal[1];
         //actual test
         if (!($myUtils->UNITresizeGif($sDir . $sTestImageFile, $sDir . $sTestImageFileResized, $iWidth, $iHeight, $iImageOriginalWidth, $iImageOriginalHeight, $gdver, false))) {
-            $this->fail("Failed to call resizeGIF()");
+            $this->fail('Failed to call resizeGIF()');
         }
         if (!is_file($sDir . $sTestImageFileResized)) {
-            $this->fail("Failed to find the resized image file.");
+            $this->fail('Failed to find the resized image file.');
         }
         $aImageSizeResized = getImageSize($sDir . $sTestImageFileResized);
         $iImageResizedWidth = $aImageSizeResized[0];

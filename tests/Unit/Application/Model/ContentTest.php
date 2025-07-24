@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxDb;
+use oxField;
+use oxRegistry;
+use oxTestModules;
 
 class ContentTest extends \OxidTestCase
 {
@@ -80,14 +82,14 @@ class ContentTest extends \OxidTestCase
 
         $oDb = oxDb::getDb();
         $oDb->execute("insert into oxacceptedterms (`OXUSERID`, `OXSHOPID`, `OXTERMVERSION`) values ('testuser', '{$sShopId}', '0')");
-        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms"));
+        $this->assertTrue((bool) $oDb->getOne('select 1 from oxacceptedterms'));
 
         $oContent = oxNew('oxContent');
-        $oContent->loadByIdent("oxagb");
-        $oContent->oxcontents__oxtermversion = new oxField("testVersion");
+        $oContent->loadByIdent('oxagb');
+        $oContent->oxcontents__oxtermversion = new oxField('testVersion');
         $oContent->save();
 
-        $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms"));
+        $this->assertFalse((bool) $oDb->getOne('select 1 from oxacceptedterms'));
     }
 
     /**
@@ -97,10 +99,10 @@ class ContentTest extends \OxidTestCase
      */
     public function testGetTermsVersion()
     {
-        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, array("loadByIdent"));
-        $oContent->oxcontents__oxtermversion = new oxField("testVersion");
+        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, ['loadByIdent']);
+        $oContent->oxcontents__oxtermversion = new oxField('testVersion');
         $oContent->expects($this->once())->method('loadByIdent')->with($this->equalTo('oxagb'))->will($this->returnValue(true));
-        $this->assertEquals("testVersion", $oContent->getTermsVersion());
+        $this->assertEquals('testVersion', $oContent->getTermsVersion());
     }
 
     /**
@@ -166,15 +168,15 @@ class ContentTest extends \OxidTestCase
     {
         $oObj = $this->getProxyClass('oxcontent');
         $oObj->disableLazyLoading();
-        $oObj->UNITsetFieldData("oxid", "asd< as");
-        $oObj->UNITsetFieldData("oxcOntent", "asd< as");
+        $oObj->UNITsetFieldData('oxid', 'asd< as');
+        $oObj->UNITsetFieldData('oxcOntent', 'asd< as');
         $this->assertEquals('asd&lt; as', $oObj->oxcontents__oxid->value);
         $this->assertEquals('asd< as', $oObj->oxcontents__oxcontent->value);
     }
 
     public function testGetStdLink()
     {
-        $sUrl = $this->getConfig()->getShopHomeURL() . "cl=content&amp;oxloadid=testLoadId&amp;oxcid=testts";
+        $sUrl = $this->getConfig()->getShopHomeURL() . 'cl=content&amp;oxloadid=testLoadId&amp;oxcid=testts';
 
         $oContent = oxNew('oxContent');
         $oContent->setId('testts');
@@ -187,8 +189,8 @@ class ContentTest extends \OxidTestCase
         $oContent->save();
         $this->assertEquals($sUrl, $oContent->getStdLink());
 
-        $categoryId = ($this->getTestConfig()->getShopEdition() === 'EE')? '30e44ab83159266c7.83602558' : '8a142c3e44ea4e714.31136811';
-        $categoryCnid = ($this->getTestConfig()->getShopEdition() === 'EE')? '30e44ab82c03c3848.49471214' : '8a142c3e4143562a5.46426637';
+        $categoryId = ($this->getTestConfig()->getShopEdition() === 'EE') ? '30e44ab83159266c7.83602558' : '8a142c3e44ea4e714.31136811';
+        $categoryCnid = ($this->getTestConfig()->getShopEdition() === 'EE') ? '30e44ab82c03c3848.49471214' : '8a142c3e4143562a5.46426637';
 
         $oContent->oxcontents__oxcatid = new oxField($categoryId);
         $oContent->save();
@@ -197,20 +199,19 @@ class ContentTest extends \OxidTestCase
 
     public function testGetLink()
     {
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return false;}");
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return false;}');
 
-        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, array('getStdLink'));
+        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, ['getStdLink']);
         $oContent->expects($this->once())->method('getStdLink')->will($this->returnValue('stdlink'));
 
         $this->assertEquals('stdlink', $oContent->getLink());
     }
 
-
     public function testGetLinkSeo()
     {
         $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return true;}");
-        oxTestModules::addFunction("oxseoencodercontent", "getContentUrl", '{$o = $aA[0]; return "seolink".$o->oxcontents__oxtitle->value;}');
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return true;}');
+        oxTestModules::addFunction('oxseoencodercontent', 'getContentUrl', '{$o = $aA[0]; return "seolink".$o->oxcontents__oxtitle->value;}');
 
         try {
             $o = oxNew('oxContent');
@@ -218,7 +219,7 @@ class ContentTest extends \OxidTestCase
             $o->oxcontents__oxcatid = new oxField();
             $o->oxcontents__oxtitle = new oxField('aaFaa');
 
-            $this->assertEquals("seolinkaaFaa", $o->getLink());
+            $this->assertEquals('seolinkaaFaa', $o->getLink());
         } catch (Ecxeption $e) {
         }
         if ($e) {
@@ -228,7 +229,7 @@ class ContentTest extends \OxidTestCase
 
     public function testGetStdLinkWithLangParam()
     {
-        $sUrl = $this->getConfig()->getShopHomeURL() . "cl=content&amp;oxloadid=testLoadId&amp;oxcid=testts";
+        $sUrl = $this->getConfig()->getShopHomeURL() . 'cl=content&amp;oxloadid=testLoadId&amp;oxcid=testts';
         $oContent = oxNew('oxContent');
         $oContent->setId('testts');
         $oContent->oxcontents__oxloadid = new oxField('testLoadId');
@@ -250,9 +251,9 @@ class ContentTest extends \OxidTestCase
 
     public function testGetLinkWithDifLangParam()
     {
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return false;}");
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return false;}');
 
-        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, array('getStdLink'));
+        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, ['getStdLink']);
         $oContent->expects($this->once())->method('getStdLink')->with($this->equalTo(1))->will($this->returnValue('stdlink'));
 
         $this->assertEquals('stdlink', $oContent->getLink(1));
@@ -260,9 +261,9 @@ class ContentTest extends \OxidTestCase
 
     public function testGetLinkWithLangParam()
     {
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return false;}");
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return false;}');
 
-        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, array('getStdLink'));
+        $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, ['getStdLink']);
         $oContent->expects($this->once())->method('getStdLink')->will($this->returnValue('stdlink'));
 
         $this->assertEquals('stdlink', $oContent->getLink(0));
@@ -271,8 +272,8 @@ class ContentTest extends \OxidTestCase
     public function testGetLinkSeoWithLangParam()
     {
         $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return true;}");
-        oxTestModules::addFunction("oxseoencodercontent", "getContentUrl", '{$o = $aA[0]; return "seolink".$o->oxcontents__oxtitle->value.$aA[1];}');
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return true;}');
+        oxTestModules::addFunction('oxseoencodercontent', 'getContentUrl', '{$o = $aA[0]; return "seolink".$o->oxcontents__oxtitle->value.$aA[1];}');
 
         try {
             $o = oxNew('oxContent');
@@ -280,14 +281,13 @@ class ContentTest extends \OxidTestCase
             $o->oxcontents__oxcatid = new oxField();
             $o->oxcontents__oxtitle = new oxField('aaFaa');
 
-            $this->assertEquals("seolinkaaFaa1", $o->getLink(1));
+            $this->assertEquals('seolinkaaFaa1', $o->getLink(1));
         } catch (Ecxeption $e) {
         }
         if ($e) {
             throw $e;
         }
     }
-
 
     public function testExpandedStatusGetter()
     {
@@ -317,14 +317,14 @@ class ContentTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: 0 does not match expected value 1.');
         oxTestModules::addFunction('oxSeoEncoderContent', 'onDeleteContent', '{$this->onDelete[] = $aA[0];}');
-        oxRegistry::get("oxSeoEncoderContent")->onDelete = array();
+        oxRegistry::get('oxSeoEncoderContent')->onDelete = [];
 
         // parent is not deletable
         $sId = $this->_oContent->getId();
         $this->assertEquals(true, $this->_oContent->delete());
         $this->assertEquals(false, $this->_oContent->exists());
-        $this->assertEquals(1, count(oxRegistry::get("oxSeoEncoderContent")->onDelete));
-        $this->assertSame($sId, oxRegistry::get("oxSeoEncoderContent")->onDelete[0]);
+        $this->assertEquals(1, count(oxRegistry::get('oxSeoEncoderContent')->onDelete));
+        $this->assertSame($sId, oxRegistry::get('oxSeoEncoderContent')->onDelete[0]);
     }
 
     /**
@@ -335,14 +335,14 @@ class ContentTest extends \OxidTestCase
     public function testloadCredits()
     {
         // default "oxcredits"
-        $sId = "oxcredits";
+        $sId = 'oxcredits';
         $oContent = oxNew('oxContent');
         $this->assertTrue($oContent->loadByIdent($sId));
         $this->assertEquals($sId, $oContent->oxcontents__oxloadid->value);
-        $this->assertNotEquals("", $oContent->oxcontents__oxcontent->value);
+        $this->assertNotEquals('', $oContent->oxcontents__oxcontent->value);
 
         // unknown "credits"
-        $sId = "credits";
+        $sId = 'credits';
         $oContent = oxNew('oxContent');
         $this->assertFalse($oContent->loadByIdent($sId));
     }

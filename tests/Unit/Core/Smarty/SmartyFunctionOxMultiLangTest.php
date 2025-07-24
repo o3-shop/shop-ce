@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \Smarty;
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
+use Smarty;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/function.oxmultilang.php';
 if (file_exists($filePath)) {
@@ -32,7 +34,6 @@ if (file_exists($filePath)) {
 
 class SmartyFunctionOxMultiLangTest extends \OxidTestCase
 {
-
     /**
      * Returns data for testSingleAssignment
      *
@@ -40,13 +41,13 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
      */
     public function provider()
     {
-        return array(
-            array('FIRST_NAME', 'First name', 1, false),
-            array('FIRST_NAME', 'Vorname', 0, false),
-            array('GENERAL_SAVE', 'Save', 1, true),
-            array('VAT', 'VAT', 1, false),
-            array('GENERAL_SAVE', 'Speichern', 0, true),
-        );
+        return [
+            ['FIRST_NAME', 'First name', 1, false],
+            ['FIRST_NAME', 'Vorname', 0, false],
+            ['GENERAL_SAVE', 'Save', 1, true],
+            ['VAT', 'VAT', 1, false],
+            ['GENERAL_SAVE', 'Speichern', 0, true],
+        ];
     }
 
     /**
@@ -59,7 +60,7 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
         $oSmarty = new Smarty();
         $this->setLanguage($iLang);
         $this->setAdminMode($blAdmin);
-        $this->assertEquals($sTranslation, smarty_function_oxmultilang(array('ident' => $sIndent), $oSmarty));
+        $this->assertEquals($sTranslation, smarty_function_oxmultilang(['ident' => $sIndent], $oSmarty));
     }
 
     /**
@@ -69,12 +70,12 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
      */
     public function additionalProvider()
     {
-        return array(
-            array('FIRST_NAME', 'First name:', 1, 'COLON'),
-            array('FIRST_NAME', 'Vorname:', 0, 'COLON'),
-            array('FIRST_NAME', 'First name!', 1, '!'),
-            array('FIRST_NAME', 'Vorname !', 0, ' !')
-        );
+        return [
+            ['FIRST_NAME', 'First name:', 1, 'COLON'],
+            ['FIRST_NAME', 'Vorname:', 0, 'COLON'],
+            ['FIRST_NAME', 'First name!', 1, '!'],
+            ['FIRST_NAME', 'Vorname !', 0, ' !'],
+        ];
     }
 
     /**
@@ -86,7 +87,7 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
     {
         $oSmarty = new Smarty();
         $this->setLanguage($iLang);
-        $this->assertEquals($sTranslation, smarty_function_oxmultilang(array('ident' => $sIndent, 'suffix' => $sSuffixIndent), $oSmarty));
+        $this->assertEquals($sTranslation, smarty_function_oxmultilang(['ident' => $sIndent, 'suffix' => $sSuffixIndent], $oSmarty));
     }
 
     /**
@@ -96,14 +97,14 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
      */
     public function alternativeProvider()
     {
-        return array(
-            array(
-                array('ident' => 'FIRST_NAME_WRONG_HAS_ALTERNATIVE', 'alternative' => 'Alternative translation', 'suffix' => '!'),
-                'Alternative translation!', 1), // we can actually add any string at the end
-            array(
-                array('ident' => 'FIRST_NAME_WRONG_HAS_ALTERNATIVE_NO_SUFFIX', 'alternative' => 'Vorname:'),
-                'Vorname:', 0),
-        );
+        return [
+            [
+                ['ident' => 'FIRST_NAME_WRONG_HAS_ALTERNATIVE', 'alternative' => 'Alternative translation', 'suffix' => '!'],
+                'Alternative translation!', 1], // we can actually add any string at the end
+            [
+                ['ident' => 'FIRST_NAME_WRONG_HAS_ALTERNATIVE_NO_SUFFIX', 'alternative' => 'Vorname:'],
+                'Vorname:', 0],
+        ];
     }
 
     /**
@@ -119,7 +120,6 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
         $this->assertEquals($sTranslation, smarty_function_oxmultilang($aArgs, $oSmarty));
     }
 
-
     /**
      * testTranslateFrontend_isMissingTranslation data provider
      *
@@ -127,33 +127,33 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
      */
     public function missingTranslationProviderFrontend()
     {
-        return array(
-            array(
+        return [
+            [
                 true,
-                array('ident' => 'MY_MISING_TRANSLATION'),
+                ['ident' => 'MY_MISING_TRANSLATION'],
                 'MY_MISING_TRANSLATION',
-            ),
-            array(
+            ],
+            [
                 false,
-                array('ident' => 'MY_MISING_TRANSLATION'),
+                ['ident' => 'MY_MISING_TRANSLATION'],
                 'ERROR: Translation for MY_MISING_TRANSLATION not found!',
-            ),
-            array(
+            ],
+            [
                 true,
-                array('ident' => 'MY_MISING_TRANSLATION', 'noerror' => true),
+                ['ident' => 'MY_MISING_TRANSLATION', 'noerror' => true],
                 'MY_MISING_TRANSLATION',
-            ),
-            array(
+            ],
+            [
                 false,
-                array('ident' => 'MY_MISING_TRANSLATION', 'noerror' => true),
+                ['ident' => 'MY_MISING_TRANSLATION', 'noerror' => true],
                 'MY_MISING_TRANSLATION',
-            ),
-            array(
+            ],
+            [
                 false,
-                array('ident' => 'MY_MISING_TRANSLATION', 'noerror' => false),
+                ['ident' => 'MY_MISING_TRANSLATION', 'noerror' => false],
                 'ERROR: Translation for MY_MISING_TRANSLATION not found!',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -180,20 +180,20 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
      */
     public function missingTranslationProviderAdmin()
     {
-        return array(
-            array(
-                array('ident' => 'MY_MISING_TRANSLATION'),
+        return [
+            [
+                ['ident' => 'MY_MISING_TRANSLATION'],
                 'ERROR: Translation for MY_MISING_TRANSLATION not found!',
-            ),
-            array(
-                array('ident' => 'MY_MISING_TRANSLATION', 'noerror' => true),
+            ],
+            [
+                ['ident' => 'MY_MISING_TRANSLATION', 'noerror' => true],
                 'MY_MISING_TRANSLATION',
-            ),
-            array(
-                array('ident' => 'MY_MISING_TRANSLATION', 'noerror' => false),
+            ],
+            [
+                ['ident' => 'MY_MISING_TRANSLATION', 'noerror' => false],
                 'ERROR: Translation for MY_MISING_TRANSLATION not found!',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

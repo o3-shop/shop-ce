@@ -24,9 +24,9 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
 use OxidEsales\Codeception\Module\Translation\Translator;
+use OxidEsales\Codeception\Step\Basket;
 use OxidEsales\Codeception\Step\Start;
 use OxidEsales\Codeception\Step\UserRegistration;
-use OxidEsales\Codeception\Step\Basket;
 use OxidEsales\Codeception\Step\UserRegistrationInCheckout;
 
 final class UserRegistrationCest

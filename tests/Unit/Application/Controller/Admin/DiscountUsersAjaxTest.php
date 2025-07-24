@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
 
 /**
@@ -60,7 +62,7 @@ class DiscountUsersAjaxTest extends \OxidTestCase
      */
     public function testGetQuery()
     {
-        $sUserTable = getViewName("oxuser");
+        $sUserTable = getViewName('oxuser');
 
         $oView = oxNew('discount_users_ajax');
         $sQuery = "from $sUserTable where 1  and oxshopid = '" . $this->getShopId() . "'";
@@ -74,9 +76,9 @@ class DiscountUsersAjaxTest extends \OxidTestCase
     {
         $sOxid = '_testOxid';
         $sSynchoxid = '_testSynchoxid';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $sUserTable = getViewName("oxuser");
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $sUserTable = getViewName('oxuser');
 
         $oView = oxNew('discount_users_ajax');
         $sQuery = "from oxobject2group left join $sUserTable on $sUserTable.oxid = oxobject2group.oxobjectid";
@@ -92,8 +94,8 @@ class DiscountUsersAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testSynchoxid';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $sUserTable = getViewName("oxuser");
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $sUserTable = getViewName('oxuser');
 
         $oView = oxNew('discount_users_ajax');
         $sQuery = "from $sUserTable where 1  and oxshopid = '" . $this->getShopId() . "'  and";
@@ -109,8 +111,8 @@ class DiscountUsersAjaxTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountUsersAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testO2DRemove1', '_testO2DRemove2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountUsersAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testO2DRemove1', '_testO2DRemove2']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->removeDiscUser();
@@ -123,8 +125,8 @@ class DiscountUsersAjaxTest extends \OxidTestCase
     public function testRemoveDiscUserAll()
     {
         $sOxid = '_testDiscount';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
 
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
@@ -141,9 +143,9 @@ class DiscountUsersAjaxTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         $sSynchoxid = '_testDiscount';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountUsersAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testNewUser1', '_testNewUser2')));
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountUsersAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testNewUser1', '_testNewUser2']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->addDiscUser();
@@ -156,10 +158,10 @@ class DiscountUsersAjaxTest extends \OxidTestCase
     public function testAddDiscUserAll()
     {
         $sSynchoxid = '_testDiscountNew';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $this->setRequestParameter('all', true);
 
-        $iCount = oxDb::getDb()->getOne("select count(oxid) from oxuser");
+        $iCount = oxDb::getDb()->getOne('select count(oxid) from oxuser');
 
         $oView = oxNew('discount_users_ajax');
         $this->assertGreaterThan(0, $iCount);

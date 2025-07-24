@@ -59,7 +59,7 @@ class SelectListOrderAjax extends ListComponentAjax
         $sArtId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         return " from $sSelTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sSelTable.oxid " .
-                 "where oxobjectid = " . DatabaseProvider::getDb()->quote($sArtId) . " ";
+                 'where oxobjectid = ' . DatabaseProvider::getDb()->quote($sArtId) . ' ';
     }
 
     /**
@@ -79,12 +79,12 @@ class SelectListOrderAjax extends ListComponentAjax
     public function setSorting()
     {
         $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $sSelect = "select * from oxobject2selectlist where oxobjectid = :oxobjectid order by oxsort";
+        $sSelect = 'select * from oxobject2selectlist where oxobjectid = :oxobjectid order by oxsort';
 
         $oList = oxNew(ListModel::class);
-        $oList->init("oxbase", "oxobject2selectlist");
+        $oList->init('oxbase', 'oxobject2selectlist');
         $oList->selectString($sSelect, [
-            ':oxobjectid' => $sSelId
+            ':oxobjectid' => $sSelId,
         ]);
 
         // fixing indexes

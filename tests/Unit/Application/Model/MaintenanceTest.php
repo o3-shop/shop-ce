@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxTestModules;
+use oxTestModules;
 
 class MaintenanceTest extends \OxidTestCase
 {
-
     /**
      * Test case for oxMaintenance::execute()
      *
@@ -33,12 +34,12 @@ class MaintenanceTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Method not called.');
 
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, array('updateUpcomingPrices'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, ['updateUpcomingPrices']);
         $oList->expects($this->once())->method('updateUpcomingPrices')->with($this->equalTo(true));
 
         oxTestModules::addModuleObject('oxarticlelist', $oList);
 
-        $oMaintenance = oxNew("oxMaintenance");
+        $oMaintenance = oxNew('oxMaintenance');
         $oMaintenance->execute();
     }
 }

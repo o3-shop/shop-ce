@@ -82,11 +82,11 @@ class OrderArticle extends AdminDetailsController
         parent::render();
 
         if ($oOrder = $this->getEditObject()) {
-            $this->_aViewData["edit"] = $oOrder;
-            $this->_aViewData["aProductVats"] = $oOrder->getProductVats(true);
+            $this->_aViewData['edit'] = $oOrder;
+            $this->_aViewData['aProductVats'] = $oOrder->getProductVats(true);
         }
 
-        return "order_article.tpl";
+        return 'order_article.tpl';
     }
 
     /**
@@ -97,7 +97,7 @@ class OrderArticle extends AdminDetailsController
     public function getEditObject()
     {
         $soxId = $this->getEditObjectId();
-        if ($this->_oEditObject === null && isset($soxId) && $soxId != "-1") {
+        if ($this->_oEditObject === null && isset($soxId) && $soxId != '-1') {
             $this->_oEditObject = oxNew(Order::class);
             $this->_oEditObject->load($soxId);
         }
@@ -153,11 +153,11 @@ class OrderArticle extends AdminDetailsController
 
             //get article id
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles");
+            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
             $sQ = "select oxid, oxparentid from $sTable where oxartnum = :oxartnum limit 1";
 
             $rs = $oDb->select($sQ, [
-                ':oxartnum' => $sArtNum
+                ':oxartnum' => $sArtNum,
             ]);
             if ($rs && $rs->count() > 0) {
                 $sArtId = $rs->fields['OXPARENTID'] ? $rs->fields['OXPARENTID'] : $rs->fields['OXID'];
@@ -217,7 +217,8 @@ class OrderArticle extends AdminDetailsController
                 $oOrderArticle->oxorderarticles__oxartnum = new Field($oProduct->oxarticles__oxartnum->value);
                 $oOrderArticle->oxorderarticles__oxamount = new Field($dAmount);
                 $oOrderArticle->oxorderarticles__oxselvariant = new Field(
-                    Registry::getRequest()->getRequestEscapedParameter('sel'));
+                    Registry::getRequest()->getRequestEscapedParameter('sel')
+                );
                 $oOrder->recalculateOrder([$oOrderArticle]);
             }
         }
@@ -270,11 +271,11 @@ class OrderArticle extends AdminDetailsController
         }
 
         $oDb = DatabaseProvider::getDb();
-        $sQ = "update oxorderarticles set oxstorno = :oxstorno where oxid = :oxid";
+        $sQ = 'update oxorderarticles set oxstorno = :oxstorno where oxid = :oxid';
         $oDb->execute($sQ, [':oxstorno' => $oArticle->oxorderarticles__oxstorno->value, ':oxid' => $sOrderArtId]);
 
         //get article id
-        $sQ = "select oxartid from oxorderarticles where oxid = :oxid";
+        $sQ = 'select oxartid from oxorderarticles where oxid = :oxid';
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         if ((DatabaseProvider::getMaster()->getOne($sQ, [':oxid' => $sOrderArtId]))) {
             $oOrder = oxNew(Order::class);

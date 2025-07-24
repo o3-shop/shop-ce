@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -38,7 +40,7 @@ class SmartySecuritySettingsDataProviderTest extends \PHPUnit\Framework\TestCase
                 'IF_FUNCS' => ['XML_ELEMENT_NODE', 'is_int'],
                 'MODIFIER_FUNCS' => ['round', 'floor', 'trim', 'implode', 'is_array', 'getimagesize'],
                 'ALLOW_CONSTANTS' => true,
-            ]
+            ],
         ];
 
         $this->assertEquals($settings, $dataProvider->getSecuritySettings());

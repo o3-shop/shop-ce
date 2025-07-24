@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -32,7 +34,7 @@ class ActionsOrderAjaxTest extends \OxidTestCase
     public function testGetQuery()
     {
         $sOxid = '_testOrder';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
         $oView = oxNew('actions_order_ajax');
 
         $sViewTable = $this->getSelectListViewTable();
@@ -48,7 +50,7 @@ class ActionsOrderAjaxTest extends \OxidTestCase
     public function testGetSorting()
     {
         $oView = oxNew('actions_order_ajax');
-        $this->assertEquals("order by oxobject2selectlist.oxsort", trim($oView->UNITgetSorting()));
+        $this->assertEquals('order by oxobject2selectlist.oxsort', trim($oView->UNITgetSorting()));
     }
 
     /**
@@ -58,12 +60,12 @@ class ActionsOrderAjaxTest extends \OxidTestCase
      */
     public function testSetSorting()
     {
-        $this->getConfig()->setConfigParam("iDebug", 1);
+        $this->getConfig()->setConfigParam('iDebug', 1);
 
         $sViewTable = $this->getSelectListViewTable();
-        $aData = array('startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sViewTable.oxid where oxobjectid = '$sOxid'  ", 'records' => array(), 'totalRecords' => 0);
+        $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sViewTable.oxid where oxobjectid = '$sOxid'  ", 'records' => [], 'totalRecords' => 0];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsOrderAjax::class, array("_output"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsOrderAjax::class, ['_output']);
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
         ob_start();
         $oView->setsorting();
@@ -78,13 +80,13 @@ class ActionsOrderAjaxTest extends \OxidTestCase
     public function testSetSortingOxid()
     {
         $sOxid = '_testOrder';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->getConfig()->setConfigParam("iDebug", 1);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->getConfig()->setConfigParam('iDebug', 1);
 
         $sViewTable = $this->getSelectListViewTable();
-        $aData = array('startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sViewTable.oxid where oxobjectid = '$sOxid'  ", 'records' => array(), 'totalRecords' => 0);
+        $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxobject2selectlist on oxobject2selectlist.oxselnid = $sViewTable.oxid where oxobjectid = '$sOxid'  ", 'records' => [], 'totalRecords' => 0];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsOrderAjax::class, array("_output"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsOrderAjax::class, ['_output']);
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
         ob_start();
         $oView->setsorting();

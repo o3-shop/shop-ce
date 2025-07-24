@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class MailValidatorTest extends \OxidTestCase
 {
     public function providerValidateEmailWithValidEmail()
     {
-        return array(
-            array('mathias.krieck@oxid-esales.com'),
-            array('mytest@com.org'),
-            array('my+test@com.org'),
-            array('mytest@oxid-esales.museum'),
-        );
+        return [
+            ['mathias.krieck@oxid-esales.com'],
+            ['mytest@com.org'],
+            ['my+test@com.org'],
+            ['mytest@oxid-esales.museum'],
+        ];
     }
 
     /**
@@ -44,14 +46,14 @@ class MailValidatorTest extends \OxidTestCase
 
     public function providerValidateEmailWithNotValidEmail()
     {
-        return array(
-            array('?mathias.krieck@oxid-esales.com'),
-            array('my/test@com.org'),
-            array('@com.org'),
-            array('mytestcom.org'),
-            array('mytest@com'),
-            array('info@�vyturys.lt'),
-        );
+        return [
+            ['?mathias.krieck@oxid-esales.com'],
+            ['my/test@com.org'],
+            ['@com.org'],
+            ['mytestcom.org'],
+            ['mytest@com'],
+            ['info@�vyturys.lt'],
+        ];
     }
 
     /**

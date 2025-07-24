@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
-use Exception;
 
 /**
  * Admin systeminfo manager.
@@ -49,9 +49,9 @@ class ToolsList extends AdminListController
     public function updateViews()
     {
         //preventing edit for anyone except malladmin
-        if (Registry::getSession()->getVariable("malladmin")) {
+        if (Registry::getSession()->getVariable('malladmin')) {
             $oMetaData = oxNew(DbMetaDataHandler::class);
-            $this->_aViewData["blViewSuccess"] = $oMetaData->updateViews();
+            $this->_aViewData['blViewSuccess'] = $oMetaData->updateViews();
         }
     }
 
@@ -62,7 +62,7 @@ class ToolsList extends AdminListController
     {
         $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
-        if ($oAuthUser->oxuser__oxrights->value === "malladmin") {
+        if ($oAuthUser->oxuser__oxrights->value === 'malladmin') {
             $sUpdateSQL = Registry::getRequest()->getRequestEscapedParameter('updatesql');
             $sUpdateSQLFile = $this->_processFiles();
 
@@ -79,7 +79,7 @@ class ToolsList extends AdminListController
             $iLen = $oStr->strlen($sUpdateSQL);
             if ($this->_prepareSQL($sUpdateSQL, $iLen)) {
                 $aQueries = $this->aSQLs;
-                $this->_aViewData["aQueries"] = [];
+                $this->_aViewData['aQueries'] = [];
                 $aPassedQueries = [];
                 $aQAffectedRows = [];
                 $aQErrorMessages = [];
@@ -96,10 +96,10 @@ class ToolsList extends AdminListController
                         if ($oStr->strlen($sUpdateSQL) > 0) {
                             $aPassedQueries[$iQueriesCounter] = nl2br(Str::getStr()->htmlentities($sUpdateSQL));
                             if ($oStr->strlen($aPassedQueries[$iQueriesCounter]) > 200) {
-                                $aPassedQueries[$iQueriesCounter] = $oStr->substr($aPassedQueries[$iQueriesCounter], 0, 200) . "...";
+                                $aPassedQueries[$iQueriesCounter] = $oStr->substr($aPassedQueries[$iQueriesCounter], 0, 200) . '...';
                             }
 
-                            while ($sUpdateSQL[$oStr->strlen($sUpdateSQL) - 1] == ";") {
+                            while ($sUpdateSQL[$oStr->strlen($sUpdateSQL) - 1] == ';') {
                                 $sUpdateSQL = $oStr->substr($sUpdateSQL, 0, ($oStr->strlen($sUpdateSQL) - 1));
                             }
 
@@ -126,10 +126,10 @@ class ToolsList extends AdminListController
                         }
                     }
                 }
-                $this->_aViewData["aQueries"] = $aPassedQueries;
-                $this->_aViewData["aAffectedRows"] = $aQAffectedRows;
-                $this->_aViewData["aErrorMessages"] = $aQErrorMessages;
-                $this->_aViewData["aErrorNumbers"] = $aQErrorNumbers;
+                $this->_aViewData['aQueries'] = $aPassedQueries;
+                $this->_aViewData['aAffectedRows'] = $aQAffectedRows;
+                $this->_aViewData['aErrorMessages'] = $aQErrorMessages;
+                $this->_aViewData['aErrorNumbers'] = $aQErrorNumbers;
             }
             $this->_iDefEdit = 1;
         }
@@ -150,11 +150,11 @@ class ToolsList extends AdminListController
                 $sSource = $aSource[$key];
                 $value = strtolower($value);
                 // add type to name
-                $aFilename = explode(".", $value);
+                $aFilename = explode('.', $value);
 
                 //hack?
 
-                $aBadFiles = ["php", 'php4', 'php5', "jsp", "cgi", "cmf", "exe"];
+                $aBadFiles = ['php', 'php4', 'php5', 'jsp', 'cgi', 'cmf', 'exe'];
 
                 if (in_array($aFilename[1], $aBadFiles)) {
                     Registry::getUtils()->showMessageAndExit("File didn't pass our allowed files filter.");
@@ -162,7 +162,7 @@ class ToolsList extends AdminListController
 
                 //reading SQL dump file
                 if (filesize($sSource) > 0) {
-                    $rHandle = fopen($sSource, "r");
+                    $rHandle = fopen($sSource, 'r');
                     $sContents = fread($rHandle, filesize($sSource));
                     fclose($rHandle);
 
@@ -186,13 +186,13 @@ class ToolsList extends AdminListController
      */
     protected function _prepareSQL($sSQL, $iSQLlen) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sStrStart = "";
+        $sStrStart = '';
         $blString = false;
         $oStr = Str::getStr();
 
         //removing "mysqldump" application comments
         while ($oStr->preg_match("/^\-\-.*\n/", $sSQL)) {
-            $sSQL = trim($oStr->preg_replace("/^\-\-.*\n/", "", $sSQL));
+            $sSQL = trim($oStr->preg_replace("/^\-\-.*\n/", '', $sSQL));
         }
         while ($oStr->preg_match("/\n\-\-.*\n/", $sSQL)) {
             $sSQL = trim($oStr->preg_replace("/\n\-\-.*\n/", "\n", $sSQL));
@@ -211,7 +211,7 @@ class ToolsList extends AdminListController
                     } elseif ($sStrStart == '`' || $sSQL[$iPos - 1] != '\\') {
                         //found some query separators
                         $blString = false;
-                        $sStrStart = "";
+                        $sStrStart = '';
                         break;
                     } else {
                         $iNext = 2;
@@ -222,14 +222,14 @@ class ToolsList extends AdminListController
                         }
                         if ($blBackslash) {
                             $blString = false;
-                            $sStrStart = "";
+                            $sStrStart = '';
                             break;
                         } else {
                             $iPos++;
                         }
                     }
                 }
-            } elseif ($sChar == ";") {
+            } elseif ($sChar == ';') {
                 // delimiter found, appending query array
                 $this->aSQLs[] = $oStr->substr($sSQL, 0, $iPos);
                 $sSQL = ltrim($oStr->substr($sSQL, min($iPos + 1, $iSQLlen)));
@@ -242,9 +242,9 @@ class ToolsList extends AdminListController
             } elseif (($sChar == '"') || ($sChar == '\'') || ($sChar == '`')) {
                 $blString = true;
                 $sStrStart = $sChar;
-            } elseif ($sChar == "#" || ($sChar == ' ' && $iPos > 1 && $sSQL[$iPos - 2] . $sSQL[$iPos - 1] == '--')) {
+            } elseif ($sChar == '#' || ($sChar == ' ' && $iPos > 1 && $sSQL[$iPos - 2] . $sSQL[$iPos - 1] == '--')) {
                 // removing # commented query code
-                $iCommStart = (($sSQL[$iPos] == "#") ? $iPos : $iPos - 2);
+                $iCommStart = (($sSQL[$iPos] == '#') ? $iPos : $iPos - 2);
                 $iCommEnd = ($oStr->strpos(' ' . $sSQL, "\012", $iPos + 2))
                     ? $oStr->strpos(' ' . $sSQL, "\012", $iPos + 2)
                     : $oStr->strpos(' ' . $sSQL, "\015", $iPos + 2);
@@ -265,7 +265,7 @@ class ToolsList extends AdminListController
             }
         }
 
-        if (!empty($sSQL) && $oStr->preg_match("/[^[:space:]]+/", $sSQL)) {
+        if (!empty($sSQL) && $oStr->preg_match('/[^[:space:]]+/', $sSQL)) {
             $this->aSQLs[] = $sSQL;
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Price;
 
 use oxArticle;
 use oxBase;
 use oxBasket;
 use oxField;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseErrorException;
 use oxRegistry;
 use oxUser;
 
@@ -143,7 +144,7 @@ class BasketConstruct
      */
     protected function _createUser($userData)
     {
-        $user = $this->createObj($userData, "oxuser", "oxuser");
+        $user = $this->createObj($userData, 'oxuser', 'oxuser');
 
         return $user;
     }
@@ -160,10 +161,10 @@ class BasketConstruct
             $category = $this->createObj($categoryData, 'oxcategory', 'oxcategories');
             if (!empty($categoryData['oxarticles'])) {
                 foreach ($categoryData['oxarticles'] as $articleId) {
-                    $data = array(
+                    $data = [
                         'oxcatnid'   => $category->getId(),
-                        'oxobjectid' => $articleId
-                    );
+                        'oxobjectid' => $articleId,
+                    ];
                     $this->createObj2Obj($data, 'oxobject2category');
                 }
             }
@@ -179,20 +180,20 @@ class BasketConstruct
      */
     protected function _getArticles($articles)
     {
-        $result = array();
+        $result = [];
         $articles = (array) $articles;
         foreach ($articles as $outerKey => $articleData) {
             $article = oxNew('oxArticle');
             $article->setId($articleData['oxid']);
             foreach ($articleData as $key => $value) {
-                if (strstr($key, "ox")) {
+                if (strstr($key, 'ox')) {
                     $field = "oxarticles__{$key}";
                     $article->$field = new oxField($articleData[$key]);
                 }
             }
             $article->save();
             if (isset($articleData['scaleprices']) && $articleData['scaleprices']) {
-                $this->_createScalePrices(array($articleData['scaleprices']));
+                $this->_createScalePrices([$articleData['scaleprices']]);
             }
             if (isset($articleData['field2shop']) && $articleData['field2shop']) {
                 $this->_createField2Shop($article, $articleData['field2shop']);
@@ -214,7 +215,7 @@ class BasketConstruct
      */
     protected function _createScalePrices($scalePrices)
     {
-        $this->createObj2Obj($scalePrices, "oxprice2article");
+        $this->createObj2Obj($scalePrices, 'oxprice2article');
     }
 
     /**
@@ -241,13 +242,13 @@ class BasketConstruct
      */
     protected function _createField2Shop($article, $options)
     {
-        $field2Shop = oxNew("oxField2Shop");
+        $field2Shop = oxNew('oxField2Shop');
         $field2Shop->setProductData($article);
         if (!isset($options['oxartid'])) {
             $options['oxartid'] = new oxField($article->getId());
         }
         foreach ($options as $sKey => $sValue) {
-            if (strstr($sKey, "ox")) {
+            if (strstr($sKey, 'ox')) {
                 $field = "oxfield2shop__{$sKey}";
                 $field2Shop->$field = new oxField($options[$sKey]);
             }
@@ -269,17 +270,17 @@ class BasketConstruct
             $discount->setId($discountData['oxid']);
             foreach ($discountData as $key => $value) {
                 if (!is_array($value)) {
-                    $field = "oxdiscount__" . $key;
+                    $field = 'oxdiscount__' . $key;
                     $discount->$field = new oxField("{$value}");
                 } else {
                     foreach ($value as $id) {
-                        $aData = array(
-                            'oxid'         => $discount->getId() . "_" . $id,
+                        $aData = [
+                            'oxid'         => $discount->getId() . '_' . $id,
                             'oxdiscountid' => $discount->getId(),
                             'oxobjectid'   => $id,
-                            'oxtype'       => $key
-                        );
-                        $this->createObj2Obj($aData, "oxobject2discount");
+                            'oxtype'       => $key,
+                        ];
+                        $this->createObj2Obj($aData, 'oxobject2discount');
                     }
                 }
             }
@@ -296,14 +297,14 @@ class BasketConstruct
      */
     protected function _setWrappings($wrappings)
     {
-        $result = array();
+        $result = [];
         $wrappings = (array) $wrappings;
         foreach ($wrappings as $wrapping) {
             $card = oxNew('oxBase');
             $card->init('oxwrapping');
             foreach ($wrapping as $key => $value) {
                 if (!is_array($value)) {
-                    $field = "oxwrapping__" . $key;
+                    $field = 'oxwrapping__' . $key;
                     $card->$field = new oxField($value, oxField::T_RAW);
                 }
             }
@@ -332,12 +333,12 @@ class BasketConstruct
         if (empty($deliveryCosts)) {
             return null;
         }
-        $deliveries = array();
+        $deliveries = [];
 
         if (!empty($deliveryCosts['oxdeliveryset'])) {
             $data = $deliveryCosts['oxdeliveryset'];
         } else {
-            $data = array('oxactive' => 1);
+            $data = ['oxactive' => 1];
         }
         $deliverySet = $this->createObj($data, 'oxdeliveryset', 'oxdeliveryset');
 
@@ -346,26 +347,26 @@ class BasketConstruct
             $delivery->save();
             foreach ($deliveryData as $key => $value) {
                 if (!is_array($value)) {
-                    $field = "oxdelivery__" . $key;
+                    $field = 'oxdelivery__' . $key;
                     $delivery->$field = new oxField("{$value}");
                 } else {
                     foreach ($value as $sId) {
-                        $data = array(
+                        $data = [
                             'oxdeliveryid' => $delivery->getId(),
                             'oxobjectid'   => $sId,
-                            'oxtype'       => $key
-                        );
+                            'oxtype'       => $key,
+                        ];
                         $this->createObj2Obj($data, 'oxobject2delivery');
                     }
                 }
             }
             $delivery->save();
             $deliveries[] = $delivery->getId();
-            $data = array(
+            $data = [
                 'oxdelid'    => $delivery->getId(),
                 'oxdelsetid' => $deliverySet->getId(),
-            );
-            $this->createObj2Obj($data, "oxdel2delset");
+            ];
+            $this->createObj2Obj($data, 'oxdel2delset');
         }
 
         return $deliveries;
@@ -380,14 +381,14 @@ class BasketConstruct
      */
     protected function _setPayments($payments)
     {
-        $result = array();
+        $result = [];
         $payments = (array) $payments;
         foreach ($payments as $paymentData) {
             // add discounts
             $payment = oxNew('oxPayment');
             foreach ($paymentData as $key => $value) {
                 if (!is_array($value)) {
-                    $field = "oxpayments__" . $key;
+                    $field = 'oxpayments__' . $key;
                     $payment->$field = new oxField("{$value}");
                 }
             }
@@ -407,23 +408,23 @@ class BasketConstruct
      */
     protected function _setVouchers($voucherSeries)
     {
-        $voucherIDs = array();
+        $voucherIDs = [];
         $voucherSeries = (array) $voucherSeries;
         foreach ($voucherSeries as $voucherData) {
             $voucherSerie = oxNew('oxBase');
             $voucherSerie->init('oxvoucherseries');
             foreach ($voucherData as $key => $value) {
-                $field = "oxvoucherseries__" . $key;
+                $field = 'oxvoucherseries__' . $key;
                 $voucherSerie->$field = new oxField($value, oxField::T_RAW);
             }
             $voucherSerie->save();
             // inserting vouchers
             for ($i = 1; $i <= $voucherData['voucher_count']; $i++) {
-                $data = array(
+                $data = [
                     'oxreserved'       => 0,
                     'oxvouchernr'      => md5(uniqid(rand(), true)),
-                    'oxvoucherserieid' => $voucherSerie->getId()
-                );
+                    'oxvoucherserieid' => $voucherSerie->getId(),
+                ];
                 $voucher = $this->createObj($data, 'oxvoucher', 'oxvouchers');
                 $voucherIDs[] = $voucher->getId();
             }
@@ -437,7 +438,7 @@ class BasketConstruct
      */
     protected function _getDefaultUserData()
     {
-        return array(
+        return [
             'oxrights'      => 'malladmin',
             'oxactive'      => '1',
             'oxusername'    => 'admin',
@@ -457,8 +458,8 @@ class BasketConstruct
             'oxaddinfo'     => null,
             'oxustid'       => null,
             'oxsal'         => 'MR',
-            'oxustidstatus' => '0'
-        );
+            'oxustidstatus' => '0',
+        ];
     }
 
     /**
@@ -488,9 +489,9 @@ class BasketConstruct
         }
         if (isset($options['activeCurrencyRate']) && $options['activeCurrencyRate']) {
             // load active currencies, change if set option
-            $currencies = $config->getConfigParam("aCurrencies");
-            $currencies[0] = "EUR@ " . $options['activeCurrencyRate'] . "@ ,@ .@ €@ 2";
-            $config->setConfigParam("aCurrencies", $currencies);
+            $currencies = $config->getConfigParam('aCurrencies');
+            $currencies[0] = 'EUR@ ' . $options['activeCurrencyRate'] . '@ ,@ .@ €@ 2';
+            $config->setConfigParam('aCurrencies', $currencies);
         }
     }
 
@@ -522,12 +523,12 @@ class BasketConstruct
      */
     public function createObj2Obj($data, $object2ObjectTable)
     {
-        $newData = is_array($data[0] ?? null) ? $data : array($data);
+        $newData = is_array($data[0] ?? null) ? $data : [$data];
         foreach ($newData as $values) {
             $object = oxNew('oxBase');
             $object->init($object2ObjectTable);
             foreach ($values as $key => $value) {
-                $field = $object2ObjectTable . "__" . $key;
+                $field = $object2ObjectTable . '__' . $key;
                 $object->$field = new oxField($value, oxField::T_RAW);
             }
             $object->save();
@@ -547,10 +548,10 @@ class BasketConstruct
             if (!empty($groupData['oxobject2group'])) {
                 $count = count($groupData['oxobject2group']);
                 for ($i = 0; $i < $count; $i++) {
-                    $connection = array(
+                    $connection = [
                         'oxgroupsid' => $group->getId(),
-                        'oxobjectid' => $groupData['oxobject2group'][$i] ?? null
-                    );
+                        'oxobjectid' => $groupData['oxobject2group'][$i] ?? null,
+                    ];
                     $this->createObj2Obj($connection, 'oxobject2group');
                 }
             }
@@ -578,7 +579,7 @@ class BasketConstruct
         }
         foreach ($data as $key => $value) {
             if (!is_array($value)) {
-                $field = $table . "__" . $key;
+                $field = $table . '__' . $key;
                 $object->$field = new oxField($value, oxField::T_RAW);
             }
         }
@@ -599,19 +600,19 @@ class BasketConstruct
         $activeShopId = 1;
         $shopCnt = $this->getShopCount($data);
         for ($i = 0; $i < $shopCnt; $i++) {
-            $parameters = array();
+            $parameters = [];
             foreach ($data[$i] as $key => $value) {
-                $field = "oxshops__" . $key;
+                $field = 'oxshops__' . $key;
                 $parameters[$field] = $value;
             }
 
-            $shop = oxNew("oxShop");
+            $shop = oxNew('oxShop');
             $shop->assign($parameters);
             $shop->save();
 
             $config = oxNew('oxConfig');
             $config->setShopId($shop->getId());
-            $config->saveShopConfVar('aarr', 'aLanguages', array('de' => 'Deutch', 'en' => 'English'));
+            $config->saveShopConfVar('aarr', 'aLanguages', ['de' => 'Deutch', 'en' => 'English']);
 
             $shop->generateViews();
             if ($data[$i]['activeshop']) {

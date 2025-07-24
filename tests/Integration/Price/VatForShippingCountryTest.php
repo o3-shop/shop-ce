@@ -71,7 +71,7 @@ class VatForShippingCountryTest extends UnitTestCase
             'oxcompany' => 'myCompany',
             'oxfon' => '217-8918713',
             'oxfax' => '217-8918713',
-            'oxsal' => 'MRS'
+            'oxsal' => 'MRS',
         ];
 
         $switzerland = [
@@ -85,7 +85,7 @@ class VatForShippingCountryTest extends UnitTestCase
             'oxcompany' => 'myCompany',
             'oxfon' => '217-8918713',
             'oxfax' => '217-8918713',
-            'oxsal' => 'MRS'
+            'oxsal' => 'MRS',
         ];
 
         $this->addressInfo = ['Germany' => $germany, 'Switzerland' => $switzerland];
@@ -208,7 +208,7 @@ class VatForShippingCountryTest extends UnitTestCase
             'oxuser__oxstreet'    => $addressInfo['oxstreet'],
             'oxuser__oxzip'       => $addressInfo['oxzip'],
             'oxuser__oxcity'      => $addressInfo['oxcity'],
-            'oxuser__oxcountryid' => $addressInfo['oxcountryid']
+            'oxuser__oxcountryid' => $addressInfo['oxcountryid'],
         ];
 
         $_POST['stoken'] = Registry::getSession()->getSessionChallengeToken();
@@ -252,7 +252,7 @@ class VatForShippingCountryTest extends UnitTestCase
         $oArticle->setId($articleId);
         $oArticle->oxarticles__oxprice = new Field($price);
         $oArticle->oxarticles__oxshopid = new Field(1);
-        $oArticle->oxarticles__oxtitle = new Field("test");
+        $oArticle->oxarticles__oxtitle = new Field('test');
         $oArticle->save();
     }
 }

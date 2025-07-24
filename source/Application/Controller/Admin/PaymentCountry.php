@@ -47,10 +47,10 @@ class PaymentCountry extends AdminDetailsController
         parent::render();
 
         // remove itm from list
-        unset($this->_aViewData["sumtype"][2]);
+        unset($this->_aViewData['sumtype'][2]);
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oPayment = oxNew(Payment::class);
             $oPayment->loadInLang($this->_iEditLang, $soxId);
@@ -60,19 +60,19 @@ class PaymentCountry extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oPayment->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oPayment;
+            $this->_aViewData['edit'] = $oPayment;
 
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
@@ -80,10 +80,10 @@ class PaymentCountry extends AdminDetailsController
             $oPaymentCountryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\PaymentCountryAjax::class);
             $this->_aViewData['oxajax'] = $oPaymentCountryAjax->getColumns();
 
-            return "popups/payment_country.tpl";
+            return 'popups/payment_country.tpl';
         }
 
-        return "payment_country.tpl";
+        return 'payment_country.tpl';
     }
 
     /**
@@ -93,13 +93,13 @@ class PaymentCountry extends AdminDetailsController
     {
         $sOxId = $this->getEditObjectId();
         $aChosenCntr = Registry::getRequest()->getRequestEscapedParameter('allcountries');
-        if (isset($sOxId) && $sOxId != "-1" && is_array($aChosenCntr)) {
+        if (isset($sOxId) && $sOxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Payment = oxNew(BaseModel::class);
                 $oObject2Payment->init('oxobject2payment');
                 $oObject2Payment->oxobject2payment__oxpaymentid = new Field($sOxId);
                 $oObject2Payment->oxobject2payment__oxobjectid = new Field($sChosenCntr);
-                $oObject2Payment->oxobject2payment__oxtype = new Field("oxcountry");
+                $oObject2Payment->oxobject2payment__oxtype = new Field('oxcountry');
                 $oObject2Payment->save();
             }
         }
@@ -112,7 +112,7 @@ class PaymentCountry extends AdminDetailsController
     {
         $sOxId = $this->getEditObjectId();
         $aChosenCntr = Registry::getRequest()->getRequestEscapedParameter('countries');
-        if (isset($sOxId) && $sOxId != "-1" && is_array($aChosenCntr)) {
+        if (isset($sOxId) && $sOxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Payment = oxNew(BaseModel::class);
                 $oObject2Payment->init('oxobject2payment');

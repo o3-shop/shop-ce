@@ -66,7 +66,7 @@ class ActionsList extends AdminListController
         parent::render();
 
         // passing display type back to view
-        $this->_aViewData["displaytype"] = Registry::getRequest()->getRequestEscapedParameter('displaytype');
+        $this->_aViewData['displaytype'] = Registry::getRequest()->getRequestEscapedParameter('displaytype');
 
         return $this->_sThisTemplate;
     }
@@ -99,7 +99,7 @@ class ActionsList extends AdminListController
     {
         $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
-        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxactions");
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxactions');
 
         // searching for empty oxfolder fields
         if ($sDisplayType) {

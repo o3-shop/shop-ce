@@ -26,7 +26,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class ExceptionTest extends UnitTestCase
 {
-
     // 1. testing constructor works .. ok, its a pseudo test ;-)
     public function testConstruct()
     {

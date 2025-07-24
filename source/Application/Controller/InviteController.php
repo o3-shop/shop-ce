@@ -100,7 +100,7 @@ class InviteController extends AccountController
     {
         $oConfig = Registry::getConfig();
 
-        if (!$oConfig->getConfigParam("blInvitationsEnabled")) {
+        if (!$oConfig->getConfigParam('blInvitationsEnabled')) {
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
 
             return;
@@ -119,7 +119,7 @@ class InviteController extends AccountController
     {
         $oConfig = Registry::getConfig();
 
-        if (!$oConfig->getConfigParam("blInvitationsEnabled")) {
+        if (!$oConfig->getConfigParam('blInvitationsEnabled')) {
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
         }
 
@@ -138,7 +138,7 @@ class InviteController extends AccountController
         // filled not all fields ?
         foreach ($this->_aReqFields as $sFieldName) {
             //checking if any email was entered
-            if ($sFieldName == "rec_email") {
+            if ($sFieldName == 'rec_email') {
                 foreach ($aParams[$sFieldName] as $sKey => $sEmail) {
                     //removing empty emails fields from eMails array
                     if (empty($sEmail)) {
@@ -165,7 +165,7 @@ class InviteController extends AccountController
         }
 
         //validating entered emails
-        foreach ($aParams["rec_email"] as $sRecipientEmail) {
+        foreach ($aParams['rec_email'] as $sRecipientEmail) {
             if (!oxNew(MailValidator::class)->isValidEmail($sRecipientEmail)) {
                 $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_INVITE_INCORRECTEMAILADDRESS');
 
@@ -173,7 +173,7 @@ class InviteController extends AccountController
             }
         }
 
-        if (!oxNew(MailValidator::class)->isValidEmail($aParams["send_email"])) {
+        if (!oxNew(MailValidator::class)->isValidEmail($aParams['send_email'])) {
             $oUtilsView->addErrorToDisplay('ERROR_MESSAGE_INVITE_INCORRECTEMAILADDRESS');
 
             return;
@@ -189,7 +189,7 @@ class InviteController extends AccountController
             $oUser = $this->getUser();
 
             //saving statistics for sent emails
-            $oUser->updateInvitationStatistics($aParams["rec_email"]);
+            $oUser->updateInvitationStatistics($aParams['rec_email']);
         } else {
             Registry::getUtilsView()->addErrorToDisplay('ERROR_MESSAGE_CHECK_EMAIL');
         }
@@ -237,7 +237,7 @@ class InviteController extends AccountController
 
         $iLang = Registry::getLang()->getBaseLanguage();
         $aPath['title'] = Registry::getLang()->translateString('INVITE_YOUR_FRIENDS', $iLang, false);
-        $aPath['link']  = $this->getLink();
+        $aPath['link'] = $this->getLink();
         $aPaths[] = $aPath;
 
         return $aPaths;

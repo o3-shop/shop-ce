@@ -77,7 +77,7 @@ class ContentController extends FrontendController
      *
      * @var array
      */
-    protected $_aPsAllowedContents = ["oxagb", "oxrightofwithdrawal", "oximpressum"];
+    protected $_aPsAllowedContents = ['oxagb', 'oxrightofwithdrawal', 'oximpressum'];
 
     /**
      * Current view content title
@@ -120,13 +120,13 @@ class ContentController extends FrontendController
      *
      * @var array
      */
-    protected $_aBusinessEntityExtends = ["sRDFaLogoUrl",
-                                               "sRDFaLongitude",
-                                               "sRDFaLatitude",
-                                               "sRDFaGLN",
-                                               "sRDFaNAICS",
-                                               "sRDFaISIC",
-                                               "sRDFaDUNS"];
+    protected $_aBusinessEntityExtends = ['sRDFaLogoUrl',
+                                               'sRDFaLongitude',
+                                               'sRDFaLatitude',
+                                               'sRDFaGLN',
+                                               'sRDFaNAICS',
+                                               'sRDFaISIC',
+                                               'sRDFaDUNS'];
 
     /**
      * Returns prefix ID used by template engine.
@@ -524,7 +524,7 @@ class ContentController extends FrontendController
         $aDeliveryChargeSpecs = [];
         $oDeliveryChargeSpecs = $this->getDeliveryList();
         foreach ($oDeliveryChargeSpecs as $oDeliveryChargeSpec) {
-            if ($oDeliveryChargeSpec->oxdelivery__oxaddsumtype->value == "abs") {
+            if ($oDeliveryChargeSpec->oxdelivery__oxaddsumtype->value == 'abs') {
                 $oDelSets = oxNew(DeliverySetList::class);
                 $oDelSets->loadRDFaDeliverySetList($oDeliveryChargeSpec->getId());
                 $oDeliveryChargeSpec->deliverysetmethods = $oDelSets;
@@ -571,8 +571,8 @@ class ContentController extends FrontendController
         $iFrom = Registry::getUtilsDate()->getTime();
         $iThrough = $iFrom + ($iDays * 24 * 60 * 60);
         $aPriceValidity = [];
-        $aPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . "Z";
-        $aPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . "Z";
+        $aPriceValidity['validfrom'] = date('Y-m-d\TH:i:s', $iFrom) . 'Z';
+        $aPriceValidity['validthrough'] = date('Y-m-d\TH:i:s', $iThrough) . 'Z';
 
         return $aPriceValidity;
     }

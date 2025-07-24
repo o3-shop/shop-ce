@@ -30,13 +30,13 @@ class IncludeDynamicLogic
      */
     public function renderForCache(array $parameters): string
     {
-        $content = "<oxid_dynamic>";
+        $content = '<oxid_dynamic>';
 
         foreach ($parameters as $key => $value) {
             $content .= " $key='" . base64_encode($value) . "'";
         }
 
-        $content .= "</oxid_dynamic>";
+        $content .= '</oxid_dynamic>';
 
         return $content;
     }
@@ -48,9 +48,9 @@ class IncludeDynamicLogic
      */
     public function includeDynamicPrefix(array $parameters): array
     {
-        $prefix = "_";
+        $prefix = '_';
         if (array_key_exists('type', $parameters)) {
-            $prefix .= $parameters['type'] . "_";
+            $prefix .= $parameters['type'] . '_';
         }
         foreach ($parameters as $key => $value) {
             unset($parameters[$key]);

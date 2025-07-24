@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,20 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\Delivery;
-
-use \Exception;
-use \stdClass;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
+use stdClass;
 
 /**
  * Tests for Delivery_Main class
  */
 class DeliveryMainTest extends \OxidTestCase
 {
-
     /**
      * Delivery_Main::Render() test case
      *
@@ -39,8 +39,8 @@ class DeliveryMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxdelivery", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxdelivery', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Delivery_Main');
@@ -57,14 +57,14 @@ class DeliveryMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Delivery_Main');
         $this->assertEquals('delivery_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -76,18 +76,18 @@ class DeliveryMainTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxdelivery', 'save', '{ throw new Exception( "save" ); }');
         oxTestModules::addFunction('oxdelivery', 'isDerived', '{ return false; }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('Delivery_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Delivery_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Delivery_Main::save()');
 
             return;
         }
-        $this->fail("error in Delivery_Main::save()");
+        $this->fail('error in Delivery_Main::save()');
     }
 
     /**
@@ -99,18 +99,18 @@ class DeliveryMainTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxdelivery', 'save', '{ throw new Exception( "save" ); }');
         oxTestModules::addFunction('oxdelivery', 'isDerived', '{ return false; }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('Delivery_Main');
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Delivery_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Delivery_Main::save()');
 
             return;
         }
-        $this->fail("error in Delivery_Main::save()");
+        $this->fail('error in Delivery_Main::save()');
     }
 
     /**
@@ -127,12 +127,12 @@ class DeliveryMainTest extends \OxidTestCase
         $iLang = $oLang->getTplLanguage();
 
         $oType = new stdClass();
-        $oType->sType = "t";      // test
-        $oType->sDesc = $oLang->translateString("test", $iLang);
+        $oType->sType = 't';      // test
+        $oType->sDesc = $oLang->translateString('test', $iLang);
         $aDelTypes['t'] = $oType;
 
         $this->assertIsArray($aDelTypes);
-        $aDelTypeKeys = array('a', 's', 'w', 'p', 't');
+        $aDelTypeKeys = ['a', 's', 'w', 'p', 't'];
         foreach ($aDelTypeKeys as $sDelTypeKey) {
             $this->assertArrayHasKey($sDelTypeKey, $aDelTypes);
         }

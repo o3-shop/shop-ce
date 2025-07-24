@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,27 +18,23 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use oxArticleException;
-use oxArticleInputException;
-use OxidEsales\EshopCommunity\Core\Exception\ExceptionToDisplay;
+use oxArticle;
+use oxBasketItem;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Article;
-use \oxArticle;
-use \oxBasketItem;
-use \oxField;
-use oxNoArticleException;
-use oxOutOfStockException;
-use \stdClass;
-use \oxRegistry;
-use \oxTestModules;
+use OxidEsales\EshopCommunity\Core\Exception\ExceptionToDisplay;
+use oxRegistry;
+use oxTestModules;
+use stdClass;
 
 /**
  * Test oxArticle module - notBuyable
  */
 class BasketItemTest_ArticleHelper extends oxArticle
 {
-
     /**
      * Force isBuyable.
      *
@@ -54,7 +51,6 @@ class BasketItemTest_ArticleHelper extends oxArticle
  */
 class modOxArticle_notVisible_oxbasketItem extends oxArticle
 {
-
     /**
      * Force isVisible.
      *
@@ -96,7 +92,6 @@ class modForTestSetAsDiscountArticle extends oxBasketItem
         $this->$sName = $sValue;
     }
 }
-
 
 /**
  * Testing oxBasketItem class.
@@ -144,7 +139,7 @@ class BasketitemTest extends \OxidTestCase
         } catch (\OxidEsales\EshopCommunity\Core\Exception\ArticleInputException $oException) {
             return;
         }
-        $this->fail("product should not be orderable");
+        $this->fail('product should not be orderable');
     }
 
     /**
@@ -168,7 +163,7 @@ class BasketitemTest extends \OxidTestCase
 
             return;
         }
-        $this->fail("failed stock related check");
+        $this->fail('failed stock related check');
     }
 
     /**
@@ -178,17 +173,17 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testInitFromOrderArticle()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("getOrderArticleSelectList", "getPersParams", "isBundle"));
-        $oOrderArticle->expects($this->once())->method('getOrderArticleSelectList')->will($this->returnValue("aOrderArticleSelectList"));
-        $oOrderArticle->expects($this->once())->method('getPersParams')->will($this->returnValue("aPersParams"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['getOrderArticleSelectList', 'getPersParams', 'isBundle']);
+        $oOrderArticle->expects($this->once())->method('getOrderArticleSelectList')->will($this->returnValue('aOrderArticleSelectList'));
+        $oOrderArticle->expects($this->once())->method('getPersParams')->will($this->returnValue('aPersParams'));
         $oOrderArticle->expects($this->once())->method('isBundle')->will($this->returnValue(true));
         $oOrderArticle->oxorderarticles__oxamount = new oxField(999);
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array("_setFromOrderArticle", "setAmount", "_setSelectList", "setPersParams", "setBundle"));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['_setFromOrderArticle', 'setAmount', '_setSelectList', 'setPersParams', 'setBundle']);
         $oBasketItem->expects($this->once())->method('_setFromOrderArticle')->with($this->equalTo($oOrderArticle));
         $oBasketItem->expects($this->once())->method('setAmount')->with($this->equalTo(999));
-        $oBasketItem->expects($this->once())->method('_setSelectList')->with($this->equalTo("aOrderArticleSelectList"));
-        $oBasketItem->expects($this->once())->method('setPersParams')->with($this->equalTo("aPersParams"));
+        $oBasketItem->expects($this->once())->method('_setSelectList')->with($this->equalTo('aOrderArticleSelectList'));
+        $oBasketItem->expects($this->once())->method('setPersParams')->with($this->equalTo('aPersParams'));
         $oBasketItem->expects($this->once())->method('setBundle')->with($this->equalTo(true));
 
         $oBasketItem->initFromOrderArticle($oOrderArticle);
@@ -201,20 +196,20 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetFromOrderArticle()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("getProductId"));
-        $oOrderArticle->expects($this->once())->method('getProductId')->will($this->returnValue("sProductId"));
-        $oOrderArticle->oxorderarticles__oxtitle = new oxField("oxarticles__oxtitle");
-        $oOrderArticle->oxorderarticles__oxordershopid = new oxField("sNativeShopId");
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['getProductId']);
+        $oOrderArticle->expects($this->once())->method('getProductId')->will($this->returnValue('sProductId'));
+        $oOrderArticle->oxorderarticles__oxtitle = new oxField('oxarticles__oxtitle');
+        $oOrderArticle->oxorderarticles__oxordershopid = new oxField('sNativeShopId');
         $oOrderArticle->UNITsetArticleParams();
 
-        $oBasketItem = $this->getProxyClass("oxbasketitem");
+        $oBasketItem = $this->getProxyClass('oxbasketitem');
         $oBasketItem->UNITsetFromOrderArticle($oOrderArticle);
 
-        $this->assertEquals($oOrderArticle, $oBasketItem->getNonPublicVar("_oArticle"));
-        $this->assertEquals("sProductId", $oBasketItem->getNonPublicVar("_sProductId"));
-        $this->assertEquals("oxarticles__oxtitle", $oBasketItem->getNonPublicVar("_sTitle"));
-        $this->assertEquals($this->getConfig()->getShopId(), $oBasketItem->getNonPublicVar("_sShopId"));
-        $this->assertEquals("sNativeShopId", $oBasketItem->getNonPublicVar("_sNativeShopId"));
+        $this->assertEquals($oOrderArticle, $oBasketItem->getNonPublicVar('_oArticle'));
+        $this->assertEquals('sProductId', $oBasketItem->getNonPublicVar('_sProductId'));
+        $this->assertEquals('oxarticles__oxtitle', $oBasketItem->getNonPublicVar('_sTitle'));
+        $this->assertEquals($this->getConfig()->getShopId(), $oBasketItem->getNonPublicVar('_sShopId'));
+        $this->assertEquals('sNativeShopId', $oBasketItem->getNonPublicVar('_sNativeShopId'));
     }
 
     /**
@@ -226,7 +221,7 @@ class BasketitemTest extends \OxidTestCase
     {
         $article = $this->createArticle();
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle', 'getStockCheckStatus'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle', 'getStockCheckStatus']);
         $oBasketItem->expects($this->once())->method('getArticle')->will($this->returnValue($article));
         $oBasketItem->expects($this->once())->method('getStockCheckStatus')->will($this->returnValue(true));
 
@@ -259,11 +254,11 @@ class BasketitemTest extends \OxidTestCase
 
         $oBasketItem = $this->getMock(
             'oxBasketItem',
-            array('_setArticle',
+            ['_setArticle',
                                   'setAmount',
                                   '_setSelectList',
                                   'setPersParams',
-                                  'setBundle')
+                                  'setBundle']
         );
 
         $oBasketItem->expects($this->once())->method('_setArticle');
@@ -321,7 +316,7 @@ class BasketitemTest extends \OxidTestCase
 
             return;
         }
-        $this->fail("failed stock related check");
+        $this->fail('failed stock related check');
     }
 
     /**
@@ -334,11 +329,11 @@ class BasketitemTest extends \OxidTestCase
         $this->markTestSkipped('Bug: 100.0 is not same as 99');
         $article = $this->createArticle();
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('getArtStockInBasket'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getArtStockInBasket']);
         $oBasket->expects($this->any())->method('getArtStockInBasket')->with($this->equalTo($article->getId()), $this->equalTo('testItemKey'))->will($this->returnValue(1));
         $oSession = oxNew('oxSession');
         $oSession->setBasket($oBasket);
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getSession'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getSession']);
         $oBasketItem->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
 
         $oBasketItem->UNITsetArticle($article->getId());
@@ -353,7 +348,7 @@ class BasketitemTest extends \OxidTestCase
 
             return;
         }
-        $this->fail("failed stock related check");
+        $this->fail('failed stock related check');
     }
 
     /**
@@ -397,7 +392,7 @@ class BasketitemTest extends \OxidTestCase
 
             return;
         }
-        $this->fail("failed stock related check");
+        $this->fail('failed stock related check');
     }
 
     /**
@@ -407,7 +402,7 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetPrice()
     {
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array());
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, []);
 
         $oBasketItem->setPrice(oxNew('oxprice'));
     }
@@ -691,10 +686,10 @@ class BasketitemTest extends \OxidTestCase
         $oBasketItem->setLanguageId(2);
         oxRegistry::getLang()->setBaseLanguage(1);
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle']);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($article));
 
-        $this->assertEquals("title2, var2", $oBasketItem->getTitle());
+        $this->assertEquals('title2, var2', $oBasketItem->getTitle());
     }
 
     /**
@@ -705,12 +700,12 @@ class BasketitemTest extends \OxidTestCase
     public function testGetIconUrl()
     {
         $this->markTestSkipped('Bug: Strings does not match');
-        $sIconUrl = $this->getConfig()->getConfigParam("sShopURL") . "out/pictures/generated/product/1/56_42_75/nopic.jpg";
+        $sIconUrl = $this->getConfig()->getConfigParam('sShopURL') . 'out/pictures/generated/product/1/56_42_75/nopic.jpg';
 
         $oArticle = oxNew('oxArticle');
         $oArticle->oxarticles__oxpic1 = new oxField('testicon.jpg');
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle']);
         $oBasketItem->expects($this->once())->method('getArticle')->will($this->returnValue($oArticle));
 
         $this->assertEquals($sIconUrl, $oBasketItem->getIconUrl());
@@ -723,24 +718,24 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testGetIconUrlAfterSslSwitch()
     {
-        $sIconUrl = $this->getConfig()->getConfigParam("sShopURL") . "out/pictures/master/product/icon/nopic_ico.jpg";
+        $sIconUrl = $this->getConfig()->getConfigParam('sShopURL') . 'out/pictures/master/product/icon/nopic_ico.jpg';
 
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('getIconUrl', 'getLink'));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getIconUrl', 'getLink']);
         $oArticle->oxarticles__oxpic1 = new oxField('testicon.jpg');
         $oArticle->expects($this->once())->method('getIconUrl')->will($this->returnValue($sIconUrl));
         $oArticle->expects($this->any())->method('getLink');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopId'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopId']);
         $oConfig->expects($this->any())->method('isSsl')->will($this->returnValue(false));
         $oConfig->expects($this->any())->method('getShopId')->will($this->returnValue(1));
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle', 'getConfig', "getTitle"));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle', 'getConfig', 'getTitle']);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($oArticle));
         $oBasketItem->expects($this->once())->method('getTitle');
         $oBasketItem->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
         // initiating product
-        $oBasketItem->UNITsetArticle("testId");
+        $oBasketItem->UNITsetArticle('testId');
         $this->assertEquals($sIconUrl, $oBasketItem->getIconUrl());
     }
 
@@ -786,7 +781,7 @@ class BasketitemTest extends \OxidTestCase
 
         $oBasketItem = oxNew('oxbasketitem');
         $oBasketItem->init($article->getId(), 6);
-        $this->assertEquals(array(0), $oBasketItem->getSelList());
+        $this->assertEquals([0], $oBasketItem->getSelList());
     }
 
     /**
@@ -806,7 +801,7 @@ class BasketitemTest extends \OxidTestCase
         $oList->name = 'Test title';
         $oList->value = null;
 
-        $this->assertEquals(array($oList), $oBasketItem->getChosenSelList());
+        $this->assertEquals([$oList], $oBasketItem->getChosenSelList());
     }
 
     /**
@@ -887,7 +882,7 @@ class BasketitemTest extends \OxidTestCase
         $oBasketItem->init($article->getId(), 6, null, null, true);
 
         $this->assertEquals($article->getId(), $oBasketItem->sProductId);
-        $this->assertEquals($article->oxarticles__oxtitle->value . ", xxx", $oBasketItem->sTitle);
+        $this->assertEquals($article->oxarticles__oxtitle->value . ', xxx', $oBasketItem->sTitle);
         $this->assertEquals('xxx', $oBasketItem->sVarSelect);
 
         $expectedImageName = '2077_p1_ico.jpg';
@@ -911,7 +906,7 @@ class BasketitemTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('bl_perfLoadSelectLists', true);
         $oBasketItem = new modForTestSetAsDiscountArticle();
         $oBasketItem->init($article->getId(), 6);
-        $this->assertEquals(array(0), $oBasketItem->getSelList());
+        $this->assertEquals([0], $oBasketItem->getSelList());
     }
 
     /**
@@ -925,7 +920,7 @@ class BasketitemTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('bl_perfLoadSelectLists', true);
         $oBasketItem = new modForTestSetAsDiscountArticle();
         $oBasketItem->init($article->getId(), 6);
-        $this->assertEquals(array(0), $oBasketItem->getSelList(array()));
+        $this->assertEquals([0], $oBasketItem->getSelList([]));
     }
 
     /**
@@ -936,8 +931,8 @@ class BasketitemTest extends \OxidTestCase
     public function testSetPersParams()
     {
         $oBasketItem = new modForTestSetAsDiscountArticle();
-        $oBasketItem->setPersParams(array('something'));
-        $this->assertEquals(array('something'), $oBasketItem->getPersParams());
+        $oBasketItem->setPersParams(['something']);
+        $this->assertEquals(['something'], $oBasketItem->getPersParams());
     }
 
     /**
@@ -1010,9 +1005,9 @@ class BasketitemTest extends \OxidTestCase
     {
         // creating wrap paper
         $wrapping = oxNew('oxWrapping');
-        $wrapping->setId("_testwrap");
-        $wrapping->oxwrapping__oxtype = new oxField("WRAP", oxField::T_RAW);
-        $wrapping->oxwrapping__oxname = new oxField("Test card", oxField::T_RAW);
+        $wrapping->setId('_testwrap');
+        $wrapping->oxwrapping__oxtype = new oxField('WRAP', oxField::T_RAW);
+        $wrapping->oxwrapping__oxname = new oxField('Test card', oxField::T_RAW);
         $wrapping->oxwrapping__oxprice = new oxField(5, oxField::T_RAW);
         $wrapping->save();
 
@@ -1035,11 +1030,11 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testGetFUnitPrice()
     {
-        $oPrice = $this->getMock(\OxidEsales\Eshop\Core\Price::class, array('getBruttoPrice'));
+        $oPrice = $this->getMock(\OxidEsales\Eshop\Core\Price::class, ['getBruttoPrice']);
         $oPrice->expects($this->once())->method('getBruttoPrice')->will($this->returnValue(11.158));
-        $oBasketItem = $this->getProxyClass("oxbasketitem");
+        $oBasketItem = $this->getProxyClass('oxbasketitem');
         $oBasketItem->setNonPublicVar('_oUnitPrice', $oPrice);
-        $this->assertEquals("11,16", $oBasketItem->getFUnitPrice());
+        $this->assertEquals('11,16', $oBasketItem->getFUnitPrice());
     }
 
     /**
@@ -1049,11 +1044,11 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testGetFTotalPrice()
     {
-        $oPrice = $this->getMock(\OxidEsales\Eshop\Core\Price::class, array('getBruttoPrice'));
+        $oPrice = $this->getMock(\OxidEsales\Eshop\Core\Price::class, ['getBruttoPrice']);
         $oPrice->expects($this->once())->method('getBruttoPrice')->will($this->returnValue(11.158));
-        $oBasketItem = $this->getProxyClass("oxbasketitem");
+        $oBasketItem = $this->getProxyClass('oxbasketitem');
         $oBasketItem->setNonPublicVar('_oPrice', $oPrice);
-        $this->assertEquals("11,16", $oBasketItem->getFTotalPrice());
+        $this->assertEquals('11,16', $oBasketItem->getFTotalPrice());
     }
 
     /**
@@ -1067,12 +1062,12 @@ class BasketitemTest extends \OxidTestCase
         $article->oxarticles__oxtitle = new oxField('title', oxField::T_RAW);
         $article->oxarticles__oxvarselect = new oxField('var1', oxField::T_RAW);
         $article->save();
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle']);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($article));
         $oBasketItem->UNITsetArticle($article->getId());
 
-        $this->assertEquals("title, var1", $oBasketItem->getTitle());
-        $this->assertEquals("var1", $oBasketItem->getVarSelect());
+        $this->assertEquals('title, var1', $oBasketItem->getTitle());
+        $this->assertEquals('var1', $oBasketItem->getVarSelect());
         $this->assertEquals($article->getId(), $oBasketItem->getProductId());
         $this->assertEquals($article->getLink(), $oBasketItem->getLink());
         $this->assertEquals($this->getConfig()->getShopId(), $oBasketItem->getShopId());
@@ -1086,11 +1081,11 @@ class BasketitemTest extends \OxidTestCase
         $article = $this->createArticle();
         $article->oxarticles__oxvarselect = new oxField('0', oxField::T_RAW);
         $article->save();
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle']);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($article));
         $oBasketItem->UNITsetArticle($article->getId());
 
-        $this->assertEquals("0", $oBasketItem->getVarSelect());
+        $this->assertEquals('0', $oBasketItem->getVarSelect());
     }
 
     /**
@@ -1100,7 +1095,7 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetLanguageId()
     {
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('_setArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['_setArticle']);
         $oBasketItem->expects($this->never())->method('_setArticle');
 
         $oBasketItem->setLanguageId('17');
@@ -1114,7 +1109,7 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetLanguageId_change()
     {
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('_setArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['_setArticle']);
         $oBasketItem->setLanguageId('17');
         $this->assertEquals('17', $oBasketItem->getLanguageId());
 
@@ -1131,9 +1126,9 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetLanguageId_change_noArticle()
     {
-        $oBasketItem = $this->getMock('oxbasketitem', array( '_setArticle' ));
+        $oBasketItem = $this->getMock('oxbasketitem', [ '_setArticle' ]);
         $oBasketItem->setLanguageId('15');
-        $oEx = oxNew("oxNoArticleException");
+        $oEx = oxNew('oxNoArticleException');
         $oBasketItem->expects($this->once())->method('_setArticle')->will($this->throwException($oEx));
         $oBasketItem->setLanguageId('17');
         $this->assertEquals('17', $oBasketItem->getLanguageId());
@@ -1154,9 +1149,9 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetLanguageId_change_wrongArticleInput()
     {
-        $oBasketItem = $this->getMock('oxbasketitem', array( '_setArticle' ));
+        $oBasketItem = $this->getMock('oxbasketitem', [ '_setArticle' ]);
         $oBasketItem->setLanguageId('15');
-        $oEx = oxNew("oxArticleInputException");
+        $oEx = oxNew('oxArticleInputException');
         $oBasketItem->expects($this->once())->method('_setArticle')->will($this->throwException($oEx));
         $oBasketItem->setLanguageId('17');
         $this->assertEquals('17', $oBasketItem->getLanguageId());
@@ -1194,10 +1189,10 @@ class BasketitemTest extends \OxidTestCase
         $oBasketItem->setLanguageId(2);
         oxRegistry::getLang()->setBaseLanguage(1);
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getArticle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getArticle']);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($article));
 
-        $this->assertEquals("var2", $oBasketItem->GetVarSelect());
+        $this->assertEquals('var2', $oBasketItem->GetVarSelect());
     }
 
     /**
@@ -1232,8 +1227,8 @@ class BasketitemTest extends \OxidTestCase
         $selectionList->save();
 
         // assigning select list
-        $newGroup = oxNew("oxBase");
-        $newGroup->init("oxobject2selectlist");
+        $newGroup = oxNew('oxBase');
+        $newGroup->init('oxobject2selectlist');
         $newGroup->oxobject2selectlist__oxobjectid = new oxField($article->getId(), oxField::T_RAW);
         $newGroup->oxobject2selectlist__oxselnid = new oxField($selectionList->getId(), oxField::T_RAW);
         $newGroup->oxobject2selectlist__oxsort = new oxField(0, oxField::T_RAW);

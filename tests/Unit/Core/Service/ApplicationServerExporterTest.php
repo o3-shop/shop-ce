@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,8 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
-namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \OxidEsales\Eshop\Core\Registry;
-use \OxidEsales\Eshop\Core\DatabaseProvider;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
  * @covers \OxidEsales\Eshop\Core\Service\ApplicationServerExporter
@@ -58,15 +57,15 @@ class ApplicationServerExporterTest extends \OxidEsales\TestingLibrary\UnitTestC
         $server->setIp('127.0.0.1');
         $server->setLastFrontendUsage('frontendUsageTimestamp');
 
-        $activeServers = array($server);
-        $activeServers2 = array($server, $server);
+        $activeServers = [$server];
+        $activeServers2 = [$server, $server];
 
-        $expectedServerCollection = array(
+        $expectedServerCollection = [
             'id'                => 'serverNameHash1',
             'ip'                => '127.0.0.1',
             'lastFrontendUsage' => 'frontendUsageTimestamp',
-            'lastAdminUsage'    => ''
-        );
+            'lastAdminUsage'    => '',
+        ];
 
         return [
             [false, 0, null],

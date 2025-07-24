@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\VoucherSerie;
-
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for VoucherSerie_Groups class
  */
 class VoucherSerieGroupsTest extends \OxidTestCase
 {
-
     /**
      * VoucherSerie_Groups::Render() test case
      *
@@ -36,7 +36,7 @@ class VoucherSerieGroupsTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
         oxTestModules::addFunction('oxvoucherserie', 'isDerived', '{ return true; }');
 
         // testing..

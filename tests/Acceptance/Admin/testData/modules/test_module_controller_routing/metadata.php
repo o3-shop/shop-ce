@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,7 +27,7 @@ $sMetadataVersion = '1.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'test_module_controller_routing',
     'title'        => 'Test metadata_controllers_feature',
     'description'  => '',
@@ -39,6 +40,6 @@ $aModule = array(
     ],
     'templates' => [
         'test_module_controller_routing.tpl' => 'test_module_controller_routing/test_module_controller_routing.tpl',
-        'test_module_controller_routing_other.tpl' => 'test_module_controller_routing/test_module_controller_routing_other.tpl'
-    ]
-);
+        'test_module_controller_routing_other.tpl' => 'test_module_controller_routing/test_module_controller_routing_other.tpl',
+    ],
+];

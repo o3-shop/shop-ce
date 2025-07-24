@@ -91,7 +91,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
     public function __construct()
     {
         parent::__construct();
-        $this->_sCacheKey = "simplevariants";
+        $this->_sCacheKey = 'simplevariants';
         $this->init('oxarticles');
     }
 
@@ -140,7 +140,7 @@ class SimpleVariant extends MultiLanguageModel implements IUrl
         }
 
         // #1437/1436C - added config option, and check for zero A,B,C price values
-        if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (double) $dPrice == 0) {
+        if (Registry::getConfig()->getConfigParam('blOverrideZeroABCPrices') && (float) $dPrice == 0) {
             $dPrice = $this->oxarticles__oxprice->value;
         }
 

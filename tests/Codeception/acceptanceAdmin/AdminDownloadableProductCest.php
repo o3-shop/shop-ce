@@ -40,7 +40,7 @@ final class AdminDownloadableProductCest
         $I->haveInDatabase(
             'oxorderfiles',
             [
-                'OXID' => "testdownloadProductCest",
+                'OXID' => 'testdownloadProductCest',
                 'OXORDERID' => $orderId,
                 'OXFILENAME' => 'testFile3',
                 'OXFILEID' => '1000l',
@@ -52,7 +52,7 @@ final class AdminDownloadableProductCest
                 'OXLINKEXPIRATIONTIME' => 240,
                 'OXRESETCOUNT' => 0,
                 'OXVALIDUNTIL' => (new DateTime())->modify('+1 week')->format('Y-m-d 00:00:00'),
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00'),
             ]
         );
 
@@ -90,10 +90,10 @@ final class AdminDownloadableProductCest
         $settingsTab = $coreSettings->openSettingsTab();
         $settingsTab->openDownloadableProducts();
         $I->checkOption('confbools[blEnableDownloads]');
-        $I->fillField("confstrs[iMaxDownloadsCount]", "2");
-        $I->fillField("confstrs[iLinkExpirationTime]", "240");
-        $I->fillField("confstrs[iDownloadExpirationTime]", "24");
-        $I->fillField("confstrs[iMaxDownloadsCountUnregistered]", "1");
+        $I->fillField('confstrs[iMaxDownloadsCount]', '2');
+        $I->fillField('confstrs[iLinkExpirationTime]', '240');
+        $I->fillField('confstrs[iDownloadExpirationTime]', '24');
+        $I->fillField('confstrs[iMaxDownloadsCountUnregistered]', '1');
         $I->click(['name' => 'save']);
     }
 
@@ -104,7 +104,7 @@ final class AdminDownloadableProductCest
     private function setDownloadableFileForAProduct(AcceptanceAdminTester $I, AdminPanel $adminPanel): void
     {
         $products = $adminPanel->openProducts();
-        $products->find("where[oxarticles][oxartnum]", "1002");
+        $products->find('where[oxarticles][oxartnum]', '1002');
         $products->openDownloadsTab();
         $I->checkOption('editval[oxarticles__oxisdownloadable]');
         $I->click(['name' => 'save']);
@@ -117,21 +117,21 @@ final class AdminDownloadableProductCest
     private function makeOrderComplete(AcceptanceAdminTester $I, AdminPanel $adminPanel): void
     {
         $orders = $adminPanel->openOrders();
-        $order = $orders->find("where[oxorder][oxordernr]", "1");
+        $order = $orders->find('where[oxorder][oxordernr]', '1');
         $orderDownloadsTab = $order->openDownloadsTab();
 
-        $I->assertEquals("1208", $I->grabTextFrom($orderDownloadsTab->productNumberInDownloadsTab));
-        $I->assertEquals("Kite CORE GTS", $I->grabTextFrom($orderDownloadsTab->titleInDownloadsTab));
-        $I->assertEquals("testFile3", $I->grabTextFrom($orderDownloadsTab->downloadableFileInDownloadsTab));
+        $I->assertEquals('1208', $I->grabTextFrom($orderDownloadsTab->productNumberInDownloadsTab));
+        $I->assertEquals('Kite CORE GTS', $I->grabTextFrom($orderDownloadsTab->titleInDownloadsTab));
+        $I->assertEquals('testFile3', $I->grabTextFrom($orderDownloadsTab->downloadableFileInDownloadsTab));
         $I->assertEquals(
-            "0000-00-00 00:00:00",
+            '0000-00-00 00:00:00',
             $I->grabTextFrom($orderDownloadsTab->firstDownloadInDownloadsTab)
         );
         $I->assertEquals(
-            "0000-00-00 00:00:00",
+            '0000-00-00 00:00:00',
             $I->grabTextFrom($orderDownloadsTab->lastDownloadInDownloadsTab)
         );
-        $I->assertEquals("0", $I->grabTextFrom($orderDownloadsTab->countInDownloadsTab));
-        $I->assertEquals("2", $I->grabTextFrom($orderDownloadsTab->maxCountInDownloadsTab));
+        $I->assertEquals('0', $I->grabTextFrom($orderDownloadsTab->countInDownloadsTab));
+        $I->assertEquals('2', $I->grabTextFrom($orderDownloadsTab->maxCountInDownloadsTab));
     }
 }

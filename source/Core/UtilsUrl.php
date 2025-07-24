@@ -26,7 +26,7 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class UtilsUrl extends \OxidEsales\Eshop\Core\Base
 {
-    const PARAMETER_SEPARATOR = '&amp;';
+    public const PARAMETER_SEPARATOR = '&amp;';
 
     /**
      * Additional url parameters which should be appended to seo/std urls.
@@ -142,7 +142,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
             // non seo url has no language identifier..
             $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
             $sLangAbbr = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageAbbr($iLang);
-            
+
             if (
                 !$oStr->preg_match('/[&?](amp;)?lang=[0-9]+/i', $sUrl) &&
                 $sLangAbbr != $oConfig->getConfigParam('sDefaultLang')
@@ -215,9 +215,8 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
             $sUrl = $oStr->preg_replace('/(\?|&(amp;)?).+/i', '\1', $sUrl);
         }
 
-        return trim($sUrl, "?");
+        return trim($sUrl, '?');
     }
-
 
     /**
      * Adds shop host if url does not start with it.
@@ -228,7 +227,7 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
      */
     public function addShopHost($sUrl)
     {
-        if (!preg_match("#^https?://#i", $sUrl)) {
+        if (!preg_match('#^https?://#i', $sUrl)) {
             $sShopUrl = $this->getConfig()->getSslShopUrl();
             $sUrl = $sShopUrl . $sUrl;
         }
@@ -456,12 +455,12 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
     {
         $oUtilsServer = \OxidEsales\Eshop\Core\Registry::getUtilsServer();
 
-        $aServerParams["HTTPS"] = $oUtilsServer->getServerVar("HTTPS");
-        $aServerParams["HTTP_X_FORWARDED_PROTO"] = $oUtilsServer->getServerVar("HTTP_X_FORWARDED_PROTO");
-        $aServerParams["HTTP_HOST"] = $oUtilsServer->getServerVar("HTTP_HOST");
-        $aServerParams["REQUEST_URI"] = $oUtilsServer->getServerVar("REQUEST_URI");
+        $aServerParams['HTTPS'] = $oUtilsServer->getServerVar('HTTPS');
+        $aServerParams['HTTP_X_FORWARDED_PROTO'] = $oUtilsServer->getServerVar('HTTP_X_FORWARDED_PROTO');
+        $aServerParams['HTTP_HOST'] = $oUtilsServer->getServerVar('HTTP_HOST');
+        $aServerParams['REQUEST_URI'] = $oUtilsServer->getServerVar('REQUEST_URI');
 
-        $sProtocol = "http://";
+        $sProtocol = 'http://';
 
         if (
             isset($aServerParams['HTTPS']) && (($aServerParams['HTTPS'] == 'on' || $aServerParams['HTTPS'] == 1))
@@ -486,12 +485,12 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
     {
         // url building
         // replace possible ampersands, explode, and filter out empty values
-        $sValue = str_replace("&amp;", "&", $sValue);
-        $aNavParams = explode("&", $sValue);
+        $sValue = str_replace('&amp;', '&', $sValue);
+        $aNavParams = explode('&', $sValue);
         $aNavParams = array_filter($aNavParams);
         $aParams = [];
         foreach ($aNavParams as $sValue) {
-            $exp = explode("=", $sValue);
+            $exp = explode('=', $sValue);
             $aParams[$exp[0]] = $exp[1];
         }
 
@@ -561,11 +560,11 @@ class UtilsUrl extends \OxidEsales\Eshop\Core\Base
             $this->_addLanguageHost($oConfig->getConfigParam('aLanguageSSLURLs'), $this->_aHosts);
 
             // current url
-            $this->_addHost($oConfig->getConfigParam("sShopURL"), $this->_aHosts);
-            $this->_addHost($oConfig->getConfigParam("sSSLShopURL"), $this->_aHosts);
+            $this->_addHost($oConfig->getConfigParam('sShopURL'), $this->_aHosts);
+            $this->_addHost($oConfig->getConfigParam('sSSLShopURL'), $this->_aHosts);
 
             if ($this->isAdmin()) {
-                $this->_addHost($oConfig->getConfigParam("sAdminSSLURL"), $this->_aHosts);
+                $this->_addHost($oConfig->getConfigParam('sAdminSSLURL'), $this->_aHosts);
             }
         }
 

@@ -20,7 +20,7 @@
  */
 
 // checks if GD library version getter does not exist
-if (!function_exists("getGdVersion")) {
+if (!function_exists('getGdVersion')) {
     /**
      * Returns GD library version
      *
@@ -33,7 +33,7 @@ if (!function_exists("getGdVersion")) {
 }
 
 // checks if image creation function does not exist
-if (!function_exists("copyAlteredImage")) {
+if (!function_exists('copyAlteredImage')) {
     /**
      * Creates and copies the resized image
      *
@@ -54,7 +54,7 @@ if (!function_exists("copyAlteredImage")) {
 }
 
 // checks if image size calculator does nor exist
-if (!function_exists("calcImageSize")) {
+if (!function_exists('calcImageSize')) {
     /**
      * Calculates proportional new image size
      *
@@ -86,7 +86,7 @@ if (!function_exists("calcImageSize")) {
 }
 
 // sets 0755 permissions for given file
-if (!function_exists("makeReadable")) {
+if (!function_exists('makeReadable')) {
     /**
      * Sets 0755 permissions for given file and returns name of affected file
      *
@@ -108,7 +108,7 @@ if (!function_exists("makeReadable")) {
     }
 }
 
-if (!function_exists("checkSizeAndCopy")) {
+if (!function_exists('checkSizeAndCopy')) {
     /**
      * Checks if preferred image dimensions size matches defined in config;
      * in case it matches - copies original image to new location, returns
@@ -136,7 +136,7 @@ if (!function_exists("checkSizeAndCopy")) {
 }
 
 // checks if GIF resizer does not exist
-if (!function_exists("resizeGif")) {
+if (!function_exists('resizeGif')) {
     /**
      * Creates resized GIF image. Returns path of new file if creation
      * succeed. On error returns FALSE
@@ -175,7 +175,7 @@ if (!function_exists("resizeGif")) {
 }
 
 // checks if PNG resizer does not exist
-if (!function_exists("resizePng")) {
+if (!function_exists('resizePng')) {
     /**
      * Creates resized PNG image. Returns path of new file if creation
      * succeded. On error returns FALSE
@@ -205,7 +205,7 @@ if (!function_exists("resizePng")) {
                 $imgWhite = imagecolorallocate($hDestinationImage, 255, 255, 255);
                 imagefill($hDestinationImage, 0, 0, $imgWhite);
                 imagecolortransparent($hDestinationImage, $imgWhite);
-            //end of fix
+                //end of fix
             } else {
                 imagealphablending($hDestinationImage, false);
                 imagesavealpha($hDestinationImage, true);
@@ -222,7 +222,7 @@ if (!function_exists("resizePng")) {
 }
 
 // checks if JPG resizer does not exist
-if (!function_exists("resizeJpeg")) {
+if (!function_exists('resizeJpeg')) {
     /**
      * Creates resized JPG image. Returns path of new file if creation
      * succeed. On error returns FALSE

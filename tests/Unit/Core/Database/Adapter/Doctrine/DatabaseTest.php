@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Database;
 
 use OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database;
@@ -29,7 +31,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class DatabaseTest extends UnitTestCase
 {
-
     /**
      * @var Database The doctrine database we want to test in this class.
      */
@@ -80,7 +81,7 @@ class DatabaseTest extends UnitTestCase
      */
     public function testQuoteWorksWithAlreadyQuotedValue()
     {
-        $quoted = $this->database->quote("NonEmptyValue");
+        $quoted = $this->database->quote('NonEmptyValue');
         $quoted = $this->database->quote($quoted);
 
         $this->assertEquals("'\'NonEmptyValue\''", $quoted);
@@ -91,7 +92,7 @@ class DatabaseTest extends UnitTestCase
      */
     public function testQuoteArrayWithEmptyArray()
     {
-        $originalArray = array();
+        $originalArray = [];
 
         $quotedArray = $this->database->quoteArray($originalArray);
 
@@ -103,11 +104,11 @@ class DatabaseTest extends UnitTestCase
      */
     public function testQuoteArrayWithFilledArray()
     {
-        $originalArray = array('Hello', 'quoteThis');
+        $originalArray = ['Hello', 'quoteThis'];
 
         $quotedArray = $this->database->quoteArray($originalArray);
 
-        $expectedQuotedArray = array("'Hello'", "'quoteThis'");
+        $expectedQuotedArray = ["'Hello'", "'quoteThis'"];
 
         $this->assertEquals($expectedQuotedArray, $quotedArray);
     }
@@ -138,37 +139,37 @@ class DatabaseTest extends UnitTestCase
             [
                 'string to be quoted',
                 $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter,
-                'A normal string will be quoted with "' . $identifierQuoteCharacter . '""'
+                'A normal string will be quoted with "' . $identifierQuoteCharacter . '""',
             ],
             [
                 $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter,
                 $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter,
-                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"'
+                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"',
             ],
             [
-                $identifierQuoteCharacter . $identifierQuoteCharacter .$identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter . $identifierQuoteCharacter . $identifierQuoteCharacter,
+                $identifierQuoteCharacter . $identifierQuoteCharacter . $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter . $identifierQuoteCharacter . $identifierQuoteCharacter,
                 $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter,
-                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"'
+                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"',
             ],
             [
                 $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter . $identifierQuoteCharacter . $identifierQuoteCharacter,
                 $identifierQuoteCharacter . 'string to be quoted' . $identifierQuoteCharacter,
-                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"'
+                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"',
             ],
             [
                 $identifierQuoteCharacter . 'string to ' . $identifierQuoteCharacter . ' be quoted' . $identifierQuoteCharacter,
                 $identifierQuoteCharacter . 'string to  be quoted' . $identifierQuoteCharacter,
-                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"'
+                'An already quoted string will be quoted with "' . $identifierQuoteCharacter . '"',
             ],
             [
                 '',
                 $identifierQuoteCharacter . '' . $identifierQuoteCharacter,
-                'An empty string will be quoted with "' . $identifierQuoteCharacter . '"'
+                'An empty string will be quoted with "' . $identifierQuoteCharacter . '"',
             ],
             [
                 null,
                 $identifierQuoteCharacter . '' . $identifierQuoteCharacter,
-                'An empty string will be quoted as an empty string with "' . $identifierQuoteCharacter . '"'
+                'An empty string will be quoted as an empty string with "' . $identifierQuoteCharacter . '"',
             ],
         ];
     }

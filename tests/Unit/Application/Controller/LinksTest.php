@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxRegistry;
+use oxRegistry;
 
 /**
  * Testing links class
  */
 class LinksTest extends \OxidTestCase
 {
-
     /**
      * Test get link list.
      *
@@ -47,11 +48,11 @@ class LinksTest extends \OxidTestCase
     public function testGetBreadCrumb()
     {
         $oLinks = oxNew('Links');
-        $aResult = array();
-        $aResults = array();
+        $aResult = [];
+        $aResults = [];
 
-        $aResult["title"] = oxRegistry::getLang()->translateString('LINKS', oxRegistry::getLang()->getBaseLanguage(), false);
-        $aResult["link"] = $oLinks->getLink();
+        $aResult['title'] = oxRegistry::getLang()->translateString('LINKS', oxRegistry::getLang()->getBaseLanguage(), false);
+        $aResult['link'] = $oLinks->getLink();
 
         $aResults[] = $aResult;
 

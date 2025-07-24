@@ -39,7 +39,7 @@ class RequiredAddressFields
         'oxuser__oxstreetnr',
         'oxuser__oxstreet',
         'oxuser__oxzip',
-        'oxuser__oxcity'
+        'oxuser__oxcity',
     ];
 
     /**

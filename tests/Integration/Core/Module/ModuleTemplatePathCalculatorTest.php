@@ -70,8 +70,8 @@ class ModuleTemplatePathCalculatorTest extends UnitTestCase
                 'first.tpl' => 'test_path/first_secondTheme.tpl',
                 'third.tpl' => 'test_path/third_secondTheme.tpl',
                 'sixth.tpl' => 'test_path/sixth_secondTheme.tpl',
-            ]
-        ]
+            ],
+        ],
     ];
 
     /**
@@ -157,7 +157,7 @@ class ModuleTemplatePathCalculatorTest extends UnitTestCase
             $templatePathCalculator->calculateModuleTemplatePath('first.tpl');
             $this->fail('An exception should have been thrown');
         } catch (StandardException $exception) {
-            $this->assertRegExp("@^Cannot find template@i", $exception->getMessage());
+            $this->assertRegExp('@^Cannot find template@i', $exception->getMessage());
         }
     }
 

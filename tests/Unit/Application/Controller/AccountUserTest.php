@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxField;
+use oxField;
 
 /**
  * Tests for Account class
  */
 class AccountUserTest extends \OxidTestCase
 {
-
     /**
      * Testing Account_User::render()
      *
@@ -34,7 +35,7 @@ class AccountUserTest extends \OxidTestCase
      */
     public function testRenderNoUser()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountUserController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountUserController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue(false));
         $this->assertEquals('page/account/login.tpl', $oView->render());
     }
@@ -47,9 +48,9 @@ class AccountUserTest extends \OxidTestCase
     public function testRender()
     {
         $oUser = oxNew('oxuser');
-        $oUser->oxuser__oxpassword = new oxField("testPassword");
+        $oUser->oxuser__oxpassword = new oxField('testPassword');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountUserController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountUserController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
         $this->assertEquals('page/account/user.tpl', $oView->render());
     }

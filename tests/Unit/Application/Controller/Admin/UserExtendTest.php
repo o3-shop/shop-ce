@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\User;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for User_Extend class
  */
 class UserExtendTest extends \OxidTestCase
 {
-
     /**
      * User_Extend::Render() test case
      *
@@ -37,10 +37,10 @@ class UserExtendTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "oxdefaultadmin");
+        $this->setRequestParameter('oxid', 'oxdefaultadmin');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserExtend::class, array("_allowAdminEdit"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserExtend::class, ['_allowAdminEdit']);
         $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(false));
         $this->assertEquals('user_extend.tpl', $oView->render());
         $aViewData = $oView->getViewData();
@@ -66,24 +66,23 @@ class UserExtendTest extends \OxidTestCase
         oxTestModules::addFunction('oxnewssubscribed', 'setOptInStatus', '{ return true; }');
         oxTestModules::addFunction('oxnewssubscribed', 'setOptInEmailStatus', '{ return true; }');
 
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("editnews", "1");
-        $this->setRequestParameter("editval", array("oxaddress__oxid" => "testOxId"));
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('editnews', '1');
+        $this->setRequestParameter('editval', ['oxaddress__oxid' => 'testOxId']);
 
         // testing..
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserExtend::class, array("_allowAdminEdit"));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserExtend::class, ['_allowAdminEdit']);
             $oView->expects($this->once())
                 ->method('_allowAdminEdit')
-                ->with($this->equalTo("testId"))
+                ->with($this->equalTo('testId'))
                 ->willReturn(true);
             $oView->save();
-
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in User_Extend::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in User_Extend::save()');
 
             return;
         }
-        $this->fail("Error in User_Extend::save()");
+        $this->fail('Error in User_Extend::save()');
     }
 }

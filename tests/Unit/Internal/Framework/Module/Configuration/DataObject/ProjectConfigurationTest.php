@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 /**
  * This file is part of O3-Shop.
@@ -59,7 +60,6 @@ class ProjectConfigurationTest extends TestCase
             $this->projectConfiguration->getShopConfigurations()
         );
     }
-
 
     public function testGetShopConfigurationThrowsExceptionWithNotExistingShopId()
     {

@@ -123,15 +123,15 @@ class SuggestController extends FrontendController
         }
 
         if (
-            !oxNew(MailValidator::class)->isValidEmail($aParams["rec_email"])
-            || !oxNew(MailValidator::class)->isValidEmail($aParams["send_email"])
+            !oxNew(MailValidator::class)->isValidEmail($aParams['rec_email'])
+            || !oxNew(MailValidator::class)->isValidEmail($aParams['send_email'])
         ) {
             $oUtilsView->addErrorToDisplay('SUGGEST_INVALIDMAIL');
 
             return;
         }
 
-        $sReturn = "";
+        $sReturn = '';
         // #1834M - specialchar search
         $sSearchParamForLink = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
         if ($sSearchParamForLink) {

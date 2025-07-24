@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,10 +22,10 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Contact\Form;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormMessageBuilder;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\Form;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
-use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormMessageBuilder;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 
 class ContactFormMessageBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -56,23 +58,23 @@ class ContactFormMessageBuilderTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'email',
-                'marina.ginesta@bcn.cat'
+                'marina.ginesta@bcn.cat',
             ],
             [
                 'firstName',
-                'Marina'
+                'Marina',
             ],
             [
                 'lastName',
-                'Ginestà'
+                'Ginestà',
             ],
             [
                 'salutation',
-                'MRS'
+                'MRS',
             ],
             [
                 'message',
-                'I\'m standing on the rooftop'
+                'I\'m standing on the rooftop',
             ],
         ];
     }

@@ -65,10 +65,10 @@ class ArticleSeo extends ObjectSeo
     {
         $sType = false;
         $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
-        if ($aData && isset($aData["oxparams"])) {
+        if ($aData && isset($aData['oxparams'])) {
             $oStr = Str::getStr();
-            $iEndPos = $oStr->strpos($aData["oxparams"], "#");
-            $sType = $oStr->substr($aData["oxparams"], 0, $iEndPos);
+            $iEndPos = $oStr->strpos($aData['oxparams'], '#');
+            $sType = $oStr->substr($aData['oxparams'], 0, $iEndPos);
         } elseif ($aList = $this->getSelectionList()) {
             reset($aList);
             $sType = key($aList);
@@ -92,11 +92,11 @@ class ArticleSeo extends ObjectSeo
 
         $iLang = false;
         $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
-        if ($aData && isset($aData["oxparams"])) {
+        if ($aData && isset($aData['oxparams'])) {
             $oStr = Str::getStr();
-            $iStartPos = $oStr->strpos($aData["oxparams"], "#");
-            $iEndPos = $oStr->strpos($aData["oxparams"], "#", $iStartPos + 1);
-            $iLang = $oStr->substr($aData["oxparams"], $iEndPos + 1);
+            $iStartPos = $oStr->strpos($aData['oxparams'], '#');
+            $iEndPos = $oStr->strpos($aData['oxparams'], '#', $iStartPos + 1);
+            $iLang = $oStr->substr($aData['oxparams'], $iEndPos + 1);
         } elseif ($aList = $this->getSelectionList()) {
             $aList = reset($aList);
             $iLang = key($aList);
@@ -116,13 +116,13 @@ class ArticleSeo extends ObjectSeo
     {
         $sId = false;
         $aData = Registry::getRequest()->getRequestEscapedParameter('aSeoData');
-        if ($aData && isset($aData["oxparams"])) {
+        if ($aData && isset($aData['oxparams'])) {
             $oStr = Str::getStr();
-            $iStartPos = $oStr->strpos($aData["oxparams"], "#");
-            $iEndPos = $oStr->strpos($aData["oxparams"], "#", $iStartPos + 1);
-            $iLen = $oStr->strlen($aData["oxparams"]);
+            $iStartPos = $oStr->strpos($aData['oxparams'], '#');
+            $iEndPos = $oStr->strpos($aData['oxparams'], '#', $iStartPos + 1);
+            $iLen = $oStr->strlen($aData['oxparams']);
 
-            $sId = $oStr->substr($aData["oxparams"], $iStartPos + 1, $iEndPos - $iLen);
+            $sId = $oStr->substr($aData['oxparams'], $iStartPos + 1, $iEndPos - $iLen);
         } elseif ($aList = $this->getSelectionList()) {
             $oItem = reset($aList[$this->getActCatType()][$this->getActCatLang()]);
 
@@ -148,15 +148,15 @@ class ArticleSeo extends ObjectSeo
             $oProduct->load($this->getEditObjectId());
 
             if ($oCatList = $this->getCategoryList($oProduct)) {
-                $this->_aSelectionList["oxcategory"][$this->_iEditLang] = $oCatList;
+                $this->_aSelectionList['oxcategory'][$this->_iEditLang] = $oCatList;
             }
 
             if ($oVndList = $this->getVendorList($oProduct)) {
-                $this->_aSelectionList["oxvendor"][$this->_iEditLang] = $oVndList;
+                $this->_aSelectionList['oxvendor'][$this->_iEditLang] = $oVndList;
             }
 
             if ($oManList = $this->getManufacturerList($oProduct)) {
-                $this->_aSelectionList["oxmanufacturer"][$this->_iEditLang] = $oManList;
+                $this->_aSelectionList['oxmanufacturer'][$this->_iEditLang] = $oManList;
             }
         }
 
@@ -202,10 +202,10 @@ class ArticleSeo extends ObjectSeo
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $sSqlForPriceCategories = $oArticle->getSqlForPriceCategories('oxid');
         $sQ = "select oxobject2category.oxcatnid as oxid from {$sView} as oxobject2category " .
-              "where oxobject2category.oxobjectid = :oxobjectid union " . $sSqlForPriceCategories;
+              'where oxobject2category.oxobjectid = :oxobjectid union ' . $sSqlForPriceCategories;
 
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $oArticle->getId()
+            ':oxobjectid' => $oArticle->getId(),
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
@@ -214,7 +214,7 @@ class ArticleSeo extends ObjectSeo
                     if ($sMainCatId == $oCat->getId()) {
                         $sSuffix = Registry::getLang()->translateString('(main category)', $this->getEditLang());
                         $sTitleField = 'oxcategories__oxtitle';
-                        $sTitle = $oCat->$sTitleField->getRawValue() . " " . $sSuffix;
+                        $sTitle = $oCat->$sTitleField->getRawValue() . ' ' . $sSuffix;
                         $oCat->$sTitleField = new Field($sTitle, Field::T_RAW);
                     }
                     $aCatList[] = $oCat;
@@ -508,16 +508,16 @@ class ArticleSeo extends ObjectSeo
         $iShopId = Registry::getConfig()->getShopId();
         $sParam = $this->processParam($this->getActCatId());
 
-        $sQ = "select oxfixed from oxseo where
+        $sQ = 'select oxfixed from oxseo where
                    oxseo.oxobjectid = :oxobjectid and
-                   oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = :oxparams";
+                   oxseo.oxshopid = :oxshopid and oxseo.oxlang = :oxlang and oxparams = :oxparams';
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         return (bool) DatabaseProvider::getMaster()->getOne($sQ, [
             ':oxobjectid' => $sId,
             ':oxshopid' => $iShopId,
             ':oxlang' => $iLang,
-            ':oxparams' => $sParam
+            ':oxparams' => $sParam,
         ]);
     }
 }

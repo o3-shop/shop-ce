@@ -38,7 +38,7 @@ class Dispatcher extends Core
 
         // executing action which returns name of template to render
         /** @var Controller $oController */
-        $oController = $this->getInstance("Controller");
+        $oController = $this->getInstance('Controller');
 
         $view = $oController->getView();
         $view->sendHeaders();
@@ -59,14 +59,14 @@ class Dispatcher extends Core
     protected function _chooseCurrentAction() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         /** @var Setup $oSetup */
-        $oSetup = $this->getInstance("Setup");
+        $oSetup = $this->getInstance('Setup');
         $iCurrStep = $oSetup->getCurrentStep();
 
         $sName = null;
         foreach ($oSetup->getSteps() as $sStepName => $sStepId) {
             if ($sStepId == $iCurrStep) {
-                $sActionName = str_ireplace("step_", "", $sStepName);
-                $sName = str_replace("_", "", $sActionName);
+                $sActionName = str_ireplace('step_', '', $sStepName);
+                $sName = str_replace('_', '', $sActionName);
                 break;
             }
         }

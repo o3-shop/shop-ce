@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require "_header.php"; ?>
+require '_header.php'; ?>
 <strong><?php $this->getText('STEP_0_DESC'); ?></strong><br><br>
 
 <table cellpadding="1" cellspacing="0">
@@ -29,15 +29,15 @@ require "_header.php"; ?>
             <form action="index.php" id="langSelectionForm" method="post">
             <select name="setup_lang" onChange="document.getElementById('langSelectionForm').submit();" style="font-size: 11px;">
             <?php
-            $aLanguages = $this->getViewParam("aLanguages");
-            foreach ($aLanguages as $sLangId => $sLangTitle) {
-                ?>
-                <option value="<?php echo $sLangId; ?>" <?php if ($this->getViewParam("sLanguage") == $sLangId) {
+            $aLanguages = $this->getViewParam('aLanguages');
+foreach ($aLanguages as $sLangId => $sLangTitle) {
+    ?>
+                <option value="<?php echo $sLangId; ?>" <?php if ($this->getViewParam('sLanguage') == $sLangId) {
                     echo 'selected';
-                               } ?>><?php echo $sLangTitle; ?></option>
+                } ?>><?php echo $sLangTitle; ?></option>
                 <?php
-            }
-            ?>
+}
+?>
             </select>
             <noscript>
             <input type="submit" name="setup_lang_submit" value="<?php $this->getText('SELECT_SETUP_LANG_SUBMIT'); ?>" style="font-size: 11px;">
@@ -53,25 +53,25 @@ require "_header.php"; ?>
 
     <ul class="req">
     <?php
-    $aGroupModuleInfo = $this->getViewParam("aGroupModuleInfo");
-    foreach ($aGroupModuleInfo as $sGroupName => $aGroupInfo) {
-        ?><li class="group"><?php echo $sGroupName; ?><ul><?php
+    $aGroupModuleInfo = $this->getViewParam('aGroupModuleInfo');
+foreach ($aGroupModuleInfo as $sGroupName => $aGroupInfo) {
+    ?><li class="group"><?php echo $sGroupName; ?><ul><?php
 foreach ($aGroupInfo as $aModuleInfo) {
     ?><li id="<?php echo $aModuleInfo['module']; ?>" class="<?php echo $aModuleInfo['class']; ?>"><?php
-if ($aModuleInfo['class'] == "fail" || $aModuleInfo['class'] == "pmin" || $aModuleInfo['class'] == "null") {
+if ($aModuleInfo['class'] == 'fail' || $aModuleInfo['class'] == 'pmin' || $aModuleInfo['class'] == 'null') {
     ?><a href="<?php $this->getReqInfoUrl($aModuleInfo['module']); ?>" target="_blank"><?php
 }
     echo $aModuleInfo['modulename'];
-if ($aModuleInfo['class'] == "fail" || $aModuleInfo['class'] == "pmin" || $aModuleInfo['class'] == "null") {
-    ?></a><?php
-} ?></li><?php
-} ?></ul></li><?php
-    }
-    ?><li class="clear"></li></ul>
+    if ($aModuleInfo['class'] == 'fail' || $aModuleInfo['class'] == 'pmin' || $aModuleInfo['class'] == 'null') {
+        ?></a><?php
+    } ?></li><?php
+    } ?></ul></li><?php
+}
+?><li class="clear"></li></ul>
     <?php $this->getText('STEP_0_TEXT'); ?>
     <br><br>
 
-<?php if ($this->getViewParam("blContinue") === true) { ?>
+<?php if ($this->getViewParam('blContinue') === true) { ?>
 <form action="index.php" method="post">
 <input type="hidden" name="sid" value="<?php $this->getSid(); ?>">
 <input type="hidden" name="istep" value="<?php $this->getSetupStep('STEP_WELCOME'); ?>">
@@ -82,4 +82,4 @@ if ($aModuleInfo['class'] == "fail" || $aModuleInfo['class'] == "pmin" || $aModu
     ?><b><?php $this->getText('STEP_0_ERROR_TEXT'); ?></b><br>
     <a target="_blank" href="<?php $this->getText('STEP_0_ERROR_URL'); ?>"><?php $this->getText('STEP_0_ERROR_URL'); ?></a><?php
 }
-require "_footer.php";
+require '_footer.php';

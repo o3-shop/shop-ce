@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\Newsletter;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Newsletter_Plain class
  */
 class NewsletterPlainTest extends \OxidTestCase
 {
-
     /**
      * Newsletter_Plain::Render() test case
      *
@@ -37,7 +37,7 @@ class NewsletterPlainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Newsletter_Plain');
@@ -54,14 +54,14 @@ class NewsletterPlainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Newsletter_Plain');
         $this->assertEquals('newsletter_plain.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -79,10 +79,10 @@ class NewsletterPlainTest extends \OxidTestCase
             $oView = oxNew('Newsletter_Plain');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Newsletter_Plain::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Newsletter_Plain::save()');
 
             return;
         }
-        $this->fail("error in Newsletter_Plain::save()");
+        $this->fail('error in Newsletter_Plain::save()');
     }
 }

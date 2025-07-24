@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
 
 /**
  * Testing news class.
  */
 class NewsTest extends \OxidTestCase
 {
-    public $aNews = array();
+    public $aNews = [];
 
     /**
      * Initialize the fixture.
@@ -38,7 +40,7 @@ class NewsTest extends \OxidTestCase
     {
         parent::setUp();
         // cleaning
-        $this->aNews = array();
+        $this->aNews = [];
 
         $this->aNews[0] = oxNew('oxBase');
         $this->aNews[0]->init('oxnews');
@@ -92,7 +94,7 @@ class NewsTest extends \OxidTestCase
 
     public function testRender()
     {
-        $n = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, array('getNews'));
+        $n = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, ['getNews']);
         $n->expects($this->once())->method('getNews')->will($this->returnValue('newse'));
 
         $this->assertEquals('page/info/news.tpl', $n->render());
@@ -109,17 +111,17 @@ class NewsTest extends \OxidTestCase
         $oShop = oxNew('oxShop');
         $oShop->oxshops__oxname = new oxField('shop');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getActiveShop'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveShop']);
         $oConfig->expects($this->any())->method('getActiveShop')->will($this->returnValue($oShop));
 
-        $oNews = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, array('getConfig'));
+        $oNews = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, ['getConfig']);
         $oNews->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
-        $aResult = array();
-        $aResults = array();
+        $aResult = [];
+        $aResults = [];
 
-        $aResult["title"] = oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' O3-Shop';
-        $aResult["link"] = $oNews->getLink();
+        $aResult['title'] = oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' O3-Shop';
+        $aResult['link'] = $oNews->getLink();
 
         $aResults[] = $aResult;
 
@@ -133,8 +135,8 @@ class NewsTest extends \OxidTestCase
      */
     public function testGetPageNavigation()
     {
-        $oObj = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, array('generatePageNavigation'));
-        $oObj->expects($this->any())->method('generatePageNavigation')->will($this->returnValue("aaa"));
+        $oObj = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, ['generatePageNavigation']);
+        $oObj->expects($this->any())->method('generatePageNavigation')->will($this->returnValue('aaa'));
         $this->assertEquals('aaa', $oObj->getPageNavigation());
     }
 
@@ -146,10 +148,10 @@ class NewsTest extends \OxidTestCase
         $oShop = oxNew('oxShop');
         $oShop->oxshops__oxname = new oxField('shop');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getActiveShop'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveShop']);
         $oConfig->expects($this->any())->method('getActiveShop')->will($this->returnValue($oShop));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, array('getConfig'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\NewsController::class, ['getConfig']);
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->assertEquals(oxRegistry::getLang()->translateString('LATEST_NEWS_AND_UPDATES_AT', oxRegistry::getLang()->getBaseLanguage(), false) . ' O3-Shop', $oView->getTitle());

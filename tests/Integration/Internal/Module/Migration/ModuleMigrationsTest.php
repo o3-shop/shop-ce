@@ -25,7 +25,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Module\Migration;
 
 use OxidEsales\DoctrineMigrationWrapper\Migrations;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
-use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidEshopPackage;
@@ -48,7 +47,7 @@ class ModuleMigrationsTest extends TestCase
      */
     private $databaseRestorer;
 
-    private $moduleIdWithMigrations= 'myTestModuleWithMigrations';
+    private $moduleIdWithMigrations = 'myTestModuleWithMigrations';
     private $moduleIdWithoutMigrations = 'myTestModuleWithoutMigrations';
 
     public function setUp(): void
@@ -106,7 +105,7 @@ class ModuleMigrationsTest extends TestCase
     private function installModule(string $moduleId): void
     {
         $package = new OxidEshopPackage($moduleId, __DIR__ . '/Fixtures/' . $moduleId);
-        $package->setTargetDirectory('oeTest/'. $moduleId);
+        $package->setTargetDirectory('oeTest/' . $moduleId);
         $this->getModuleInstaller()->install($package);
     }
 
@@ -116,7 +115,7 @@ class ModuleMigrationsTest extends TestCase
     private function removeTestModule(string $moduleId): void
     {
         $package = new OxidEshopPackage($moduleId, __DIR__ . '/Fixtures/' . $moduleId);
-        $package->setTargetDirectory('oeTest/'. $moduleId);
+        $package->setTargetDirectory('oeTest/' . $moduleId);
         $this->getModuleInstaller()->uninstall($package);
     }
 

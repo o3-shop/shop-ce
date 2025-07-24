@@ -28,12 +28,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20230405121448 extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'set affected content elements to plain';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql(
             'UPDATE oxcontents SET OXISPLAIN = ? WHERE oxloadid LIKE "%plain%"',
@@ -41,5 +41,7 @@ final class Version20230405121448 extends AbstractMigration
         );
     }
 
-    public function down( Schema $schema ): void {}
+    public function down(Schema $schema): void
+    {
+    }
 }

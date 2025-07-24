@@ -37,9 +37,9 @@ use stdClass;
 /**
  * Error constants
  */
-DEFINE("ERR_SUCCESS", -2);
-DEFINE("ERR_GENERAL", -1);
-DEFINE("ERR_FILEIO", 1);
+DEFINE('ERR_SUCCESS', -2);
+DEFINE('ERR_GENERAL', -1);
+DEFINE('ERR_FILEIO', 1);
 
 /**
  * DynExportBase framework class encapsulating a method for defining implementation class.
@@ -54,35 +54,35 @@ class DynamicExportBaseController extends AdminDetailsController
      *
      * @var string
      */
-    public $sClassDo = "";
+    public $sClassDo = '';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "";
+    public $sClassMain = '';
 
     /**
      * Export output folder
      *
      * @var string
      */
-    public $sExportPath = "export/";
+    public $sExportPath = 'export/';
 
     /**
      * Export file extension
      *
      * @var string
      */
-    public $sExportFileType = "txt";
+    public $sExportFileType = 'txt';
 
     /**
      * Export file name
      *
      * @var string
      */
-    public $sExportFileName = "dynexport";
+    public $sExportFileName = 'dynexport';
 
     /**
      * Export file resource
@@ -125,7 +125,7 @@ class DynamicExportBaseController extends AdminDetailsController
      *
      * @var string
      */
-    protected $_sThisTemplate = "dynexportbase.tpl";
+    protected $_sThisTemplate = 'dynexportbase.tpl';
 
     /**
      * Category data cache
@@ -142,7 +142,7 @@ class DynamicExportBaseController extends AdminDetailsController
         parent::__construct();
 
         // set generic frame template
-        $this->_sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . "/" . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
+        $this->_sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . '/' . $this->sExportPath . $this->sExportFileName . '.' . $this->sExportFileType;
     }
 
     /**
@@ -162,7 +162,7 @@ class DynamicExportBaseController extends AdminDetailsController
         }
 
         $this->_aViewData['sOutputFile'] = $this->_sFilePath;
-        $this->_aViewData['sDownloadFile'] = Registry::getConfig()->getConfigParam('sShopURL') . $this->sExportPath . $this->sExportFileName . "." . $this->sExportFileType;
+        $this->_aViewData['sDownloadFile'] = Registry::getConfig()->getConfigParam('sShopURL') . $this->sExportPath . $this->sExportFileName . '.' . $this->sExportFileType;
 
         return $this->_sThisTemplate;
     }
@@ -173,14 +173,14 @@ class DynamicExportBaseController extends AdminDetailsController
     public function createMainExportView()
     {
         // parent category-tree
-        $this->_aViewData["cattree"] = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
-        $this->_aViewData["cattree"]->loadList();
+        $this->_aViewData['cattree'] = oxNew(\OxidEsales\Eshop\Application\Model\CategoryList::class);
+        $this->_aViewData['cattree']->loadList();
 
         $oLangObj = oxNew(Language::class);
         $aLangs = $oLangObj->getLanguageArray();
         foreach ($aLangs as $id => $language) {
             $language->selected = ($id == $this->_iEditLang);
-            $this->_aViewData["aLangs"][$id] = clone $language;
+            $this->_aViewData['aLangs'][$id] = clone $language;
         }
     }
 
@@ -190,7 +190,7 @@ class DynamicExportBaseController extends AdminDetailsController
     public function start()
     {
         // delete file, if it's already there
-        $this->fpFile = @fopen($this->_sFilePath, "w");
+        $this->fpFile = @fopen($this->_sFilePath, 'w');
         if (!isset($this->fpFile) || !$this->fpFile) {
             // we do have an error !
             $this->stop(ERR_FILEIO);
@@ -201,7 +201,7 @@ class DynamicExportBaseController extends AdminDetailsController
 
             // prepare it
             $iEnd = $this->prepareExport();
-            Registry::getSession()->setVariable("iEnd", $iEnd);
+            Registry::getSession()->setVariable('iEnd', $iEnd);
             $this->_aViewData['iEnd'] = $iEnd;
         }
     }
@@ -220,7 +220,7 @@ class DynamicExportBaseController extends AdminDetailsController
         }
 
         // delete temporary heap table
-        DatabaseProvider::getDb()->execute("drop TABLE if exists " . $this->getHeapTableName());
+        DatabaseProvider::getDb()->execute('drop TABLE if exists ' . $this->getHeapTableName());
     }
 
     /**
@@ -243,7 +243,7 @@ class DynamicExportBaseController extends AdminDetailsController
     public function write($sLine)
     {
         $sLine = $this->removeSID($sLine);
-        $sLine = str_replace(["\r\n", "\n"], "", $sLine);
+        $sLine = str_replace(["\r\n", "\n"], '', $sLine);
         fwrite($this->fpFile, $sLine . "\r\n");
     }
 
@@ -255,7 +255,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $blContinue = true;
         $iExportedItems = 0;
 
-        $this->fpFile = @fopen($this->_sFilePath, "a");
+        $this->fpFile = @fopen($this->_sFilePath, 'a');
         if (!isset($this->fpFile) || !$this->fpFile) {
             // we do have an error !
             $this->stop(ERR_FILEIO);
@@ -291,7 +291,7 @@ class DynamicExportBaseController extends AdminDetailsController
     public function getExportPerTick()
     {
         if ($this->_iExportPerTick === null) {
-            $this->_iExportPerTick = (int) Registry::getConfig()->getConfigParam("iExportNrofLines");
+            $this->_iExportPerTick = (int) Registry::getConfig()->getConfigParam('iExportNrofLines');
             if (!$this->_iExportPerTick) {
                 $this->_iExportPerTick = $this->iExportPerTick;
             }
@@ -322,11 +322,11 @@ class DynamicExportBaseController extends AdminDetailsController
         $sSid = Registry::getSession()->getId();
 
         // remove sid from link
-        $sOutput = str_replace("sid={$sSid}/", "", $sInput);
-        $sOutput = str_replace("sid/{$sSid}/", "", $sOutput);
-        $sOutput = str_replace("sid={$sSid}&amp;", "", $sOutput);
-        $sOutput = str_replace("sid={$sSid}&", "", $sOutput);
-        $sOutput = str_replace("sid={$sSid}", "", $sOutput);
+        $sOutput = str_replace("sid={$sSid}/", '', $sInput);
+        $sOutput = str_replace("sid/{$sSid}/", '', $sOutput);
+        $sOutput = str_replace("sid={$sSid}&amp;", '', $sOutput);
+        $sOutput = str_replace("sid={$sSid}&", '', $sOutput);
+        $sOutput = str_replace("sid={$sSid}", '', $sOutput);
 
         return $sOutput;
     }
@@ -343,18 +343,18 @@ class DynamicExportBaseController extends AdminDetailsController
     public function shrink($sInput, $iMaxSize, $blRemoveNewline = true)
     {
         if ($blRemoveNewline) {
-            $sInput = str_replace("\r\n", " ", $sInput);
-            $sInput = str_replace("\n", " ", $sInput);
+            $sInput = str_replace("\r\n", ' ', $sInput);
+            $sInput = str_replace("\n", ' ', $sInput);
         }
 
-        $sInput = str_replace("\t", "    ", $sInput);
+        $sInput = str_replace("\t", '    ', $sInput);
 
         // remove html entities, remove html tags
         $sInput = $this->unHTMLEntities(strip_tags($sInput));
 
         $oStr = Str::getStr();
         if ($oStr->strlen($sInput) > $iMaxSize - 3) {
-            $sInput = $oStr->substr($sInput, 0, $iMaxSize - 5) . "...";
+            $sInput = $oStr->substr($sInput, 0, $iMaxSize - 5) . '...';
         }
 
         return $sInput;
@@ -370,7 +370,7 @@ class DynamicExportBaseController extends AdminDetailsController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      */
-    public function getCategoryString($oArticle, $sSeparator = "/")
+    public function getCategoryString($oArticle, $sSeparator = '/')
     {
         $sCatStr = '';
 
@@ -385,7 +385,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $sQ .= "where oxobject2category.oxobjectid = :oxobjectid and $sCatView.oxactive = 1 order by oxobject2category.oxtime ";
 
         $oRs = $oDB->select($sQ, [
-            ':oxobjectid' => $oArticle->getId()
+            ':oxobjectid' => $oArticle->getId(),
         ]);
         if ($oRs && $oRs->count() > 0) {
             $sLeft = $oRs->fields[0];
@@ -398,7 +398,7 @@ class DynamicExportBaseController extends AdminDetailsController
             $oRs = $oDB->select($sQ, [
                 ':oxright' => $sRight,
                 ':oxleft' => $sLeft,
-                ':oxrootid' => $sRootId
+                ':oxrootid' => $sRootId,
             ]);
             if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
@@ -435,7 +435,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $sQ .= "where oxobject2category.oxobjectid = :oxobjectid and $sCatView.oxactive = 1 order by oxobject2category.oxtime ";
 
         return $oDB->getOne($sQ, [
-            ':oxobjectid' => $oArticle->getId()
+            ':oxobjectid' => $oArticle->getId(),
         ]);
     }
 
@@ -450,7 +450,7 @@ class DynamicExportBaseController extends AdminDetailsController
     {
         $sInput = Registry::getUtilsString()->prepareCSVField($sInput);
 
-        return str_replace(["&nbsp;", "&euro;", "|"], [" ", "", ""], $sInput);
+        return str_replace(['&nbsp;', '&euro;', '|'], [' ', '', ''], $sInput);
     }
 
     /**
@@ -462,11 +462,11 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     public function prepareXML($sInput)
     {
-        $sOutput = str_replace("&", "&amp;", $sInput);
-        $sOutput = str_replace("\"", "&quot;", $sOutput);
-        $sOutput = str_replace(">", "&gt;", $sOutput);
-        $sOutput = str_replace("<", "&lt;", $sOutput);
-        $sOutput = str_replace("'", "&apos;", $sOutput);
+        $sOutput = str_replace('&', '&amp;', $sInput);
+        $sOutput = str_replace('"', '&quot;', $sOutput);
+        $sOutput = str_replace('>', '&gt;', $sOutput);
+        $sOutput = str_replace('<', '&lt;', $sOutput);
+        $sOutput = str_replace("'", '&apos;', $sOutput);
 
         return $sOutput;
     }
@@ -565,7 +565,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $oStr = Str::getStr();
         if (!$oStr->strlen($sInput)) {
             if (!isset($sReplace) || !$oStr->strlen($sReplace)) {
-                $sReplace = "-";
+                $sReplace = '-';
             }
             $sInput = $sReplace;
         }
@@ -621,7 +621,7 @@ class DynamicExportBaseController extends AdminDetailsController
     protected function getHeapTableName()
     {
         // table name must not start with any digit
-        return "tmp_" . str_replace("0", "", md5(Registry::getSession()->getId()));
+        return 'tmp_' . str_replace('0', '', md5(Registry::getSession()->getId()));
     }
 
     /**
@@ -650,7 +650,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function generateTableCharSet($sMysqlVersion)
     {
-        $sTableCharset = "";
+        $sTableCharset = '';
 
         //if MySQL >= 4.1.0 set charsets and collations
         if (version_compare($sMysqlVersion, '4.1.0', '>=') > 0) {
@@ -733,16 +733,16 @@ class DynamicExportBaseController extends AdminDetailsController
         $sCatAdd = null;
         if (is_array($aChosenCat) && count($aChosenCat)) {
             $oDB = DatabaseProvider::getDb();
-            $sCatAdd = " and ( ";
+            $sCatAdd = ' and ( ';
             $blSep = false;
             foreach ($aChosenCat as $sCat) {
                 if ($blSep) {
-                    $sCatAdd .= " or ";
+                    $sCatAdd .= ' or ';
                 }
-                $sCatAdd .= "oxobject2category.oxcatnid = " . $oDB->quote($sCat);
+                $sCatAdd .= 'oxobject2category.oxcatnid = ' . $oDB->quote($sCat);
                 $blSep = true;
             }
-            $sCatAdd .= ")";
+            $sCatAdd .= ')';
         }
 
         return $sCatAdd;
@@ -780,14 +780,14 @@ class DynamicExportBaseController extends AdminDetailsController
 
         $iExpLang = Registry::getRequest()->getRequestEscapedParameter('iExportLanguage');
         if (!isset($iExpLang)) {
-            $iExpLang = Registry::getSession()->getVariable("iExportLanguage");
+            $iExpLang = Registry::getSession()->getVariable('iExportLanguage');
         }
 
         $oArticle = oxNew(Article::class);
         $oArticle->setLanguage($iExpLang);
 
         $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category', $iExpLang);
-        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles", $iExpLang);
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $iExpLang);
 
         $insertQuery = "insert into {$sHeapTable} select {$sArticleTable}.oxid from {$sArticleTable}, {$sO2CView} as oxobject2category where ";
         $insertQuery .= $oArticle->getSqlActiveSnippet();
@@ -802,7 +802,7 @@ class DynamicExportBaseController extends AdminDetailsController
         if (isset($sSearchString)) {
             $insertQuery .= "and ( {$sArticleTable}.OXTITLE like " . $oDB->quote("%{$sSearchString}%");
             $insertQuery .= " or {$sArticleTable}.OXSHORTDESC like " . $oDB->quote("%$sSearchString%");
-            $insertQuery .= " or {$sArticleTable}.oxsearchkeys like " . $oDB->quote("%$sSearchString%") . " ) ";
+            $insertQuery .= " or {$sArticleTable}.oxsearchkeys like " . $oDB->quote("%$sSearchString%") . ' ) ';
         }
 
         if ($sCatAdd) {
@@ -811,7 +811,7 @@ class DynamicExportBaseController extends AdminDetailsController
 
         // add minimum stock value
         if (Registry::getConfig()->getConfigParam('blUseStock') && ($dMinStock = Registry::getRequest()->getRequestEscapedParameter('sExportMinStock'))) {
-            $dMinStock = str_replace([";", " ", "/", "'"], "", $dMinStock);
+            $dMinStock = str_replace([';', ' ', '/', "'"], '', $dMinStock);
             $insertQuery .= " and {$sArticleTable}.oxstock >= " . $oDB->quote($dMinStock);
         }
 
@@ -856,14 +856,14 @@ class DynamicExportBaseController extends AdminDetailsController
             if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
                     if ($blSep) {
-                        $sDel .= ",";
+                        $sDel .= ',';
                     }
                     $sDel .= $oDB->quote($oRs->fields[0]);
                     $blSep = true;
                     $oRs->fetchRow();
                 }
             }
-            $sDel .= " )";
+            $sDel .= ' )';
             $oDB->execute($sDel);
         }
     }
@@ -883,44 +883,44 @@ class DynamicExportBaseController extends AdminDetailsController
     protected function setSessionParams()
     {
         // reset it from session
-        Registry::getSession()->deleteVariable("sExportDelCost");
+        Registry::getSession()->deleteVariable('sExportDelCost');
         $dDelCost = Registry::getRequest()->getRequestEscapedParameter('sExportDelCost');
         if (isset($dDelCost)) {
-            $dDelCost = str_replace([";", " ", "/", "'"], "", $dDelCost);
-            $dDelCost = str_replace(",", ".", $dDelCost);
-            Registry::getSession()->setVariable("sExportDelCost", $dDelCost);
+            $dDelCost = str_replace([';', ' ', '/', "'"], '', $dDelCost);
+            $dDelCost = str_replace(',', '.', $dDelCost);
+            Registry::getSession()->setVariable('sExportDelCost', $dDelCost);
         }
 
-        Registry::getSession()->deleteVariable("sExportMinPrice");
+        Registry::getSession()->deleteVariable('sExportMinPrice');
         $dMinPrice = Registry::getRequest()->getRequestEscapedParameter('sExportMinPrice');
         if (isset($dMinPrice)) {
-            $dMinPrice = str_replace([";", " ", "/", "'"], "", $dMinPrice);
-            $dMinPrice = str_replace(",", ".", $dMinPrice);
-            Registry::getSession()->setVariable("sExportMinPrice", $dMinPrice);
+            $dMinPrice = str_replace([';', ' ', '/', "'"], '', $dMinPrice);
+            $dMinPrice = str_replace(',', '.', $dMinPrice);
+            Registry::getSession()->setVariable('sExportMinPrice', $dMinPrice);
         }
 
         // #827
-        Registry::getSession()->deleteVariable("sExportCampaign");
+        Registry::getSession()->deleteVariable('sExportCampaign');
         $sCampaign = Registry::getRequest()->getRequestEscapedParameter('sExportCampaign');
         if (isset($sCampaign)) {
-            $sCampaign = str_replace([";", " ", "/", "'"], "", $sCampaign);
-            Registry::getSession()->setVariable("sExportCampaign", $sCampaign);
+            $sCampaign = str_replace([';', ' ', '/', "'"], '', $sCampaign);
+            Registry::getSession()->setVariable('sExportCampaign', $sCampaign);
         }
 
         // reset it from session
-        Registry::getSession()->deleteVariable("blAppendCatToCampaign");
+        Registry::getSession()->deleteVariable('blAppendCatToCampaign');
         // now retrieve it from get or post.
         $blAppendCatToCampaign = Registry::getRequest()->getRequestEscapedParameter('blAppendCatToCampaign');
         if ($blAppendCatToCampaign) {
-            Registry::getSession()->setVariable("blAppendCatToCampaign", $blAppendCatToCampaign);
+            Registry::getSession()->setVariable('blAppendCatToCampaign', $blAppendCatToCampaign);
         }
 
         // reset it from session
-        Registry::getSession()->deleteVariable("iExportLanguage");
-        Registry::getSession()->setVariable("iExportLanguage", Registry::getRequest()->getRequestEscapedParameter('iExportLanguage'));
+        Registry::getSession()->deleteVariable('iExportLanguage');
+        Registry::getSession()->setVariable('iExportLanguage', Registry::getRequest()->getRequestEscapedParameter('iExportLanguage'));
 
         //setting the custom header
-        Registry::getSession()->setVariable("sExportCustomHeader", Registry::getRequest()->getRequestEscapedParameter('sExportCustomHeader'));
+        Registry::getSession()->setVariable('sExportCustomHeader', Registry::getRequest()->getRequestEscapedParameter('sExportCustomHeader'));
     }
 
     /**
@@ -964,7 +964,7 @@ class DynamicExportBaseController extends AdminDetailsController
                              v.oxleft AND v.oxright AND s.oxhidden = '0' GROUP BY s.oxleft order by level";
 
                     $oRs2 = $oDb->select($sSQL, [
-                        ':oxrootid' => $oRs->fields[0]
+                        ':oxrootid' => $oRs->fields[0],
                     ]);
                     if ($oRs2 && $oRs2->count() > 0) {
                         while (!$oRs2->EOF) {
@@ -1013,7 +1013,7 @@ class DynamicExportBaseController extends AdminDetailsController
      */
     protected function findDeepestCatPath($oArticle)
     {
-        $sRet = "";
+        $sRet = '';
 
         // find deepest
         $aIds = $oArticle->getCategoryIds();
@@ -1031,11 +1031,11 @@ class DynamicExportBaseController extends AdminDetailsController
 
                 // endless
                 while (true) {
-                    if (!isset($aCatLvlCache[$sIdMax]->oxparentid) || $aCatLvlCache[$sIdMax]->oxparentid == "oxrootid") {
+                    if (!isset($aCatLvlCache[$sIdMax]->oxparentid) || $aCatLvlCache[$sIdMax]->oxparentid == 'oxrootid') {
                         break;
                     }
                     $sIdMax = $aCatLvlCache[$sIdMax]->oxparentid;
-                    $sRet = $aCatLvlCache[$sIdMax]->oxtitle . "/" . $sRet;
+                    $sRet = $aCatLvlCache[$sIdMax]->oxtitle . '/' . $sRet;
                 }
             }
         }
@@ -1080,7 +1080,7 @@ class DynamicExportBaseController extends AdminDetailsController
             $oArticle = oxNew(Article::class);
             $oArticle->setLoadParentData(true);
 
-            $oArticle->setLanguage(Registry::getSession()->getVariable("iExportLanguage"));
+            $oArticle->setLanguage(Registry::getSession()->getVariable('iExportLanguage'));
 
             if ($oArticle->load($oRs->fields[0])) {
                 // if article exists, do not stop export
@@ -1089,7 +1089,7 @@ class DynamicExportBaseController extends AdminDetailsController
                 $dMinPrice = Registry::getRequest()->getRequestEscapedParameter('sExportMinPrice');
                 if (!isset($dMinPrice) || ($oArticle->getPrice()->getBruttoPrice() >= $dMinPrice)) {
                     //Saulius: variant title added
-                    $sTitle = $oArticle->oxarticles__oxvarselect->value ? " " . $oArticle->oxarticles__oxvarselect->value : "";
+                    $sTitle = $oArticle->oxarticles__oxvarselect->value ? ' ' . $oArticle->oxarticles__oxvarselect->value : '';
                     $oArticle->oxarticles__oxtitle->setValue($oArticle->oxarticles__oxtitle->value . $sTitle);
 
                     return $this->updateArticle($oArticle);

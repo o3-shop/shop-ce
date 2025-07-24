@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -74,7 +76,7 @@ class PasswordPolicyTest extends TestCase
                 ['UTF-16LE'],
                 ['ISO-8859-1'],
                 ['ISO-8859-15'],
-                ['Windows-1252']
+                ['Windows-1252'],
             ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: bruto
@@ -17,45 +18,45 @@
  * Short description:
  * From articlePrice.csv: article final price calculations. 9205 - 1st
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9205,
                 'oxprice'                  => 25.90,
                 'oxvat'                    => 18,
                 'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'abs_discount_for_9205',
                 'oxaddsum'     => 5.31,
                 'oxaddsumtype' => 'abs',
                 'oxamount' => 0,
                 'oxamountto' => 99999,
                 'oxactive' => 1,
-                'oxarticles' => array( 9205 ),
+                'oxarticles' => [ 9205 ],
                 'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9205 => array( '11,53', '11,53' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 9205 => [ '11,53', '11,53' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '11,53',
                 'totalNetto'  => '9,77',
-                'vats' => array(
+                'vats' => [
                         18 => '1,76',
-                ),
-                'grandTotal'  => '11,53'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '11,53',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 0.56,
-    ),
-);
+    ],
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class SelectListListTest extends \OxidTestCase
 {
-
     /**
      * SelectList_List::Init() test case
      *
@@ -35,11 +36,11 @@ class SelectListListTest extends \OxidTestCase
         $this->markTestSkipped('Overwork due => tests are stoping without message.');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\SelectListList::class, array("_authorize"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\SelectListList::class, ['_authorize']);
         $oView->expects($this->any())->method('_authorize')->will($this->returnValue(true));
         $oView->init();
         $oView->render();
-        $this->assertEquals(array('oxselectlist' => array("oxtitle" => "asc")), $oView->getListSorting());
+        $this->assertEquals(['oxselectlist' => ['oxtitle' => 'asc']], $oView->getListSorting());
     }
 
     /**

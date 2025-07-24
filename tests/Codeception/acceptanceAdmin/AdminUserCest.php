@@ -67,7 +67,7 @@ final class AdminUserCest
         $adminUsersPage = $adminUsersPage->createNewUser($adminUser, $adminUserAddress);
 
         //By default is Customer
-        $adminUser->setUserRights("Customer");
+        $adminUser->setUserRights('Customer');
 
         $adminUsersPage = $adminUsersPage->seeUserInformation($adminUser, $adminUserAddress);
 
@@ -84,12 +84,12 @@ final class AdminUserCest
             ->seeUserAddress($changedAdminUserAddress);
 
         $adminUserHistoryPage = $adminUserExtendedPage->openHistoryTab()
-            ->createNewRemark("new note_šÄßüл")
-            ->selectUserRemark("0");
-        $I->seeInField($adminUserHistoryPage->remarkField, "new note_šÄßüл");
+            ->createNewRemark('new note_šÄßüл')
+            ->selectUserRemark('0');
+        $I->seeInField($adminUserHistoryPage->remarkField, 'new note_šÄßüл');
 
-        $adminUserHistoryPage = $adminUserHistoryPage->deleteRemark()->selectUserRemark("0");
-        $I->dontSeeInField($adminUserHistoryPage->remarkField, "new note_šÄßüл");
+        $adminUserHistoryPage = $adminUserHistoryPage->deleteRemark()->selectUserRemark('0');
+        $I->dontSeeInField($adminUserHistoryPage->remarkField, 'new note_šÄßüл');
 
         $adminUserProductPage = $adminUserHistoryPage->openProductsTab();
         $adminUserPaymentPage = $adminUserProductPage->openPaymentTab();
@@ -104,7 +104,8 @@ final class AdminUserCest
     {
         $I->wantToTest('User addresses');
 
-        $this->createAdminTestUser($I,
+        $this->createAdminTestUser(
+            $I,
             $this->getAdminUser(),
             $this->getAdminUserAddress(),
             $this->getAdminUserExtendedInfo()
@@ -112,38 +113,38 @@ final class AdminUserCest
 
         $adminUsersPage = $I->loginAdmin()->openUsers();
 
-        $adminUsersPage = $adminUsersPage->findByUserName("example00@oxid-esales.dev")->openAddressesTab();
+        $adminUsersPage = $adminUsersPage->findByUserName('example00@oxid-esales.dev')->openAddressesTab();
 
         $adminUserAddress1 = new AdminUserAddresses();
-        $adminUserAddress1->setTitle("Mr");
-        $adminUserAddress1->setFirstName("shipping name_šÄßüл");
-        $adminUserAddress1->setLastName("shipping surname_šÄßüл");
-        $adminUserAddress1->setCompany("shipping company_šÄßüл");
-        $adminUserAddress1->setStreet("shipping street_šÄßüл");
-        $adminUserAddress1->setStreetNumber("1");
-        $adminUserAddress1->setZip("1000");
-        $adminUserAddress1->setCity("shipping city_šÄßüл");
-        $adminUserAddress1->setAdditionalInfo("shipping additional info_šÄßüл");
-        $adminUserAddress1->setCountryId("Germany");
-        $adminUserAddress1->setPhone("7778788");
-        $adminUserAddress1->setFax("8887877");
+        $adminUserAddress1->setTitle('Mr');
+        $adminUserAddress1->setFirstName('shipping name_šÄßüл');
+        $adminUserAddress1->setLastName('shipping surname_šÄßüл');
+        $adminUserAddress1->setCompany('shipping company_šÄßüл');
+        $adminUserAddress1->setStreet('shipping street_šÄßüл');
+        $adminUserAddress1->setStreetNumber('1');
+        $adminUserAddress1->setZip('1000');
+        $adminUserAddress1->setCity('shipping city_šÄßüл');
+        $adminUserAddress1->setAdditionalInfo('shipping additional info_šÄßüл');
+        $adminUserAddress1->setCountryId('Germany');
+        $adminUserAddress1->setPhone('7778788');
+        $adminUserAddress1->setFax('8887877');
 
         $adminUsersPage = $adminUsersPage->createNewAddress($adminUserAddress1)
             ->seeAddressInformation($adminUserAddress1);
 
         $adminUserAddress2 = new AdminUserAddresses();
-        $adminUserAddress2->setTitle("Mrs");
-        $adminUserAddress2->setFirstName("name2");
-        $adminUserAddress2->setLastName("last name 2");
-        $adminUserAddress2->setCompany("company 2");
-        $adminUserAddress2->setStreet("street2");
-        $adminUserAddress2->setStreetNumber("12");
-        $adminUserAddress2->setZip("2001");
-        $adminUserAddress2->setCity("city2");
-        $adminUserAddress2->setAdditionalInfo("additional info2");
-        $adminUserAddress2->setCountryId("United States");
-        $adminUserAddress2->setPhone("999666");
-        $adminUserAddress2->setFax("666999");
+        $adminUserAddress2->setTitle('Mrs');
+        $adminUserAddress2->setFirstName('name2');
+        $adminUserAddress2->setLastName('last name 2');
+        $adminUserAddress2->setCompany('company 2');
+        $adminUserAddress2->setStreet('street2');
+        $adminUserAddress2->setStreetNumber('12');
+        $adminUserAddress2->setZip('2001');
+        $adminUserAddress2->setCity('city2');
+        $adminUserAddress2->setAdditionalInfo('additional info2');
+        $adminUserAddress2->setCountryId('United States');
+        $adminUserAddress2->setPhone('999666');
+        $adminUserAddress2->setFax('666999');
 
         $emptyAddress = new AdminUserAddresses();
 
@@ -193,12 +194,12 @@ final class AdminUserCest
         AcceptanceAdminTester $I,
         AdminUser $user,
         AdminUserAddresses $userAddress,
-        AdminUserExtendedInfo $userExtendedInfo): void
-    {
+        AdminUserExtendedInfo $userExtendedInfo
+    ): void {
         $I->haveInDatabase(
             'oxuser',
             [
-                'OXID'        => "kdiruuc",
+                'OXID'        => 'kdiruuc',
                 'OXACTIVE'    => $user->getActive(),
                 'OXRIGHTS'    => 'malladmin',
                 'OXSHOPID'    => 1,
@@ -225,7 +226,7 @@ final class AdminUserCest
                 'OXREGISTER'  => '2010-02-05 10:22:48',
                 'OXPRIVFON'   => $userExtendedInfo->getEveningPhone(),
                 'OXMOBFON'    => $userExtendedInfo->getCelluarPhone(),
-                'OXBIRTHDATE' => $user->getBirthYear() . '-' . $user->getBirthMonth(). '-' . $user->getBirthday(),
+                'OXBIRTHDATE' => $user->getBirthYear() . '-' . $user->getBirthMonth() . '-' . $user->getBirthday(),
                 'OXURL'       => $userExtendedInfo->getUrl(),
                 'OXUPDATEKEY' => '',
                 'OXUPDATEEXP' => 0,
@@ -240,8 +241,8 @@ final class AdminUserCest
     {
         $adminUser = new AdminUser();
         $adminUser->setActive(false);
-        $adminUser->setUserRights("Admin");
-        $adminUser->setPassword("adminpass");
+        $adminUser->setUserRights('Admin');
+        $adminUser->setPassword('adminpass');
         $adminUser->setUsername('example00@oxid-esales.dev');
         $adminUser->setCustomerNumber('121');
         $adminUser->setBirthday('01');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,20 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\SeoEncoderVendor;
-
-use \Exception;
-use \oxField;
-use \oxDb;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Vendor_Seo class
  */
 class VendorSeoTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -66,7 +66,7 @@ class VendorSeoTest extends \OxidTestCase
     {
         // testing..
         $oView = oxNew('Vendor_Seo');
-        $this->assertEquals("oxvendor", $oView->UNITgetType());
+        $this->assertEquals('oxvendor', $oView->UNITgetType());
     }
 
     /**
@@ -76,7 +76,7 @@ class VendorSeoTest extends \OxidTestCase
      */
     public function testSave()
     {
-        $this->setRequestParameter('oxid', "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         oxTestModules::addFunction('oxbase', 'save', '{ throw new Exception("save"); }');
         oxTestModules::addFunction('oxbase', 'load', '{ return true; }');
@@ -86,11 +86,11 @@ class VendorSeoTest extends \OxidTestCase
             $oView = oxNew('Vendor_Seo');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in Vendor_Seo::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in Vendor_Seo::save()');
 
             return;
         }
-        $this->fail("Error in Vendor_Seo::save()");
+        $this->fail('Error in Vendor_Seo::save()');
     }
 
     /**
@@ -123,20 +123,19 @@ class VendorSeoTest extends \OxidTestCase
     public function testIsEntrySuffixed()
     {
         $oVendor = oxNew('oxVendor');
-        $oVendor->setId("_test1");
+        $oVendor->setId('_test1');
         $oVendor->oxvendor__oxshowsuffix = new oxField(1);
         $oVendor->save();
 
         $oVendor = oxNew('oxVendor');
-        $oVendor->setId("_test2");
+        $oVendor->setId('_test2');
         $oVendor->oxvendor__oxshowsuffix = new oxField(0);
         $oVendor->save();
 
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, array("getEditObjectId"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, ['getEditObjectId']);
         $oView->expects($this->exactly(2))
             ->method('getEditObjectId')
-            ->willReturnOnConsecutiveCalls("_test1", "_test2");
+            ->willReturnOnConsecutiveCalls('_test1', '_test2');
 
         $this->assertTrue($oView->isEntrySuffixed());
         $this->assertFalse($oView->isEntrySuffixed());
@@ -150,17 +149,17 @@ class VendorSeoTest extends \OxidTestCase
     public function testGetEntryUri()
     {
         $oVendor = oxNew('oxVendor');
-        $oVendor->setId("_test1");
+        $oVendor->setId('_test1');
         $oVendor->oxvendor__oxshowsuffix = new oxField(0);
         $oVendor->save();
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, array("getVendorUri"));
-        $oEncoder->expects($this->once())->method('getVendorUri')->will($this->returnValue("VendorUri"));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, ['getVendorUri']);
+        $oEncoder->expects($this->once())->method('getVendorUri')->will($this->returnValue('VendorUri'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, array("getEditObjectId", "_getEncoder"));
-        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue("_test1"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, ['getEditObjectId', '_getEncoder']);
+        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('_test1'));
         $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
-        $this->assertEquals("VendorUri", $oView->getEntryUri());
+        $this->assertEquals('VendorUri', $oView->getEntryUri());
     }
 
     /**
@@ -171,13 +170,13 @@ class VendorSeoTest extends \OxidTestCase
     public function testGetStdUrl()
     {
         $oVendor = oxNew('oxVendor');
-        $oVendor->setId("_test1");
+        $oVendor->setId('_test1');
         $oVendor->oxvendor__oxshowsuffix = new oxField(0);
         $oVendor->save();
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, array("getEditLang"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorSeo::class, ['getEditLang']);
         $oView->expects($this->once())->method('getEditLang')->will($this->returnValue(0));
 
-        $this->assertEquals($oVendor->getBaseStdLink(0, true, false), $oView->UNITgetStdUrl("_test1"));
+        $this->assertEquals($oVendor->getBaseStdLink(0, true, false), $oView->UNITgetStdUrl('_test1'));
     }
 }

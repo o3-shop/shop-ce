@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop Community Edition.
  *
@@ -26,7 +27,7 @@ use OxidEsales\Eshop\Application\Controller\AccountReviewController;
 use OxidEsales\Eshop\Application\Model\Rating;
 use OxidEsales\Eshop\Application\Model\Review;
 use OxidEsales\Eshop\Application\Model\User;
-use \OxidEsales\Eshop\Core\Field;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Utils;
 
@@ -39,7 +40,7 @@ use OxidEsales\Eshop\Core\Utils;
  */
 class AccountReviewControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
-    const TESTUSER_ID = 'AccountReviewControllerTest';
+    public const TESTUSER_ID = 'AccountReviewControllerTest';
 
     /**
      * @inheritdoc

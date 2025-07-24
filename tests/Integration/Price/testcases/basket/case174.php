@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto / brutto
  * Price view mode: netto / brutto
@@ -11,30 +12,30 @@
  * shop has discount assigned to product 1126 with amount restrictions ( 3 < discount < 999 ), test case is moved from unit test
  *
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
                     'oxid'                     => 1126,
                     'oxprice'                  => 34.00,
                     'oxvat'                    => 19,
                     'amount'                   => 2,
-        ),
-    ),
+        ],
+    ],
 
     // Discounts
-    'discounts' => array(
-        0 => array(
+    'discounts' => [
+        0 => [
             'oxid'         => 'testdisc',
             'oxaddsum'     => 50,
             'oxaddsumtype' => '%',
             'oxamount' => 3,
             'oxamountto' => 99999,
             'oxactive' => 0,
-            'oxarticles' => array( 1126 ),
+            'oxarticles' => [ 1126 ],
             'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'         => '_testoxdiscount2',
             'oxaddsum'     => 50,
             'oxaddsumtype' => '%',
@@ -43,42 +44,41 @@ $aData = array(
             'oxprice' => 69,
             'oxpriceto' => 999999,
             'oxactive' => 1,
-            'oxarticles' => array( 1126 ),
+            'oxarticles' => [ 1126 ],
             'oxsort' => 20,
-        ),
-    ),
+        ],
+    ],
 
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             1126 => array( '34,00', '68,00' ),
-        ),
+        'articles' => [
+             1126 => [ '34,00', '68,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '68,00',
             // Total NETTO
             'totalNetto'  => '57,14',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
-                19 => '10,86'
-            ),
-
+            'vats' => [
+                19 => '10,86',
+            ],
 
             // GRAND TOTAL
-            'grandTotal'  => '68,00'
-        ),
-    ),
+            'grandTotal'  => '68,00',
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'bl_perfLoadSelectLists' => true,
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

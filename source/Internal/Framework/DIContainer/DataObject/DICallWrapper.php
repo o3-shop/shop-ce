@@ -25,8 +25,8 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\DataObject;
 
 class DICallWrapper
 {
-    const METHOD_KEY = 'method';
-    const PARAMETER_KEY = 'arguments';
+    public const METHOD_KEY = 'method';
+    public const PARAMETER_KEY = 'arguments';
 
     private $callArray;
 

@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
-use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Controller\CompareController;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsUrl;
@@ -243,8 +243,8 @@ class AccountController extends FrontendController
 
             // building redirect link
             foreach ($this->getNavigationParams() as $key => $value) {
-                if ($value && $key != "sourcecl") {
-                    $redirectUrl .= '&' . rawurlencode($key) . "=" . rawurlencode($value);
+                if ($value && $key != 'sourcecl') {
+                    $redirectUrl .= '&' . rawurlencode($key) . '=' . rawurlencode($value);
                 }
             }
 
@@ -354,7 +354,7 @@ class AccountController extends FrontendController
         $baseLanguageId = $language->getBaseLanguage();
         if ($user = $this->getUser()) {
             $username = $user->oxuser__oxusername->value;
-            $pathData['title'] = $language->translateString('MY_ACCOUNT', $baseLanguageId, false) . " - " . $username;
+            $pathData['title'] = $language->translateString('MY_ACCOUNT', $baseLanguageId, false) . ' - ' . $username;
         } else {
             $pathData['title'] = $language->translateString('LOGIN', $baseLanguageId, false);
         }

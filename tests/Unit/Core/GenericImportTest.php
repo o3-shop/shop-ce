@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use oxDb;
@@ -59,7 +61,7 @@ class GenericImportTest extends OxidTestCase
         $oImport = new GenericImport();
 
         /** @var oxUser|MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('isAdmin'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['isAdmin']);
         $oUser->expects($this->any())->method('isAdmin')->will($this->returnValue(true));
         $oUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD);
         $oUser->loadAdminUser();
@@ -91,21 +93,21 @@ class GenericImportTest extends OxidTestCase
      */
     public function providerMapFields()
     {
-        return array(
-            array(
-                array('aa', 'bb', 'cc'),
-                array('OXID' => 'oxid', 'OXTITLE' => 'oxtitle', 'OXNAME' => 'oxname'),
-                array('oxid' => 'aa', 'oxtitle' => 'bb', 'oxname' => 'cc')),
-            array(
-                array('aa', 'bb', 'cc'),
-                array('OXID' => 'oxid', 'OXTITLE' => '', 'OXNAME' => 'oxname'),
-                array('oxid' => 'aa', 'oxname' => 'cc')),
-            array(
-                array('aa', 'bb', 'NULL'),
-                array('OXID' => 'oxid', 'OXNAME' => 'oxname', 'OXVAT' => 'oxvat'),
-                array('oxid' => 'aa', 'oxname' => 'bb', 'oxvat' => null)
-            ),
-        );
+        return [
+            [
+                ['aa', 'bb', 'cc'],
+                ['OXID' => 'oxid', 'OXTITLE' => 'oxtitle', 'OXNAME' => 'oxname'],
+                ['oxid' => 'aa', 'oxtitle' => 'bb', 'oxname' => 'cc']],
+            [
+                ['aa', 'bb', 'cc'],
+                ['OXID' => 'oxid', 'OXTITLE' => '', 'OXNAME' => 'oxname'],
+                ['oxid' => 'aa', 'oxname' => 'cc']],
+            [
+                ['aa', 'bb', 'NULL'],
+                ['OXID' => 'oxid', 'OXNAME' => 'oxname', 'OXVAT' => 'oxvat'],
+                ['oxid' => 'aa', 'oxname' => 'bb', 'oxvat' => null],
+            ],
+        ];
     }
 
     /**
@@ -117,32 +119,32 @@ class GenericImportTest extends OxidTestCase
      */
     public function testMapFields($dataToMap, $csvFields, $mappedData)
     {
-        $importObject = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\ImportObject', array('import'));
+        $importObject = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\ImportObject', ['import']);
         $importObject->expects($this->once())->method('import')->with($mappedData)->will($this->returnValue(1));
 
         /** @var GenericImport|MockObject $oImport */
-        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', array('createImportObject', 'checkAccess'));
+        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['createImportObject', 'checkAccess']);
         $oImport->expects($this->any())->method('createImportObject')->will($this->returnValue($importObject));
 
         $oImport->setImportType('A');
         $oImport->setCsvFileFieldsOrder($csvFields);
-        $oImport->importData(array($dataToMap));
+        $oImport->importData([$dataToMap]);
     }
 
     public function testCalculationOfImportedRows()
     {
-        $importObject = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\ImportObject', array('import'));
+        $importObject = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\ImportObject\ImportObject', ['import']);
         $importObject->expects($this->any())->method('import')->will($this->returnValue(1));
 
         /** @var GenericImport|MockObject $oImport */
-        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', array('createImportObject', 'checkAccess'));
+        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['createImportObject', 'checkAccess']);
         $oImport->expects($this->any())->method('createImportObject')->will($this->returnValue($importObject));
 
         $this->assertEquals(0, $oImport->getImportedRowCount());
 
         $oImport->setImportType('A');
-        $oImport->setCsvFileFieldsOrder(array('OXID' => 'oxid', 'OXTITLE' => 'oxtitle', 'OXNAME' => 'oxname'));
-        $oImport->importData(array(array('aa', 'bb', 'cc')));
+        $oImport->setCsvFileFieldsOrder(['OXID' => 'oxid', 'OXTITLE' => 'oxtitle', 'OXNAME' => 'oxname']);
+        $oImport->importData([['aa', 'bb', 'cc']]);
 
         $this->assertEquals(1, $oImport->getImportedRowCount());
     }
@@ -162,7 +164,7 @@ class GenericImportTest extends OxidTestCase
     public function testDoImportFailsWhenImportFileNotFound()
     {
         /** @var GenericImport|MockObject $oImport */
-        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', array('init'));
+        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['init']);
         $oImport->expects($this->once())->method('init')->will($this->returnValue(true));
 
         $this->assertEquals('ERPGENIMPORT_ERROR_WRONG_FILE', $oImport->importFile('nosuchfile'));
@@ -176,20 +178,20 @@ class GenericImportTest extends OxidTestCase
         $this->markTestSkipped('Review with D.S. Created vfs file seems to be empty.');
 
         /** @var GenericImport|MockObject $oImport */
-        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', array('init', 'checkAccess'));
+        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['init', 'checkAccess']);
         $oImport->expects($this->once())->method('init')->will($this->returnValue(true));
         $oImport->expects($this->any())->method('checkAccess')->will($this->returnValue(true));
 
         $oImport->setCsvContainsHeader(true);
         $oImport->setImportType('U');
-        $oImport->setCsvFileFieldsOrder(array("OXID", "OXACTIVE", "OXSHOPID", "OXUSERNAME", "OXFNAME", "OXLNAME"));
+        $oImport->setCsvFileFieldsOrder(['OXID', 'OXACTIVE', 'OXSHOPID', 'OXUSERNAME', 'OXFNAME', 'OXLNAME']);
 
         $csvWithHeaders = $this->createCsvFile(true);
         $oImport->importFile($csvWithHeaders);
 
         $shopId = ShopIdCalculator::BASE_SHOP_ID;
-        $aTestData1 = array(array("_testId1", "1", $shopId, "userName1", "FirstName1", "LastName1"));
-        $aTestData2 = array(array("_testId2", "1", $shopId, "userName2", "FirstName2", "LastName2"));
+        $aTestData1 = [['_testId1', '1', $shopId, 'userName1', 'FirstName1', 'LastName1']];
+        $aTestData2 = [['_testId2', '1', $shopId, 'userName2', 'FirstName2', 'LastName2']];
 
         $aUser1 = oxDb::getDb()->getAll("select OXID, OXACTIVE, OXSHOPID, OXUSERNAME, OXFNAME, OXLNAME from oxuser where oxid='_testId1'");
         $aUser2 = oxDb::getDb()->getAll("select OXID, OXACTIVE, OXSHOPID, OXUSERNAME, OXFNAME, OXLNAME from oxuser where oxid='_testId2'");
@@ -204,13 +206,13 @@ class GenericImportTest extends OxidTestCase
     public function testDoImportSkipsHeaderLine()
     {
         /** @var GenericImport|MockObject $oImport */
-        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', array('init', 'checkAccess'));
+        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['init', 'checkAccess']);
         $oImport->expects($this->once())->method('init')->will($this->returnValue(true));
         $oImport->expects($this->any())->method('checkAccess')->will($this->returnValue(true));
 
         $oImport->setCsvContainsHeader(true);
         $oImport->setImportType('U');
-        $oImport->setCsvFileFieldsOrder(array("OXID", "OXACTIVE", "OXSHOPID", "OXUSERNAME", "OXFNAME", "OXLNAME"));
+        $oImport->setCsvFileFieldsOrder(['OXID', 'OXACTIVE', 'OXSHOPID', 'OXUSERNAME', 'OXFNAME', 'OXLNAME']);
 
         //checking if header line was not saved to DB
         $csvWithHeaders = $this->createCsvFile(true);
@@ -227,13 +229,13 @@ class GenericImportTest extends OxidTestCase
         $this->markTestSkipped('Review with D.S. Created vfs file seems to be empty.');
 
         /** @var GenericImport|MockObject $oImport */
-        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', array('init', 'checkAccess'));
+        $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['init', 'checkAccess']);
         $oImport->expects($this->once())->method('init')->will($this->returnValue(true));
         $oImport->expects($this->any())->method('checkAccess')->will($this->returnValue(true));
 
         $oImport->setCsvContainsHeader(false);
         $oImport->setImportType('U');
-        $oImport->setCsvFileFieldsOrder(array("OXID", "OXACTIVE", "OXSHOPID", "OXUSERNAME", "OXFNAME", "OXLNAME"));
+        $oImport->setCsvFileFieldsOrder(['OXID', 'OXACTIVE', 'OXSHOPID', 'OXUSERNAME', 'OXFNAME', 'OXLNAME']);
 
         //checking if first line from csv file was saved to DB
         $csvWithoutHeaders = $this->createCsvFile(false);
@@ -250,10 +252,10 @@ class GenericImportTest extends OxidTestCase
      */
     private function createCsvFile($addHeaders = true)
     {
-        $content = '"_testId1";"1";"1";"userName1";"FirstName1";"LastName1"'."\n";
-        $content .= '"_testId2";"1";"1";"userName2";"FirstName2";"LastName2"'."\n";
+        $content = '"_testId1";"1";"1";"userName1";"FirstName1";"LastName1"' . "\n";
+        $content .= '"_testId2";"1";"1";"userName2";"FirstName2";"LastName2"' . "\n";
         if ($addHeaders) {
-            $content = '"OXID";"OXACTIVE";"OXSHOPID";"OXUSERNAME";"OXFNAME";"OXLNAME"'."\n" . $content;
+            $content = '"OXID";"OXACTIVE";"OXSHOPID";"OXUSERNAME";"OXFNAME";"OXLNAME"' . "\n" . $content;
         }
 
         $file = $this->createFile('csvWithHeader.csv', $content);

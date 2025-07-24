@@ -59,7 +59,7 @@ class PriceAlarmMail extends AdminDetailsController
             FROM oxpricealarm
             WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
         $result = DatabaseProvider::getDb()->select($query, [
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
         if ($result && $result->count() > 0) {
             $simpleCache = [];
@@ -83,6 +83,6 @@ class PriceAlarmMail extends AdminDetailsController
             }
         }
 
-        return "pricealarm_mail.tpl";
+        return 'pricealarm_mail.tpl';
     }
 }

@@ -23,13 +23,13 @@ namespace OxidEsales\EshopCommunity\Setup;
 
 use Exception;
 use OxidEsales\DatabaseViewsGenerator\ViewsGenerator;
-use OxidEsales\Eshop\Core\Edition\EditionRootPathProvider;
-use OxidEsales\Eshop\Core\Edition\EditionPathProvider;
-use OxidEsales\Facts\Facts;
-use OxidEsales\Eshop\Core\Edition\EditionSelector;
+use OxidEsales\DemoDataInstaller\DemoDataInstallerBuilder;
 use OxidEsales\DoctrineMigrationWrapper\Migrations;
 use OxidEsales\DoctrineMigrationWrapper\MigrationsBuilder;
-use OxidEsales\DemoDataInstaller\DemoDataInstallerBuilder;
+use OxidEsales\Eshop\Core\Edition\EditionPathProvider;
+use OxidEsales\Eshop\Core\Edition\EditionRootPathProvider;
+use OxidEsales\Eshop\Core\Edition\EditionSelector;
+use OxidEsales\Facts\Facts;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
@@ -37,35 +37,35 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  */
 class Utilities extends Core
 {
-    const CONFIG_FILE_NAME = 'config.inc.php';
+    public const CONFIG_FILE_NAME = 'config.inc.php';
 
-    const DEMODATA_PACKAGE_NAME = 'shop-demodata-%s';
+    public const DEMODATA_PACKAGE_NAME = 'shop-demodata-%s';
 
-    const DEMODATA_PACKAGE_SOURCE_DIRECTORY = 'src';
+    public const DEMODATA_PACKAGE_SOURCE_DIRECTORY = 'src';
 
-    const DEMODATA_SQL_FILENAME = 'demodata.sql';
-    const LICENSE_TEXT_FILENAME = "LICENSE";
+    public const DEMODATA_SQL_FILENAME = 'demodata.sql';
+    public const LICENSE_TEXT_FILENAME = 'LICENSE';
 
     /**
      * Unable to find file
      *
      * @var int
      */
-    const ERROR_COULD_NOT_FIND_FILE = 1;
+    public const ERROR_COULD_NOT_FIND_FILE = 1;
 
     /**
      * File is not readable
      *
      * @var int
      */
-    const ERROR_COULD_NOT_READ_FILE = 2;
+    public const ERROR_COULD_NOT_READ_FILE = 2;
 
     /**
      * File is not writable
      *
      * @var int
      */
-    const ERROR_COULD_NOT_WRITE_TO_FILE = 3;
+    public const ERROR_COULD_NOT_WRITE_TO_FILE = 3;
 
     /**
      * Email validation regular expression
@@ -73,7 +73,6 @@ class Utilities extends Core
      * @var string
      */
     protected $_sEmailTpl = "/^([-!#\$%&'*+.\/0-9=?A-Z^_`a-z{|}~\177])+@([-!#\$%&'*+\/0-9=?A-Z^_`a-z{|}~\177]+\\.)+[a-zA-Z]{2,6}\$/i";
-
 
     /**
      * Generates unique id
@@ -103,8 +102,8 @@ class Utilities extends Core
             $d = dir($sPath);
             $d->handle;
             while (false !== ($sEntry = $d->read())) {
-                if ($sEntry != "." && $sEntry != "..") {
-                    $sFilePath = $sPath . "/" . $sEntry;
+                if ($sEntry != '.' && $sEntry != '..') {
+                    $sFilePath = $sPath . '/' . $sEntry;
                     if (is_file($sFilePath)) {
                         if (!in_array(basename($sFilePath), $aSkipFiles)) {
                             $blDeleteSuccess = $blDeleteSuccess * @unlink($sFilePath);
@@ -161,8 +160,8 @@ class Utilities extends Core
     public function getDefaultPathParams()
     {
         // default values
-        $aParams['sShopDir'] = "";
-        $aParams['sShopURL'] = "";
+        $aParams['sShopDir'] = '';
+        $aParams['sShopURL'] = '';
 
         // try path translated
         if (isset($_SERVER['PATH_TRANSLATED']) && ($_SERVER['PATH_TRANSLATED'] != '')) {
@@ -171,15 +170,15 @@ class Utilities extends Core
             $sFilepath = $_SERVER['SCRIPT_FILENAME'];
         }
 
-        $aParams['sShopDir'] = str_replace("\\", "/", $this->_extractPath(preg_split("/\\\|\//", $sFilepath)));
-        $aParams['sCompileDir'] = $aParams['sShopDir'] . "tmp/";
+        $aParams['sShopDir'] = str_replace('\\', '/', $this->_extractPath(preg_split("/\\\|\//", $sFilepath)));
+        $aParams['sCompileDir'] = $aParams['sShopDir'] . 'tmp/';
 
         // try referer
         $sFilepath = @$_SERVER['HTTP_REFERER'];
         if (!isset($sFilepath) || !$sFilepath) {
-            $sFilepath = "https://" . @$_SERVER['HTTP_HOST'] . @$_SERVER['SCRIPT_NAME'];
+            $sFilepath = 'https://' . @$_SERVER['HTTP_HOST'] . @$_SERVER['SCRIPT_NAME'];
         }
-        $aParams['sShopURL'] = ltrim($this->_extractPath(explode("/", $sFilepath)), "/");
+        $aParams['sShopURL'] = ltrim($this->_extractPath(explode('/', $sFilepath)), '/');
 
         return $aParams;
     }
@@ -194,10 +193,10 @@ class Utilities extends Core
     public function updateEnvFile($parameters)
     {
         $configFile = '';
-        $language = $this->getInstance("Language");
+        $language = $this->getInstance('Language');
 
         if (isset($parameters['sShopDir'])) {
-            $configFile = $parameters['sShopDir'] . "/../.env";
+            $configFile = $parameters['sShopDir'] . '/../.env';
         }
         $this->handleMissingConfigFileException($configFile);
 
@@ -233,10 +232,10 @@ class Utilities extends Core
     public function updateConfigFile($parameters)
     {
         $configFile = '';
-        $language = $this->getInstance("Language");
+        $language = $this->getInstance('Language');
 
         if (isset($parameters['sShopDir'])) {
-            $configFile = $parameters['sShopDir'] . "/config.inc.php";
+            $configFile = $parameters['sShopDir'] . '/config.inc.php';
         }
         $this->handleMissingConfigFileException($configFile);
 
@@ -271,24 +270,24 @@ class Utilities extends Core
      *
      * @throws Exception when .htaccess file is not accessible/readable.
      */
-    public function updateHtaccessFile($aParams, $sSubFolder = "")
+    public function updateHtaccessFile($aParams, $sSubFolder = '')
     {
         /** @var \OxidEsales\EshopCommunity\Setup\Language $oLang */
-        $oLang = $this->getInstance("Language");
+        $oLang = $this->getInstance('Language');
 
         // preparing rewrite base param
-        if (!isset($aParams["sBaseUrlPath"]) || !$aParams["sBaseUrlPath"]) {
-            $aParams["sBaseUrlPath"] = "";
+        if (!isset($aParams['sBaseUrlPath']) || !$aParams['sBaseUrlPath']) {
+            $aParams['sBaseUrlPath'] = '';
         }
 
         if ($sSubFolder) {
-            $sSubFolder = $this->preparePath("/" . $sSubFolder);
+            $sSubFolder = $this->preparePath('/' . $sSubFolder);
         }
 
-        $aParams["sBaseUrlPath"] = trim($aParams["sBaseUrlPath"] . $sSubFolder, "/");
-        $aParams["sBaseUrlPath"] = "/" . $aParams["sBaseUrlPath"];
+        $aParams['sBaseUrlPath'] = trim($aParams['sBaseUrlPath'] . $sSubFolder, '/');
+        $aParams['sBaseUrlPath'] = '/' . $aParams['sBaseUrlPath'];
 
-        $sHtaccessPath = $this->preparePath($aParams["sShopDir"]) . $sSubFolder . "/.htaccess";
+        $sHtaccessPath = $this->preparePath($aParams['sShopDir']) . $sSubFolder . '/.htaccess';
 
         clearstatcache();
         if (!file_exists($sHtaccessPath)) {
@@ -296,7 +295,7 @@ class Utilities extends Core
         }
 
         @chmod($sHtaccessPath, getDefaultFileMode());
-        if (is_readable($sHtaccessPath) && ($fp = fopen($sHtaccessPath, "r"))) {
+        if (is_readable($sHtaccessPath) && ($fp = fopen($sHtaccessPath, 'r'))) {
             $sHtaccessFile = fread($fp, filesize($sHtaccessPath));
             fclose($fp);
         } else {
@@ -304,8 +303,8 @@ class Utilities extends Core
         }
 
         // overwriting settings
-        $sHtaccessFile = preg_replace("/RewriteBase.*/", "RewriteBase " . $aParams["sBaseUrlPath"], $sHtaccessFile);
-        if (is_writable($sHtaccessPath) && ($fp = fopen($sHtaccessPath, "w"))) {
+        $sHtaccessFile = preg_replace('/RewriteBase.*/', 'RewriteBase ' . $aParams['sBaseUrlPath'], $sHtaccessFile);
+        if (is_writable($sHtaccessPath) && ($fp = fopen($sHtaccessPath, 'w'))) {
             fwrite($fp, $sHtaccessFile);
             fclose($fp);
         } else {
@@ -434,7 +433,7 @@ class Utilities extends Core
      */
     public function preparePath($sPath)
     {
-        return rtrim(str_replace("\\", "/", $sPath), "/");
+        return rtrim(str_replace('\\', '/', $sPath), '/');
     }
 
     /**
@@ -446,10 +445,10 @@ class Utilities extends Core
      */
     public function extractRewriteBase($sUrl)
     {
-        $sPath = "/";
+        $sPath = '/';
         if (($aPathInfo = @parse_url($sUrl)) !== false) {
-            if (isset($aPathInfo["path"])) {
-                $sPath = $this->preparePath($aPathInfo["path"]);
+            if (isset($aPathInfo['path'])) {
+                $sPath = $this->preparePath($aPathInfo['path']);
             }
         }
 
@@ -529,7 +528,7 @@ class Utilities extends Core
     {
         try {
             $databaseExists = true;
-            $database->execSql("select * from oxconfig");
+            $database->execSql('select * from oxconfig');
         } catch (Exception $exception) {
             $databaseExists = false;
         }
@@ -647,7 +646,7 @@ class Utilities extends Core
      */
     public static function stripAnsiControlCodes($outputWithAnsiControlCodes)
     {
-        return preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', "", $outputWithAnsiControlCodes);
+        return preg_replace('/\x1b(\[|\(|\))[;?0-9]*[0-9A-Za-z]/', '', $outputWithAnsiControlCodes);
     }
 
     /**

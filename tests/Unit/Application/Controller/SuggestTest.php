@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
+use oxDb;
 use OxidEsales\EshopCommunity\Core\Model\ListModel;
-
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 class SuggestTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -48,17 +48,17 @@ class SuggestTest extends \OxidTestCase
     public function testGetProduct()
     {
         $this->setRequestParameter('anid', '2000');
-        $oSuggest = $this->getProxyClass("suggest");
+        $oSuggest = $this->getProxyClass('suggest');
 
         $this->assertEquals('2000', $oSuggest->getProduct()->getId());
     }
 
     public function testGetCrossSelling()
     {
-        $oSuggest = $this->getProxyClass("suggest");
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("1849");
-        $oSuggest->setNonPublicVar("_oProduct", $oArticle);
+        $oSuggest = $this->getProxyClass('suggest');
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('1849');
+        $oSuggest->setNonPublicVar('_oProduct', $oArticle);
         $oList = $oSuggest->getCrossSelling();
         $this->assertTrue($oList instanceof ListModel);
         $iCount = $this->getTestConfig()->getShopEdition() == 'EE' ? 3 : 2;
@@ -67,10 +67,10 @@ class SuggestTest extends \OxidTestCase
 
     public function testGetSimilarProducts()
     {
-        $oSuggest = $this->getProxyClass("suggest");
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("2000");
-        $oSuggest->setNonPublicVar("_oProduct", $oArticle);
+        $oSuggest = $this->getProxyClass('suggest');
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('2000');
+        $oSuggest->setNonPublicVar('_oProduct', $oArticle);
         $oList = $oSuggest->getSimilarProducts();
         $this->assertTrue($oList instanceof ListModel);
         $iCount = $this->getTestConfig()->getShopEdition() == 'EE' ? 4 : 5;
@@ -87,24 +87,24 @@ class SuggestTest extends \OxidTestCase
         $sQ = 'insert into oxobject2list ( oxid, oxobjectid, oxlistid, oxdesc ) values ( "testlist", "2000", "testlist", "test" ) ';
         $myDB->Execute($sQ);
 
-        $oSuggest = $this->getProxyClass("suggest");
-        $oArticle = oxNew("oxArticle");
+        $oSuggest = $this->getProxyClass('suggest');
+        $oArticle = oxNew('oxArticle');
         $oArticle->load('2000');
-        $oSuggest->setNonPublicVar("_oProduct", $oArticle);
+        $oSuggest->setNonPublicVar('_oProduct', $oArticle);
         $aLists = $oSuggest->getRecommList();
         $this->assertTrue($aLists instanceof ListModel);
         $this->assertTrue($aLists instanceof ListModel);
         $this->assertEquals(1, $aLists->count());
         $this->assertEquals('testlist', $aLists['testlist']->getId());
-        $this->assertTrue(in_array($aLists['testlist']->getFirstArticle()->getId(), array('2000')));
+        $this->assertTrue(in_array($aLists['testlist']->getFirstArticle()->getId(), ['2000']));
     }
 
     public function testGetSuggestData()
     {
-        $this->setRequestParameter('editval', array('name' => 'test', 'value' => 'testvalue'));
+        $this->setRequestParameter('editval', ['name' => 'test', 'value' => 'testvalue']);
 
         /** @var Suggest $oSuggest */
-        $oSuggest = $this->getProxyClass("suggest");
+        $oSuggest = $this->getProxyClass('suggest');
         $oSuggest->send();
 
         $oParam = $oSuggest->getSuggestData();
@@ -115,13 +115,13 @@ class SuggestTest extends \OxidTestCase
 
     public function testGetLink()
     {
-        oxTestModules::addFunction("oxutilsserver", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
+        oxTestModules::addFunction('oxutilsserver', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
         $oCfg = $this->getConfig();
-        $oV = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, array('_getRequestParams', '_getSeoRequestParams'));
+        $oV = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, ['_getRequestParams', '_getSeoRequestParams']);
         $oV->expects($this->any())->method('_getRequestParams')->will($this->returnValue('cl=suggest'));
         $oV->expects($this->any())->method('_getSeoRequestParams')->will($this->returnValue('cl=suggest'));
 
-        $sCnid = $this->getTestConfig()->getShopEdition() == 'EE'? '30e44ab82c03c3848.49471214' : '8a142c3e60a535f16.78077188';
+        $sCnid = $this->getTestConfig()->getShopEdition() == 'EE' ? '30e44ab82c03c3848.49471214' : '8a142c3e60a535f16.78077188';
         $this->setRequestParameter('anid', '2000');
         $this->setRequestParameter('cnid', $sCnid);
         $this->assertEquals($oCfg->getShopURL() . 'empfehlen/?cnid=' . $sCnid . '&amp;anid=2000', $oV->getLink());
@@ -136,10 +136,10 @@ class SuggestTest extends \OxidTestCase
      */
     public function testgetRecommListsIfOff()
     {
-        $oCfg = $this->getMock("stdClass", array("getShowListmania"));
+        $oCfg = $this->getMock('stdClass', ['getShowListmania']);
         $oCfg->expects($this->once())->method('getShowListmania')->will($this->returnValue(false));
 
-        $oSuggest = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, array("getViewConfig", 'getArticleList'));
+        $oSuggest = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, ['getViewConfig', 'getArticleList']);
         $oSuggest->expects($this->once())->method('getViewConfig')->will($this->returnValue($oCfg));
         $oSuggest->expects($this->never())->method('getArticleList');
 
@@ -148,7 +148,7 @@ class SuggestTest extends \OxidTestCase
 
     public function testRender()
     {
-        $oSuggest = $this->getProxyClass("suggest");
+        $oSuggest = $this->getProxyClass('suggest');
         $this->assertSame('page/info/suggest.tpl', $oSuggest->render());
     }
 
@@ -166,7 +166,7 @@ class SuggestTest extends \OxidTestCase
         $this->markTestSkipped('Bug: strings does not match');
         $this->setRequestParameter(
             'editval',
-            array(
+            [
                 'name'         => 'test',
                 'value'        => 'testvalue',
                 'rec_name'     => 'test1',
@@ -175,28 +175,28 @@ class SuggestTest extends \OxidTestCase
                 'send_email'   => 'sendmail@oxid.lt',
                 'send_message' => 'test5',
                 'send_subject' => 'test6',
-            )
+            ]
         );
 
-        $oEmail = $this->getMock("stdclass", array('sendSuggestMail'));
+        $oEmail = $this->getMock('stdclass', ['sendSuggestMail']);
         $oEmail->expects($this->once())->method('sendSuggestMail')
             ->will($this->returnValue(1));
 
         oxTestModules::addModuleObject('oxemail', $oEmail);
 
         /** @var oxArticle|PHPUnit\Framework\MockObject\MockObject $oProduct */
-        $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('getId'));
+        $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getId']);
         $oProduct->expects($this->once())->method('getId')->will($this->returnValue('XProduct'));
 
         /** @var Suggest|PHPUnit\Framework\MockObject\MockObject $oSuggest */
-        $oSuggest = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, array("getProduct"));
+        $oSuggest = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, ['getProduct']);
         $oSuggest->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
 
-        $this->setRequestParameter('searchparam', "searchparam&&A");
-        $this->setRequestParameter('searchcnid', "searchcnid&&A");
-        $this->setRequestParameter('searchvendor', "searchvendor&&A");
-        $this->setRequestParameter('searchmanufacturer', "searchmanufacturer&&A");
-        $this->setRequestParameter('listtype', "listtype&&A");
+        $this->setRequestParameter('searchparam', 'searchparam&&A');
+        $this->setRequestParameter('searchcnid', 'searchcnid&&A');
+        $this->setRequestParameter('searchvendor', 'searchvendor&&A');
+        $this->setRequestParameter('searchmanufacturer', 'searchmanufacturer&&A');
+        $this->setRequestParameter('listtype', 'listtype&&A');
 
         $sExpected = 'details?anid=XProduct&searchparam=searchparam%26%26A&searchcnid=searchcnid&amp;&amp;A&searchvendor=searchvendor&amp;&amp;A&searchmanufacturer=searchmanufacturer&amp;&amp;A&listtype=listtype&amp;&amp;A';
         $this->assertEquals($sExpected, $oSuggest->send());
@@ -206,7 +206,7 @@ class SuggestTest extends \OxidTestCase
     {
         $this->setRequestParameter(
             'editval',
-            array(
+            [
                 'name'         => 'test',
                 'value'        => 'testvalue',
                 'rec_name'     => 'test1',
@@ -215,22 +215,22 @@ class SuggestTest extends \OxidTestCase
                 'send_email'   => 'test4',
                 'send_message' => 'test5',
                 'send_subject' => 'test6',
-            )
+            ]
         );
 
-        $oEmail = $this->getMock("stdclass", array('sendSuggestMail'));
+        $oEmail = $this->getMock('stdclass', ['sendSuggestMail']);
         $oEmail->expects($this->never())->method('sendSuggestMail');
 
         oxTestModules::addModuleObject('oxemail', $oEmail);
 
-        $oProduct = $this->getMock("stdclass", array('getId'));
+        $oProduct = $this->getMock('stdclass', ['getId']);
         $oProduct->expects($this->never())->method('getId');
 
         /** @var Suggest|PHPUnit\Framework\MockObject\MockObject $oSuggest */
-        $oSuggest = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, array("getProduct"));
+        $oSuggest = $this->getMock(\OxidEsales\Eshop\Application\Controller\SuggestController::class, ['getProduct']);
         $oSuggest->expects($this->never())->method('getProduct')->will($this->returnValue($oProduct));
 
-        $oUtilsView = $this->getMock("stdclass", array('addErrorToDisplay'));
+        $oUtilsView = $this->getMock('stdclass', ['addErrorToDisplay']);
         $oUtilsView->expects($this->once())->method('addErrorToDisplay');
 
         oxTestModules::addModuleObject('oxUtilsView', $oUtilsView);
@@ -245,12 +245,12 @@ class SuggestTest extends \OxidTestCase
      */
     public function testGetBreadCrumb()
     {
-        $oSuggest = $this->getProxyClass("suggest");
-        $aResults = array();
-        $aResult = array();
+        $oSuggest = $this->getProxyClass('suggest');
+        $aResults = [];
+        $aResult = [];
 
-        $aResult["title"] = oxRegistry::getLang()->translateString('RECOMMEND_PRODUCT', oxRegistry::getLang()->getBaseLanguage(), false);
-        $aResult["link"] = $oSuggest->getLink();
+        $aResult['title'] = oxRegistry::getLang()->translateString('RECOMMEND_PRODUCT', oxRegistry::getLang()->getBaseLanguage(), false);
+        $aResult['link'] = $oSuggest->getLink();
 
         $aResults[] = $aResult;
 

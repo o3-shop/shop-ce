@@ -50,12 +50,12 @@ final class ModuleDestructionCest
         $I->uninstallModule($this->testModule1Path, $this->testModule1Id);
         $I->uninstallModule($this->testModule2Path, $this->testModule2Id);
     }
-        
+
     /** @param AcceptanceAdminTester $I */
     public function testPhysicallyDeleteNamespacedModuleWithoutDeactivation(AcceptanceAdminTester $I): void
     {
         $I->wantToTest('Physically remove an activated module from shop without deactivating it.');
-        
+
         exec('rm ' . $I->getShopModulePath($this->testModule1Path) . ' -R');
 
         $this->checkAdmin($I);
@@ -66,7 +66,7 @@ final class ModuleDestructionCest
     {
         $I->uninstallModule($this->testModule2Path, $this->testModule2Id);
         $I->wantToTest('Activate then deactivate only module and then physically remove it from shop.');
-        
+
         $I->activateModule($this->testModule1Id);
         $I->deactivateModule($this->testModule1Id);
         exec('rm ' . $I->getShopModulePath($this->testModule1Path) . ' -R');
@@ -80,7 +80,7 @@ final class ModuleDestructionCest
     public function testPhysicallyDeleteNamespacedModuleWithDeactivation(AcceptanceAdminTester $I): void
     {
         $I->wantToTest('Activate then deactivate a namespace module and then physically remove it from shop.');
-        
+
         $I->activateModule($this->testModule1Id);
         $I->deactivateModule($this->testModule1Id);
         exec('rm ' . $I->getShopModulePath($this->testModule1Path) . ' -R');

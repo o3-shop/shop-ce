@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,19 +21,19 @@
 
 namespace OxidEsales\DoctrineMigrationWrapper;
 
-use OxidEsales\Facts\Facts;
 use OxidEsales\Eshop\Core\ConfigFile;
+use OxidEsales\Facts\Facts;
 use OxidEsales\TestingLibrary\Services\Library\DatabaseDefaultsFileGenerator;
 
 $facts = new Facts();
 
 $selenium_server_port = getenv('SELENIUM_SERVER_PORT');
-$selenium_server_port = ($selenium_server_port) ? : '4444';
+$selenium_server_port = ($selenium_server_port) ?: '4444';
 $selenium_server_host = getenv('SELENIUM_SERVER_HOST');
-$selenium_server_host = ($selenium_server_host) ? : '127.0.0.1';
-$php = (getenv('PHPBIN')) ? : 'php';
+$selenium_server_host = ($selenium_server_host) ?: '127.0.0.1';
+$php = (getenv('PHPBIN')) ?: 'php';
 $cc_screen_shot_url = getenv('CC_SCREEN_SHOTS_URL');
-$cc_screen_shot_url = ($cc_screen_shot_url) ? : '';
+$cc_screen_shot_url = ($cc_screen_shot_url) ?: '';
 
 return [
     'SHOP_URL' => $facts->getShopUrl(),
@@ -49,19 +50,19 @@ return [
     'SELENIUM_SERVER_HOST' => $selenium_server_host,
     'BROWSER_NAME' => getenv('BROWSER_NAME') ?: 'firefox',
     'PHP_BIN' => $php,
-    'SCREEN_SHOT_URL' => $cc_screen_shot_url
+    'SCREEN_SHOT_URL' => $cc_screen_shot_url,
 ];
 
 function getTestDataDumpFilePath()
 {
-    return getShopTestPath().'/Codeception/_data/dump.sql';
+    return getShopTestPath() . '/Codeception/_data/dump.sql';
 }
 
 function getShopSuitePath($facts)
 {
     $testSuitePath = getenv('TEST_SUITE');
     if (!$testSuitePath) {
-        $testSuitePath = $facts->getShopRootPath().'/tests';
+        $testSuitePath = $facts->getShopRootPath() . '/tests';
     }
     return $testSuitePath;
 }

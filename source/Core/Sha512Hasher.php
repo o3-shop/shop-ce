@@ -33,7 +33,7 @@ namespace OxidEsales\EshopCommunity\Core;
 class Sha512Hasher extends \OxidEsales\Eshop\Core\Hasher
 {
     /** Algorithm name. */
-    const HASHING_ALGORITHM_SHA512 = 'sha512';
+    public const HASHING_ALGORITHM_SHA512 = 'sha512';
 
     /**
      * Encrypt string.

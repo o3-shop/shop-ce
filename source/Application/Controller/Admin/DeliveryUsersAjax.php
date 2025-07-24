@@ -39,7 +39,7 @@ class DeliveryUsersAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field, table, visible, multilanguage, ident
             ['oxusername', 'oxuser', 1, 0, 0],
             ['oxlname', 'oxuser', 0, 0, 0],
@@ -103,18 +103,18 @@ class DeliveryUsersAjax extends ListComponentAjax
         } elseif ($sSynchId && $sSynchId != $sId) {
             // selected group ?
             $sQAdd = " from oxobject2group left join $sUserTable on $sUserTable.oxid = oxobject2group.oxobjectid ";
-            $sQAdd .= " where oxobject2group.oxgroupsid = " . $oDb->quote($sId);
+            $sQAdd .= ' where oxobject2group.oxgroupsid = ' . $oDb->quote($sId);
             if (!$myConfig->getConfigParam('blMallUsers')) {
                 $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
             }
         } else {
             $sQAdd = " from oxobject2delivery left join $sUserTable on $sUserTable.oxid=oxobject2delivery.oxobjectid ";
-            $sQAdd .= " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ";
+            $sQAdd .= ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from oxobject2delivery left join $sUserTable on $sUserTable.oxid=oxobject2delivery.oxobjectid ";
-            $sQAdd .= " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ) ";
+            $sQAdd .= ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) . " and oxobject2delivery.oxtype = 'oxuser' and $sUserTable.oxid IS NOT NULL ) ";
         }
 
         return $sQAdd;
@@ -127,10 +127,10 @@ class DeliveryUsersAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -149,7 +149,7 @@ class DeliveryUsersAjax extends ListComponentAjax
             $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  brutto
@@ -18,17 +19,17 @@
  *
  * Case: 0004462: Incorrect calculation when entered basket item and basket discounts
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 111,
                 'oxprice'                  => 120.00,
                 'oxvat'                    => 20,
                 'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'discount_for_111',
                 'oxaddsum'     => 50.00,
                 'oxaddsumtype' => '%',
@@ -37,10 +38,10 @@ $aData = array(
                 'oxprice' => 0,
                 'oxpriceto' => 99999,
                 'oxactive' => 1,
-                'oxarticles' => array( 111 ),
+                'oxarticles' => [ 111 ],
                 'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
                 'oxid'         => 'basket',
                 'oxaddsum'     => 50.00,
                 'oxaddsumtype' => '%',
@@ -50,31 +51,30 @@ $aData = array(
                 'oxpriceto' => 99999,
                 'oxactive' => 1,
                 'oxsort' => 20,
-        ),
+        ],
+    ],
 
-    ),
-
-    'expected' => array(
-        'articles' => array(
-                 111 => array( '60,00', '60,00' ),
-        ),
-        'totals' => array(
+    'expected' => [
+        'articles' => [
+                 111 => [ '60,00', '60,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '60,00',
                 'totalNetto'  => '25,00',
-                'vats' => array(
+                'vats' => [
                     20 => '5,00',
-                ),
-                'discounts' => array(
+                ],
+                'discounts' => [
                     'basket' => '30,00',
-                ),
-                'grandTotal'  => '30,00'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '30,00',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

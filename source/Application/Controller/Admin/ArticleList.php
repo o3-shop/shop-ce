@@ -99,7 +99,7 @@ class ArticleList extends AdminListController
     {
         $myConfig = Registry::getConfig();
         $sPwrSearchFld = Registry::getRequest()->getRequestEscapedParameter('pwrsearchfld');
-        $sPwrSearchFld = $sPwrSearchFld ? strtolower($sPwrSearchFld) : "oxtitle";
+        $sPwrSearchFld = $sPwrSearchFld ? strtolower($sPwrSearchFld) : 'oxtitle';
 
         $sDateTime = $this->getServerDateTime();
         $blUseTimeCheck = Registry::getConfig()->getConfigParam('blUseTimeCheck');
@@ -111,11 +111,11 @@ class ArticleList extends AdminListController
 
                 // formatting view
                 if (!$myConfig->getConfigParam('blSkipFormatConversion')) {
-                    if ($oArticle->$sFieldName->fldtype == "datetime") {
+                    if ($oArticle->$sFieldName->fldtype == 'datetime') {
                         Registry::getUtilsDate()->convertDBDateTime($oArticle->$sFieldName);
-                    } elseif ($oArticle->$sFieldName->fldtype == "timestamp") {
+                    } elseif ($oArticle->$sFieldName->fldtype == 'timestamp') {
                         Registry::getUtilsDate()->convertDBTimestamp($oArticle->$sFieldName);
-                    } elseif ($oArticle->$sFieldName->fldtype == "date") {
+                    } elseif ($oArticle->$sFieldName->fldtype == 'date') {
                         Registry::getUtilsDate()->convertDBDate($oArticle->$sFieldName);
                     }
                 }
@@ -132,33 +132,33 @@ class ArticleList extends AdminListController
         if (!$oArticle && $oList) {
             $oArticle = $oList->getBaseObject();
         }
-        $this->_aViewData["pwrsearchfields"] = $oArticle ? $this->getSearchFields() : null;
-        $this->_aViewData["pwrsearchfld"] = strtoupper($sPwrSearchFld);
+        $this->_aViewData['pwrsearchfields'] = $oArticle ? $this->getSearchFields() : null;
+        $this->_aViewData['pwrsearchfld'] = strtoupper($sPwrSearchFld);
 
         $aFilter = $this->getListFilter();
-        if (isset($aFilter["oxarticles"][$sPwrSearchFld])) {
-            $this->_aViewData["pwrsearchinput"] = $aFilter["oxarticles"][$sPwrSearchFld];
+        if (isset($aFilter['oxarticles'][$sPwrSearchFld])) {
+            $this->_aViewData['pwrsearchinput'] = $aFilter['oxarticles'][$sPwrSearchFld];
         }
 
         $sType = '';
         $sValue = '';
 
         $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
-        if ($sArtCat && strstr($sArtCat, "@@") !== false) {
-            list($sType, $sValue) = explode("@@", $sArtCat);
+        if ($sArtCat && strstr($sArtCat, '@@') !== false) {
+            list($sType, $sValue) = explode('@@', $sArtCat);
         }
-        $this->_aViewData["art_category"] = $sArtCat;
+        $this->_aViewData['art_category'] = $sArtCat;
 
         // parent category tree
-        $this->_aViewData["cattree"] = $this->getCategoryList($sType, $sValue);
+        $this->_aViewData['cattree'] = $this->getCategoryList($sType, $sValue);
 
         // manufacturer list
-        $this->_aViewData["mnftree"] = $this->getManufacturerlist($sType, $sValue);
+        $this->_aViewData['mnftree'] = $this->getManufacturerlist($sType, $sValue);
 
         // vendor list
-        $this->_aViewData["vndtree"] = $this->getVendorList($sType, $sValue);
+        $this->_aViewData['vndtree'] = $this->getVendorList($sType, $sValue);
 
-        return "article_list.tpl";
+        return 'article_list.tpl';
     }
 
     /**
@@ -169,12 +169,12 @@ class ArticleList extends AdminListController
     public function getSearchFields()
     {
         $aSkipFields = [
-            "oxblfixedprice",
-            "oxvarselect",
-            "oxamitemid",
-            "oxamtaskid",
-            "oxpixiexport",
-            "oxpixiexported"
+            'oxblfixedprice',
+            'oxvarselect',
+            'oxamitemid',
+            'oxamtaskid',
+            'oxpixiexport',
+            'oxpixiexported',
         ];
         $oArticle = oxNew(Article::class);
 
@@ -280,31 +280,31 @@ class ArticleList extends AdminListController
     {
         $sQ = parent::buildSelectString($listObject);
         if ($sQ) {
-            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles");
+            $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
             $sQ .= " and $sTable.oxparentid = '' ";
 
             $sType = false;
             $sValue = '';
 
             $sArtCat = Registry::getRequest()->getRequestEscapedParameter('art_category');
-            if ($sArtCat && strstr($sArtCat, "@@") !== false) {
-                list($sType, $sValue) = explode("@@", $sArtCat);
+            if ($sArtCat && strstr($sArtCat, '@@') !== false) {
+                list($sType, $sValue) = explode('@@', $sArtCat);
             }
 
             switch ($sType) {
                 // add category
                 case 'cat':
                     $oStr = Str::getStr();
-                    $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxobject2category");
+                    $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
                     $sInsert = "from $sTable left join {$sViewName} on {$sTable}.oxid = {$sViewName}.oxobjectid " .
-                               "where {$sViewName}.oxcatnid = " . DatabaseProvider::getDb()->quote($sValue) . " and ";
+                               "where {$sViewName}.oxcatnid = " . DatabaseProvider::getDb()->quote($sValue) . ' and ';
                     $sQ = $oStr->preg_replace("/from\s+$sTable\s+where/i", $sInsert, $sQ);
                     break;
-                // add category
+                    // add category
                 case 'mnf':
                     $sQ .= " and $sTable.oxmanufacturerid = " . DatabaseProvider::getDb()->quote($sValue);
                     break;
-                // add vendor
+                    // add vendor
                 case 'vnd':
                     $sQ .= " and $sTable.oxvendorid = " . DatabaseProvider::getDb()->quote($sValue);
                     break;
@@ -328,7 +328,7 @@ class ArticleList extends AdminListController
         // adding folder check
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         if ($sFolder && $sFolder != '-1') {
-            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles") . ".oxfolder"] = $sFolder;
+            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles') . '.oxfolder'] = $sFolder;
         }
 
         return $this->_aWhere;

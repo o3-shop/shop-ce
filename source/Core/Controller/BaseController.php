@@ -595,7 +595,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base
             if (false === class_exists($realClassName)) {
                 //If redirect tries to use a not existing class throw an exception.
                 //we'll be redirected to start page directly.
-                $exception =  new \OxidEsales\Eshop\Core\Exception\SystemComponentException();
+                $exception = new \OxidEsales\Eshop\Core\Exception\SystemComponentException();
                 /** Use setMessage here instead of passing it in constructor in order to test exception message */
                 $exception->setMessage('ERROR_MESSAGE_SYSTEMCOMPONENT_CLASSNOTFOUND' . ' ' . $className);
                 $exception->setComponent($className);
@@ -706,7 +706,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base
      */
     public function getShopFullEdition()
     {
-        return "O3-Shop";
+        return 'O3-Shop';
     }
 
     /**
@@ -716,7 +716,7 @@ class BaseController extends \OxidEsales\Eshop\Core\Base
      */
     public function getSupportMarker()
     {
-        return "LTS";
+        return 'LTS';
     }
 
     /**

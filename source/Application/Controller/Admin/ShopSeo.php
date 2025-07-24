@@ -66,7 +66,7 @@ class ShopSeo extends ShopConfiguration
         $oList = oxNew(ListModel::class);
         $oList->init('oxbase', 'oxseo');
         $oList->selectString($sQ, [
-            ':oxshopid' => $oShop->getId()
+            ':oxshopid' => $oShop->getId(),
         ]);
 
         $this->_aViewData['aStaticUrls'] = $oList;
@@ -74,7 +74,7 @@ class ShopSeo extends ShopConfiguration
         // loading active url info
         $this->_loadActiveUrl($oShop->getId());
 
-        return "shop_seo.tpl";
+        return 'shop_seo.tpl';
     }
 
     /**
@@ -98,10 +98,10 @@ class ShopSeo extends ShopConfiguration
             $this->_aViewData['sActSeoObject'] = $sActObject;
 
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-            $sQ = "select oxseourl, oxlang from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid";
+            $sQ = 'select oxseourl, oxlang from oxseo where oxobjectid = :oxobjectid and oxshopid = :oxshopid';
             $oRs = $oDb->select($sQ, [
                 ':oxobjectid' => $sActObject,
-                ':oxshopid' => $iShopId
+                ':oxshopid' => $iShopId,
             ]);
             if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
@@ -215,7 +215,7 @@ class ShopSeo extends ShopConfiguration
         $db = DatabaseProvider::getDb();
         $db->execute("delete from oxseo where oxtype='static' and oxobjectid = :oxobjectid and oxshopid = :oxshopid", [
             ':oxobjectid' => $staticUrlId,
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
     }
 }

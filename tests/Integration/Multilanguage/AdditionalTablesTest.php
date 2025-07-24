@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Multilanguage;
 
 use oxDb;
@@ -35,7 +37,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
      *
      * @var array
      */
-    protected $additionalTables = array();
+    protected $additionalTables = [];
 
     /**
      * Fixture setUp.
@@ -50,7 +52,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
      */
     protected function tearDown(): void
     {
-        $this->setConfigParam('aMultiLangTables', array());
+        $this->setConfigParam('aMultiLangTables', []);
         $this->updateViews();
 
         foreach ($this->additionalTables as $name) {
@@ -68,7 +70,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
     public function testCreateLanguagesAfterAdditionalTable()
     {
         $this->createTable('addtest');
-        $this->setConfigParam('aMultiLangTables', array('addtest'));
+        $this->setConfigParam('aMultiLangTables', ['addtest']);
 
         //add nine more languages
         $this->prepare(9);
@@ -78,8 +80,8 @@ class AdditionalTablesTest extends MultilanguageTestCase
 
         self::assertEquals(
             [
-                'TABLE_NAME'      => "addtest_set1",
-                'TABLE_COLLATION' => "latin1_general_ci"
+                'TABLE_NAME'      => 'addtest_set1',
+                'TABLE_COLLATION' => 'latin1_general_ci',
             ],
             $result
         );
@@ -104,7 +106,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
         $this->prepare(9);
 
         $this->createTable('addtest');
-        $this->setConfigParam('aMultiLangTables', array('addtest'));
+        $this->setConfigParam('aMultiLangTables', ['addtest']);
 
         $this->updateViews();
 
@@ -121,7 +123,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
         $oxid = '_test101';
 
         $this->createTable('addtest');
-        $this->setConfigParam('aMultiLangTables', array('addtest'));
+        $this->setConfigParam('aMultiLangTables', ['addtest']);
 
         //add nine more languages
         $languageId = $this->prepare(9);
@@ -131,13 +133,13 @@ class AdditionalTablesTest extends MultilanguageTestCase
         oxDb::getDb()->execute($sql);
 
         //insert testdata for last added language id in set1 table
-        $sql = "INSERT INTO addtest_set1 (OXID, TITLE_" . $languageId . ") VALUES ('" . $oxid . "', 'some additional title')";
+        $sql = 'INSERT INTO addtest_set1 (OXID, TITLE_' . $languageId . ") VALUES ('" . $oxid . "', 'some additional title')";
         oxDb::getDb()->execute($sql);
 
-        $sql = "SELECT TITLE FROM " . getViewName('addtest', $languageId) . " WHERE OXID = '" . $oxid . "'";
+        $sql = 'SELECT TITLE FROM ' . getViewName('addtest', $languageId) . " WHERE OXID = '" . $oxid . "'";
         $this->assertSame('some additional title', oxDb::getDb()->getOne($sql));
 
-        $sql = "SELECT TITLE FROM " . getViewName('addtest', 0) . " WHERE OXID = '" . $oxid . "'";
+        $sql = 'SELECT TITLE FROM ' . getViewName('addtest', 0) . " WHERE OXID = '" . $oxid . "'";
         $this->assertSame('some default title', oxDb::getDb()->getOne($sql));
     }
 
@@ -151,7 +153,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
         $oxid = '_test101';
 
         $this->createTable('addtest');
-        $this->setConfigParam('aMultiLangTables', array('addtest'));
+        $this->setConfigParam('aMultiLangTables', ['addtest']);
 
         $this->updateViews();
 
@@ -160,13 +162,13 @@ class AdditionalTablesTest extends MultilanguageTestCase
         oxDb::getDb()->execute($sql);
 
         //insert testdata for last added language id in set1 table
-        $sql = "INSERT INTO addtest_set1 (OXID, TITLE_" . $languageId . ") VALUES ('" . $oxid . "', 'some additional title')";
+        $sql = 'INSERT INTO addtest_set1 (OXID, TITLE_' . $languageId . ") VALUES ('" . $oxid . "', 'some additional title')";
         oxDb::getDb()->execute($sql);
 
-        $sql = "SELECT TITLE FROM " . getViewName('addtest', $languageId) . " WHERE OXID = '" . $oxid . "'";
+        $sql = 'SELECT TITLE FROM ' . getViewName('addtest', $languageId) . " WHERE OXID = '" . $oxid . "'";
         $this->assertSame('some additional title', oxDb::getDb()->getOne($sql));
 
-        $sql = "SELECT TITLE FROM " . getViewName('addtest', 0) . " WHERE OXID = '" . $oxid . "'";
+        $sql = 'SELECT TITLE FROM ' . getViewName('addtest', 0) . " WHERE OXID = '" . $oxid . "'";
         $this->assertSame('some default title', oxDb::getDb()->getOne($sql));
     }
 
@@ -177,7 +179,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
      */
     protected function createTable($name = 'addtest')
     {
-        $sql = "CREATE TABLE `" . $name . "` (" .
+        $sql = 'CREATE TABLE `' . $name . '` (' .
                 "`OXID` char(32) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL COMMENT 'Item id'," .
                 "`TITLE` varchar(128) NOT NULL DEFAULT '' COMMENT 'Title (multilanguage)'," .
                 "`TITLE_1` varchar(128) NOT NULL DEFAULT ''," .
@@ -187,7 +189,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
                 "`TITLE_5` varchar(128) NOT NULL DEFAULT ''," .
                 "`TITLE_6` varchar(128) NOT NULL DEFAULT ''," .
                 "`TITLE_7` varchar(128) NOT NULL DEFAULT ''," .
-                "PRIMARY KEY (`OXID`)" .
+                'PRIMARY KEY (`OXID`)' .
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='for testing'";
 
         oxDb::getDb()->execute($sql);
@@ -205,7 +207,7 @@ class AdditionalTablesTest extends MultilanguageTestCase
         $sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_NAME LIKE '%" . $name . "%'";
         $result = oxDb::getDb(oxDb::FETCH_MODE_ASSOC)->getAll($sql);
         foreach ($result as $sub) {
-            oxDb::getDb()->execute("DROP TABLE IF EXISTS `" . $sub['TABLE_NAME'] . "`");
+            oxDb::getDb()->execute('DROP TABLE IF EXISTS `' . $sub['TABLE_NAME'] . '`');
         }
     }
 }

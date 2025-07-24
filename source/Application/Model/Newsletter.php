@@ -110,10 +110,10 @@ class Newsletter extends BaseModel
 
         if ($blDeleted) {
             $oDb = DatabaseProvider::getDb();
-            $sDelete = "delete from oxobject2group where oxobject2group.oxshopid = :oxshopid and oxobject2group.oxobjectid = :oxobjectid";
+            $sDelete = 'delete from oxobject2group where oxobject2group.oxshopid = :oxshopid and oxobject2group.oxobjectid = :oxobjectid';
             $oDb->execute($sDelete, [
                 ':oxshopid' => $this->getShopId(),
-                ':oxobjectid' => $sOxId
+                ':oxobjectid' => $sOxId,
             ]);
         }
 
@@ -132,15 +132,15 @@ class Newsletter extends BaseModel
         }
 
         // user-groups
-        $this->_oGroups = oxNew(ListModel::class, "oxgroups");
-        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups");
+        $this->_oGroups = oxNew(ListModel::class, 'oxgroups');
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
 
         // performance
         $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group
                 where oxobject2group.oxobjectid = :oxobjectid
                 and oxobject2group.oxgroupsid={$sViewName}.oxid ";
         $this->_oGroups->selectString($sSelect, [
-            ':oxobjectid' => $this->getId()
+            ':oxobjectid' => $this->getId(),
         ]);
 
         return $this->_oGroups;
@@ -284,7 +284,7 @@ class Newsletter extends BaseModel
             // add products which fit to the last order of this user
             $sSelect = "select $sArticleTable.* from oxorder left join oxorderarticles on oxorderarticles.oxorderid = oxorder.oxid";
             $sSelect .= " left join $sArticleTable on oxorderarticles.oxartid = $sArticleTable.oxid";
-            $sSelect .= " where " . $oArticle->getSqlActiveSnippet();
+            $sSelect .= ' where ' . $oArticle->getSqlActiveSnippet();
             $sSelect .= " and oxorder.oxuserid = '" . $this->_oUser->getId() . "' order by oxorder.oxorderdate desc limit 1";
 
             if ($oArticle->assignRecord($sSelect)) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
+use Exception;
+use oxDb;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\ArticleList;
-use \oxDb;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Article_Variant class
@@ -37,7 +39,7 @@ class ArticleVariantTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", oxDb::getDb()->getOne("select oxparentid from oxarticles where oxparentid != ''"));
+        $this->setRequestParameter('oxid', oxDb::getDb()->getOne("select oxparentid from oxarticles where oxparentid != ''"));
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
 
         // testing..
@@ -45,8 +47,8 @@ class ArticleVariantTest extends \OxidTestCase
         $this->assertEquals('article_variant.tpl', $oView->render());
 
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Article);
-        $this->assertTrue($aViewData["mylist"] instanceof ArticleList);
+        $this->assertTrue($aViewData['edit'] instanceof Article);
+        $this->assertTrue($aViewData['mylist'] instanceof ArticleList);
     }
 
     /**
@@ -56,7 +58,7 @@ class ArticleVariantTest extends \OxidTestCase
      */
     public function testRenderVariant()
     {
-        $this->setRequestParameter("oxid", oxDb::getDb()->getOne("select oxid from oxarticles where oxparentid != ''"));
+        $this->setRequestParameter('oxid', oxDb::getDb()->getOne("select oxid from oxarticles where oxparentid != ''"));
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
 
         // testing..
@@ -64,11 +66,11 @@ class ArticleVariantTest extends \OxidTestCase
         $this->assertEquals('article_variant.tpl', $oView->render());
 
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Article);
-        $this->assertTrue($aViewData["parentarticle"] instanceof Article);
-        $this->assertEquals(1, $aViewData["issubvariant"]);
-        $this->assertEquals(1, $aViewData["readonly"]);
-        $this->assertTrue($aViewData["mylist"] instanceof ArticleList);
+        $this->assertTrue($aViewData['edit'] instanceof Article);
+        $this->assertTrue($aViewData['parentarticle'] instanceof Article);
+        $this->assertEquals(1, $aViewData['issubvariant']);
+        $this->assertEquals(1, $aViewData['readonly']);
+        $this->assertTrue($aViewData['mylist'] instanceof ArticleList);
     }
 
     /**
@@ -79,18 +81,18 @@ class ArticleVariantTest extends \OxidTestCase
     public function testSavevariant()
     {
         oxTestModules::addFunction('oxarticle', 'save', '{ throw new Exception( "save" ); }');
-        $this->setRequestParameter("voxid", "testid");
-        $this->setRequestParameter("oxid", "testid");
+        $this->setRequestParameter('voxid', 'testid');
+        $this->setRequestParameter('oxid', 'testid');
 
         try {
             $oView = oxNew('Article_Variant');
             $oView->savevariant();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Variant::savevariant()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Variant::savevariant()');
 
             return;
         }
-        $this->fail("error in Article_Variant::savevariant()");
+        $this->fail('error in Article_Variant::savevariant()');
     }
 
     /**
@@ -101,17 +103,17 @@ class ArticleVariantTest extends \OxidTestCase
     public function testSavevariantDefaultId()
     {
         oxTestModules::addFunction('oxarticle', 'save', '{ throw new Exception( "save" ); }');
-        $this->setRequestParameter("voxid", "-1");
+        $this->setRequestParameter('voxid', '-1');
 
         try {
             $oView = oxNew('Article_Variant');
             $oView->savevariant();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Variant::savevariant()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Variant::savevariant()');
 
             return;
         }
-        $this->fail("error in Article_Variant::savevariant()");
+        $this->fail('error in Article_Variant::savevariant()');
     }
 
     /**
@@ -121,21 +123,20 @@ class ArticleVariantTest extends \OxidTestCase
      */
     public function testSavevariants()
     {
-        $this->setRequestParameter("editval", array("oxid1" => "param1", "oxid2" => "param2"));
+        $this->setRequestParameter('editval', ['oxid1' => 'param1', 'oxid2' => 'param2']);
 
-        $aMethods[] = "savevariant";
-        $aMethods[] = "resetContentCache";
+        $aMethods[] = 'savevariant';
+        $aMethods[] = 'resetContentCache';
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleVariant::class, $aMethods);
         $oView->expects($this->exactly(2))
             ->method('savevariant')
             ->withConsecutive(
-                [$this->equalTo("oxid1"), $this->equalTo("param1")],
-                [$this->equalTo("oxid2"), $this->equalTo("param2")]
+                [$this->equalTo('oxid1'), $this->equalTo('param1')],
+                [$this->equalTo('oxid2'), $this->equalTo('param2')]
             );
         $oView->expects($this->once())
             ->method('resetContentCache');
-
 
         $oView->savevariants();
     }
@@ -150,17 +151,17 @@ class ArticleVariantTest extends \OxidTestCase
         $this->markTestSkipped('Bug: Undefined method OxidEsales\Eshop\Core\Request::getRequestRawParameter().');
 
         oxTestModules::addFunction('oxarticle', 'delete', '{ throw new Exception( "delete" ); }');
-        $this->setRequestParameter("oxid", "testid");
+        $this->setRequestParameter('oxid', 'testid');
 
         try {
             $oView = oxNew('Article_Variant');
             $oView->deleteVariant();
         } catch (Exception $oExcp) {
-            $this->assertEquals("delete", $oExcp->getMessage(), "error in Article_Variant::deleteVariant()");
+            $this->assertEquals('delete', $oExcp->getMessage(), 'error in Article_Variant::deleteVariant()');
 
             return;
         }
-        $this->fail("error in Article_Variant::deleteVariant()");
+        $this->fail('error in Article_Variant::deleteVariant()');
     }
 
     /**
@@ -171,17 +172,17 @@ class ArticleVariantTest extends \OxidTestCase
     public function testChangename()
     {
         oxTestModules::addFunction('oxarticle', 'save', '{ throw new Exception( "save" ); }');
-        $this->setRequestParameter("oxid", "testid");
+        $this->setRequestParameter('oxid', 'testid');
 
         try {
             $oView = oxNew('Article_Variant');
             $oView->changename();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Variant::changename()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Variant::changename()');
 
             return;
         }
-        $this->fail("error in Article_Variant::changename()");
+        $this->fail('error in Article_Variant::changename()');
     }
 
     /**
@@ -195,16 +196,16 @@ class ArticleVariantTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'load', '{ return true; }');
         oxTestModules::addFunction('oxVariantHandler', 'genVariantFromSell', '{ throw new Exception( "genVariantFromSell" ); }');
 
-        $this->setRequestParameter("allsel", "testsel");
+        $this->setRequestParameter('allsel', 'testsel');
 
         try {
             $oView = oxNew('Article_Variant');
             $oView->addsel();
         } catch (Exception $oExcp) {
-            $this->assertEquals("genVariantFromSell", $oExcp->getMessage(), "error in Article_Variant::addsel()");
+            $this->assertEquals('genVariantFromSell', $oExcp->getMessage(), 'error in Article_Variant::addsel()');
 
             return;
         }
-        $this->fail("error in Article_Variant::addsel()");
+        $this->fail('error in Article_Variant::addsel()');
     }
 }

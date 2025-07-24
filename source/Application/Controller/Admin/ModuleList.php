@@ -41,7 +41,6 @@ class ModuleList extends AdminListController
      */
     protected $_aModules = [];
 
-
     /**
      * Calls parent::render() and returns name of template to render
      *

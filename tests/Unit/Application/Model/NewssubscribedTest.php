@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
+use oxField;
 
 require_once TEST_LIBRARY_HELPERS_PATH . 'oxNewsSubscribedHelper.php';
 
@@ -36,7 +38,7 @@ class NewssubscribedTest extends \OxidTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->_oNewsSub = oxNew("oxnewssubscribed");
+        $this->_oNewsSub = oxNew('oxnewssubscribed');
         $this->_oNewsSub->setId('_testNewsSubscrId');
         $this->_oNewsSub->oxnewssubscribed__oxuserid = new oxField('_testUserId', oxField::T_RAW);
         $this->_oNewsSub->oxnewssubscribed__oxemail = new oxField('useremail@useremail.nl', oxField::T_RAW);
@@ -45,7 +47,7 @@ class NewssubscribedTest extends \OxidTestCase
         $this->_oNewsSub->save();
 
         //set default user
-        $this->_oUser = oxNew("oxuser");
+        $this->_oUser = oxNew('oxuser');
         $this->_oUser->setId('_testUserId');
         $this->_oUser->oxuser__oxactive = new oxField('1', oxField::T_RAW);
         $this->_oUser->oxuser__oxusername = new oxField('username@useremail.nl', oxField::T_RAW);
@@ -209,7 +211,6 @@ class NewssubscribedTest extends \OxidTestCase
         $this->assertEquals(9, $oNewsSubscribed->oxnewssubscribed__oxdboptin->value);
     }
 
-
     /**
      * Testing subscription email sending status getter
      */
@@ -219,7 +220,6 @@ class NewssubscribedTest extends \OxidTestCase
         $this->assertEquals('xxx', $this->_oNewsSub->getOptInEmailStatus());
     }
 
-
     /**
      * Testing subscription email sending status setter
      */
@@ -227,13 +227,11 @@ class NewssubscribedTest extends \OxidTestCase
     {
         $this->_oNewsSub->setOptInEmailStatus(1);
 
-
         $oNewsSubscribed = oxNew('oxnewssubscribed');
         $oNewsSubscribed->load('_testNewsSubscrId');
 
         $this->assertEquals(1, $oNewsSubscribed->oxnewssubscribed__oxemailfailed->value);
     }
-
 
     /**
      * Testing subscription email updater

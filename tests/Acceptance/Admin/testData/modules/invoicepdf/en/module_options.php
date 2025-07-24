@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -18,11 +19,10 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$aLang = array(
+$aLang = [
 'charset'                                       => 'UTF-8',
 
 'SHOP_MODULE_GROUP_features'                     => 'Features',
 'SHOP_MODULE_sTestInvoicePdfOption'                 => 'label1',
 //'HELP_SHOP_MODULE_bl_showSomeFeatureHelpText'    => 'Help text for some feature',
-
-);
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \OxidEsales\Eshop\Application\Model\Order;
-use \oxpaymentgateway;
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
+use OxidEsales\Eshop\Application\Model\Order;
+use oxpaymentgateway;
 
 class mod_oxpaymentgateway extends oxpaymentgateway
 {
@@ -60,10 +62,10 @@ class PaymentGatewayTest extends \OxidTestCase
 
     public function testSetPaymentParams()
     {
-        $oUserpayment = oxNew("oxuserpayment");
-        $oUserpayment->oxuserpayments__oxuserid = new oxField("test", oxField::T_RAW);
-        $oUserpayment->oxuserpayments__oxpaymentsid = new oxField("test", oxField::T_RAW);
-        $oUserpayment->oxuserpayments__oxvalue = new oxField("test", oxField::T_RAW);
+        $oUserpayment = oxNew('oxuserpayment');
+        $oUserpayment->oxuserpayments__oxuserid = new oxField('test', oxField::T_RAW);
+        $oUserpayment->oxuserpayments__oxpaymentsid = new oxField('test', oxField::T_RAW);
+        $oUserpayment->oxuserpayments__oxvalue = new oxField('test', oxField::T_RAW);
         $oUserpayment->Save();
         $oPaymentGateway = new mod_oxpaymentgateway();
         $oPaymentGateway->setPaymentParams($oUserpayment);
@@ -92,10 +94,10 @@ class PaymentGatewayTest extends \OxidTestCase
     public function testExecutePayment()
     {
         $oOrder = oxNew(Order::class);
-        $oUserpayment = oxNew("oxuserpayment");
-        $oUserpayment->oxuserpayments__oxuserid = new oxField("test", oxField::T_RAW);
-        $oUserpayment->oxuserpayments__oxpaymentsid = new oxField("test", oxField::T_RAW);
-        $oUserpayment->oxuserpayments__oxvalue = new oxField("test", oxField::T_RAW);
+        $oUserpayment = oxNew('oxuserpayment');
+        $oUserpayment->oxuserpayments__oxuserid = new oxField('test', oxField::T_RAW);
+        $oUserpayment->oxuserpayments__oxpaymentsid = new oxField('test', oxField::T_RAW);
+        $oUserpayment->oxuserpayments__oxvalue = new oxField('test', oxField::T_RAW);
         $oUserpayment->Save();
         $oPaymentGateway = new mod_oxpaymentgateway();
         $oPaymentGateway->setActive();
@@ -107,10 +109,10 @@ class PaymentGatewayTest extends \OxidTestCase
     public function testExecutePaymentWithEmptyPaymentId()
     {
         $oOrder = oxNew(Order::class);
-        $oUserpayment = oxNew("oxuserpayment");
-        $oUserpayment->oxuserpayments__oxuserid = new oxField("test", oxField::T_RAW);
-        $oUserpayment->oxuserpayments__oxpaymentsid = new oxField("oxempty", oxField::T_RAW);
-        $oUserpayment->oxuserpayments__oxvalue = new oxField("test", oxField::T_RAW);
+        $oUserpayment = oxNew('oxuserpayment');
+        $oUserpayment->oxuserpayments__oxuserid = new oxField('test', oxField::T_RAW);
+        $oUserpayment->oxuserpayments__oxpaymentsid = new oxField('oxempty', oxField::T_RAW);
+        $oUserpayment->oxuserpayments__oxvalue = new oxField('test', oxField::T_RAW);
         $oUserpayment->Save();
         $oPaymentGateway = new mod_oxpaymentgateway();
         $oPaymentGateway->setActive();
@@ -130,7 +132,7 @@ class PaymentGatewayTest extends \OxidTestCase
     public function testGetLastSetErrorNo()
     {
         $oPaymentGateway = new mod_oxpaymentgateway();
-        $oPaymentGateway->setError(22, "Test Error");
+        $oPaymentGateway->setError(22, 'Test Error');
         $blResult = $oPaymentGateway->getLastErrorNo();
         $this->assertEquals($blResult, 22);
     }
@@ -146,8 +148,8 @@ class PaymentGatewayTest extends \OxidTestCase
     public function testGetLastSetError()
     {
         $oPaymentGateway = new mod_oxpaymentgateway();
-        $oPaymentGateway->setError(22, "Test Error");
+        $oPaymentGateway->setError(22, 'Test Error');
         $blResult = $oPaymentGateway->getLastError();
-        $this->assertEquals($blResult, "Test Error");
+        $this->assertEquals($blResult, 'Test Error');
     }
 }

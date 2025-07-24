@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -19,62 +20,62 @@
  * Brutto-Brutto mode.
  * From basketCalc.csv: V order.
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9201,
                 'oxprice'                  => 72.85,
                 'oxvat'                    => 17,
                 'amount'                   => 1012,
-        ),
-        1 => array(
+        ],
+        1 => [
                 'oxid'                     => 9203,
                 'oxprice'                  => 33.30,
                 'oxvat'                    => 19,
                 'amount'                   => 453,
-        ),
-        2 => array(
+        ],
+        2 => [
                 'oxid'                     => 9211,
                 'oxprice'                  => 5.86,
                 'oxvat'                    => 16,
                 'amount'                   => 88,
-        ),
-        3 => array(
+        ],
+        3 => [
                 'oxid'                     => 9216,
                 'oxprice'                  => 56.45,
                 'oxvat'                    => 17,
                 'amount'                   => 56,
-        ),
-        4 => array(
+        ],
+        4 => [
                 'oxid'                     => 9219,
                 'oxprice'                  => 24.33,
                 'oxvat'                    => 19,
                 'amount'                   => 74,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9201 => array( '72,85', '73.724,20' ),
-                 9203 => array( '33,30', '15.084,90' ),
-                 9211 => array( '5,86', '515,68' ),
-                 9216 => array( '56,45', '3.161,20' ),
-                 9219 => array( '24,33', '1.800,42' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 9201 => [ '72,85', '73.724,20' ],
+                 9203 => [ '33,30', '15.084,90' ],
+                 9211 => [ '5,86', '515,68' ],
+                 9216 => [ '56,45', '3.161,20' ],
+                 9219 => [ '24,33', '1.800,42' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '94.286,40',
                 'totalNetto'  => '80.347,91',
-                'vats' => array(
+                'vats' => [
                         16 => '71,13',
                         17 => '11.171,38',
                         19 => '2.695,98',
-                ),
-                'grandTotal'  => '94.286,40'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '94.286,40',
+        ],
+    ],
+    'options' => [
+        'config' => [
             'blEnterNetPrice' => false,
-            'blShowNetPrice' => false
-        ),
-    ),
-);
+            'blShowNetPrice' => false,
+        ],
+    ],
+];

@@ -45,12 +45,12 @@ class VoucherSerieGroups extends AdminDetailsController
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oVoucherSerie = oxNew(VoucherSerie::class);
             $oVoucherSerie->load($soxId);
             $oVoucherSerie->setUserGroups();
-            $this->_aViewData["edit"] = $oVoucherSerie;
+            $this->_aViewData['edit'] = $oVoucherSerie;
 
             //Disable editing for derived items
             if ($oVoucherSerie->isDerived()) {
@@ -61,9 +61,9 @@ class VoucherSerieGroups extends AdminDetailsController
             $oVoucherSerieGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oVoucherSerieGroupsAjax->getColumns();
 
-            return "popups/voucherserie_groups.tpl";
+            return 'popups/voucherserie_groups.tpl';
         }
 
-        return "voucherserie_groups.tpl";
+        return 'voucherserie_groups.tpl';
     }
 }

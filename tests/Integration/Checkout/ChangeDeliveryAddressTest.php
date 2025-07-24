@@ -1,7 +1,9 @@
 <?php
+
 /**
  * #PHPHEADER_OXID_LICENSE_INFORMATION#
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Checkout;
 
 use oxField;
@@ -10,7 +12,7 @@ use oxRegistry;
 
 class ChangeDeliveryAddressTest extends \OxidTestCase
 {
-    const TEST_ARTICLE_ID = '1951';
+    public const TEST_ARTICLE_ID = '1951';
 
     /**
      * Fixture setUp.
@@ -172,13 +174,13 @@ class ChangeDeliveryAddressTest extends \OxidTestCase
     private function changeUser()
     {
         //now change the user address
-        $rawValues = array('oxuser__oxfname'     => 'Erna',
+        $rawValues = ['oxuser__oxfname'     => 'Erna',
                            'oxuser__oxlname'     => 'Hahnentritt',
                            'oxuser__oxstreetnr'  => '117',
                            'oxuser__oxstreet'    => 'Landstrasse',
                            'oxuser__oxzip'       => '22769',
                            'oxuser__oxcity'      => 'Hamburg',
-                           'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984');
+                           'oxuser__oxcountryid' => 'a7c40f631fc920687.20179984'];
 
         $this->setRequestParameter('invadr', $rawValues);
         $this->setRequestParameter('stoken', $this->getSession()->getSessionChallengeToken());

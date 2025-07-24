@@ -22,6 +22,7 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\ArticleException;
@@ -37,7 +38,6 @@ use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\PriceList;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
-use OxidEsales\Eshop\Application\Model\BasketItem;
 use stdClass;
 
 /**
@@ -300,7 +300,6 @@ class Basket extends Base
      */
     protected $_blDownloadableProducts = null;
 
-
     /**
      * Save basket to database if user is logged in
      *
@@ -345,7 +344,6 @@ class Basket extends Base
 
         return $this->_blSaveToDataBase;
     }
-
 
     /**
      * Return true if calculation mode is netto
@@ -634,7 +632,6 @@ class Basket extends Base
 
         return $sItemKey;
     }
-
 
     /**
      * Removes item from basket
@@ -992,7 +989,7 @@ class Basket extends Base
                 foreach ($aDeliveryList as $oDelivery) {
                     //debug trace
                     if ($myConfig->getConfigParam('iDebug') == 5) {
-                        echo("DelCost : " . $oDelivery->oxdelivery__oxtitle->value . "<br>");
+                        echo('DelCost : ' . $oDelivery->oxdelivery__oxtitle->value . '<br>');
                     }
                     $oDeliveryPrice->addPrice($oDelivery->getDeliveryPrice($fDelVATPercent));
                 }
@@ -1068,7 +1065,6 @@ class Basket extends Base
         return false;
     }
 
-
     //P
     /**
      * Performs final sum calculation and rounding.
@@ -1078,7 +1074,6 @@ class Basket extends Base
     {
         // 1. add products price
         $dPrice = $this->_dBruttoSum;
-
 
         /** @var Price $oTotalPrice */
         $oTotalPrice = oxNew(Price::class);
@@ -1367,7 +1362,6 @@ class Basket extends Base
                 $oWrappingPrices->addToPriceList($oWrappingPrice);
             }
         }
-
 
         return $oWrappingPrices->calculateToPrice();
     }
@@ -2039,7 +2033,6 @@ class Basket extends Base
         $this->_oPrice = $oPrice;
     }
 
-
     /**
      * Returns unique order ID assigned to current basket.
      * This id is only available on last order step
@@ -2526,7 +2519,6 @@ class Basket extends Base
         return false;
     }
 
-
     /**
      * Returns VAT of wrapping costs
      *
@@ -2538,7 +2530,6 @@ class Basket extends Base
     {
         return $this->getCosts('oxwrapping')->getVat();
     }
-
 
     /**
      * Returns VAT of gift card costs
@@ -2782,7 +2773,6 @@ class Basket extends Base
         return $dPrice;
     }
 
-
     /**
      * Returns ( current basket products sum - total discount - voucher discount )
      *
@@ -2860,7 +2850,7 @@ class Basket extends Base
         $blIsBelowMinOrderPrice = false;
         $sConfValue = Registry::getConfig()->getConfigParam('iMinOrderPrice');
         if (is_numeric($sConfValue) && $this->getProductsCount()) {
-            $dMinOrderPrice = Price::getPriceInActCurrency((double) $sConfValue);
+            $dMinOrderPrice = Price::getPriceInActCurrency((float) $sConfValue);
             $dNotDiscountedProductPrice = 0;
             if ($oPrice = $this->getNotDiscountProductsPrice()) {
                 $dNotDiscountedProductPrice = $oPrice->getBruttoSum();
@@ -2958,8 +2948,8 @@ class Basket extends Base
         $sCatTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories');
 
         $oDb = DatabaseProvider::getDb();
-        $sParentId = $oDb->getOne("select oxparentid from oxarticles where oxid = :oxid", [
-            ':oxid' => $sProductId
+        $sParentId = $oDb->getOne('select oxparentid from oxarticles where oxid = :oxid', [
+            ':oxid' => $sProductId,
         ]);
         $sProductId = $sParentId ? $sParentId : $sProductId;
 
@@ -2970,7 +2960,7 @@ class Basket extends Base
 
         return (bool) $oDb->getOne($sQ, [
             ':oxobjectid' => $sProductId,
-            ':oxrootid' => $sRootCatId
+            ':oxrootid' => $sRootCatId,
         ]);
     }
 
@@ -3051,7 +3041,7 @@ class Basket extends Base
     {
         if (!$blOverride) {
             $this->_blNewITemAdded = null;
-            Registry::getSession()->setVariable("blAddedNewItem", true);
+            Registry::getSession()->setVariable('blAddedNewItem', true);
         }
     }
 
@@ -3072,8 +3062,8 @@ class Basket extends Base
     public function isNewItemAdded()
     {
         if ($this->_blNewITemAdded == null) {
-            $this->_blNewITemAdded = (bool) Registry::getSession()->getVariable("blAddedNewItem");
-            Registry::getSession()->deleteVariable("blAddedNewItem");
+            $this->_blNewITemAdded = (bool) Registry::getSession()->getVariable('blAddedNewItem');
+            Registry::getSession()->deleteVariable('blAddedNewItem');
         }
 
         return $this->_blNewITemAdded;

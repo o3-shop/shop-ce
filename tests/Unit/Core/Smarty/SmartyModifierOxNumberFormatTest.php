@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \oxRegistry;
+use oxRegistry;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/modifier.oxnumberformat.php';
 if (file_exists($filePath)) {
@@ -30,19 +32,18 @@ if (file_exists($filePath)) {
 
 class SmartyModifierOxNumberFormatTest extends \OxidTestCase
 {
-
     /**
      * Provides number format, number and expected value
      */
     public function Provider()
     {
-        return array(
-            array("EUR@ 1.00@ ,@ .@ EUR@ 2", 25000, '25.000,00'),
-            array("EUR@ 1.00@ ,@ .@ EUR@ 2", 25000.1584, '25.000,16'),
-            array("EUR@ 1.00@ ,@ .@ EUR@ 3", 25000.1584, '25.000,158'),
-            array("EUR@ 1.00@ ,@ .@ EUR@ 0", 25000000.5584, '25.000.001'),
-            array("EUR@ 1.00@ .@ ,@ EUR@ 2", 25000000.5584, '25,000,000.56'),
-        );
+        return [
+            ['EUR@ 1.00@ ,@ .@ EUR@ 2', 25000, '25.000,00'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 2', 25000.1584, '25.000,16'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 3', 25000.1584, '25.000,158'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 0', 25000000.5584, '25.000.001'],
+            ['EUR@ 1.00@ .@ ,@ EUR@ 2', 25000000.5584, '25,000,000.56'],
+        ];
     }
 
     /**

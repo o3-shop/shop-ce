@@ -39,7 +39,7 @@ class DeliveryMainAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxcountry', 1, 1, 0],
             ['oxisoalpha2', 'oxcountry', 1, 0, 0],
@@ -87,7 +87,7 @@ class DeliveryMainAjax extends ListComponentAjax
         } else {
             $sQAdd = " from oxobject2delivery left join {$sCountryTable} " .
                      "on {$sCountryTable}.oxid=oxobject2delivery.oxobjectid " .
-                     " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) .
+                     ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) .
                      " and oxobject2delivery.oxtype = 'oxcountry' ";
         }
 
@@ -95,7 +95,7 @@ class DeliveryMainAjax extends ListComponentAjax
             $sQAdd .= " and {$sCountryTable}.oxid not in ( select {$sCountryTable}.oxid " .
                       "from oxobject2delivery left join {$sCountryTable} " .
                       "on {$sCountryTable}.oxid=oxobject2delivery.oxobjectid " .
-                      " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) .
+                      ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2delivery.oxtype = 'oxcountry' ) ";
         }
 
@@ -109,10 +109,10 @@ class DeliveryMainAjax extends ListComponentAjax
     {
         $aChosenCntr = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -131,7 +131,7 @@ class DeliveryMainAjax extends ListComponentAjax
             $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');

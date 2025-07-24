@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,20 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
+use oxDb;
 use OxidEsales\EshopCommunity\Application\Model\Wrapping;
-
-use \Exception;
-use \oxDb;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Wrapping_Main class
  */
 class WrappingMainTest extends \OxidTestCase
 {
-
     /**
      * Wrapping_Main::Render() test case
      *
@@ -38,7 +38,7 @@ class WrappingMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", oxDb::getDb()->getOne("select oxid from oxwrapping"));
+        $this->setRequestParameter('oxid', oxDb::getDb()->getOne('select oxid from oxwrapping'));
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
 
         // testing..
@@ -57,7 +57,7 @@ class WrappingMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Wrapping_Main');
@@ -65,7 +65,7 @@ class WrappingMainTest extends \OxidTestCase
 
         $aViewData = $oView->getViewData();
         $this->assertFalse(isset($aViewData['edit']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -82,11 +82,11 @@ class WrappingMainTest extends \OxidTestCase
             $oView = oxNew('Wrapping_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Wrapping_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Wrapping_Main::save()');
 
             return;
         }
-        $this->fail("error in Wrapping_Main::save()");
+        $this->fail('error in Wrapping_Main::save()');
     }
 
     /**
@@ -103,10 +103,10 @@ class WrappingMainTest extends \OxidTestCase
             $oView = oxNew('Wrapping_Main');
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Wrapping_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Wrapping_Main::save()');
 
             return;
         }
-        $this->fail("error in Wrapping_Main::save()");
+        $this->fail('error in Wrapping_Main::save()');
     }
 }

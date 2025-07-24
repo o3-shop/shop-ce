@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use DOMDocument;
@@ -26,7 +28,6 @@ use DOMDocument;
  */
 class ListReviewTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -55,15 +56,15 @@ class ListReviewTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array("getDomXml"));
-        $oNavTree->expects($this->once())->method('getDomXml')->will($this->returnValue(new DOMDocument));
+        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getDomXml']);
+        $oNavTree->expects($this->once())->method('getDomXml')->will($this->returnValue(new DOMDocument()));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListReview::class, array("getNavigation"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListReview::class, ['getNavigation']);
         $oView->expects($this->once())
             ->method('getNavigation')
             ->willReturn($oNavTree);
 
-        $this->assertEquals("list_review.tpl", $oView->render());
+        $this->assertEquals('list_review.tpl', $oView->render());
     }
 
     /**
@@ -75,15 +76,15 @@ class ListReviewTest extends \OxidTestCase
     {
         $oArtList = oxNew('Article_List');
         $sSql = $oArtList->UNITbuildSelectString(oxNew('oxArticle'));
-        $sSql = $oArtList->UNITprepareWhereQuery(array(), $sSql);
+        $sSql = $oArtList->UNITprepareWhereQuery([], $sSql);
 
         // checking if exists string oxarticle.oxparentid = ''
         $blCheckForParent = preg_match("/\s+and\s+" . getViewName('oxarticles') . ".oxparentid\s+=\s+''/", $sSql);
         $this->assertTrue((bool) $blCheckForParent);
 
         $oList = oxNew('List_Review');
-        $sSql = $oList->UNITbuildSelectString("");
-        $sSql = $oList->UNITprepareWhereQuery(array(), $sSql);
+        $sSql = $oList->UNITbuildSelectString('');
+        $sSql = $oList->UNITprepareWhereQuery([], $sSql);
 
         // checking if not exists string oxarticle.oxparentid = ''
         $blCheckForParent = preg_match("/\s+and\s+" . getViewName('oxarticles') . ".oxparentid\s+=\s+''/", $sSql);
@@ -99,15 +100,15 @@ class ListReviewTest extends \OxidTestCase
     {
         $oArtList = oxNew('Article_List');
         $sSql = $oArtList->UNITbuildSelectString(oxNew('oxArticle'));
-        $sSql = $oArtList->UNITprepareWhereQuery(array(), $sSql);
+        $sSql = $oArtList->UNITprepareWhereQuery([], $sSql);
 
         // checking if exists string oxarticle.oxparentid = ''
         $blCheckForParent = preg_match("/\s+and\s+" . getViewName('oxarticles') . ".oxparentid\s+=\s+''/", $sSql);
         $this->assertTrue((bool) $blCheckForParent);
 
         $oList = oxNew('List_Review');
-        $sSql = $oList->UNITbuildSelectString("");
-        $sSql = $oList->UNITprepareWhereQuery(array(), $sSql);
+        $sSql = $oList->UNITbuildSelectString('');
+        $sSql = $oList->UNITprepareWhereQuery([], $sSql);
 
         // checking if not exists string oxarticle.oxparentid = ''
         $blCheckForParent = preg_match("/\s+and\s+" . getViewName('oxarticles') . ".oxparentid\s+=\s+''/", $sSql);

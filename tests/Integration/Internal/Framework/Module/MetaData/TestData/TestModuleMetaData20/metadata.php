@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -49,7 +50,7 @@ $aModule = [
     ],
     'templates'   => [
         'mymodule.tpl'       => 'TestModuleMetaData20/mymodule.tpl',
-        'mymodule_other.tpl' => 'TestModuleMetaData20/mymodule_other.tpl'
+        'mymodule_other.tpl' => 'TestModuleMetaData20/mymodule_other.tpl',
     ],
     'blocks'      => [
         [
@@ -57,13 +58,13 @@ $aModule = [
             'template' => 'template_1.tpl',
             'block'    => 'block_1',
             'file'     => '/blocks/template_1.tpl',
-            'position' => '1'
+            'position' => '1',
         ],
         [
             'template' => 'template_2.tpl',
             'block'    => 'block_2',
             'file'     => '/blocks/template_2.tpl',
-            'position' => '2'
+            'position' => '2',
         ],
     ],
     'settings'    => [
@@ -73,13 +74,12 @@ $aModule = [
             'type' => 'select',
             'value' => '0',
             'constraints' => '0|1|2|3',
-            'position' => 3
+            'position' => 3,
         ],
-        ['group' => 'main', 'name' => 'setting_2', 'type' => 'arr', 'value' => ['value1', 'value2']]
+        ['group' => 'main', 'name' => 'setting_2', 'type' => 'arr', 'value' => ['value1', 'value2']],
     ],
     'events'      => [
         'onActivate'   => 'TestModuleMetaData20\Events::onActivate',
-        'onDeactivate' => 'TestModuleMetaData20\Events::onDeactivate'
+        'onDeactivate' => 'TestModuleMetaData20\Events::onDeactivate',
     ],
-
 ];

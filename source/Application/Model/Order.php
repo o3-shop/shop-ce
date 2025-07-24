@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Payment as EshopPayment;
+use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
 use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
@@ -34,10 +36,8 @@ use OxidEsales\Eshop\Core\Exception\OutOfStockException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Price as ShopPrice;
-use OxidEsales\Eshop\Application\Model\Payment as EshopPayment;
-use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use stdClass;
 
@@ -54,42 +54,42 @@ class Order extends BaseModel
      *
      * @var int
      */
-    const ORDER_STATE_MAILINGERROR = 0;
+    public const ORDER_STATE_MAILINGERROR = 0;
 
     /**
      * Order finalization was completed without errors
      *
      * @var int
      */
-    const ORDER_STATE_OK = 1;
+    public const ORDER_STATE_OK = 1;
 
     /**
      * Error during payment execution
      *
      * @var int
      */
-    const ORDER_STATE_PAYMENTERROR = 2;
+    public const ORDER_STATE_PAYMENTERROR = 2;
 
     /**
      * Order with such id already exist
      *
      * @var int
      */
-    const ORDER_STATE_ORDEREXISTS = 3;
+    public const ORDER_STATE_ORDEREXISTS = 3;
 
     /**
      * Delivery parameters used for order are invalid
      *
      * @var int
      */
-    const ORDER_STATE_INVALIDDELIVERY = 4;
+    public const ORDER_STATE_INVALIDDELIVERY = 4;
 
     /**
      * Payment parameters used for order are invalid
      *
      * @var int
      */
-    const ORDER_STATE_INVALIDPAYMENT = 5;
+    public const ORDER_STATE_INVALIDPAYMENT = 5;
 
     /**
      * Protection parameters used for some data in order are invalid
@@ -98,28 +98,28 @@ class Order extends BaseModel
      *
      * @var int
      */
-    const ORDER_STATE_INVALIDDElADDRESSCHANGED = 7; // phpcs:ignore
+    public const ORDER_STATE_INVALIDDElADDRESSCHANGED = 7; // phpcs:ignore
 
     /**
      * Protection parameters used for some data in order are invalid
      *
      * @var int
      */
-    const ORDER_STATE_INVALIDDELADDRESSCHANGED = 7;
+    public const ORDER_STATE_INVALIDDELADDRESSCHANGED = 7;
 
     /**
      * Basket price < minimum order price
      *
      * @var int
      */
-    const ORDER_STATE_BELOWMINPRICE = 8;
+    public const ORDER_STATE_BELOWMINPRICE = 8;
 
     /**
      * Voucher cannot be applied
      *
      * @var int
      */
-    const ORDER_STATE_VOUCHERERROR = 9;
+    public const ORDER_STATE_VOUCHERERROR = 9;
 
     /**
      * Skip update fields
@@ -353,16 +353,16 @@ class Order extends BaseModel
      */
     protected function _getArticles($blExcludeCanceled = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSelect = "SELECT `oxorderarticles`.* FROM `oxorderarticles`
-                        WHERE `oxorderarticles`.`oxorderid` = :oxorderid" .
-                   ($blExcludeCanceled ? " AND `oxorderarticles`.`oxstorno` != 1 " : " ") . "
-                        ORDER BY `oxorderarticles`.`oxartid`, `oxorderarticles`.`oxselvariant`, `oxorderarticles`.`oxpersparam` ";
+        $sSelect = 'SELECT `oxorderarticles`.* FROM `oxorderarticles`
+                        WHERE `oxorderarticles`.`oxorderid` = :oxorderid' .
+                   ($blExcludeCanceled ? ' AND `oxorderarticles`.`oxstorno` != 1 ' : ' ') . '
+                        ORDER BY `oxorderarticles`.`oxartid`, `oxorderarticles`.`oxselvariant`, `oxorderarticles`.`oxpersparam` ';
 
         // order articles
         $oArticles = oxNew(ListModel::class);
         $oArticles->init('oxorderarticle');
         $oArticles->selectString($sSelect, [
-            ':oxorderid' => (string) $this->getId()
+            ':oxorderid' => (string) $this->getId(),
         ]);
 
         return $oArticles;
@@ -450,7 +450,6 @@ class Order extends BaseModel
 
         return $this->_oGidtCardPrice;
     }
-
 
     /**
      * Returns order payment expenses price object
@@ -612,7 +611,6 @@ class Order extends BaseModel
         return (bool) $this->oxorder__oxisnettomode->value;
     }
 
-
     /**
      * Updates order transaction status. Faster than saving whole object
      *
@@ -627,7 +625,7 @@ class Order extends BaseModel
         $sQ = 'update oxorder set oxtransstatus = :oxtransstatus where oxid = :oxid';
         $oDb->execute($sQ, [
             ':oxtransstatus' => $sStatus,
-            ':oxid' => $this->getId()
+            ':oxid' => $this->getId(),
         ]);
 
         //updating order object
@@ -746,7 +744,6 @@ class Order extends BaseModel
         //order language
         $this->oxorder__oxlang = new Field($this->getOrderLanguage());
 
-
         // initial status - 'ERROR'
         $this->oxorder__oxtransstatus = new Field('ERROR', Field::T_RAW);
 
@@ -802,7 +799,6 @@ class Order extends BaseModel
         $this->oxorder__oxbillfon = clone $oUser->oxuser__oxfon;
         $this->oxorder__oxbillfax = clone $oUser->oxuser__oxfax;
         $this->oxorder__oxbillsal = clone $oUser->oxuser__oxsal;
-
 
         // delivery address
         if (($oDelAddress = $this->getDelAddressInfo())) {
@@ -883,7 +879,7 @@ class Order extends BaseModel
                 if (count($aChosenSelList = $oContent->getChosenSelList())) {
                     foreach ($aChosenSelList as $oItem) {
                         if ($sSelList) {
-                            $sSelList .= ", ";
+                            $sSelList .= ', ';
                         }
                         $sSelList .= "{$oItem->name} : {$oItem->value}";
                     }
@@ -1160,7 +1156,7 @@ class Order extends BaseModel
         $this->oxorder__oxorderdate = new Field($sDate, Field::T_RAW);
         $oDb->execute($sQ, [
             ':oxorderdate' => $sDate,
-            ':oxid' => $this->getId()
+            ':oxid' => $this->getId(),
         ]);
     }
 
@@ -1328,7 +1324,6 @@ class Order extends BaseModel
         return $sCounterIdent;
     }
 
-
     /**
      * Tries to fetch and set next record number in DB. Returns true on success
      *
@@ -1342,10 +1337,10 @@ class Order extends BaseModel
         $oDb = DatabaseProvider::getDb();
 
         $iCnt = oxNew(Counter::class)->getNext($this->_getCounterIdent());
-        $sQ = "update oxorder set oxordernr = :oxordernr where oxid = :oxid";
+        $sQ = 'update oxorder set oxordernr = :oxordernr where oxid = :oxid';
         $blUpdate = (bool) $oDb->execute($sQ, [
             ':oxordernr' => $iCnt,
-            ':oxid' => $this->getId()
+            ':oxid' => $this->getId(),
         ]);
 
         if ($blUpdate) {
@@ -1366,7 +1361,8 @@ class Order extends BaseModel
     {
         $this->_aSkipSaveFields = ['oxtimestamp', 'oxorderdate'];
         $this->oxorder__oxsenddate = new Field(
-            Registry::getUtilsDate()->formatDBDate($this->oxorder__oxsenddate->value, true));
+            Registry::getUtilsDate()->formatDBDate($this->oxorder__oxsenddate->value, true)
+        );
 
         return parent::_update();
     }
@@ -1501,7 +1497,7 @@ class Order extends BaseModel
             // add previously used vouchers
             $sQ = 'select oxid from oxvouchers where oxorderid = :oxorderid';
             $aVouchers = $oDb->getAll($sQ, [
-                ':oxorderid' => $this->getId()
+                ':oxorderid' => $this->getId(),
             ]);
             foreach ($aVouchers as $aVoucher) {
                 $this->_oOrderBasket->addVoucher($aVoucher['oxid']);
@@ -1623,7 +1619,7 @@ class Order extends BaseModel
         $sQ = 'select max(oxorder.oxinvoicenr) from oxorder 
             where oxorder.oxshopid = :oxshopid ';
         $params = [
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ];
 
         return ((int) DatabaseProvider::getDb()->getOne($sQ, $params) + 1);
@@ -1640,7 +1636,7 @@ class Order extends BaseModel
         $sQ = 'select max(cast(oxorder.oxbillnr as unsigned)) from oxorder 
             where oxorder.oxshopid = :oxshopid ';
         $params = [
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ];
 
         return ((int) DatabaseProvider::getDb()->getOne($sQ, $params) + 1);
@@ -1681,7 +1677,7 @@ class Order extends BaseModel
         $oBasket->calculateBasket(true);
 
         // load fitting deliveries list
-        $oDeliveryList = oxNew(DeliveryList::class, "core");
+        $oDeliveryList = oxNew(DeliveryList::class, 'core');
         $oDeliveryList->setCollectFittingDeliveriesSets(true);
 
         return $oDeliveryList->getDeliveryList($oBasket, $this->getOrderUser(), $sShipId);
@@ -1698,10 +1694,10 @@ class Order extends BaseModel
     {
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $aVouchers = [];
-        $sSelect = "select oxvouchernr from oxvouchers 
-            where oxorderid = :oxorderid";
+        $sSelect = 'select oxvouchernr from oxvouchers 
+            where oxorderid = :oxorderid';
         $rs = $oDb->select($sSelect, [
-            ':oxorderid' => $this->oxorder__oxid->value
+            ':oxorderid' => $this->oxorder__oxid->value,
         ]);
         if ($rs && $rs->count() > 0) {
             while (!$rs->EOF) {
@@ -1731,11 +1727,11 @@ class Order extends BaseModel
         }
 
         $params = [
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ];
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return (double) DatabaseProvider::getMaster()->getOne($sSelect, $params);
+        return (float) DatabaseProvider::getMaster()->getOne($sSelect, $params);
     }
 
     /**
@@ -1756,13 +1752,12 @@ class Order extends BaseModel
         }
 
         $params = [
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ];
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         return (int) DatabaseProvider::getMaster()->getOne($sSelect, $params);
     }
-
 
     /**
      * Checking if this order is already stored.
@@ -1782,7 +1777,7 @@ class Order extends BaseModel
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = DatabaseProvider::getMaster();
         $params = [
-            ':oxid' => $sOxId
+            ':oxid' => $sOxId,
         ];
         if ($masterDb->getOne('select oxid from oxorder where oxid = :oxid', $params)) {
             return true;
@@ -1933,7 +1928,7 @@ class Order extends BaseModel
 
         $sLastPaymentId = $masterDb->getOne($sQ, [
             ':oxshopid' => Registry::getConfig()->getShopId(),
-            ':oxuserid' => $sUserId
+            ':oxuserid' => $sUserId,
         ]);
 
         return $sLastPaymentId;
@@ -2003,7 +1998,7 @@ class Order extends BaseModel
     {
         $oCur = Registry::getConfig()->getActShopCurrencyObject();
 
-        return number_format((double) $this->oxorder__oxtotalordersum->value, $oCur->decimal, '.', '');
+        return number_format((float) $this->oxorder__oxtotalordersum->value, $oCur->decimal, '.', '');
     }
 
     /**
@@ -2233,7 +2228,6 @@ class Order extends BaseModel
         return $iState;
     }
 
-
     /**
      * Checks if delivery set used for current order is available and active.
      * Throws exception if not available
@@ -2259,7 +2253,7 @@ class Order extends BaseModel
 
         $sQ = "select 1 from {$sTable} where {$sTable}.oxid = :oxid and " . $oDelSet->getSqlActiveSnippet();
         $params = [
-            ':oxid' => $oBasket->getShippingId()
+            ':oxid' => $oBasket->getShippingId(),
         ];
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -2413,7 +2407,7 @@ class Order extends BaseModel
             $sParcelService = $oConfig->getConfigParam('sParcelService');
             $sTrackingCode = $this->getTrackCode();
             if ($sParcelService && $sTrackingCode) {
-                $this->_sShipTrackUrl = str_replace("##ID##", $sTrackingCode, $sParcelService);
+                $this->_sShipTrackUrl = str_replace('##ID##', $sTrackingCode, $sParcelService);
             }
         }
 
@@ -2447,7 +2441,7 @@ class Order extends BaseModel
         ";
 
         return (bool) $masterDb->getOne($sql, [
-            ':oxid' => $paymentId
+            ':oxid' => $paymentId,
         ]);
     }
 

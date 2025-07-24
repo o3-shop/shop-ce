@@ -31,5 +31,5 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class ProjectYamlChangedEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 }

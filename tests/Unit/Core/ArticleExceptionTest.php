@@ -26,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class ArticleExceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
-
     /**
      * Contains a test object of oxarticleexception
      *

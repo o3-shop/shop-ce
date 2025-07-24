@@ -31,13 +31,13 @@ DEFINE('ACTION_UPDATE', 3);
 DEFINE('ACTION_UPDATE_STOCK', 4);
 
 use Exception;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use OxidEsales\Eshop\Core\Field;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeModelUpdateEvent;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeModelDeleteEvent;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
+use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelDeleteEvent;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelInsertEvent;
+use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
+use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeModelDeleteEvent;
+use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeModelUpdateEvent;
 
 /**
  * Class BaseModel
@@ -291,7 +291,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
         // implementing lazy loading fields
         // This part of the code is slow and normally is called before field cache is built.
         // Make sure it is not called after first page is loaded and cache data is fully built.
-        if ($this->_blUseLazyLoading && stripos($variableName, $this->_sCoreTable . "__") === 0) {
+        if ($this->_blUseLazyLoading && stripos($variableName, $this->_sCoreTable . '__') === 0) {
             if ($this->getId()) {
                 //lazy load it
                 $fieldName = str_replace($this->_sCoreTable . '__', '', $variableName);
@@ -307,7 +307,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
                         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
                         $query = 'SELECT * FROM ' . $viewName . ' WHERE `oxid` = :oxid';
                         $queryResult = $database->select($query, [
-                            ':oxid' => $id
+                            ':oxid' => $id,
                         ]);
                         if ($queryResult && $queryResult->count()) {
                             $this->_aInnerLazyCache = array_change_key_case($queryResult->fields, CASE_UPPER);
@@ -444,7 +444,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
             $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
             $tableName = $this->getCoreTableName();
             $title = $database->getOne("select `{$fieldName}` from `{$tableName}` where `oxid` = :oxid", [
-                ':oxid' => $this->getId()
+                ':oxid' => $this->getId(),
             ]);
             $fieldValue = "{$tableName}__{$fieldName}";
             $currentTime = $this->$fieldValue->value;
@@ -827,7 +827,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
      */
     public function delete($oxid = null)
     {
-        $oxid = $oxid ? : $this->getId();
+        $oxid = $oxid ?: $this->getId();
         if (!$oxid || !$this->allowDerivedDelete()) {
             return false;
         }
@@ -840,7 +840,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
         $coreTable = $this->getCoreTableName();
         $deleteQuery = "delete from {$coreTable} where oxid = :oxid";
         $affectedRows = $database->execute($deleteQuery, [
-            ':oxid' => $oxid
+            ':oxid' => $oxid,
         ]);
         if ($blDelete = (bool) $affectedRows) {
             $this->onChange(ACTION_DELETE, $oxid);
@@ -954,7 +954,7 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
         $query = "select {$this->_sExistKey} from {$viewName} where {$this->_sExistKey} = :oxid";
 
         return (bool) $database->getOne($query, [
-            ':oxid' => $oxid
+            ':oxid' => $oxid,
         ]);
     }
 
@@ -1292,7 +1292,6 @@ class BaseModel extends \OxidEsales\Eshop\Core\Base
         // situation: only first article is loaded fully for "select oxid from oxarticles"
         //if ($this->_blUseLazyLoading && !isset($this->$sLongFieldName))
         //    return;
-
 
         //in non lazy loading case we just add a field and do not care about it more
         if (

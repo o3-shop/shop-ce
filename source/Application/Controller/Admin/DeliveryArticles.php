@@ -46,13 +46,13 @@ class DeliveryArticles extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        if (isset($soxId) && $soxId != "-1") {
-            $this->createCategoryTree("artcattree");
+        if (isset($soxId) && $soxId != '-1') {
+            $this->createCategoryTree('artcattree');
 
             // load object
             $oDelivery = oxNew(Delivery::class);
             $oDelivery->load($soxId);
-            $this->_aViewData["edit"] = $oDelivery;
+            $this->_aViewData['edit'] = $oDelivery;
 
             //Disable editing for derived articles
             if ($oDelivery->isDerived()) {
@@ -65,14 +65,14 @@ class DeliveryArticles extends AdminDetailsController
             $oDeliveryArticlesAjax = oxNew(DeliveryArticlesAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryArticlesAjax->getColumns();
 
-            return "popups/delivery_articles.tpl";
+            return 'popups/delivery_articles.tpl';
         } elseif ($iAoc == 2) {
             $oDeliveryCategoriesAjax = oxNew(DeliveryCategoriesAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryCategoriesAjax->getColumns();
 
-            return "popups/delivery_categories.tpl";
+            return 'popups/delivery_categories.tpl';
         }
 
-        return "delivery_articles.tpl";
+        return 'delivery_articles.tpl';
     }
 }

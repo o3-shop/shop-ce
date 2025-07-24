@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,21 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxField;
-use \Exception;
-use \oxDb;
+use Exception;
+use oxDb;
+use oxField;
 use OxidEsales\Eshop\Application\Controller\ArticleListController;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Tests for aList class
  */
 class AlistTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -52,14 +53,14 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetAddUrlParams()
     {
-        $this->setRequestParameter("pgNr", 999);
+        $this->setRequestParameter('pgNr', 999);
         $this->setConfigParam('blSeoMode', false);
 
         $oView = oxNew('aList');
 
         $oUBaseView = oxNew('oxUBase');
         $sTestParams = $oUBaseView->getAddUrlParams();
-        $sTestParams .= ($sTestParams ? '&amp;' : '') . "pgNr=999";
+        $sTestParams .= ($sTestParams ? '&amp;' : '') . 'pgNr=999';
 
         $this->assertEquals($sTestParams, $oView->getAddUrlParams());
     }
@@ -82,15 +83,15 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetTitlePageSuffix()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getActPage"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage']);
         $oView->expects($this->once())->method('getActPage')->will($this->returnValue(0));
 
         $this->assertNull($oView->getTitlePageSuffix());
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getActPage"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage']);
         $oView->expects($this->once())->method('getActPage')->will($this->returnValue(1));
 
-        $this->assertEquals(oxRegistry::getLang()->translateString('PAGE') . " " . 2, $oView->getTitlePageSuffix());
+        $this->assertEquals(oxRegistry::getLang()->translateString('PAGE') . ' ' . 2, $oView->getTitlePageSuffix());
     }
 
     /**
@@ -100,20 +101,20 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetMetaDescription()
     {
-        $sCatId = "6b6b64bdcf7c25e92191b1120974af4e";
+        $sCatId = '6b6b64bdcf7c25e92191b1120974af4e';
 
         // Demo data is different in EE and CE
         $shopVersion = 6;
-        $sPrefix = "Woman - Jackets. O3-Shop";
+        $sPrefix = 'Woman - Jackets. O3-Shop';
 
         $oCategory = oxNew('oxCategory');
         $oCategory->load($sCatId);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getActPage", "getActiveCategory"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage', 'getActiveCategory']);
         $oView->expects($this->once())->method('getActPage')->will($this->returnValue(1));
         $oView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
-        $this->assertEquals($sPrefix . ", " . oxRegistry::getLang()->translateString('PAGE') . " " . 2, $oView->getMetaDescription());
+        $this->assertEquals($sPrefix . ', ' . oxRegistry::getLang()->translateString('PAGE') . ' ' . 2, $oView->getMetaDescription());
     }
 
     /**
@@ -123,13 +124,13 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetTreePath()
     {
-        $oCategoryList = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, array("getPath"));
-        $oCategoryList->expects($this->once())->method('getPath')->will($this->returnValue("testPath"));
+        $oCategoryList = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, ['getPath']);
+        $oCategoryList->expects($this->once())->method('getPath')->will($this->returnValue('testPath'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getCategoryTree"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getCategoryTree']);
         $oView->expects($this->once())->method('getCategoryTree')->will($this->returnValue($oCategoryList));
 
-        $this->assertEquals("testPath", $oView->getTreePath());
+        $this->assertEquals('testPath', $oView->getTreePath());
     }
 
     /**
@@ -141,16 +142,16 @@ class AlistTest extends \OxidTestCase
     {
         $this->setConfigParam('blSeoMode', true);
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array("getBaseSeoLink", "getBaseStdLink", "getLanguage"));
-        $oCategory->expects($this->once())->method('getBaseSeoLink')->will($this->returnValue("testSeoUrl"));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getBaseSeoLink', 'getBaseStdLink', 'getLanguage']);
+        $oCategory->expects($this->once())->method('getBaseSeoLink')->will($this->returnValue('testSeoUrl'));
         $oCategory->expects($this->never())->method('getBaseStdLink');
         $oCategory->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getActPage", "getActiveCategory"));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage', 'getActiveCategory']);
         $oListView->expects($this->once())->method('getActPage')->will($this->returnValue(1));
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
-        $this->assertEquals("testSeoUrl", $oListView->getCanonicalUrl());
+        $this->assertEquals('testSeoUrl', $oListView->getCanonicalUrl());
     }
 
     /**
@@ -162,16 +163,16 @@ class AlistTest extends \OxidTestCase
     {
         $this->setConfigParam('blSeoMode', false);
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array("getBaseSeoLink", "getBaseStdLink", "getLanguage"));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getBaseSeoLink', 'getBaseStdLink', 'getLanguage']);
         $oCategory->expects($this->never())->method('getBaseSeoLink');
-        $oCategory->expects($this->once())->method('getBaseStdLink')->will($this->returnValue("testStdUrl"));
+        $oCategory->expects($this->once())->method('getBaseStdLink')->will($this->returnValue('testStdUrl'));
         $oCategory->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getActPage", "getActiveCategory"));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage', 'getActiveCategory']);
         $oListView->expects($this->once())->method('getActPage')->will($this->returnValue(1));
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
-        $this->assertEquals("testStdUrl", $oListView->getCanonicalUrl());
+        $this->assertEquals('testStdUrl', $oListView->getCanonicalUrl());
     }
 
     /**
@@ -193,19 +194,19 @@ class AlistTest extends \OxidTestCase
      */
     public function testProcessListArticles()
     {
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('setLinkType', "appendStdLink", "appendLink"));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['setLinkType', 'appendStdLink', 'appendLink']);
         $oArticle->expects($this->once())->method('setLinkType')->with($this->equalto('xxx'));
         $oArticle->expects($this->once())->method('appendStdLink')->with($this->equalto('testStdParams'));
         $oArticle->expects($this->once())->method('appendLink')->with($this->equalto('testSeoParams'));
         $aArticleList[] = $oArticle;
 
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('setLinkType', "appendStdLink", "appendLink"));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['setLinkType', 'appendStdLink', 'appendLink']);
         $oArticle->expects($this->once())->method('setLinkType')->with($this->equalto('xxx'));
         $oArticle->expects($this->once())->method('appendStdLink')->with($this->equalto('testStdParams'));
         $oArticle->expects($this->once())->method('appendLink')->with($this->equalto('testSeoParams'));
         $aArticleList[] = $oArticle;
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getArticleList', '_getProductLinkType', "getAddUrlParams", "getAddSeoUrlParams"));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getArticleList', '_getProductLinkType', 'getAddUrlParams', 'getAddSeoUrlParams']);
         $oListView->expects($this->once())->method('getArticleList')->will($this->returnValue($aArticleList));
         $oListView->expects($this->once())->method('_getProductLinkType')->will($this->returnValue('xxx'));
         $oListView->expects($this->once())->method('getAddUrlParams')->will($this->returnValue('testStdParams'));
@@ -221,18 +222,17 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetProductLinkType()
     {
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('isPriceCategory'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['isPriceCategory']);
         $oCategory->expects($this->once())->method('isPriceCategory')->will($this->returnValue(true));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCategory));
         $this->assertEquals(3, $oListView->UNITgetProductLinkType());
 
-
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('isPriceCategory'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['isPriceCategory']);
         $oCategory->expects($this->once())->method('isPriceCategory')->will($this->returnValue(false));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCategory));
         $this->assertEquals(0, $oListView->UNITgetProductLinkType());
     }
@@ -249,7 +249,7 @@ class AlistTest extends \OxidTestCase
         $oMoreCat = oxNew('oxCategory');
         $oMoreCat->oxcategories__oxactive = new oxField(1, oxField::T_RAW);
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('setActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['setActiveCategory']);
         $oListView->expects($this->once())->method('setActiveCategory')->with($this->equalto($oMoreCat));
         $this->assertEquals('page/list/morecategories.tpl', $oListView->render());
     }
@@ -261,12 +261,12 @@ class AlistTest extends \OxidTestCase
      */
     public function testLoadArticlesForPriceCategory()
     {
-        oxTestModules::addFunction("oxarticlelist", "loadPriceArticles", "{ throw new Exception( \$aA[0] . \$aA[1] ); }");
+        oxTestModules::addFunction('oxarticlelist', 'loadPriceArticles', '{ throw new Exception( $aA[0] . $aA[1] ); }');
 
         $oCategory = oxNew('oxcategory');
-        $oCategory->oxcategories__oxpricefrom = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oCategory->oxcategories__oxpricefrom = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oCategory->oxcategories__oxpricefrom->expects($this->exactly(2))->method('__get')->will($this->returnValue(10));
-        $oCategory->oxcategories__oxpriceto = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oCategory->oxcategories__oxpriceto = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oCategory->oxcategories__oxpriceto->expects($this->once())->method('__get')->will($this->returnValue(100));
 
         try {
@@ -287,12 +287,12 @@ class AlistTest extends \OxidTestCase
      */
     public function testRenderInactiveCategory()
     {
-        oxTestModules::addFunction("oxUtils", "redirect", "{ throw new Exception('OK'); }");
+        oxTestModules::addFunction('oxUtils', 'redirect', "{ throw new Exception('OK'); }");
 
         $oCat = oxNew('oxCategory');
         $oCat->oxcategories__oxactive = new oxField(0, oxField::T_RAW);
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->atLeastOnce())->method('getActiveCategory')->will($this->returnValue($oCat));
 
         try {
@@ -313,13 +313,13 @@ class AlistTest extends \OxidTestCase
      */
     public function testRender_pageCountIsIncorrect()
     {
-        oxTestModules::addFunction("oxUtils", "redirect", "{ throw new Exception('OK'); }");
+        oxTestModules::addFunction('oxUtils', 'redirect', "{ throw new Exception('OK'); }");
 
-        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('canView'));
+        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['canView']);
         $oCat->expects($this->any())->method('canView')->will($this->returnValue(true));
         $oCat->oxcategories__oxactive = new oxField(1, oxField::T_RAW);
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getArticleList', 'getActPage', 'getPageCount'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getArticleList', 'getActPage', 'getPageCount']);
         $oListView->expects($this->atLeastOnce())->method('getActiveCategory')->will($this->returnValue($oCat));
         $oListView->expects($this->once())->method('getActPage')->will($this->returnValue(12));
         $oListView->expects($this->once())->method('getPageCount')->will($this->returnValue(10));
@@ -343,15 +343,15 @@ class AlistTest extends \OxidTestCase
      */
     public function testRender_pageCountIsZero()
     {
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('handlePageNotFoundError'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $utils->expects($this->once())->method('handlePageNotFoundError');
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
-        $category = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('canView'));
+        $category = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['canView']);
         $category->expects($this->any())->method('canView')->will($this->returnValue(true));
         $category->oxcategories__oxactive = new oxField(1, oxField::T_RAW);
 
-        $listView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getArticleList', 'getActPage', 'getPageCount'));
+        $listView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getArticleList', 'getActPage', 'getPageCount']);
         $listView->expects($this->atLeastOnce())->method('getActiveCategory')->will($this->returnValue($category));
         $listView->expects($this->once())->method('getActPage')->will($this->returnValue(12));
         $listView->expects($this->once())->method('getPageCount')->will($this->returnValue(0));
@@ -374,7 +374,7 @@ class AlistTest extends \OxidTestCase
         $oListView = oxNew('aList');
         $oListView->executefilter();
 
-        $this->assertEquals(array('somecategory' => array('0' => 'somefilter')), $this->getSessionParam('session_attrfilter'));
+        $this->assertEquals(['somecategory' => ['0' => 'somefilter']], $this->getSessionParam('session_attrfilter'));
     }
 
     /**
@@ -402,7 +402,7 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetSubject()
     {
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue('getActiveCategory'));
 
         $this->assertEquals('getActiveCategory', $oListView->UNITgetSubject(oxRegistry::getLang()->getBaseLanguage()));
@@ -418,17 +418,17 @@ class AlistTest extends \OxidTestCase
         $this->markTestSkipped('Bug: Method not called.');
 
         $oCat = oxNew('oxcategory');
-        $oCat->oxcategories__oxshowsuffix = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oCat->oxcategories__oxshowsuffix = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oCat->oxcategories__oxshowsuffix->expects($this->once())->method('__get')->will($this->returnValue(true));
 
         $oShop = oxNew('oxshop');
-        $oShop->oxshops__oxtitlesuffix = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oShop->oxshops__oxtitlesuffix = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oShop->oxshops__oxtitlesuffix->expects($this->once())->method('__get')->will($this->returnValue('testsuffix'));
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getActiveShop'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveShop']);
         $oConfig->expects($this->once())->method('getActiveShop')->will($this->returnValue($oShop));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getConfig'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getConfig']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCat));
         $oListView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
 
@@ -440,21 +440,21 @@ class AlistTest extends \OxidTestCase
      *
      * @return null
      */
-//    public function testGetDefaultSorting()
-//    {
-//        //$oList = oxNew('aList');
-//
-//        $oCat = oxNew('oxcategory');
-//        $sArticleTable = getViewName( 'oxarticles' );
-//        $aSorting = array( 'sortby' => $sArticleTable.'.'.'oxid', 'sortdir' => 'asc' );
-//
-//        $oCat->oxcategories__oxdefsort = new oxField( 'oxid' );
-//        //$oList->setActCategory($oCat);
-//        $oListView = $this->getMock( 'alist', array( 'getActiveCategory' ) );
-//        $oListView->expects( $this->once() )->method( 'getActiveCategory')->will( $this->returnValue( $oCat ) );
-//
-//        $this->assertEquals($aSorting ,$oListView->getDefaultSorting());
-//    }
+    //    public function testGetDefaultSorting()
+    //    {
+    //        //$oList = oxNew('aList');
+    //
+    //        $oCat = oxNew('oxcategory');
+    //        $sArticleTable = getViewName( 'oxarticles' );
+    //        $aSorting = array( 'sortby' => $sArticleTable.'.'.'oxid', 'sortdir' => 'asc' );
+    //
+    //        $oCat->oxcategories__oxdefsort = new oxField( 'oxid' );
+    //        //$oList->setActCategory($oCat);
+    //        $oListView = $this->getMock( 'alist', array( 'getActiveCategory' ) );
+    //        $oListView->expects( $this->once() )->method( 'getActiveCategory')->will( $this->returnValue( $oCat ) );
+    //
+    //        $this->assertEquals($aSorting ,$oListView->getDefaultSorting());
+    //    }
 
     /**
      * Test getDefaultSorting when default sorting is not set
@@ -465,7 +465,7 @@ class AlistTest extends \OxidTestCase
     {
         $oController = oxNew('aList');
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getDefaultSorting'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getDefaultSorting']);
         $oCategory->expects($this->any())->method('getDefaultSorting')->will($this->returnValue(''));
         $oController->setActiveCategory($oCategory);
 
@@ -481,12 +481,12 @@ class AlistTest extends \OxidTestCase
     {
         $oController = oxNew('aList');
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getDefaultSorting'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getDefaultSorting']);
         $oCategory->expects($this->any())->method('getDefaultSorting')->will($this->returnValue('testsort'));
         $oController->setActiveCategory($oCategory);
 
         $sArticleTable = getViewName('oxarticles');
-        $this->assertEquals(array('sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => "asc"), $oController->getDefaultSorting());
+        $this->assertEquals(['sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => 'asc'], $oController->getDefaultSorting());
     }
 
     /**
@@ -498,13 +498,13 @@ class AlistTest extends \OxidTestCase
     {
         $oController = oxNew('aList');
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getDefaultSorting', 'getDefaultSortingMode'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getDefaultSorting', 'getDefaultSortingMode']);
         $oCategory->expects($this->any())->method('getDefaultSorting')->will($this->returnValue('testsort'));
         $oCategory->expects($this->any())->method('getDefaultSortingMode')->will($this->returnValue(null));
         $oController->setActiveCategory($oCategory);
 
         $sArticleTable = getViewName('oxarticles');
-        $this->assertEquals(array('sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => "asc"), $oController->getDefaultSorting());
+        $this->assertEquals(['sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => 'asc'], $oController->getDefaultSorting());
     }
 
     /**
@@ -517,14 +517,14 @@ class AlistTest extends \OxidTestCase
     {
         $oController = oxNew('aList');
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getDefaultSorting', 'getDefaultSortingMode'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getDefaultSorting', 'getDefaultSortingMode']);
         $oCategory->expects($this->any())->method('getDefaultSorting')->will($this->returnValue('testsort'));
         $oCategory->expects($this->any())->method('getDefaultSortingMode')->will($this->returnValue(false));
 
         $oController->setActiveCategory($oCategory);
 
         $sArticleTable = getViewName('oxarticles');
-        $this->assertEquals(array('sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => "asc"), $oController->getDefaultSorting());
+        $this->assertEquals(['sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => 'asc'], $oController->getDefaultSorting());
     }
 
     /**
@@ -536,14 +536,14 @@ class AlistTest extends \OxidTestCase
     {
         $oController = oxNew('aList');
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getDefaultSorting', 'getDefaultSortingMode'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getDefaultSorting', 'getDefaultSortingMode']);
         $oCategory->expects($this->any())->method('getDefaultSorting')->will($this->returnValue('testsort'));
         $oCategory->expects($this->any())->method('getDefaultSortingMode')->will($this->returnValue(true));
 
         $oController->setActiveCategory($oCategory);
 
         $sArticleTable = getViewName('oxarticles');
-        $this->assertEquals(array('sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => "desc"), $oController->getDefaultSorting());
+        $this->assertEquals(['sortby' => $sArticleTable . '.' . 'testsort', 'sortdir' => 'desc'], $oController->getDefaultSorting());
     }
 
     /**
@@ -555,10 +555,10 @@ class AlistTest extends \OxidTestCase
     {
         $sTestLink = 'testLink';
 
-        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getLink'));
+        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getLink']);
         $oCat->expects($this->once())->method('getLink')->will($this->returnValue($sTestLink));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCat));
 
         $this->assertEquals($sTestLink, $oListView->generatePageNavigationUrl());
@@ -571,7 +571,7 @@ class AlistTest extends \OxidTestCase
      */
     public function testGeneratePageNavigationUrl()
     {
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue(null));
 
         $oView = oxNew('oxubase');
@@ -592,7 +592,7 @@ class AlistTest extends \OxidTestCase
         $oView = oxNew('oxUBase');
         $sViewId = md5($oView->getViewId() . '|xxx|999|100|grid');
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActPage'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage']);
         $oListView->expects($this->any())->method('getActPage')->will($this->returnValue('999'));
         $this->assertEquals($sViewId, $oListView->getViewId());
     }
@@ -604,14 +604,14 @@ class AlistTest extends \OxidTestCase
     {
         $this->setRequestParameter('cnid', 'xxx');
         $this->setSessionParam('_artperpage', '100');
-        $this->setSessionParam('session_attrfilter', array('xxx' => array('0' => array('100'))));
+        $this->setSessionParam('session_attrfilter', ['xxx' => ['0' => ['100']]]);
 
         $oView = oxNew('oxUBase');
         $sListType = $this->getConfig()->getConfigParam('sDefaultListDisplayType');
 
         $sViewId = md5($oView->getViewId() . '|xxx|999|100|' . $sListType);
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActPage'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActPage']);
         $oListView->expects($this->any())->method('getActPage')->will($this->returnValue('999'));
         $this->assertEquals($sViewId, $oListView->getViewId());
     }
@@ -624,12 +624,12 @@ class AlistTest extends \OxidTestCase
     public function testGetCatPathString()
     {
         $oCategory = oxNew('oxcategory');
-        $oCategory->oxcategories__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oCategory->oxcategories__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oCategory->oxcategories__oxtitle->expects($this->any())->method('__get')->will($this->returnValue('testTitle'));
 
-        $aPath = array($oCategory, $oCategory);
+        $aPath = [$oCategory, $oCategory];
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getCatTreePath'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getCatTreePath']);
         $oListView->expects($this->any())->method('getCatTreePath')->will($this->returnValue($aPath));
 
         $this->assertEquals(strtolower('testTitle, testTitle'), $oListView->UNITgetCatPathString());
@@ -643,11 +643,11 @@ class AlistTest extends \OxidTestCase
     public function testCollectMetaDescription()
     {
         $oActCat = oxNew('oxcategory');
-        $oActCat->oxcategories__oxlongdesc = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oActCat->oxcategories__oxlongdesc = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oActCat->oxcategories__oxlongdesc->expects($this->once())->method('__get')->will($this->returnValue(''));
 
         $oArticle = oxNew('oxArticle');
-        $oArticle->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oArticle->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oArticle->oxarticles__oxtitle->expects($this->exactly(2))->method('__get')->will($this->returnValue('testtitle'));
 
         $oArtList = oxNew('oxlist');
@@ -656,7 +656,7 @@ class AlistTest extends \OxidTestCase
 
         $sCatPathString = 'sCatPathString';
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getArticleList', '_getCatPathString'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getArticleList', '_getCatPathString']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oActCat));
         $oListView->expects($this->any())->method('getArticleList')->will($this->returnValue($oArtList));
         $oListView->expects($this->any())->method('_getCatPathString')->will($this->returnValue($sCatPathString));
@@ -675,7 +675,7 @@ class AlistTest extends \OxidTestCase
     public function testCollectMetaKeyword()
     {
         $oLongDesc = new oxField('testtitle');
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('getLongDescription'));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getLongDescription']);
         $oArticle->expects($this->exactly(2))->method('getLongDescription')->will($this->returnValue($oLongDesc));
 
         $oArtList = oxNew('oxlist');
@@ -684,7 +684,7 @@ class AlistTest extends \OxidTestCase
 
         $sCatPathString = 'sCatPathString';
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getArticleList', '_getCatPathString', '_prepareMetaDescription'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getArticleList', '_getCatPathString', '_prepareMetaDescription']);
         $oListView->expects($this->any())->method('_prepareMetaDescription')->with($this->equalTo('sCatPathString, testtitle, testtitle'))->will($this->returnValue('test'));
         $oListView->expects($this->any())->method('getArticleList')->will($this->returnValue($oArtList));
         $oListView->expects($this->any())->method('_getCatPathString')->will($this->returnValue($sCatPathString));
@@ -700,7 +700,7 @@ class AlistTest extends \OxidTestCase
     public function testCollectMetaKeywordLongerThen60()
     {
         $oLongDesc = new oxField('testtitle Originelle, witzige Geschenkideen - Lifestyle, Trends, Accessoires');
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('getLongDescription'));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getLongDescription']);
         $oArticle->expects($this->exactly(1))->method('getLongDescription')->will($this->returnValue($oLongDesc));
 
         $oArtList = oxNew('oxlist');
@@ -708,7 +708,7 @@ class AlistTest extends \OxidTestCase
 
         $sCatPathString = 'sCatPathString';
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getArticleList', '_getCatPathString', '_prepareMetaDescription'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getArticleList', '_getCatPathString', '_prepareMetaDescription']);
         $oListView->expects($this->any())->method('_prepareMetaDescription')->with($this->equalTo('sCatPathString, testtitle originelle, witzige geschenkideen - lifestyle, '))->will($this->returnValue('test'));
         $oListView->expects($this->any())->method('getArticleList')->will($this->returnValue($oArtList));
         $oListView->expects($this->any())->method('_getCatPathString')->will($this->returnValue($sCatPathString));
@@ -727,10 +727,10 @@ class AlistTest extends \OxidTestCase
         $oCategory->oxcategories__oxtemplate = new oxfield('test.tpl');
 
         // default template name
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $this->assertEquals('page/list/list.tpl', $oListView->getTemplateName());
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
         // category template name
@@ -755,7 +755,7 @@ class AlistTest extends \OxidTestCase
         $oCategory->load('6b6b64bdcf7c25e92191b1120974af4e');
         $sUrl = $oCategory->getLink();
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
         $this->assertEquals($sUrl, $oListView->UNITaddPageNrParam($sUrl, 0, 0));
     }
@@ -767,16 +767,16 @@ class AlistTest extends \OxidTestCase
      */
     public function testAddPageNrParamSeoOnSecondPage()
     {
-        oxTestModules::addFunction("oxutilsserver", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
+        oxTestModules::addFunction('oxutilsserver', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
 
         $oCategory = oxNew('oxcategory');
         $oCategory->load('6b6b64bdcf7c25e92191b1120974af4e');
 
         $sUrl = $oCategory->getLink();
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
-        $this->assertEquals($sUrl . "?pgNr=1", $oListView->UNITaddPageNrParam($sUrl, 1, 0));
+        $this->assertEquals($sUrl . '?pgNr=1', $oListView->UNITaddPageNrParam($sUrl, 1, 0));
     }
 
     /**
@@ -790,10 +790,10 @@ class AlistTest extends \OxidTestCase
         $oCategory->load('6b6b64bdcf7c25e92191b1120974af4e');
         $sUrl = $oCategory->getStdLink();
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue(null));
 
-        $this->assertEquals($sUrl . "&amp;pgNr=10", $oListView->UNITaddPageNrParam($sUrl, 10, 0));
+        $this->assertEquals($sUrl . '&amp;pgNr=10', $oListView->UNITaddPageNrParam($sUrl, 10, 0));
     }
 
     /**
@@ -822,10 +822,10 @@ class AlistTest extends \OxidTestCase
         $aCatTree[] = $oParentCategory;
         $aCatTree[] = $oCategory;
 
-        $oCategoryTree = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, array('getPath'));
+        $oCategoryTree = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, ['getPath']);
         $oCategoryTree->expects($this->any())->method('getPath')->will($this->returnValue($aCatTree));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getCategoryTree'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getCategoryTree']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
         $oListView->expects($this->any())->method('getCategoryTree')->will($this->returnValue($oCategoryTree));
 
@@ -848,11 +848,11 @@ class AlistTest extends \OxidTestCase
 
         $oCategory->setParentCategory($oParentCategory);
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
         $shopVersion = 6;
-        $sExpect = "parent category - category. O3-Shop";
+        $sExpect = 'parent category - category. O3-Shop';
         //expected string changed due to #2776
         $this->assertEquals(
             $sExpect,
@@ -871,10 +871,10 @@ class AlistTest extends \OxidTestCase
         $oAttr = oxNew('oxAttribute');
         $oAttrList->offsetSet(1, $oAttr);
 
-        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getAttributes'));
+        $oCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getAttributes']);
         $oCategory->expects($this->any())->method('getAttributes')->will($this->returnValue($oAttrList));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
 
         $this->assertEquals($oAttrList->getArray(), $oListView->getAttributes()->getArray());
@@ -887,14 +887,13 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetSimilarRecommListIds()
     {
-        $aArrayKeys = array("articleId");
-        $oArtList = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, array("count", "arrayKeys"));
-        $oArtList->expects($this->once())->method("arrayKeys")->will($this->returnValue($aArrayKeys));
+        $aArrayKeys = ['articleId'];
+        $oArtList = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, ['count', 'arrayKeys']);
+        $oArtList->expects($this->once())->method('arrayKeys')->will($this->returnValue($aArrayKeys));
 
-
-        $oSearch = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getArticleList"));
-        $oSearch->expects($this->once())->method("getArticleList")->will($this->returnValue($oArtList));
-        $this->assertEquals($aArrayKeys, $oSearch->getSimilarRecommListIds(), "getSimilarRecommListIds() should return array of keys from result of getArticleList()");
+        $oSearch = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getArticleList']);
+        $oSearch->expects($this->once())->method('getArticleList')->will($this->returnValue($oArtList));
+        $this->assertEquals($aArrayKeys, $oSearch->getSimilarRecommListIds(), 'getSimilarRecommListIds() should return array of keys from result of getArticleList()');
     }
 
     /**
@@ -904,8 +903,8 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetPageNavigation()
     {
-        $oObj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('generatePageNavigation'));
-        $oObj->expects($this->any())->method('generatePageNavigation')->will($this->returnValue("aaa"));
+        $oObj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['generatePageNavigation']);
+        $oObj->expects($this->any())->method('generatePageNavigation')->will($this->returnValue('aaa'));
         $this->assertEquals('aaa', $oObj->getPageNavigation());
     }
 
@@ -916,7 +915,7 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetArticleList()
     {
-        $oObj = $this->getProxyClass("alist");
+        $oObj = $this->getProxyClass('alist');
         $this->setRequestParameter('cnid', '943173edecf6d6870a0f357b8ac84d32');
         $this->setConfigParam('iNrofCatArticles', 10);
         $oObj->render();
@@ -931,9 +930,9 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetCatTreePath()
     {
-        $oCatTree = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, array('getPath'));
-        $oCatTree->expects($this->any())->method('getPath')->will($this->returnValue("aaa"));
-        $oObj = $this->getProxyClass("alist");
+        $oCatTree = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, ['getPath']);
+        $oCatTree->expects($this->any())->method('getPath')->will($this->returnValue('aaa'));
+        $oObj = $this->getProxyClass('alist');
         $oObj->setCategoryTree($oCatTree);
         $this->assertEquals('aaa', $oObj->getCatTreePath());
     }
@@ -945,10 +944,10 @@ class AlistTest extends \OxidTestCase
      */
     public function testHasVisibleSubCats()
     {
-        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getHasVisibleSubCats'));
+        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getHasVisibleSubCats']);
         $oCat->expects($this->any())->method('getHasVisibleSubCats')->will($this->returnValue(true));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCat));
 
         $this->assertTrue($oListView->hasVisibleSubCats());
@@ -961,10 +960,10 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetSubCatList()
     {
-        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getSubCats'));
+        $oCat = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getSubCats']);
         $oCat->expects($this->any())->method('getSubCats')->will($this->returnValue('aaa'));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCat));
 
         $this->assertEquals('aaa', $oListView->getSubCatList());
@@ -980,7 +979,7 @@ class AlistTest extends \OxidTestCase
         $oCat = oxNew('oxCategory');
         $oCat->load('943173edecf6d6870a0f357b8ac84d32');
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCat));
 
         $this->assertEquals('Men', $oListView->getTitle());
@@ -993,7 +992,7 @@ class AlistTest extends \OxidTestCase
     {
         $sCatId = 'oxmore';
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getCategoryId'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getCategoryId']);
         $oListView->expects($this->any())->method('getCategoryId')->will($this->returnValue($sCatId));
 
         $this->assertEquals(oxRegistry::getLang()->translateString('CATEGORY_OVERVIEW', oxRegistry::getLang()->getBaseLanguage(), false), $oListView->getTitle());
@@ -1006,8 +1005,8 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetBargainArticleList()
     {
-        $oObj = $this->getProxyClass("alist");
-        $oObj->setNonPublicVar("_blIsCat", true);
+        $oObj = $this->getProxyClass('alist');
+        $oObj->setNonPublicVar('_blIsCat', true);
 
         $aList = $oObj->getBargainArticleList();
         $count = $this->getTestConfig()->getShopEdition() == 'EE' ? 6 : 4;
@@ -1025,15 +1024,15 @@ class AlistTest extends \OxidTestCase
 
         $this->setRequestParameter('cnid', $sCatId);
 
-        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('_prepareMetaKeyword'));
-        $oSubj->expects($this->any())->method('_prepareMetaKeyword')->will($this->returnValue("aaa"));
+        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['_prepareMetaKeyword']);
+        $oSubj->expects($this->any())->method('_prepareMetaKeyword')->will($this->returnValue('aaa'));
 
         $oSubj->setCategoryId($sCatId);
         $oSubj->render();
 
         $oSubj->render();
         $sMetaKeywords = $oSubj->getMetaKeywords();
-        $this->assertEquals("aaa", $sMetaKeywords);
+        $this->assertEquals('aaa', $sMetaKeywords);
     }
 
     /**
@@ -1048,15 +1047,15 @@ class AlistTest extends \OxidTestCase
         $this->setRequestParameter('cnid', $sCatId);
 
         /** @var AList|PHPUnit\Framework\MockObject\MockObject $oSubj */
-        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('_prepareMetaKeyword'));
-        $oSubj->expects($this->any())->method('_prepareMetaKeyword')->will($this->returnValue("aaa"));
+        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['_prepareMetaKeyword']);
+        $oSubj->expects($this->any())->method('_prepareMetaKeyword')->will($this->returnValue('aaa'));
 
         $oSubj->setCategoryId($sCatId);
         $oSubj->render();
 
         $oSubj->render();
         $oSubj->getMetaKeywords();
-        $this->assertEquals("aaa", $oSubj->getMetaKeywords());
+        $this->assertEquals('aaa', $oSubj->getMetaKeywords());
     }
 
     /**
@@ -1071,7 +1070,6 @@ class AlistTest extends \OxidTestCase
         $this->assertEquals('aaa', $oArticleList->getActiveCategory());
     }
 
-
     /**
      * Testing allist::getBreadCrumb()
      *
@@ -1079,18 +1077,18 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetBreadCrumb()
     {
-        $oCat1 = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getLink'));
+        $oCat1 = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getLink']);
         $oCat1->expects($this->once())->method('getLink')->will($this->returnValue('linkas1'));
         $oCat1->oxcategories__oxtitle = new oxField('title1');
 
-        $oCat2 = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, array('getLink'));
+        $oCat2 = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['getLink']);
         $oCat2->expects($this->once())->method('getLink')->will($this->returnValue('linkas2'));
         $oCat2->oxcategories__oxtitle = new oxField('title2');
 
-        $oCategoryList = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, array('getPath'));
-        $oCategoryList->expects($this->once())->method('getPath')->will($this->returnValue(array($oCat1, $oCat2)));
+        $oCategoryList = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, ['getPath']);
+        $oCategoryList->expects($this->once())->method('getPath')->will($this->returnValue([$oCat1, $oCat2]));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getCategoryTree"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getCategoryTree']);
         $oView->expects($this->once())->method('getCategoryTree')->will($this->returnValue($oCategoryList));
 
         $this->assertTrue(count($oView->getBreadCrumb()) == 2);
@@ -1105,14 +1103,14 @@ class AlistTest extends \OxidTestCase
     {
         $this->setRequestParameter('cnid', 'oxmore');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array("getCategoryTree", "getLink"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getCategoryTree', 'getLink']);
         $oView->expects($this->never())->method('getCategoryTree');
-        $oView->expects($this->once())->method('getLink')->will($this->returnValue("moreLink"));
+        $oView->expects($this->once())->method('getLink')->will($this->returnValue('moreLink'));
 
         $aPath = $oView->getBreadCrumb();
         $this->assertEquals(1, count($aPath));
         $this->assertNotNull($aPath[0]['title']);
-        $this->assertEquals("moreLink", $aPath[0]['link']);
+        $this->assertEquals('moreLink', $aPath[0]['link']);
     }
 
     /**
@@ -1124,10 +1122,10 @@ class AlistTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Method not called.');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getConfigParam'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
         $oConfig->expects($this->once())->method('getConfigParam')->will($this->returnValue(true));
 
-        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getConfig'));
+        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getConfig']);
         $oSubj->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->assertEquals(true, $oSubj->canSelectDisplayType());
@@ -1140,8 +1138,8 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetActPage()
     {
-        $oList = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('_getRequestPageNr'));
-        $oList->expects($this->once())->method('_getRequestPageNr')->will($this->returnValue("10"));
+        $oList = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['_getRequestPageNr']);
+        $oList->expects($this->once())->method('_getRequestPageNr')->will($this->returnValue('10'));
 
         $this->assertEquals(10, $oList->getActPage());
     }
@@ -1153,8 +1151,8 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetPageCount()
     {
-        $oList = $this->getProxyClass("aList");
-        $oList->setNonPublicVar("_iCntPages", 10);
+        $oList = $this->getProxyClass('aList');
+        $oList->setNonPublicVar('_iCntPages', 10);
 
         $this->assertEquals(10, $oList->getPageCount());
     }

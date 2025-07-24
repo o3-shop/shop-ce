@@ -388,7 +388,7 @@ class ListComponentAjax extends Base
      */
     protected function getQueryCols()
     {
-        $sQ = $this->buildColsQuery($this->getVisibleColNames(), false) . ", ";
+        $sQ = $this->buildColsQuery($this->getVisibleColNames(), false) . ', ';
         $sQ .= $this->buildColsQuery($this->getIdentColNames());
 
         return " $sQ ";
@@ -1001,5 +1001,5 @@ class ListComponentAjax extends Base
      */
     protected function resetCaches()
     {
-    }    
+    }
 }

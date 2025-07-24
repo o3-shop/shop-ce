@@ -44,7 +44,7 @@ class ArticleBundleAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -99,14 +99,14 @@ class ArticleBundleAjax extends ListComponentAjax
                 $sVariantsSqlSnippet = $blVariantsSelectionParameter ? $sSqlIfTrue : $sSqlIfFalse;
 
                 $sQAdd = " from {$sView} as oxobject2category left join {$sArticleTable} on {$sVariantsSqlSnippet}" .
-                         " where oxobject2category.oxcatnid = " . $oDb->quote($sSelId) . " ";
+                         ' where oxobject2category.oxcatnid = ' . $oDb->quote($sSelId) . ' ';
             }
         }
         // #1513C/#1826C - skip references, to not existing articles
         $sQAdd .= " and $sArticleTable.oxid IS NOT NULL ";
 
         // skipping self from list
-        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . " ";
+        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . ' ';
 
         return $sQAdd;
     }
@@ -165,13 +165,13 @@ class ArticleBundleAjax extends ListComponentAjax
     {
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "update oxarticles set oxarticles.oxbundleid = :oxbundleid " .
-              "where oxarticles.oxid  = :oxid ";
+        $sQ = 'update oxarticles set oxarticles.oxbundleid = :oxbundleid ' .
+              'where oxarticles.oxid  = :oxid ';
         $oDb->Execute(
             $sQ,
             [
                 ':oxbundleid' => Registry::getRequest()->getRequestEscapedParameter('oxbundleid'),
-                ':oxid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
+                ':oxid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
             ]
         );
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,13 +22,13 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Smarty\Configuration;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyConfigurationFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyPluginsDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyPrefiltersDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyResourcesDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartySecuritySettingsDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartySettingsDataProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyContextInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyConfigurationFactory;
 
 class SmartyConfigurationFactoryTest extends \PHPUnit\Framework\TestCase
 {

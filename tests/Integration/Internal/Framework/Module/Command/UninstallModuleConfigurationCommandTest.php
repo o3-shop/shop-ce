@@ -32,7 +32,7 @@ final class UninstallModuleConfigurationCommandTest extends ModuleCommandsTestCa
     {
         $this->cleanupTestData();
     }
-    
+
     public function testRemoveModuleConfig(): void
     {
         $this->installTestModule();

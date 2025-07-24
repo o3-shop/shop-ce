@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -30,7 +31,6 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 
 /**
@@ -177,8 +177,8 @@ class RecommendationList extends BaseModel implements IUrl
         if (($blDelete = parent::delete($sOXID))) {
             $oDb = DatabaseProvider::getDb();
             // cleaning up related data
-            $oDb->execute("delete from oxobject2list where oxlistid = :oxlistid", [
-                ':oxlistid' => $sOXID
+            $oDb->execute('delete from oxobject2list where oxlistid = :oxlistid', [
+                ':oxlistid' => $sOXID,
             ]);
             $this->onDelete();
         }
@@ -206,7 +206,7 @@ class RecommendationList extends BaseModel implements IUrl
 
         return $oDb->getOne($sSelect, [
             ':oxlistid' => $this->getId(),
-            ':oxobjectid' => $sOXID
+            ':oxobjectid' => $sOXID,
         ]);
     }
 
@@ -223,11 +223,11 @@ class RecommendationList extends BaseModel implements IUrl
     {
         if ($sOXID) {
             $oDb = DatabaseProvider::getDb();
-            $sQ = "delete from oxobject2list where oxobjectid = :oxobjectid and oxlistid = :oxlistid";
+            $sQ = 'delete from oxobject2list where oxobjectid = :oxobjectid and oxlistid = :oxlistid';
 
             return $oDb->execute($sQ, [
                 ':oxobjectid' => $sOXID,
-                ':oxlistid' => $this->getId()
+                ':oxlistid' => $this->getId(),
             ]);
         }
     }
@@ -249,22 +249,22 @@ class RecommendationList extends BaseModel implements IUrl
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
             $database = DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sql = "select oxid from oxobject2list 
+            $sql = 'select oxid from oxobject2list 
                 where oxobjectid = :oxobjectid 
-                    and oxlistid = :oxlistid";
+                    and oxlistid = :oxlistid';
             $params = [
                 ':oxobjectid' => $sOXID,
-                ':oxlistid' => $this->getId()
+                ':oxlistid' => $this->getId(),
             ];
 
             if (!$database->getOne($sql, $params)) {
                 $sUid = Registry::getUtilsObject()->generateUID();
-                $sQ = "insert into oxobject2list (oxid, oxobjectid, oxlistid, oxdesc) values (:oxid, :oxobjectid, :oxlistid, :oxdesc)";
+                $sQ = 'insert into oxobject2list (oxid, oxobjectid, oxlistid, oxdesc) values (:oxid, :oxobjectid, :oxlistid, :oxdesc)';
                 $blAdd = $database->execute($sQ, [
                     ':oxid' => $sUid,
                     ':oxobjectid' => $sOXID,
                     ':oxlistid' => $this->getId(),
-                    ':oxdesc' => $sDesc
+                    ':oxdesc' => $sDesc,
                 ]);
             }
         }
@@ -288,7 +288,7 @@ class RecommendationList extends BaseModel implements IUrl
         if (is_array($aArticleIds) && count($aArticleIds)) {
             startProfile(__FUNCTION__);
 
-            $sIds = implode(",", DatabaseProvider::getDb()->quoteArray($aArticleIds));
+            $sIds = implode(',', DatabaseProvider::getDb()->quoteArray($aArticleIds));
 
             $oRecommList = oxNew(ListModel::class);
             $oRecommList->init('oxrecommlist');
@@ -297,17 +297,17 @@ class RecommendationList extends BaseModel implements IUrl
 
             $oRecommList->setSqlLimit(0, $iCnt);
 
-            $sSelect = "SELECT distinct lists.* FROM oxobject2list AS o2l_lists";
-            $sSelect .= " LEFT JOIN oxobject2list AS o2l_count ON o2l_lists.oxlistid = o2l_count.oxlistid";
-            $sSelect .= " LEFT JOIN oxrecommlists as lists ON o2l_lists.oxlistid = lists.oxid";
+            $sSelect = 'SELECT distinct lists.* FROM oxobject2list AS o2l_lists';
+            $sSelect .= ' LEFT JOIN oxobject2list AS o2l_count ON o2l_lists.oxlistid = o2l_count.oxlistid';
+            $sSelect .= ' LEFT JOIN oxrecommlists as lists ON o2l_lists.oxlistid = lists.oxid';
             $sSelect .= " WHERE o2l_lists.oxobjectid IN ( $sIds ) and lists.oxshopid = :oxshopid";
-            $sSelect .= " GROUP BY lists.oxid order by (";
-            $sSelect .= " SELECT count( order1.oxobjectid ) FROM oxobject2list AS order1";
+            $sSelect .= ' GROUP BY lists.oxid order by (';
+            $sSelect .= ' SELECT count( order1.oxobjectid ) FROM oxobject2list AS order1';
             $sSelect .= " WHERE order1.oxobjectid IN ( $sIds ) AND o2l_lists.oxlistid = order1.oxlistid";
-            $sSelect .= " ) DESC, count( lists.oxid ) DESC";
+            $sSelect .= ' ) DESC, count( lists.oxid ) DESC';
 
             $oRecommList->selectString($sSelect, [
-                ':oxshopid' => Registry::getConfig()->getShopId()
+                ':oxshopid' => Registry::getConfig()->getShopId(),
             ]);
 
             stopProfile(__FUNCTION__);
@@ -338,7 +338,7 @@ class RecommendationList extends BaseModel implements IUrl
     protected function _loadFirstArticles(ListModel $oRecommList, $aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aIds = DatabaseProvider::getDb()->quoteArray($aIds);
-        $sIds = implode(", ", $aIds);
+        $sIds = implode(', ', $aIds);
 
         $aPrevIds = [];
         $sArtView = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
@@ -360,7 +360,7 @@ class RecommendationList extends BaseModel implements IUrl
                 $sId = $oArticle->getId();
                 $aPrevIds[$sId] = $sId;
                 unset($aIds[$sId]);
-                $sIds = implode(", ", $aIds);
+                $sIds = implode(', ', $aIds);
             } else {
                 unset($oRecommList[$key]);
             }
@@ -431,8 +431,8 @@ class RecommendationList extends BaseModel implements IUrl
         $iShopId = Registry::getConfig()->getShopId();
         $sSearchStrQuoted = DatabaseProvider::getDb()->quote("%$sSearchStr%");
 
-        $sSelect = "select distinct rl.* from oxrecommlists as rl";
-        $sSelect .= " inner join oxobject2list as o2l on o2l.oxlistid = rl.oxid";
+        $sSelect = 'select distinct rl.* from oxrecommlists as rl';
+        $sSelect .= ' inner join oxobject2list as o2l on o2l.oxlistid = rl.oxid';
         $sSelect .= " where ( rl.oxtitle like $sSearchStrQuoted or rl.oxdesc like $sSearchStrQuoted";
         $sSelect .= " or o2l.oxdesc like $sSearchStrQuoted ) and rl.oxshopid = '$iShopId'";
 
@@ -548,7 +548,7 @@ class RecommendationList extends BaseModel implements IUrl
             $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=recommlist" . ($blAddId ? "&amp;recommid=" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=recommlist' . ($blAddId ? '&amp;recommid=' . $this->getId() : '');
     }
 
     /**

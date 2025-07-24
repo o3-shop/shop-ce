@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxDb;
+use oxDb;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
-use oxVoucherException;
 
 /**
  * Testing oxVoucher class
  */
 class VoucherExcludeTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -157,7 +157,7 @@ class VoucherExcludeTest extends \OxidTestCase
          Total: 751-250              = 501       Total: 751-450              = 301       Total: 751-50               = 701
 
         */
-        $sShopFields = "`OXSHOPID`";
+        $sShopFields = '`OXSHOPID`';
         $sShopId = ShopIdCalculator::BASE_SHOP_ID;
         $sShopValues = $sShopId;
 
@@ -240,10 +240,10 @@ class VoucherExcludeTest extends \OxidTestCase
         $sValuesPart = "('test_c2',$sShopValues,'1','c2');";
         $this->addToDatabase($sInsertCategoriesPart . $sValuesPart, 'oxcategories');
 
-        $sInsertCategoryRelationsPart = "
+        $sInsertCategoryRelationsPart = '
         INSERT INTO `oxobject2category`
         (`OXID`, `OXCATNID`, `OXOBJECTID`)
-        VALUES ";
+        VALUES ';
 
         $sValuesPart = "('test_r00','test_c0','test_a0')";
         $this->addToDatabase($sInsertCategoryRelationsPart . $sValuesPart, 'oxobject2category');
@@ -352,7 +352,6 @@ class VoucherExcludeTest extends \OxidTestCase
         ('test_i83','test_o8','test_a3','5','150','150','0','0','30','30','30',$sShopId),
         ('test_i84','test_o8','test_a4','5','200','200','0','0','40','40','40',$sShopId);";
 
-
         $this->addToDatabase($sInsertVouchers, 'oxvouchers');
         $this->addToDatabase($sInsertVoucherReleations, 'oxobject2discount');
         $this->addToDatabase($sInsertOrder, 'oxorder');
@@ -366,14 +365,14 @@ class VoucherExcludeTest extends \OxidTestCase
      */
     protected function tearDown(): void
     {
-        $sDeleteSeries            = "DELETE FROM `oxvoucherseries`   WHERE `OXID` LIKE 'test_%';";
-        $sDeleteVouchers          = "DELETE FROM `oxvouchers`        WHERE `OXID` LIKE 'test_%';";
-        $sDeleteArticles          = "DELETE FROM `oxarticles`        WHERE `OXID` LIKE 'test_%';";
-        $sDeleteCategories        = "DELETE FROM `oxcategories`      WHERE `OXID` LIKE 'test_%';";
+        $sDeleteSeries = "DELETE FROM `oxvoucherseries`   WHERE `OXID` LIKE 'test_%';";
+        $sDeleteVouchers = "DELETE FROM `oxvouchers`        WHERE `OXID` LIKE 'test_%';";
+        $sDeleteArticles = "DELETE FROM `oxarticles`        WHERE `OXID` LIKE 'test_%';";
+        $sDeleteCategories = "DELETE FROM `oxcategories`      WHERE `OXID` LIKE 'test_%';";
         $sDeleteCategoryRelations = "DELETE FROM `oxobject2category` WHERE `OXID` LIKE 'test_%';";
-        $sDeleteVoucherRelations  = "DELETE FROM `oxobject2discount` WHERE `OXID` LIKE 'test_%';";
-        $sDeleteOrder             = "DELETE FROM `oxorder`           WHERE `OXID` LIKE 'test_%';";
-        $sDeleteOrderArticles     = "DELETE FROM `oxorderarticles`   WHERE `OXID` LIKE 'test_%';";
+        $sDeleteVoucherRelations = "DELETE FROM `oxobject2discount` WHERE `OXID` LIKE 'test_%';";
+        $sDeleteOrder = "DELETE FROM `oxorder`           WHERE `OXID` LIKE 'test_%';";
+        $sDeleteOrderArticles = "DELETE FROM `oxorderarticles`   WHERE `OXID` LIKE 'test_%';";
 
         oxDb::getDb()->execute($sDeleteSeries);
         oxDb::getDb()->execute($sDeleteVouchers);
@@ -469,7 +468,7 @@ class VoucherExcludeTest extends \OxidTestCase
      */
     public function testGetProductDiscountValue_ThrowNoArticleException()
     {
-        $oVoucher = $this->getMock(\OxidEsales\Eshop\Application\Model\Voucher::class, array('isAdmin'));
+        $oVoucher = $this->getMock(\OxidEsales\Eshop\Application\Model\Voucher::class, ['isAdmin']);
         $oVoucher->expects($this->any())->method('isAdmin')->will($this->returnValue(false));
         $oVoucher->load('test_111');
 
@@ -486,7 +485,7 @@ class VoucherExcludeTest extends \OxidTestCase
      */
     public function testGetCategoryDiscountValue_ThrowNoArticleException()
     {
-        $oVoucher = $this->getMock(\OxidEsales\Eshop\Application\Model\Voucher::class, array('isAdmin'));
+        $oVoucher = $this->getMock(\OxidEsales\Eshop\Application\Model\Voucher::class, ['isAdmin']);
         $oVoucher->expects($this->any())->method('isAdmin')->will($this->returnValue(false));
         $oVoucher->load('test_333');
 
@@ -535,7 +534,6 @@ class VoucherExcludeTest extends \OxidTestCase
             $this->fail('exception thrown');
         }
     }
-
 
     /**
      * Test get series discount.
@@ -591,20 +589,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_111');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '10',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '10',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -641,20 +639,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_222');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '20',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '20',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -691,20 +689,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_333');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '30',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '30',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -741,20 +739,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_444');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '40',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a4',
                 'price'    => '40',
                 'discount' => '40',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -791,20 +789,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_555');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '1',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '2',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -841,20 +839,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_666');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '2',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '4',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -891,20 +889,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_777');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '9',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '15',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -941,20 +939,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_888');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '12',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a4',
                 'price'    => '40',
                 'discount' => '16',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -991,14 +989,14 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_100');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '1000',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1030,20 +1028,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_200');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a4',
                 'price'    => '40',
                 'discount' => '1000',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '1000',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1075,14 +1073,14 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_300');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '1000',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetSessionBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1104,20 +1102,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_111111');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '10',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '10',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1139,20 +1137,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_222222');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '20',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '20',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1174,20 +1172,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_333333');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '30',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '30',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1209,20 +1207,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_444444');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '40',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a4',
                 'price'    => '40',
                 'discount' => '40',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1244,20 +1242,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_555555');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '1',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '2',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1279,20 +1277,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_666666');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a1',
                 'price'    => '10',
                 'discount' => '2',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a2',
                 'price'    => '20',
                 'discount' => '4',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1314,20 +1312,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_777777');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '9',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a5',
                 'price'    => '50',
                 'discount' => '15',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());
@@ -1349,20 +1347,20 @@ class VoucherExcludeTest extends \OxidTestCase
         $oVoucher = oxNew('oxVoucher');
         $oVoucher->load('test_888888');
 
-        $aExpItems = array(
-            array(
+        $aExpItems = [
+            [
                 'oxid'     => 'test_a3',
                 'price'    => '30',
                 'discount' => '12',
-                'amount'   => '5'
-            ),
-            array(
+                'amount'   => '5',
+            ],
+            [
                 'oxid'     => 'test_a4',
                 'price'    => '40',
                 'discount' => '16',
-                'amount'   => '5'
-            )
-        );
+                'amount'   => '5',
+            ],
+        ];
 
         $this->assertEquals($aExpItems, $oVoucher->UNITgetOrderBasketItems());
         $this->assertEquals($aExpItems, $oVoucher->UNITgetBasketItems());

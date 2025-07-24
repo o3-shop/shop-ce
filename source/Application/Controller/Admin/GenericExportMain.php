@@ -33,21 +33,21 @@ class GenericExportMain extends DynamicExportBaseController
      *
      * @var string
      */
-    public $sClassDo = "genExport_do";
+    public $sClassDo = 'genExport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genExport_main";
+    public $sClassMain = 'genExport_main';
 
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "dyn_exportdefault.tpl";
+    protected $_sThisTemplate = 'dyn_exportdefault.tpl';
 
     /**
      * Creates shop object, passes shop data to Smarty engine and returns name of

@@ -47,10 +47,10 @@ class ArticlePictures extends AdminDetailsController
     {
         parent::render();
 
-        $this->_aViewData["edit"] = $oArticle = oxNew(Article::class);
+        $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oArticle->load($soxId);
             $oArticle = $this->updateArticle($oArticle);
@@ -59,14 +59,14 @@ class ArticlePictures extends AdminDetailsController
             if ($oArticle->oxarticles__oxparentid->value) {
                 $oParentArticle = oxNew(Article::class);
                 $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $oParentArticle;
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['parentarticle'] = $oParentArticle;
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
             }
         }
 
-        $this->_aViewData["iPicCount"] = Registry::getConfig()->getConfigParam('iPicCount');
+        $this->_aViewData['iPicCount'] = Registry::getConfig()->getConfigParam('iPicCount');
 
-        return "article_pictures.tpl";
+        return 'article_pictures.tpl';
     }
 
     /**
@@ -133,10 +133,10 @@ class ArticlePictures extends AdminDetailsController
         $oArticle = oxNew(Article::class);
         $oArticle->load($sOxId);
 
-        if ($iIndex == "ICO") {
+        if ($iIndex == 'ICO') {
             // deleting main icon
             $this->deleteMainIcon($oArticle);
-        } elseif ($iIndex == "TH") {
+        } elseif ($iIndex == 'TH') {
             // deleting thumbnail
             $this->deleteThumbnail($oArticle);
         } else {
@@ -182,12 +182,12 @@ class ArticlePictures extends AdminDetailsController
 
             if ($blDeleteMaster) {
                 //reseting master picture field
-                $oArticle->{"oxarticles__oxpic" . $iIndex} = new Field();
+                $oArticle->{'oxarticles__oxpic' . $iIndex} = new Field();
             }
 
             // cleaning oxzoom fields
-            if (isset($oArticle->{"oxarticles__oxzoom" . $iIndex})) {
-                $oArticle->{"oxarticles__oxzoom" . $iIndex} = new Field();
+            if (isset($oArticle->{'oxarticles__oxzoom' . $iIndex})) {
+                $oArticle->{'oxarticles__oxzoom' . $iIndex} = new Field();
             }
 
             if ($iIndex == 1) {
@@ -277,11 +277,11 @@ class ArticlePictures extends AdminDetailsController
         $sIcon = $oArticle->oxarticles__oxicon->value;
         $sThumb = $oArticle->oxarticles__oxthumb->value;
 
-        if ($sIcon == "nopic.jpg") {
+        if ($sIcon == 'nopic.jpg') {
             $oArticle->oxarticles__oxicon = new Field();
         }
 
-        if ($sThumb == "nopic.jpg") {
+        if ($sThumb == 'nopic.jpg') {
             $oArticle->oxarticles__oxthumb = new Field();
         }
     }
@@ -308,7 +308,7 @@ class ArticlePictures extends AdminDetailsController
      */
     protected function canResetMasterPicture($oArticle, $masterPictureIndex)
     {
-        return (bool) $oArticle->{"oxarticles__oxpic" . $masterPictureIndex}->value;
+        return (bool) $oArticle->{'oxarticles__oxpic' . $masterPictureIndex}->value;
     }
 
     /**

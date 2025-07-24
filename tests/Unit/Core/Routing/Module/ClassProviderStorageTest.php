@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Routing\Module;
 
-use OxidEsales\TestingLibrary\UnitTestCase;
 use OxidEsales\EshopCommunity\Core\Routing\Module\ClassProviderStorage;
+use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**
  * Test the module controller provider cache.
@@ -78,22 +80,22 @@ class ControllerProviderCacheTest extends UnitTestCase
         $value = [
             'ModuleA' => [
                 'MyControllerKeyOne' => '\MyNamespace\MyClassOne',
-                'MyControllerKeyTwo' => '\MyNamespace\MyClassTwo'
+                'MyControllerKeyTwo' => '\MyNamespace\MyClassTwo',
             ],
             'ModuleB' => [
                 'MyControllerKeyThree' => '\MyNamespace\MyClassThree',
-                'MyControllerKeyFour' => '\MyNamespace\MyClassFour'
-            ]
+                'MyControllerKeyFour' => '\MyNamespace\MyClassFour',
+            ],
         ];
         $expectedValue = [
             'modulea' => [
                 'mycontrollerkeyone' => '\MyNamespace\MyClassOne',
-                'mycontrollerkeytwo' => '\MyNamespace\MyClassTwo'
+                'mycontrollerkeytwo' => '\MyNamespace\MyClassTwo',
             ],
             'moduleb' => [
                 'mycontrollerkeythree' => '\MyNamespace\MyClassThree',
-                'mycontrollerkeyfour' => '\MyNamespace\MyClassFour'
-            ]
+                'mycontrollerkeyfour' => '\MyNamespace\MyClassFour',
+            ],
         ];
 
         $cache = $this->testCreation();

@@ -71,8 +71,8 @@ class ModuleConfiguration extends ShopConfiguration
             if (!empty($moduleConfiguration->getModuleSettings())) {
                 $formatModuleSettings = $this->formatModuleSettingsForTemplate($moduleConfiguration->getModuleSettings());
 
-                $this->_aViewData["var_constraints"] = $formatModuleSettings['constraints'];
-                $this->_aViewData["var_grouping"] = $formatModuleSettings['grouping'];
+                $this->_aViewData['var_constraints'] = $formatModuleSettings['constraints'];
+                $this->_aViewData['var_grouping'] = $formatModuleSettings['grouping'];
 
                 foreach ($this->_aConfParams as $sType => $sParam) {
                     $this->_aViewData[$sParam] = $formatModuleSettings['vars'][$sType];
@@ -123,12 +123,12 @@ class ModuleConfiguration extends ShopConfiguration
         $oConfig = Registry::getConfig();
 
         $aConfVars = [
-            "bool"     => [],
-            "str"      => [],
-            "arr"      => [],
-            "aarr"     => [],
-            "select"   => [],
-            "password" => [],
+            'bool'     => [],
+            'str'      => [],
+            'arr'      => [],
+            'aarr'     => [],
+            'select'   => [],
+            'password' => [],
         ];
         $aVarConstraints = [];
         $aGrouping = [];
@@ -137,22 +137,22 @@ class ModuleConfiguration extends ShopConfiguration
 
         if (is_array($aModuleSettings)) {
             foreach ($aModuleSettings as $aValue) {
-                $sName = $aValue["name"];
-                $sType = $aValue["type"];
+                $sName = $aValue['name'];
+                $sType = $aValue['type'];
                 $sValue = null;
                 if (is_null($oConfig->getConfigParam($sName))) {
-                    switch ($aValue["type"]) {
-                        case "arr":
-                            $sValue = $this->arrayToMultiline($aValue["value"]);
+                    switch ($aValue['type']) {
+                        case 'arr':
+                            $sValue = $this->arrayToMultiline($aValue['value']);
                             break;
-                        case "aarr":
-                            $sValue = $this->aarrayToMultiline($aValue["value"]);
+                        case 'aarr':
+                            $sValue = $this->aarrayToMultiline($aValue['value']);
                             break;
-                        case "bool":
-                            $sValue = filter_var($aValue["value"], FILTER_VALIDATE_BOOLEAN);
+                        case 'bool':
+                            $sValue = filter_var($aValue['value'], FILTER_VALIDATE_BOOLEAN);
                             break;
                         default:
-                            $sValue = $aValue["value"];
+                            $sValue = $aValue['value'];
                             break;
                     }
                     $sValue = Str::getStr()->htmlentities($sValue);
@@ -161,13 +161,13 @@ class ModuleConfiguration extends ShopConfiguration
                     $sValue = $aDbVariables['vars'][$sDbType][$sName];
                 }
 
-                $sGroup = $aValue["group"];
+                $sGroup = $aValue['group'];
 
-                $sConstraints = "";
-                if ($aValue["constraints"]) {
-                    $sConstraints = $aValue["constraints"];
-                } elseif ($aValue["constrains"]) {
-                    $sConstraints = $aValue["constrains"];
+                $sConstraints = '';
+                if ($aValue['constraints']) {
+                    $sConstraints = $aValue['constraints'];
+                } elseif ($aValue['constrains']) {
+                    $sConstraints = $aValue['constrains'];
                 }
 
                 $aConfVars[$sType][$sName] = $sValue;
@@ -326,7 +326,6 @@ class ModuleConfiguration extends ShopConfiguration
             }
 
             $group = $setting->getGroupName();
-
 
             $confVars[$valueType][$name] = $value;
             $constraints[$name] = $setting->getConstraints() ?? '';

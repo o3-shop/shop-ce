@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -24,8 +25,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\TransactionIsolationLevel;
 use oxDb;
 use OxidEsales\Eshop\Core\ConfigFile;
-use OxidEsales\EshopCommunity\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Core\Database\Adapter\DatabaseInterface;
+use OxidEsales\EshopCommunity\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use ReflectionClass;
@@ -52,157 +53,156 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestGetAllForAllFetchModes()
     {
-        return array(
+        return [
             /**
              *
              * DatabaseInterface::FETCH_MODE_DEFAULT
              * This returns the same as DatabaseInterface::FETCH_MODE_BOTH and a funny aspect of our beloved ADOdb lite
              *
              */
-            array( // fetch mode "default", this is not the "default fetch mode" and an empty result
+            [ // fetch mode "default", this is not the "default fetch mode" and an empty result
                    DatabaseInterface::FETCH_MODE_DEFAULT,
                    'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE 0',
-                   array()
-            ),
-            array( // fetch mode "default", this is not the "default fetch mode" and one column
+                   [],
+            ],
+            [ // fetch mode "default", this is not the "default fetch mode" and one column
                    DatabaseInterface::FETCH_MODE_DEFAULT,
                    'SELECT OXID FROM ' . self::TABLE_NAME,
-                   array(
-                       array('OXID' => self::FIXTURE_OXID_1, 0 => self::FIXTURE_OXID_1),
-                       array('OXID' => self::FIXTURE_OXID_2, 0 => self::FIXTURE_OXID_2),
-                       array('OXID' => self::FIXTURE_OXID_3, 0 => self::FIXTURE_OXID_3)
-                   )
-            ),
-            array( // fetch mode "default", this is not the "default fetch mode" and multiple columns
+                   [
+                       ['OXID' => self::FIXTURE_OXID_1, 0 => self::FIXTURE_OXID_1],
+                       ['OXID' => self::FIXTURE_OXID_2, 0 => self::FIXTURE_OXID_2],
+                       ['OXID' => self::FIXTURE_OXID_3, 0 => self::FIXTURE_OXID_3],
+                   ],
+            ],
+            [ // fetch mode "default", this is not the "default fetch mode" and multiple columns
                    DatabaseInterface::FETCH_MODE_DEFAULT,
                    'SELECT OXID, OXUSERID FROM ' . self::TABLE_NAME,
-                   array(
-                       array(
+                   [
+                       [
                            'OXID'     => self::FIXTURE_OXID_1,
                            'OXUSERID' => self::FIXTURE_OXUSERID_1,
                            0          => self::FIXTURE_OXID_1,
                            1          => self::FIXTURE_OXUSERID_1,
-                       ),
-                       array(
+                       ],
+                       [
                            'OXID'     => self::FIXTURE_OXID_2,
                            'OXUSERID' => self::FIXTURE_OXUSERID_2,
                            0          => self::FIXTURE_OXID_2,
                            1          => self::FIXTURE_OXUSERID_2,
-                       ),
-                       array(
+                       ],
+                       [
                            'OXID'     => self::FIXTURE_OXID_3,
                            'OXUSERID' => self::FIXTURE_OXUSERID_3,
                            0          => self::FIXTURE_OXID_3,
                            1          => self::FIXTURE_OXUSERID_3,
-                       )
-                   )
-            ),
+                       ],
+                   ],
+            ],
             /**
              *
              * DatabaseInterface::FETCH_MODE_NUM
              *
              */
-            array( // fetch mode numeric and an INSERT statement
+            [ // fetch mode numeric and an INSERT statement
                    DatabaseInterface::FETCH_MODE_NUM,
                    'INSERT INTO ' . self::TABLE_NAME . ' VALUES (\'a\', \'b\')',
-                   array()
-            ),
-            array( // fetch mode numeric and an empty result
+                   [],
+            ],
+            [ // fetch mode numeric and an empty result
                    DatabaseInterface::FETCH_MODE_NUM,
                    'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE 0',
-                   array()
-            ),
-            array( // fetch mode numeric and one column
+                   [],
+            ],
+            [ // fetch mode numeric and one column
                    DatabaseInterface::FETCH_MODE_NUM,
                    'SELECT OXID FROM ' . self::TABLE_NAME,
-                   array(
-                       array(self::FIXTURE_OXID_1),
-                       array(self::FIXTURE_OXID_2),
-                       array(self::FIXTURE_OXID_3)
-                   )
-            ),
-            array( // fetch mode numeric and multiple columns
+                   [
+                       [self::FIXTURE_OXID_1],
+                       [self::FIXTURE_OXID_2],
+                       [self::FIXTURE_OXID_3],
+                   ],
+            ],
+            [ // fetch mode numeric and multiple columns
                    DatabaseInterface::FETCH_MODE_NUM,
                    'SELECT OXID, OXUSERID FROM ' . self::TABLE_NAME,
-                   array(
-                       array(self::FIXTURE_OXID_1, self::FIXTURE_OXUSERID_1),
-                       array(self::FIXTURE_OXID_2, self::FIXTURE_OXUSERID_2),
-                       array(self::FIXTURE_OXID_3, self::FIXTURE_OXUSERID_3)
-                   )
-            ),
+                   [
+                       [self::FIXTURE_OXID_1, self::FIXTURE_OXUSERID_1],
+                       [self::FIXTURE_OXID_2, self::FIXTURE_OXUSERID_2],
+                       [self::FIXTURE_OXID_3, self::FIXTURE_OXUSERID_3],
+                   ],
+            ],
             /**
              *
              * DatabaseInterface::FETCH_MODE_ASSOC
              *
              */
-            array( // fetch mode associative and an empty result
+            [ // fetch mode associative and an empty result
                    DatabaseInterface::FETCH_MODE_ASSOC,
                    'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE 0',
-                   array()
-            ),
-            array( // fetch mode associative and one column
+                   [],
+            ],
+            [ // fetch mode associative and one column
                    DatabaseInterface::FETCH_MODE_ASSOC,
                    'SELECT OXID FROM ' . self::TABLE_NAME,
-                   array(
-                       array('OXID' => self::FIXTURE_OXID_1),
-                       array('OXID' => self::FIXTURE_OXID_2),
-                       array('OXID' => self::FIXTURE_OXID_3)
-                   )
-            ),
-            array( // fetch mode associative and multiple columns
+                   [
+                       ['OXID' => self::FIXTURE_OXID_1],
+                       ['OXID' => self::FIXTURE_OXID_2],
+                       ['OXID' => self::FIXTURE_OXID_3],
+                   ],
+            ],
+            [ // fetch mode associative and multiple columns
                    DatabaseInterface::FETCH_MODE_ASSOC,
                    'SELECT OXID, OXUSERID FROM ' . self::TABLE_NAME,
-                   array(
-                       array('OXID' => self::FIXTURE_OXID_1, 'OXUSERID' => self::FIXTURE_OXUSERID_1),
-                       array('OXID' => self::FIXTURE_OXID_2, 'OXUSERID' => self::FIXTURE_OXUSERID_2),
-                       array('OXID' => self::FIXTURE_OXID_3, 'OXUSERID' => self::FIXTURE_OXUSERID_3)
-                   )
-            ),
+                   [
+                       ['OXID' => self::FIXTURE_OXID_1, 'OXUSERID' => self::FIXTURE_OXUSERID_1],
+                       ['OXID' => self::FIXTURE_OXID_2, 'OXUSERID' => self::FIXTURE_OXUSERID_2],
+                       ['OXID' => self::FIXTURE_OXID_3, 'OXUSERID' => self::FIXTURE_OXUSERID_3],
+                   ],
+            ],
             /**
              *
              * DatabaseInterface::FETCH_MODE_BOTH
              *
              */
-            array( // fetch mode both and an empty result
+            [ // fetch mode both and an empty result
                    DatabaseInterface::FETCH_MODE_BOTH,
                    'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE 0',
-                   array()
-            ),
-            array( // fetch mode both and one column
+                   [],
+            ],
+            [ // fetch mode both and one column
                    DatabaseInterface::FETCH_MODE_BOTH,
                    'SELECT OXID FROM ' . self::TABLE_NAME,
-                   array(
-                       array('OXID' => self::FIXTURE_OXID_1, 0 => self::FIXTURE_OXID_1),
-                       array('OXID' => self::FIXTURE_OXID_2, 0 => self::FIXTURE_OXID_2),
-                       array('OXID' => self::FIXTURE_OXID_3, 0 => self::FIXTURE_OXID_3)
-                   )
-            ),
-            array( // fetch mode both and multiple columns
+                   [
+                       ['OXID' => self::FIXTURE_OXID_1, 0 => self::FIXTURE_OXID_1],
+                       ['OXID' => self::FIXTURE_OXID_2, 0 => self::FIXTURE_OXID_2],
+                       ['OXID' => self::FIXTURE_OXID_3, 0 => self::FIXTURE_OXID_3],
+                   ],
+            ],
+            [ // fetch mode both and multiple columns
                    DatabaseInterface::FETCH_MODE_BOTH,
                    'SELECT OXID, OXUSERID FROM ' . self::TABLE_NAME,
-                   array(
-                       array(
+                   [
+                       [
                            'OXID'     => self::FIXTURE_OXID_1,
                            'OXUSERID' => self::FIXTURE_OXUSERID_1,
                            0          => self::FIXTURE_OXID_1,
                            1          => self::FIXTURE_OXUSERID_1,
-                       ),
-                       array(
+                       ],
+                       [
                            'OXID'     => self::FIXTURE_OXID_2,
                            'OXUSERID' => self::FIXTURE_OXUSERID_2,
                            0          => self::FIXTURE_OXID_2,
                            1          => self::FIXTURE_OXUSERID_2,
-                       ),
-                       array(
+                       ],
+                       [
                            'OXID'     => self::FIXTURE_OXID_3,
                            'OXUSERID' => self::FIXTURE_OXUSERID_3,
                            0          => self::FIXTURE_OXID_3,
                            1          => self::FIXTURE_OXUSERID_3,
-                       )
-                   )
-            ),
-
-        );
+                       ],
+                   ],
+            ],
+        ];
     }
 
     /**
@@ -233,32 +233,31 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestFetchAllDefaultFetchMode()
     {
-        return array(
-            array(
+        return [
+            [
                 'On default fetch mode, DatabaseInterface::select() will return an empty array for an empty result',
                 'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE 0',
-                array()
-            ),
-            array( // fetch mode default and one column
+                [],
+            ],
+            [ // fetch mode default and one column
                    'On default fetch mode, DatabaseInterface::select() will return an array with numeric key for a non empty result',
                    'SELECT OXID FROM ' . self::TABLE_NAME,
-                   array(
-                       array(self::FIXTURE_OXID_1),
-                       array(self::FIXTURE_OXID_2),
-                       array(self::FIXTURE_OXID_3)
-                   )
-            ),
-            array( // fetch mode default and multiple columns
+                   [
+                       [self::FIXTURE_OXID_1],
+                       [self::FIXTURE_OXID_2],
+                       [self::FIXTURE_OXID_3],
+                   ],
+            ],
+            [ // fetch mode default and multiple columns
                    'On default fetch mode, DatabaseInterface::select() will return an array with numeric key for a non empty result',
                    'SELECT OXID, OXUSERID FROM ' . self::TABLE_NAME,
-                   array(
-                       array(self::FIXTURE_OXID_1, '1'),
-                       array(self::FIXTURE_OXID_2, '2'),
-                       array(self::FIXTURE_OXID_3, '3')
-                   )
-            ),
-
-        );
+                   [
+                       [self::FIXTURE_OXID_1, '1'],
+                       [self::FIXTURE_OXID_2, '2'],
+                       [self::FIXTURE_OXID_3, '3'],
+                   ],
+            ],
+        ];
     }
 
     /**
@@ -292,11 +291,11 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $resultSet = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?', array(self::FIXTURE_OXID_2), false);
+        $resultSet = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?', [self::FIXTURE_OXID_2], false);
 
         $result = $resultSet->fetchAll();
 
-        $this->assertEquals(array(array(self::FIXTURE_OXID_2)), $result);
+        $this->assertEquals([[self::FIXTURE_OXID_2]], $result);
     }
 
     public function testSelectWithNonReadStatementThrowsException()
@@ -306,16 +305,15 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         $this->database->select('INSERT INTO ' . self::TABLE_NAME . ' VALUES (\'a\',\'b\')');
     }
 
-
     public function testSelectPreparedWithInvalidParameterDoesNotThrowException()
     {
         $this->loadFixtureToTestTable();
 
-        $resultSet = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?', array(array('key' => 'value')), false);
+        $resultSet = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?', [['key' => 'value']], false);
 
         $result = $resultSet->fetchAll();
 
-        $this->assertEquals(array(), $result);
+        $this->assertEquals([], $result);
     }
 
     /**
@@ -325,11 +323,11 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $resultSet = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID <> ?', array(self::FIXTURE_OXID_2), false);
+        $resultSet = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID <> ?', [self::FIXTURE_OXID_2], false);
 
         $result = $resultSet->fetchAll();
 
-        $this->assertEquals(array(array(self::FIXTURE_OXID_1), array(self::FIXTURE_OXID_3)), $result);
+        $this->assertEquals([[self::FIXTURE_OXID_1], [self::FIXTURE_OXID_3]], $result);
     }
 
     /**
@@ -339,38 +337,38 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestSelectLimitForDifferentLimitAndOffsetValues()
     {
-        return array(
-            array(
+        return [
+            [
                 'If parameter rowCount is integer 0, no rows are returned at all',
                 0, // row count
                 0, // offset
-                [] // expected result
-            ),
-            array(
+                [], // expected result
+            ],
+            [
                 'If parameter rowCount is string "2" and offset is string "0", the first 2 rows will be returned',
-                "2", // row count as a string
-                "0", // offset as string
+                '2', // row count as a string
+                '0', // offset as string
                 [
-                    [self::FIXTURE_OXID_1], [self::FIXTURE_OXID_2]  // expected result
-                ]
-            ),
-            array(
+                    [self::FIXTURE_OXID_1], [self::FIXTURE_OXID_2],  // expected result
+                ],
+            ],
+            [
                 'If parameter rowCount has the value 2 and offset has the value 0, the first 2 rows will be returned',
                 2, // row count
                 0, // offset
                 [
-                    [self::FIXTURE_OXID_1], [self::FIXTURE_OXID_2]  // expected result
-                ]
-            ),
-            array(
+                    [self::FIXTURE_OXID_1], [self::FIXTURE_OXID_2],  // expected result
+                ],
+            ],
+            [
                 'If parameter rowCount has the value 2 and offset has the value 1, the last 2 rows will be returned',
                 2, // row count
                 1, // offset
                 [
-                    [self::FIXTURE_OXID_2], [self::FIXTURE_OXID_3] // expected result
-                ]
-            )
-        );
+                    [self::FIXTURE_OXID_2], [self::FIXTURE_OXID_3], // expected result
+                ],
+            ],
+        ];
     }
 
     /**
@@ -433,7 +431,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $result = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME);
 
-        $expectedRows = array();
+        $expectedRows = [];
         $allRows = $result->fetchAll();
         $this->assertSame($expectedRows, $allRows);
     }
@@ -446,7 +444,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $result = $this->database->select('   SELECT OXID FROM ' . self::TABLE_NAME);
 
-        $expectedRows = array();
+        $expectedRows = [];
         $allRows = $result->fetchAll();
         $this->assertSame($expectedRows, $allRows);
     }
@@ -461,13 +459,13 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         $result = $this->database->select('SELECT OXID FROM ' . self::TABLE_NAME . ' ORDER BY OXID');
 
         $this->assertFalse($result->EOF);
-        $this->assertSame(array(self::FIXTURE_OXID_1), $result->fields);
+        $this->assertSame([self::FIXTURE_OXID_1], $result->fields);
 
-        $expectedRows = array(
-            array(self::FIXTURE_OXID_1),
-            array(self::FIXTURE_OXID_2),
-            array(self::FIXTURE_OXID_3)
-        );
+        $expectedRows = [
+            [self::FIXTURE_OXID_1],
+            [self::FIXTURE_OXID_2],
+            [self::FIXTURE_OXID_3],
+        ];
         $allRows = $result->fetchAll();
 
         $this->assertSame($expectedRows, $allRows);
@@ -497,7 +495,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         $masterDb = oxDb::getMaster();
         $masterDb->select(
             'SELECT SOME INVALID QUERY',
-            array()
+            []
         );
     }
 
@@ -511,7 +509,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         // check normal (associative array) case
         $row = $this->fetchFirstTestTableOxId();
         $this->assertIsArray($row);
-        $this->assertSame(array(0), array_keys($row));
+        $this->assertSame([0], array_keys($row));
 
         // check numeric array case
         $this->database->setFetchMode(DatabaseInterface::FETCH_MODE_NUM);
@@ -519,7 +517,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
 
         // check result
         $this->assertIsArray($row);
-        $this->assertSame(array(0), array_keys($row));
+        $this->assertSame([0], array_keys($row));
     }
 
     public function testSetTransactionIsolationLevel(): void
@@ -542,7 +540,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function testGetColWithoutParametersEmptyResult()
     {
-        $result = $this->database->getCol("SELECT OXID FROM " . self::TABLE_NAME);
+        $result = $this->database->getCol('SELECT OXID FROM ' . self::TABLE_NAME);
 
         $this->assertIsArray($result);
         $this->assertSame(0, count($result));
@@ -555,11 +553,11 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $result = $this->database->getCol("SELECT OXUSERID FROM " . self::TABLE_NAME);
+        $result = $this->database->getCol('SELECT OXUSERID FROM ' . self::TABLE_NAME);
 
         $this->assertIsArray($result);
         $this->assertSame(3, count($result));
-        $this->assertSame(array(self::FIXTURE_OXUSERID_1, self::FIXTURE_OXUSERID_2, self::FIXTURE_OXUSERID_3), $result);
+        $this->assertSame([self::FIXTURE_OXUSERID_1, self::FIXTURE_OXUSERID_2, self::FIXTURE_OXUSERID_3], $result);
     }
 
     /**
@@ -571,11 +569,11 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
 
         $this->database->setFetchMode(DatabaseInterface::FETCH_MODE_ASSOC);
 
-        $result = $this->database->getCol("SELECT OXUSERID FROM " . self::TABLE_NAME);
+        $result = $this->database->getCol('SELECT OXUSERID FROM ' . self::TABLE_NAME);
 
         $this->assertIsArray($result);
         $this->assertSame(3, count($result));
-        $this->assertSame(array(self::FIXTURE_OXUSERID_1, self::FIXTURE_OXUSERID_2, self::FIXTURE_OXUSERID_3), $result);
+        $this->assertSame([self::FIXTURE_OXUSERID_1, self::FIXTURE_OXUSERID_2, self::FIXTURE_OXUSERID_3], $result);
     }
 
     /**
@@ -585,11 +583,11 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $result = $this->database->getCol("SELECT OXUSERID FROM " . self::TABLE_NAME . " WHERE OXUSERID LIKE ? ", array('%2'));
+        $result = $this->database->getCol('SELECT OXUSERID FROM ' . self::TABLE_NAME . ' WHERE OXUSERID LIKE ? ', ['%2']);
 
         $this->assertIsArray($result);
         $this->assertSame(1, count($result));
-        $this->assertSame(array(self::FIXTURE_OXUSERID_2), $result);
+        $this->assertSame([self::FIXTURE_OXUSERID_2], $result);
     }
 
     /**
@@ -599,7 +597,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->database->getCol("INSERT INTO " . self::TABLE_NAME . " VALUES ('a', 'b')");
+        $this->database->getCol('INSERT INTO ' . self::TABLE_NAME . " VALUES ('a', 'b')");
     }
 
     /**
@@ -611,7 +609,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
 
         $this->truncateTestTable();
         $this->database->startTransaction();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('$exampleOxId');", array());
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('$exampleOxId');", []);
 
         // assure, that the changes are made in this transaction
         $this->assertTestTableHasOnly($exampleOxId);
@@ -631,7 +629,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
 
         $this->truncateTestTable();
         $this->database->startTransaction();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('$exampleOxId');", array());
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('$exampleOxId');", []);
 
         // assure, that the changes are made in this transaction
         $this->assertTestTableHasOnly($exampleOxId);
@@ -653,14 +651,14 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function testGetAllReturnsExpectedResultOnNoFetchModeSet()
     {
-        $expectedResult = array(array(self::FIXTURE_OXID_1));
+        $expectedResult = [[self::FIXTURE_OXID_1]];
         $message = 'An array with integer keys is returned, if setFetchMode is not called before calling getAll';
 
         $database = $this->getDb();
         $this->truncateTestTable();
-        $database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
+        $database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
 
-        $actualResult = $database->getAll("SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'");
+        $actualResult = $database->getAll('SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'");
 
         $this->assertEquals($actualResult, $expectedResult, $message);
     }
@@ -679,10 +677,10 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     public function testGetAllRespectsTheGivenFetchMode($message, $fetchMode, $expectedResult)
     {
         $this->truncateTestTable();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
         $this->database->setFetchMode($fetchMode);
 
-        $actualResult = $this->database->getAll("SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'");
+        $actualResult = $this->database->getAll('SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'");
 
         $this->assertEquals($actualResult, $expectedResult, $message);
     }
@@ -694,28 +692,28 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestGetAllRespectsFetchMode()
     {
-        return array(
-            array(
+        return [
+            [
                 'An array with both integer and string keys is returned for fetch mode DatabaseInterface::FETCH_MODE_DEFAULT',
                 DatabaseInterface::FETCH_MODE_DEFAULT,
-                [[0 => self::FIXTURE_OXID_1, 'OXID' => self::FIXTURE_OXID_1]]
-            ),
-            array(
+                [[0 => self::FIXTURE_OXID_1, 'OXID' => self::FIXTURE_OXID_1]],
+            ],
+            [
                 'An array with integer keys is returned for fetch mode DatabaseInterface::FETCH_MODE_NUM',
                 DatabaseInterface::FETCH_MODE_NUM,
-                array(array(self::FIXTURE_OXID_1))
-            ),
-            array(
+                [[self::FIXTURE_OXID_1]],
+            ],
+            [
                 'An array with string keys is returned for fetch mode DatabaseInterface::FETCH_MODE_ASSOC',
                 DatabaseInterface::FETCH_MODE_ASSOC,
-                array(array('OXID' => self::FIXTURE_OXID_1))
-            ),
-            array(
+                [['OXID' => self::FIXTURE_OXID_1]],
+            ],
+            [
                 'An array with both integer and string keys is returned for fetch mode DatabaseInterface::FETCH_MODE_BOTH',
                 DatabaseInterface::FETCH_MODE_BOTH,
-                array(array(0 => self::FIXTURE_OXID_1, 'OXID' => self::FIXTURE_OXID_1))
-            ),
-        );
+                [[0 => self::FIXTURE_OXID_1, 'OXID' => self::FIXTURE_OXID_1]],
+            ],
+        ];
     }
 
     /**
@@ -725,15 +723,15 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $message = 'The expected result is returned when passing an empty array as parameter to Doctrine::getAll()';
         $fetchMode = DatabaseInterface::FETCH_MODE_NUM;
-        $expectedResult = array(array(self::FIXTURE_OXID_1));
+        $expectedResult = [[self::FIXTURE_OXID_1]];
 
         $this->truncateTestTable();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
         $this->database->setFetchMode($fetchMode);
 
         $actualResult = $this->database->getAll(
-            "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'",
-            array()
+            'SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'",
+            []
         );
 
         $this->assertEquals($actualResult, $expectedResult, $message);
@@ -746,15 +744,15 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $message = 'The expected result is returned when passing an array with one parameter to Doctrine::getAll()';
         $fetchMode = DatabaseInterface::FETCH_MODE_NUM;
-        $expectedResult = array(array(self::FIXTURE_OXID_1));
+        $expectedResult = [[self::FIXTURE_OXID_1]];
 
         $this->truncateTestTable();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
         $this->database->setFetchMode($fetchMode);
 
         $actualResult = $this->database->getAll(
-            "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = ?",
-            array(self::FIXTURE_OXID_1)
+            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID = ?',
+            [self::FIXTURE_OXID_1]
         );
 
         $this->assertEquals($actualResult, $expectedResult, $message);
@@ -767,19 +765,19 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $message = 'The expected result is returned when passing an array with more than one parameter to Doctrine::getAll()';
         $fetchMode = DatabaseInterface::FETCH_MODE_NUM;
-        $expectedResult = array(
-            array(self::FIXTURE_OXID_1),
-            array(self::FIXTURE_OXID_2)
-        );
+        $expectedResult = [
+            [self::FIXTURE_OXID_1],
+            [self::FIXTURE_OXID_2],
+        ];
 
         $this->truncateTestTable();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_2 . "')");
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_2 . "')");
         $this->database->setFetchMode($fetchMode);
 
         $actualResult = $this->database->getAll(
-            "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID IN (?, ?)",
-            array(self::FIXTURE_OXID_1, self::FIXTURE_OXID_2)
+            'SELECT OXID FROM ' . self::TABLE_NAME . ' WHERE OXID IN (?, ?)',
+            [self::FIXTURE_OXID_1, self::FIXTURE_OXID_2]
         );
 
         $this->assertEquals($actualResult, $expectedResult, $message);
@@ -795,8 +793,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         $this->expectException($expectedExceptionClass);
 
         $this->database->getAll(
-            "SOME INVALID QUERY",
-            array()
+            'SOME INVALID QUERY',
+            []
         );
     }
 
@@ -808,28 +806,28 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestGetAllThrowsDatabaseExceptionOnInvalidArguments()
     {
-        return array(
-            array(
+        return [
+            [
                 //'Passing a plain string as parameter to getAll triggers an exception',
-                'string'
-            ),
-            array(
+                'string',
+            ],
+            [
                 //'Passing an object as parameter to getAll triggers an exception',
-                new \stdClass()
-            ),
-            array(
+                new \stdClass(),
+            ],
+            [
                 //'Passing an integer as parameter to getAll triggers an exception',
-                (int) 1
-            ),
-            array(
+                (int) 1,
+            ],
+            [
                 //'Passing a float string as parameter to getAll triggers an exception',
-                (float) 1
-            ),
-            array(
+                (float) 1,
+            ],
+            [
                 //'Passing TRUE as parameter to getAll triggers an exception',
-                true
-            ),
-        );
+                true,
+            ],
+        ];
     }
 
     /**
@@ -847,14 +845,14 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     public function testGetAllThrowsNoExceptionOnValidArguments($message, $validParameter)
     {
         $fetchMode = DatabaseInterface::FETCH_MODE_NUM;
-        $expectedResult = array(array(self::FIXTURE_OXID_1));
+        $expectedResult = [[self::FIXTURE_OXID_1]];
 
         $this->truncateTestTable();
-        $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
+        $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('" . self::FIXTURE_OXID_1 . "')");
         $this->database->setFetchMode($fetchMode);
 
         $actualResult = $this->database->getAll(
-            "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'",
+            'SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'",
             $validParameter
         );
 
@@ -870,28 +868,28 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestGetAllThrowsNoExceptionOnValidArguments()
     {
-        return array(
-            array(
+        return [
+            [
                 'Passing an empty string as parameter to getAll does not trigger an exception',
-                ''
-            ),
-            array(
+                '',
+            ],
+            [
                 'Passing an null as parameter to getAll does not trigger an exception',
-                null
-            ),
-            array(
+                null,
+            ],
+            [
                 'Passing an empty array as parameter to getAll does not trigger an exception',
-                array()
-            ),
-            array(
+                [],
+            ],
+            [
                 'Passing a false as parameter to getAll does not trigger an exception',
-                false
-            ),
-            array(
+                false,
+            ],
+            [
                 'Passing "0" as parameter to getAll triggers does not trigger an exception',
-                "0"
-            ),
-        );
+                '0',
+            ],
+        ];
     }
 
     /**
@@ -997,7 +995,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $result = $this->database->getOne('SELECT OXUSERID FROM ' . self::TABLE_NAME, array());
+        $result = $this->database->getOne('SELECT OXUSERID FROM ' . self::TABLE_NAME, []);
 
         $this->assertEquals(self::FIXTURE_OXUSERID_1, $result);
     }
@@ -1009,11 +1007,10 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $result = $this->database->getOne('SELECT OXUSERID FROM ' . self::TABLE_NAME . ' WHERE oxid = ?', array(self::FIXTURE_OXID_3));
+        $result = $this->database->getOne('SELECT OXUSERID FROM ' . self::TABLE_NAME . ' WHERE oxid = ?', [self::FIXTURE_OXID_3]);
 
         $this->assertEquals(self::FIXTURE_OXUSERID_3, $result);
     }
-
 
     /**
      * Test, that the method 'getRow' gives an empty array with a non empty table and an incorrect sql statement.
@@ -1046,7 +1043,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         $result = $this->database->getRow('SELECT * FROM ' . self::TABLE_NAME);
 
         $this->assertIsArray($result);
-        $this->assertEquals(array(self::FIXTURE_OXID_1, self::FIXTURE_OXUSERID_1), $result);
+        $this->assertEquals([self::FIXTURE_OXID_1, self::FIXTURE_OXUSERID_1], $result);
     }
 
     /**
@@ -1056,10 +1053,10 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $this->loadFixtureToTestTable();
 
-        $result = $this->database->getRow('SELECT * FROM ' . self::TABLE_NAME . ' WHERE oxid = ?', array(self::FIXTURE_OXID_2));
+        $result = $this->database->getRow('SELECT * FROM ' . self::TABLE_NAME . ' WHERE oxid = ?', [self::FIXTURE_OXID_2]);
 
         $this->assertIsArray($result);
-        $this->assertEquals(array(self::FIXTURE_OXID_2, self::FIXTURE_OXUSERID_2), $result);
+        $this->assertEquals([self::FIXTURE_OXID_2, self::FIXTURE_OXUSERID_2], $result);
     }
 
     /**
@@ -1070,44 +1067,44 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     public function dataProviderTestGetRowForAllFetchModes()
     {
-        return array(
-            array(
+        return [
+            [
                 'getRow will return an array with both integer and string keys for DatabaseInterface::FETCH_MODE_DEFAULT',
                 DatabaseInterface::FETCH_MODE_DEFAULT,
-                array(
+                [
                     0          => self::FIXTURE_OXID_1,
                     1          => self::FIXTURE_OXUSERID_1,
                     'oxid'     => self::FIXTURE_OXID_1,
                     'oxuserid' => self::FIXTURE_OXUSERID_1,
-                )
-            ),
-            array(
+                ],
+            ],
+            [
                 'getRow will return an array with integer keys for DatabaseInterface::FETCH_MODE_NUM',
                 DatabaseInterface::FETCH_MODE_NUM,
-                array(
+                [
                     0 => self::FIXTURE_OXID_1,
                     1 => self::FIXTURE_OXUSERID_1,
-                )
-            ),
-            array(
+                ],
+            ],
+            [
                 'getRow will return an array with string keys for DatabaseInterface::FETCH_MODE_ASSOC',
                 DatabaseInterface::FETCH_MODE_ASSOC,
-                array(
+                [
                     'oxid'     => self::FIXTURE_OXID_1,
                     'oxuserid' => self::FIXTURE_OXUSERID_1,
-                )
-            ),
-            array(
+                ],
+            ],
+            [
                 'getRow will return an array with both integer and string keys for DatabaseInterface::FETCH_MODE_BOTH',
                 DatabaseInterface::FETCH_MODE_BOTH,
-                array(
+                [
                     0          => self::FIXTURE_OXID_1,
                     1          => self::FIXTURE_OXUSERID_1,
                     'oxid'     => self::FIXTURE_OXID_1,
                     'oxuserid' => self::FIXTURE_OXUSERID_1,
-                )
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -1141,7 +1138,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
         $result = $this->database->getRow('SELECT * FROM ' . self::TABLE_NAME);
 
         $this->assertIsArray($result);
-        $this->assertEquals(array(self::FIXTURE_OXID_1, self::FIXTURE_OXUSERID_1), $result);
+        $this->assertEquals([self::FIXTURE_OXID_1, self::FIXTURE_OXUSERID_1], $result);
     }
 
     public function testCharsetIsUtf8()
@@ -1195,7 +1192,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
 
         $this->assertSame($expectedQuotedValue, $actualQuotedValue, $message);
 
-        $query = "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = {$actualQuotedValue}";
+        $query = 'SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = {$actualQuotedValue}";
         $resultSet = $this->database->select($query);
         $actualResult = $resultSet->fetchAll();
 
@@ -1205,7 +1202,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     public function dataProviderTestQuoteWithValidValues()
     {
         return [
-            [self::FIXTURE_OXID_1, "'" . self::FIXTURE_OXID_1 . "'", [[self::FIXTURE_OXID_1]], 'The string "'. self::FIXTURE_OXID_1 .'" 1  will be converted into the string "\''. self::FIXTURE_OXID_1 .'\'" and the query result will be ['. self::FIXTURE_OXID_1 .']'],
+            [self::FIXTURE_OXID_1, "'" . self::FIXTURE_OXID_1 . "'", [[self::FIXTURE_OXID_1]], 'The string "' . self::FIXTURE_OXID_1 . '" 1  will be converted into the string "\'' . self::FIXTURE_OXID_1 . '\'" and the query result will be [' . self::FIXTURE_OXID_1 . ']'],
             [1, "'1'", [], 'The integer 1  will be converted into the string "1" and the query result will be empty'],
         ];
     }
@@ -1218,7 +1215,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     protected function createTableForTestMetaColumns($metaColumnsTestTable)
     {
         $dbh = self::getDatabaseHandler();
-        $dbh->exec("CREATE TABLE IF NOT EXISTS " . $metaColumnsTestTable . " (
+        $dbh->exec('CREATE TABLE IF NOT EXISTS ' . $metaColumnsTestTable . " (
             OXINT INT(11) NOT NULL AUTO_INCREMENT COMMENT 'a column with type INT',
             OXUSERID CHAR(32) CHARACTER SET 'utf8' COLLATE 'utf8_general_ci'  COMMENT 'a column with type CHAR',
             OXTIME TIME COMMENT 'a column of type TIME',
@@ -1237,8 +1234,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
      */
     protected function getExpectedColumnsByTestMetaColumns()
     {
-        return array(
-            array(
+        return [
+            [
                 'name'           => 'OXINT',
                 'max_length'     => '11',
                 'type'           => 'int',
@@ -1249,8 +1246,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'unsigned'       => false,
                 'has_default'    => false,
                 'comment'        => 'a column with type INT',
-            ),
-            array(
+            ],
+            [
                 'name'           => 'OXUSERID',
                 'max_length'     => '32',
                 'type'           => 'char',
@@ -1261,9 +1258,9 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'unsigned'       => false,
                 'comment'        => 'a column with type CHAR',
                 'characterSet'   => 'utf8',
-                'collation'      => 'utf8_general_ci'
-            ),
-            array(
+                'collation'      => 'utf8_general_ci',
+            ],
+            [
                 'name'           => 'OXTIME',
                 'type'           => 'time',
                 'not_null'       => false,
@@ -1272,8 +1269,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'binary'         => false,
                 'unsigned'       => false,
                 'comment'        => 'a column of type TIME',
-            ),
-            array(
+            ],
+            [
                 'name'           => 'OXBIT',
                 'max_length'     => '6',
                 'type'           => 'bit',
@@ -1283,8 +1280,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'binary'         => false,
                 'unsigned'       => false,
                 'comment'        => 'a column with type BIT',
-            ),
-            array(
+            ],
+            [
                 'name'           => 'OXDEC',
                 'max_length'     => '6',
                 'type'           => 'decimal',
@@ -1297,8 +1294,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'default_value'  => '1.30',
                 'scale'          => '2',
                 'comment'        => 'a column with type DECIMAL',
-            ),
-            array(
+            ],
+            [
                 'name'           => 'OXTEXT',
                 'type'           => 'text',
                 'not_null'       => true,
@@ -1309,9 +1306,9 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'has_default'    => false,
                 'comment'        => 'a column with type TEXT',
                 'characterSet'   => 'utf8',
-                'collation'      => 'utf8_general_ci'
-            ),
-            array(
+                'collation'      => 'utf8_general_ci',
+            ],
+            [
                 'name'           => 'OXID',
                 'max_length'     => '32',
                 'type'           => 'char',
@@ -1323,9 +1320,9 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'has_default'    => false,
                 'comment'        => 'a column with type CHAR',
                 'characterSet'   => 'utf8',
-                'collation'      => 'utf8_general_ci'
-            ),
-            array(
+                'collation'      => 'utf8_general_ci',
+            ],
+            [
                 'name'           => 'OXBLOB',
                 'type'           => 'blob',
                 'not_null'       => false,
@@ -1334,8 +1331,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'binary'         => true,
                 'unsigned'       => false,
                 'comment'        => 'a column with type BLOB',
-            ),
-            array(
+            ],
+            [
                 'name'           => 'OXFLOAT',
                 'max_length'     => '5',
                 'scale'          => '2',
@@ -1347,8 +1344,8 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
                 'unsigned'       => true,
                 'has_default'    => true,
                 'default_value'  => '1.30',
-            )
-        );
+            ],
+        ];
     }
 
     /**
@@ -1384,7 +1381,7 @@ abstract class DatabaseInterfaceImplementationTest extends DatabaseInterfaceImpl
     {
         $masterDb = oxDb::getMaster();
 
-        $rows = $masterDb->select('SELECT OXID FROM ' . self::TABLE_NAME, array());
+        $rows = $masterDb->select('SELECT OXID FROM ' . self::TABLE_NAME, []);
         $row = $rows->fetchRow();
 
         return $row;

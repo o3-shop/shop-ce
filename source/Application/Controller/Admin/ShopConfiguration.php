@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Shop;
@@ -32,11 +33,10 @@ use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfigurationInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
-use Exception;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleSettingNotFountException;
+use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfigurationInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleSettingNotFountException;
 
 /**
  * Admin shop config manager.
@@ -50,12 +50,12 @@ class ShopConfiguration extends AdminDetailsController
     protected $_aParseFloat = ['iMinOrderPrice'];
 
     protected $_aConfParams = [
-        "bool"   => 'confbools',
-        "str"    => 'confstrs',
-        "arr"    => 'confarrs',
-        "aarr"   => 'confaarrs',
-        "select" => 'confselects',
-        "num"    => 'confnum',
+        'bool'   => 'confbools',
+        'str'    => 'confstrs',
+        'arr'    => 'confarrs',
+        'aarr'   => 'confaarrs',
+        'select' => 'confselects',
+        'num'    => 'confnum',
     ];
 
     /**
@@ -72,24 +72,24 @@ class ShopConfiguration extends AdminDetailsController
 
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
-            $this->_aViewData["edit"] = $shop = $this->_getEditShop($soxId);
+            $this->_aViewData['edit'] = $shop = $this->_getEditShop($soxId);
 
             try {
                 // category chosen as default
-                $this->_aViewData["defcat"] = null;
+                $this->_aViewData['defcat'] = null;
                 if ($shop->oxshops__oxdefcat->value) {
                     $category = oxNew(Category::class);
                     if ($category->load($shop->oxshops__oxdefcat->value)) {
-                        $this->_aViewData["defcat"] = $category;
+                        $this->_aViewData['defcat'] = $category;
                     }
                 }
             } catch (Exception $exception) {
                 // on most cases this means that views are broken, so just
                 // outputting notice and keeping functionality flow ...
-                $this->_aViewData["updateViews"] = 1;
+                $this->_aViewData['updateViews'] = 1;
             }
 
             $aoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
@@ -97,7 +97,7 @@ class ShopConfiguration extends AdminDetailsController
                 $shopDefaultCategoryAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ShopDefaultCategoryAjax::class);
                 $this->_aViewData['oxajax'] = $shopDefaultCategoryAjax->getColumns();
 
-                return "popups/shop_default_category.tpl";
+                return 'popups/shop_default_category.tpl';
             }
         }
 
@@ -105,8 +105,8 @@ class ShopConfiguration extends AdminDetailsController
         $confVars = $dbVariables['vars'];
         $confVars['str']['sVersion'] = $config->getConfigParam('sVersion');
 
-        $this->_aViewData["var_constraints"] = $dbVariables['constraints'];
-        $this->_aViewData["var_grouping"] = $dbVariables['grouping'];
+        $this->_aViewData['var_constraints'] = $dbVariables['constraints'];
+        $this->_aViewData['var_grouping'] = $dbVariables['grouping'];
         foreach ($this->_aConfParams as $type => $param) {
             $this->_aViewData[$param] = $confVars[$type];
         }
@@ -114,18 +114,18 @@ class ShopConfiguration extends AdminDetailsController
         // #251A passing country list
         $countryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
         $countryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
-        if (isset($confVars['arr']["aHomeCountry"]) && count($confVars['arr']["aHomeCountry"]) && count($countryList)) {
+        if (isset($confVars['arr']['aHomeCountry']) && count($confVars['arr']['aHomeCountry']) && count($countryList)) {
             foreach ($countryList as $sCountryId => $oCountry) {
-                if (in_array($oCountry->oxcountry__oxid->value, $confVars['arr']["aHomeCountry"])) {
-                    $countryList[$sCountryId]->selected = "1";
+                if (in_array($oCountry->oxcountry__oxid->value, $confVars['arr']['aHomeCountry'])) {
+                    $countryList[$sCountryId]->selected = '1';
                 }
             }
         }
 
-        $this->_aViewData["countrylist"] = $countryList;
+        $this->_aViewData['countrylist'] = $countryList;
 
         // checking if cUrl is enabled
-        $this->_aViewData["blCurlIsActive"] = function_exists('curl_init');
+        $this->_aViewData['blCurlIsActive'] = function_exists('curl_init');
 
         /** @var ContactFormBridgeInterface $contactFormBridge */
         $contactFormBridge = $this->getContainer()->get(ContactFormBridgeInterface::class);
@@ -184,7 +184,7 @@ class ShopConfiguration extends AdminDetailsController
                         if (!$configValidator->isValid($sValueToValidate)) {
                             $error = oxNew(DisplayError::class);
                             $error->setFormatParameters(htmlspecialchars($sValueToValidate));
-                            $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
+                            $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
                             Registry::getUtilsView()->addErrorToDisplay($error);
                             continue;
                         }
@@ -229,17 +229,17 @@ class ShopConfiguration extends AdminDetailsController
     public function loadConfVars($shopId, $moduleId)
     {
         $configurationVariables = [
-            "bool"   => [],
-            "str"    => [],
-            "arr"    => [],
-            "aarr"   => [],
-            "select" => [],
+            'bool'   => [],
+            'str'    => [],
+            'arr'    => [],
+            'aarr'   => [],
+            'select' => [],
         ];
         $constraints = [];
         $groupings = [];
         $database = DatabaseProvider::getDb();
         $rs = $database->select(
-            "select cfg.oxvarname,
+            'select cfg.oxvarname,
                     cfg.oxvartype,
                     cfg.oxvarvalue as oxvarvalue,
                         disp.oxvarconstraint,
@@ -249,10 +249,10 @@ class ShopConfiguration extends AdminDetailsController
                         on cfg.oxmodule=disp.oxcfgmodule and cfg.oxvarname=disp.oxcfgvarname
                 where cfg.oxshopid = :oxshopid
                     and cfg.oxmodule = :oxmodule
-                order by disp.oxpos, cfg.oxvarname",
+                order by disp.oxpos, cfg.oxvarname',
             [
                 ':oxshopid' => $shopId,
-                ':oxmodule' => $moduleId
+                ':oxmodule' => $moduleId,
             ]
         );
 
@@ -303,7 +303,7 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function parseConstraint($type, $constraint)
     {
-        if ($type == "select") {
+        if ($type == 'select') {
             return array_map('trim', explode('|', $constraint));
         }
         return null;
@@ -333,7 +333,7 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function serializeConstraint($type, $constraint)
     {
-        if ($type == "select") {
+        if ($type == 'select') {
             return implode('|', array_map('trim', $constraint));
         }
         return '';
@@ -355,21 +355,21 @@ class ShopConfiguration extends AdminDetailsController
         $data = null;
 
         switch ($type) {
-            case "bool":
-                $data = ($value == "true" || $value == "1");
+            case 'bool':
+                $data = ($value == 'true' || $value == '1');
                 break;
 
-            case "str":
-            case "select":
-            case "num":
-            case "int":
+            case 'str':
+            case 'select':
+            case 'num':
+            case 'int':
                 $data = $str->htmlentities($value);
                 if (in_array($name, $this->_aParseFloat)) {
                     $data = str_replace(',', '.', $data);
                 }
                 break;
 
-            case "arr":
+            case 'arr':
                 if (in_array($name, $this->_aSkipMultiline)) {
                     $data = unserialize($value);
                 } else {
@@ -377,7 +377,7 @@ class ShopConfiguration extends AdminDetailsController
                 }
                 break;
 
-            case "aarr":
+            case 'aarr':
                 if (in_array($name, $this->_aSkipMultiline)) {
                     $data = unserialize($value);
                 } else {
@@ -405,24 +405,24 @@ class ShopConfiguration extends AdminDetailsController
         $data = $value;
 
         switch ($type) {
-            case "bool":
+            case 'bool':
                 break;
 
-            case "str":
-            case "select":
-            case "int":
+            case 'str':
+            case 'select':
+            case 'int':
                 if (in_array($name, $this->_aParseFloat)) {
                     $data = str_replace(',', '.', $data);
                 }
                 break;
 
-            case "arr":
+            case 'arr':
                 if (!is_array($value)) {
                     $data = $this->_multilineToArray($value);
                 }
                 break;
 
-            case "aarr":
+            case 'aarr':
                 $data = $this->_multilineToAarray($value);
                 break;
         }
@@ -481,7 +481,7 @@ class ShopConfiguration extends AdminDetailsController
         if (is_array($array)) {
             foreach ($array as $key => $value) {
                 $array[$key] = trim($value);
-                if ($array[$key] == "") {
+                if ($array[$key] == '') {
                     unset($array[$key]);
                 }
             }
@@ -518,7 +518,7 @@ class ShopConfiguration extends AdminDetailsController
                 if ($multiline) {
                     $multiline .= "\n";
                 }
-                $multiline .= $key . " => " . $value;
+                $multiline .= $key . ' => ' . $value;
             }
 
             return $multiline;
@@ -538,7 +538,7 @@ class ShopConfiguration extends AdminDetailsController
         return $this->multilineToAarray($multiline);
     }
 
-        /**
+    /**
      * Converts Multiline text to associative array. Returns this array.
      *
      * @param string $multiline Multiline text
@@ -552,10 +552,10 @@ class ShopConfiguration extends AdminDetailsController
         $lines = explode("\n", $multiline);
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line != "" && $string->preg_match("/(.+)=>(.+)/", $line, $regs)) {
+            if ($line != '' && $string->preg_match('/(.+)=>(.+)/', $line, $regs)) {
                 $key = trim($regs[1]);
                 $value = trim($regs[2]);
-                if ($key != "" && $value != "") {
+                if ($key != '' && $value != '') {
                     $array[$key] = $value;
                 }
             }

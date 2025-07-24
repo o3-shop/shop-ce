@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -29,10 +31,10 @@ class ModuleVariablesLocatorTest extends \OxidTestCase
     {
         $cache = $this->getMock('oxFileCache');
 
-        $shopIdCalculator = $this->getMock(\OxidEsales\Eshop\Core\ShopIdCalculator::class, array('getShopId'), array(), '', false);
+        $shopIdCalculator = $this->getMock(\OxidEsales\Eshop\Core\ShopIdCalculator::class, ['getShopId'], [], '', false);
         $shopIdCalculator->expects($this->any())->method('getShopId')->will($this->returnValue($this->getShopId()));
 
         $moduleCache = oxNew('oxModuleVariablesLocator', $cache, $shopIdCalculator);
-        $this->assertEquals(array("a7c40f631fc920687.20179984"), $moduleCache->getModuleVariable("aHomeCountry"));
+        $this->assertEquals(['a7c40f631fc920687.20179984'], $moduleCache->getModuleVariable('aHomeCountry'));
     }
 }

@@ -30,6 +30,6 @@ $aModule = [
     'author' => 'OXID',
     'extend' => [
         /** The class file does not exist at all and thus the class cannot be loaded */
-        \OxidEsales\Eshop\Application\Model\Article::class => \Codeception\TestModule\Problems\Model\NonExistentFile::class
+        \OxidEsales\Eshop\Application\Model\Article::class => \Codeception\TestModule\Problems\Model\NonExistentFile::class,
     ],
 ];

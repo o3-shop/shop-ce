@@ -46,10 +46,10 @@ class ShopRdfa extends ShopConfiguration
      * @var array
      */
     protected $_aCustomers = [
-        "Enduser"           => 0,
-        "Reseller"          => 0,
-        "Business"          => 0,
-        "PublicInstitution" => 0,
+        'Enduser'           => 0,
+        'Reseller'          => 0,
+        'Business'          => 0,
+        'PublicInstitution' => 0,
     ];
 
     /**
@@ -61,7 +61,7 @@ class ShopRdfa extends ShopConfiguration
     public function getContentList()
     {
         $oContentList = oxNew(\OxidEsales\Eshop\Application\Model\ContentList::class);
-        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName("oxcontents", $this->_iEditLang);
+        $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcontents', $this->_iEditLang);
         $oContentList->selectString(
             "SELECT * 
              FROM {$sTable} 
@@ -82,7 +82,7 @@ class ShopRdfa extends ShopConfiguration
      */
     public function getCustomers()
     {
-        $aCustomersConf = Registry::getConfig()->getShopConfVar("aRDFaCustomers");
+        $aCustomersConf = Registry::getConfig()->getShopConfVar('aRDFaCustomers');
         if (isset($aCustomersConf)) {
             foreach ($this->_aCustomers as $sCustomer => $iValue) {
                 $aCustomers[$sCustomer] = (in_array($sCustomer, $aCustomersConf)) ? 1 : 0;
@@ -103,15 +103,15 @@ class ShopRdfa extends ShopConfiguration
     {
         $aParams = Registry::getRequest()->getRequestEscapedParameter('aSubmitUrl');
         if ($aParams['url']) {
-            $sNotificationUrl = "http://gr-notify.appspot.com/submit?uri=" . urlencode($aParams['url']) . "&agent=oxid";
+            $sNotificationUrl = 'http://gr-notify.appspot.com/submit?uri=' . urlencode($aParams['url']) . '&agent=oxid';
             if ($aParams['email']) {
-                $sNotificationUrl .= "&contact=" . urlencode($aParams['email']);
+                $sNotificationUrl .= '&contact=' . urlencode($aParams['email']);
             }
             $aHeaders = $this->getHttpResponseCode($sNotificationUrl);
-            if (substr($aHeaders[2], -4) === "True") {
-                $this->_aViewData["submitMessage"] = 'SHOP_RDFA_SUBMITED_SUCCESSFULLY';
+            if (substr($aHeaders[2], -4) === 'True') {
+                $this->_aViewData['submitMessage'] = 'SHOP_RDFA_SUBMITED_SUCCESSFULLY';
             } else {
-                Registry::getUtilsView()->addErrorToDisplay(substr($aHeaders[3], strpos($aHeaders[3], ":") + 2));
+                Registry::getUtilsView()->addErrorToDisplay(substr($aHeaders[3], strpos($aHeaders[3], ':') + 2));
             }
         } else {
             Registry::getUtilsView()->addErrorToDisplay('SHOP_RDFA_MESSAGE_NOURL');

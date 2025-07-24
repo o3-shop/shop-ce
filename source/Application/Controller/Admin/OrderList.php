@@ -53,7 +53,7 @@ class OrderList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxorderdate";
+    protected $_sDefSortField = 'oxorderdate';
 
     /**
      * Executes parent method parent::render() and returns name of template
@@ -78,13 +78,13 @@ class OrderList extends AdminListController
         $searchQuery = Registry::getRequest()->getRequestEscapedParameter('addsearch');
         $searchField = Registry::getRequest()->getRequestEscapedParameter('addsearchfld');
 
-        $this->_aViewData["folder"] = $folder ? $folder : -1;
-        $this->_aViewData["addsearchfld"] = $searchField ? $searchField : -1;
-        $this->_aViewData["asearch"] = $search;
-        $this->_aViewData["addsearch"] = $searchQuery;
-        $this->_aViewData["afolder"] = $folders;
+        $this->_aViewData['folder'] = $folder ? $folder : -1;
+        $this->_aViewData['addsearchfld'] = $searchField ? $searchField : -1;
+        $this->_aViewData['asearch'] = $search;
+        $this->_aViewData['addsearch'] = $searchQuery;
+        $this->_aViewData['afolder'] = $folders;
 
-        return "order_list.tpl";
+        return 'order_list.tpl';
     }
 
     /**
@@ -122,7 +122,7 @@ class OrderList extends AdminListController
     public function getListSorting()
     {
         $sorting = parent::getListSorting();
-        if (isset($sorting["oxorder"]["oxbilllname"])) {
+        if (isset($sorting['oxorder']['oxbilllname'])) {
             $this->_blDesc = false;
         }
 
@@ -148,10 +148,10 @@ class OrderList extends AdminListController
         $folder = Registry::getRequest()->getRequestEscapedParameter('folder');
         // Searching for empty oxfolder fields
         if ($folder && $folder != '-1') {
-            $query .= " and ( oxorder.oxfolder = " . $database->quote($folder) . " )";
+            $query .= ' and ( oxorder.oxfolder = ' . $database->quote($folder) . ' )';
         } elseif (!$folder && is_array($folders)) {
             $folderNames = array_keys($folders);
-            $query .= " and ( oxorder.oxfolder = " . $database->quote($folderNames[0]) . " )";
+            $query .= ' and ( oxorder.oxfolder = ' . $database->quote($folderNames[0]) . ' )';
         }
 
         return $query;
@@ -178,13 +178,13 @@ class OrderList extends AdminListController
         if ($searchQuery) {
             switch ($searchField) {
                 case 'oxorderarticles':
-                    $queryPart = "oxorder left join oxorderarticles on oxorderarticles.oxorderid=oxorder.oxid where ( oxorderarticles.oxartnum like " . $database->quote("%{$searchQuery}%") . " or oxorderarticles.oxtitle like " . $database->quote("%{$searchQuery}%") . " ) and ";
+                    $queryPart = 'oxorder left join oxorderarticles on oxorderarticles.oxorderid=oxorder.oxid where ( oxorderarticles.oxartnum like ' . $database->quote("%{$searchQuery}%") . ' or oxorderarticles.oxtitle like ' . $database->quote("%{$searchQuery}%") . ' ) and ';
                     break;
                 case 'oxpayments':
-                    $queryPart = "oxorder left join oxpayments on oxpayments.oxid=oxorder.oxpaymenttype where oxpayments.oxdesc like " . $database->quote("%{$searchQuery}%") . " and ";
+                    $queryPart = 'oxorder left join oxpayments on oxpayments.oxid=oxorder.oxpaymenttype where oxpayments.oxdesc like ' . $database->quote("%{$searchQuery}%") . ' and ';
                     break;
                 default:
-                    $queryPart = "oxorder where oxorder.oxpaid like " . $database->quote("%{$searchQuery}%") . " and ";
+                    $queryPart = 'oxorder where oxorder.oxpaid like ' . $database->quote("%{$searchQuery}%") . ' and ';
                     break;
             }
             $query = str_replace('oxorder where', $queryPart, $query);

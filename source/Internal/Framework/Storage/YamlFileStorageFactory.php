@@ -57,7 +57,6 @@ class YamlFileStorageFactory implements FileStorageFactoryInterface
         $this->filesystemService = $filesystemService;
     }
 
-
     public function create(string $filePath): ArrayStorageInterface
     {
         return new YamlFileStorage(

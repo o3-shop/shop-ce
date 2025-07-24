@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,11 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxField;
 use OxidEsales\EshopCommunity\Core\Model\ListModel;
-
-use \oxField;
 
 //class should be named Unit_oxSimpleVariantListTest
 //but GAAAH IT DOES NOT WORK somehow, just because of the name??????
@@ -30,21 +31,21 @@ class SimplevariantlistTest extends \OxidTestCase
 {
     public function testSetParent()
     {
-        $oSubj = $this->getProxyClass("oxSimpleVariantList");
-        $oSubj->setParent("testString");
-        $this->assertEquals("testString", $oSubj->getNonPublicVar("_oParent"));
+        $oSubj = $this->getProxyClass('oxSimpleVariantList');
+        $oSubj->setParent('testString');
+        $this->assertEquals('testString', $oSubj->getNonPublicVar('_oParent'));
     }
 
     public function testAssignElement()
     {
-        $sParent = "someString";
-        $aDbFields = array("field1" => "val1");
+        $sParent = 'someString';
+        $aDbFields = ['field1' => 'val1'];
 
-        $oListObjectMock = $this->getMock(\OxidEsales\Eshop\Application\Model\SimpleVariant::class, array('setParent'));
+        $oListObjectMock = $this->getMock(\OxidEsales\Eshop\Application\Model\SimpleVariant::class, ['setParent']);
         $oListObjectMock->expects($this->once())->method('setParent')->with($sParent);
 
-        $oSubj = $this->getProxyClass("oxSimpleVariantList");
-        $oSubj->setNonPublicVar("_oParent", $sParent);
+        $oSubj = $this->getProxyClass('oxSimpleVariantList');
+        $oSubj->setNonPublicVar('_oParent', $sParent);
         $oSubj->UNITassignElement($oListObjectMock, $aDbFields);
     }
 
@@ -61,7 +62,7 @@ class SimplevariantlistTest extends \OxidTestCase
             $sArtPrice = 19;
         }
 
-        $oParent = $this->getProxyClass("oxArticle");
+        $oParent = $this->getProxyClass('oxArticle');
         $oParent->setInList();
         $oParent->load($sArtId);
         $oVariantList = $oParent->getVariants();

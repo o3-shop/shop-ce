@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxUniversallyUniqueIdGenerator;
+use oxUniversallyUniqueIdGenerator;
 
 /**
  * Class Unit_Core_oxServersClusterIdGeneratorTest
@@ -30,7 +32,7 @@ class UniversallyUniqueIdGeneratorTest extends \OxidTestCase
     {
         $oGenerator = oxNew('oxUniversallyUniqueIdGenerator');
 
-        $aIds = array();
+        $aIds = [];
         for ($i = 0; $i < 100; $i++) {
             $aIds[] = $oGenerator->generate();
         }
@@ -53,7 +55,7 @@ class UniversallyUniqueIdGeneratorTest extends \OxidTestCase
     {
         $oGenerator = oxNew('oxUniversallyUniqueIdGenerator');
 
-        $aIds = array();
+        $aIds = [];
         for ($i = 0; $i < 100; $i++) {
             $aIds[] = $oGenerator->generateV4();
         }
@@ -67,14 +69,14 @@ class UniversallyUniqueIdGeneratorTest extends \OxidTestCase
      */
     public function testUUIDV4UniquenessWhenInFallbackMode()
     {
-        $oCheckerMock = $this->getMock(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker::class, array('isOpenSslRandomBytesGeneratorAvailable'));
+        $oCheckerMock = $this->getMock(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker::class, ['isOpenSslRandomBytesGeneratorAvailable']);
         $oCheckerMock->expects($this->any())->method('isOpenSslRandomBytesGeneratorAvailable')->will($this->returnValue(false));
         /** @var oxOpenSSLFunctionalityChecker $oChecker */
         $oChecker = $oCheckerMock;
 
         $oGenerator = new oxUniversallyUniqueIdGenerator($oChecker);
 
-        $aIds = array();
+        $aIds = [];
         for ($i = 0; $i < 100; $i++) {
             $aIds[] = $oGenerator->generateV4();
         }
@@ -100,7 +102,7 @@ class UniversallyUniqueIdGeneratorTest extends \OxidTestCase
     {
         $oGenerator = oxNew('oxUniversallyUniqueIdGenerator');
 
-        $aIds = array();
+        $aIds = [];
         for ($i = 0; $i < 100; $i++) {
             $aIds[] = $oGenerator->generateV5('seed', 'salt' . $i);
         }
@@ -115,7 +117,7 @@ class UniversallyUniqueIdGeneratorTest extends \OxidTestCase
     {
         $oGenerator = oxNew('oxUniversallyUniqueIdGenerator');
 
-        $aIds = array();
+        $aIds = [];
         for ($i = 0; $i < 100; $i++) {
             $aIds[] = $oGenerator->generateV5('seed' . $i, 'salt');
         }
@@ -146,5 +148,4 @@ class UniversallyUniqueIdGeneratorTest extends \OxidTestCase
 
         $this->assertMatchesRegularExpression('/^[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}$/', $sId);
     }
-
 }

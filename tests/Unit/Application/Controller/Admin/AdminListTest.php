@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxActions;
-use \oxField;
-use \stdClass;
-use \oxDb;
-use \oxRegistry;
+use oxActions;
+use oxDb;
+use oxField;
+use oxRegistry;
+use stdClass;
 
 /**
  * Test oxAdminList module
@@ -90,17 +92,17 @@ class AdminListTest extends \OxidTestCase
     public function testGetViewListSize()
     {
         $this->markTestSkipped('Bug: 9 does not match 10');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('setConfigParam', 'getConfigParam'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['setConfigParam', 'getConfigParam']);
         $oConfig->expects($this->once())->method('setConfigParam')->with($this->equalTo('iAdminListSize'), $this->equalTo(10));
         $oConfig->expects($this->once())->method('getConfigParam')->will($this->returnValue(''));
 
         // testing is config value taken
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array('getConfig'), array(), '', false);
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getConfig'], [], '', false);
         $oAdminList->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
         $this->assertEquals(10, $oAdminList->UNITgetViewListSize());
 
         // testing if cookie data is used
-        $this->getSession()->setVariable('profile', array(1 => 500));
+        $this->getSession()->setVariable('profile', [1 => 500]);
         $oAdminList = oxNew('oxAdminList');
         $this->assertEquals(500, $oAdminList->UNITgetViewListSize());
     }
@@ -194,28 +196,27 @@ class AdminListTest extends \OxidTestCase
         $oAdminList = $this->getProxyClass('oxAdminList');
         $oAdminList->setNonPublicVar('_iListSize', 110);
 
-        $sPage = "1 from 7";
+        $sPage = '1 from 7';
         $oAdminList->UNITsetCurrentListPosition($sPage);
         $this->assertEquals(0, $oAdminList->getNonPublicVar('_iCurrListPos'));
         $this->assertEquals(0, $oAdminList->getNonPublicVar('_iOverPos'));
 
-        $sPage = "3 from 7";
+        $sPage = '3 from 7';
         $oAdminList->UNITsetCurrentListPosition($sPage);
         $this->assertEquals(20, $oAdminList->getNonPublicVar('_iCurrListPos'));
         $this->assertEquals(20, $oAdminList->getNonPublicVar('_iOverPos'));
 
-        $sPage = "7 from 7";
+        $sPage = '7 from 7';
 
         $oAdminList->UNITsetCurrentListPosition($sPage);
         $this->assertEquals(60, $oAdminList->getNonPublicVar('_iCurrListPos'));
         $this->assertEquals(60, $oAdminList->getNonPublicVar('_iOverPos'));
 
-        $sPage = "80 from 7";
+        $sPage = '80 from 7';
 
         $oAdminList->UNITsetCurrentListPosition($sPage);
         $this->assertEquals(100, $oAdminList->getNonPublicVar('_iCurrListPos'));
         $this->assertEquals(100, $oAdminList->getNonPublicVar('_iOverPos'));
-
 
         $sPage = '';
         $oAdminList->UNITsetCurrentListPosition($sPage);
@@ -234,12 +235,12 @@ class AdminListTest extends \OxidTestCase
 
         $sTable = getViewName('oxarticles', 1);
 
-        $aSorting = array("oxarticles" => array("oxtitle" => "asc"));
-        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, array("isMultilang", "getLanguage"));
+        $aSorting = ['oxarticles' => ['oxtitle' => 'asc']];
+        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, ['isMultilang', 'getLanguage']);
         $oListObject->expects($this->once())->method('isMultilang')->will($this->returnValue(true));
         $oListObject->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getListSorting", "getItemListBaseObject"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getListSorting', 'getItemListBaseObject']);
         $oAdminList->expects($this->once())->method('getListSorting')->will($this->returnValue($aSorting));
         $oAdminList->expects($this->once())->method('getItemListBaseObject')->will($this->returnValue($oListObject));
 
@@ -254,13 +255,13 @@ class AdminListTest extends \OxidTestCase
     public function testPrepareOrderByQueryMultipleSort()
     {
         $sTable = getViewName('oxlinks', 1);
-        $aSorting = array("oxlinks" => array("oxtitle" => "asc", "oxactive" => "asc", "sort" => "asc"));
+        $aSorting = ['oxlinks' => ['oxtitle' => 'asc', 'oxactive' => 'asc', 'sort' => 'asc']];
 
-        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, array("isMultilang", "getLanguage"));
+        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, ['isMultilang', 'getLanguage']);
         $oListObject->expects($this->once())->method('isMultilang')->will($this->returnValue(true));
         $oListObject->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getListSorting", "getItemListBaseObject"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getListSorting', 'getItemListBaseObject']);
         $oAdminList->expects($this->once())->method('getListSorting')->will($this->returnValue($aSorting));
         $oAdminList->expects($this->once())->method('getItemListBaseObject')->will($this->returnValue($oListObject));
 
@@ -275,12 +276,12 @@ class AdminListTest extends \OxidTestCase
      */
     public function testPrepareOrderByQueryByInternalParam()
     {
-        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, array("isMultilang", "getLanguage", "getCoreTableName"));
+        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, ['isMultilang', 'getLanguage', 'getCoreTableName']);
         $oListObject->expects($this->once())->method('isMultilang')->will($this->returnValue(true));
         $oListObject->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
-        $oListObject->expects($this->once())->method('getCoreTableName')->will($this->returnValue("oxlinks"));
+        $oListObject->expects($this->once())->method('getCoreTableName')->will($this->returnValue('oxlinks'));
 
-        $oList = $this->getMock(\OxidEsales\Eshop\Core\Model\ListModel::class, array("getBaseObject"));
+        $oList = $this->getMock(\OxidEsales\Eshop\Core\Model\ListModel::class, ['getBaseObject']);
         $oList->expects($this->any())->method('getBaseObject')->will($this->returnValue($oListObject));
 
         $sTable = getViewName('oxlinks', 1);
@@ -318,13 +319,13 @@ class AdminListTest extends \OxidTestCase
     public function testPrepareOrderWithOrderType()
     {
         $sTable = getViewName('oxlinks', 1);
-        $aSorting = array("oxlinks" => array("oxtitle" => "desc"));
+        $aSorting = ['oxlinks' => ['oxtitle' => 'desc']];
 
-        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, array("isMultilang", "getLanguage"));
+        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, ['isMultilang', 'getLanguage']);
         $oListObject->expects($this->once())->method('isMultilang')->will($this->returnValue(true));
         $oListObject->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getListSorting", "getItemListBaseObject"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getListSorting', 'getItemListBaseObject']);
         $oAdminList->expects($this->once())->method('getListSorting')->will($this->returnValue($aSorting));
         $oAdminList->expects($this->once())->method('getItemListBaseObject')->will($this->returnValue($oListObject));
 
@@ -339,13 +340,13 @@ class AdminListTest extends \OxidTestCase
     public function testPrepareOrderMultilanguageField()
     {
         $sTable = getViewName('oxlinks', 1);
-        $aSorting = array("oxlinks" => array("oxurldesc" => "asc"));
+        $aSorting = ['oxlinks' => ['oxurldesc' => 'asc']];
 
-        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, array("isMultilang", "getLanguage"));
+        $oListObject = $this->getMock(\OxidEsales\Eshop\Application\Model\Links::class, ['isMultilang', 'getLanguage']);
         $oListObject->expects($this->once())->method('isMultilang')->will($this->returnValue(true));
         $oListObject->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getListSorting", "getItemListBaseObject"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getListSorting', 'getItemListBaseObject']);
         $oAdminList->expects($this->once())->method('getListSorting')->will($this->returnValue($aSorting));
         $oAdminList->expects($this->once())->method('getItemListBaseObject')->will($this->returnValue($oListObject));
 
@@ -360,13 +361,13 @@ class AdminListTest extends \OxidTestCase
     public function testPrepareOrderByWithDefinedOrderTable()
     {
         $sTable = getViewName('oxarticles', 1);
-        $aSorting = array("oxarticles" => array("oxtitle" => "asc"));
+        $aSorting = ['oxarticles' => ['oxtitle' => 'asc']];
 
-        $oListObject = $this->getMock('oxarticles', array("isMultilang", "getLanguage"));
+        $oListObject = $this->getMock('oxarticles', ['isMultilang', 'getLanguage']);
         $oListObject->expects($this->once())->method('isMultilang')->will($this->returnValue(true));
         $oListObject->expects($this->once())->method('getLanguage')->will($this->returnValue(1));
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getListSorting", "getItemListBaseObject"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getListSorting', 'getItemListBaseObject']);
         $oAdminList->expects($this->once())->method('getListSorting')->will($this->returnValue($aSorting));
         $oAdminList->expects($this->once())->method('getItemListBaseObject')->will($this->returnValue($oListObject));
 
@@ -416,7 +417,7 @@ class AdminListTest extends \OxidTestCase
 
         //setting spacing to 1 space
         $sResultSql = strtolower(trim($sResultSql));
-        $sResultSql = preg_replace("/\s+/", " ", $sResultSql);
+        $sResultSql = preg_replace("/\s+/", ' ', $sResultSql);
 
         $sSql = "and ( `oxtitle` like '%testvalue%' ) and ( `oxid` = 'testid' )";
 
@@ -438,7 +439,7 @@ class AdminListTest extends \OxidTestCase
 
         //setting spacing to 1 space
         $sResultSql = strtolower(trim($sResultSql));
-        $sResultSql = preg_replace("/\s+/", " ", $sResultSql);
+        $sResultSql = preg_replace("/\s+/", ' ', $sResultSql);
 
         $sSql = "and ( `oxtitle` like '%testvalue1%' and `oxtitle` like '%testvalue2%' and `oxtitle` like '%testvalue3%' ) and ( `oxid` = 'testid' )";
 
@@ -462,7 +463,7 @@ class AdminListTest extends \OxidTestCase
 
         //setting spacing to 1 space
         $sResultSql = strtolower(trim($sResultSql));
-        $sResultSql = preg_replace("/\s+/", " ", $sResultSql);
+        $sResultSql = preg_replace("/\s+/", ' ', $sResultSql);
 
         $sSql = "and ( `oxtitle` = 'das' and ( `oxtitle` = '%testvalueäö%' or `oxtitle` = '%testvalue&auml;&ouml;%' ) and `oxtitle` = 'asd' ) and ( `oxid` = 'testid' )";
 
@@ -483,9 +484,9 @@ class AdminListTest extends \OxidTestCase
 
         //setting spacing to 1 space
         $sResultSql = strtolower(trim($sResultSql));
-        $sResultSql = preg_replace("/\s+/", " ", $sResultSql);
+        $sResultSql = preg_replace("/\s+/", ' ', $sResultSql);
 
-        $sSql = "";
+        $sSql = '';
 
         $this->assertEquals($sSql, $sResultSql);
     }
@@ -504,7 +505,7 @@ class AdminListTest extends \OxidTestCase
 
         //setting spacing to 1 space
         $sResultSql = strtolower(trim($sResultSql));
-        $sResultSql = preg_replace("/\s+/", " ", $sResultSql);
+        $sResultSql = preg_replace("/\s+/", ' ', $sResultSql);
 
         $sSql = "and ( `oxtitle` like '%0%' )";
 
@@ -520,7 +521,7 @@ class AdminListTest extends \OxidTestCase
      */
     public function testPrepareWhereQueryWithOrderWhenFolderNotSpecified()
     {
-        $this->getConfig()->setConfigParam('aOrderfolder', array('Neu' => 1, 'Old' => 2));
+        $this->getConfig()->setConfigParam('aOrderfolder', ['Neu' => 1, 'Old' => 2]);
         $this->setRequestParameter('folder', '');
 
         $aWhere['oxtitle'] = '';
@@ -560,7 +561,7 @@ class AdminListTest extends \OxidTestCase
         $oLinks = oxNew('oxList');
         $oLinks->init('oxLinks');
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getItemList"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getItemList']);
         $oAdminList->expects($this->any())->method('getItemList')->will($this->returnValue($oLinks));
         $this->assertEquals($aResultWhere, $oAdminList->buildWhere());
     }
@@ -607,7 +608,7 @@ class AdminListTest extends \OxidTestCase
 
         $oAdminList = $this->getProxyClass('oxAdminList');
         $oAdminList->setNonPublicVar('_oList', $oLinks);
-        $this->assertEquals(array(), $oAdminList->buildWhere());
+        $this->assertEquals([], $oAdminList->buildWhere());
     }
 
     /**
@@ -631,7 +632,7 @@ class AdminListTest extends \OxidTestCase
         $oLinks = oxNew('oxList');
         $oLinks->init('oxLinks');
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getItemList"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getItemList']);
         $oAdminList->expects($this->any())->method('getItemList')->will($this->returnValue($oLinks));
 
         $this->assertEquals($aResultWhere, $oAdminList->buildWhere());
@@ -655,7 +656,7 @@ class AdminListTest extends \OxidTestCase
         $oLinks = oxNew('oxList');
         $oLinks->init('oxLinks');
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getItemList"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getItemList']);
         $oAdminList->expects($this->any())->method('getItemList')->will($this->returnValue($oLinks));
 
         $this->assertEquals($aResultWhere, $oAdminList->buildWhere());
@@ -687,10 +688,10 @@ class AdminListTest extends \OxidTestCase
         $oLinks->init('oxLinks');
 
         $oBaseObject = oxNew('oxLinks');
-        $oBaseObject->oxlinks__oxinsert = new oxField("test");
-        $oBaseObject->oxlinks__oxinsert->fldtype = "date";
+        $oBaseObject->oxlinks__oxinsert = new oxField('test');
+        $oBaseObject->oxlinks__oxinsert->fldtype = 'date';
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array("getItemList", "getItemListBaseObject"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getItemList', 'getItemListBaseObject']);
         $oAdminList->expects($this->any())->method('getItemList')->will($this->returnValue($oLinks));
         $oAdminList->expects($this->any())->method('getItemListBaseObject')->will($this->returnValue($oBaseObject));
 
@@ -738,11 +739,11 @@ class AdminListTest extends \OxidTestCase
      */
     public function testSetupNavigation()
     {
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array('getTabs', 'getActiveTab'));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getTabs', 'getActiveTab']);
         $oNavigation->expects($this->once())->method('getTabs')->with($this->equalTo('xxx'), $this->equalTo(0))->will($this->returnValue('editnavi'));
         $oNavigation->expects($this->exactly(2))->method('getActiveTab')->with($this->equalTo('xxx'), $this->equalTo(0))->will($this->onConsecutiveCalls('actlocation', 'default_edit'));
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array('getNavigation'));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getNavigation']);
         $oAdminList->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
 
         $oAdminList->UNITsetupNavigation('xxx');
@@ -759,8 +760,8 @@ class AdminListTest extends \OxidTestCase
      */
     public function testSetupNavigationResetsActiveTabIdOnCreatingNewItem()
     {
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array('getTabs', 'getActiveTab'));
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, array('getNavigation'));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getTabs', 'getActiveTab']);
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminListController::class, ['getNavigation']);
         $oAdminList->expects($this->any())->method('getNavigation')->will($this->returnValue($oNavigation));
 
         //setting active tab 1
@@ -786,7 +787,7 @@ class AdminListTest extends \OxidTestCase
 
         $sTable = getViewName('oxlinks');
 
-        $aSearchFields = array('oxlinks.oxid' => '1', 'oxshopid' => '2', 'oxarticles.oxtitle' => '3');
+        $aSearchFields = ['oxlinks.oxid' => '1', 'oxshopid' => '2', 'oxarticles.oxtitle' => '3'];
         $this->setRequestParameter('where', $aSearchFields);
 
         $oAdminList = $this->getProxyClass('oxAdminList');
@@ -811,23 +812,23 @@ class AdminListTest extends \OxidTestCase
      */
     public function testConvertToDBDate()
     {
-        $aDates[] = array("14.11.2008", "2008-11-14", 'date');
-        $aDates[] = array("11.2008", "2008-11", 'date');
-        $aDates[] = array("14.11", "11-14", 'date');
-        $aDates[] = array("11/14/2008", "2008-11-14", 'date');
-        $aDates[] = array("11/14", "11-14", 'date');
-        $aDates[] = array("11/2008", "2008-11", 'date');
-        $aDates[] = array("11/2008", "2008-11", 'datetime');
-        $aDates[] = array("2007-07", "2007-07", 'datetime');
-        $aDates[] = array("2007-07-20 12:02:07", "2007-07-20 12:02:07", 'datetime');
-        $aDates[] = array("07/20/2007 10:02:07 AM", "2007-07-20 10:02:07", 'datetime');
-        $aDates[] = array("2007-07-20 12", "2007-07-20 12", 'datetime');
-        $aDates[] = array("20.07.2007 12.02", "2007-07-20 12:02", 'datetime');
-        $aDates[] = array("20.07.2007 12", "2007-07-20 12", 'datetime');
-        $aDates[] = array("07/20/2007 10:02 AM", "2007-07-20 10:02", 'datetime');
-        $aDates[] = array("07/20/2007 10:02 PM", "2007-07-20 22:02", 'datetime');
-        $aDates[] = array("07/20/2007 10 AM", "2007-07-20 10", 'datetime');
-        $aDates[] = array("07/20/2007 10 PM", "2007-07-20 22", 'datetime');
+        $aDates[] = ['14.11.2008', '2008-11-14', 'date'];
+        $aDates[] = ['11.2008', '2008-11', 'date'];
+        $aDates[] = ['14.11', '11-14', 'date'];
+        $aDates[] = ['11/14/2008', '2008-11-14', 'date'];
+        $aDates[] = ['11/14', '11-14', 'date'];
+        $aDates[] = ['11/2008', '2008-11', 'date'];
+        $aDates[] = ['11/2008', '2008-11', 'datetime'];
+        $aDates[] = ['2007-07', '2007-07', 'datetime'];
+        $aDates[] = ['2007-07-20 12:02:07', '2007-07-20 12:02:07', 'datetime'];
+        $aDates[] = ['07/20/2007 10:02:07 AM', '2007-07-20 10:02:07', 'datetime'];
+        $aDates[] = ['2007-07-20 12', '2007-07-20 12', 'datetime'];
+        $aDates[] = ['20.07.2007 12.02', '2007-07-20 12:02', 'datetime'];
+        $aDates[] = ['20.07.2007 12', '2007-07-20 12', 'datetime'];
+        $aDates[] = ['07/20/2007 10:02 AM', '2007-07-20 10:02', 'datetime'];
+        $aDates[] = ['07/20/2007 10:02 PM', '2007-07-20 22:02', 'datetime'];
+        $aDates[] = ['07/20/2007 10 AM', '2007-07-20 10', 'datetime'];
+        $aDates[] = ['07/20/2007 10 PM', '2007-07-20 22', 'datetime'];
         $oAdminList = $this->getProxyClass('oxAdminList');
         foreach ($aDates as $aDate) {
             list($sInput, $sResult, $blFldType) = $aDate;
@@ -844,10 +845,10 @@ class AdminListTest extends \OxidTestCase
      */
     public function testConvertDate()
     {
-        $aDates[] = array("11.2008", "2008-11");
-        $aDates[] = array("14.11", "11-14");
-        $aDates[] = array("11/2008", "2008-11");
-        $aDates[] = array("11/14", "11-14");
+        $aDates[] = ['11.2008', '2008-11'];
+        $aDates[] = ['14.11', '11-14'];
+        $aDates[] = ['11/2008', '2008-11'];
+        $aDates[] = ['11/14', '11-14'];
         $oAdminList = $this->getProxyClass('oxAdminList');
         foreach ($aDates as $aDate) {
             list($sInput, $sResult) = $aDate;
@@ -864,11 +865,11 @@ class AdminListTest extends \OxidTestCase
      */
     public function testConvertTime()
     {
-        $aDates[] = array("11.11.2008 11.10", "2008-11-11 11:10");
-        $aDates[] = array("11.11.2008 11", "2008-11-11 11");
-        $aDates[] = array("11/11/2008 11:10 AM", "2008-11-11 11:10");
-        $aDates[] = array("11/11/2008 11:10 PM", "2008-11-11 23:10");
-        $aDates[] = array("11/11/2008 10 PM", "2008-11-11 22");
+        $aDates[] = ['11.11.2008 11.10', '2008-11-11 11:10'];
+        $aDates[] = ['11.11.2008 11', '2008-11-11 11'];
+        $aDates[] = ['11/11/2008 11:10 AM', '2008-11-11 11:10'];
+        $aDates[] = ['11/11/2008 11:10 PM', '2008-11-11 23:10'];
+        $aDates[] = ['11/11/2008 10 PM', '2008-11-11 22'];
         $oAdminList = $this->getProxyClass('oxAdminList');
         foreach ($aDates as $aDate) {
             list($sInput, $sResult) = $aDate;

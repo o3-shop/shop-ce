@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,7 +27,7 @@ $sMetadataVersion = '2.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'with_metadata_v21',
     'title'        => 'Smarty plugin directoies',
     'description'  => 'Test defining smarty plugin directoies',
@@ -35,6 +36,6 @@ $aModule = array(
     'author'       => 'OXID eSales AG',
     'smartyPluginDirectories'  => [
         'Smarty/PluginDirectory1WithMetadataVersion21',
-        'Smarty/PluginDirectory2WithMetadataVersion21'
-    ]
-);
+        'Smarty/PluginDirectory2WithMetadataVersion21',
+    ],
+];

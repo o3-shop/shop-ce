@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\core;
 
-use \oxField;
+use oxField;
 use oxStr;
 
 class EmailUtf8Test extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -53,7 +54,7 @@ class EmailUtf8Test extends \OxidTestCase
     public function testGetCharset()
     {
         $oEmail = oxNew('oxEmail');
-        $this->assertEquals("UTF-8", $oEmail->getCharset());
+        $this->assertEquals('UTF-8', $oEmail->getCharset());
     }
 
     /**
@@ -64,7 +65,7 @@ class EmailUtf8Test extends \OxidTestCase
     public function testGetCurrency()
     {
         $oEmail = oxNew('oxEmail');
-        $this->assertEquals("€", $oEmail->getCurrency()->sign);
+        $this->assertEquals('€', $oEmail->getCurrency()->sign);
     }
 
     /**
@@ -76,14 +77,14 @@ class EmailUtf8Test extends \OxidTestCase
         $oPrice->expects($this->any())->method('getPrice')->will($this->returnValue(256));
         $oPrice->expects($this->any())->method('getBruttoPrice')->will($this->returnValue(8));
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array('getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle'));
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle']);
         $oBasketItem->expects($this->any())->method('getPrice')->will($this->returnValue($oPrice));
         $oBasketItem->expects($this->any())->method('getUnitPrice')->will($this->returnValue($oPrice));
         $oBasketItem->expects($this->any())->method('getRegularUnitPrice')->will($this->returnValue($oPrice));
-        $oBasketItem->expects($this->any())->method('getTitle')->will($this->returnValue("testarticle"));
+        $oBasketItem->expects($this->any())->method('getTitle')->will($this->returnValue('testarticle'));
 
         // insert test article
-        $oArticle = oxNew("oxArticle");
+        $oArticle = oxNew('oxArticle');
         $oArticle->setId('_testArticleId');
         $oArticle->setId('_testArticleId');
         $oArticle->oxarticles__oxtitle = new oxField();
@@ -93,22 +94,22 @@ class EmailUtf8Test extends \OxidTestCase
 
         $oPrice->setPrice(0);
 
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array("getBasketArticles", "getContents", "getCosts", "getBruttoSum",));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getBasketArticles', 'getContents', 'getCosts', 'getBruttoSum',]);
         $oBasket->expects($this->any())->method('getBasketArticles')->will($this->returnValue($aBasketArticles));
         $oBasket->expects($this->any())->method('getContents')->will($this->returnValue($aBasketContents));
         $oBasket->expects($this->any())->method('getCosts')->will($this->returnValue($oPrice));
         $oBasket->expects($this->any())->method('getBruttoSum')->will($this->returnValue(7));
 
         $oPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
-        $oPayment->oxpayments__oxdesc = new oxField("testPaymentDesc");
+        $oPayment->oxpayments__oxdesc = new oxField('testPaymentDesc');
 
-        $oUser = oxNew("oxuser");
+        $oUser = oxNew('oxuser');
         $oUser->setId('_testUserId');
         $oUser->oxuser__oxusername = new oxField('username@useremail.nl', oxField::T_RAW);
         $oUser->oxuser__oxfname = new oxField('testUserFName', oxField::T_RAW);
         $oUser->oxuser__oxlname = new oxField('testUserLName', oxField::T_RAW);
 
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, array("getOrderUser", "getBasket", "getPayment"));
+        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, ['getOrderUser', 'getBasket', 'getPayment']);
         $oOrder->expects($this->any())->method('getOrderUser')->will($this->returnValue($oUser));
         $oOrder->expects($this->any())->method('getBasket')->will($this->returnValue($oBasket));
         $oOrder->expects($this->any())->method('getPayment')->will($this->returnValue($oPayment));
@@ -121,12 +122,12 @@ class EmailUtf8Test extends \OxidTestCase
         $oOrder->oxorder__oxbillcity = new oxField('');
         $oOrder->oxorder__oxbillcountry = new oxField('');
         $oOrder->oxorder__oxbillcompany = new oxField('');
-        $oOrder->oxorder__oxdeltype = new oxField("oxidstandard");
+        $oOrder->oxorder__oxdeltype = new oxField('oxidstandard');
 
-        $oShop = oxNew("oxshop");
+        $oShop = oxNew('oxshop');
         $oShop->load($this->getConfig()->getShopId());
 
-        $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("_sendMail", "_getShop", "getOrderFileList"));
+        $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, ['_sendMail', '_getShop', 'getOrderFileList']);
         $oEmail->expects($this->once())->method('_sendMail')->will($this->returnValue(true));
         $oEmail->expects($this->any())->method('_getShop')->will($this->returnValue($oShop));
         $oEmail->expects($this->any())->method('getOrderFileList')->will($this->returnValue(false));
@@ -143,14 +144,14 @@ class EmailUtf8Test extends \OxidTestCase
         // checking if there are some utf-8 strings
 
         // translation check
-        $this->assertTrue($oStr->strpos($sBody, "Grußkarte:") > 0);
+        $this->assertTrue($oStr->strpos($sBody, 'Grußkarte:') > 0);
 
         // euro sign check
-        $this->assertTrue($oStr->strpos($sBody, "256,00 €") > 0);
+        $this->assertTrue($oStr->strpos($sBody, '256,00 €') > 0);
 
         // strings, that comes from oxcontent
-        $this->assertTrue($oStr->strpos($sBody, "Vielen Dank für Ihre Bestellung!") > 0);
-        $this->assertTrue($oStr->strpos($sBody, "Bitte fügen Sie hier Ihre vollständige Anbieterkennzeichnung ein.") > 0);
+        $this->assertTrue($oStr->strpos($sBody, 'Vielen Dank für Ihre Bestellung!') > 0);
+        $this->assertTrue($oStr->strpos($sBody, 'Bitte fügen Sie hier Ihre vollständige Anbieterkennzeichnung ein.') > 0);
     }
 
     public function testSendForgotPwdEmailIsCaseInsensitive()
@@ -158,9 +159,9 @@ class EmailUtf8Test extends \OxidTestCase
         $realEmailAddress = 'admin';
         $userProvidedEmailAddress = 'ADMIN';
 
-        $oEmailMock = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array("send", "setRecipient"));
-        $oEmailMock->expects($this->once())->method("setRecipient")->with($realEmailAddress, 'Erika Mustermann');
-        $oEmailMock->expects($this->once())->method("send")->will($this->returnValue(true));
+        $oEmailMock = $this->getMock(\OxidEsales\Eshop\Core\Email::class, ['send', 'setRecipient']);
+        $oEmailMock->expects($this->once())->method('setRecipient')->with($realEmailAddress, 'Erika Mustermann');
+        $oEmailMock->expects($this->once())->method('send')->will($this->returnValue(true));
 
         $oEmailMock->sendForgotPwdEmail($userProvidedEmailAddress);
     }
@@ -174,9 +175,9 @@ class EmailUtf8Test extends \OxidTestCase
     {
         $realEmailAddress = 'admin';
 
-        $oEmailMock = $this->getMock(\OxidEsales\Eshop\Core\Email::class, ["send", "setRecipient"]);
-        $oEmailMock->expects($this->atLeastOnce())->method("setRecipient")->with($realEmailAddress, 'Erika Mustermann');
-        $oEmailMock->expects($this->atLeastOnce())->method("send")->will($this->returnValue(true));
+        $oEmailMock = $this->getMock(\OxidEsales\Eshop\Core\Email::class, ['send', 'setRecipient']);
+        $oEmailMock->expects($this->atLeastOnce())->method('setRecipient')->with($realEmailAddress, 'Erika Mustermann');
+        $oEmailMock->expects($this->atLeastOnce())->method('send')->will($this->returnValue(true));
 
         $oEmailMock->sendForgotPwdEmail($bogusEmailAddress);
     }
@@ -199,7 +200,7 @@ class EmailUtf8Test extends \OxidTestCase
             ['ådmin'],
             ['Ādmin'],
             ['Ądmin'],
-            ['ądmin']
+            ['ądmin'],
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Modules\TestData\modules\w
 
 class TestModuleOnePrice extends TestModuleOnePrice_parent
 {
-
     /**
      * Double the original price
      *
@@ -31,6 +31,6 @@ class TestModuleOnePrice extends TestModuleOnePrice_parent
     public function getPrice()
     {
         $return = parent::getPrice();
-        return 2*$return;
+        return 2 * $return;
     }
 }

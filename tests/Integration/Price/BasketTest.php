@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Price;
 
 use oxDb;
 use oxOrderArticle;
 use oxRegistry;
 
-require_once __DIR__. '/BaseTestCase.php';
+require_once __DIR__ . '/BaseTestCase.php';
 
 /**
  * Basket price calculation test
@@ -38,15 +40,15 @@ require_once __DIR__. '/BaseTestCase.php';
 class BasketTest extends BaseTestCase
 {
     /** @var array Test case directory array */
-    private $testCaseDirectories = array(
-        "testcases/basket",
+    private $testCaseDirectories = [
+        'testcases/basket',
         // "testcases/databomb",
-    );
+    ];
 
     /** @var string Specified test cases (optional) */
-    private $testCases = array(
+    private $testCases = [
         //"testCase.php",
-    );
+    ];
 
     /**
      * Initialize the fixture.
@@ -73,23 +75,23 @@ class BasketTest extends BaseTestCase
     {
         $database = oxDb::getDb();
         $config = oxRegistry::getConfig();
-        $database->execute("TRUNCATE oxarticles");
-        $database->execute("TRUNCATE oxcategories");
-        $database->execute("TRUNCATE oxdiscount");
-        $database->execute("TRUNCATE oxobject2discount");
-        $database->execute("TRUNCATE oxwrapping");
-        $database->execute("TRUNCATE oxdelivery");
-        $database->execute("TRUNCATE oxdel2delset");
-        $database->execute("TRUNCATE oxobject2payment");
-        $database->execute("TRUNCATE oxvouchers");
-        $database->execute("TRUNCATE oxvoucherseries");
-        $database->execute("TRUNCATE oxobject2delivery");
-        $database->execute("TRUNCATE oxobject2category");
-        $database->execute("TRUNCATE oxdeliveryset");
-        $database->execute("TRUNCATE oxuser");
-        $database->execute("TRUNCATE oxprice2article");
-        $config->setConfigParam("blShowVATForDelivery", true);
-        $config->setConfigParam("blShowVATForPayCharge", true);
+        $database->execute('TRUNCATE oxarticles');
+        $database->execute('TRUNCATE oxcategories');
+        $database->execute('TRUNCATE oxdiscount');
+        $database->execute('TRUNCATE oxobject2discount');
+        $database->execute('TRUNCATE oxwrapping');
+        $database->execute('TRUNCATE oxdelivery');
+        $database->execute('TRUNCATE oxdel2delset');
+        $database->execute('TRUNCATE oxobject2payment');
+        $database->execute('TRUNCATE oxvouchers');
+        $database->execute('TRUNCATE oxvoucherseries');
+        $database->execute('TRUNCATE oxobject2delivery');
+        $database->execute('TRUNCATE oxobject2category');
+        $database->execute('TRUNCATE oxdeliveryset');
+        $database->execute('TRUNCATE oxuser');
+        $database->execute('TRUNCATE oxprice2article');
+        $config->setConfigParam('blShowVATForDelivery', true);
+        $config->setConfigParam('blShowVATForPayCharge', true);
     }
 
     /**
@@ -112,14 +114,14 @@ class BasketTest extends BaseTestCase
     public function testBasketCalculation($testCase)
     {
         if (isset($testCase['skipped']) && $testCase['skipped'] == 1) {
-            $this->markTestSkipped("testcase is skipped");
+            $this->markTestSkipped('testcase is skipped');
         }
         // gathering data arrays
         $expected = $testCase['expected'];
 
         //if not finished testing data skip test
         if (empty($expected)) {
-            $this->markTestSkipped("skipping test case due invalid data provided");
+            $this->markTestSkipped('skipping test case due invalid data provided');
         }
 
         // load calculated basket from provided data
@@ -171,17 +173,17 @@ class BasketTest extends BaseTestCase
             $this->assertEquals(
                 $expectedWrappings['brutto'],
                 $basket->getFWrappingCosts(),
-                "Total wrappings brutto price"
+                'Total wrappings brutto price'
             );
             $this->assertEquals(
                 $expectedWrappings['netto'] ?? null,
                 $basket->getWrappCostNet(),
-                "Total wrappings netto price"
+                'Total wrappings netto price'
             );
             $this->assertEquals(
                 $expectedWrappings['vat'] ?? null,
                 $basket->getWrappCostVat(),
-                "Total wrappings vat price"
+                'Total wrappings vat price'
             );
         }
 
@@ -191,17 +193,17 @@ class BasketTest extends BaseTestCase
             $this->assertEquals(
                 $expectedCards['brutto'],
                 $basket->getFGiftCardCosts(),
-                "Total giftcard brutto price"
+                'Total giftcard brutto price'
             );
             $this->assertEquals(
                 $expectedCards['netto'] ?? null,
                 $basket->getGiftCardCostNet(),
-                "Total giftcard netto price"
+                'Total giftcard netto price'
             );
             $this->assertEquals(
                 $expectedCards['vat'] ?? null,
                 $basket->getGiftCardCostVat(),
-                "Total giftcard vat price"
+                'Total giftcard vat price'
             );
         }
 
@@ -211,17 +213,17 @@ class BasketTest extends BaseTestCase
             $this->assertEquals(
                 $expectedDeliveryCosts['brutto'],
                 number_format(round($basket->getDeliveryCosts(), 2), 2, ',', '.'),
-                "Delivery total brutto price"
+                'Delivery total brutto price'
             );
             $this->assertEquals(
                 $expectedDeliveryCosts['netto'] ?? null,
                 $basket->getDelCostNet(),
-                "Delivery total netto price"
+                'Delivery total netto price'
             );
             $this->assertEquals(
                 $expectedDeliveryCosts['vat'] ?? null,
                 $basket->getDelCostVat(),
-                "Delivery total vat price"
+                'Delivery total vat price'
             );
         }
 
@@ -231,17 +233,17 @@ class BasketTest extends BaseTestCase
             $this->assertEquals(
                 $expectedPayments['brutto'] ?? null,
                 number_format(round($basket->getPaymentCosts(), 2), 2, ',', '.'),
-                "Payment total brutto price"
+                'Payment total brutto price'
             );
             $this->assertEquals(
                 $expectedPayments['netto'] ?? null,
                 $basket->getPayCostNet(),
-                "Payment total netto price"
+                'Payment total netto price'
             );
             $this->assertEquals(
                 $expectedPayments['vat'] ?? null,
                 $basket->getPayCostVat(),
-                "Payment total vat price"
+                'Payment total vat price'
             );
         }
 
@@ -251,13 +253,13 @@ class BasketTest extends BaseTestCase
             $this->assertEquals(
                 $expectedVouchers['brutto'],
                 number_format(round($basket->getVoucherDiscValue(), 2), 2, ',', '.'),
-                "Voucher total discount brutto"
+                'Voucher total discount brutto'
             );
         }
 
         // Total netto & brutto, grand total
-        $this->assertEquals($expected['totals']['totalNetto'], $basket->getProductsNetPrice(), "Total Netto");
-        $this->assertEquals($expected['totals']['totalBrutto'], $basket->getFProductsPrice(), "Total Brutto");
-        $this->assertEquals($expected['totals']['grandTotal'], $basket->getFPrice(), "Grand Total");
+        $this->assertEquals($expected['totals']['totalNetto'], $basket->getProductsNetPrice(), 'Total Netto');
+        $this->assertEquals($expected['totals']['totalBrutto'], $basket->getFProductsPrice(), 'Total Brutto');
+        $this->assertEquals($expected['totals']['grandTotal'], $basket->getFPrice(), 'Grand Total');
     }
 }

@@ -37,7 +37,7 @@ class ModuleSortList extends AdminDetailsController
      * It is unsafe to use a backslash as HTML id in conjunction with UI.sortable, so it will be replaced in the
      * view and restored in the controller
      */
-    const BACKSLASH_REPLACEMENT = '---';
+    public const BACKSLASH_REPLACEMENT = '---';
 
     /**
      * Executes parent method parent::render(), loads active and disabled extensions,
@@ -57,19 +57,19 @@ class ModuleSortList extends AdminDetailsController
 
         $sanitizedExtendClass = [];
         foreach ($classExtensionsChain as $extendedClass => $classChain) {
-            $sanitizedKey = str_replace("\\", self::BACKSLASH_REPLACEMENT, $extendedClass);
+            $sanitizedKey = str_replace('\\', self::BACKSLASH_REPLACEMENT, $extendedClass);
             $sanitizedExtendClass[$sanitizedKey] = $classChain;
         }
 
-        $this->_aViewData["aExtClasses"] = $sanitizedExtendClass;
-        $this->_aViewData["aDisabledModules"] = $oModuleList->getDisabledModuleClasses();
+        $this->_aViewData['aExtClasses'] = $sanitizedExtendClass;
+        $this->_aViewData['aDisabledModules'] = $oModuleList->getDisabledModuleClasses();
 
         // checking if there are any deleted extensions
-        if (!Registry::getSession()->getVariable("blSkipDeletedExtChecking")) {
+        if (!Registry::getSession()->getVariable('blSkipDeletedExtChecking')) {
             $aDeletedExt = $oModuleList->getDeletedExtensions();
 
             if (!empty($aDeletedExt)) {
-                $this->_aViewData["aDeletedExt"] = $aDeletedExt;
+                $this->_aViewData['aDeletedExt'] = $aDeletedExt;
             }
         }
 
@@ -113,7 +113,7 @@ class ModuleSortList extends AdminDetailsController
     {
         //if user selected not to update modules, skipping all updates
         if (Registry::getRequest()->getRequestEscapedParameter('noButton')) {
-            Registry::getSession()->setVariable("blSkipDeletedExtChecking", true);
+            Registry::getSession()->setVariable('blSkipDeletedExtChecking', true);
 
             return;
         }
@@ -131,7 +131,7 @@ class ModuleSortList extends AdminDetailsController
         $sanitizedClassExtensionsChain = [];
 
         foreach ($chain as $key => $value) {
-            $sanitizedKey = str_replace(self::BACKSLASH_REPLACEMENT, "\\", $key);
+            $sanitizedKey = str_replace(self::BACKSLASH_REPLACEMENT, '\\', $key);
             $sanitizedClassExtensionsChain[$sanitizedKey] = $value;
         }
 

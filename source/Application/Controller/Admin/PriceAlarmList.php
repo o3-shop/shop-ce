@@ -52,7 +52,7 @@ class PriceAlarmList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxuserid";
+    protected $_sDefSortField = 'oxuserid';
 
     /**
      * Modifying SQL query to load additional article and customer data
@@ -64,11 +64,11 @@ class PriceAlarmList extends AdminListController
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles", (int) Registry::getConfig()->getConfigParam("sDefaultLang"));
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', (int) Registry::getConfig()->getConfigParam('sDefaultLang'));
         $sSql = "select oxpricealarm.*, {$sViewName}.oxtitle AS articletitle, ";
-        $sSql .= "oxuser.oxlname as userlname, oxuser.oxfname as userfname ";
+        $sSql .= 'oxuser.oxlname as userlname, oxuser.oxfname as userfname ';
         $sSql .= "from oxpricealarm left join {$sViewName} on {$sViewName}.oxid = oxpricealarm.oxartid ";
-        $sSql .= "left join oxuser on oxuser.oxid = oxpricealarm.oxuserid WHERE 1 ";
+        $sSql .= 'left join oxuser on oxuser.oxid = oxpricealarm.oxuserid WHERE 1 ';
 
         return $sSql;
     }
@@ -82,17 +82,17 @@ class PriceAlarmList extends AdminListController
     public function buildWhere()
     {
         $this->_aWhere = parent::buildWhere();
-        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxpricealarm");
-        $sArtViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxarticles");
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxpricealarm');
+        $sArtViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
         // updating price fields values for correct search in DB
         if (isset($this->_aWhere[$sViewName . '.oxprice'])) {
-            $sPriceParam = (double) str_replace(['%', ','], ['', '.'], $this->_aWhere[$sViewName . '.oxprice']);
+            $sPriceParam = (float) str_replace(['%', ','], ['', '.'], $this->_aWhere[$sViewName . '.oxprice']);
             $this->_aWhere[$sViewName . '.oxprice'] = '%' . $sPriceParam . '%';
         }
 
         if (isset($this->_aWhere[$sArtViewName . '.oxprice'])) {
-            $sPriceParam = (double) str_replace(['%', ','], ['', '.'], $this->_aWhere[$sArtViewName . '.oxprice']);
+            $sPriceParam = (float) str_replace(['%', ','], ['', '.'], $this->_aWhere[$sArtViewName . '.oxprice']);
             $this->_aWhere[$sArtViewName . '.oxprice'] = '%' . $sPriceParam . '%';
         }
 

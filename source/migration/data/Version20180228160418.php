@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
 
 /**
  * change oxconfig::oxvarvalue type to mediumblob for large module lists

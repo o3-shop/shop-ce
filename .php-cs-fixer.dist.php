@@ -49,7 +49,5 @@ return (new PhpCsFixer\Config())
         ],
         'single_quote' => true,
         'trailing_comma_in_multiline' => true,
-        'class_keyword_remove' => true,
-        'fully_qualified_strict_types' => true,
     ])
     ->setFinder($finder);

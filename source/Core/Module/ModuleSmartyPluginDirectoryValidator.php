@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core\Module;
 
-use OxidEsales\Eshop\Core\Exception\ModuleValidationException   as EshopModuleValidationException;
-use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectories  as EshopModuleSmartyPluginDirectories;
+use OxidEsales\Eshop\Core\Exception\ModuleValidationException as EshopModuleValidationException;
+use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectories as EshopModuleSmartyPluginDirectories;
 
 /**
  * Class ModuleSmartyPluginDirectoryValidator

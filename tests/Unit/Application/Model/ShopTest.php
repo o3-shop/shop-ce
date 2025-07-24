@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxDb;
+use oxField;
 use OxidEsales\Eshop\Application\Model\Shop;
-use OxidEsales\EshopCommunity\Core\I18n;
-
-use \oxDb;
-use \oxField;
 
 class ShopTest extends \OxidTestCase
 {
@@ -72,17 +72,17 @@ class ShopTest extends \OxidTestCase
         $sFieldsMultilang = 'OXID, OXTITLE, OXTITLE_1';
         $sFields = 'OXID, OXTITLE';
 
-        $aMockedFunctionReturns = array(
+        $aMockedFunctionReturns = [
             '_getViewSelectMultilang' => $sFieldsMultilang,
             '_getViewSelect'          => $sFields,
-        );
+        ];
 
-        return array(
-            array('oxarticles', null, $aMockedFunctionReturns,
-                  'CREATE OR REPLACE SQL SECURITY INVOKER VIEW `oxv_oxarticles` AS SELECT ' . $sFieldsMultilang . ' FROM oxarticles'), // default
-            array('oxarticles', 'de', $aMockedFunctionReturns,
-                  'CREATE OR REPLACE SQL SECURITY INVOKER VIEW `oxv_oxarticles_de` AS SELECT ' . $sFields . ' FROM oxarticles'),
-        );
+        return [
+            ['oxarticles', null, $aMockedFunctionReturns,
+                  'CREATE OR REPLACE SQL SECURITY INVOKER VIEW `oxv_oxarticles` AS SELECT ' . $sFieldsMultilang . ' FROM oxarticles'], // default
+            ['oxarticles', 'de', $aMockedFunctionReturns,
+                  'CREATE OR REPLACE SQL SECURITY INVOKER VIEW `oxv_oxarticles_de` AS SELECT ' . $sFields . ' FROM oxarticles'],
+        ];
     }
 
     /**
@@ -97,7 +97,7 @@ class ShopTest extends \OxidTestCase
         foreach ($aMockedFunctionReturns as $sFunction => $sReturnValue) {
             $oShop->expects($this->any())->method($sFunction)->will($this->returnValue($sReturnValue));
         }
-        $oShop->createViewQuery($sTable, array(0 => $sLang));
+        $oShop->createViewQuery($sTable, [0 => $sLang]);
         $aQueries = $oShop->getQueries();
         $this->assertEquals(rtrim($sQuery), rtrim($aQueries[0]));
     }
@@ -139,7 +139,7 @@ class ShopTest extends \OxidTestCase
     public function testGetMultishopTablesDefaultNotSet()
     {
         $oShop = oxNew('oxShop');
-        $this->assertEquals(array(), $oShop->getMultiShopTables());
+        $this->assertEquals([], $oShop->getMultiShopTables());
     }
 
     /**
@@ -148,8 +148,8 @@ class ShopTest extends \OxidTestCase
     public function testGetMultishopTablesWhenSet()
     {
         $oShop = oxNew('oxShop');
-        $oShop->setMultiShopTables(array('table1', 'table2'));
-        $this->assertEquals(array('table1', 'table2'), $oShop->getMultiShopTables());
+        $oShop->setMultiShopTables(['table1', 'table2']);
+        $this->assertEquals(['table1', 'table2'], $oShop->getMultiShopTables());
     }
 
     /**
@@ -159,10 +159,10 @@ class ShopTest extends \OxidTestCase
     {
         $oShop = oxNew('oxShop');
         $oShop->addQuery('query');
-        $this->assertEquals(array('query'), $oShop->getQueries());
+        $this->assertEquals(['query'], $oShop->getQueries());
 
         $oShop->addQuery('anotherquery');
-        $this->assertEquals(array('query', 'anotherquery'), $oShop->getQueries());
+        $this->assertEquals(['query', 'anotherquery'], $oShop->getQueries());
     }
 
     /**
@@ -171,7 +171,7 @@ class ShopTest extends \OxidTestCase
     public function testGetQueriesNoQueriesAdded()
     {
         $oShop = oxNew('oxShop');
-        $this->assertEquals(array(), $oShop->getQueries());
+        $this->assertEquals([], $oShop->getQueries());
     }
 
     /**
@@ -180,8 +180,8 @@ class ShopTest extends \OxidTestCase
     public function testGetQueriesQueriesAdded()
     {
         $oShop = oxNew('oxShop');
-        $oShop->setQueries(array('query', 'query2'));
-        $this->assertEquals(array('query', 'query2'), $oShop->getQueries());
+        $oShop->setQueries(['query', 'query2']);
+        $this->assertEquals(['query', 'query2'], $oShop->getQueries());
     }
 
     /**

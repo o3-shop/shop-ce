@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,22 +27,22 @@ abstract class FrontendTestCase extends AcceptanceTestCase
     {
         parent::setUp();
 
-        $this->callShopSC("oxConfig", null, null, array(
-            "iTopNaviCatCount" => array(
-                "type" => "str",
-                "value" => '3',
-                "module" => "theme:azure"
-            ),
-            "aNrofCatArticles" => array(
-                "type" => "arr",
-                "value" => 'a:6:{i:0;s:2:"10";i:1;s:2:"20";i:2;s:2:"50";i:3;s:3:"100";i:4;s:1:"2";i:5;s:1:"1";}',
-                "module" => "theme:azure"
-            ),
-            "aNrofCatArticlesInGrid" => array(
-                "type" => "arr",
-                "value" => 'a:4:{i:0;s:2:"12";i:1;s:2:"16";i:2;s:2:"24";i:3;s:2:"32";}',
-                "module" => "theme:azure"
-            )
-        ));
+        $this->callShopSC('oxConfig', null, null, [
+            'iTopNaviCatCount' => [
+                'type' => 'str',
+                'value' => '3',
+                'module' => 'theme:azure',
+            ],
+            'aNrofCatArticles' => [
+                'type' => 'arr',
+                'value' => 'a:6:{i:0;s:2:"10";i:1;s:2:"20";i:2;s:2:"50";i:3;s:3:"100";i:4;s:1:"2";i:5;s:1:"1";}',
+                'module' => 'theme:azure',
+            ],
+            'aNrofCatArticlesInGrid' => [
+                'type' => 'arr',
+                'value' => 'a:4:{i:0;s:2:"12";i:1;s:2:"16";i:2;s:2:"24";i:3;s:2:"32";}',
+                'module' => 'theme:azure',
+            ],
+        ]);
     }
 }

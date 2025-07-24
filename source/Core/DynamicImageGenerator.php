@@ -20,9 +20,8 @@
  */
 
 namespace {
-
     /** Checks if instance name getter does not exist */
-    if (!function_exists("getGeneratorInstanceName")) {
+    if (!function_exists('getGeneratorInstanceName')) {
         /**
          * Returns image generator instance name
          *
@@ -35,7 +34,7 @@ namespace {
     }
 
     /** Checks if GD library version getter does not exist */
-    if (!function_exists("getGdVersion")) {
+    if (!function_exists('getGdVersion')) {
         /**
          * Returns GD library version
          *
@@ -47,11 +46,11 @@ namespace {
 
             if ($version === null) {
                 $version = false;
-                if (function_exists("gd_info")) {
+                if (function_exists('gd_info')) {
                     // extracting GD version from php
                     $info = gd_info();
-                    if (isset($info["GD Version"])) {
-                        $version = version_compare(preg_replace("/[^0-9\.]/", "", $info["GD Version"]), 1, '>') ? 2 : 1;
+                    if (isset($info['GD Version'])) {
+                        $version = version_compare(preg_replace("/[^0-9\.]/", '', $info['GD Version']), 1, '>') ? 2 : 1;
                     }
                 }
             }
@@ -61,18 +60,18 @@ namespace {
     }
 
     /** Checks if image utils file loader does not exist */
-    if (!function_exists("includeImageUtils")) {
+    if (!function_exists('includeImageUtils')) {
         /**
          * Includes image utils
          */
         function includeImageUtils()
         {
-            include_once __DIR__ . "/utils/oxpicgenerator.php";
+            include_once __DIR__ . '/utils/oxpicgenerator.php';
         }
     }
 }
-namespace OxidEsales\EshopCommunity\Core {
 
+namespace OxidEsales\EshopCommunity\Core {
     /**
      * Image generator class
      */
@@ -97,7 +96,7 @@ namespace OxidEsales\EshopCommunity\Core {
          *
          * @var array
          */
-        protected $_aAllowedImgTypes = ["jpg", "jpeg", "png", "gif"];
+        protected $_aAllowedImgTypes = ['jpg', 'jpeg', 'png', 'gif'];
 
         /**
          * Image info like size and quality is defined in directory
@@ -105,7 +104,7 @@ namespace OxidEsales\EshopCommunity\Core {
          *
          * @var string
          */
-        protected $_sImageInfoSep = "_";
+        protected $_sImageInfoSep = '_';
 
         /**
          * Lockable file handle
@@ -127,18 +126,18 @@ namespace OxidEsales\EshopCommunity\Core {
          * @var array
          */
         protected $_aConfParamToPath = [ // ** product
-            "sIconsize"             => '/.*\/generated\/product\/(icon|\d+)\/\d+\_\d+\_\d+$/', // Icon size
-            "sThumbnailsize"        => '/.*\/generated\/product\/(thumb|\d+)\/\d+\_\d+\_\d+$/', // Thumbnail size
-            "sZoomImageSize"        => '/.*\/generated\/product\/\d+\/\d+\_\d+\_\d+$/', // Zoom picture size
-            "aDetailImageSizes"     => '/.*\/generated\/product\/\d+\/\d+\_\d+\_\d+$/', // Product picture size
+            'sIconsize'             => '/.*\/generated\/product\/(icon|\d+)\/\d+\_\d+\_\d+$/', // Icon size
+            'sThumbnailsize'        => '/.*\/generated\/product\/(thumb|\d+)\/\d+\_\d+\_\d+$/', // Thumbnail size
+            'sZoomImageSize'        => '/.*\/generated\/product\/\d+\/\d+\_\d+\_\d+$/', // Zoom picture size
+            'aDetailImageSizes'     => '/.*\/generated\/product\/\d+\/\d+\_\d+\_\d+$/', // Product picture size
 
             // ** manufacturer/vendor
-            "sManufacturerIconsize" => '/.*\/generated\/(manufacturer|vendor)\/icon\/\d+\_\d+\_\d+$/', // Manufacturer's|brand logo size
+            'sManufacturerIconsize' => '/.*\/generated\/(manufacturer|vendor)\/icon\/\d+\_\d+\_\d+$/', // Manufacturer's|brand logo size
 
             // ** category
-            "sCatThumbnailsize"     => '/.*\/generated\/category\/thumb\/\d+\_\d+\_\d+$/', // Category picture size
-            "sCatIconsize"          => '/.*\/generated\/category\/icon\/\d+\_\d+\_\d+$/', // Size of a subcategory's picture
-            "sCatPromotionsize"     => '/.*\/generated\/category\/promo_icon\/\d+\_\d+\_\d+$/' // Category picture size for promotion on startpage
+            'sCatThumbnailsize'     => '/.*\/generated\/category\/thumb\/\d+\_\d+\_\d+$/', // Category picture size
+            'sCatIconsize'          => '/.*\/generated\/category\/icon\/\d+\_\d+\_\d+$/', // Size of a subcategory's picture
+            'sCatPromotionsize'     => '/.*\/generated\/category\/promo_icon\/\d+\_\d+\_\d+$/', // Category picture size for promotion on startpage
         ];
 
         /**
@@ -170,15 +169,15 @@ namespace OxidEsales\EshopCommunity\Core {
         public function __call($method, $args)
         {
             if (defined('OXID_PHP_UNIT')) {
-                if (substr($method, 0, 4) == "UNIT") {
-                    $method = str_replace("UNIT", "_", $method);
+                if (substr($method, 0, 4) == 'UNIT') {
+                    $method = str_replace('UNIT', '_', $method);
                 }
                 if (method_exists($this, $method)) {
                     return call_user_func_array([& $this, $method], $args);
                 }
             }
 
-            throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException("Function '$method' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL);
+            throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException("Function '$method' does not exist or is not accessible! (" . get_class($this) . ')' . PHP_EOL);
         }
 
         /**
@@ -189,7 +188,7 @@ namespace OxidEsales\EshopCommunity\Core {
          */
         protected function _getShopBasePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         {
-            return Registry::getConfig()->getConfigParam("sShopDir");
+            return Registry::getConfig()->getConfigParam('sShopDir');
         }
 
         /**
@@ -201,16 +200,16 @@ namespace OxidEsales\EshopCommunity\Core {
         protected function _getImageUri() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         {
             if ($this->_sImageUri === null) {
-                $this->_sImageUri = "";
+                $this->_sImageUri = '';
                 $reqPath = 'out/pictures/generated';
 
-                $reqImg = isset($_SERVER["REQUEST_URI"]) ? urldecode($_SERVER["REQUEST_URI"]) : "";
+                $reqImg = isset($_SERVER['REQUEST_URI']) ? urldecode($_SERVER['REQUEST_URI']) : '';
                 $reqImg = str_replace('//', '/', $reqImg);
                 if (($pos = strpos($reqImg, $reqPath)) !== false) {
                     $this->_sImageUri = substr($reqImg, $pos);
                 }
 
-                $this->_sImageUri = trim($this->_sImageUri, "/");
+                $this->_sImageUri = trim($this->_sImageUri, '/');
             }
 
             return $this->_sImageUri;
@@ -239,7 +238,7 @@ namespace OxidEsales\EshopCommunity\Core {
             $path = false;
 
             if ($uri && ($path = dirname(dirname($uri)))) {
-                $path = preg_replace("/\/([^\/]*)\/([^\/]*)\/([^\/]*)$/", "/master/\\2/\\3/", $path);
+                $path = preg_replace("/\/([^\/]*)\/([^\/]*)\/([^\/]*)$/", '/master/\\2/\\3/', $path);
             }
 
             return $path;
@@ -282,7 +281,7 @@ namespace OxidEsales\EshopCommunity\Core {
         {
             $path = $this->_getShopBasePath() . $this->_getImageUri();
 
-            return str_replace($this->_getImageName(), "nopic.jpg", $path);
+            return str_replace($this->_getImageName(), 'nopic.jpg', $path);
         }
 
         /**
@@ -433,8 +432,8 @@ namespace OxidEsales\EshopCommunity\Core {
                 foreach ($this->_aConfParamToPath as $paramName => $pathReg) {
                     if (preg_match($pathReg, $path)) {
                         $names[] = $db->quote($paramName);
-                        if ($paramName == "sManufacturerIconsize" || $paramName == "sCatIconsize") {
-                            $names[] = $db->quote("sIconsize");
+                        if ($paramName == 'sManufacturerIconsize' || $paramName == 'sCatIconsize') {
+                            $names[] = $db->quote('sIconsize');
                         }
                     }
                 }
@@ -451,7 +450,7 @@ namespace OxidEsales\EshopCommunity\Core {
                        {$decodeField} = :quality";
 
                     $shopIdsArray = $db->getAll($q, [
-                        ':quality' => $quality
+                        ':quality' => $quality,
                     ]);
 
                     // building query:
@@ -472,7 +471,7 @@ namespace OxidEsales\EshopCommunity\Core {
 
                         $values = $db->getAll($q);
                         foreach ($values as $value) {
-                            $confValues = (array) $config->decodeValue($value["oxvartype"], $value["oxvarvalue"]);
+                            $confValues = (array) $config->decodeValue($value['oxvartype'], $value['oxvarvalue']);
                             foreach ($confValues as $confValue) {
                                 if (strcmp($checkSize, $confValue) == 0) {
                                     $valid = true;
@@ -535,14 +534,14 @@ namespace OxidEsales\EshopCommunity\Core {
             if ($this->_lock($imageTarget)) {
                 // extracting image info - size/quality
                 switch ($fileExtensionSource) {
-                    case "png":
+                    case 'png':
                         $generatedImagePath = $this->_generatePng($imageSource, $imageTarget, $targetWidth, $targetHeight);
                         break;
-                    case "jpeg":
-                    case "jpg":
+                    case 'jpeg':
+                    case 'jpg':
                         $generatedImagePath = $this->_generateJpg($imageSource, $imageTarget, $targetWidth, $targetHeight, $targetQuality);
                         break;
-                    case "gif":
+                    case 'gif':
                         $generatedImagePath = $this->_generateGif($imageSource, $imageTarget, $targetWidth, $targetHeight);
                         break;
                 }
@@ -583,7 +582,7 @@ namespace OxidEsales\EshopCommunity\Core {
             $lockName = $this->_getLockName($source);
 
             // creating lock file
-            $this->_hLockHandle = @fopen($lockName, "w");
+            $this->_hLockHandle = @fopen($lockName, 'w');
             if (is_resource($this->_hLockHandle)) {
                 if (!($locked = flock($this->_hLockHandle, LOCK_EX))) {
                     // on failure - closing
@@ -596,7 +595,7 @@ namespace OxidEsales\EshopCommunity\Core {
             if (!$locked) {
                 // start a blank file to inform other processes we are dealing with it.
                 if (!(file_exists($lockName) && abs(time() - filectime($lockName) < 40))) {
-                    if ($this->_hLockHandle = @fopen($lockName, "w")) {
+                    if ($this->_hLockHandle = @fopen($lockName, 'w')) {
                         $locked = true;
                     }
                 }
@@ -636,7 +635,7 @@ namespace OxidEsales\EshopCommunity\Core {
         public function getImagePath($absPath = false)
         {
             if ($absPath) {
-                $this->_sImageUri = str_replace($this->_getShopBasePath(), "", $absPath);
+                $this->_sImageUri = str_replace($this->_getShopBasePath(), '', $absPath);
             }
 
             $imagePath = false;
@@ -649,11 +648,11 @@ namespace OxidEsales\EshopCommunity\Core {
                 $genImagePath = $this->_getImageTarget();
             } else {
                 // nopic master path
-                $masterImagePath = $this->_getShopBasePath() . dirname(dirname($masterPath)) . "/nopic.jpg";
+                $masterImagePath = $this->_getShopBasePath() . dirname(dirname($masterPath)) . '/nopic.jpg';
                 $genImagePath = $this->_getNopicImageTarget();
 
                 // 404 header for nopic
-                $this->_setHeader("HTTP/1.1 404 Not Found");
+                $this->_setHeader('HTTP/1.1 404 Not Found');
             }
 
             // checking if master image is accessible
@@ -670,7 +669,7 @@ namespace OxidEsales\EshopCommunity\Core {
                 $this->_setHeader("Content-Type: $contentType;");
             } else {
                 // unable to output any file
-                $this->_setHeader("HTTP/1.1 404 Not Found");
+                $this->_setHeader('HTTP/1.1 404 Not Found');
             }
 
             return $imagePath;

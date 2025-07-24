@@ -43,17 +43,17 @@ class Delivery extends MultiLanguageModel
     /**
      * Calculation rule
      */
-    const CALCULATION_RULE_ONCE_PER_CART = 0;
-    const CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT = 1;
-    const CALCULATION_RULE_FOR_EACH_PRODUCT = 2;
+    public const CALCULATION_RULE_ONCE_PER_CART = 0;
+    public const CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT = 1;
+    public const CALCULATION_RULE_FOR_EACH_PRODUCT = 2;
 
     /**
      * Condition type
      */
-    const CONDITION_TYPE_PRICE = 'p';
-    const CONDITION_TYPE_AMOUNT = 'a';
-    const CONDITION_TYPE_SIZE = 's';
-    const CONDITION_TYPE_WEIGHT = 'w';
+    public const CONDITION_TYPE_PRICE = 'p';
+    public const CONDITION_TYPE_AMOUNT = 'a';
+    public const CONDITION_TYPE_SIZE = 's';
+    public const CONDITION_TYPE_WEIGHT = 'w';
 
     /**
      * Current class name
@@ -173,11 +173,11 @@ class Delivery extends MultiLanguageModel
     {
         if (is_null($this->_aArtIds)) {
             $oDb = DatabaseProvider::getDb();
-            $sQ = "select oxobjectid from oxobject2delivery 
-                where oxdeliveryid = :oxdeliveryid and oxtype = :oxtype";
+            $sQ = 'select oxobjectid from oxobject2delivery 
+                where oxdeliveryid = :oxdeliveryid and oxtype = :oxtype';
             $aArtIds = $oDb->getCol($sQ, [
                 ':oxdeliveryid' => $this->getId(),
-                ':oxtype' => 'oxarticles'
+                ':oxtype' => 'oxarticles',
             ]);
             $this->_aArtIds = $aArtIds;
         }
@@ -196,11 +196,11 @@ class Delivery extends MultiLanguageModel
     {
         if (is_null($this->_aCatIds)) {
             $oDb = DatabaseProvider::getDb();
-            $sQ = "select oxobjectid from oxobject2delivery 
-                where oxdeliveryid = :oxdeliveryid and oxtype = :oxtype";
+            $sQ = 'select oxobjectid from oxobject2delivery 
+                where oxdeliveryid = :oxdeliveryid and oxtype = :oxtype';
             $aCatIds = $oDb->getCol($sQ, [
                 ':oxdeliveryid' => $this->getId(),
-                ':oxtype' => 'oxcategories'
+                ':oxtype' => 'oxcategories',
             ]);
             $this->_aCatIds = $aCatIds;
         }
@@ -352,9 +352,9 @@ class Delivery extends MultiLanguageModel
         }
 
         $oDb = DatabaseProvider::getDb();
-        $sQ = "delete from `oxobject2delivery` where `oxobject2delivery`.`oxdeliveryid` = :oxdeliveryid";
+        $sQ = 'delete from `oxobject2delivery` where `oxobject2delivery`.`oxdeliveryid` = :oxdeliveryid';
         $oDb->execute($sQ, [
-            ':oxdeliveryid' => $sOxId
+            ':oxdeliveryid' => $sOxId,
         ]);
 
         return parent::delete($sOxId);
@@ -531,10 +531,10 @@ class Delivery extends MultiLanguageModel
     public function getIdByName($sTitle)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "SELECT `oxid` FROM `" . Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery') . "` 
-            WHERE `oxtitle` = :oxtitle";
+        $sQ = 'SELECT `oxid` FROM `' . Registry::get(TableViewNameGenerator::class)->getViewName('oxdelivery') . '` 
+            WHERE `oxtitle` = :oxtitle';
         $sId = $oDb->getOne($sQ, [
-            ':oxtitle' => $sTitle
+            ':oxtitle' => $sTitle,
         ]);
 
         return $sId;
@@ -553,17 +553,17 @@ class Delivery extends MultiLanguageModel
             $oDb = DatabaseProvider::getDb();
             $this->_aCountriesISO = [];
 
-            $sSelect = "
+            $sSelect = '
                 SELECT
                     `oxcountry`.`oxisoalpha2`
                 FROM `oxcountry`
                     LEFT JOIN `oxobject2delivery` ON `oxobject2delivery`.`oxobjectid` = `oxcountry`.`oxid`
                 WHERE `oxobject2delivery`.`oxdeliveryid` = :oxdeliveryid
-                    AND `oxobject2delivery`.`oxtype` = :oxtype";
+                    AND `oxobject2delivery`.`oxtype` = :oxtype';
 
             $rs = $oDb->getCol($sSelect, [
                 ':oxdeliveryid' => $this->getId(),
-                ':oxtype' => 'oxcountry'
+                ':oxtype' => 'oxcountry',
             ]);
             $this->_aCountriesISO = $rs;
         }

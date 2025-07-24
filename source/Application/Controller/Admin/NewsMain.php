@@ -47,8 +47,8 @@ class NewsMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oNews = oxNew(News::class);
             $oNews->loadInLang($this->_iEditLang, $soxId);
@@ -58,7 +58,7 @@ class NewsMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oNews->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oNews;
+            $this->_aViewData['edit'] = $oNews;
 
             //Disable editing for derived items
             if ($oNews->isDerived()) {
@@ -66,23 +66,23 @@ class NewsMain extends AdminDetailsController
             }
 
             // remove already created languages
-            $this->_aViewData["posslang"] = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $this->_aViewData['posslang'] = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oNewsMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NewsMainAjax::class);
             $this->_aViewData['oxajax'] = $oNewsMainAjax->getColumns();
 
-            return "popups/news_main.tpl";
+            return 'popups/news_main.tpl';
         }
 
-        return "news_main.tpl";
+        return 'news_main.tpl';
     }
 
     /**
@@ -103,18 +103,18 @@ class NewsMain extends AdminDetailsController
         }
         // creating fake object to save correct time value
         if (!$aParams['oxnews__oxdate']) {
-            $aParams['oxnews__oxdate'] = "";
+            $aParams['oxnews__oxdate'] = '';
         }
 
         $oConvObject = new Field();
         $oConvObject->fldmax_length = 0;
-        $oConvObject->fldtype = "date";
+        $oConvObject->fldtype = 'date';
         $oConvObject->value = $aParams['oxnews__oxdate'];
         $aParams['oxnews__oxdate'] = Registry::getUtilsDate()->convertDBDate($oConvObject, true);
 
         $oNews = oxNew(News::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oNews->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxnews__oxid'] = null;
@@ -155,18 +155,18 @@ class NewsMain extends AdminDetailsController
 
         // creating fake object to save correct time value
         if (!$aParams['oxnews__oxdate']) {
-            $aParams['oxnews__oxdate'] = "";
+            $aParams['oxnews__oxdate'] = '';
         }
 
         $oConvObject = new Field();
         $oConvObject->fldmax_length = 0;
-        $oConvObject->fldtype = "date";
+        $oConvObject->fldtype = 'date';
         $oConvObject->value = $aParams['oxnews__oxdate'];
         $aParams['oxnews__oxdate'] = Registry::getUtilsDate()->convertDBDate($oConvObject, true);
 
         $oNews = oxNew(News::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oNews->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxnews__oxid'] = null;

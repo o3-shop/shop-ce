@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxArticle;
-
+use oxField;
 use OxidEsales\EshopCommunity\Core\Exception\SystemComponentException;
-use \stdClass;
-use \oxField;
-use \oxTestModules;
+use oxTestModules;
+use stdClass;
 
 /**
  * Tests for functions in source/oxfunctions.php file.
@@ -44,7 +44,7 @@ class FunctionsTest extends \OxidTestCase
     {
         parent::setUp();
         // backuping
-        $this->requestMethod = $_SERVER["REQUEST_METHOD"];
+        $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         $this->requestUri = $_SERVER['REQUEST_URI'];
     }
 
@@ -54,7 +54,7 @@ class FunctionsTest extends \OxidTestCase
     protected function tearDown(): void
     {
         // restoring
-        $_SERVER["REQUEST_METHOD"] = $this->requestMethod;
+        $_SERVER['REQUEST_METHOD'] = $this->requestMethod;
         $_SERVER['REQUEST_URI'] = $this->requestUri;
         parent::tearDown();
     }
@@ -67,11 +67,11 @@ class FunctionsTest extends \OxidTestCase
     public function test_dumpVar()
     {
         $myConfig = $this->getConfig();
-        @unlink($myConfig->getConfigParam('sCompileDir') . "/vardump.txt");
-        dumpVar("bobo", true);
-        $file = file_get_contents($myConfig->getConfigParam('sCompileDir') . "/vardump.txt");
-        $file = str_replace("\r", "", $file);
-        @unlink($myConfig->getConfigParam('sCompileDir') . "/vardump.txt");
+        @unlink($myConfig->getConfigParam('sCompileDir') . '/vardump.txt');
+        dumpVar('bobo', true);
+        $file = file_get_contents($myConfig->getConfigParam('sCompileDir') . '/vardump.txt');
+        $file = str_replace("\r", '', $file);
+        @unlink($myConfig->getConfigParam('sCompileDir') . '/vardump.txt');
         $this->assertEquals($file, "'bobo'", $file);
     }
 
@@ -111,12 +111,12 @@ class FunctionsTest extends \OxidTestCase
         $this->expectException(SystemComponentException::class);
         $this->expectExceptionMessage('non_existing_class');
 
-        oxNew("non_existing_class");
+        oxNew('non_existing_class');
     }
 
     public function testOx_get_template()
     {
-        $fake = new stdClass;
+        $fake = new stdClass();
         $fake->oxidcache = new oxField('test', oxField::T_RAW);
         $sRes = 'aa';
         $this->assertEquals(true, ox_get_template('blah', $sRes, $fake));
@@ -128,7 +128,7 @@ class FunctionsTest extends \OxidTestCase
 
     public function testOx_get_timestamp()
     {
-        $fake = new stdClass;
+        $fake = new stdClass();
         $this->assertEquals(true, ox_get_timestamp('blah', $res, $fake));
         $this->assertEquals(true, is_numeric($res));
         $tm = time() - $res;
@@ -141,14 +141,14 @@ class FunctionsTest extends \OxidTestCase
     public function testOx_get_secure()
     {
         $o = null;
-        $this->assertEquals(true, ox_get_secure("s", $o));
+        $this->assertEquals(true, ox_get_secure('s', $o));
     }
 
     public function testOx_get_trusted()
     {
         $o = null;
         // in php void functions also return - null
-        $this->assertEquals(null, ox_get_trusted("s", $o));
+        $this->assertEquals(null, ox_get_trusted('s', $o));
     }
 
     public function testGetViewName()
@@ -158,7 +158,7 @@ class FunctionsTest extends \OxidTestCase
 
     public function testError_404_handler()
     {
-        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('handlePageNotFoundError'));
+        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->exactly(2))
             ->method('handlePageNotFoundError')
             ->withConsecutive(

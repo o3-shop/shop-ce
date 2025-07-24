@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -56,7 +58,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
     {
         $engine = $this->getEngineMock();
 
-        $renderer= new TemplateRenderer($engine);
+        $renderer = new TemplateRenderer($engine);
 
         $this->assertSame($engine, $renderer->getTemplateEngine());
     }

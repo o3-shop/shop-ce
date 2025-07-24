@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: netto
@@ -17,41 +18,41 @@
  * Short description:
  * user with diferent foreign country, adn vat should not be calculated
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9202,
                 'oxprice'                  => 100,
                 'oxvat'                    => 19,
                 'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
      // User
-    'user' => array(
+    'user' => [
             'oxactive' => 1,
             'oxusername' => 'basketUser',
             // country id, for example this is United States, make sure country with specified ID is active
             'oxcountryid' => '8f241f11096877ac0.98748826',
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9202 => array( '100,00', '100,00' ),
-        ),
-        'totals' => array(
+    ],
+    'expected' => [
+        'articles' => [
+                 9202 => [ '100,00', '100,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '100,00',
                 'totalNetto'  => '100,00',
-                'vats' => array(
+                'vats' => [
                     0 => '0,00',
-                ),
-                'grandTotal'  => '100,00'
-        ),
-    ),
+                ],
+                'grandTotal'  => '100,00',
+        ],
+    ],
 
-    'options' => array(
-        'config' => array(
+    'options' => [
+        'config' => [
             'blEnterNetPrice' => true,
             'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

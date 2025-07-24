@@ -39,16 +39,16 @@ class ModuleTemplateBlockRepository
     public function getBlocksCount($modulesId, $shopId)
     {
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $modulesIdQuery = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($modulesId));
-        $sql = "select COUNT(*)
+        $modulesIdQuery = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($modulesId));
+        $sql = 'select COUNT(*)
                             from oxtplblocks
                             where oxactive = :oxactive
                                 and oxshopid = :oxshopid
-                                and oxmodule in ( " . $modulesIdQuery . " )";
+                                and oxmodule in ( ' . $modulesIdQuery . ' )';
 
         return $db->getOne($sql, [
             ':oxactive' => '1',
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
     }
 
@@ -64,22 +64,22 @@ class ModuleTemplateBlockRepository
      */
     public function getBlocks($shopTemplateName, $activeModulesId, $shopId, $themesId = [])
     {
-        $modulesId = implode(", ", \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($activeModulesId));
+        $modulesId = implode(', ', \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->quoteArray($activeModulesId));
 
         $activeThemesIdQuery = $this->formActiveThemesIdQuery($themesId);
-        $sql = "select *
+        $sql = 'select *
                     from oxtplblocks
                     where oxactive=1
                         and oxshopid= :oxshopid
                         and oxtemplate= :oxtemplate
-                        and oxmodule in ( " . $modulesId . " )
-                        and oxtheme in (" . $activeThemesIdQuery . ")
-                        order by oxpos asc, oxtheme asc, oxid asc";
+                        and oxmodule in ( ' . $modulesId . ' )
+                        and oxtheme in (' . $activeThemesIdQuery . ')
+                        order by oxpos asc, oxtheme asc, oxid asc';
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
 
         return $db->getAll($sql, [
             ':oxshopid' => $shopId,
-            ':oxtemplate' => $shopTemplateName
+            ':oxtemplate' => $shopTemplateName,
         ]);
     }
 

@@ -56,7 +56,6 @@ class ContactFormConfigurationFactory implements FormConfigurationFactoryInterfa
         $this->context = $context;
     }
 
-
     /**
      * @return FormConfigurationInterface
      */

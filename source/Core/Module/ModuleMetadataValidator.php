@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core\Module;
 
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\NamespaceInformationProvider;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * Module metadata validation class.
@@ -84,7 +84,7 @@ class ModuleMetadataValidator implements \OxidEsales\Eshop\Core\Contract\IModule
                  && (
                      NamespaceInformationProvider::classBelongsToShopEditionNamespace($classToBePatched)
                       || (NamespaceInformationProvider::classBelongsToShopUnifiedNamespace($classToBePatched) && !class_exists($classToBePatched))
-                    )
+                 )
             ) {
                 $incorrect[$classToBePatched] = $moduleClass;
             }

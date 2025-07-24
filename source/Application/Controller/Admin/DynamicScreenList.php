@@ -47,6 +47,6 @@ class DynamicScreenList extends DynamicScreenController
         parent::render();
         $this->_aViewData['menu'] = basename(Registry::getRequest()->getRequestEscapedParameter('menu'));
 
-        return "dynscreen_list.tpl";
+        return 'dynscreen_list.tpl';
     }
 }

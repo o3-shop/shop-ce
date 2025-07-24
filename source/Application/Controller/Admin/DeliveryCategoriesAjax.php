@@ -39,7 +39,7 @@ class DeliveryCategoriesAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxcategories', 1, 1, 0],
             ['oxdesc', 'oxcategories', 1, 1, 0],
@@ -87,7 +87,7 @@ class DeliveryCategoriesAjax extends ListComponentAjax
         } else {
             $sQAdd = " from oxobject2delivery left join {$sCatTable} " .
                      "on {$sCatTable}.oxid=oxobject2delivery.oxobjectid " .
-                     " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sDelId) .
+                     ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sDelId) .
                      " and oxobject2delivery.oxtype = 'oxcategories' ";
         }
 
@@ -95,7 +95,7 @@ class DeliveryCategoriesAjax extends ListComponentAjax
             // performance
             $sSubSelect = " select {$sCatTable}.oxid from oxobject2delivery left join {$sCatTable} " .
                           "on {$sCatTable}.oxid=oxobject2delivery.oxobjectid " .
-                          " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchDelId) .
+                          ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchDelId) .
                           " and oxobject2delivery.oxtype = 'oxcategories' ";
             if (stristr($sQAdd, 'where') === false) {
                 $sQAdd .= ' where ';
@@ -117,11 +117,11 @@ class DeliveryCategoriesAjax extends ListComponentAjax
 
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
-            $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sChosenCategories . ") ";
+            $sChosenCategories = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCat));
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $sChosenCategories . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -140,13 +140,13 @@ class DeliveryCategoriesAjax extends ListComponentAjax
             $aChosenCat = $this->getAll($this->addFilter("select $sCatTable.oxid " . $this->getQuery()));
         }
 
-        if (isset($soxId) && $soxId != "-1" && isset($aChosenCat) && $aChosenCat) {
+        if (isset($soxId) && $soxId != '-1' && isset($aChosenCat) && $aChosenCat) {
             foreach ($aChosenCat as $sChosenCat) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
                 $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
                 $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenCat);
-                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxcategories");
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxcategories');
                 $oObject2Delivery->save();
             }
         }

@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use DOMDocument;
+use DOMElement;
 use DOMNodeList;
+use DOMXPath;
 use Exception;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Registry;
-use DOMXPath;
-use DOMDocument;
-use DOMElement;
 use OxidEsales\Eshop\Core\Str;
 use stdClass;
 
@@ -119,7 +119,7 @@ class NavigationTree extends Base
         $xPath = new DomXPath($dom);
 
         // building
-        $nodeList = $xPath->query("//SUBMENU[@cl]");
+        $nodeList = $xPath->query('//SUBMENU[@cl]');
         foreach ($nodeList as $node) {
             // fetching class
             $cl = $node->getAttribute('cl');
@@ -163,10 +163,10 @@ class NavigationTree extends Base
             // looking for non-supported character encoding
             if (Str::getStr()->preg_match("/encoding\=(.*)\?\>/", $xml, $matches) !== 0) {
                 if (isset($matches[1])) {
-                    $currEncoding = trim($matches[1], "\"");
+                    $currEncoding = trim($matches[1], '"');
                     if (!in_array(strtolower($currEncoding), $this->_aSupportedExpathXmlEncodings)) {
-                        $xml = str_replace($matches[1], "\"UTF-8\"", $xml);
-                        $xml = iconv($currEncoding, "UTF-8", $xml);
+                        $xml = str_replace($matches[1], '"UTF-8"', $xml);
+                        $xml = iconv($currEncoding, 'UTF-8', $xml);
                     }
                 }
             }
@@ -338,7 +338,7 @@ class NavigationTree extends Base
         $this->checkGroups($dom);
     }
 
-        /**
+    /**
      * Removes from tree elements which don't have required groups
      *
      * @param DOMDocument $dom document to check group
@@ -346,7 +346,7 @@ class NavigationTree extends Base
     protected function checkGroups($dom)
     {
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@nogroup or @group]");
+        $nodeList = $xPath->query('//*[@nogroup or @group]');
 
         foreach ($nodeList as $node) {
             // allowed only for groups
@@ -382,7 +382,7 @@ class NavigationTree extends Base
         $this->checkDemoShopDenials($dom);
     }
 
-        /**
+    /**
      * Removes form tree elements if this is demo shop and elements have disableForDemoShop="1"
      *
      * @param DOMDocument $dom document to check group
@@ -397,7 +397,7 @@ class NavigationTree extends Base
         }
 
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@disableForDemoShop]");
+        $nodeList = $xPath->query('//*[@disableForDemoShop]');
         foreach ($nodeList as $node) {
             if ($node->getAttribute('disableForDemoShop')) {
                 $node->parentNode->removeChild($node);
@@ -413,7 +413,7 @@ class NavigationTree extends Base
     protected function removeInvisibleMenuNodes($dom)
     {
         $xPath = new DomXPath($dom);
-        $nodeList = $xPath->query("//*[@visible]");
+        $nodeList = $xPath->query('//*[@visible]');
         foreach ($nodeList as $node) {
             if (!$node->getAttribute('visible')) {
                 $node->parentNode->removeChild($node);
@@ -496,7 +496,7 @@ class NavigationTree extends Base
             }
         }
     }
-    
+
     /**
      * If oDomXML exists merges nodes
      *
@@ -617,11 +617,11 @@ class NavigationTree extends Base
         $activeModuleInfo = $moduleList->getActiveModuleInfo();
         if (is_array($activeModuleInfo)) {
             foreach ($activeModuleInfo as $modulePath) {
-                $fullPath = $path . "modules/" . $modulePath;
+                $fullPath = $path . 'modules/' . $modulePath;
                 // missing file/folder?
                 if (is_dir($fullPath)) {
                     // including menu file
-                    $menuFile = $fullPath . "/menu.xml";
+                    $menuFile = $fullPath . '/menu.xml';
                     if (file_exists($menuFile) && is_readable($menuFile)) {
                         $filesToLoad[] = $menuFile;
                     }
@@ -646,7 +646,7 @@ class NavigationTree extends Base
         $dynFile = null;
         if (file_exists($dynFilePath)) {
             if (($handle = @fopen($dynFilePath, 'r'))) {
-                $line = stream_get_line($handle, 100, "?>");
+                $line = stream_get_line($handle, 100, '?>');
                 fclose($handle);
 
                 // checking xml file header
@@ -972,7 +972,6 @@ class NavigationTree extends Base
         }
     }
 
-
     /**
      * Get dynamic pages url or local path
      *
@@ -990,12 +989,12 @@ class NavigationTree extends Base
             // getting dyn info from oxid server is off, so getting local menu path
             $fullAdminDir = getShopBasePath() . 'Application/views/admin';
 
-            return $fullAdminDir . "/dynscreen_local.xml";
+            return $fullAdminDir . '/dynscreen_local.xml';
         }
         $adminView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class);
         $this->sDynIncludeUrl = $adminView->getServiceUrl($lang);
 
-        return $this->sDynIncludeUrl . "menue/dynscreen.xml";
+        return $this->sDynIncludeUrl . 'menue/dynscreen.xml';
     }
 
     /**
