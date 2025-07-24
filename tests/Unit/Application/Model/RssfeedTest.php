@@ -437,7 +437,7 @@ class RssfeedTest extends \OxidTestCase
 
         $oRss = oxNew('oxrssfeed');
         $oRss->setConfig($oCfg);
-        $this->assertEquals('http://localhost:8090/?cl=rss&amp;fnc=topshop&amp;lang=1extra', $oRss->UNITprepareUrl('cl=rss&amp;fnc=topshop', 'asd'));
+        $this->assertEquals('http://localhost:8080/?cl=rss&amp;fnc=topshop&amp;lang=1extra', $oRss->UNITprepareUrl('cl=rss&amp;fnc=topshop', 'asd'));
     }
 
     public function testPrepareUrlSeoOn()
@@ -457,7 +457,7 @@ class RssfeedTest extends \OxidTestCase
 
         \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->setConfig($oCfg);
 
-        $this->assertEquals('http://localhost:8090/?cl=rss&amp;fnc=topshop&amp;lang=1 - SEO - rss/asd/extra', $oRss->UNITprepareUrl('cl=rss&amp;fnc=topshop', 'asd'));
+        $this->assertEquals('http://localhost:8080/?cl=rss&amp;fnc=topshop&amp;lang=1 - SEO - rss/asd/extra', $oRss->UNITprepareUrl('cl=rss&amp;fnc=topshop', 'asd'));
     }
 
     public function testPrepareFeedName()
