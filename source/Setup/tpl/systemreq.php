@@ -65,7 +65,7 @@ if ($aModuleInfo['class'] == 'fail' || $aModuleInfo['class'] == 'pmin' || $aModu
     if ($aModuleInfo['class'] == 'fail' || $aModuleInfo['class'] == 'pmin' || $aModuleInfo['class'] == 'null') {
         ?></a><?php
     } ?></li><?php
-    } ?></ul></li><?php
+} ?></ul></li><?php
 }
 ?><li class="clear"></li></ul>
     <?php $this->getText('STEP_0_TEXT'); ?>
