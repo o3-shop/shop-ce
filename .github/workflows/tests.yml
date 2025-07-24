@@ -124,8 +124,8 @@ jobs:
           composer install --prefer-dist --no-progress
           echo "::endgroup::"
           echo "::group::Apt Intall"
-          apt-get update
-          apt-get install -y libxml2-utils
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
           echo "::endgroup::"
 
       - name: 🎨 Install Wave Theme
