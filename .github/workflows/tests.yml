@@ -182,7 +182,7 @@ jobs:
         id: parse_failed_tests
         run: |
           if [ -f junit.xml ]; then
-            FAILURES=$(xmllint --xpath "string-count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
+            FAILURES=$(xmllint --xpath "count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
             ERROR_OUTPUT=$(xmllint --xpath '//testcase[failure]' junit.xml 2>/dev/null | grep -oP 'classname="\K[^"]+' || true)
             echo "FAILURES=$FAILURES"
             echo "ERROR_OUTPUT=$ERROR_OUTPUT"
