@@ -184,6 +184,8 @@ jobs:
           if [ -f junit.xml ]; then
             FAILURES=$(xmllint --xpath "string-count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
             ERROR_OUTPUT=$(xmllint --xpath '//testcase[failure]' junit.xml 2>/dev/null | grep -oP 'classname="\K[^"]+' || true)
+            echo "FAILURES=$FAILURES"
+            echo "ERROR_OUTPUT=$ERROR_OUTPUT"
              if [ "$FAILURES" -gt 0 ]; then
                 TESTS=$(xmllint --xpath '//testcase[failure]/../@classname|//testcase[failure]/../@name' junit.xml 2>/dev/null | tr ' ' '\n' | paste -sd ', ' -)
                 echo "FAILED_TESTS=$TESTS" >> $GITHUB_ENV
