@@ -332,7 +332,6 @@ class ShopControlTest extends \OxidTestCase
         $oSmarty = $this->getMock("Smarty", array('fetch'));
         $oSmarty->expects($this->once())->method('fetch')
             ->with($this->equalTo("message/exception.tpl"))
-            ->with($this->equalTo('message/exception.tpl'))
             ->will($this->returnValue(''));
 
         $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getSmarty'));
