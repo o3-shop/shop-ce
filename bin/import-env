@@ -19,33 +19,52 @@ class ConfigLoader {
         include $path;
     }
 }
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__.'/..');
+$dotenv->load();
 
-$configPath = __DIR__ . '/../config.inc.php';
+$configPath = __DIR__ . '/../source/config.inc.php';
+$backupPath = $configPath . '.bak';
 $config = new ConfigLoader();
 $config->load($configPath);
+$configRewrite = false;
+
+$migrate = $_ENV['O3SHOP_CONF_MIGRATE'];
+
+if ($migrate) {
+    echo "⚠️  Migration flag is set, Already Migrated.\n";
+    exit(1);
+    $configRewrite = false;
+} else {
+    echo "🔧 Preparing to update config.inc.php...\n";
+    $configRewrite = true;
+}
 
 // Step 2: Build env replacements map
 $configUpdates = [
-    "O3SHOP_CONF_DBHOST"        => $config->dbHost,
-    "O3SHOP_CONF_DBPORT"        => $config->dbPort,
-    "O3SHOP_CONF_DBNAME"        => $config->dbName,
-    "O3SHOP_CONF_DBUSER"        => $config->dbUser,
-    "O3SHOP_CONF_DBPWD"         => $config->dbPwd,
-    "O3SHOP_CONF_SHOPURL"       => $config->sShopURL,
-    "O3SHOP_CONF_SHOPDIR"       => $config->sShopDir,
-    "O3SHOP_CONF_COMPILEDIR"    => $config->sCompileDir,
+    "O3SHOP_CONF_DBHOST"        => 'dbHost',
+    "O3SHOP_CONF_DBPORT"        => 'dbPort',
+    "O3SHOP_CONF_DBNAME"        => 'dbName',
+    "O3SHOP_CONF_DBUSER"        => 'dbUser',
+    "O3SHOP_CONF_DBPWD"         => 'dbPwd',
+    "O3SHOP_CONF_SHOPURL"       => 'sShopURL',
+    "O3SHOP_CONF_SHOPDIR"       => 'sShopDir',
+    "O3SHOP_CONF_COMPILEDIR"    => 'sCompileDir',
+    "O3SHOP_CONF_MIGRATE"       => 1,
 ];
 
 // Step 3: Read existing .env file
-$envPath = __DIR__ . '/../../.env';
+$envPath = __DIR__ . '/../.env';
 $envLines = file_exists($envPath) ? file($envPath, FILE_IGNORE_NEW_LINES) : [];
 
 $processedKeys = [];
 foreach ($envLines as &$line) {
     if (preg_match('/^([A-Z0-9_]+)=/', $line, $matches)) {
         $key = $matches[1];
+        $configKey = $configUpdates[$key];
         if (isset($configUpdates[$key])) {
-            $line = $key . '="' . $configUpdates[$key] . '"';
+            echo "Updating $key with value: " . $config->$configKey . "\n";
+            $line = $key . '="' . $config->$configKey . '"';
             $processedKeys[] = $key;
         }
     }
@@ -62,6 +81,108 @@ foreach ($configUpdates as $key => $value) {
 // Step 5: Write back .env file
 if (file_put_contents($envPath, implode(PHP_EOL, $envLines) . PHP_EOL)) {
     echo "✅ .env file successfully updated at: $envPath\n";
+    echo "Rewriting the config.inc.php file with the new values.\n";
+    $configRewrite = true;
 } else {
     echo "❌ Failed to update .env file.\n";
 }
+
+if ($configRewrite) {
+// 1. Read current permissions
+    echo "🔍 Checking config file permissions...\n";
+    if (!file_exists($configPath)) {
+        fwrite(STDERR, "Config file not found: $configPath\n");
+        exit(1);
+    }
+    $origPerms = fileperms($configPath) & 0777; // Save original (only permission bits)
+    chmod($configPath, 0644); // Set to writable for the script
+
+    echo "🔧 Preparing to update config.inc.php...\n";
+
+// 2.2. Read and backup
+    $configContents = file_get_contents($configPath);
+    copy($configPath, $backupPath);
+
+    $configContents = file_get_contents($configPath);
+    copy($configPath, $backupPath);
+
+// 2. Step: Prepare replacements and Dotenv loader
+    $assignments = [
+        'dbHost'       => "    \$this->dbHost    = \$_ENV['O3SHOP_CONF_DBHOST'];     // database host name",
+        'dbPort'       => "    \$this->dbPort    = \$_ENV['O3SHOP_CONF_DBPORT'];     // tcp port to which the database is bound",
+        'dbName'       => "    \$this->dbName    = \$_ENV['O3SHOP_CONF_DBNAME'];     // database name",
+        'dbUser'       => "    \$this->dbUser    = \$_ENV['O3SHOP_CONF_DBUSER'];     // database user name",
+        'dbPwd'        => "    \$this->dbPwd     = \$_ENV['O3SHOP_CONF_DBPWD'];      // database user password",
+        'sShopURL'     => "    \$this->sShopURL  = \$_ENV['O3SHOP_CONF_SHOPURL'];    // Shop base url, required",
+        'sShopDir'     => "    \$this->sShopDir  = \$_ENV['O3SHOP_CONF_SHOPDIR'];",
+        'sCompileDir'  => "    \$this->sCompileDir = \$_ENV['O3SHOP_CONF_COMPILEDIR'];",
+        // Optionals (will be left as is if not defined)
+        'sSSLShopURL'  => "    \$this->sSSLShopURL  = \$_ENV['O3SHOP_CONF_SSLSHOPURL'];   // Shop SSL url, optional",
+        'sAdminSSLURL' => "    \$this->sAdminSSLURL = \$_ENV['O3SHOP_CONF_ADMINSSLURL'];  // Shop Admin SSL url, optional",
+    ];
+
+// Dotenv Loader Block
+    $dotenvBlock = <<<DOTENV
+// get configuration data from environment variables (../.env in the default)
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+\$dotenv = \\Dotenv\\Dotenv::createImmutable(__DIR__.'/..');
+\$dotenv->load();
+\$dotenv->required([
+     'O3SHOP_CONF_DBHOST',
+     'O3SHOP_CONF_DBPORT',
+     'O3SHOP_CONF_DBNAME',
+     'O3SHOP_CONF_DBUSER',
+     'O3SHOP_CONF_DBPWD',
+     'O3SHOP_CONF_SHOPURL',
+     'O3SHOP_CONF_SHOPDIR',
+     'O3SHOP_CONF_COMPILEDIR'
+])->notEmpty();
+
+DOTENV;
+
+
+// 3. Step: Rewrite lines in the config
+    $lines = explode("\n", $configContents);
+    $newLines = [];
+    $blockInserted = false;
+    $configKeys = array_keys($assignments);
+    foreach ($lines as $ix => $line) {
+        $trim = ltrim($line);
+        // Prep: insert Dotenv loader before the first config assignment (dbHost)
+        if (!$blockInserted && preg_match('/\$this->dbHost\s*=/', $line)) {
+            $newLines[] = $dotenvBlock;
+            $blockInserted = true;
+        }
+
+        // Replace assignment lines as per mapping
+        $replaced = false;
+        foreach ($configKeys as $key) {
+            if (preg_match('/\$this->' . $key . '\s*=/', $trim)) {
+                $newLines[] = $assignments[$key];
+                $replaced = true;
+                break;
+            }
+        }
+        // If not replaced, leave line as is
+        if (!$replaced) {
+            $newLines[] = $line;
+        }
+    }
+
+
+// 4. Step: Write updated config back
+    if (file_put_contents($configPath, implode("\n", $newLines))) {
+        echo "✅ config.inc.php has been updated. Backup at $backupPath\n";
+        // 3. Restore original permissions
+    } else {
+        echo "❌ Failed to write to config.inc.php\n";
+        // Optionally restore backup
+    }
+
+    // 3. Restore original permissions
+    if (!chmod($configPath, $origPerms)) {
+        fwrite(STDERR, "⚠️  Warning: Failed to restore file permissions to ".decoct($origPerms)."\n");
+        // Still report as updated, but flag the issue.
+    }
+}
+
