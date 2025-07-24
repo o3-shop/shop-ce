@@ -318,29 +318,29 @@ class ShopControlTest extends \OxidTestCase
     public function testRenderTemplateNotFound()
     {
         ContainerFactory::resetContainer();
-        $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, array('render'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['render']);
         $oView->expects($this->once())->method('render')->will($this->returnValue('wrongTpl'));
 
-        $oOut = $this->getMock(\OxidEsales\Eshop\Core\Output::class, array('process'));
+        $oOut = $this->getMock(\OxidEsales\Eshop\Core\Output::class, ['process']);
         $oOut->expects($this->once())->method('process');
 
-        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, array("isAdmin", '_getOutputManager', '_isDebugMode'), array(), '', false);
+        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['isAdmin', '_getOutputManager', '_isDebugMode'], [], '', false);
         $oControl->expects($this->any())->method('isAdmin')->will($this->returnValue(false));
         $oControl->expects($this->any())->method('_getOutputManager')->will($this->returnValue($oOut));
         $oControl->expects($this->any())->method('_isDebugMode')->will($this->returnValue(true));
 
-        $oSmarty = $this->getMock("Smarty", array('fetch'));
+        $oSmarty = $this->getMock('Smarty', ['fetch']);
         $oSmarty->expects($this->once())->method('fetch')
-            ->with($this->equalTo("message/exception.tpl"))
+            ->with($this->equalTo('message/exception.tpl'))
             ->will($this->returnValue(''));
 
-        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getSmarty'));
+        $oUtilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getSmarty']);
         $oUtilsView->expects($this->once())->method('getSmarty')->will($this->returnValue($oSmarty));
-        oxTestModules::addModuleObject("oxUtilsView", $oUtilsView);
+        oxTestModules::addModuleObject('oxUtilsView', $oUtilsView);
 
         $oControl->UNITrender($oView);
         \OxidEsales\Eshop\Core\Registry::getUtilsView()->passAllErrorsToView($aViewData, $oControl->UNITgetErrors('oxubase'));
-        $this->assertTrue($aViewData["Errors"]["default"][0] instanceof ExceptionToDisplay);
+        $this->assertTrue($aViewData['Errors']['default'][0] instanceof ExceptionToDisplay);
 
         /**
          * Although no exception is thrown, the underlying error will be logged in oxideshop.log
