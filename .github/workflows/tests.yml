@@ -1,4 +1,4 @@
-name: PHPUnit Tests
+name: Code Quality & Tests
 
 on:
   push:
@@ -7,6 +7,27 @@ on:
     branches: ['**']
 
 jobs:
+  cs-fixer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Get PHP-CS-Fixer
+        run: |
+          wget -q https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.66.0/php-cs-fixer.phar -O php-cs-fixer.phar
+          chmod +x php-cs-fixer.phar
+          sudo mv php-cs-fixer.phar /usr/local/bin/php-cs-fixer
+          php-cs-fixer --version
+
+      - name: Run PHP-CS-Fixer check
+        run: php-cs-fixer fix --dry-run --diff --ansi
+
   test:
     runs-on: ubuntu-latest
 
