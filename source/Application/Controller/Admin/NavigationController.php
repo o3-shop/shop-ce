@@ -31,6 +31,7 @@ use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
 use OxidEsales\Facts\Facts;
+use PHPUnit\Util\Json;
 
 /**
  * Administrator GUI navigation manager class.
@@ -224,9 +225,22 @@ class NavigationController extends AdminController
      */
     protected function checkVersion()
     {
-        $edition = (new Facts())->getEdition();
-        $query = 'http://admin.oxid-esales.com/' . $edition . '/onlinecheck.php?getlatestversion';
-        $latestVersion = Registry::getUtilsFile()->readRemoteFileAsString($query);
+        $json = file_get_contents('https://api.github.com/repos/o3-shop/o3-shop/releases/latest', false, stream_context_create([
+            "http" => [
+                "header" => [
+                    "User-Agent: PHP", // GitHub requires a User-Agent header
+                    "Accept: application/vnd.github+json",
+                    "X-GitHub-Api-Version: 2022-11-28"
+                ]
+            ]
+        ]));
+
+        $data = json_decode($json, true);
+
+        $latestVersion = $data['name'] ?? null;
+
+        Registry::getLogger()->debug("Latest Release name: " . $latestVersion);
+
         if ($latestVersion) {
             $currentVersion = oxNew(ShopVersion::class)->getVersion();
             if (version_compare($currentVersion, $latestVersion, '<')) {
