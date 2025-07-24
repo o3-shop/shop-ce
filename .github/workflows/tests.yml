@@ -116,12 +116,16 @@ jobs:
           cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
 
-      - name: 📥 Install Composer Dependencies
+      - name: 📥 Install Dependencies
         env:
           COMPOSER_ROOT_VERSION: ${{ env.COMPOSER_ROOT_VERSION }}
         run: |
           echo "::group::Composer Install"
           composer install --prefer-dist --no-progress
+          echo "::endgroup::"
+          echo "::group::Apt Intall"
+          apt-get update
+          apt-get install -y libxml2-utils
           echo "::endgroup::"
 
       - name: 🎨 Install Wave Theme
