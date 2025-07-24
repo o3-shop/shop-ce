@@ -118,6 +118,13 @@ class Config extends \OxidEsales\Eshop\Core\Base
     protected $sShopDir = null;
 
     /**
+     * Shops Log directory
+     *
+     * @var string
+     */
+    protected $sLogDir = null;
+
+    /**
      * Shops compile directory
      *
      * @var string
@@ -502,6 +509,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
         //adding trailing slashes
         $fileUtils = Registry::getUtilsFile();
         $this->sShopDir = $fileUtils->normalizeDir($this->sShopDir);
+        $this->sLogDir = $fileUtils->normalizeDir($this->sLogDir);
         $this->sCompileDir = $fileUtils->normalizeDir($this->sCompileDir);
         $this->sShopURL = $fileUtils->normalizeDir($this->sShopURL);
         $this->sSSLShopURL = $fileUtils->normalizeDir($this->sSSLShopURL);
@@ -2183,7 +2191,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getLogsDir()
     {
-        return $this->getConfigParam('sShopDir') . 'log/';
+        return $this->getConfigParam('sShopDir') . $this->sLogDir;
     }
 
     /**
