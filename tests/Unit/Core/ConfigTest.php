@@ -2189,7 +2189,7 @@ class ConfigTest extends OxidTestCase
      */
     public function testCorrectVersion()
     {
-        $this->assertTrue(version_compare($this->getConfig()->getVersion(), 'v1.5.0') >= 0);
+        $this->assertTrue(version_compare($this->getConfig()->getVersion(), '1.1.0') >= 0);
     }
 
     /**
