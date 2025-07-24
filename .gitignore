@@ -65,3 +65,5 @@ composer.lock
 docker/database/data
 docker/mailpit/data
 coverage
+
+.php-cs-fixer.cache
