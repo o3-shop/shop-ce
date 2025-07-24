@@ -28,7 +28,7 @@ jobs:
         run: php-cs-fixer --version
 
       - name: 💅 Run Code Style Check (PHP-CS-Fixer)
-        run: php-cs-fixer fix --dry-run --diff --ansi
+        run: php-cs-fixer check
 
   test:
     runs-on: ubuntu-latest
