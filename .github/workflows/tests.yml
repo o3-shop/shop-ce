@@ -26,7 +26,7 @@ jobs:
           php-cs-fixer --version
 
       - name: Run PHP-CS-Fixer check
-        run: php-cs-fixer fix --dry-run --diff --ansi
+        run: php-cs-fixer check
 
   test:
     runs-on: ubuntu-latest
