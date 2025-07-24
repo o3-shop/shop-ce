@@ -2190,7 +2190,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getLogsDir()
     {
-        return $this->getConfigParam('sShopDir') . $this->sLogDir;
+        return $this->getConfigParam('sShopDir') . 'log/';
     }
 
     /**
