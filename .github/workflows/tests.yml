@@ -28,7 +28,21 @@ jobs:
         run: php-cs-fixer --version
 
       - name: 💅 Run Code Style Check (PHP-CS-Fixer)
+        id: cs_check
         run: php-cs-fixer check
+        continue-on-error: true
+
+      - name: 💬 Comment on PR if style check fails
+        if: ${{ failure() && github.event_name == 'pull_request' }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            Please check the code style. The PHP-CS-Fixer check failed.
+          comment_tag: cs-style-check
+
+      - name: 🔴 Fail if code style check failed
+        if: steps.cs_check.outcome == 'failure'
+        run: exit 1
 
   test:
     runs-on: ubuntu-latest
@@ -139,6 +153,7 @@ jobs:
         run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
 
       - name: ✅ Run PHPUnit (with Coverage)
+        id: phpunit
         continue-on-error: true
         run: |
           echo "::group::PHPUnit"
@@ -149,7 +164,8 @@ jobs:
             $CURRENT_DIR/tests/Unit \
             --colors=always \
             --coverage-clover="$CURRENT_DIR/coverage.xml" \
-            --coverage-html="$CURRENT_DIR/coverage-html/" || exit 0
+            --coverage-html="$CURRENT_DIR/coverage-html/" \
+            --log-junit $CURRENT_DIR/junit.xml
           echo "::endgroup::"
 
       - name: ☁️ Upload Coverage Report (HTML)
@@ -157,6 +173,25 @@ jobs:
         with:
           name: coverage-report-php-${{ matrix.php-version }}
           path: coverage-html/
+
+      - name: 📝 Parse Failed Tests
+        id: parse_failed_tests
+        run: |
+          if [ -f junit.xml ]; then
+            FAILURES=$(xmllint --xpath "string-count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
+            ERROR_OUTPUT=$(xmllint --xpath '//testcase[failure]' junit.xml 2>/dev/null | grep -oP 'classname="\K[^"]+' || true)
+             if [ "$FAILURES" -gt 0 ]; then
+                TESTS=$(xmllint --xpath '//testcase[failure]/../@classname|//testcase[failure]/../@name' junit.xml 2>/dev/null | tr ' ' '\n' | paste -sd ', ' -)
+                echo "FAILED_TESTS=$TESTS" >> $GITHUB_ENV
+                echo "TESTS_FAILED=true" >> $GITHUB_ENV
+              else
+                echo "FAILED_TESTS=" >> $GITHUB_ENV
+                echo "TESTS_FAILED=false" >> $GITHUB_ENV
+              fi
+            else
+              echo "FAILED_TESTS=" >> $GITHUB_ENV
+              echo "TESTS_FAILED=false" >> $GITHUB_ENV
+            fi
 
       - name: 📝 Generate Coverage Summary
         run: |
@@ -175,6 +210,13 @@ jobs:
           else
             echo "No coverage file found"
           fi
+
+      - name: 💡 Add failed test summary if not PR
+        if: env.TESTS_FAILED == 'true' && github.event_name != 'pull_request'
+        run: |
+          echo "## ❌ Some PHPUnit tests failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "${{ env.FAILED_TESTS }}" >> $GITHUB_STEP_SUMMARY
 
       - name: 💬 Comment Coverage on PR
         if: github.event_name == 'pull_request'
@@ -197,3 +239,25 @@ jobs:
                 body: body
               });
             }
+
+      - name: 💬 Comment failed tests on PR
+        if: env.TESTS_FAILED == 'true' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const failed = process.env.FAILED_TESTS || 'Unable to parse failures.';
+            const body = `❌ **Some PHPUnit tests failed**:
+            
+            ${failed}
+            
+            Please check your tests.`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: 🔴 Fail if tests failed
+        if: env.TESTS_FAILED == 'true'
+        run: exit 1
