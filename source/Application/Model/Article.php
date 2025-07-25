@@ -3623,9 +3623,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getUnitName()
     {
-        if ($this->oxarticles__oxunitname->value) {
-            return Registry::getLang()->translateString($this->oxarticles__oxunitname->value);
-        }
+        return $this->oxarticles__oxunitname->value;
     }
 
     /**
