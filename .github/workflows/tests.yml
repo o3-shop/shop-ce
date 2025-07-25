@@ -184,7 +184,7 @@ jobs:
           if [ -f junit.xml ]; then
             FAILURES=$(xmllint --xpath "count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
             ERROR_OUTPUT=$(
-              xmllint --xpath '//testcase[failure]/..' coverage/junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
+              xmllint --xpath '//testcase[failure]/..' junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
               while (/<testcase\b([^>]*)>/g) {
               my $attr = $1;
               my ($class) = $attr =~ /\bclass="([^"]*)"/;
