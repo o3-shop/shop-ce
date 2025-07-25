@@ -197,7 +197,14 @@ jobs:
             echo "FAILURES=$FAILURES"
             echo "ERROR_OUTPUT=$ERROR_OUTPUT"
              if [ "$FAILURES" -gt 0 ]; then
-                TESTS=$(xmllint --xpath '//testcase[failure]/../@classname|//testcase[failure]/../@name' junit.xml 2>/dev/null | tr ' ' '\n' | paste -sd ', ' -)
+                TESTS=$(xmllint --xpath '//testcase[failure]/..' coverage/junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
+              while (/<testcase\b([^>]*)>/g) {
+              my $attr = $1;
+              my ($class) = $attr =~ /\bclass="([^"]*)"/;
+              my ($name)  = $attr =~ /\bname="([^"]*)"/;
+              print "$class"."::"."$name\n" if $class && $name;
+            }
+              ')
                 echo "FAILED_TESTS=$TESTS" >> $GITHUB_ENV
                 echo "TESTS_FAILED=true" >> $GITHUB_ENV
               else
