@@ -232,7 +232,7 @@ jobs:
         run: |
           echo "## ❌ Some PHPUnit tests failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "${{ env.FAILED_TESTS }}" >> $GITHUB_STEP_SUMMARY
+          echo ${{ env.FAILED_TESTS }} >> $GITHUB_STEP_SUMMARY
 
       - name: 💬 Comment Coverage on PR
         if: github.event_name == 'pull_request'
