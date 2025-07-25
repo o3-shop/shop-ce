@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -19,9 +20,9 @@
  * Brutto-Brutto mode.
  * Short description: test added from selenium test (testFrontendVatForBillingCountry) ; Checking VAT functionality, when it is calculated for Billing country
  */
-$aData = array(
-    'articles' => array(
-            0 => array(
+$aData = [
+    'articles' => [
+            0 => [
                     'oxid'                     => 10011,
                     'oxprice'                  => 101,
                     'oxvat'                    => 10,
@@ -29,9 +30,9 @@ $aData = array(
                     'oxpricea'       		   => 0,
                     'oxpriceb' 			       => 0,
                     'oxpricec' 			       => 0,
-            ),
-       
-            1 => array(
+            ],
+
+            1 => [
                     'oxid'                     => 1003,
                     'oxprice'                  => 75.00,
                     'oxvat'                    => 19,
@@ -46,8 +47,8 @@ $aData = array(
                         'oxaddperc'    => 20,
                     ),
                     */
-            ),
-            2 => array(
+            ],
+            2 => [
                     'oxid'                     => 1000,
                     'oxprice'                  => 50.00,
                     'oxvat'                    => 5,
@@ -57,18 +58,17 @@ $aData = array(
                     'oxpricec' 			       => 55,
                     'oxunitname'               => 'kg',
                     'oxunitquantity'           => 2,
-                    'oxweight'                 => 2
-            ),
+                    'oxweight'                 => 2,
+            ],
+    ],
 
-    ),
-    
         // User
-    'user' => array(
+    'user' => [
             'oxactive' => 1,
             'oxusername' => 'basketUser',
             // country id, for example this is Deutschland, make sure country with specified ID is active
             'oxcountryid' => 'a7c40f631fc920687.20179984',
-    ),
+    ],
     /*
     'discounts' => array (
 
@@ -84,14 +84,10 @@ $aData = array(
             ),
     ),
     */
-    
 
-    
-    
-    
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxactive' => 1,
                 'oxaddsum' => 6.90,
                 'oxaddsumtype' => 'abs',
@@ -99,11 +95,11 @@ $aData = array(
                 'oxfinalize' => 1,
                 'oxparamend' => 99999,
             //	'oxcountryid' => 'a7c40f6321c6f6109.43859248',
-            ),
-        ),
+            ],
+        ],
                 // Payment
-        'payment' => array(
-             0 => array(
+        'payment' => [
+             0 => [
                 // oxpayments DB fields
                 'oxaddsum' => 0.00,
                 'oxaddsumtype' => 'abs',
@@ -112,39 +108,37 @@ $aData = array(
                 'oxchecked' => 1,
                 'oxaddsumrules'=>0,
                 'oxcountryid' => 'a7c40f631fc920687.20179984',
-                
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                10011 => array( '101,00', '101,00' ),
-                1003 => array( '75,00', '75,00' ),
-                1000 => array( '50,00', '50,00' ),
-
-        ),
-        'totals' => array(
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                10011 => [ '101,00', '101,00' ],
+                1003 => [ '75,00', '75,00' ],
+                1000 => [ '50,00', '50,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '226,00',
                 'totalNetto'  => '202,47',
-                'vats' => array(
+                'vats' => [
                         10 => '9,18',
                         19 => '11,97',
-                        5 => '2,38'
-                ),
-                'delivery' => array(
+                        5 => '2,38',
+                ],
+                'delivery' => [
                         'brutto' => '6,90',
-                ),
-                'grandTotal'  => '232,90'
-        ),
-    ),
-    'options' => array(
+                ],
+                'grandTotal'  => '232,90',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => false,
                 'blShowVATForDelivery' => false,
                 'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
-    ),
-);
+        ],
+    ],
+];

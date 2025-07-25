@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,12 +21,10 @@
 
 $sLangName = 'Deutsch';
 
-
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
 // -------------------------------
 $aLang = [
-
     'charset'          => 'UTF-8',
     'fullDateFormat'   => 'd.m.Y H:i:s',
     'simpleDateFormat' => 'd.m.Y',
@@ -744,7 +743,7 @@ $aLang = [
     // http://oxid-eshop-developer-documentation.readthedocs.io/en/latest/modules/metadata/version20.html
     // and http://oxid-eshop-developer-documentation.readthedocs.io/en/latest/modules/using_namespaces_in_modules.html
     'MODULE_METADATA_PROBLEMATIC_DATA_IN_EXTEND'     => 'Ungültige Metadaten im Abschnitt extend. Die folgenden Shopklassen sind entweder falsch geschrieben oder gehören nicht zum virtuellen Namespace: <br> %s',
-    'LANGUAGE_ERRORGENERATEVIEWS'                    => "Bitte aktualisieren Sie die Datenbank-Views unter Service -> Tools",
+    'LANGUAGE_ERRORGENERATEVIEWS'                    => 'Bitte aktualisieren Sie die Datenbank-Views unter Service -> Tools',
     'LANGUAGE_ACTIVE'                                => 'Im Frontend aktiv',
     'LANGUAGE_LIST_MENUITEM'                         => 'Stammdaten',
     'LANGUAGE_LIST_MENUSUBITEM'                      => 'Sprachen',
@@ -804,7 +803,7 @@ $aLang = [
     'NEWS_MAIN_SHOWFORGROUP'                         => 'Sichtbar für Benutzergruppe',
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Nicht sichtbar für Benutzergruppe',
     // END deprecated
-    'NAVIGATION_SYSREQ_MESSAGE'                      => "Die Systemgesundheit dieses Shops ist gefährdet. Möglicherweise verhält sich Ihr O3-Shop in einigen Bereichen unerwartet. Bitte stellen Sie sicher, dass die Servereinstellungen korrekt vorgenommen werden. Unterstützung finden Sie in der ",
+    'NAVIGATION_SYSREQ_MESSAGE'                      => 'Die Systemgesundheit dieses Shops ist gefährdet. Möglicherweise verhält sich Ihr O3-Shop in einigen Bereichen unerwartet. Bitte stellen Sie sicher, dass die Servereinstellungen korrekt vorgenommen werden. Unterstützung finden Sie in der ',
     'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>Systemgesundheitsprüfung</b>.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'Die permanente Systemgesundheitsprüfung wurde deaktiviert. Sie können diese auf der Registerkarte Perform. unter Stammdaten -> Grundeinstellungen aktivieren. Um dennoch zu prüfen, klicken Sie bitte hier: ',
     'NAVIGATION_SHOPFRONT'                           => 'Startseite des Shops',
@@ -872,8 +871,8 @@ $aLang = [
     'ORDER_MAIN_DELTYPE'                                 => 'Versandart',
     'ORDER_MAIN_UPDATE_DELPAY'                           => 'Aktualisieren',
     'ORDER_MAIN_SEND_DOWNLOADS'                          => 'Bestellte Downloadlinks',
-    'ORDER_MAIN_PAYMENT_INFORMATION'                     => "Bezahlinformationen",
-    'ORDER_MAIN_SHIPPING_INFORMATION'                    => "Versandinformationen",
+    'ORDER_MAIN_PAYMENT_INFORMATION'                     => 'Bezahlinformationen',
+    'ORDER_MAIN_SHIPPING_INFORMATION'                    => 'Versandinformationen',
     'ORDER_REMARK_REMARK'                                => '[Bem.]',
     'ORDER_REMARK_ORDER'                                 => '[Best.]',
     'ORDER_REMARK_USER'                                  => '[Reg.]',
@@ -1266,7 +1265,6 @@ $aLang = [
     'SYSREQ_MYSQL_CONNECT'                    => 'PDO_MySQL',
 
     'SYSREQ_MYSQL_VERSION'                    => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10',
-
 
     'SYSREQ_GD_INFO'                          => 'GDlib v2 incl. JPEG Unterstützung',
     'SYSREQ_INI_SET'                          => 'ini_set erlaubt',
@@ -1790,7 +1788,6 @@ $aLang = [
     'SHOP_OPTIONS_BANK_INFORMATION'                => 'Bankinformationen (SEPA)',
     'SHOP_OPTIONS_GROUP_ACCOUNT_SETTINGS'          => 'Kontoeinstellungen',
 
-
     'PROMOTION_USERS_SETGROUPS'   => 'Zugeordnete Benutzergruppen',
     'PROMOTION_LIST_ALL'          => 'Alle',
     'PROMOTION_LIST_ACTIVE'       => 'Aktiv',
@@ -1932,7 +1929,7 @@ $aLang = [
     'SHOP_CONFIG_ADDITIONAL_SERVICE_VAT_CALCULATION_PROPORTIONAL' => 'MwSt. anteilig berechnen',
 
     'CUSTOM_TEMPLATE_EXIST_FOR_DELETED_SHOP' => 'Der gelöschte Shop verwendet eigene Templates. Löschen Sie diese manuell, falls gewünscht.',
-    'TOTAL_PLUS_PROPORTIONAL_VAT'            => "plus MwSt. (anteilig berechnet)",
+    'TOTAL_PLUS_PROPORTIONAL_VAT'            => 'plus MwSt. (anteilig berechnet)',
 
     'BUTTON_DOWNLOAD' => 'Herunterladen',
 
@@ -1967,7 +1964,6 @@ $aLang = [
     'OXDIAG_MODIFIEDHINTS1'                       => 'O3-Shop kann durch Module funktional erweitert werden, ohne dass dabei die  ausgelieferten Dateien angepasst werden müssen. Shopdateien sollten niemals geändert werden. Siehe dazu unsere englischen <a href="http://blog.oxid-esales.com/2009/02/how-extend-oxid-eshop-with-modules-part-1/" target=_blank>Tutorials</a>.',
     'OXDIAG_MODIFIEDHINTS2'                       => 'Es ist möglich eigene Templates zu verwenden, ohne die ausgelieferten Templates zu ändern.',
     'OXDIAG_VERSIONMISMATCHHINTS'                 => 'Offenbar schlug ein Update oder auch mehrere fehl. Klicken Sie auf den Details-Link, um mehr Informationen zu jeder einzelnen Datei zu erhalten. Eine übrig gebliebene Datei, die nicht mehr länger zum O3-Shop gehört, kann auch ein <u>möglicher</u> Grund für eine Versionsungleichheit sein. Informationen zum Update finden Sie in unserer <a href="http://www.oxid-esales.com/de/support-services/dokumentation-und-hilfe/oxid-eshop/installation/oxid-eshop-aktualisieren" target=_blank>Dokumentation und Hilfe</a>.',
-
 
     'OXDIAG_HOME'                     => 'O3-Shop Diagnose',
     'OXDIAG_ABOUT'                    => 'Dieses Modul sammelt technische Informationen &uuml;ber Ihren Shop und den Server.

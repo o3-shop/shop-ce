@@ -22,8 +22,8 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\Eshop\Core\SystemRequirements;
-use Psr\Container\ContainerInterface;
 use PHPUnit\Framework\MockObject\MockObject as Mock;
+use Psr\Container\ContainerInterface;
 
 class SystemRequirementsTest extends \OxidTestCase
 {
@@ -50,7 +50,7 @@ class SystemRequirementsTest extends \OxidTestCase
     public function testGetModuleInfo()
     {
         /** @var SystemRequirements|Mock $systemRequirementsMock */
-        $systemRequirementsMock = $this->getMock(SystemRequirements::class, array('checkMbString', 'checkModRewrite'));
+        $systemRequirementsMock = $this->getMock(SystemRequirements::class, ['checkMbString', 'checkModRewrite']);
 
         $systemRequirementsMock->expects($this->once())->method('checkMbString');
         $systemRequirementsMock->expects($this->never())->method('checkModRewrite');
@@ -97,7 +97,7 @@ class SystemRequirementsTest extends \OxidTestCase
     public function testGetSysReqStatus()
     {
         /** @var SystemRequirements|Mock $systemRequirementsMock */
-        $systemRequirementsMock = $this->getMock(SystemRequirements::class, array('getSystemInfo'));
+        $systemRequirementsMock = $this->getMock(SystemRequirements::class, ['getSystemInfo']);
         $systemRequirementsMock->expects($this->once())->method('getSystemInfo');
 
         $this->assertTrue($systemRequirementsMock->getSysReqStatus());
@@ -154,42 +154,42 @@ class SystemRequirementsTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('sShopURL', 'http://www.testshopurl.lt/testsubdir1/insideit2/');
         $systemRequirements = new SystemRequirements();
         $this->assertEquals(
-            array(
+            [
                 'host' => 'www.testshopurl.lt',
                 'port' => 80,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => false,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromConfig()
         );
         $this->getConfig()->setConfigParam('sShopURL', 'https://www.testshopurl.lt/testsubdir1/insideit2/');
         $this->assertEquals(
-            array(
+            [
                 'host' => 'www.testshopurl.lt',
                 'port' => 443,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => true,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromConfig()
         );
         $this->getConfig()->setConfigParam('sShopURL', 'https://51.1586.51.15:21/testsubdir1/insideit2/');
         $this->assertEquals(
-            array(
+            [
                 'host' => '51.1586.51.15',
                 'port' => 21,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => true,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromConfig()
         );
         $this->getConfig()->setConfigParam('sShopURL', '51.1586.51.15:21/testsubdir1/insideit2/');
         $this->assertEquals(
-            array(
+            [
                 'host' => '51.1586.51.15',
                 'port' => 21,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => false,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromConfig()
         );
     }
@@ -204,42 +204,42 @@ class SystemRequirementsTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('sSSLShopURL', 'http://www.testshopurl.lt/testsubdir1/insideit2/');
         $systemRequirements = new SystemRequirements();
         $this->assertEquals(
-            array(
+            [
                 'host' => 'www.testshopurl.lt',
                 'port' => 80,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => false,
-            ),
+            ],
             $systemRequirements->UNITgetShopSSLHostInfoFromConfig()
         );
         $this->getConfig()->setConfigParam('sSSLShopURL', 'https://www.testshopurl.lt/testsubdir1/insideit2/');
         $this->assertEquals(
-            array(
+            [
                 'host' => 'www.testshopurl.lt',
                 'port' => 443,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => true,
-            ),
+            ],
             $systemRequirements->UNITgetShopSSLHostInfoFromConfig()
         );
         $this->getConfig()->setConfigParam('sSSLShopURL', 'https://51.1586.51.15:21/testsubdir1/insideit2/');
         $this->assertEquals(
-            array(
+            [
                 'host' => '51.1586.51.15',
                 'port' => 21,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => true,
-            ),
+            ],
             $systemRequirements->UNITgetShopSSLHostInfoFromConfig()
         );
         $this->getConfig()->setConfigParam('sSSLShopURL', '51.1586.51.15:21/testsubdir1/insideit2/');
         $this->assertEquals(
-            array(
+            [
                 'host' => '51.1586.51.15',
                 'port' => 21,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => false,
-            ),
+            ],
             $systemRequirements->UNITgetShopSSLHostInfoFromConfig()
         );
     }
@@ -258,12 +258,12 @@ class SystemRequirementsTest extends \OxidTestCase
 
         $systemRequirements = new SystemRequirements();
         $this->assertEquals(
-            array(
+            [
                 'host' => 'www.testshopurl.lt',
                 'port' => 80,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => false,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromServerVars()
         );
 
@@ -272,12 +272,12 @@ class SystemRequirementsTest extends \OxidTestCase
         $_SERVER['SERVER_PORT'] = null;
         $_SERVER['HTTP_HOST'] = 'www.testshopurl.lt';
         $this->assertEquals(
-            array(
+            [
                 'host' => 'www.testshopurl.lt',
                 'port' => 443,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => true,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromServerVars()
         );
 
@@ -286,12 +286,12 @@ class SystemRequirementsTest extends \OxidTestCase
         $_SERVER['SERVER_PORT'] = 21;
         $_SERVER['HTTP_HOST'] = '51.1586.51.15';
         $this->assertEquals(
-            array(
+            [
                 'host' => '51.1586.51.15',
                 'port' => 21,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => true,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromServerVars()
         );
 
@@ -300,12 +300,12 @@ class SystemRequirementsTest extends \OxidTestCase
         $_SERVER['SERVER_PORT'] = '21';
         $_SERVER['HTTP_HOST'] = '51.1586.51.15';
         $this->assertEquals(
-            array(
+            [
                 'host' => '51.1586.51.15',
                 'port' => 21,
                 'dir'  => '/testsubdir1/insideit2/',
                 'ssl'  => false,
-            ),
+            ],
             $systemRequirements->UNITgetShopHostInfoFromServerVars()
         );
     }
@@ -371,33 +371,33 @@ class SystemRequirementsTest extends \OxidTestCase
      */
     public function testGetMissingTemplateBlocksIfNotFound()
     {
-        $resultSetMock = $this->getMock('stdclass', array('fetchRow', 'count'));
+        $resultSetMock = $this->getMock('stdclass', ['fetchRow', 'count']);
         $resultSetMock->expects($this->exactly(1))->method('fetchRow')
             ->will($this->evalFunction('{$_this->EOF = true;}'));
         $resultSetMock->expects($this->exactly(1))->method('count')
             ->will($this->returnValue(1));
-        $resultSetMock->fields = array(
+        $resultSetMock->fields = [
             'OXTEMPLATE'  => '_OXTEMPLATE_',
             'OXBLOCKNAME' => '_OXBLOCKNAME_',
             'OXMODULE'    => '_OXMODULE_',
-        );
+        ];
 
         /** @var SystemRequirements|Mock $systemRequirementsMock */
-        $systemRequirementsMock = $this->getMock(\OxidEsales\Eshop\Core\SystemRequirements::class, array('_checkTemplateBlock', 'fetchBlockRecords'));
+        $systemRequirementsMock = $this->getMock(\OxidEsales\Eshop\Core\SystemRequirements::class, ['_checkTemplateBlock', 'fetchBlockRecords']);
         $systemRequirementsMock->expects($this->exactly(1))->method('_checkTemplateBlock')
-            ->with($this->equalTo("_OXTEMPLATE_"), $this->equalTo("_OXBLOCKNAME_"))
+            ->with($this->equalTo('_OXTEMPLATE_'), $this->equalTo('_OXBLOCKNAME_'))
             ->will($this->returnValue(false));
         $systemRequirementsMock->expects($this->exactly(1))->method('fetchBlockRecords')
             ->willReturn($resultSetMock);
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'module'   => '_OXMODULE_',
                     'block'    => '_OXBLOCKNAME_',
                     'template' => '_OXTEMPLATE_',
-                )
-            ),
+                ],
+            ],
             $systemRequirementsMock->getMissingTemplateBlocks()
         );
     }
@@ -407,27 +407,27 @@ class SystemRequirementsTest extends \OxidTestCase
      */
     public function testGetMissingTemplateBlocksIfFound()
     {
-        $resultSetMock = $this->getMock('stdclass', array('fetchRow', 'count'));
+        $resultSetMock = $this->getMock('stdclass', ['fetchRow', 'count']);
         $resultSetMock->expects($this->exactly(1))->method('fetchRow')
             ->will($this->evalFunction('{$_this->EOF = true;}'));
         $resultSetMock->expects($this->exactly(1))->method('count')
             ->will($this->returnValue(1));
-        $resultSetMock->fields = array(
+        $resultSetMock->fields = [
             'OXTEMPLATE'  => '_OXTEMPLATE_',
             'OXBLOCKNAME' => '_OXBLOCKNAME_',
             'OXMODULE'    => '_OXMODULE_',
-        );
+        ];
 
         /** @var SystemRequirements|Mock $systemRequirementsMock */
-        $systemRequirementsMock = $this->getMock(\OxidEsales\Eshop\Core\SystemRequirements::class, array('_checkTemplateBlock', 'fetchBlockRecords'));
+        $systemRequirementsMock = $this->getMock(\OxidEsales\Eshop\Core\SystemRequirements::class, ['_checkTemplateBlock', 'fetchBlockRecords']);
         $systemRequirementsMock->expects($this->exactly(1))->method('_checkTemplateBlock')
-            ->with($this->equalTo("_OXTEMPLATE_"), $this->equalTo("_OXBLOCKNAME_"))
+            ->with($this->equalTo('_OXTEMPLATE_'), $this->equalTo('_OXBLOCKNAME_'))
             ->will($this->returnValue(true));
         $systemRequirementsMock->expects($this->exactly(1))->method('fetchBlockRecords')
             ->willReturn($resultSetMock);
 
         $this->assertEquals(
-            array(),
+            [],
             $systemRequirementsMock->getMissingTemplateBlocks()
         );
     }
@@ -439,15 +439,15 @@ class SystemRequirementsTest extends \OxidTestCase
      */
     public function providerCheckMemoryLimit()
     {
-        $memoryLimitsWithExpectedSystemHealth = array(
-            array('8M', 0),
-            array('31M', 0),
-            array('32M', 1),
-            array('59M', 1),
-            array('60M', 2),
-            array('61M', 2),
-            array('-1', 2),
-        );
+        $memoryLimitsWithExpectedSystemHealth = [
+            ['8M', 0],
+            ['31M', 0],
+            ['32M', 1],
+            ['59M', 1],
+            ['60M', 2],
+            ['61M', 2],
+            ['-1', 2],
+        ];
 
         return $memoryLimitsWithExpectedSystemHealth;
     }
@@ -479,7 +479,7 @@ class SystemRequirementsTest extends \OxidTestCase
             ],
             'group_b' => [
                 'module_c' => SystemRequirements::MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS,
-            ]
+            ],
         ];
 
         $expectedSystemRequirementsInfo = [
@@ -489,7 +489,7 @@ class SystemRequirementsTest extends \OxidTestCase
             ],
             'group_b' => [
                 'module_c' => SystemRequirements::MODULE_STATUS_BLOCKS_SETUP,
-            ]
+            ],
         ];
 
         $filterFunction = function ($groupId, $moduleId, $status) {
@@ -528,8 +528,8 @@ class SystemRequirementsTest extends \OxidTestCase
     {
         $testCase1 = [
             'group_a' => [
-                'module_a' => SystemRequirements::MODULE_STATUS_OK
-            ]
+                'module_a' => SystemRequirements::MODULE_STATUS_OK,
+            ],
         ];
 
         $testCase2 = [
@@ -539,7 +539,7 @@ class SystemRequirementsTest extends \OxidTestCase
             ],
             'group_b' => [
                 'module_c' => SystemRequirements::MODULE_STATUS_UNABLE_TO_DETECT,
-            ]
+            ],
         ];
 
         return [
@@ -565,8 +565,8 @@ class SystemRequirementsTest extends \OxidTestCase
     {
         $testCase1 = [
             'group_a' => [
-                'module_a' => SystemRequirements::MODULE_STATUS_BLOCKS_SETUP
-            ]
+                'module_a' => SystemRequirements::MODULE_STATUS_BLOCKS_SETUP,
+            ],
         ];
 
         $testCase2 = [

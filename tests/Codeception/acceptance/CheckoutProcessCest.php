@@ -48,7 +48,7 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'price' => '50,00 €'
+            'price' => '50,00 €',
         ];
 
         $basket->addProductToBasket($basketItem1['id'], 1);
@@ -58,14 +58,14 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 2,
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'price' => '100,00 €'
+            'price' => '100,00 €',
         ];
         $basket->addProductToBasket($basketItem1['id'], 1);
         $basket->addProductToBasket($basketItem2['id'], 1);
@@ -93,7 +93,7 @@ final class CheckoutProcessCest
     public function createOrder(AcceptanceTester $I)
     {
         $I->wantToTest('simple order steps (without any special cases)');
-        
+
         $I->retry(3, 2000);
 
         $I->updateConfigInDatabase('blShowVATForDelivery', false, 'bool');
@@ -106,14 +106,14 @@ final class CheckoutProcessCest
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1002-2',
             'title' => 'Test product 2 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '67,00 €'
+            'totalPrice' => '67,00 €',
         ];
         $homePage = $I->openShop();
 
@@ -190,14 +190,14 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 5,
-            'totalPrice' => '250,00 €'
+            'totalPrice' => '250,00 €',
         ];
 
         $basketItem2 = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         //add Product to basket
@@ -219,7 +219,7 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 3,
-            'totalPrice' => '150,00 €'
+            'totalPrice' => '150,00 €',
         ];
         $paymentPage = $basketPage->seeBasketContains([$basketItem1, $basketItem2], '250,00 €')
             ->goToNextStep()
@@ -274,7 +274,7 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '50,00 €'
+            'totalPrice' => '50,00 €',
         ];
 
         $userData = $this->getExistingUserData();
@@ -325,13 +325,13 @@ final class CheckoutProcessCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '50,00 €'
+            'totalPrice' => '50,00 €',
         ];
 
         $bundledProductData = [
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
-            'amount' => '+1'
+            'amount' => '+1',
         ];
 
         $this->prepareTestDataForBundledProduct($I, $productData['id'], $bundledProductData['id']);
@@ -454,7 +454,7 @@ final class CheckoutProcessCest
     public function checkNoSessionCookiesCheckout(AcceptanceTester $I): void
     {
         $I->wantToTest('Check if checkout is possible without cookies');
-       
+
         file_put_contents(
             (new Facts())->getShopRootPath() . '/cust_config.inc.php',
             '<?php $this->blSessionUseCookies = false;'
@@ -473,7 +473,6 @@ final class CheckoutProcessCest
 
         $orderPage = $paymentPage->selectPayment('oxidcashondel')
             ->goToNextStep();
-
 
         $orderPage->submitOrder();
 
@@ -503,7 +502,7 @@ final class CheckoutProcessCest
             'id' => '1001',
             'title' => 'Test product 1 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '100,00 €'
+            'totalPrice' => '100,00 €',
         ];
 
         $homePage = $I->openShop();
@@ -512,7 +511,7 @@ final class CheckoutProcessCest
 
         $homePage->openMiniBasket()->openBasketDisplay();
 
-        $I->see('Black', "#table_cartItem_1");
+        $I->see('Black', '#table_cartItem_1');
     }
 
     /**

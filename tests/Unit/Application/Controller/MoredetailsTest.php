@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +29,6 @@ use oxTestModules;
  */
 class MoredetailsTest extends OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *

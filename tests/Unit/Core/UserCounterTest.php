@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class UserCounterTest extends \OxidTestCase
 {
     public function testCountingAdmins()
     {
-        $this->getDb()->execute("delete from `oxuser`");
+        $this->getDb()->execute('delete from `oxuser`');
 
         $this->_createUserWithRights('_testMallAdmin1', true, 'malladmin');
         $this->_createUserWithRights('_testMallAdmin2', true, 'malladmin');
@@ -37,7 +39,7 @@ class UserCounterTest extends \OxidTestCase
 
     public function testCountingAdminsWhenInActiveAdminsExist()
     {
-        $this->getDb()->execute("delete from `oxuser`");
+        $this->getDb()->execute('delete from `oxuser`');
 
         $this->_createUserWithRights('_testMallAdmin1', true, 'malladmin');
         $this->_createUserWithRights('_testMallAdmin2', false, 'malladmin');
@@ -51,7 +53,7 @@ class UserCounterTest extends \OxidTestCase
 
     public function testCountingAdminsWhenNoAdminsExist()
     {
-        $this->getDb()->execute("delete from `oxuser`");
+        $this->getDb()->execute('delete from `oxuser`');
 
         $this->_createUserWithRights('_tesUser1', true, 'user');
         $this->_createUserWithRights('_tesUser2', true, 'user');
@@ -62,7 +64,7 @@ class UserCounterTest extends \OxidTestCase
 
     public function testCountingActiveAdmins()
     {
-        $this->getDb()->execute("delete from `oxuser`");
+        $this->getDb()->execute('delete from `oxuser`');
 
         $this->_createUserWithRights('_testMallAdmin1', true, 'malladmin');
         $this->_createUserWithRights('_testMallAdmin2', true, 'malladmin');
@@ -76,7 +78,7 @@ class UserCounterTest extends \OxidTestCase
 
     public function testCountingActiveAdminsWhenInActiveAdminsExist()
     {
-        $this->getDb()->execute("delete from `oxuser`");
+        $this->getDb()->execute('delete from `oxuser`');
 
         $this->_createUserWithRights('_testMallAdmin1', true, 'malladmin');
         $this->_createUserWithRights('_testMallAdmin2', false, 'malladmin');
@@ -90,7 +92,7 @@ class UserCounterTest extends \OxidTestCase
 
     public function testCountingActiveAdminsWhenNoAdminsExist()
     {
-        $this->getDb()->execute("delete from `oxuser`");
+        $this->getDb()->execute('delete from `oxuser`');
 
         $this->_createUserWithRights('_tesUser1', true, 'user');
         $this->_createUserWithRights('_tesUser2', true, 'user');

@@ -51,11 +51,11 @@ class DeliverySetUsers extends AdminDetailsController
         // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
-        $oGroups->selectString("select * from " . Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->_iEditLang));
+        $oGroups->selectString('select * from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups', $this->_iEditLang));
 
         $oRoot = new Groups();
-        $oRoot->oxgroups__oxid = new Field("");
-        $oRoot->oxgroups__oxtitle = new Field("-- ");
+        $oRoot->oxgroups__oxid = new Field('');
+        $oRoot->oxgroups__oxtitle = new Field('-- ');
         // rebuild list as we need the "no value" entry at the first position
         $aNewList = [];
         $aNewList[] = $oRoot;
@@ -68,7 +68,7 @@ class DeliverySetUsers extends AdminDetailsController
 
         $oGroups = $aNewList;
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oDelivery = oxNew(DeliverySet::class);
             $oDelivery->load($soxId);
 
@@ -78,21 +78,21 @@ class DeliverySetUsers extends AdminDetailsController
             }
         }
 
-        $this->_aViewData["allgroups2"] = $oGroups;
+        $this->_aViewData['allgroups2'] = $oGroups;
 
         $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
         if ($iAoc == 1) {
             $oDeliverysetGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetGroupsAjax->getColumns();
 
-            return "popups/deliveryset_groups.tpl";
+            return 'popups/deliveryset_groups.tpl';
         } elseif ($iAoc == 2) {
             $oDeliverysetUsersAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetUsersAjax->getColumns();
 
-            return "popups/deliveryset_users.tpl";
+            return 'popups/deliveryset_users.tpl';
         }
 
-        return "deliveryset_users.tpl";
+        return 'deliveryset_users.tpl';
     }
 }

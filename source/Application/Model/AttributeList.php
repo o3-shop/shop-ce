@@ -65,7 +65,7 @@ class AttributeList extends ListModel
 
         $sSelect = "select $sAttrViewName.oxid, $sAttrViewName.oxtitle, {$sViewName}.oxvalue, {$sViewName}.oxobjectid ";
         $sSelect .= "from {$sViewName} left join $sAttrViewName on $sAttrViewName.oxid = {$sViewName}.oxattrid ";
-        $sSelect .= "where {$sViewName}.oxobjectid in ( " . $oxObjectIdsSql . " ) ";
+        $sSelect .= "where {$sViewName}.oxobjectid in ( " . $oxObjectIdsSql . ' ) ';
         $sSelect .= "order by {$sViewName}.oxpos, $sAttrViewName.oxpos";
 
         return $this->_createAttributeListFromSql($sSelect);
@@ -125,12 +125,12 @@ class AttributeList extends ListModel
             $sSelect .= "order by o2a.oxpos, {$sAttrViewName}.oxpos";
 
             $aAttributes = $oDb->getAll($sSelect, [
-                ':oxobjectid' => $sArticleId
+                ':oxobjectid' => $sArticleId,
             ]);
 
             if ($sParentId) {
                 $aParentAttributes = $oDb->getAll($sSelect, [
-                    ':oxobjectid' => $sParentId
+                    ':oxobjectid' => $sParentId,
                 ]);
                 $aAttributes = $this->_mergeAttributes($aAttributes, $aParentAttributes);
             }
@@ -161,12 +161,12 @@ class AttributeList extends ListModel
             $sSelect .= "order by o2a.oxpos, {$sAttrViewName}.oxpos";
 
             $aAttributes = $oDb->getAll($sSelect, [
-                ':oxobjectid' => $sArtId
+                ':oxobjectid' => $sArtId,
             ]);
 
             if ($sParentId) {
                 $aParentAttributes = $oDb->getAll($sSelect, [
-                    ':oxobjectid' => $sParentId
+                    ':oxobjectid' => $sParentId,
                 ]);
                 $aAttributes = $this->_mergeAttributes($aAttributes, $aParentAttributes);
             }
@@ -207,13 +207,13 @@ class AttributeList extends ListModel
             $sO2ATbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2attribute', $iLang);
             $sC2ATbl = Registry::get(TableViewNameGenerator::class)->getViewName('oxcategory2attribute', $iLang);
 
-            $sSelect = "SELECT DISTINCT att.oxid, att.oxtitle, o2a.oxvalue " .
+            $sSelect = 'SELECT DISTINCT att.oxid, att.oxtitle, o2a.oxvalue ' .
                        "FROM $sAttTbl as att, $sO2ATbl as o2a ,$sC2ATbl as c2a " .
                        "WHERE att.oxid = o2a.oxattrid AND c2a.oxobjectid = :oxobjectid AND c2a.oxattrid = att.oxid AND o2a.oxvalue !='' AND o2a.oxobjectid IN ($sArtIds) " .
-                       "ORDER BY c2a.oxsort , att.oxpos, att.oxtitle, o2a.oxvalue";
+                       'ORDER BY c2a.oxsort , att.oxpos, att.oxtitle, o2a.oxvalue';
 
             $rs = $oDb->select($sSelect, [
-                ':oxobjectid' => $sCategoryId
+                ':oxobjectid' => $sCategoryId,
             ]);
 
             if ($rs && $rs->count() > 0) {

@@ -38,7 +38,7 @@ class AdminLogSqlDecorator
     {
         $userId = $this->getUserId();
 
-        return "insert into {$this->table} (oxuserid, oxsql) values ('{$userId}', " . $this->quote($originalSql) . ")";
+        return "insert into {$this->table} (oxuserid, oxsql) values ('{$userId}', " . $this->quote($originalSql) . ')';
     }
 
     /**

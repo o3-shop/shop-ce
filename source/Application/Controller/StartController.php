@@ -262,7 +262,6 @@ class StartController extends FrontendController
         return $this->_aTopArticleList;
     }
 
-
     /**
      * Template variable getter. Returns newest article list
      *
@@ -367,7 +366,6 @@ class StartController extends FrontendController
             return Registry::getUtilsUrl()->prepareCanonicalUrl($oViewConf->getHomeLink());
         }
     }
-
 
     /**
      * Returns active banner list

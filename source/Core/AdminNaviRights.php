@@ -51,10 +51,10 @@ class AdminNaviRights extends Base
             /** @var DOMNode $node */
             foreach ($oNodeList as $node) {
                 /** @var DOMElement $node */
-                $nodeId = strtolower($node->getAttribute( 'id' ));
+                $nodeId = strtolower($node->getAttribute('id'));
 
-                if ( $nodeId && in_array( $nodeId, array_keys($menuItemRights))) {
-                    $node->parentNode->removeChild( $node );
+                if ($nodeId && in_array($nodeId, array_keys($menuItemRights))) {
+                    $node->parentNode->removeChild($node);
                 }
             }
         }
@@ -62,7 +62,9 @@ class AdminNaviRights extends Base
 
     public function applyRights(BaseController $view)
     {
-        if (!$this->getUser() || !$view->getViewId()) return;
+        if (!$this->getUser() || !$view->getViewId()) {
+            return;
+        }
 
         if ($this->isDenied($view)) {
             throw oxNew(AccessDeniedException::class);
@@ -73,7 +75,9 @@ class AdminNaviRights extends Base
     {
         $menuItemRights = $this->getMenuItemRights() ?? [];
 
-        if (!count($menuItemRights)) return;
+        if (!count($menuItemRights)) {
+            return;
+        }
 
         return in_array($view->getViewId(), array_keys($menuItemRights)) &&
             $menuItemRights[$view->getViewId()] == RightsRolesElement::TYPE_HIDDEN;
@@ -83,22 +87,22 @@ class AdminNaviRights extends Base
     {
         $controllersWithoutViewRights = [
             'adminnavigation',
-            'adminrights_main'
+            'adminrights_main',
         ];
 
         if ($this->menuItemRights === null) {
             $roleRights = $this->doLoad ? $this->getRoleRights() : [];
             $viewRights = !in_array(Registry::getConfig()->getActiveView()->getClassKey(), $controllersWithoutViewRights) ?
                 $this->getRestrictedViewRights(
-                    oxNew( AdminViewSetting::class )->canShowAllMenuItems(),
+                    oxNew(AdminViewSetting::class)->canShowAllMenuItems(),
                     $roleRights,
                     $xPath
                 ) : [];
 
-            if ( count( $roleRights ) && count( $viewRights ) ) {
-                $this->menuItemRights = $this->intersectRightLists( $roleRights, $viewRights );
+            if (count($roleRights) && count($viewRights)) {
+                $this->menuItemRights = $this->intersectRightLists($roleRights, $viewRights);
             } else {
-                $this->menuItemRights = count( $roleRights ) ? $roleRights : $viewRights;
+                $this->menuItemRights = count($roleRights) ? $roleRights : $viewRights;
             }
         }
 

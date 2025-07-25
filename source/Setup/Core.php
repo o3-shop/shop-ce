@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Setup;
 
-use OxidEsales\Eshop\Core\Edition\EditionPathProvider;
 use OxidEsales\Facts\Facts;
 use oxSystemComponentException;
 
@@ -70,15 +69,15 @@ class Core
     public function __call($sMethod, $aArgs)
     {
         if (defined('OXID_PHP_UNIT')) {
-            if (substr($sMethod, 0, 4) == "UNIT") {
-                $sMethod = str_replace("UNIT", "_", $sMethod);
+            if (substr($sMethod, 0, 4) == 'UNIT') {
+                $sMethod = str_replace('UNIT', '_', $sMethod);
             }
             if (method_exists($this, $sMethod)) {
                 return call_user_func_array([& $this, $sMethod], $aArgs);
             }
         }
 
-        throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException("Function '$sMethod' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL);
+        throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException("Function '$sMethod' does not exist or is not accessible! (" . get_class($this) . ')' . PHP_EOL);
     }
 
     /**
@@ -91,7 +90,7 @@ class Core
     protected function getClass($sInstanceName)
     {
         $facts = new Facts();
-        $class =  'OxidEsales\\EshopCommunity\\Setup\\' . $sInstanceName;
+        $class = 'OxidEsales\\EshopCommunity\\Setup\\' . $sInstanceName;
 
         return $class;
     }
@@ -101,7 +100,7 @@ class Core
      */
     protected function getSetupInstance()
     {
-        return $this->getInstance("Setup");
+        return $this->getInstance('Setup');
     }
 
     /**
@@ -109,7 +108,7 @@ class Core
      */
     protected function getLanguageInstance()
     {
-        return $this->getInstance("Language");
+        return $this->getInstance('Language');
     }
 
     /**
@@ -117,7 +116,7 @@ class Core
      */
     protected function getUtilitiesInstance()
     {
-        return $this->getInstance("Utilities");
+        return $this->getInstance('Utilities');
     }
 
     /**
@@ -125,7 +124,7 @@ class Core
      */
     protected function getSessionInstance()
     {
-        return $this->getInstance("Session");
+        return $this->getInstance('Session');
     }
 
     /**
@@ -133,7 +132,7 @@ class Core
      */
     protected function getDatabaseInstance()
     {
-        return $this->getInstance("Database");
+        return $this->getInstance('Database');
     }
 
     /**
@@ -145,7 +144,7 @@ class Core
     {
         $userDecidedOverwriteDatabase = false;
 
-        $overwriteCheck = $this->getUtilitiesInstance()->getRequestVar("ow", "get");
+        $overwriteCheck = $this->getUtilitiesInstance()->getRequestVar('ow', 'get');
         $session = $this->getSessionInstance();
 
         if (isset($overwriteCheck) || $session->getSessionParam('blOverwrite')) {
@@ -164,7 +163,7 @@ class Core
     {
         $userDecidedIgnoreDBWarning = false;
 
-        $overwriteCheck = $this->getUtilitiesInstance()->getRequestVar("owrec", "get");
+        $overwriteCheck = $this->getUtilitiesInstance()->getRequestVar('owrec', 'get');
         $session = $this->getSessionInstance();
 
         if (isset($overwriteCheck) || $session->getSessionParam('blIgnoreDbRecommendations')) {

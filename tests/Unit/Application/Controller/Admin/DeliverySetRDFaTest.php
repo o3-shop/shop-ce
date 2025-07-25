@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \stdClass;
-
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
+use stdClass;
 
 /**
  * Tests for Shop_Main class
  */
 class DeliverySetRDFaTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -63,7 +63,7 @@ class DeliverySetRDFaTest extends \OxidTestCase
 
         $iExists = $oDB->GetOne(
             'SELECT 1 FROM oxobject2delivery WHERE oxdeliveryid = ? AND oxtype = ?',
-            array($sTestID, 'rdfadeliveryset')
+            [$sTestID, 'rdfadeliveryset']
         );
         $this->assertFalse(empty($iExists));
 
@@ -72,7 +72,7 @@ class DeliverySetRDFaTest extends \OxidTestCase
 
         $iExists = $oDB->GetOne(
             'SELECT 1 FROM oxobject2delivery WHERE oxdeliveryid = ? AND oxtype = ?',
-            array($sTestID, 'rdfadeliveryset')
+            [$sTestID, 'rdfadeliveryset']
         );
         $this->assertTrue(empty($iExists));
     }
@@ -85,15 +85,15 @@ class DeliverySetRDFaTest extends \OxidTestCase
     public function testSave_createRecords()
     {
         $sTestID = '_test_recid';
-        $aObjIDs = array('_test_obj1', '_test_obj2');
+        $aObjIDs = ['_test_obj1', '_test_obj2'];
         $this->setRequestParameter('oxid', $sTestID);
         $this->setRequestParameter('ardfadeliveries', $aObjIDs);
         $this->setRequestParameter(
             'editval',
-            array(
+            [
                  'oxobject2delivery__oxdeliveryid' => $sTestID,
                  'oxobject2delivery__oxtype'       => 'rdfadeliveryset',
-            )
+            ]
         );
 
         $oDB = oxDb::getDb();
@@ -103,7 +103,7 @@ class DeliverySetRDFaTest extends \OxidTestCase
 
         $aCurrObjIDs = $oDB->GetCol(
             'SELECT oxobjectid FROM oxobject2delivery WHERE oxdeliveryid = ? AND oxtype = ?',
-            array($sTestID, 'rdfadeliveryset')
+            [$sTestID, 'rdfadeliveryset']
         );
         sort($aObjIDs);
         sort($aCurrObjIDs);
@@ -117,10 +117,10 @@ class DeliverySetRDFaTest extends \OxidTestCase
      */
     public function testGetAllRDFaDeliveries()
     {
-        $aAssignedRDFaDeliveries = array('DeliveryModeOwnFleet');
-        $aExpResp = array();
+        $aAssignedRDFaDeliveries = ['DeliveryModeOwnFleet'];
+        $aExpResp = [];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetRdfa::class, array('getAssignedRDFaDeliveries'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetRdfa::class, ['getAssignedRDFaDeliveries']);
         $oView->expects($this->once())->method('getAssignedRDFaDeliveries')->will($this->returnValue($aAssignedRDFaDeliveries));
         $aCurrResp = $oView->getAllRDFaDeliveries();
 
@@ -152,13 +152,13 @@ class DeliverySetRDFaTest extends \OxidTestCase
     public function testGetAssignedRDFaDeliveries()
     {
         $sTestID = '_test_recid';
-        $aObjIDs = array('_test_obj1', '_test_obj2');
+        $aObjIDs = ['_test_obj1', '_test_obj2'];
         $this->setRequestParameter('oxid', $sTestID);
         $oView = oxNew('DeliverySet_RDFa');
 
         $oDB = oxDb::getDb();
-        $oDB->Execute('DELETE FROM oxobject2delivery WHERE oxdeliveryid = ? AND oxtype = ?', array($sTestID, 'rdfadeliveryset'));
-        $this->assertSame(array(), $oView->getAssignedRDFaDeliveries(), 'Should be empty array');
+        $oDB->Execute('DELETE FROM oxobject2delivery WHERE oxdeliveryid = ? AND oxtype = ?', [$sTestID, 'rdfadeliveryset']);
+        $this->assertSame([], $oView->getAssignedRDFaDeliveries(), 'Should be empty array');
 
         foreach ($aObjIDs as $sObjID) {
             $oMapping = oxNew('oxBase');

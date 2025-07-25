@@ -50,5 +50,5 @@ class NewsletterList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxtitle";
+    protected $_sDefSortField = 'oxtitle';
 }

@@ -62,7 +62,7 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true)
-                ->setOptions(["collation"    => "latin1_general_ci"]);
+                ->setOptions(['collation'    => 'latin1_general_ci']);
         }
         if (!$adminNaviTable->hasColumn('SHOPID')) {
             $adminNaviTable->addColumn('SHOPID', (new IntegerType())->getName())
@@ -114,7 +114,7 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true)
-                ->setOptions(["collation"    => "latin1_general_ci"]);
+                ->setOptions(['collation'    => 'latin1_general_ci']);
         }
 
         if (!$adminNaviTable->hasColumn('ELEMENTID')) {
@@ -166,7 +166,7 @@ final class Version20230730131836 extends AbstractMigration
                 ->setLength(32)
                 ->setFixed(true)
                 ->setNotnull(true)
-                ->setOptions(["collation"    => "latin1_general_ci"]);
+                ->setOptions(['collation'    => 'latin1_general_ci']);
         }
 
         if (!$object2RoleTable->hasColumn('OXSHOPID')) {

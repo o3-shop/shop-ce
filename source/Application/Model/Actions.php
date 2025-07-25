@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -43,7 +43,7 @@ class Actions extends MultiLanguageModel
      *
      * @var string
      */
-    protected $_sClassName = "oxactions";
+    protected $_sClassName = 'oxactions';
 
     /**
      * Class constructor. Executes oxActions::init(), initiates parent constructor.
@@ -51,7 +51,7 @@ class Actions extends MultiLanguageModel
     public function __construct()
     {
         parent::__construct();
-        $this->init("oxactions");
+        $this->init('oxactions');
     }
 
     /**
@@ -63,13 +63,13 @@ class Actions extends MultiLanguageModel
     public function addArticle($articleId)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select max(oxsort) 
+        $sQ = 'select max(oxsort) 
                 from oxactions2article 
-                where oxactionid = :oxactionid and oxshopid = :oxshopid";
+                where oxactionid = :oxactionid and oxshopid = :oxshopid';
 
         $params = [
             ':oxactionid' => $this->getId(),
-            ':oxshopid' => $this->getShopId()
+            ':oxshopid' => $this->getShopId(),
         ];
         $iSort = ((int)$oDb->getOne($sQ, $params)) + 1;
 
@@ -95,11 +95,11 @@ class Actions extends MultiLanguageModel
     {
         // remove actions from articles also
         $oDb = DatabaseProvider::getDb();
-        $sDelete = "delete from oxactions2article where oxactionid = :oxactionid and oxartid = :oxartid and oxshopid = :oxshopid";
+        $sDelete = 'delete from oxactions2article where oxactionid = :oxactionid and oxartid = :oxartid and oxshopid = :oxshopid';
         $iRemovedArticles = $oDb->execute($sDelete, [
             ':oxactionid' => $this->getId(),
             ':oxartid' => $articleId,
-            ':oxshopid' => $this->getShopId()
+            ':oxshopid' => $this->getShopId(),
         ]);
 
         return (bool) $iRemovedArticles;
@@ -125,10 +125,10 @@ class Actions extends MultiLanguageModel
 
         // remove actions from articles also
         $oDb = DatabaseProvider::getDb();
-        $sDelete = "delete from oxactions2article where oxactionid = :oxactionid and oxshopid = :oxshopid";
+        $sDelete = 'delete from oxactions2article where oxactionid = :oxactionid and oxshopid = :oxshopid';
         $oDb->execute($sDelete, [
             ':oxactionid' => $articleId,
-            ':oxshopid' => $this->getShopId()
+            ':oxshopid' => $this->getShopId(),
         ]);
 
         return parent::delete($articleId);
@@ -194,7 +194,7 @@ class Actions extends MultiLanguageModel
     {
         if (
             !(
-            $this->oxactions__oxactive->value
+                $this->oxactions__oxactive->value
               && $this->oxactions__oxtype->value == 2
               && $this->oxactions__oxactivefrom->value != '0000-00-00 00:00:00'
             )
@@ -254,7 +254,6 @@ class Actions extends MultiLanguageModel
         return null;
     }
 
-
     /**
      * Fetch the oxobjectid of the article corresponding this action.
      *
@@ -270,7 +269,7 @@ class Actions extends MultiLanguageModel
             'where oxactionid = :oxactionid and oxclass = :oxclass',
             [
                 ':oxactionid' => $this->getId(),
-                ':oxclass' => 'oxarticle'
+                ':oxclass' => 'oxarticle',
             ]
         );
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of O3-Shop.
@@ -70,7 +72,7 @@ class MetaDataSchemataProviderTest extends TestCase
             '20only'    => 0,
             'subSchema' => [
                 'subKey1' => 0,
-                'subKey2' => 1
+                'subKey2' => 1,
             ],
         ];
         $metaDataSchema = new MetaDataSchemataProvider($this->metaDataSchemata);

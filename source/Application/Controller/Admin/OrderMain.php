@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -69,8 +69,8 @@ class OrderMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oOrder = oxNew(Order::class);
             $oOrder->load($soxId);
@@ -79,16 +79,16 @@ class OrderMain extends AdminDetailsController
             $sOxPaidField = 'oxorder__oxpaid';
             $sDelTypeField = 'oxorder__oxdeltype';
 
-            if ($oOrder->$sOxPaidField->value != "0000-00-00 00:00:00") {
+            if ($oOrder->$sOxPaidField->value != '0000-00-00 00:00:00') {
                 $oOrder->blIsPaid = true;
                 /** @var UtilsDate $oUtilsDate */
                 $oUtilsDate = Registry::getUtilsDate();
                 $oOrder->$sOxPaidField = new Field($oUtilsDate->formatDBDate($oOrder->$sOxPaidField->value));
             }
 
-            $this->_aViewData["edit"] = $oOrder;
-            $this->_aViewData["paymentType"] = $oOrder->getPaymentType();
-            $this->_aViewData["oShipSet"] = $oOrder->getShippingSetList();
+            $this->_aViewData['edit'] = $oOrder;
+            $this->_aViewData['paymentType'] = $oOrder->getPaymentType();
+            $this->_aViewData['oShipSet'] = $oOrder->getShippingSetList();
 
             if ($oOrder->$sDelTypeField->value) {
                 // order user
@@ -100,17 +100,17 @@ class OrderMain extends AdminDetailsController
 
                 /** @var \OxidEsales\Eshop\Application\Model\PaymentList $oPaymentList */
                 $oPaymentList = Registry::get(\OxidEsales\Eshop\Application\Model\PaymentList::class);
-                $this->_aViewData["oPayments"] =
+                $this->_aViewData['oPayments'] =
                                         $oPaymentList->getPaymentList($oOrder->$sDelTypeField->value, $dPrice, $oUser);
             }
 
             // any voucher used ?
-            $this->_aViewData["aVouchers"] = $oOrder->getVoucherNrList();
+            $this->_aViewData['aVouchers'] = $oOrder->getVoucherNrList();
         }
 
-        $this->_aViewData["sNowValue"] = date("Y-m-d H:i:s", Registry::getUtilsDate()->getTime());
+        $this->_aViewData['sNowValue'] = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
 
-        return "order_main.tpl";
+        return 'order_main.tpl';
     }
 
     /**
@@ -124,7 +124,7 @@ class OrderMain extends AdminDetailsController
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oOrder = oxNew(Order::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oOrder->load($soxId);
         } else {
             $aParams['oxorder__oxid'] = null;
@@ -161,7 +161,7 @@ class OrderMain extends AdminDetailsController
         //change delivery set
         $sDelSetId = Registry::getRequest()->getRequestEscapedParameter('setDelSet');
         if (!empty($sDelSetId) && ($sDelSetId != $oOrder->oxorder__oxdeltype->value)) {
-            $oOrder->oxorder__oxpaymenttype->setValue("oxempty");
+            $oOrder->oxorder__oxpaymenttype->setValue('oxempty');
             $oOrder->setDelivery($sDelSetId);
             $needOrderRecalculate = true;
         } else {
@@ -191,7 +191,7 @@ class OrderMain extends AdminDetailsController
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($soxId)) {
             // #632A
-            $oOrder->oxorder__oxsenddate = new Field(date("Y-m-d H:i:s", Registry::getUtilsDate()->getTime()));
+            $oOrder->oxorder__oxsenddate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
             $oOrder->save();
 
             // #1071C
@@ -225,7 +225,7 @@ class OrderMain extends AdminDetailsController
     {
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new Field("0000-00-00 00:00:00");
+            $oOrder->oxorder__oxsenddate = new Field('0000-00-00 00:00:00');
             $oOrder->save();
 
             $this->onOrderReset();

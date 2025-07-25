@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxLinks;
-use \oxAdminView;
-use \stdClass;
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
+use stdClass;
 
 /**
  * Testing oxAdminDetails class.
@@ -49,10 +49,10 @@ class AdminDetailsTest extends \OxidTestCase
     public function testGetPlainEditor()
     {
         $this->markTestSkipped('Bug: sEditObjectValue is missing.');
-        $oObject = new stdClass;
+        $oObject = new stdClass();
         $sEditorHtml = "<textarea id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
 
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, array('_getEditValue'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['_getEditValue']);
         $oAdminDetails->expects($this->once())->method('_getEditValue')->with($this->equalTo($oObject), $this->equalTo('sField'))->will($this->returnValue('sEditObjectValue'));
         $this->assertEquals($sEditorHtml, $oAdminDetails->UNITgetPlainEditor(100, 100, $oObject, 'sField'));
     }
@@ -71,10 +71,10 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testGetEditValue()
     {
-        $oObject = new stdClass;
+        $oObject = new stdClass();
         $oObject->oField1 = new oxField('field1value');
 
-        $oObject->oField2 = new stdClass;
+        $oObject->oField2 = new stdClass();
         $oObject->oField2->value = 'field2value';
 
         $oAdminDetails = oxNew('oxadmindetails');
@@ -88,11 +88,11 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testGetEditValue_parseIsOff()
     {
-        $oObject = new stdClass;
+        $oObject = new stdClass();
         $oObject->oField = new oxField('test [{$oViewConf->getCurrentHomeDir()}]');
 
         $myConfig = $this->getConfig();
-        $myConfig->setConfigParam("bl_perfParseLongDescinSmarty", false);
+        $myConfig->setConfigParam('bl_perfParseLongDescinSmarty', false);
         $sUrl = $this->getConfig()->getCurrentShopURL();
 
         $oAdminDetails = oxNew('oxadmindetails');
@@ -106,7 +106,7 @@ class AdminDetailsTest extends \OxidTestCase
     {
         $oListItem = oxNew('oxContent');
         $oListItem->setId('_testId');
-        $oListItem->oxcontents__oxloadid = new oxField("_testLoadId");
+        $oListItem->oxcontents__oxloadid = new oxField('_testLoadId');
         $oListItem->save();
 
         $this->setRequestParameter('oxid', '_testId');
@@ -128,7 +128,7 @@ class AdminDetailsTest extends \OxidTestCase
     {
         $oListItem = oxNew('oxContent');
         $oListItem->setId('_testId');
-        $oListItem->oxcontents__oxloadid = new oxField("_testLoadId");
+        $oListItem->oxcontents__oxloadid = new oxField('_testLoadId');
         $oListItem->oxcontents__oxfolder = new oxField('neu', oxField::T_RAW);
         $oListItem->save();
 
@@ -150,11 +150,11 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testSetupNavigation()
     {
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array('getBtn', 'getActiveTab'));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getBtn', 'getActiveTab']);
         $oNavigation->expects($this->once())->method('getBtn')->with($this->equalTo('xxx'))->will($this->returnValue('bottom_buttons'));
         $oNavigation->expects($this->once())->method('getActiveTab')->with($this->equalTo('xxx'), $this->equalTo(0))->will($this->returnValue('default_edit'));
 
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, array('getNavigation'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['getNavigation']);
         $oAdminDetails->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
 
         $oAdminDetails->UNITsetupNavigation('xxx');
@@ -222,7 +222,7 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testResetNrOfCatArticles()
     {
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, array('resetContentCache'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['resetContentCache']);
         $oAdminDetails->expects($this->once())->method('resetContentCache');
 
         $oAdminDetails->resetNrOfCatArticles();
@@ -233,7 +233,7 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testResetNrOfVendorArticles()
     {
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, array('resetContentCache'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['resetContentCache']);
         $oAdminDetails->expects($this->once())->method('resetContentCache');
 
         $oAdminDetails->resetNrOfVendorArticles();
@@ -244,7 +244,7 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testResetNrOfManufacturerArticles()
     {
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, array('resetContentCache'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['resetContentCache']);
         $oAdminDetails->expects($this->once())->method('resetContentCache');
 
         $oAdminDetails->resetNrOfManufacturerArticles();
@@ -255,15 +255,15 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testResetCounts()
     {
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, array('resetCounter'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['resetCounter']);
         $oAdminDetails->expects($this->exactly(2))
             ->method('resetCounter')
             ->withConsecutive(
-                [$this->equalTo("vendorArticle"), $this->equalTo("ID1")],
-                [$this->equalTo("manufacturerArticle"), $this->equalTo("ID2")]
+                [$this->equalTo('vendorArticle'), $this->equalTo('ID1')],
+                [$this->equalTo('manufacturerArticle'), $this->equalTo('ID2')]
             );
 
-        $aIds = array("vendor" => array("ID1" => "1"), "manufacturer" => array("ID2" => "2"));
+        $aIds = ['vendor' => ['ID1' => '1'], 'manufacturer' => ['ID2' => '2']];
 
         $oAdminDetails->UNITresetCounts($aIds);
     }

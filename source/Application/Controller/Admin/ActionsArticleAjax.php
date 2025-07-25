@@ -46,7 +46,7 @@ class ActionsArticleAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table,         visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -66,7 +66,7 @@ class ActionsArticleAjax extends ListComponentAjax
      * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {        
+    {
         return $this->getQuery();
     }
 
@@ -100,14 +100,14 @@ class ActionsArticleAjax extends ListComponentAjax
                 $sSqlIfFalse = " {$sArticleTable}.oxid=oxobject2category.oxobjectid ";
                 $sVariantSelection = $blVariantsSelectionParameter ? $sSqlIfTrue : $sSqlIfFalse;
                 $sQAdd = " from {$sViewName} as oxobject2category left join {$sArticleTable} on " . $sVariantSelection .
-                         " where oxobject2category.oxcatnid = " . $oDb->quote($sSelId) . " ";
+                         ' where oxobject2category.oxcatnid = ' . $oDb->quote($sSelId) . ' ';
             }
         }
         // #1513C/#1826C - skip references, to not existing articles
         $sQAdd .= " and $sArticleTable.oxid IS NOT NULL ";
 
         // skipping self from list
-        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . " ";
+        $sQAdd .= " and $sArticleTable.oxid != " . $oDb->quote($sSynchSelId) . ' ';
 
         return $sQAdd;
     }
@@ -183,7 +183,7 @@ class ActionsArticleAjax extends ListComponentAjax
         $oObject2Promotion->init('oxobject2action');
         $oObject2Promotion->oxobject2action__oxactionid = new Field($sActionId);
         $oObject2Promotion->oxobject2action__oxobjectid = new Field($sArticleId);
-        $oObject2Promotion->oxobject2action__oxclass = new Field("oxarticle");
+        $oObject2Promotion->oxobject2action__oxclass = new Field('oxarticle');
         $oObject2Promotion->save();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class ContentListTest extends \OxidTestCase
 {
-
     /**
      * Content_List::Render() test case
      *
@@ -32,14 +33,14 @@ class ContentListTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("folder", "sTestFolder");
+        $this->setRequestParameter('folder', 'sTestFolder');
 
         // testing..
         $oView = oxNew('Content_List');
         $sTplName = $oView->render();
         $aViewData = $oView->getViewData();
-        $this->assertEquals($this->getConfig()->getConfigParam('afolder'), $aViewData["CMSFOLDER_EMAILS"]);
-        $this->assertEquals("sTestFolder", $aViewData["folder"]);
+        $this->assertEquals($this->getConfig()->getConfigParam('afolder'), $aViewData['CMSFOLDER_EMAILS']);
+        $this->assertEquals('sTestFolder', $aViewData['folder']);
 
         $this->assertEquals('content_list.tpl', $sTplName);
     }
@@ -51,12 +52,12 @@ class ContentListTest extends \OxidTestCase
      */
     public function testPrepareWhereQueryUserDefinedFolder()
     {
-        $this->setRequestParameter("folder", "testFolder");
-        $sViewName = getviewName("oxcontents");
+        $this->setRequestParameter('folder', 'testFolder');
+        $sViewName = getviewName('oxcontents');
 
         // defining parameters
         $oView = oxNew('Content_List');
-        $sResQ = $oView->UNITprepareWhereQuery(array(), "");
+        $sResQ = $oView->UNITprepareWhereQuery([], '');
 
         $sQ = " and {$sViewName}.oxfolder = 'testFolder'";
 

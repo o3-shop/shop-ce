@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  brutto
@@ -18,18 +19,18 @@
  * Actions with basket or order:
  *   change config
  */
-$aData = array(
+$aData = [
     'skipped' => 1,
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
                 'oxid'                     => 111,
                 'oxprice'                  => 159.00,
                 'oxvat'                    => 19,
                 'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'abs_discount_for_111',
                 'oxaddsum'     => 20.00,
                 'oxaddsumtype' => 'abs',
@@ -38,28 +39,28 @@ $aData = array(
                 'oxprice' => 1,
                 'oxpriceto' => 99999,
                 'oxactive' => 1,
-                'oxarticles' => array( 111 ),
+                'oxarticles' => [ 111 ],
                 'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 111 => array( '159,00', '159,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 111 => [ '159,00', '159,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '159,00',
                 'totalNetto'  => '133,61',
-                'vats' => array(
+                'vats' => [
                     19 => '25,39',
-                ),
-                'grandTotal'  => '159,00'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '159,00',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class PricelistTest extends \OxidTestCase
 {
-    public $aPrices = array();
+    public $aPrices = [];
 
     /**
      * Initialize the fixture.
@@ -88,15 +90,15 @@ class PricelistTest extends \OxidTestCase
         $oList->addToPriceList($this->aPrices[3]);
         $oList->addToPriceList($this->aPrices[4]);
 
-        $aVatInfo = array(5  => 10 - 10 / 1.05,
+        $aVatInfo = [5  => 10 - 10 / 1.05,
                           10 => 100 - 100 / 1.1,
-                          20 => 40 - 40 / 1.2);
+                          20 => 40 - 40 / 1.2];
 
         $this->assertEqualsWithDelta($aVatInfo, $oList->getVatInfo(false), 0.0000001);
 
-        $aVatInfo = array(5  => 10 * 0.05,
+        $aVatInfo = [5  => 10 * 0.05,
                           10 => 100 * 0.1,
-                          20 => 40 * 0.2);
+                          20 => 40 * 0.2];
 
         $this->assertEqualsWithDelta($aVatInfo, $oList->getVatInfo(), 0.0000001);
     }
@@ -122,7 +124,6 @@ class PricelistTest extends \OxidTestCase
         $this->assertEqualsWithDelta(30, $oList->getSum(), 0.0000001);
     }
 
-
     /**
      * testing price info getter
      */
@@ -135,9 +136,9 @@ class PricelistTest extends \OxidTestCase
         $oList->addToPriceList($this->aPrices[3]);
         $oList->addToPriceList($this->aPrices[4]);
 
-        $aPriceInfo = array(5  => 10,
+        $aPriceInfo = [5  => 10,
                             10 => 100,
-                            20 => 40);
+                            20 => 40];
 
         $this->assertEquals($aPriceInfo, $oList->getPriceInfo());
     }
@@ -174,7 +175,6 @@ class PricelistTest extends \OxidTestCase
         $oPrice->setPrice(121, 21);
         $oList->addToPriceList($oPrice);
         $this->assertEquals(19.5, $oList->getProportionalVatPercent());
-
 
         $oList = oxNew('oxPriceList');
         $oPrice = oxNew('oxPrice');
@@ -236,7 +236,6 @@ class PricelistTest extends \OxidTestCase
         $oPrice->setPrice(118, 18);
         $oList->addToPriceList($oPrice);
 
-
         $oPrice = oxNew('oxPrice');
         $oPrice->setBruttoPriceMode();
         $oPrice->setPrice(121, 21);
@@ -249,7 +248,6 @@ class PricelistTest extends \OxidTestCase
         $this->assertEquals(39, $oPrice->getVatValue());
         $this->assertEquals(19.5, $oPrice->getVat());
     }
-
 
     public function testGetMostUsedVatPercentIfPriceListNotSet()
     {

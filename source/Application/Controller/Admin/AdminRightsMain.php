@@ -37,14 +37,14 @@ class AdminRightsMain extends AdminDetailsController
             $rightsUserAjax = oxNew(AdminRightsMainAjax::class);
             $this->addTplParam('oxajax', $rightsUserAjax->getColumns());
 
-            return "popups/adminrights_user.tpl";
+            return 'popups/adminrights_user.tpl';
         }
 
         $roleElementsList = oxNew(RightsRolesElementsList::class);
         $role = oxNew(RightsRoles::class);
 
         $soxId = $this->getEditObjectId();
-        $this->addTplParam("oxid", $soxId);
+        $this->addTplParam('oxid', $soxId);
 
         if ($soxId != '-1') {
             $role->loadInLang($this->_iEditLang, $soxId);
@@ -56,20 +56,20 @@ class AdminRightsMain extends AdminDetailsController
 
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->addTplParam("posslang", $aLang);
+                $this->addTplParam('posslang', $aLang);
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
         $this->addTplParam('roleElementsList', $roleElementsList);
         $this->addTplParam('edit', $role);
 
-        return "adminrights_main.tpl";
+        return 'adminrights_main.tpl';
     }
 
     public function save()
@@ -80,7 +80,7 @@ class AdminRightsMain extends AdminDetailsController
         $rightsRole->setLanguage(0);
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $rightsRole->loadInLang($this->_iEditLang, $soxId);
             $rightsRole->assign($aParams);
         } else {
@@ -89,7 +89,7 @@ class AdminRightsMain extends AdminDetailsController
                     $aParams,
                     [
                         'o3rightsroles__oxid' => null,
-                        'o3rightsroles__oxshopid' => Registry::getConfig()->getShopId()
+                        'o3rightsroles__oxshopid' => Registry::getConfig()->getShopId(),
                     ]
                 )
             );

@@ -51,12 +51,12 @@ class PaymentMain extends AdminDetailsController
         parent::render();
 
         // remove itm from list
-        unset($this->_aViewData["sumtype"][2]);
+        unset($this->_aViewData['sumtype'][2]);
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         $oPayment = oxNew(Payment::class);
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oPayment->loadInLang($this->_iEditLang, $soxId);
 
             $oOtherLang = $oPayment->getAvailableInLangs();
@@ -64,19 +64,19 @@ class PaymentMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oPayment->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oPayment;
+            $this->_aViewData['edit'] = $oPayment;
 
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             // #708
@@ -87,12 +87,12 @@ class PaymentMain extends AdminDetailsController
             $oPaymentMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\PaymentMainAjax::class);
             $this->_aViewData['oxajax'] = $oPaymentMainAjax->getColumns();
 
-            return "popups/payment_main.tpl";
+            return 'popups/payment_main.tpl';
         }
 
-        $this->_aViewData["editor"] = $this->_generateTextEditor("100%", 300, $oPayment, "oxpayments__oxlongdesc");
+        $this->_aViewData['editor'] = $this->_generateTextEditor('100%', 300, $oPayment, 'oxpayments__oxlongdesc');
 
-        return "payment_main.tpl";
+        return 'payment_main.tpl';
     }
 
     /**
@@ -114,7 +114,7 @@ class PaymentMain extends AdminDetailsController
 
         $oPayment = oxNew(Payment::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oPayment->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxpayments__oxid'] = null;
@@ -128,10 +128,9 @@ class PaymentMain extends AdminDetailsController
         $aRules = (array) Registry::getRequest()->getRequestEscapedParameter('oxpayments__oxaddsumrules');
         // if sum equals 0, show notice, that default value will be used.
         if (empty($aRules)) {
-            $this->_aViewData["noticeoxaddsumrules"] = 1;
+            $this->_aViewData['noticeoxaddsumrules'] = 1;
         }
         $oPayment->oxpayments__oxaddsumrules = new Field(array_sum($aRules));
-
 
         //#708
         if (!is_array($this->_aFieldArray)) {
@@ -139,9 +138,9 @@ class PaymentMain extends AdminDetailsController
         }
 
         // build value
-        $sValdesc = "";
+        $sValdesc = '';
         foreach ($this->_aFieldArray as $oField) {
-            $sValdesc .= $oField->name . "__@@";
+            $sValdesc .= $oField->name . '__@@';
         }
 
         $oPayment->oxpayments__oxvaldesc = new Field($sValdesc, Field::T_RAW);
@@ -162,7 +161,7 @@ class PaymentMain extends AdminDetailsController
 
         $oObj = oxNew(Payment::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oObj->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxpayments__oxid'] = null;

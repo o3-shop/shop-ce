@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Class manages deliveryset and delivery configuration
@@ -40,7 +40,7 @@ class DeliverySetMainAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field, table, visible, multilanguage, ident
             ['oxtitle', 'oxdelivery', 1, 1, 0],
             ['oxaddsum', 'oxdelivery', 1, 0, 0],
@@ -86,12 +86,12 @@ class DeliverySetMainAjax extends ListComponentAjax
             $sQAdd = " from $sDeliveryViewName where 1 ";
         } else {
             $sQAdd = " from $sDeliveryViewName left join oxdel2delset on oxdel2delset.oxdelid=$sDeliveryViewName.oxid ";
-            $sQAdd .= "where oxdel2delset.oxdelsetid = " . $oDb->quote($sId);
+            $sQAdd .= 'where oxdel2delset.oxdelsetid = ' . $oDb->quote($sId);
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= "and $sDeliveryViewName.oxid not in ( select $sDeliveryViewName.oxid from $sDeliveryViewName left join oxdel2delset on oxdel2delset.oxdelid=$sDeliveryViewName.oxid ";
-            $sQAdd .= "where oxdel2delset.oxdelsetid = " . $oDb->quote($sSynchId) . " ) ";
+            $sQAdd .= 'where oxdel2delset.oxdelsetid = ' . $oDb->quote($sSynchId) . ' ) ';
         }
 
         return $sQAdd;
@@ -104,10 +104,10 @@ class DeliverySetMainAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxdel2delset.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxdel2delset.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxdel2delset.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxdel2delset where oxdel2delset.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxdel2delset where oxdel2delset.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -127,15 +127,15 @@ class DeliverySetMainAjax extends ListComponentAjax
             $sDeliveryViewName = $this->getViewName('oxdelivery');
             $aChosenSets = $this->getAll($this->addFilter("select $sDeliveryViewName.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
             $database = DatabaseProvider::getMaster();
             foreach ($aChosenSets as $sChosenSet) {
                 // check if we have this entry already in
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-                $sID = $database->getOne("select oxid from oxdel2delset where oxdelid = :oxdelid and oxdelsetid = :oxdelsetid", [
+                $sID = $database->getOne('select oxid from oxdel2delset where oxdelid = :oxdelid and oxdelsetid = :oxdelsetid', [
                     ':oxdelid' => $sChosenSet,
-                    ':oxdelsetid' => $soxId
+                    ':oxdelsetid' => $soxId,
                 ]);
                 if (!isset($sID) || !$sID) {
                     $oDel2delset = oxNew(BaseModel::class);

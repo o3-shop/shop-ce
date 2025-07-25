@@ -86,11 +86,11 @@ class VoucherSerie extends BaseModel
         if ($this->_oGroups === null) {
             $this->_oGroups = oxNew(ListModel::class);
             $this->_oGroups->init('oxgroups');
-            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups");
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
             $sSelect = "select gr.* from {$sViewName} as gr, oxobject2group as o2g where
                          o2g.oxobjectid = :oxobjectid and gr.oxid = o2g.oxgroupsid ";
             $this->_oGroups->selectString($sSelect, [
-                ':oxobjectid' => $this->getId()
+                ':oxobjectid' => $this->getId(),
             ]);
         }
 
@@ -105,7 +105,7 @@ class VoucherSerie extends BaseModel
         $oDb = DatabaseProvider::getDb();
         $sDelete = 'delete from oxobject2group where oxobjectid = :oxobjectid';
         $oDb->execute($sDelete, [
-            ':oxobjectid' => $this->getId()
+            ':oxobjectid' => $this->getId(),
         ]);
     }
 
@@ -117,7 +117,7 @@ class VoucherSerie extends BaseModel
         $oDb = DatabaseProvider::getDb();
         $sDelete = 'delete from oxobject2discount where oxobject2discount.oxdiscountid = :oxdiscountid';
         $oDb->execute($sDelete, [
-            ':oxdiscountid' => $this->getId()
+            ':oxdiscountid' => $this->getId(),
         ]);
     }
 
@@ -132,7 +132,7 @@ class VoucherSerie extends BaseModel
         $sSelect = 'select * from oxvouchers 
             where oxvoucherserieid = :oxvoucherserieid';
         $oVoucherList->selectString($sSelect, [
-            ':oxvoucherserieid' => $this->getId()
+            ':oxvoucherserieid' => $this->getId(),
         ]);
 
         return $oVoucherList;
@@ -146,7 +146,7 @@ class VoucherSerie extends BaseModel
         $oDb = DatabaseProvider::getDb();
         $sDelete = 'delete from oxvouchers where oxvoucherserieid = :oxvoucherserieid';
         $oDb->execute($sDelete, [
-            ':oxvoucherserieid' => $this->getId()
+            ':oxvoucherserieid' => $this->getId(),
         ]);
     }
 
@@ -164,14 +164,14 @@ class VoucherSerie extends BaseModel
         $sQuery = 'select count(*) as total from oxvouchers 
             where oxvoucherserieid = :oxvoucherserieid';
         $aStatus['total'] = $oDb->getOne($sQuery, [
-            ':oxvoucherserieid' => $this->getId()
+            ':oxvoucherserieid' => $this->getId(),
         ]);
 
         $sQuery = 'select count(*) as used from oxvouchers 
             where oxvoucherserieid = :oxvoucherserieid 
                 and ((oxorderid is not NULL and oxorderid != "") or (oxdateused is not NULL and oxdateused != 0))';
         $aStatus['used'] = $oDb->getOne($sQuery, [
-            ':oxvoucherserieid' => $this->getId()
+            ':oxvoucherserieid' => $this->getId(),
         ]);
 
         $aStatus['available'] = $aStatus['total'] - $aStatus['used'];

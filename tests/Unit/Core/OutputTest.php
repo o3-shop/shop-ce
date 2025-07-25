@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
+use oxconfig;
 use OxidEsales\Eshop\Core\ShopVersion;
-use \oxUtils;
-use \oxOutput;
-use \oxconfig;
-use \oxField;
-use \oxTestModules;
+use oxOutput;
+use oxTestModules;
+use oxUtils;
 
 class oxUtils_Extended extends oxUtils
 {
@@ -83,13 +84,13 @@ class OutputTest extends \OxidTestCase
     public function testAddVersionTags()
     {
         $version = oxNew(ShopVersion::class)->getVersion();
-        $currentYear = date("Y");
+        $currentYear = date('Y');
 
         $majorVersion = explode('.', $version)[0];
 
         $output = oxNew('oxOutput');
         // should add tag only to first head item
-        $test = "<head>foo</head>bar<head>test2</head>";
+        $test = '<head>foo</head>bar<head>test2</head>';
         $result = $output->addVersionTags($test);
 
         $editionName = $this->getEditionName();
@@ -112,7 +113,6 @@ O3-Shop (c) 2022-{$currentYear} [www.O3-shop.com]
 HEADER;
 
         $this->assertEquals($expected, $result);
-
     }
 
     /**
@@ -121,18 +121,18 @@ HEADER;
     public function testAddVersionTagsUpperCase()
     {
         $version = oxNew(ShopVersion::class)->getVersion();
-        $sCurYear = date("Y");
+        $sCurYear = date('Y');
 
         $sMajorVersion = explode('.', $version)[0];
 
         $oOutput = oxNew('oxOutput');
-        $sTest = "<head>foo</Head>bar";
+        $sTest = '<head>foo</Head>bar';
         $sRes = $oOutput->addVersionTags($sTest);
 
         $editionName = $this->getEditionName();
         $this->assertNotEquals($sTest, $sRes);
 
-        $currentYear = date("Y");
+        $currentYear = date('Y');
 
         $expected = <<<HEADER
 <head>foo</head>
@@ -159,7 +159,7 @@ HEADER;
     public function testProcessViewArray()
     {
         $oOutput = oxNew('oxOutput');
-        $this->assertEquals(array('something'), $oOutput->processViewArray(array('something'), 'something'));
+        $this->assertEquals(['something'], $oOutput->processViewArray(['something'], 'something'));
     }
 
     /**
@@ -177,7 +177,7 @@ HEADER;
 
     public function testSetCharsetSetOutputFormatSendHeaders()
     {
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('setHeader'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['setHeader']);
         $utils->expects($this->once())->method('setHeader')->with($this->equalTo('Content-Type: text/html; charset=asd'));
         oxTestModules::cleanUp();
         oxTestModules::addModuleObject('oxUtils', $utils);
@@ -185,8 +185,7 @@ HEADER;
         $oOutput->setCharset('asd');
         $oOutput->sendHeaders();
 
-
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('setHeader'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['setHeader']);
         $utils->expects($this->once())->method('setHeader')->with($this->equalTo('Content-Type: application/json; charset=asdd'));
         oxTestModules::cleanUp();
         oxTestModules::addModuleObject('oxUtils', $utils);
@@ -195,8 +194,7 @@ HEADER;
         $oOutput->setOutputFormat(oxOutput::OUTPUT_FORMAT_JSON);
         $oOutput->sendHeaders();
 
-
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('setHeader'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['setHeader']);
         $utils->expects($this->once())->method('setHeader')->with($this->equalTo('Content-Type: text/html; charset=asdd'));
         oxTestModules::cleanUp();
         oxTestModules::addModuleObject('oxUtils', $utils);

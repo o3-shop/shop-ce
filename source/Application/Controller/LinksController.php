@@ -58,7 +58,7 @@ class LinksController extends FrontendController
             $this->_oLinksList = false;
             // Load links
             $oLinksList = oxNew(ListModel::class);
-            $oLinksList->init("oxlinks");
+            $oLinksList->init('oxlinks');
             $oLinksList->getList();
             $this->_oLinksList = $oLinksList;
         }

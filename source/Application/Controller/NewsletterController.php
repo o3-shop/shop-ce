@@ -151,7 +151,6 @@ class NewsletterController extends FrontendController
             $blUserLoaded = $oUser->load($oUser->getId());
         }
 
-
         // if user was added/loaded successfully and subscribe is on - subscribing to newsletter
         if ($blSubscribe && $blUserLoaded) {
             //removing user from subscribe list before adding

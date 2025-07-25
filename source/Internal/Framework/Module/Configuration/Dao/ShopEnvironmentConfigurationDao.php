@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -50,7 +50,6 @@ class ShopEnvironmentConfigurationDao implements ShopEnvironmentConfigurationDao
      * @var BasicContextInterface
      */
     private $context;
-
 
     /**
      * ShopConfigurationDao constructor.

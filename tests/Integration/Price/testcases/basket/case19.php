@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: neto
  * Price view mode:  brutto
@@ -19,45 +20,45 @@
  *   change config
  * Short description: From articlePrice.csv: article final price calculations. 9201 - 1st
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9201,
                 'oxprice'                  => 66.58,
                 'oxvat'                    => 17,
                 'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'abs_discount_for_9201',
                 'oxaddsum'     => 4.32,
                 'oxaddsumtype' => 'abs',
                 'oxamount' => 0,
                 'oxamountto' => 99999,
                 'oxactive' => 1,
-                'oxarticles' => array( 9201 ),
+                'oxarticles' => [ 9201 ],
                 'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9201 => array( '73,58', '73,58' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 9201 => [ '73,58', '73,58' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '73,58',
                 'totalNetto'  => '62,89',
-                'vats' => array(
+                'vats' => [
                     17 => '10,69',
-                ),
-                'grandTotal'  => '73,58'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '73,58',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => true,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

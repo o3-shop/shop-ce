@@ -27,7 +27,6 @@ namespace OxidEsales\EshopCommunity\Application\Model\Contract;
  */
 interface ArticleInterface
 {
-
     /**
      * Checks if stock configuration allows to buy user chosen amount $dAmount
      *

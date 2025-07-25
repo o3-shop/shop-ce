@@ -182,17 +182,17 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
                 $aTFields = $aTFormats[$sType][1];
 
                 //
-                if ($sType == "USA" && isset($aTimeMatches[4])) {
+                if ($sType == 'USA' && isset($aTimeMatches[4])) {
                     $iIntVal = (int) $aTimeMatches[1];
-                    if ($aTimeMatches[4] == "PM") {
+                    if ($aTimeMatches[4] == 'PM') {
                         if ($iIntVal < 13) {
                             $iIntVal += 12;
                         }
-                    } elseif ($aTimeMatches[4] == "AM" && $aTimeMatches[1] == "12") {
+                    } elseif ($aTimeMatches[4] == 'AM' && $aTimeMatches[1] == '12') {
                         $iIntVal = 0;
                     }
 
-                    $aTimeMatches[1] = sprintf("%02d", $iIntVal);
+                    $aTimeMatches[1] = sprintf('%02d', $iIntVal);
                 }
 
                 break;
@@ -228,8 +228,8 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
     public function convertDBTimestamp($oObject, $blToTimeStamp = false)
     {
         // on this case usually means that we gonna save value, and value is formatted, not plain
-        $sSQLTimeStampPattern = "/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/";
-        $sISOTimeStampPattern = "/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/";
+        $sSQLTimeStampPattern = '/^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})$/';
+        $sISOTimeStampPattern = '/^([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/';
         $aMatches = [];
         $oStr = getStr();
 
@@ -259,10 +259,10 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
                     $aMatches[1]
                 ); //y
                 if (!$iTimestamp) {
-                    $iTimestamp = "0";
+                    $iTimestamp = '0';
                 }
 
-                $oObject->setValue(trim(date("Y-m-d H:i:s", $iTimestamp)));
+                $oObject->setValue(trim(date('Y-m-d H:i:s', $iTimestamp)));
                 $oObject->fldmax_length = strlen($oObject->value);
                 $this->convertDBDateTime($oObject, $blToTimeStamp);
 
@@ -319,7 +319,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
             return;
         } elseif ($blDefTimeFound) {
             // setting value
-            $oObject->setValue(trim($aDFormats[$sLocalDateFormat][2] . " " . $aTFormats[$sLocalTimeFormat][2]));
+            $oObject->setValue(trim($aDFormats[$sLocalDateFormat][2] . ' ' . $aTFormats[$sLocalTimeFormat][2]));
             // increasing(decreasing) field length
             $oObject->fldmax_length = strlen($oObject->value);
 
@@ -341,7 +341,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
         // checking for default values
         $sLocalTimeFormat = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sLocalTimeFormat');
         if (!$sLocalTimeFormat || $blToTimeStamp) {
-            $sLocalTimeFormat = "ISO";
+            $sLocalTimeFormat = 'ISO';
         }
 
         return $sLocalTimeFormat;
@@ -361,7 +361,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
         // checking for default values
         $sLocalDateFormat = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('sLocalDateFormat');
         if (!$sLocalDateFormat || $blToTimeStamp) {
-            $sLocalDateFormat = "ISO";
+            $sLocalDateFormat = 'ISO';
         }
 
         return $sLocalDateFormat;
@@ -375,9 +375,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     protected function _defaultDatePattern() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ["/^0000-00-00/"   => "ISO",
-                     "/^00\.00\.0000/" => "EUR",
-                     "/^00\/00\/0000/" => "USA"
+        return ['/^0000-00-00/'   => 'ISO',
+                     "/^00\.00\.0000/" => 'EUR',
+                     "/^00\/00\/0000/" => 'USA',
         ];
     }
 
@@ -389,9 +389,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     protected function _defaultTimePattern() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ["/00:00:00$/"    => "ISO",
-                     "/00\.00\.00$/"  => "EUR",
-                     "/00:00:00 AM$/" => "USA"
+        return ['/00:00:00$/'    => 'ISO',
+                     "/00\.00\.00$/"  => 'EUR',
+                     '/00:00:00 AM$/' => 'USA',
         ];
     }
 
@@ -403,9 +403,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     protected function _regexp2ValidateDateInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ["/^([0-9]{4})-([0-9]{2})-([0-9]{2})/"   => "ISO",
-                     "/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})/" => "EUR",
-                     "/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})/" => "USA"
+        return ['/^([0-9]{4})-([0-9]{2})-([0-9]{2})/'   => 'ISO',
+                     "/^([0-9]{2})\.([0-9]{2})\.([0-9]{4})/" => 'EUR',
+                     "/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})/" => 'USA',
         ];
     }
 
@@ -417,9 +417,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     protected function _regexp2ValidateTimeInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ["/([0-9]{2}):([0-9]{2}):([0-9]{2})$/"                 => "ISO",
-                     "/([0-9]{2})\.([0-9]{2})\.([0-9]{2})$/"               => "EUR",
-                     "/([0-9]{2}):([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/" => "USA"
+        return ['/([0-9]{2}):([0-9]{2}):([0-9]{2})$/'                 => 'ISO',
+                     "/([0-9]{2})\.([0-9]{2})\.([0-9]{2})$/"               => 'EUR',
+                     '/([0-9]{2}):([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/' => 'USA',
         ];
     }
 
@@ -431,9 +431,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     protected function _defineDateFormattingRules() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ["ISO" => ["Y-m-d", [2, 3, 1], "0000-00-00"],
-                     "EUR" => ["d.m.Y", [2, 1, 3], "00.00.0000"],
-                     "USA" => ["m/d/Y", [1, 2, 3], "00/00/0000"]
+        return ['ISO' => ['Y-m-d', [2, 3, 1], '0000-00-00'],
+                     'EUR' => ['d.m.Y', [2, 1, 3], '00.00.0000'],
+                     'USA' => ['m/d/Y', [1, 2, 3], '00/00/0000'],
         ];
     }
 
@@ -445,9 +445,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     protected function _defineTimeFormattingRules() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return ["ISO" => ["H:i:s", [1, 2, 3], "00:00:00"],
-                     "EUR" => ["H.i.s", [1, 2, 3], "00.00.00"],
-                     "USA" => ["h:i:s A", [1, 2, 3], "00:00:00 AM"]
+        return ['ISO' => ['H:i:s', [1, 2, 3], '00:00:00'],
+                     'EUR' => ['H.i.s', [1, 2, 3], '00.00.00'],
+                     'USA' => ['h:i:s A', [1, 2, 3], '00:00:00 AM'],
         ];
     }
 
@@ -467,7 +467,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
 
         $sReturn = $aDFormats[$sLocalDateFormat][2];
         if (!$blOnlyDate) {
-            $sReturn .= " " . $aTFormats[$sLocalTimeFormat][2];
+            $sReturn .= ' ' . $aTFormats[$sLocalTimeFormat][2];
         }
 
         if ($oObject instanceof \OxidEsales\Eshop\Core\Field) {
@@ -534,9 +534,9 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
         );
 
         if ($oObject instanceof \OxidEsales\Eshop\Core\Field) {
-            $oObject->setValue(trim(@date($sDateFormat . " " . $sTimeFormat, $iTimestamp)));
+            $oObject->setValue(trim(@date($sDateFormat . ' ' . $sTimeFormat, $iTimestamp)));
         } else {
-            $oObject->value = trim(@date($sDateFormat . " " . $sTimeFormat, $iTimestamp));
+            $oObject->value = trim(@date($sDateFormat . ' ' . $sTimeFormat, $iTimestamp));
         }
 
         // we should increase (decrease) field lenght
@@ -677,13 +677,13 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
      */
     public function german2English($sDate)
     {
-        $aDate = explode(".", $sDate);
+        $aDate = explode('.', $sDate);
 
         if (isset($aDate) && count($aDate) > 1) {
             if (count($aDate) == 2) {
-                $sDate = $aDate[1] . "-" . $aDate[0];
+                $sDate = $aDate[1] . '-' . $aDate[0];
             } else {
-                $sDate = $aDate[2] . "-" . $aDate[1] . "-" . $aDate[0];
+                $sDate = $aDate[2] . '-' . $aDate[1] . '-' . $aDate[0];
             }
         }
 
@@ -701,7 +701,7 @@ class UtilsDate extends \OxidEsales\Eshop\Core\Base
     public function isEmptyDate($sDate)
     {
         if (!empty($sDate)) {
-            $sDate = preg_replace("/[^0-9a-z]/i", "", $sDate);
+            $sDate = preg_replace('/[^0-9a-z]/i', '', $sDate);
             if (!is_numeric($sDate) || $sDate != 0) {
                 return false;
             }

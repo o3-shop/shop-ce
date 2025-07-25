@@ -33,7 +33,7 @@ use Webmozart\PathUtil\Path;
  */
 class ProjectYamlImportService implements ProjectYamlImportServiceInterface
 {
-    const SERVICE_FILE_NAME = 'services.yaml';
+    public const SERVICE_FILE_NAME = 'services.yaml';
 
     /**
      * @var ProjectYamlDaoInterface

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -28,7 +29,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Class controls article assignment to category.
@@ -173,11 +173,11 @@ class ArticleExtendAjax extends ListComponentAjax
 
         // removing all
         if (is_array($categoriesToRemove) && count($categoriesToRemove)) {
-            $query = "delete from oxobject2category where oxobject2category.oxobjectid = :oxobjectid and ";
+            $query = 'delete from oxobject2category where oxobject2category.oxobjectid = :oxobjectid and ';
             $query = $this->updateQueryForRemovingArticleFromCategory($query);
-            $query .= " oxcatnid in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($categoriesToRemove)) . ')';
+            $query .= ' oxcatnid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($categoriesToRemove)) . ')';
             $dataBase->Execute($query, [
-                ':oxobjectid' => $oxId
+                ':oxobjectid' => $oxId,
             ]);
 
             // updating oxtime values
@@ -217,9 +217,9 @@ class ArticleExtendAjax extends ListComponentAjax
 
             foreach ($categoriesToAdd as $sAdd) {
                 // check, if it's already in, then don't add it again
-                $sSelect = "select 1 from " . $objectToCategoryView . " as oxobject2category " .
-                    "where oxobject2category.oxcatnid = :oxcatnid " .
-                    "and oxobject2category.oxobjectid = :oxobjectid";
+                $sSelect = 'select 1 from ' . $objectToCategoryView . ' as oxobject2category ' .
+                    'where oxobject2category.oxcatnid = :oxcatnid ' .
+                    'and oxobject2category.oxobjectid = :oxobjectid';
                 if ($database->getOne($sSelect, [':oxcatnid' => $sAdd, ':oxobjectid' => $oxId])) {
                     continue;
                 }
@@ -295,7 +295,7 @@ class ArticleExtendAjax extends ListComponentAjax
                   where oxobjectid = :oxobjectid and oxcatnid = :oxcatnid {$queryToEmbed}";
         DatabaseProvider::getInstance()->getDb()->execute($query, [
             ':oxobjectid' => $oxId,
-            ':oxcatnid' => $defCat
+            ':oxcatnid' => $defCat,
         ]);
         //echo "\n$sQ\n";
 

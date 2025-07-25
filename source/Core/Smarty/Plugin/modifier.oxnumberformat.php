@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -32,18 +32,18 @@
  *
  * @return string
  */
-function smarty_modifier_oxnumberformat($sFormat = "EUR@ 1.00@ ,@ .@ EUR@ 2", $sValue = 0)
+function smarty_modifier_oxnumberformat($sFormat = 'EUR@ 1.00@ ,@ .@ EUR@ 2', $sValue = 0)
 {
     // logic copied from \OxidEsales\Eshop\Core\Config::getCurrencyArray()
-    $sCur = explode("@", $sFormat);
-    $oCur           = new stdClass();
-    $oCur->id       = 0;
-    $oCur->name     = @trim($sCur[0]);
-    $oCur->rate     = @trim($sCur[1]);
-    $oCur->dec      = @trim($sCur[2]);
+    $sCur = explode('@', $sFormat);
+    $oCur = new stdClass();
+    $oCur->id = 0;
+    $oCur->name = @trim($sCur[0]);
+    $oCur->rate = @trim($sCur[1]);
+    $oCur->dec = @trim($sCur[2]);
     $oCur->thousand = @trim($sCur[3]);
-    $oCur->sign     = @trim($sCur[4]);
-    $oCur->decimal  = @trim($sCur[5]);
+    $oCur->sign = @trim($sCur[4]);
+    $oCur->decimal = @trim($sCur[5]);
 
     // change for US version
     if (isset($sCur[6])) {

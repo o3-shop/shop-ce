@@ -53,23 +53,23 @@ class NewsletterSelection extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oNewsletter = oxNew(Newsletter::class);
             if ($oNewsletter->load($soxId)) {
-                $this->_aViewData["edit"] = $oNewsletter;
+                $this->_aViewData['edit'] = $oNewsletter;
 
                 if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
                     $oNewsletterSelectionAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class);
                     $this->_aViewData['oxajax'] = $oNewsletterSelectionAjax->getColumns();
 
-                    return "popups/newsletter_selection.tpl";
+                    return 'popups/newsletter_selection.tpl';
                 }
             }
         }
 
-        return "newsletter_selection.tpl";
+        return 'newsletter_selection.tpl';
     }
 
     /**
@@ -90,22 +90,22 @@ class NewsletterSelection extends AdminDetailsController
                 // we do not use lists here as we don't need this overhead right now
                 $oDB = DatabaseProvider::getDb();
                 $blSep = false;
-                $sSelectGroups = " ( oxobject2group.oxgroupsid in ( ";
+                $sSelectGroups = ' ( oxobject2group.oxgroupsid in ( ';
 
                 // remove already added groups
                 foreach ($oNewsletter->getGroups() as $oInGroup) {
                     if ($blSep) {
-                        $sSelectGroups .= ",";
+                        $sSelectGroups .= ',';
                     }
                     $sSelectGroups .= $oDB->quote($oInGroup->oxgroups__oxid->value);
                     $blSep = true;
                 }
 
-                $sSelectGroups .= " ) ) ";
+                $sSelectGroups .= ' ) ) ';
 
                 // no group selected
                 if (!$blSep) {
-                    $sSelectGroups = " oxobject2group.oxobjectid is null ";
+                    $sSelectGroups = ' oxobject2group.oxobjectid is null ';
                 }
                 $sShopId = Registry::getConfig()->getShopID();
                 $sQ = "select count(*) from ( select oxnewssubscribed.oxemail as _icnt from oxnewssubscribed left join
@@ -118,7 +118,7 @@ class NewsletterSelection extends AdminDetailsController
 
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
                 $this->_iUserCount = DatabaseProvider::getMaster()->getOne($sQ, [
-                    ':oxshopid' => $sShopId
+                    ':oxshopid' => $sShopId,
                 ]);
             }
         }
@@ -136,7 +136,7 @@ class NewsletterSelection extends AdminDetailsController
         $aParams['oxnewsletter__oxshopid'] = Registry::getConfig()->getShopId();
 
         $oNewsletter = oxNew(Newsletter::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oNewsletter->load($soxId);
         } else {
             $aParams['oxnewsletter__oxid'] = null;

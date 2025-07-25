@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
 /**
@@ -43,7 +45,7 @@ class RatingTest extends \OxidTestCase
     public function testGetRatingValue()
     {
         $oRating = oxNew('oxwRating');
-        $oRating->setViewParameters(array("dRatingValue" => 2.59));
+        $oRating->setViewParameters(['dRatingValue' => 2.59]);
         $this->assertEquals(2.6, $oRating->getRatingValue());
     }
 
@@ -55,7 +57,7 @@ class RatingTest extends \OxidTestCase
     public function testGetRatingCount()
     {
         $oRating = oxNew('oxwRating');
-        $oRating->setViewParameters(array("dRatingCount" => 6));
+        $oRating->setViewParameters(['dRatingCount' => 6]);
         $this->assertEquals(6, $oRating->getRatingCount());
     }
 
@@ -67,7 +69,7 @@ class RatingTest extends \OxidTestCase
     public function testCanRate()
     {
         $oRating = oxNew('oxwRating');
-        $oRating->setViewParameters(array("blCanRate" => true));
+        $oRating->setViewParameters(['blCanRate' => true]);
         $this->assertTrue((bool)$oRating->canRate());
     }
 
@@ -79,7 +81,7 @@ class RatingTest extends \OxidTestCase
     public function testGetArticleNId()
     {
         $oRating = oxNew('oxwRating');
-        $oRating->setViewParameters(array('anid' => 'testanid'));
+        $oRating->setViewParameters(['anid' => 'testanid']);
         $this->assertEquals('testanid', $oRating->getArticleNId());
     }
 
@@ -91,7 +93,7 @@ class RatingTest extends \OxidTestCase
     public function testGetRateUrl_RateUrlParamSet_RateUrlValue()
     {
         $oRating = oxNew('oxwRating');
-        $oRating->setViewParameters(array("sRateUrl" => "testUrl"));
+        $oRating->setViewParameters(['sRateUrl' => 'testUrl']);
         $this->assertEquals('testUrl', $oRating->getRateUrl());
     }
 

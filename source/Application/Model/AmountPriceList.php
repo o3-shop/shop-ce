@@ -110,13 +110,13 @@ class AmountPriceList extends ListModel
         }
 
         $params = [
-            ':oxartid' => $sArticleId
+            ':oxartid' => $sArticleId,
         ];
 
         if (Registry::getConfig()->getConfigParam('blMallInterchangeArticles')) {
             $sShopSelect = '1';
         } else {
-            $sShopSelect = " `oxshopid` = :oxshopid ";
+            $sShopSelect = ' `oxshopid` = :oxshopid ';
             $params[':oxshopid'] = Registry::getConfig()->getShopId();
         }
 

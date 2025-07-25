@@ -38,7 +38,6 @@ class ShopEnvironmentWithOrphanSettingEvent extends Event
 
     public function __construct($shopId, $moduleId, $settingId)
     {
-
         $this->shopId = $shopId;
         $this->moduleId = $moduleId;
         $this->settingId = $settingId;

@@ -86,9 +86,9 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
         $urlParameters = false;
 
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $resultSet = $database->select("select oxstdurl, oxlang from oxseo where oxident = :oxident and oxshopid = :oxshopid limit 1", [
+        $resultSet = $database->select('select oxstdurl, oxlang from oxseo where oxident = :oxident and oxshopid = :oxshopid limit 1', [
             ':oxident' => $key,
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
         if (!$resultSet->EOF) {
             // primary seo language changed ?
@@ -129,17 +129,17 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
         $key = $this->_getIdent($seoUrl, true);
 
         $url = false;
-        $resultSet = $database->select("select oxobjectid, oxlang from oxseohistory where oxident = :oxident and oxshopid = :oxshopid limit 1", [
+        $resultSet = $database->select('select oxobjectid, oxlang from oxseohistory where oxident = :oxident and oxshopid = :oxshopid limit 1', [
             ':oxident' => $key,
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
         if (!$resultSet->EOF) {
             // updating hit info (oxtimestamp field will be updated automatically)
             $database->execute(
-                "update oxseohistory set oxhits = oxhits + 1 where oxident = :oxident and oxshopid = :oxshopid limit 1",
+                'update oxseohistory set oxhits = oxhits + 1 where oxident = :oxident and oxshopid = :oxshopid limit 1',
                 [
                     ':oxident' => $key,
-                    ':oxshopid' => $shopId
+                    ':oxshopid' => $shopId,
                 ]
             );
 
@@ -166,11 +166,11 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
      */
     protected function _addQueryString($sUrl) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if (isset($_SERVER["QUERY_STRING"]) && $_SERVER["QUERY_STRING"]) {
-            $sUrl = rtrim($sUrl, "&?");
-            $sQ = ltrim($_SERVER["QUERY_STRING"], "&?");
+        if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING']) {
+            $sUrl = rtrim($sUrl, '&?');
+            $sQ = ltrim($_SERVER['QUERY_STRING'], '&?');
 
-            $sUrl .= (strpos($sUrl, '?') === false) ? "?" : "&";
+            $sUrl .= (strpos($sUrl, '?') === false) ? '?' : '&';
             $sUrl .= $sQ;
         }
 
@@ -191,18 +191,18 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
     protected function _getSeoUrl($sObjectId, $iLang, $iShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $aInfo = $oDb->getRow("select oxseourl, oxtype from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid order by oxparams limit 1", [
+        $aInfo = $oDb->getRow('select oxseourl, oxtype from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid order by oxparams limit 1', [
             ':oxobjectid' => $sObjectId,
             ':oxlang' => $iLang,
             ':oxshopid' => $iShopId,
         ]);
 
         if ('oxarticle' == $aInfo['oxtype']) {
-            $sMainCatId = $oDb->getOne("select oxcatnid from " . getViewName("oxobject2category") . " where oxobjectid = :oxobjectid order by oxtime", [
-                ':oxobjectid' => $sObjectId
+            $sMainCatId = $oDb->getOne('select oxcatnid from ' . getViewName('oxobject2category') . ' where oxobjectid = :oxobjectid order by oxtime', [
+                ':oxobjectid' => $sObjectId,
             ]);
             if ($sMainCatId) {
-                $sUrl = $oDb->getOne("select oxseourl from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid  and oxparams = :oxparams order by oxexpired", [
+                $sUrl = $oDb->getOne('select oxseourl from oxseo where oxobjectid = :oxobjectid and oxlang = :oxlang and oxshopid = :oxshopid  and oxparams = :oxparams order by oxexpired', [
                     ':oxobjectid' => $sObjectId,
                     ':oxlang' => $iLang,
                     ':oxshopid' => $iShopId,
@@ -315,10 +315,10 @@ class SeoDecoder extends \OxidEsales\Eshop\Core\Base
             // if field exists - searching for object id
             if (
                 $sObjectId = $oDb->getOne("select oxid from {$sTable} where oxseoid = :oxseoid", [
-                ':oxseoid' => $sSeoId
+                ':oxseoid' => $sSeoId,
                 ])
             ) {
-                return $oDb->getOne("select oxseourl from oxseo where oxtype = :oxtype and oxobjectid = :oxobjectid and oxlang = :oxlang", [
+                return $oDb->getOne('select oxseourl from oxseo where oxtype = :oxtype and oxobjectid = :oxobjectid and oxlang = :oxlang', [
                     ':oxtype' => $sType,
                     ':oxobjectid' => $sObjectId,
                     ':oxlang' => $iLanguage,

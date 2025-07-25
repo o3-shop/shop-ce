@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
@@ -35,7 +37,7 @@ class GenExportDoTest extends \OxidTestCase
      */
     public function testNextTickNoMoreArticleFound()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericExportDo::class, array("getOneArticle", "write"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericExportDo::class, ['getOneArticle', 'write']);
         $oView->expects($this->once())->method('getOneArticle')->will($this->returnValue(false));
         $oView->expects($this->never())->method('write');
         $this->assertFalse($oView->nextTick(1));
@@ -50,12 +52,12 @@ class GenExportDoTest extends \OxidTestCase
     {
         $article = oxNew('oxArticle');
         $parameters = [
-            "sCustomHeader" => '',
-            "linenr" => 1,
-            "article" => $article,
-            "spr" => $this->getConfigParam('sCSVSign'),
-            "encl" => $this->getConfigParam('sGiCsvFieldEncloser'),
-            'oxEngineTemplateId' => 'dyn_interface'
+            'sCustomHeader' => '',
+            'linenr' => 1,
+            'article' => $article,
+            'spr' => $this->getConfigParam('sCSVSign'),
+            'encl' => $this->getConfigParam('sGiCsvFieldEncloser'),
+            'oxEngineTemplateId' => 'dyn_interface',
         ];
         $renderer = $this->getMockBuilder(TemplateRendererInterface::class)
             ->setMethods(['renderTemplate', 'renderFragment', 'getTemplateEngine', 'exists'])
@@ -74,7 +76,7 @@ class GenExportDoTest extends \OxidTestCase
 
         $container = $this->getContainerMock('OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface', $bridge);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericExportDo::class, array("getOneArticle", "write", "getViewId", "getContainer"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericExportDo::class, ['getOneArticle', 'write', 'getViewId', 'getContainer']);
         $oView->expects($this->once())->method('getOneArticle')->will($this->returnValue($article));
         $oView->expects($this->once())->method('write');
         $oView->expects($this->once())->method('getViewId')->will($this->returnValue('dyn_interface'));
@@ -94,7 +96,7 @@ class GenExportDoTest extends \OxidTestCase
         $testFile = $this->createFile('test.txt', '');
 
         $oView = oxNew('GenExport_Do');
-        $oView->fpFile = @fopen($testFile, "w");
+        $oView->fpFile = @fopen($testFile, 'w');
         $oView->write($sLine);
         fclose($oView->fpFile);
         $sFileCont = file_get_contents($testFile, true);

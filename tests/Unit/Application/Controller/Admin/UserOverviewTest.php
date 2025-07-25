@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\User;
@@ -26,7 +28,6 @@ use OxidEsales\EshopCommunity\Application\Model\User;
  */
 class UserOverviewTest extends \OxidTestCase
 {
-
     /**
      * User_Overview::Render() test case
      *
@@ -34,7 +35,7 @@ class UserOverviewTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('User_Overview');

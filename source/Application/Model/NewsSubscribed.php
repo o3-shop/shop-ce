@@ -114,11 +114,11 @@ class NewsSubscribed extends BaseModel
     {
         $database = DatabaseProvider::getDb();
         $params = [
-            ':oxemail' => (string) $email
+            ':oxemail' => (string) $email,
         ];
 
-        $userOxid = $database->getOne("select oxid from oxnewssubscribed 
-            where oxemail = :oxemail ", $params);
+        $userOxid = $database->getOne('select oxid from oxnewssubscribed 
+            where oxemail = :oxemail ', $params);
 
         return $userOxid;
     }
@@ -136,11 +136,11 @@ class NewsSubscribed extends BaseModel
         $oDb = DatabaseProvider::getDb();
         $params = [
             ':oxuserid' => $sOxUserId,
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ];
 
-        $sOxId = $oDb->getOne("select oxid from oxnewssubscribed 
-            where oxuserid = :oxuserid and oxshopid = :oxshopid", $params);
+        $sOxId = $oDb->getOne('select oxid from oxnewssubscribed 
+            where oxuserid = :oxuserid and oxshopid = :oxshopid', $params);
 
         return $this->load($sOxId);
     }

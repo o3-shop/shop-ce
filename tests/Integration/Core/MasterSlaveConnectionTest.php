@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core;
 
 use oxDb;
-use OxidEsales\EshopCommunity\Core\DatabaseProvider;
 use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**

@@ -37,9 +37,9 @@ function smarty_function_oxid_include_widget($params, &$oSmarty)
     unset($params['cl']);
 
     $parentViews = null;
-    if (!empty($params["_parent"])) {
-        $parentViews = explode("|", $params["_parent"]);
-        unset($params["_parent"]);
+    if (!empty($params['_parent'])) {
+        $parentViews = explode('|', $params['_parent']);
+        unset($params['_parent']);
     }
 
     $widgetControl = oxNew(\OxidEsales\Eshop\Core\WidgetControl::class);

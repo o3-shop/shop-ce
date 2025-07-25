@@ -52,7 +52,7 @@ class ContentSeo extends ObjectSeo
     {
         return 'oxcontent';
     }
-    
+
     /**
      * Returns current object type seo encoder object
      *

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -84,7 +86,7 @@ class PasswordServiceBridgeTest extends TestCase
     /**
      * @return ContainerInterface
      */
-    private function getContainer() : ContainerInterface
+    private function getContainer(): ContainerInterface
     {
         $factory = ContainerFactory::getInstance();
 

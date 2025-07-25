@@ -42,35 +42,35 @@ class Payment extends MultiLanguageModel
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_ALLGOODS = 1;
+    public const PAYMENT_ADDSUMRULE_ALLGOODS = 1;
 
     /**
      * Consider for calculation of base sum - Discounts
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_DISCOUNTS = 2;
+    public const PAYMENT_ADDSUMRULE_DISCOUNTS = 2;
 
     /**
      * Consider for calculation of base sum - Vouchers
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_VOUCHERS = 4;
+    public const PAYMENT_ADDSUMRULE_VOUCHERS = 4;
 
     /**
      * Consider for calculation of base sum - Shipping costs
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_SHIPCOSTS = 8;
+    public const PAYMENT_ADDSUMRULE_SHIPCOSTS = 8;
 
     /**
      * Consider for calculation of base sum - Gift Wrapping/Greeting Card
      *
      * @var int
      */
-    const PAYMENT_ADDSUMRULE_GIFTS = 16;
+    public const PAYMENT_ADDSUMRULE_GIFTS = 16;
 
     /**
      * User groups object (default null).
@@ -152,14 +152,14 @@ class Payment extends MultiLanguageModel
         if ($this->_oGroups == null && ($sOxid = $this->getId())) {
             // user groups
             $this->_oGroups = oxNew('oxlist', 'oxgroups');
-            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->getLanguage());
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups', $this->getLanguage());
 
             // performance
             $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group
                         where oxobject2group.oxobjectid = :oxobjectid
                         and oxobject2group.oxgroupsid = {$sViewName}.oxid ";
             $this->_oGroups->selectString($sSelect, [
-                ':oxobjectid' => $sOxid
+                ':oxobjectid' => $sOxid,
             ]);
         }
 
@@ -215,7 +215,7 @@ class Payment extends MultiLanguageModel
      */
     public function getPaymentValue($dBasePrice)
     {
-        if ($this->oxpayments__oxaddsumtype->value == "%") {
+        if ($this->oxpayments__oxaddsumtype->value == '%') {
             $dRet = $dBasePrice * $this->oxpayments__oxaddsum->value / 100;
         } else {
             $oCur = Registry::getConfig()->getActShopCurrencyObject();
@@ -392,7 +392,7 @@ class Payment extends MultiLanguageModel
                 where oxpaymentid = :oxpaymentid and oxtype = :oxtype ';
             $rs = $oDb->getCol($sSelect, [
                 ':oxpaymentid' => $this->getId(),
-                ':oxtype' => 'oxcountry'
+                ':oxtype' => 'oxcountry',
             ]);
             $this->_aCountries = $rs;
         }
@@ -416,8 +416,8 @@ class Payment extends MultiLanguageModel
             $oDb = DatabaseProvider::getDb();
 
             // deleting payment related data
-            $rs = $oDb->execute("delete from oxobject2payment where oxpaymentid = :oxpaymentid", [
-                ':oxpaymentid' => $sOxId
+            $rs = $oDb->execute('delete from oxobject2payment where oxpaymentid = :oxpaymentid', [
+                ':oxpaymentid' => $sOxId,
             ]);
 
             return $rs->EOF;
@@ -444,7 +444,7 @@ class Payment extends MultiLanguageModel
         $myConfig = Registry::getConfig();
         if ($this->oxpayments__oxid->value == 'oxempty') {
             // inactive or blOtherCountryOrder is off
-            if (!$this->oxpayments__oxactive->value || !$myConfig->getConfigParam("blOtherCountryOrder")) {
+            if (!$this->oxpayments__oxactive->value || !$myConfig->getConfigParam('blOtherCountryOrder')) {
                 $this->_iPaymentError = -2;
 
                 return false;

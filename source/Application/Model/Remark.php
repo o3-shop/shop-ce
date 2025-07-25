@@ -66,7 +66,7 @@ class Remark extends BaseModel
         if ($blRet = parent::load($oxID)) {
             // convert date's to international format
             $this->assign([
-                'oxcreate'    => Registry::getUtilsDate()->formatDBDate($this->oxremark__oxcreate->value)
+                'oxcreate'    => Registry::getUtilsDate()->formatDBDate($this->oxremark__oxcreate->value),
             ]);
         }
 

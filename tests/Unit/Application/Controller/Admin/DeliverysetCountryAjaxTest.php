@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Delivery_Groups_Ajax class
@@ -102,7 +104,7 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     public function testGetQuery()
     {
         $oView = oxNew('deliveryset_country_ajax');
-        $this->assertEquals("from " . $this->getCountryViewTable() . " where oxv_oxcountry_de.oxactive = '1'", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from ' . $this->getCountryViewTable() . " where oxv_oxcountry_de.oxactive = '1'", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -113,10 +115,10 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testAction';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('deliveryset_country_ajax');
-        $this->assertEquals("from " . $this->getCountryViewTable() . " where " . $this->getCountryViewTable() . ".oxactive = '1' and " . $this->getCountryViewTable() . ".oxid not in ( select " . $this->getCountryViewTable() . ".oxid from oxobject2delivery, " . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sSynchoxid . "'and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' )", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from ' . $this->getCountryViewTable() . ' where ' . $this->getCountryViewTable() . ".oxactive = '1' and " . $this->getCountryViewTable() . '.oxid not in ( select ' . $this->getCountryViewTable() . '.oxid from oxobject2delivery, ' . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sSynchoxid . "'and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' )", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -127,10 +129,10 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     public function testGetQueryOxid()
     {
         $sOxid = '_testAction';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
 
         $oView = oxNew('deliveryset_country_ajax');
-        $this->assertEquals("from oxobject2delivery, " . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sOxid . "' and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset'", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from oxobject2delivery, ' . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sOxid . "' and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset'", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -142,11 +144,11 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     {
         $sOxid = '_testAction';
         $sSynchoxid = '_testActionSynch';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('deliveryset_country_ajax');
-        $this->assertEquals("from oxobject2delivery, " . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sOxid . "' and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' and " . $this->getCountryViewTable() . ".oxid not in ( select " . $this->getCountryViewTable() . ".oxid from oxobject2delivery, " . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sSynchoxid . "'and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' )", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from oxobject2delivery, ' . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sOxid . "' and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' and " . $this->getCountryViewTable() . '.oxid not in ( select ' . $this->getCountryViewTable() . '.oxid from oxobject2delivery, ' . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sSynchoxid . "'and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' )", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -158,8 +160,8 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testDeliverysetCountry1', '_testDeliverysetCountry2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDeliverysetCountry1', '_testDeliverysetCountry2']));
 
         $sSql = "select count(oxid) from oxobject2delivery where oxid in ('_testDeliverysetCountry1', '_testDeliverysetCountry2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -175,10 +177,10 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     public function testRemoveCountryFromSetAll()
     {
         $sOxid = '_testDeliverysetCountryRemoveAll';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
 
-        $sSql = "select count(oxobject2delivery.oxid) from oxobject2delivery, " . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sOxid . "' and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset'";
+        $sSql = 'select count(oxobject2delivery.oxid) from oxobject2delivery, ' . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sOxid . "' and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset'";
         $oView = oxNew('deliveryset_country_ajax');
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
         $oView->removeCountryFromSet();
@@ -195,13 +197,13 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         $sSynchoxid = '_testActionAddCountry';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testActionAdd1', '_testActionAdd2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addCountryToSet();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -215,17 +217,17 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
     public function testAddCountryToSetAll()
     {
         $sSynchoxid = '_testActionAddCountryAll';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $this->setRequestParameter('all', true);
 
         //count how much articles gets filtered
-        $iCount = oxDb::getDb()->getOne("select count(" . $this->getCountryViewTable() . ".oxid) from " . $this->getCountryViewTable() . " where " . $this->getCountryViewTable() . ".oxactive = '1' and " . $this->getCountryViewTable() . ".oxid not in ( select " . $this->getCountryViewTable() . ".oxid from oxobject2delivery, " . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sSynchoxid . "'and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' )");
+        $iCount = oxDb::getDb()->getOne('select count(' . $this->getCountryViewTable() . '.oxid) from ' . $this->getCountryViewTable() . ' where ' . $this->getCountryViewTable() . ".oxactive = '1' and " . $this->getCountryViewTable() . '.oxid not in ( select ' . $this->getCountryViewTable() . '.oxid from oxobject2delivery, ' . $this->getCountryViewTable() . " where oxobject2delivery.oxdeliveryid = '" . $sSynchoxid . "'and oxobject2delivery.oxobjectid = " . $this->getCountryViewTable() . ".oxid and oxobject2delivery.oxtype = 'oxdelset' )");
 
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testActionAdd1', '_testActionAdd2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addCountryToSet();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

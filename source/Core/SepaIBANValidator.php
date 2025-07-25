@@ -27,7 +27,7 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class SepaIBANValidator
 {
-    const IBAN_ALGORITHM_MOD_VALUE = 97;
+    public const IBAN_ALGORITHM_MOD_VALUE = 97;
 
     protected $_aCodeLengths = [];
 
@@ -98,7 +98,6 @@ class SepaIBANValidator
         return $this->_aCodeLengths;
     }
 
-
     /**
      * Check if the total IBAN length is correct as per country. If not, the IBAN is invalid.
      *
@@ -115,7 +114,6 @@ class SepaIBANValidator
 
         return !is_null($iCorrectLength) && $iActualLength === $iCorrectLength;
     }
-
 
     /**
      * Gets length for country.
@@ -207,7 +205,7 @@ class SepaIBANValidator
             'W' => 32,
             'X' => 33,
             'Y' => 34,
-            'Z' => 35
+            'Z' => 35,
         ];
 
         return str_replace(
@@ -278,7 +276,7 @@ class SepaIBANValidator
      */
     protected function _isCodeLengthKeyValid($sCountryAbbr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (int) preg_match("/^[A-Z]{2}$/", $sCountryAbbr) !== 0;
+        return (int) preg_match('/^[A-Z]{2}$/', $sCountryAbbr) !== 0;
     }
 
     /**

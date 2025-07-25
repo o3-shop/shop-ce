@@ -77,7 +77,7 @@ class BasketComponent extends BaseController
                                     'searchmanufacturer', // search manufacturer
                                     // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
                                     'searchrecomm', // search recomendation
-                                    'recommid' // recomm. list id
+                                    'recommid', // recomm. list id
                                     // END deprecated
     ];
 
@@ -302,7 +302,7 @@ class BasketComponent extends BaseController
     {
         return $this->getRedirectUrl();
     }
-    
+
     /**
      * Formats and returns redirect URL where shop must be redirected after
      * storing something to basket
@@ -311,7 +311,6 @@ class BasketComponent extends BaseController
      */
     protected function getRedirectUrl()
     {
-
         // active controller id
         $controllerId = Registry::getConfig()->getRequestControllerId();
         $controllerId = $controllerId ? $controllerId . '?' : 'start?';
@@ -373,7 +372,7 @@ class BasketComponent extends BaseController
      * @return array|bool
      * @deprecated underscore prefix violates PSR12, will be renamed to "getItems" in next major
      */
-    protected function _getItems( // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getItems(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         $sProductId = null,
         $dAmount = null,
         $aSel = null,
@@ -382,7 +381,7 @@ class BasketComponent extends BaseController
     ) {
         return $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride);
     }
-    
+
     /**
      * Collects and returns array of items to add to basket. Product info is taken not only from
      * given parameters, but additionally from request 'aproducts' parameter
@@ -425,7 +424,7 @@ class BasketComponent extends BaseController
                                        'sel'          => $aSel,
                                        'persparam'    => $aPersParam,
                                        'override'     => $blOverride,
-                                       'basketitemid' => $sBasketItemId
+                                       'basketitemid' => $sBasketItemId,
             ];
         }
 
@@ -526,7 +525,7 @@ class BasketComponent extends BaseController
     {
         $this->setLastCall($sCallName, $aProductInfo, $aBasketInfo);
     }
-    
+
     /**
      * Setting last call data to session (data used by econda)
      *
@@ -570,7 +569,7 @@ class BasketComponent extends BaseController
     {
         return $this->getLastCallFnc();
     }
-    
+
     /**
      * Getting last call function name (data used by econda)
      *
@@ -625,8 +624,8 @@ class BasketComponent extends BaseController
         $this->dispatchEvent(new BasketChangedEvent($this));
 
         // redirect to basket
-        if (Registry::getRequest()->getRequestEscapedParameter("tobasket")) {
-            return "basket";
+        if (Registry::getRequest()->getRequestEscapedParameter('tobasket')) {
+            return 'basket';
         } else {
             // clear basket
             Registry::getSession()->getBasket()->deleteBasket();

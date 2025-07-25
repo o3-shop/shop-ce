@@ -62,7 +62,7 @@ class PriceAlarmSend extends AdminListController
 
         $oRequest = Registry::getRequest();
 
-        ini_set("session.gc_maxlifetime", 36000);
+        ini_set('session.gc_maxlifetime', 36000);
 
         $start = (int)$oRequest->getRequestEscapedParameter('iStart');
         $limit = Registry::getConfig()->getConfigParam('iCntofMails');
@@ -76,14 +76,14 @@ class PriceAlarmSend extends AdminListController
         // Advance mail pointer and set parameter
         $start += $limit;
 
-        $this->_aViewData["iStart"] = $start;
-        $this->_aViewData["iAllCnt"] = $activeAlertsAmount;
-        $this->_aViewData["actlang"] = Registry::getLang()->getBaseLanguage();
+        $this->_aViewData['iStart'] = $start;
+        $this->_aViewData['iAllCnt'] = $activeAlertsAmount;
+        $this->_aViewData['actlang'] = Registry::getLang()->getBaseLanguage();
 
         if ($start < $activeAlertsAmount) {
-            $template = "pricealarm_send.tpl";
+            $template = 'pricealarm_send.tpl';
         } else {
-            $template = "pricealarm_done.tpl";
+            $template = 'pricealarm_done.tpl';
         }
 
         return $template;
@@ -118,7 +118,7 @@ class PriceAlarmSend extends AdminListController
             "SELECT oxprice, oxartid FROM oxpricealarm
                     WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
         $result = $database->select($activeAlarmsQuery, [
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
         $count = 0;
         while ($result != false && !$result->EOF) {
@@ -153,7 +153,7 @@ class PriceAlarmSend extends AdminListController
             "SELECT oxid, oxemail, oxartid, oxprice FROM oxpricealarm
             WHERE oxsended = '000-00-00 00:00:00' AND oxshopid = :oxshopid";
         $result = $database->selectLimit($alarmsQuery, $limit, $start, [
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
         while ($result != false && !$result->EOF) {
             $article = oxNew(Article::class);
@@ -196,7 +196,7 @@ class PriceAlarmSend extends AdminListController
         $language->setTplLanguage($oldLanguageId);
 
         if ($success) {
-            $alarm->oxpricealarm__oxsended = new Field(date("Y-m-d H:i:s"));
+            $alarm->oxpricealarm__oxsended = new Field(date('Y-m-d H:i:s'));
             $alarm->save();
         }
     }

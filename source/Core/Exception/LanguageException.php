@@ -40,7 +40,7 @@ class LanguageException extends \OxidEsales\Eshop\Core\Exception\StandardExcepti
      *
      * @var string
      */
-    private $_sLangConstant = "";
+    private $_sLangConstant = '';
 
     /**
      * sets the language constant which is missing
@@ -70,7 +70,7 @@ class LanguageException extends \OxidEsales\Eshop\Core\Exception\StandardExcepti
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty Constant --> " . $this->_sLangConstant . "\n";
+        return __CLASS__ . '-' . parent::getString() . ' Faulty Constant --> ' . $this->_sLangConstant . "\n";
     }
 
     /**

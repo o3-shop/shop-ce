@@ -319,21 +319,21 @@ class Content extends MultiLanguageModel implements IUrl
         }
 
         if ($this->oxcontents__oxloadid->value === 'oxcredits') {
-            $sUrl .= "index.php?cl=credits";
+            $sUrl .= 'index.php?cl=credits';
         } else {
-            $sUrl .= "index.php?cl=content";
+            $sUrl .= 'index.php?cl=content';
         }
         $sUrl .= '&amp;oxloadid=' . $this->getLoadId();
 
         if ($blAddId) {
-            $sUrl .= "&amp;oxcid=" . $this->getId();
+            $sUrl .= '&amp;oxcid=' . $this->getId();
             // adding parent category if available
             if ($this->_sParentCatId !== false && $this->oxcontents__oxcatid->value && $this->oxcontents__oxcatid->value != 'oxrootid') {
                 if ($this->_sParentCatId === null) {
                     $this->_sParentCatId = false;
                     $oDb = DatabaseProvider::getDb();
-                    $sParentId = $oDb->getOne("select oxparentid from oxcategories where oxid = :oxid", [
-                        ':oxid' => $this->oxcontents__oxcatid->value
+                    $sParentId = $oDb->getOne('select oxparentid from oxcategories where oxid = :oxid', [
+                        ':oxid' => $this->oxcontents__oxcatid->value,
                     ]);
                     if ($sParentId && 'oxrootid' != $sParentId) {
                         $this->_sParentCatId = $sParentId;
@@ -341,7 +341,7 @@ class Content extends MultiLanguageModel implements IUrl
                 }
 
                 if ($this->_sParentCatId) {
-                    $sUrl .= "&amp;cnid=" . $this->_sParentCatId;
+                    $sUrl .= '&amp;cnid=' . $this->_sParentCatId;
                 }
             }
         }
@@ -441,9 +441,9 @@ class Content extends MultiLanguageModel implements IUrl
 
             $oDb = DatabaseProvider::getDb();
             // dropping expired...
-            $oDb->execute("delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion", [
+            $oDb->execute('delete from oxacceptedterms where oxshopid = :oxshopid and oxtermversion != :notoxtermversion', [
                 ':oxshopid' => $sShopId,
-                ':notoxtermversion' => $sVersion
+                ':notoxtermversion' => $sVersion,
             ]);
         }
 

@@ -55,12 +55,12 @@ class ThemeConfiguration extends ShopConfiguration
 
         $oTheme = oxNew(Theme::class);
         if ($oTheme->load($sTheme)) {
-            $this->_aViewData["oTheme"] = $oTheme;
+            $this->_aViewData['oTheme'] = $oTheme;
 
             try {
                 $aDbVariables = $this->loadConfVars($sShopId, $this->_getModuleForConfigVars());
-                $this->_aViewData["var_constraints"] = $aDbVariables['constraints'];
-                $this->_aViewData["var_grouping"] = $aDbVariables['grouping'];
+                $this->_aViewData['var_constraints'] = $aDbVariables['constraints'];
+                $this->_aViewData['var_grouping'] = $aDbVariables['grouping'];
                 foreach ($this->_aConfParams as $sType => $sParam) {
                     $this->_aViewData[$sParam] = $aDbVariables['vars'][$sType];
                 }

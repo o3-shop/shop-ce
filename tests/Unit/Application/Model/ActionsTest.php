@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 use oxDb;
 use oxField;
-use OxidEsales\EshopCommunity\Core\DatabaseProvider;
-use oxRegistry;
 use oxTestModules;
 
 /**
@@ -30,7 +30,6 @@ use oxTestModules;
  */
 class ActionsTest extends \OxidTestCase
 {
-
     /**
      * Contains a object of oxactions()
      *
@@ -54,19 +53,18 @@ class ActionsTest extends \OxidTestCase
     {
         parent::setUp();
         $this->_oAction = oxNew('oxActions');
-        $this->_oAction->oxactions__oxtitle = new oxField("test", oxField::T_RAW);
+        $this->_oAction->oxactions__oxtitle = new oxField('test', oxField::T_RAW);
         $this->_oAction->save();
-
 
         $this->_oPromo = oxNew('oxActions');
         $this->_oPromo->assign(
-            array(
+            [
                  'oxtitle'    => 'title',
                  'oxlongdesc' => 'longdesc',
                  'oxtype'     => 2,
                  'oxsort'     => 1,
                  'oxactive'   => 1,
-            )
+            ]
         );
         $this->_oPromo->save();
 
@@ -99,7 +97,7 @@ class ActionsTest extends \OxidTestCase
 
         $sCheckOxid = oxDb::getDb(oxDB::FETCH_MODE_ASSOC)->getOne("select oxid from oxactions2article where oxactionid = '" . $this->_oAction->getId() . "' and oxartid = '$sArtOxid' ");
         if (!$sCheckOxid) {
-            $this->fail("fail adding article");
+            $this->fail('fail adding article');
         }
     }
 
@@ -117,7 +115,7 @@ class ActionsTest extends \OxidTestCase
 
         $sCheckOxid = oxDb::getDb(oxDB::FETCH_MODE_ASSOC)->getOne("select oxid from oxactions2article where oxactionid = '" . $this->_oAction->getId() . "' and oxartid = '$sArtOxid' ");
         if ($sCheckOxid) {
-            $this->fail("fail removing article");
+            $this->fail('fail removing article');
         }
     }
 
@@ -159,9 +157,9 @@ class ActionsTest extends \OxidTestCase
         $this->_oAction->delete();
 
         $sCheckOxid = oxDb::getDb(oxDB::FETCH_MODE_ASSOC)->GetOne("select oxid from oxactions2article where oxactionid = '" . $this->_oAction->getId() . "'");
-        $oAction = oxNew("oxActions");
+        $oAction = oxNew('oxActions');
         if ($sCheckOxid || $oAction->Load($this->sOxId)) {
-            $this->fail("fail deleting");
+            $this->fail('fail deleting');
         }
     }
 
@@ -223,7 +221,6 @@ class ActionsTest extends \OxidTestCase
         $this->_oPromo->load($id);
         $this->assertEquals(date('Y-m-d H:i:s', $iNow), $this->_oPromo->oxactions__oxactivefrom->value);
         $this->assertEquals('0000-00-00 00:00:00', $this->_oPromo->oxactions__oxactiveto->value);
-
 
         $this->_oPromo->oxactions__oxactiveto = new oxField(date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + 10));
         $sTo = $this->_oPromo->oxactions__oxactiveto->value;
@@ -314,7 +311,7 @@ class ActionsTest extends \OxidTestCase
      */
     public function testGetLongDescTags()
     {
-        $this->_oPromo->oxactions__oxlongdesc = new oxField("[{* *}]parsed");
+        $this->_oPromo->oxactions__oxlongdesc = new oxField('[{* *}]parsed');
         $this->assertEquals('parsed', $this->_oPromo->getLongDesc());
     }
 
@@ -329,10 +326,10 @@ class ActionsTest extends \OxidTestCase
     {
         $this->getConfig()->setConfigParam('blCheckTemplates', false);
 
-        $this->_oPromo->oxactions__oxlongdesc = new oxField("[{* *}]generated");
+        $this->_oPromo->oxactions__oxlongdesc = new oxField('[{* *}]generated');
         $this->_oPromo->getLongDesc();
 
-        $this->_oPromo->oxactions__oxlongdesc = new oxField("[{* *}]regenerated");
+        $this->_oPromo->oxactions__oxlongdesc = new oxField('[{* *}]regenerated');
         $this->assertEquals('regenerated', $this->_oPromo->getLongDesc());
     }
 
@@ -340,12 +337,12 @@ class ActionsTest extends \OxidTestCase
     {
         $databaseResult = false;
 
-        $oArticle = $this->getMock('stdclass', array('load'));
+        $oArticle = $this->getMock('stdclass', ['load']);
         $oArticle->expects($this->never())->method('load');
 
         oxTestModules::addModuleObject('oxarticle', $oArticle);
 
-        $promotionMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, array('fetchBannerArticleId'));
+        $promotionMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, ['fetchBannerArticleId']);
         $promotionMock->expects($this->any())->method('fetchBannerArticleId')->willReturn($databaseResult);
         $promotionMock->setId('promoid');
         $this->assertNull($promotionMock->getBannerArticle());
@@ -357,14 +354,14 @@ class ActionsTest extends \OxidTestCase
 
         $databaseResult = 'asdabsdbdsf';
 
-        $oArticle = $this->getMock('stdclass', array('load'));
+        $oArticle = $this->getMock('stdclass', ['load']);
         $oArticle->expects($this->once())->method('load')
             ->with($this->equalTo($databaseResult))
             ->will($this->returnValue(false));
 
         oxTestModules::addModuleObject('oxarticle', $oArticle);
 
-        $promotionMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, array('fetchBannerArticleId'));
+        $promotionMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, ['fetchBannerArticleId']);
         $promotionMock->expects($this->any())->method('fetchBannerArticleId')->willReturn($databaseResult);
         $promotionMock->setId('promoid');
         $this->assertNull($promotionMock->getBannerArticle());
@@ -375,14 +372,14 @@ class ActionsTest extends \OxidTestCase
         $this->markTestSkipped('Bug: Failed asserting that two variables reference the same object.');
         $databaseResult = '2000';
 
-        $oArticle = $this->getMock('stdclass', array('load'));
+        $oArticle = $this->getMock('stdclass', ['load']);
         $oArticle->expects($this->once())->method('load')
             ->with($this->equalTo('2000'))
             ->will($this->returnValue(true));
 
         oxTestModules::addModuleObject('oxarticle', $oArticle);
 
-        $promotionMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, array('fetchBannerArticleId'));
+        $promotionMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, ['fetchBannerArticleId']);
         $promotionMock->expects($this->any())->method('fetchBannerArticleId')->willReturn($databaseResult);
         $promotionMock->setId('promoid');
         $oArt = $promotionMock->getBannerArticle();
@@ -408,7 +405,6 @@ class ActionsTest extends \OxidTestCase
         return $dbMock;
     }
 
-
     /**
      * test
      */
@@ -416,10 +412,10 @@ class ActionsTest extends \OxidTestCase
     {
         $this->markTestSkipped('gives back nopic.jpg');
         $oPromo = oxNew('oxActions');
-        $oPromo->oxactions__oxpic = new oxField("current_de.jpg");
+        $oPromo->oxactions__oxpic = new oxField('current_de.jpg');
         $oConfig = $this->getConfig();
 
-        $this->assertEquals($oConfig->getPictureUrl("promo/") . "current_de.jpg", $oPromo->getBannerPictureUrl());
+        $this->assertEquals($oConfig->getPictureUrl('promo/') . 'current_de.jpg', $oPromo->getBannerPictureUrl());
     }
 
     /**
@@ -439,8 +435,8 @@ class ActionsTest extends \OxidTestCase
     public function testGetBannerPictureUrl_pictureNotUploaded()
     {
         $oPromo = oxNew('oxActions');
-        $oPromo->oxactions__oxpic = new oxField("noSuchPic.jpg");
-        $this->assertEquals($this->getConfig()->getPictureUrl("master/") . "nopic.jpg", $oPromo->getBannerPictureUrl());
+        $oPromo->oxactions__oxpic = new oxField('noSuchPic.jpg');
+        $this->assertEquals($this->getConfig()->getPictureUrl('master/') . 'nopic.jpg', $oPromo->getBannerPictureUrl());
     }
 
     /**
@@ -448,9 +444,9 @@ class ActionsTest extends \OxidTestCase
      */
     public function testGetBannerLink()
     {
-        $sUrl = "action-link";
+        $sUrl = 'action-link';
 
-        $oUtilsUrl = $this->getMock(\OxidEsales\Eshop\Core\UtilsUrl::class, array('processUrl', 'addShopHost'));
+        $oUtilsUrl = $this->getMock(\OxidEsales\Eshop\Core\UtilsUrl::class, ['processUrl', 'addShopHost']);
         $oUtilsUrl->expects($this->any())->method('addShopHost')->with($sUrl)->will($this->returnValue('http://with-url/' . $sUrl));
         $oUtilsUrl->expects($this->any())->method('processUrl')->with('http://with-url/' . $sUrl)->will($this->returnValue($sUrl . '/with-params'));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsUrl::class, $oUtilsUrl);
@@ -477,16 +473,16 @@ class ActionsTest extends \OxidTestCase
      */
     public function testGetBannerLink_noLinkWithAssignedArticle()
     {
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array('getLink'));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getLink']);
         $oArticle->expects($this->once())->method('getLink')
-            ->will($this->returnValue("testLinkToArticle"));
+            ->will($this->returnValue('testLinkToArticle'));
 
-        $oPromo = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, array('getBannerArticle'));
+        $oPromo = $this->getMock(\OxidEsales\Eshop\Application\Model\Actions::class, ['getBannerArticle']);
         $oPromo->expects($this->once())->method('getBannerArticle')
             ->will($this->returnValue($oArticle));
 
         $oPromo->oxactions__oxlink = new oxField(null);
 
-        $this->assertEquals("testLinkToArticle", $oPromo->getBannerLink());
+        $this->assertEquals('testLinkToArticle', $oPromo->getBannerLink());
     }
 }

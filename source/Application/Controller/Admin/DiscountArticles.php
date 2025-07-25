@@ -55,7 +55,7 @@ class DiscountArticles extends AdminDetailsController
             }
 
             // generating category tree for artikel choose select list
-            $this->createCategoryTree("artcattree");
+            $this->createCategoryTree('artcattree');
         }
 
         $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');
@@ -63,12 +63,12 @@ class DiscountArticles extends AdminDetailsController
             $oDiscountArticlesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountArticlesAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountArticlesAjax->getColumns();
 
-            return "popups/discount_articles.tpl";
+            return 'popups/discount_articles.tpl';
         } elseif ($iAoc == 2) {
             $oDiscountCategoriesAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountCategoriesAjax->getColumns();
 
-            return "popups/discount_categories.tpl";
+            return 'popups/discount_categories.tpl';
         }
 
         return 'discount_articles.tpl';

@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -42,20 +42,20 @@ final class AdminNotRegisteredUserOrderCest
         $adminPanel = $I->loginAdmin();
 
         $orders = $adminPanel->openOrders();
-        $orders = $orders->find($orders->orderNumberInput, "2");
+        $orders = $orders->find($orders->orderNumberInput, '2');
 
         $addressesTab = $orders->openAddressesTab();
-        $I->seeInField($addressesTab->firstNameInAddressesTab, "name");
-        $I->seeInField($addressesTab->lastNameInAddressesTab, "surname");
-        $I->seeInField($addressesTab->loginNameInAddressesTab, "example01@oxid-esales.dev");
-        $I->seeInField($addressesTab->zipCodeInAddressesTab, "3000");
-        $I->seeInField($addressesTab->cityInAddressesTab, "city");
+        $I->seeInField($addressesTab->firstNameInAddressesTab, 'name');
+        $I->seeInField($addressesTab->lastNameInAddressesTab, 'surname');
+        $I->seeInField($addressesTab->loginNameInAddressesTab, 'example01@oxid-esales.dev');
+        $I->seeInField($addressesTab->zipCodeInAddressesTab, '3000');
+        $I->seeInField($addressesTab->cityInAddressesTab, 'city');
 
         $productsTab = $orders->openProductsTab();
-        $productsTab = $productsTab->addANewProductToTheOrder("1002-1");
+        $productsTab = $productsTab->addANewProductToTheOrder('1002-1');
 
         $I->waitForElement($productsTab->secondProductInProductTab);
-        $I->see("1002-1", $productsTab->secondProductInProductTab);
+        $I->see('1002-1', $productsTab->secondProductInProductTab);
     }
 
     /** @param AcceptanceAdminTester $I */
@@ -84,7 +84,7 @@ final class AdminNotRegisteredUserOrderCest
                 'OXTRANSSTATUS' => 'OK',
                 'OXFOLDER' => 'ORDERFOLDER_NEW',
                 'OXDELTYPE' => 'oxidstandard',
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00'),
             ]
         );
 
@@ -108,7 +108,7 @@ final class AdminNotRegisteredUserOrderCest
                 'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00'),
                 'OXSEARCHKEYS' => 'šÄßüл1002',
                 'OXISSEARCH' => 1,
-                'OXORDERSHOPID' => 1
+                'OXORDERSHOPID' => 1,
             ]
         );
     }

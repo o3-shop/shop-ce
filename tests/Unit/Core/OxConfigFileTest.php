@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxConfigFile;
+use oxConfigFile;
 
 class OxConfigFileTest extends \OxidTestCase
 {
-
     /**
      * Test for OxConfigFile::getVar() method
      */
@@ -32,8 +33,8 @@ class OxConfigFileTest extends \OxidTestCase
         $filePath = $this->createFile('config.inc.php', '<?php $this->testVar = "testValue";');
         $oConfigFile = new oxConfigFile($filePath);
 
-        $sVar = $oConfigFile->getVar("testVar");
-        $this->assertSame("testValue", $sVar);
+        $sVar = $oConfigFile->getVar('testVar');
+        $this->assertSame('testValue', $sVar);
     }
 
     /**
@@ -44,9 +45,9 @@ class OxConfigFileTest extends \OxidTestCase
         $filePath = $this->createFile('config.inc.php', '<?php ');
         $oConfigFile = new oxConfigFile($filePath);
 
-        $oConfigFile->setVar("testVar", 'testValue2');
+        $oConfigFile->setVar('testVar', 'testValue2');
 
-        $sVar = $oConfigFile->getVar("testVar");
+        $sVar = $oConfigFile->getVar('testVar');
         $this->assertSame('testValue2', $sVar);
     }
 
@@ -58,8 +59,8 @@ class OxConfigFileTest extends \OxidTestCase
         $filePath = $this->createFile('config.inc.php', '<?php $this->testVar = "testValue";');
         $oConfigFile = new oxConfigFile($filePath);
 
-        $this->assertTrue($oConfigFile->isVarSet("testVar"), "Variable is supposed to be set");
-        $this->assertFalse($oConfigFile->isVarSet("nonExistingVar"), "Variable is not supposed to be set");
+        $this->assertTrue($oConfigFile->isVarSet('testVar'), 'Variable is supposed to be set');
+        $this->assertFalse($oConfigFile->isVarSet('nonExistingVar'), 'Variable is not supposed to be set');
     }
 
     /**
@@ -68,22 +69,22 @@ class OxConfigFileTest extends \OxidTestCase
     public function testGetVars()
     {
         $this->markTestSkipped('Review with D.S. Bug or feature.?');
-//        Result: Array
-//        (
-//            [dynamicProperties] => Array
-//            (
-//                [testVar] => testValue
-//                [testVar2] => testValue2
-//        )
+        //        Result: Array
+        //        (
+        //            [dynamicProperties] => Array
+        //            (
+        //                [testVar] => testValue
+        //                [testVar2] => testValue2
+        //        )
 
         $filePath = $this->createFile('config.inc.php', '<?php $this->testVar = "testValue"; $this->testVar2 = "testValue2";');
         $oConfigFile = new oxConfigFile($filePath);
 
         $aVars = $oConfigFile->getVars();
-        $expectedArray = array(
+        $expectedArray = [
             'testVar' => 'testValue',
             'testVar2' => 'testValue2',
-        );
+        ];
 
         $this->assertSame($expectedArray, $aVars);
     }
@@ -96,12 +97,12 @@ class OxConfigFileTest extends \OxidTestCase
         $filePath = $this->createFile('config.inc.php', '<?php $this->testVar = "testValue";');
         $oConfigFile = new oxConfigFile($filePath);
 
-        $sVar = $oConfigFile->getVar("testVar");
-        $this->assertSame("testValue", $sVar);
+        $sVar = $oConfigFile->getVar('testVar');
+        $this->assertSame('testValue', $sVar);
 
-        $oConfigFile->setVar("testVar", 'testValue2');
+        $oConfigFile->setVar('testVar', 'testValue2');
 
-        $this->assertSame("testValue2", $oConfigFile->getVar("testVar"));
+        $this->assertSame('testValue2', $oConfigFile->getVar('testVar'));
     }
 
     /**
@@ -115,6 +116,6 @@ class OxConfigFileTest extends \OxidTestCase
         $customConfigInc = $this->createFile('config.inc.php', '<?php $this->testVar2 = "testValue2";');
         $oConfigFile->setFile($customConfigInc);
 
-        $this->assertSame("testValue2", $oConfigFile->getVar("testVar2"));
+        $this->assertSame('testValue2', $oConfigFile->getVar('testVar2'));
     }
 }

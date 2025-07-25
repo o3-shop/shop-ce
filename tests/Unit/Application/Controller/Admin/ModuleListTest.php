@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use oxConfig;
@@ -52,10 +54,10 @@ class ModuleListTest extends \OxidTestCase
 
     public function testRenderWithCorrectModuleNames()
     {
-        $modulesDirectory = __DIR__.'/../../../testData/modules/';
+        $modulesDirectory = __DIR__ . '/../../../testData/modules/';
 
         /** @var oxConfig|MockObject $config */
-        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getModulesDir'));
+        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getModulesDir']);
         $config->expects($this->any())->method('getModulesDir')->will($this->returnValue($modulesDirectory));
 
         $container = ContainerFactory::getInstance()->getContainer();

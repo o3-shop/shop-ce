@@ -44,8 +44,8 @@ class UserGroupMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oGroup = oxNew(Groups::class);
             $oGroup->loadInLang($this->_iEditLang, $soxId);
@@ -56,30 +56,30 @@ class UserGroupMain extends AdminDetailsController
                 $oGroup->loadInLang(key($oOtherLang), $soxId);
             }
 
-            $this->_aViewData["edit"] = $oGroup;
+            $this->_aViewData['edit'] = $oGroup;
 
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
 
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oUsergroupMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\UserGroupMainAjax::class);
             $this->_aViewData['oxajax'] = $oUsergroupMainAjax->getColumns();
 
-            return "popups/usergroup_main.tpl";
+            return 'popups/usergroup_main.tpl';
         }
 
-        return "usergroup_main.tpl";
+        return 'usergroup_main.tpl';
     }
 
     /**
@@ -97,7 +97,7 @@ class UserGroupMain extends AdminDetailsController
         }
 
         $oGroup = oxNew(Groups::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oGroup->load($soxId);
         } else {
             $aParams['oxgroups__oxid'] = null;

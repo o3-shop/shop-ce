@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Database\Adapter\ResultSetInterface;
+use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker\DatabaseCheckerBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoaderInterface;
@@ -32,14 +32,14 @@ use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoade
  */
 class SystemRequirements
 {
-    const MODULE_STATUS_UNABLE_TO_DETECT = -1;
-    const MODULE_STATUS_BLOCKS_SETUP = 0;
-    const MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS = 1;
-    const MODULE_STATUS_OK = 2;
+    public const MODULE_STATUS_UNABLE_TO_DETECT = -1;
+    public const MODULE_STATUS_BLOCKS_SETUP = 0;
+    public const MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS = 1;
+    public const MODULE_STATUS_OK = 2;
 
-    const MODULE_GROUP_ID_SERVER_CONFIG = 'server_config';
-    const MODULE_ID_MOD_REWRITE = 'mod_rewrite';
-    const MODULE_ID_MYSQL_VERSION = 'mysql_version';
+    public const MODULE_GROUP_ID_SERVER_CONFIG = 'server_config';
+    public const MODULE_ID_MOD_REWRITE = 'mod_rewrite';
+    public const MODULE_ID_MYSQL_VERSION = 'mysql_version';
 
     /**
      * System required modules
@@ -121,14 +121,14 @@ class SystemRequirements
      *
      * @var string
      */
-    protected $_sReqInfoUrl = "https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/SystemRequirements.html";
+    protected $_sReqInfoUrl = 'https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/SystemRequirements.html';
 
     /**
      * Installation preparation info url
      *
      * @var string
      */
-    protected $_sPreparationInfoUrl = "https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/PrepareInstallation.html";
+    protected $_sPreparationInfoUrl = 'https://docs.o3-shop.com/en/latest/user/installation/NewInstallation/PrepareInstallation.html';
 
     /**
      * Module or system configuration mapping with installation requirements info url anchor
@@ -136,28 +136,28 @@ class SystemRequirements
      * @var array
      */
     protected $_aInfoMap = [
-        "php_version"        => "php",
-        "mod_rewrite"        => "webserver",
-        "mysql_version"      => "database",
+        'php_version'        => 'php',
+        'mod_rewrite'        => 'webserver',
+        'mysql_version'      => 'database',
 
-        "allow_url_fopen"    => "php",
-        "request_uri"        => "php",
-        "ini_set"            => "php",
-        "memory_limit"       => "php",
-        "file_uploads"       => "php",
-        "session_autostart"  => "php",
+        'allow_url_fopen'    => 'php',
+        'request_uri'        => 'php',
+        'ini_set'            => 'php',
+        'memory_limit'       => 'php',
+        'file_uploads'       => 'php',
+        'session_autostart'  => 'php',
 
-        "php_xml"            => "php",
-        "j_son"              => "php",
-        "i_conv"             => "php",
-        "tokenizer"          => "php",
-        "mysql_connect"      => "php",
-        "gd_info"            => "php",
-        "mb_string"          => "php",
-        "curl"               => "php",
-        "bc_math"            => "php",
-        "open_ssl"           => "openssl",
-        "soap"               => "php",
+        'php_xml'            => 'php',
+        'j_son'              => 'php',
+        'i_conv'             => 'php',
+        'tokenizer'          => 'php',
+        'mysql_connect'      => 'php',
+        'gd_info'            => 'php',
+        'mb_string'          => 'php',
+        'curl'               => 'php',
+        'bc_math'            => 'php',
+        'open_ssl'           => 'openssl',
+        'soap'               => 'php',
     ];
 
     /**
@@ -166,7 +166,7 @@ class SystemRequirements
      * @var array
      */
     protected $_aPreparationInfoMap = [
-        "server_permissions" => "adjusting-file-and-directory-permissions",
+        'server_permissions' => 'adjusting-file-and-directory-permissions',
     ];
 
     /**
@@ -193,8 +193,8 @@ class SystemRequirements
     public function __call($sMethod, $aArgs)
     {
         if (defined('OXID_PHP_UNIT')) {
-            if (substr($sMethod, 0, 4) == "UNIT") {
-                $sMethod = str_replace("UNIT", "_", $sMethod);
+            if (substr($sMethod, 0, 4) == 'UNIT') {
+                $sMethod = str_replace('UNIT', '_', $sMethod);
             }
             if (method_exists($this, $sMethod)) {
                 return call_user_func_array([& $this, $sMethod], $aArgs);
@@ -202,7 +202,7 @@ class SystemRequirements
         }
 
         throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException(
-            "Function '$sMethod' does not exist or is not accessible! (" . get_class($this) . ")" . PHP_EOL
+            "Function '$sMethod' does not exist or is not accessible! (" . get_class($this) . ')' . PHP_EOL
         );
     }
 
@@ -262,7 +262,7 @@ class SystemRequirements
                 'php_version',
                 'mod_rewrite',
                 'server_permissions',
-                'mysql_version'
+                'mysql_version',
             ];
 
             if ($this->isAdmin()) {
@@ -271,7 +271,7 @@ class SystemRequirements
             $this->_aRequiredModules = array_fill_keys($aRequiredServerConfigs, 'server_config') +
                                        array_fill_keys($aRequiredPHPConfigs, 'php_config') +
                                        array_fill_keys($aRequiredPHPExtensions, 'php_extennsions')
-                                       ;
+            ;
         }
 
         return $this->_aRequiredModules;
@@ -311,7 +311,7 @@ class SystemRequirements
         $sPath = $sPath ? $sPath : getShopBasePath();
 
         // special config file check
-        $sFullPath = $sPath . "config.inc.php";
+        $sFullPath = $sPath . 'config.inc.php';
         if (
             !is_readable($sFullPath) ||
             ($this->isAdmin() && is_writable($sFullPath)) ||
@@ -321,7 +321,7 @@ class SystemRequirements
         }
 
         $sTmp = "$sPath/tmp/";
-        $config = new \OxidEsales\Eshop\Core\ConfigFile(getShopBasePath() . "/config.inc.php");
+        $config = new \OxidEsales\Eshop\Core\ConfigFile(getShopBasePath() . '/config.inc.php');
         $sCfgTmp = $config->getVar('sCompileDir');
         if ($sCfgTmp && strpos($sCfgTmp, '<sCompileDir') === false) {
             $sTmp = $sCfgTmp;
@@ -335,7 +335,7 @@ class SystemRequirements
             $sPath . 'out/media/',
             $sPath . 'log/',
             $sPath . '../var/',
-            $sTmp
+            $sTmp,
         ];
         $iModStat = 2;
         $sPathToCheck = reset($aPathsToCheck);
@@ -348,10 +348,10 @@ class SystemRequirements
 
             if (is_dir($sPathToCheck)) {
                 // adding subfolders
-                $aSubF = glob($sPathToCheck . "*", GLOB_ONLYDIR);
+                $aSubF = glob($sPathToCheck . '*', GLOB_ONLYDIR);
                 if (is_array($aSubF)) {
                     foreach ($aSubF as $sNewFolder) {
-                        $aPathsToCheck[] = $sNewFolder . "/";
+                        $aPathsToCheck[] = $sNewFolder . '/';
                     }
                 }
             }
@@ -367,7 +367,6 @@ class SystemRequirements
 
         return $iModStat;
     }
-
 
     /**
      * returns host, port, base dir, ssl information as assotiative array, false on error
@@ -986,7 +985,7 @@ class SystemRequirements
     {
         if ($sModule) {
             $iModStat = null;
-            $sCheckFunction = "check" . str_replace(" ", "", ucwords(str_replace("_", " ", $sModule)));
+            $sCheckFunction = 'check' . str_replace(' ', '', ucwords(str_replace('_', ' ', $sModule)));
             $iModStat = $this->$sCheckFunction();
 
             return $iModStat;
@@ -1046,9 +1045,9 @@ class SystemRequirements
 
         // only known will be anchored
         if (isset($aInfoMap[$sIdent])) {
-            $sUrl .= "#" . $aInfoMap[$sIdent];
+            $sUrl .= '#' . $aInfoMap[$sIdent];
         } elseif (isset($aPreparationInfoMap[$sIdent])) {
-            $sUrl = $this->_sPreparationInfoUrl . "#" . $aPreparationInfoMap[$sIdent];
+            $sUrl = $this->_sPreparationInfoUrl . '#' . $aPreparationInfoMap[$sIdent];
         }
 
         return $sUrl;
@@ -1071,12 +1070,12 @@ class SystemRequirements
             // gigabytes
             case 'g':
                 $sBytes *= 1024;
-            // megabytes
-            // no break
+                // megabytes
+                // no break
             case 'm':
                 $sBytes *= 1024;
-            // kilobytes
-            // no break
+                // kilobytes
+                // no break
             case 'k':
                 $sBytes *= 1024;
                 break;
@@ -1173,7 +1172,7 @@ class SystemRequirements
 
         return $database->select($query, [
             ':oxshopid' => $config->getShopId(),
-            ':oxtheme' => $activeThemeId
+            ':oxtheme' => $activeThemeId,
         ]);
     }
 

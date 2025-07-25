@@ -46,7 +46,7 @@ class AdminController extends BaseController
     protected $_aSumType = [
         0 => 'abs',
         1 => '%',
-        2 => 'itm'
+        2 => 'itm',
     ];
 
     /**
@@ -83,7 +83,7 @@ class AdminController extends BaseController
      *
      * @var string
      */
-    protected $_sShopTitle = " - ";
+    protected $_sShopTitle = ' - ';
 
     /**
      * Shop Version
@@ -223,7 +223,7 @@ class AdminController extends BaseController
         $oShop = parent::addGlobalParams($oShop);
 
         // override cause of admin dir
-        $sURL = $myConfig->getConfigParam('sShopURL') . $myConfig->getConfigParam('sAdminDir') . "/";
+        $sURL = $myConfig->getConfigParam('sShopURL') . $myConfig->getConfigParam('sAdminDir') . '/';
 
         if ($myConfig->getConfigParam('sAdminSSLURL')) {
             $sURL = $myConfig->getConfigParam('sAdminSSLURL');
@@ -241,7 +241,7 @@ class AdminController extends BaseController
         $this->_aViewData['charset'] = $this->getCharSet();
 
         //setting active currency object
-        $this->_aViewData["oActCur"] = $myConfig->getActShopCurrencyObject();
+        $this->_aViewData['oActCur'] = $myConfig->getActShopCurrencyObject();
 
         return $oShop;
     }
@@ -292,8 +292,8 @@ class AdminController extends BaseController
                 $sLangAbbr = $oLang->getLanguageAbbr($oLang->getTplLanguage());
             }
 
-            if ($sLangAbbr != "de") {
-                $sLangAbbr = "en";
+            if ($sLangAbbr != 'de') {
+                $sLangAbbr = 'en';
             }
 
             $this->_sServiceUrl = $sUrl . ShopVersion::getVersion() . "/{$sCountry}/{$sLangAbbr}/";
@@ -374,7 +374,7 @@ class AdminController extends BaseController
 
         // active shop title
         $this->_aViewData['actshop'] = $this->_sShopTitle;
-        $this->_aViewData["shopid"] = $myConfig->getShopId();
+        $this->_aViewData['shopid'] = $myConfig->getShopId();
 
         // loading active shop
         if ($sActShopId = Registry::getSession()->getVariable('actshop')) {
@@ -388,7 +388,7 @@ class AdminController extends BaseController
         $this->_aViewData['languages'] = $oLang->getLanguageArray($iLanguage);
 
         // setting maximum upload size
-        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->getMaxUploadFileInfo(@ini_get("upload_max_filesize"));
+        list($this->_aViewData['iMaxUploadFileSize'], $this->_aViewData['sMaxFormattedFileSize']) = $this->getMaxUploadFileInfo(@ini_get('upload_max_filesize'));
 
         // "save-on-tab"
         if (!isset($this->_aViewData['updatelist'])) {
@@ -430,10 +430,10 @@ class AdminController extends BaseController
         switch ($sParam) {
             case 'g':
                 $intMaxFileSize *= 1024;
-            // no break
+                // no break
             case 'm':
                 $intMaxFileSize *= 1024;
-            // no break
+                // no break
             case 'k':
                 $intMaxFileSize *= 1024;
         }
@@ -444,7 +444,7 @@ class AdminController extends BaseController
 
         $size = floor($intMaxFileSize / 1024);
         while ($size && current($markers)) {
-            $sFormattedMaxSize = $size . " " . current($markers);
+            $sFormattedMaxSize = $size . ' ' . current($markers);
             $size = floor($size / 1024);
             next($markers);
         }
@@ -568,13 +568,13 @@ class AdminController extends BaseController
 
         if (!empty($sCountryCode)) {
             $aLangIds = Registry::getLang()->getLanguageIds();
-            $iEnglishId = array_search("en", $aLangIds);
+            $iEnglishId = array_search('en', $aLangIds);
             if (false !== $iEnglishId) {
-                $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxcountry", $iEnglishId);
+                $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry', $iEnglishId);
                 $sQ = "select oxtitle from {$sViewName} where oxisoalpha2 = :oxisoalpha2";
                 // Value does not change that often, reading from slave is ok here (see ESDEV-3804 and ESDEV-3822).
                 $sCountryName = DatabaseProvider::getDb()->getOne($sQ, [
-                    ':oxisoalpha2' => $sCountryCode
+                    ':oxisoalpha2' => $sCountryCode,
                 ]);
                 if ($sCountryName) {
                     $sCountry = $sCountryName;
@@ -649,7 +649,7 @@ class AdminController extends BaseController
     public function chshp()
     {
         $sActShop = Registry::getRequest()->getRequestEscapedParameter('shp');
-        Registry::getSession()->setVariable("shp", $sActShop);
+        Registry::getSession()->setVariable('shp', $sActShop);
         Registry::getSession()->setVariable('currentadminshop', $sActShop);
     }
 
@@ -686,7 +686,7 @@ class AdminController extends BaseController
     {
         if (null === ($sId = $this->_sEditObjectId)) {
             if (null === ($sId = Registry::getRequest()->getRequestEscapedParameter('oxid'))) {
-                $sId = Registry::getSession()->getVariable("saved_oxid");
+                $sId = Registry::getSession()->getVariable('saved_oxid');
             }
         }
 
@@ -701,7 +701,7 @@ class AdminController extends BaseController
     public function setEditObjectId($sId)
     {
         $this->_sEditObjectId = $sId;
-        $this->_aViewData["updatelist"] = 1;
+        $this->_aViewData['updatelist'] = 1;
     }
 
     /**

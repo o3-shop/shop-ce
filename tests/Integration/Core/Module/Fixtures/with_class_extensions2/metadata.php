@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -25,7 +26,7 @@ $sMetadataVersion = '1.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'          => 'with_class_extensions2',
     'title'       => 'with_class_extensions2 module',
     'description' => 'test module',
@@ -33,6 +34,6 @@ $aModule = array(
     'version'     => '1.0',
     'author'      => 'OXID',
     'extend'      => [
-        ContentController::class => \OxidEsales\EshopCommunity\Tests\Integration\Core\Module\Fixtures\with_class_extenstions2\Controllers\ContentController::class
+        ContentController::class => \OxidEsales\EshopCommunity\Tests\Integration\Core\Module\Fixtures\with_class_extenstions2\Controllers\ContentController::class,
     ],
-);
+];

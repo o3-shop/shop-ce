@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 /**
@@ -59,10 +61,10 @@ class UnifiedNameSpaceClassMapTest extends BaseModuleTestCase
      */
     public function dataProviderForTestUnifiedNamespaceModules()
     {
-        return array(
-            array(
-                'modulesToActivate'          => array('unifiednamespace_module1'),
-                'expectedInheritanceChain'   => array(
+        return [
+            [
+                'modulesToActivate'          => ['unifiednamespace_module1'],
+                'expectedInheritanceChain'   => [
                     'Test1ContentController',
                     'OxidEsales\Eshop\Application\Controller\ContentController',
                     'OxidEsales\EshopCommunity\Application\Controller\ContentController',
@@ -72,13 +74,13 @@ class UnifiedNameSpaceClassMapTest extends BaseModuleTestCase
                     'OxidEsales\EshopCommunity\Core\Controller\BaseController',
                     'OxidEsales\Eshop\Core\Base',
                     'OxidEsales\EshopCommunity\Core\Base',
-                )
+                ]
                 ,
-                'expectedTitle'              => 'Impressum - Module_1_Controller - Module_1_Model'
-            ),
-            array(
-                'modulesToActivate'          => array('unifiednamespace_module1', 'unifiednamespace_module2'),
-                'expectedInheritanceChain'   => array(
+                'expectedTitle'              => 'Impressum - Module_1_Controller - Module_1_Model',
+            ],
+            [
+                'modulesToActivate'          => ['unifiednamespace_module1', 'unifiednamespace_module2'],
+                'expectedInheritanceChain'   => [
                     'Test2ContentController',
                     'Test1ContentController',
                     'OxidEsales\Eshop\Application\Controller\ContentController',
@@ -89,12 +91,12 @@ class UnifiedNameSpaceClassMapTest extends BaseModuleTestCase
                     'OxidEsales\EshopCommunity\Core\Controller\BaseController',
                     'OxidEsales\Eshop\Core\Base',
                     'OxidEsales\EshopCommunity\Core\Base',
-                ),
-                'expectedTitle'              => 'Impressum - Module_1_Controller - Module_1_Model - Module_2_Controller'
-            ),
-            array(
-                'modulesToActivate'          => array('unifiednamespace_module1', 'unifiednamespace_module2', 'unifiednamespace_module3'),
-                'expectedInheritanceChain'   => array(
+                ],
+                'expectedTitle'              => 'Impressum - Module_1_Controller - Module_1_Model - Module_2_Controller',
+            ],
+            [
+                'modulesToActivate'          => ['unifiednamespace_module1', 'unifiednamespace_module2', 'unifiednamespace_module3'],
+                'expectedInheritanceChain'   => [
                     'Test2ContentController',
                     'Test1ContentController',
                     'OxidEsales\Eshop\Application\Controller\ContentController',
@@ -105,10 +107,10 @@ class UnifiedNameSpaceClassMapTest extends BaseModuleTestCase
                     'OxidEsales\EshopCommunity\Core\Controller\BaseController',
                     'OxidEsales\Eshop\Core\Base',
                     'OxidEsales\EshopCommunity\Core\Base',
-                ),
-                'expectedTitle'              => 'Impressum - Module_1_Controller - Module_3_Model - Module_2_Controller'
-            )
-        );
+                ],
+                'expectedTitle'              => 'Impressum - Module_1_Controller - Module_3_Model - Module_2_Controller',
+            ],
+        ];
     }
 
     /**
@@ -148,7 +150,7 @@ class UnifiedNameSpaceClassMapTest extends BaseModuleTestCase
     private function assertObjectHasInheritances($objectUnderTest, $expectedInheritanceChain)
     {
         $classParents = array_keys(class_parents($objectUnderTest));
-        $resultInheritanceChain = array_merge(array(get_class($objectUnderTest)), $classParents);
+        $resultInheritanceChain = array_merge([get_class($objectUnderTest)], $classParents);
 
         $this->assertSame($expectedInheritanceChain, $resultInheritanceChain, 'The given object does not have the expected inheritance chain!');
     }

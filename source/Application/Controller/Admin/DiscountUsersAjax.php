@@ -39,7 +39,7 @@ class DiscountUsersAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field, table, visible, multilanguage, ident
             ['oxusername', 'oxuser', 1, 0, 0],
             ['oxlname', 'oxuser', 0, 0, 0],
@@ -109,13 +109,13 @@ class DiscountUsersAjax extends ListComponentAjax
                 }
             } else {
                 $sQAdd = " from oxobject2discount, $sUserTable where $sUserTable.oxid=oxobject2discount.oxobjectid ";
-                $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxuser' ";
+                $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxuser' ";
             }
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from oxobject2discount, $sUserTable where $sUserTable.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxuser' ) ";
+            $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxuser' ) ";
         }
 
         return $sQAdd;
@@ -128,10 +128,10 @@ class DiscountUsersAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -149,13 +149,13 @@ class DiscountUsersAjax extends ListComponentAjax
             $sUserTable = $this->getViewName('oxuser');
             $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
                 $oObject2Discount = oxNew(BaseModel::class);
                 $oObject2Discount->init('oxobject2discount');
                 $oObject2Discount->oxobject2discount__oxdiscountid = new Field($soxId);
                 $oObject2Discount->oxobject2discount__oxobjectid = new Field($sChosenUsr);
-                $oObject2Discount->oxobject2discount__oxtype = new Field("oxuser");
+                $oObject2Discount->oxobject2discount__oxtype = new Field('oxuser');
                 $oObject2Discount->save();
             }
         }

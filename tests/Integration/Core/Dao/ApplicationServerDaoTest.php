@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Dao;
 
 /**
@@ -188,20 +190,20 @@ class ApplicationServerDaoTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
     private function storeInitialServersData()
     {
-        $storedData1 = array(
+        $storedData1 = [
             'id'                => 'serverNameHash1',
             'timestamp'         => 'timestamp',
             'ip'                => '127.0.0.1',
             'lastFrontendUsage' => 'frontendUsageTimestamp',
-            'lastAdminUsage'    => ''
-        );
-        $storedData2 = array(
+            'lastAdminUsage'    => '',
+        ];
+        $storedData2 = [
             'id'                => 'serverNameHash2',
             'timestamp'         => 'timestamp',
             'ip'                => '127.0.0.2',
             'lastFrontendUsage' => '',
-            'lastAdminUsage'    => 'adminUsageTimestamp'
-        );
+            'lastAdminUsage'    => 'adminUsageTimestamp',
+        ];
         $this->getConfig()->saveSystemConfigParameter('arr', 'aServersData_serverNameHash1', $storedData1);
         $this->getConfig()->saveSystemConfigParameter('arr', 'aServersData_serverNameHash2', $storedData2);
     }

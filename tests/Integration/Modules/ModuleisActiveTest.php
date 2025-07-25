@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 class ModuleIsActiveTest extends BaseModuleTestCase
@@ -26,59 +28,58 @@ class ModuleIsActiveTest extends BaseModuleTestCase
      */
     public function providerModuleIsActive()
     {
-        return array(
-            array(
-                array('extending_1_class', 'with_2_templates', 'with_everything'),
-                array('extending_1_class', 'with_everything'),
-                array(
-                    'active'    => array('with_2_templates'),
-                    'notActive' => array('extending_1_class', 'with_everything'),
-                )
-            ),
-            array(
-                array('extending_1_class', 'with_2_templates', 'with_everything'),
-                array(),
-                array(
-                    'active'    => array('extending_1_class', 'with_2_templates', 'with_everything'),
-                    'notActive' => array(),
-                )
-            ),
+        return [
+            [
+                ['extending_1_class', 'with_2_templates', 'with_everything'],
+                ['extending_1_class', 'with_everything'],
+                [
+                    'active'    => ['with_2_templates'],
+                    'notActive' => ['extending_1_class', 'with_everything'],
+                ],
+            ],
+            [
+                ['extending_1_class', 'with_2_templates', 'with_everything'],
+                [],
+                [
+                    'active'    => ['extending_1_class', 'with_2_templates', 'with_everything'],
+                    'notActive' => [],
+                ],
+            ],
 
-            array(
-                array('extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'),
-                array('extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'),
-                array(
-                    'active'    => array(),
-                    'notActive' => array('extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'),
-                )
-            ),
+            [
+                ['extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'],
+                ['extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'],
+                [
+                    'active'    => [],
+                    'notActive' => ['extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'],
+                ],
+            ],
 
-            array(
-                array('extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'),
-                array('extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'),
-                array(
-                    'active'    => array(),
-                    'notActive' => array('extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'),
-                )
-            ),
-            array(
-                array('no_extending'),
-                array(),
-                array(
-                    'active'    => array('no_extending'),
-                    'notActive' => array(),
-                )
-            ),
-            array(
-                array('no_extending'),
-                array('no_extending'),
-                array(
-                    'active'    => array(),
-                    'notActive' => array('no_extending'),
-                )
-            ),
-
-        );
+            [
+                ['extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'],
+                ['extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'],
+                [
+                    'active'    => [],
+                    'notActive' => ['extending_1_class', 'extending_1_class_3_extensions', 'no_extending', 'with_2_templates', 'with_everything'],
+                ],
+            ],
+            [
+                ['no_extending'],
+                [],
+                [
+                    'active'    => ['no_extending'],
+                    'notActive' => [],
+                ],
+            ],
+            [
+                ['no_extending'],
+                ['no_extending'],
+                [
+                    'active'    => [],
+                    'notActive' => ['no_extending'],
+                ],
+            ],
+        ];
     }
 
     /**

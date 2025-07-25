@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
-use \oxTestModules;
+use Exception;
+use oxTestModules;
 
 /**
  * Tests for Shop_Main class
@@ -35,7 +37,7 @@ class ShopMainTest extends \OxidTestCase
         // testing..
         $oView = oxNew('Shop_Main');
 
-        $this->setRequestParameter("oxid", $this->getConfig()->getBaseShopId());
+        $this->setRequestParameter('oxid', $this->getConfig()->getBaseShopId());
         $this->assertEquals('shop_main.tpl', $oView->render());
     }
 
@@ -54,10 +56,10 @@ class ShopMainTest extends \OxidTestCase
             $oView = oxNew('Shop_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Shop_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Shop_Main::save()');
 
             return;
         }
-        $this->fail("error in Shop_Main::save()");
+        $this->fail('error in Shop_Main::save()');
     }
 }

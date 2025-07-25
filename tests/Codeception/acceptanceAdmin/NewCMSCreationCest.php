@@ -36,15 +36,15 @@ final class NewCMSCreationCest
     {
         $I->wantToTest('Create a new CMS and check if it is saved in database');
 
-        $title = "New CMS Content";
-        $content = "This is a new CMS content";
-        $ident = "newcmscontent";
+        $title = 'New CMS Content';
+        $content = 'This is a new CMS content';
+        $ident = 'newcmscontent';
 
         $adminPanel = $I->loginAdmin();
         $languages = $adminPanel->openCMSPages();
         $languages->createNewCMS($title, $ident, $content);
-        $languages->find("where[oxcontents][oxtitle]", $title);
+        $languages->find('where[oxcontents][oxtitle]', $title);
 
-        $I->assertEquals($title, $I->grabFromDatabase("oxcontents", "oxtitle", ["oxloadid" => $ident]));
+        $I->assertEquals($title, $I->grabFromDatabase('oxcontents', 'oxtitle', ['oxloadid' => $ident]));
     }
 }

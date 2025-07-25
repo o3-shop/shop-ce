@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,28 +18,29 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \DOMDocument;
+use DOMDocument;
 
 class UtilsXmlTest extends \OxidTestCase
 {
     public function xmlProviderNoDomDocument()
     {
-        return array(
-            array('<?xml version="1.0" encoding="utf-8"?><message>ACK</message>', true),
-            array('<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><message>ACK</message>', false),
-        );
+        return [
+            ['<?xml version="1.0" encoding="utf-8"?><message>ACK</message>', true],
+            ['<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><message>ACK</message>', false],
+        ];
     }
 
     public function xmlProviderWithDomDocument()
     {
         $oDom = new DOMDocument();
 
-        return array(
-            array('<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><html>ACK</html>', $oDom, false),
-            array('<?xml version="1.0" encoding="utf-8"?><message>ACK</message>', $oDom, true),
-        );
+        return [
+            ['<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><html>ACK</html>', $oDom, false],
+            ['<?xml version="1.0" encoding="utf-8"?><message>ACK</message>', $oDom, true],
+        ];
     }
 
     /**
@@ -70,7 +72,7 @@ class UtilsXmlTest extends \OxidTestCase
     {
         $oUtilsXml = oxNew('oxUtilsXml');
         $oDom = new DOMDocument();
-        $sValidXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><ocl><message>ACK</message></ocl>";
+        $sValidXml = '<?xml version="1.0" encoding="utf-8"?><ocl><message>ACK</message></ocl>';
         $this->assertEquals(true, $oUtilsXml->loadXml($sValidXml, $oDom) != false);
     }
 }

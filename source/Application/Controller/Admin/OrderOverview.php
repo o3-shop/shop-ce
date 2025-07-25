@@ -54,36 +54,36 @@ class OrderOverview extends AdminDetailsController
         $oLang = Registry::getLang();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oOrder->load($soxId);
 
-            $this->_aViewData["edit"] = $oOrder;
-            $this->_aViewData["aProductVats"] = $oOrder->getProductVats();
-            $this->_aViewData["orderArticles"] = $oOrder->getOrderArticles();
-            $this->_aViewData["giftCard"] = $oOrder->getGiftCard();
-            $this->_aViewData["paymentType"] = $this->_getPaymentType($oOrder);
-            $this->_aViewData["deliveryType"] = $oOrder->getDelSet();
+            $this->_aViewData['edit'] = $oOrder;
+            $this->_aViewData['aProductVats'] = $oOrder->getProductVats();
+            $this->_aViewData['orderArticles'] = $oOrder->getOrderArticles();
+            $this->_aViewData['giftCard'] = $oOrder->getGiftCard();
+            $this->_aViewData['paymentType'] = $this->_getPaymentType($oOrder);
+            $this->_aViewData['deliveryType'] = $oOrder->getDelSet();
             $sTsProtectsField = 'oxorder__oxtsprotectcosts';
             if ($oOrder->$sTsProtectsField->value) {
-                $this->_aViewData["tsprotectcosts"] = $oLang->formatCurrency($oOrder->$sTsProtectsField->value, $oCur);
+                $this->_aViewData['tsprotectcosts'] = $oLang->formatCurrency($oOrder->$sTsProtectsField->value, $oCur);
             }
         }
 
         // orders today
         $dSum = $oOrder->getOrderSum(true);
-        $this->_aViewData["ordersum"] = $oLang->formatCurrency($dSum, $oCur);
-        $this->_aViewData["ordercnt"] = $oOrder->getOrderCnt(true);
+        $this->_aViewData['ordersum'] = $oLang->formatCurrency($dSum, $oCur);
+        $this->_aViewData['ordercnt'] = $oOrder->getOrderCnt(true);
 
         // ALL orders
         $dSum = $oOrder->getOrderSum();
-        $this->_aViewData["ordertotalsum"] = $oLang->formatCurrency($dSum, $oCur);
-        $this->_aViewData["ordertotalcnt"] = $oOrder->getOrderCnt();
-        $this->_aViewData["afolder"] = $myConfig->getConfigParam('aOrderfolder');
-        $this->_aViewData["alangs"] = $oLang->getLanguageNames();
+        $this->_aViewData['ordertotalsum'] = $oLang->formatCurrency($dSum, $oCur);
+        $this->_aViewData['ordertotalcnt'] = $oOrder->getOrderCnt();
+        $this->_aViewData['afolder'] = $myConfig->getConfigParam('aOrderfolder');
+        $this->_aViewData['alangs'] = $oLang->getLanguageNames();
 
-        $this->_aViewData["currency"] = $oCur;
+        $this->_aViewData['currency'] = $oCur;
 
-        return "order_overview.tpl";
+        return 'order_overview.tpl';
     }
 
     /**
@@ -131,7 +131,7 @@ class OrderOverview extends AdminDetailsController
     {
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new Field(date("Y-m-d H:i:s", Registry::getUtilsDate()->getTime()));
+            $oOrder->oxorder__oxsenddate = new Field(date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()));
             $oOrder->save();
 
             // #1071C
@@ -158,7 +158,7 @@ class OrderOverview extends AdminDetailsController
     {
         $oOrder = oxNew(Order::class);
         if ($oOrder->load($this->getEditObjectId())) {
-            $oOrder->oxorder__oxsenddate = new Field("0000-00-00 00:00:00");
+            $oOrder->oxorder__oxsenddate = new Field('0000-00-00 00:00:00');
             $oOrder->save();
         }
     }
@@ -173,8 +173,8 @@ class OrderOverview extends AdminDetailsController
         $oOrder = oxNew(Order::class);
         $blCan = false;
         if ($oOrder->load($this->getEditObjectId())) {
-            $blCan = $oOrder->oxorder__oxstorno->value == "0" &&
-                     !($oOrder->oxorder__oxsenddate->value == "0000-00-00 00:00:00" || $oOrder->oxorder__oxsenddate->value == "-");
+            $blCan = $oOrder->oxorder__oxstorno->value == '0' &&
+                     !($oOrder->oxorder__oxsenddate->value == '0000-00-00 00:00:00' || $oOrder->oxorder__oxsenddate->value == '-');
         }
 
         return $blCan;

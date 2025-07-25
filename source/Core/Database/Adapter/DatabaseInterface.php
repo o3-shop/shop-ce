@@ -31,28 +31,27 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
  */
 interface DatabaseInterface
 {
-
     /** @var int code of exception to check against. Use same number as MySQL to avoid duplications. */
-    const DUPLICATE_KEY_ERROR_CODE = 1062;
+    public const DUPLICATE_KEY_ERROR_CODE = 1062;
 
     /**
      * The default fetch mode as implemented by the database driver, in Doctrine this is usually FETCH_MODE_BOTH
      *
      * @deprecated since 6.0 (2016-04-19); This constant is confusing as the shop uses a different default fetch mode.
      */
-    const FETCH_MODE_DEFAULT = 0;
+    public const FETCH_MODE_DEFAULT = 0;
 
     /**
      * Fetch the query result into an array with integer keys.
      * This is the default fetch mode as it is set by O3-Shop on opening a database connection.
      */
-    const FETCH_MODE_NUM = 1;
+    public const FETCH_MODE_NUM = 1;
 
     /** Fetch the query result into an array with string keys */
-    const FETCH_MODE_ASSOC = 2;
+    public const FETCH_MODE_ASSOC = 2;
 
     /** Fetch the query result into a mixed array with both integer and string keys */
-    const FETCH_MODE_BOTH = 3;
+    public const FETCH_MODE_BOTH = 3;
 
     /**
      * Set the necessary connection parameters to connect to the database.

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -39,11 +41,11 @@ class ModuleFilesInstallerTest extends TestCase
         $packageName = 'myvendor/mymodule';
         $packagePath = '/var/www/vendor/myvendor/mymodule';
         $blackListFilters = [
-            "documentation/**/*.*",
-            "CHANGELOG.md",
-            "composer.json",
-            "CONTRIBUTING.md",
-            "README.md"
+            'documentation/**/*.*',
+            'CHANGELOG.md',
+            'composer.json',
+            'CONTRIBUTING.md',
+            'README.md',
         ];
 
         $package = new OxidEshopPackage($packageName, $packagePath);

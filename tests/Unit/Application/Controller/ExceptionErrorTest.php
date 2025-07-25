@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
-namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxRegistry;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
 /**
  * Tests for contact class
  */
 class ExceptionErrorTest extends \OxidTestCase
 {
-
     /**
      * Test view render.
      *
@@ -45,16 +44,16 @@ class ExceptionErrorTest extends \OxidTestCase
      */
     public function testDisplayExceptionError()
     {
-        $sEx = "testText";
-        $aErrors = array("default" => array("aaa" => serialize($sEx)));
+        $sEx = 'testText';
+        $aErrors = ['default' => ['aaa' => serialize($sEx)]];
 
-        $oErr = $this->getMock(\OxidEsales\Eshop\Application\Controller\ExceptionErrorController::class, array("_getErrors"));
+        $oErr = $this->getMock(\OxidEsales\Eshop\Application\Controller\ExceptionErrorController::class, ['_getErrors']);
         $oErr->expects($this->once())->method('_getErrors')->will($this->returnValue($aErrors));
 
         $oErr->displayExceptionError();
 
-        $aTplVars = $oErr->getViewDataElement("Errors");
-        $oViewEx = $aTplVars["default"]["aaa"];
+        $aTplVars = $oErr->getViewDataElement('Errors');
+        $oViewEx = $aTplVars['default']['aaa'];
 
         $this->assertEquals($sEx, $oViewEx);
     }
@@ -66,16 +65,16 @@ class ExceptionErrorTest extends \OxidTestCase
      */
     public function testDisplayExceptionError_resetsErrorsInSession()
     {
-        $this->getSession()->setVariable("Errors", "testValue");
-        $this->assertEquals("testValue", $this->getSession()->getVariable("Errors"));
+        $this->getSession()->setVariable('Errors', 'testValue');
+        $this->assertEquals('testValue', $this->getSession()->getVariable('Errors'));
 
-        $oErr = $this->getMock(\OxidEsales\Eshop\Application\Controller\ExceptionErrorController::class, array("_getErrors", 'getViewData'));
-        $oErr->expects($this->once())->method('getViewData')->will($this->returnValue(array()));
-        $oErr->expects($this->once())->method('_getErrors')->will($this->returnValue(array()));
+        $oErr = $this->getMock(\OxidEsales\Eshop\Application\Controller\ExceptionErrorController::class, ['_getErrors', 'getViewData']);
+        $oErr->expects($this->once())->method('getViewData')->will($this->returnValue([]));
+        $oErr->expects($this->once())->method('_getErrors')->will($this->returnValue([]));
 
         $oErr->displayExceptionError();
 
-        $this->assertEquals(array(), $this->getSession()->getVariable("Errors"));
+        $this->assertEquals([], $this->getSession()->getVariable('Errors'));
     }
 
     /**
@@ -85,9 +84,9 @@ class ExceptionErrorTest extends \OxidTestCase
      */
     public function testGetErrors()
     {
-        $this->getSession()->setVariable("Errors", "testValue");
+        $this->getSession()->setVariable('Errors', 'testValue');
 
-        $oErr = $this->getProxyClass("exceptionError");
-        $this->assertEquals("testValue", $oErr->UNITgetErrors());
+        $oErr = $this->getProxyClass('exceptionError');
+        $this->assertEquals('testValue', $oErr->UNITgetErrors());
     }
 }

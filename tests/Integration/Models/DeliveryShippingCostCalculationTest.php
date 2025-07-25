@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Models;
 
 use oxArticle;
@@ -34,28 +36,28 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     /**
      * Make a copy of Stewart+Brown Shirt Kisser Fish parent and variant L violet for testing
      */
-    const SOURCE_ARTICLE_ID = '6b6d966c899dd9977e88f842f67eb751';
-    const SOURCE_ARTICLE_PARENT_ID = '6b6099c305f591cb39d4314e9a823fc1';
+    public const SOURCE_ARTICLE_ID = '6b6d966c899dd9977e88f842f67eb751';
+    public const SOURCE_ARTICLE_PARENT_ID = '6b6099c305f591cb39d4314e9a823fc1';
 
-    const TEST_ARTICLE_PRICE = 10.0;
+    public const TEST_ARTICLE_PRICE = 10.0;
 
-    const TESTVOUCHER_ID_PREFIX = 'testvoucher_relative_';
+    public const TESTVOUCHER_ID_PREFIX = 'testvoucher_relative_';
 
     /**
      * Test delivery rules oxid/name map.
      *
      * @var array
      */
-    private $deliveries = array();
+    private $deliveries = [];
 
     private $testUserId = null;
 
     /** @var string Generated oxids for test article, user, order, discount and vouchers. */
-    private $categoryIds = array(
+    private $categoryIds = [
         '943927cd5d60751015b567794d3239bb',
         '943202124f58e02e84bb228a9a2a9f1e',
-        '94342f1d6f3b6fe9f1520d871f566511'
-    );
+        '94342f1d6f3b6fe9f1520d871f566511',
+    ];
 
     /**
      * Store original shop configuration and session values.
@@ -100,7 +102,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         oxRegistry::getSession()->delBasket();
         oxRegistry::getSession()->deleteVariable('_newitem');
         oxRegistry::getSession()->setVariable('sess_challenge', $this->originalSessionChallenge);
-        $_POST = array();
+        $_POST = [];
 
         parent::tearDown();
     }
@@ -110,10 +112,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     public function providerDeliveryCostRules()
     {
-        $data = array();
+        $data = [];
 
         //add 10 EUR if basket value is between 0 and 100 EUR, once per cart, not stopping further rules
-        $data['basket_value_50'][0]['rules'][0] = array(
+        $data['basket_value_50'][0]['rules'][0] = [
             'oxtitle'      => 'first',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -125,12 +127,12 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '100',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 100,
-            'oxfinalize'   => 0
-        );
+            'oxfinalize'   => 0,
+        ];
 
         //add 20 EUR if basket value is between 100 and 200 EUR (what happens at 100 sharp?), once per cart,
         //not stopping further rules
-        $data['basket_value_50'][0]['rules'][1] = array(
+        $data['basket_value_50'][0]['rules'][1] = [
             'oxtitle'      => 'second',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -142,12 +144,12 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '200',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 200,
-            'oxfinalize'   => 0
-        );
+            'oxfinalize'   => 0,
+        ];
 
         //add 30 EUR if basket value is between 0 and 200 EUR, once per cart,
         //not stopping further rules
-        $data['basket_value_50'][0]['rules'][2] = array(
+        $data['basket_value_50'][0]['rules'][2] = [
             'oxtitle'      => 'third',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -159,8 +161,8 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '200',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 300,
-            'oxfinalize'   => 0
-        );
+            'oxfinalize'   => 0,
+        ];
 
         //amount of articles to purchase
         $data['basket_value_50'][0]['buyamount'] = 5;
@@ -169,17 +171,17 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $data['basket_value_50'][0]['expected_deliverycost'] = 40.0;
 
         //test with same rules once more, change basket value
-        $data['basket_value_100'][0]['rules']                 = $data['basket_value_50'][0]['rules'];
-        $data['basket_value_100'][0]['buyamount']             = 10;   //exactly 100 EUR basket value matches all three rules
+        $data['basket_value_100'][0]['rules'] = $data['basket_value_50'][0]['rules'];
+        $data['basket_value_100'][0]['buyamount'] = 10;   //exactly 100 EUR basket value matches all three rules
         $data['basket_value_100'][0]['expected_deliverycost'] = 60.0; //
 
         //test again but set stopper on all rules. first match should stop further calculation.
-        $data['basket_value_100_finalize'][0]['rules']                  = $data['basket_value_50'][0]['rules'];
+        $data['basket_value_100_finalize'][0]['rules'] = $data['basket_value_50'][0]['rules'];
         $data['basket_value_100_finalize'][0]['rules'][0]['oxfinalize'] = 1;
         $data['basket_value_100_finalize'][0]['rules'][1]['oxfinalize'] = 1;
         $data['basket_value_100_finalize'][0]['rules'][2]['oxfinalize'] = 1;
-        $data['basket_value_100_finalize'][0]['buyamount']              = 10;   //exactly 100 EUR basket value matches all three rules
-        $data['basket_value_100_finalize'][0]['expected_deliverycost']  = 10.0; //expect first rule to match
+        $data['basket_value_100_finalize'][0]['buyamount'] = 10;   //exactly 100 EUR basket value matches all three rules
+        $data['basket_value_100_finalize'][0]['expected_deliverycost'] = 10.0; //expect first rule to match
 
         return $data;
     }
@@ -197,7 +199,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $user = oxNew('oxUser');
         $user->load($this->testUserId);
 
-        $deliveryIds = array();
+        $deliveryIds = [];
         foreach ($data['rules'] as $rule) {
             $deliveryIds[] = $this->createRule($rule)->getId();
         }
@@ -219,10 +221,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     public function providerDeliveryCostRulesWithCategoryAssigned()
     {
-        $data = array();
+        $data = [];
 
         //add 10 EUR if basket value is between 0 and 100 EUR, once per cart, stopping further rules
-        $data['once_per_cart'][0]['rules'][0] = array(
+        $data['once_per_cart'][0]['rules'][0] = [
             'oxtitle'      => 'first',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -234,12 +236,12 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '100',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 100,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //add 20 EUR if basket value is between 200 and 600 EUR (what happens at 100 sharp?), once per cart,
         //stopping further rules
-        $data['once_per_cart'][0]['rules'][1] = array(
+        $data['once_per_cart'][0]['rules'][1] = [
             'oxtitle'      => 'second',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -251,12 +253,12 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '600',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 200,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //add 30 EUR if basket value is between 0 and 600 EUR, once per cart,
         //stopping further rules
-        $data['once_per_cart'][0]['rules'][2] = array(
+        $data['once_per_cart'][0]['rules'][2] = [
             'oxtitle'      => 'third',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -268,8 +270,8 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '600',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 300,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //amount of articles to purchase
         $data['once_per_cart'][0]['buyamount'] = 10;
@@ -278,9 +280,9 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $data['once_per_cart'][0]['expected_delivery_costs'] = 10.0;
 
         //which rule should fit the basket
-        $data['once_per_cart'][0]['fits'] = array('first', 'third');
+        $data['once_per_cart'][0]['fits'] = ['first', 'third'];
 
-        $data['once_per_product'][0]                        = $data['once_per_cart'][0];
+        $data['once_per_product'][0] = $data['once_per_cart'][0];
         $data['once_per_product'][0]['rules'][0]['oxfixed'] = 1;
         $data['once_per_product'][0]['rules'][1]['oxfixed'] = 1;
         $data['once_per_product'][0]['rules'][2]['oxfixed'] = 1;
@@ -305,11 +307,11 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     public function testDeliveryCostRulesWithCategoryAssigned($data)
     {
         $testArticleId = $this->insertArticle();
-        $user          = $this->insertUser();
+        $user = $this->insertUser();
 
-        $deliveryIds = array();
+        $deliveryIds = [];
         foreach ($data['rules'] as $rule) {
-            $deliveryId    = $this->createRule($rule)->getId();
+            $deliveryId = $this->createRule($rule)->getId();
             $deliveryIds[] = $deliveryId;
             foreach ($this->categoryIds as $categoryId) {
                 $this->attachObject2Delivery($deliveryId, $categoryId, 'oxcategories');
@@ -337,7 +339,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             }
         }
 
-        $deliveryList = oxRegistry::get("oxDeliveryList")->getDeliveryList(
+        $deliveryList = oxRegistry::get('oxDeliveryList')->getDeliveryList(
             $basket,
             $user,
             $user->getActiveCountry(),
@@ -345,7 +347,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         );
         $this->assertTrue(0 < count($deliveryList));
 
-        $hasDeliveries = oxRegistry::get("oxDeliveryList")->hasDeliveries(
+        $hasDeliveries = oxRegistry::get('oxDeliveryList')->hasDeliveries(
             $basket,
             $user,
             $user->getActiveCountry(),
@@ -362,9 +364,9 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     public function providerQuantityCostRulesWithCategoryAssigned()
     {
-        $data = array();
+        $data = [];
 
-        $data['once_per_different_product'][0]['rules'][0] = array(
+        $data['once_per_different_product'][0]['rules'][0] = [
             'oxtitle'      => 'first',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -376,10 +378,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '3',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT,
             'oxsort'       => 100,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
-        $data['once_per_different_product'][0]['rules'][1] = array(
+        $data['once_per_different_product'][0]['rules'][1] = [
             'oxtitle'      => 'second',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -391,10 +393,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '11',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT,
             'oxsort'       => 200,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
-        $data['once_per_different_product'][0]['rules'][2] = array(
+        $data['once_per_different_product'][0]['rules'][2] = [
             'oxtitle'      => 'third',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -406,10 +408,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '9999',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT,
             'oxsort'       => 300,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
-        $data['once_per_different_product'][0]['rules'][3] = array(
+        $data['once_per_different_product'][0]['rules'][3] = [
             'oxtitle'      => 'fourth',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -421,94 +423,94 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '9999',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT,
             'oxsort'       => 400,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //what do we expect as result for shippings costs?
         $data['once_per_different_product'][0]['expected_costs'] = 0.0;
 
         //assign categories to delivery rules
-        $data['once_per_different_product'][0]['assign_cat'] = array(
-            'first'  => array('943927cd5d60751015b567794d3239bb', '94342f1d6f3b6fe9f1520d871f566511'),
-            'second' => array('943927cd5d60751015b567794d3239bb', '94342f1d6f3b6fe9f1520d871f566511'),
-            'third'  => array('943927cd5d60751015b567794d3239bb', '94342f1d6f3b6fe9f1520d871f566511'),
-            'fourth' => array('943202124f58e02e84bb228a9a2a9f1e')
-        );
+        $data['once_per_different_product'][0]['assign_cat'] = [
+            'first'  => ['943927cd5d60751015b567794d3239bb', '94342f1d6f3b6fe9f1520d871f566511'],
+            'second' => ['943927cd5d60751015b567794d3239bb', '94342f1d6f3b6fe9f1520d871f566511'],
+            'third'  => ['943927cd5d60751015b567794d3239bb', '94342f1d6f3b6fe9f1520d871f566511'],
+            'fourth' => ['943202124f58e02e84bb228a9a2a9f1e'],
+        ];
 
         //which rules should fit the basket
-        $data['once_per_different_product'][0]['rules_fit'] = array('third', 'fourth');
+        $data['once_per_different_product'][0]['rules_fit'] = ['third', 'fourth'];
 
         //buy amount of articles
-        $data['once_per_different_product'][0]['buyamount'] = array(12, 0, 1);
+        $data['once_per_different_product'][0]['buyamount'] = [12, 0, 1];
 
         //same dataset, but now once per cart
-        $data['once_per_cart']                           = $data['once_per_different_product'];
+        $data['once_per_cart'] = $data['once_per_different_product'];
         $data['once_per_cart'][0]['rules'][0]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
         $data['once_per_cart'][0]['rules'][1]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
         $data['once_per_cart'][0]['rules'][2]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
         $data['once_per_cart'][0]['rules'][3]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
-        $data['once_per_cart'][0]['expected_costs']      = 0.0;
-        $data['once_per_cart'][0]['buyamount']           = array(12, 0, 1);
+        $data['once_per_cart'][0]['expected_costs'] = 0.0;
+        $data['once_per_cart'][0]['buyamount'] = [12, 0, 1];
 
         //same dataset, but now once per different product
-        $data['once_per_product']                           = $data['once_per_different_product'];
+        $data['once_per_product'] = $data['once_per_different_product'];
         $data['once_per_product'][0]['rules'][0]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
         $data['once_per_product'][0]['rules'][1]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
         $data['once_per_product'][0]['rules'][2]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
         $data['once_per_product'][0]['rules'][3]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
-        $data['once_per_product'][0]['expected_costs']      = 0.0;
-        $data['once_per_product'][0]['buyamount']           = array(12, 0, 1);
+        $data['once_per_product'][0]['expected_costs'] = 0.0;
+        $data['once_per_product'][0]['buyamount'] = [12, 0, 1];
 
         //only third article
-        $data['once_per_product_goody_only']                      = $data['once_per_different_product'];
+        $data['once_per_product_goody_only'] = $data['once_per_different_product'];
         $data['once_per_product_goody_only'][0]['expected_costs'] = 2.9;
-        $data['once_per_product_goody_only'][0]['rules_fit']      = array('fourth');
-        $data['once_per_product_goody_only'][0]['buyamount']      = array(0, 0, 1);
+        $data['once_per_product_goody_only'][0]['rules_fit'] = ['fourth'];
+        $data['once_per_product_goody_only'][0]['buyamount'] = [0, 0, 1];
         ;
 
         //similar dataset, once per cart with three different products
-        $data['once_per_cart_three_products']                           = $data['once_per_different_product'];
+        $data['once_per_cart_three_products'] = $data['once_per_different_product'];
         $data['once_per_cart_three_products'][0]['rules'][0]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
         $data['once_per_cart_three_products'][0]['rules'][1]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
         $data['once_per_cart_three_products'][0]['rules'][2]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
         $data['once_per_cart_three_products'][0]['rules'][3]['oxfixed'] = oxDelivery::CALCULATION_RULE_ONCE_PER_CART;
-        $data['once_per_cart_three_products'][0]['expected_costs']      = 4.9;
-        $data['once_per_cart_three_products'][0]['rules_fit']           = array('first', 'fourth');
-        $data['once_per_cart_three_products'][0]['buyamount']           = array(1, 1, 1);
+        $data['once_per_cart_three_products'][0]['expected_costs'] = 4.9;
+        $data['once_per_cart_three_products'][0]['rules_fit'] = ['first', 'fourth'];
+        $data['once_per_cart_three_products'][0]['buyamount'] = [1, 1, 1];
 
         //similar dataset, once per product with three different products
-        $data['once_per_product_three_products']                           = $data['once_per_different_product'];
+        $data['once_per_product_three_products'] = $data['once_per_different_product'];
         $data['once_per_product_three_products'][0]['rules'][0]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
         $data['once_per_product_three_products'][0]['rules'][1]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
         $data['once_per_product_three_products'][0]['rules'][2]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
         $data['once_per_product_three_products'][0]['rules'][3]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_PRODUCT;
-        $data['once_per_product_three_products'][0]['expected_costs']      = 3 * 4.9;
-        $data['once_per_product_three_products'][0]['rules_fit']           = array('first', 'fourth');
-        $data['once_per_product_three_products'][0]['buyamount']           = array(2, 1, 1);
+        $data['once_per_product_three_products'][0]['expected_costs'] = 3 * 4.9;
+        $data['once_per_product_three_products'][0]['rules_fit'] = ['first', 'fourth'];
+        $data['once_per_product_three_products'][0]['buyamount'] = [2, 1, 1];
 
         //similar dataset, once per product with three different products
-        $data['once_per_different_product_three_products']                           = $data['once_per_different_product'];
+        $data['once_per_different_product_three_products'] = $data['once_per_different_product'];
         $data['once_per_different_product_three_products'][0]['rules'][0]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
         $data['once_per_different_product_three_products'][0]['rules'][1]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
         $data['once_per_different_product_three_products'][0]['rules'][2]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
         $data['once_per_different_product_three_products'][0]['rules'][3]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
-        $data['once_per_different_product_three_products'][0]['expected_costs']      = 2 * 4.9;
-        $data['once_per_different_product_three_products'][0]['rules_fit']           = array('first', 'fourth');
-        $data['once_per_different_product_three_products'][0]['buyamount']           = array(1, 1, 1);
+        $data['once_per_different_product_three_products'][0]['expected_costs'] = 2 * 4.9;
+        $data['once_per_different_product_three_products'][0]['rules_fit'] = ['first', 'fourth'];
+        $data['once_per_different_product_three_products'][0]['buyamount'] = [1, 1, 1];
 
         //similar dataset, once per different product with three different products
-        $data['once_per_different_product_three_products_rules']                           = $data['once_per_different_product'];
+        $data['once_per_different_product_three_products_rules'] = $data['once_per_different_product'];
         $data['once_per_different_product_three_products_rules'][0]['rules'][0]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
         $data['once_per_different_product_three_products_rules'][0]['rules'][1]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
         $data['once_per_different_product_three_products_rules'][0]['rules'][2]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
         $data['once_per_different_product_three_products_rules'][0]['rules'][3]['oxfixed'] = oxDelivery::CALCULATION_RULE_FOR_EACH_DIFFERENT_PRODUCT;
-        $data['once_per_different_product_three_products_rules'][0]['expected_costs']      = 4.9; //first matching rule is used
-        $data['once_per_different_product_three_products_rules'][0]['rules_fit']           = array(
+        $data['once_per_different_product_three_products_rules'][0]['expected_costs'] = 4.9; //first matching rule is used
+        $data['once_per_different_product_three_products_rules'][0]['rules_fit'] = [
             'first',
             'second',
-            'fourth'
-        );
-        $data['once_per_different_product_three_products_rules'][0]['buyamount']           = array(1, 4, 1);
+            'fourth',
+        ];
+        $data['once_per_different_product_three_products_rules'][0]['buyamount'] = [1, 4, 1];
 
         return $data;
     }
@@ -521,14 +523,14 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     public function testQuantityDeliveryCostRulesWithCategoryAssigned($data)
     {
-        $firstArticleId  = $this->insertArticle('UNIT-666', array('943927cd5d60751015b567794d3239bb'));
-        $secondArticleId = $this->insertArticle('UNIT-777', array('94342f1d6f3b6fe9f1520d871f566511'));
-        $thirdArticleId  = $this->insertArticle('UNIT-888', array('943202124f58e02e84bb228a9a2a9f1e')); //goody
-        $user            = $this->insertUser();
+        $firstArticleId = $this->insertArticle('UNIT-666', ['943927cd5d60751015b567794d3239bb']);
+        $secondArticleId = $this->insertArticle('UNIT-777', ['94342f1d6f3b6fe9f1520d871f566511']);
+        $thirdArticleId = $this->insertArticle('UNIT-888', ['943202124f58e02e84bb228a9a2a9f1e']); //goody
+        $user = $this->insertUser();
 
-        $deliveryIds = array();
+        $deliveryIds = [];
         foreach ($data['rules'] as $rule) {
-            $deliveryId    = $this->createRule($rule)->getId();
+            $deliveryId = $this->createRule($rule)->getId();
             $deliveryIds[] = $deliveryId;
             if (isset($data['assign_cat'][$rule['oxtitle']])) {
                 foreach ($data['assign_cat'][$rule['oxtitle']] as $categoryId) {
@@ -560,7 +562,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             }
         }
 
-        $deliveryList = oxRegistry::get("oxDeliveryList")->getDeliveryList(
+        $deliveryList = oxRegistry::get('oxDeliveryList')->getDeliveryList(
             $basket,
             $user,
             $user->getActiveCountry(),
@@ -568,7 +570,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         );
         $this->assertTrue(0 < count($deliveryList));
 
-        $hasDeliveries = oxRegistry::get("oxDeliveryList")->hasDeliveries(
+        $hasDeliveries = oxRegistry::get('oxDeliveryList')->hasDeliveries(
             $basket,
             $user,
             $user->getActiveCountry(),
@@ -585,10 +587,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     public function providerDeliveryCostRulesWithArticleAssigned()
     {
-        $data = array();
+        $data = [];
 
         //add 10 EUR if basket value is between 0 and 100 EUR, once per cart, stopping further rules
-        $data['once_per_cart'][0]['rules'][0] = array(
+        $data['once_per_cart'][0]['rules'][0] = [
             'oxtitle'      => 'first',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -600,12 +602,12 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '100',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 100,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //add 20 EUR if basket value is between 200 and 600 EUR (what happens at 100 sharp?), once per cart,
         //stopping further rules
-        $data['once_per_cart'][0]['rules'][1] = array(
+        $data['once_per_cart'][0]['rules'][1] = [
             'oxtitle'      => 'second',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -617,12 +619,12 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '600',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 200,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //add 30 EUR if basket value is between 0 and 600 EUR, once per cart,
         //stopping further rules
-        $data['once_per_cart'][0]['rules'][2] = array(
+        $data['once_per_cart'][0]['rules'][2] = [
             'oxtitle'      => 'third',
             'oxactive'     => 1,
             'oxactivefrom' => '0000-00-00 00:00:00',
@@ -634,8 +636,8 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             'oxparamend'   => '600',
             'oxfixed'      => oxDelivery::CALCULATION_RULE_ONCE_PER_CART,
             'oxsort'       => 300,
-            'oxfinalize'   => 1
-        );
+            'oxfinalize'   => 1,
+        ];
 
         //amount of articles to purchase
         $data['once_per_cart'][0]['buyamount'] = 10;
@@ -644,9 +646,9 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $data['once_per_cart'][0]['expected_delivery_costs'] = 10.0;
 
         //which rule should fit the basket
-        $data['once_per_cart'][0]['fits'] = array('first', 'third');
+        $data['once_per_cart'][0]['fits'] = ['first', 'third'];
 
-        $data['once_per_product'][0]                        = $data['once_per_cart'][0];
+        $data['once_per_product'][0] = $data['once_per_cart'][0];
         $data['once_per_product'][0]['rules'][0]['oxfixed'] = 1;
         $data['once_per_product'][0]['rules'][1]['oxfixed'] = 1;
         $data['once_per_product'][0]['rules'][2]['oxfixed'] = 1;
@@ -671,11 +673,11 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     public function testDeliveryCostRulesWithArticleAssigned($data)
     {
         $testArticleId = $this->insertArticle();
-        $user          = $this->insertUser();
+        $user = $this->insertUser();
 
-        $deliveryIds = array();
+        $deliveryIds = [];
         foreach ($data['rules'] as $rule) {
-            $deliveryId    = $this->createRule($rule)->getId();
+            $deliveryId = $this->createRule($rule)->getId();
             $deliveryIds[] = $deliveryId;
             $this->attachObject2Delivery($deliveryId, $testArticleId, 'oxarticles');
         }
@@ -701,7 +703,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
             }
         }
 
-        $deliveryList = oxRegistry::get("oxDeliveryList")->getDeliveryList(
+        $deliveryList = oxRegistry::get('oxDeliveryList')->getDeliveryList(
             $basket,
             $user,
             $user->getActiveCountry(),
@@ -709,7 +711,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         );
         $this->assertTrue(0 < count($deliveryList));
 
-        $hasDeliveries = oxRegistry::get("oxDeliveryList")->hasDeliveries(
+        $hasDeliveries = oxRegistry::get('oxDeliveryList')->hasDeliveries(
             $basket,
             $user,
             $user->getActiveCountry(),
@@ -721,8 +723,6 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $this->assertEquals($data['expected_delivery_costs'], $deliveryCost);
     }
 
-
-
     /**
      * Make a copy of article and variant for testing.
      *
@@ -730,7 +730,7 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     private function insertArticle($oxArtNum = '666-T-V', $categories = null)
     {
-        $testArticleId       = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
+        $testArticleId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
         $testArticleParentId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
 
         //copy from original article parent and variant
@@ -746,10 +746,10 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $article->load(self::SOURCE_ARTICLE_ID);
         $article->setId($testArticleId);
         $article->oxarticles__oxparentid = new oxField($testArticleParentId, oxField::T_RAW);
-        $article->oxarticles__oxprice    = new oxField(self::TEST_ARTICLE_PRICE, oxField::T_RAW);
-        $article->oxarticles__oxartnum   = new oxField($oxArtNum, oxField::T_RAW);
-        $article->oxarticles__oxactive   = new oxField('1', oxField::T_RAW);
-        $article->oxarticles__oxstock    = new oxField('1000', oxField::T_RAW);
+        $article->oxarticles__oxprice = new oxField(self::TEST_ARTICLE_PRICE, oxField::T_RAW);
+        $article->oxarticles__oxartnum = new oxField($oxArtNum, oxField::T_RAW);
+        $article->oxarticles__oxactive = new oxField('1', oxField::T_RAW);
+        $article->oxarticles__oxstock = new oxField('1000', oxField::T_RAW);
         $article->save();
 
         //attach article to category in oxobject2category
@@ -777,36 +777,36 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
         $user = oxNew('oxUser');
         $user->setId($this->testUserId);
 
-        $user->oxuser__oxactive    = new oxField('1', oxField::T_RAW);
-        $user->oxuser__oxrights    = new oxField('user', oxField::T_RAW);
-        $user->oxuser__oxshopid    = new oxField('1', oxField::T_RAW);
-        $user->oxuser__oxusername  = new oxField('testuser@oxideshop.dev', oxField::T_RAW);
-        $user->oxuser__oxpassword  = new oxField(
+        $user->oxuser__oxactive = new oxField('1', oxField::T_RAW);
+        $user->oxuser__oxrights = new oxField('user', oxField::T_RAW);
+        $user->oxuser__oxshopid = new oxField('1', oxField::T_RAW);
+        $user->oxuser__oxusername = new oxField('testuser@oxideshop.dev', oxField::T_RAW);
+        $user->oxuser__oxpassword = new oxField(
             'c630e7f6dd47f9ad60ece4492468149bfed3da3429940181464baae99941d0ffa5562' .
                                                  'aaecd01eab71c4d886e5467c5fc4dd24a45819e125501f030f61b624d7d',
             oxField::T_RAW
         ); //password is asdfasdf
-        $user->oxuser__oxpasssalt  = new oxField('3ddda7c412dbd57325210968cd31ba86', oxField::T_RAW);
-        $user->oxuser__oxcustnr    = new oxField('666', oxField::T_RAW);
-        $user->oxuser__oxfname     = new oxField('Bla', oxField::T_RAW);
-        $user->oxuser__oxlname     = new oxField('Foo', oxField::T_RAW);
-        $user->oxuser__oxstreet    = new oxField('blafoostreet', oxField::T_RAW);
-        $user->oxuser__oxstreetnr  = new oxField('123', oxField::T_RAW);
-        $user->oxuser__oxcity      = new oxField('Hamburg', oxField::T_RAW);
+        $user->oxuser__oxpasssalt = new oxField('3ddda7c412dbd57325210968cd31ba86', oxField::T_RAW);
+        $user->oxuser__oxcustnr = new oxField('666', oxField::T_RAW);
+        $user->oxuser__oxfname = new oxField('Bla', oxField::T_RAW);
+        $user->oxuser__oxlname = new oxField('Foo', oxField::T_RAW);
+        $user->oxuser__oxstreet = new oxField('blafoostreet', oxField::T_RAW);
+        $user->oxuser__oxstreetnr = new oxField('123', oxField::T_RAW);
+        $user->oxuser__oxcity = new oxField('Hamburg', oxField::T_RAW);
         $user->oxuser__oxcountryid = new oxField('a7c40f631fc920687.20179984', oxField::T_RAW);
-        $user->oxuser__oxzip       = new oxField('22769', oxField::T_RAW);
-        $user->oxuser__oxsal       = new oxField('MR', oxField::T_RAW);
-        $user->oxuser__oxactive    = new oxField('1', oxField::T_RAW);
-        $user->oxuser__oxboni      = new oxField('1000', oxField::T_RAW);
-        $user->oxuser__oxcreate    = new oxField('2015-05-20 22:10:51', oxField::T_RAW);
-        $user->oxuser__oxregister  = new oxField('2015-05-20 22:10:51', oxField::T_RAW);
-        $user->oxuser__oxboni      = new oxField('1000', oxField::T_RAW);
+        $user->oxuser__oxzip = new oxField('22769', oxField::T_RAW);
+        $user->oxuser__oxsal = new oxField('MR', oxField::T_RAW);
+        $user->oxuser__oxactive = new oxField('1', oxField::T_RAW);
+        $user->oxuser__oxboni = new oxField('1000', oxField::T_RAW);
+        $user->oxuser__oxcreate = new oxField('2015-05-20 22:10:51', oxField::T_RAW);
+        $user->oxuser__oxregister = new oxField('2015-05-20 22:10:51', oxField::T_RAW);
+        $user->oxuser__oxboni = new oxField('1000', oxField::T_RAW);
 
         $user->save();
 
         $newId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
-        $oDb   = oxDb::getDb();
-        $sQ    = 'insert into `oxobject2delivery` (oxid, oxdeliveryid, oxobjectid, oxtype ) ' .
+        $oDb = oxDb::getDb();
+        $sQ = 'insert into `oxobject2delivery` (oxid, oxdeliveryid, oxobjectid, oxtype ) ' .
                  " values ('$newId', 'oxidstandard', '" . $this->testUserId . "', 'oxdelsetu')";
         $oDb->execute($sQ);
 
@@ -824,13 +824,13 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
      */
     private function createRule($data)
     {
-        $deliveryId                    = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
+        $deliveryId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
         $this->deliveries[$deliveryId] = $data['oxtitle'];
-        $delivery                      = oxNew('oxDelivery');
+        $delivery = oxNew('oxDelivery');
         $delivery->setId($deliveryId);
 
         foreach ($data as $oxcolumn => $value) {
-            $oxkey            = 'oxdelivery__' . $oxcolumn;
+            $oxkey = 'oxdelivery__' . $oxcolumn;
             $delivery->$oxkey = new oxField($value, oxField::T_RAW);
         }
         $delivery->save();
@@ -849,9 +849,9 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     private function createDeliverySet($ruleIds, $title = 'shippingCostRulesTest')
     {
         $deliverySetId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
-        $deliveryset   = oxNew('oxDeliverySet');
+        $deliveryset = oxNew('oxDeliverySet');
         $deliveryset->setId($deliverySetId);
-        $deliveryset->oxdeliveryset__oxtitle  = new oxField($title, oxField::T_RAW);
+        $deliveryset->oxdeliveryset__oxtitle = new oxField($title, oxField::T_RAW);
         $deliveryset->oxdeliveryset__oxactive = new oxField('1', oxField::T_RAW);
         $deliveryset->save();
 
@@ -872,11 +872,11 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     private function attachDelivery2DeliverySet($deliverySetId, $deliveryId)
     {
         $delivery2deliverySetId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
-        $delivery2deliverySet   = oxNew('oxBase');
+        $delivery2deliverySet = oxNew('oxBase');
         $delivery2deliverySet->init('oxdel2delset');
 
         $delivery2deliverySet->setId($delivery2deliverySetId);
-        $delivery2deliverySet->oxdel2delset__oxdelid    = new oxField($deliveryId, oxField::T_RAW);
+        $delivery2deliverySet->oxdel2delset__oxdelid = new oxField($deliveryId, oxField::T_RAW);
         $delivery2deliverySet->oxdel2delset__oxdelsetid = new oxField($deliverySetId, oxField::T_RAW);
         $delivery2deliverySet->save();
     }
@@ -891,13 +891,13 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     private function attachObject2Delivery($deliveryId, $objectId, $type)
     {
         $object2DeliveryId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
-        $object2Delivery   = oxNew('oxBase');
+        $object2Delivery = oxNew('oxBase');
         $object2Delivery->init('oxobject2delivery');
 
         $object2Delivery->setId($object2DeliveryId);
         $object2Delivery->oxobject2delivery__oxdeliveryid = new oxField($deliveryId, oxField::T_RAW);
-        $object2Delivery->oxobject2delivery__oxobjectid   = new oxField($objectId, oxField::T_RAW);
-        $object2Delivery->oxobject2delivery__oxtype       = new oxField($type, oxField::T_RAW);
+        $object2Delivery->oxobject2delivery__oxobjectid = new oxField($objectId, oxField::T_RAW);
+        $object2Delivery->oxobject2delivery__oxtype = new oxField($type, oxField::T_RAW);
         $object2Delivery->save();
     }
 
@@ -907,13 +907,13 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     private function attachDeliveryset2Payment($deliverySetId)
     {
         $object2PaymenId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
-        $object2Payment  = oxNew('oxBase');
+        $object2Payment = oxNew('oxBase');
         $object2Payment->init('oxobject2payment');
 
         $object2Payment->setId($object2PaymenId);
         $object2Payment->oxobject2payment__oxpaymentid = new oxField('oxidinvoice', oxField::T_RAW);
-        $object2Payment->oxobject2payment__oxobjectid  = new oxField($deliverySetId, oxField::T_RAW);
-        $object2Payment->oxobject2payment__oxtype      = new oxField('oxdelset', oxField::T_RAW);
+        $object2Payment->oxobject2payment__oxobjectid = new oxField($deliverySetId, oxField::T_RAW);
+        $object2Payment->oxobject2payment__oxtype = new oxField('oxdelset', oxField::T_RAW);
         $object2Payment->save();
     }
 
@@ -923,11 +923,11 @@ class DeliveryShippingCostCalculationTest extends \OxidTestCase
     private function attachArticle2Category($articleId, $categoryId)
     {
         $object2CategoryId = substr_replace(oxRegistry::getUtilsObject()->generateUId(), '_', 0, 1);
-        $object2Category   = oxNew('oxObject2Category');
+        $object2Category = oxNew('oxObject2Category');
 
         $object2Category->setId($object2CategoryId);
         $object2Category->oxobject2category__oxobjectid = new oxField($articleId, oxField::T_RAW);
-        $object2Category->oxobject2category__oxcatnid   = new oxField($categoryId, oxField::T_RAW);
+        $object2Category->oxobject2category__oxcatnid = new oxField($categoryId, oxField::T_RAW);
         $object2Category->save();
     }
 }

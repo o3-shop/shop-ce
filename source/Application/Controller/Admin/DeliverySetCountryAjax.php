@@ -39,7 +39,7 @@ class DeliverySetCountryAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxcountry', 1, 1, 0],
             ['oxisoalpha2', 'oxcountry', 1, 0, 0],
@@ -87,7 +87,7 @@ class DeliverySetCountryAjax extends ListComponentAjax
             $sQAdd = " from {$sCountryTable} where {$sCountryTable}.oxactive = '1' ";
         } else {
             $sQAdd = " from oxobject2delivery, {$sCountryTable} " .
-                     "where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) .
+                     'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) .
                      " and oxobject2delivery.oxobjectid = {$sCountryTable}.oxid " .
                      "and oxobject2delivery.oxtype = 'oxdelset' ";
         }
@@ -95,7 +95,7 @@ class DeliverySetCountryAjax extends ListComponentAjax
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= "and {$sCountryTable}.oxid not in ( select {$sCountryTable}.oxid " .
                       "from oxobject2delivery, {$sCountryTable} " .
-                      "where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) .
+                      'where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) .
                       "and oxobject2delivery.oxobjectid = {$sCountryTable}.oxid " .
                       "and oxobject2delivery.oxtype = 'oxdelset' ) ";
         }
@@ -111,11 +111,11 @@ class DeliverySetCountryAjax extends ListComponentAjax
         $aChosenCntr = $this->getActionIds('oxobject2delivery.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sChosenCountries = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr));
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sChosenCountries . ") ";
+            $sChosenCountries = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr));
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $sChosenCountries . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -134,13 +134,13 @@ class DeliverySetCountryAjax extends ListComponentAjax
             $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
                 $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
                 $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenCntr);
-                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxdelset");
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxdelset');
                 $oObject2Delivery->save();
             }
         }

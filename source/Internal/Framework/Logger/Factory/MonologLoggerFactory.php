@@ -54,7 +54,6 @@ class MonologLoggerFactory implements LoggerFactoryInterface
         $this->configuration = $configuration;
     }
 
-
     /**
      * @return LoggerInterface
      */

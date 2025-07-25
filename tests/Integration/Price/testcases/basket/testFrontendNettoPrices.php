@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: netto;
@@ -12,79 +13,75 @@
  * Discounts: -;
  * Short description: test added from selenium test (testFrontendNettoPrices) ;Checking when prices are entered in NETTO
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             // oxarticles db fields
             'oxid'                     => 1000,
             'oxprice'                  => 50.00,
             'oxvat'                    => 5,
             // Amount in basket
             'amount'                   => 3,
-        ),
-
-    ),
+        ],
+    ],
     // Additional costs
-    'costs' => array(
+    'costs' => [
         // oxwrapping db fields
-        'wrapping' => array(
+        'wrapping' => [
             // Wrapping
-            0 => array(
+            0 => [
                 'oxtype' => 'WRAP',
                 'oxname' => 'Test wrapping [EN] ðÄßü?',
                 'oxprice' => 0.9,
                 'oxactive' => 1,
                 // If for article, specify here
-                'oxarticles' => array( 1000 )
-            ),
+                'oxarticles' => [ 1000 ],
+            ],
             // Giftcard
-            1 => array(
+            1 => [
                 'oxtype' => 'CARD',
                 'oxname' => 'Test card [EN] ðÄßü',
                 'oxprice' => 0.20,
                 'oxactive' => 1,
-            ),
-        ),
-
-
-    ),
+            ],
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-            1000 => array( '52,50', '157,50' ),
-        ),
+        'articles' => [
+            1000 => [ '52,50', '157,50' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '157,50',
             // Total NETTO
             'totalNetto'  => '150,00',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
-                5 => '7,50'
-            ),
+            'vats' => [
+                5 => '7,50',
+            ],
             // Total wrapping amounts
-            'wrapping' => array(
+            'wrapping' => [
                 'brutto' => '2,84',
-            ),
+            ],
             // Total giftcard amounts
-            'giftcard' => array(
+            'giftcard' => [
                 'brutto' => '0,21',
-
-            ),
+            ],
             // GRAND TOTAL
-            'grandTotal'  => '160,55'
-        ),
-    ),
-       'options' => array(
-            'config' => array(
+            'grandTotal'  => '160,55',
+        ],
+    ],
+       'options' => [
+            'config' => [
                 'blShowNetPrice' => false,
                 'blEnterNetPrice' => true,
                 'blWrappingVatOnTop' =>true,
                 'blDeliveryVatOnTop' => true,
-            ),
+            ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

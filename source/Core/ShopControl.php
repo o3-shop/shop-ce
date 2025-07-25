@@ -28,12 +28,12 @@ use OxidEsales\Eshop\Core\Exception\RoutingException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeHeadersSendEvent;
+use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
 use oxOutput;
 use oxSystemComponentException;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReflectionMethod;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
-use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\BeforeHeadersSendEvent;
 
 /**
  * Main shop actions controller. Processes user actions, logs
@@ -99,7 +99,6 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      * @var array
      */
     protected $_aControllerErrors = null;
-
 
     /**
      * output handler object
@@ -182,7 +181,6 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         return 0;
     }
 
-
     /**
      * @deprecated since v6.0 (2017-02-03). Use ShopControl::getStartControllerKey() instead.
      *
@@ -222,7 +220,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         if (!$controllerKey) {
             $session = \OxidEsales\Eshop\Core\Registry::getSession();
             if ($this->isAdmin()) {
-                $controllerKey = $session->getVariable("auth") ? 'admin_start' : 'login';
+                $controllerKey = $session->getVariable('auth') ? 'admin_start' : 'login';
             } else {
                 $controllerKey = $this->getFrontendStartControllerKey();
             }
@@ -502,7 +500,7 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
             $ex->setMessage('EXCEPTION_SYSTEMCOMPONENT_TEMPLATENOTFOUND' . ' ' . $templateName);
             $ex->setComponent($templateName);
 
-            $templateName = "message/exception.tpl";
+            $templateName = 'message/exception.tpl';
 
             if ($this->_isDebugMode()) {
                 \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($ex);
@@ -618,8 +616,8 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
                 $tpl = 'message/err_setup.tpl';
                 $activeView = oxNew(\OxidEsales\Eshop\Application\Controller\FrontendController::class);
                 $context = [
-                    "oViewConf" => $activeView->getViewConfig(),
-                    "oView"     => $activeView
+                    'oViewConf' => $activeView->getViewConfig(),
+                    'oView'     => $activeView,
                 ];
                 $renderer = $this->getRenderer();
                 $errorOutput = $renderer->renderTemplate($tpl, $context);
@@ -648,7 +646,6 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
         if ($this->getConfig()->isProductiveMode() && !ini_get('log_errors')) {
             $errorReporting = 0;
         }
-
 
         return $errorReporting;
     }
@@ -961,8 +958,8 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
                 Date: {$date}
                 Shop: {$failedShop}
 
-                mysql error: " . $exception->getMessage() . "
-                mysql error no: " . $exception->getCode() . "
+                mysql error: " . $exception->getMessage() . '
+                mysql error no: ' . $exception->getCode() . "
 
                 Script: {$script}
                 Referrer: {$referrer}";
@@ -980,9 +977,9 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
              * */
             $mailer->Priority = 1;
             /** MS Outlook custom header */
-            $mailer->addCustomHeader("X-MSMail-Priority: Urgent");
+            $mailer->addCustomHeader('X-MSMail-Priority: Urgent');
             /** Set the Importance header: */
-            $mailer->addCustomHeader("Importance: High");
+            $mailer->addCustomHeader('Importance: High');
 
             $result = $mailer->send();
         }

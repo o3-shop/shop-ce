@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -25,7 +27,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class ModuleListTest extends \OxidTestCase
 {
-
     /**
      * test setup
      *
@@ -59,8 +60,8 @@ class ModuleListTest extends \OxidTestCase
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
 
-        $aModules = array();
-        $aModulesArray = array();
+        $aModules = [];
+        $aModulesArray = [];
         $this->assertEquals($aModules, $oModuleList->buildModuleChains($aModulesArray));
     }
 
@@ -73,8 +74,8 @@ class ModuleListTest extends \OxidTestCase
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
 
-        $aModules = array('oxtest' => 'test/mytest');
-        $aModulesArray = array('oxtest' => array('test/mytest'));
+        $aModules = ['oxtest' => 'test/mytest'];
+        $aModulesArray = ['oxtest' => ['test/mytest']];
         $this->assertEquals($aModules, $oModuleList->buildModuleChains($aModulesArray));
     }
 
@@ -87,8 +88,8 @@ class ModuleListTest extends \OxidTestCase
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
 
-        $aModules = array('oxtest' => 'test/mytest&test1/mytest1');
-        $aModulesArray = array('oxtest' => array('test/mytest', 'test1/mytest1'));
+        $aModules = ['oxtest' => 'test/mytest&test1/mytest1'];
+        $aModulesArray = ['oxtest' => ['test/mytest', 'test1/mytest1']];
         $this->assertEquals($aModules, $oModuleList->buildModuleChains($aModulesArray));
     }
 
@@ -101,8 +102,8 @@ class ModuleListTest extends \OxidTestCase
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
 
-        $aAllModules = array();
-        $aRemModules = array();
+        $aAllModules = [];
+        $aRemModules = [];
         $this->assertEquals($aAllModules, $oModuleList->diffModuleArrays($aAllModules, $aRemModules));
     }
 
@@ -114,9 +115,9 @@ class ModuleListTest extends \OxidTestCase
     public function testDiffModuleArraysRemoveSingle()
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
-        $aAllModules = array('oxtest' => array('test/mytest'));
-        $aRemModules = array('oxtest' => 'test/mytest');
-        $aMrgModules = array();
+        $aAllModules = ['oxtest' => ['test/mytest']];
+        $aRemModules = ['oxtest' => 'test/mytest'];
+        $aMrgModules = [];
         $this->assertEquals($aMrgModules, $oModuleList->diffModuleArrays($aAllModules, $aRemModules));
     }
 
@@ -128,9 +129,9 @@ class ModuleListTest extends \OxidTestCase
     public function testDiffModuleArraysRemove()
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
-        $aAllModules = array('oxtest' => array('test/mytest'));
-        $aRemModules = array('oxtest' => array('test/mytest'));
-        $aMrgModules = array();
+        $aAllModules = ['oxtest' => ['test/mytest']];
+        $aRemModules = ['oxtest' => ['test/mytest']];
+        $aMrgModules = [];
         $this->assertEquals($aMrgModules, $oModuleList->diffModuleArrays($aAllModules, $aRemModules));
     }
 
@@ -142,9 +143,9 @@ class ModuleListTest extends \OxidTestCase
     public function testDiffModuleArraysRemoveChain()
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
-        $aAllModules = array('oxtest' => array('test/mytest', 'test1/mytest1'));
-        $aRemModules = array('oxtest' => array('test1/mytest1'));
-        $aMrgModules = array('oxtest' => array('test/mytest'));
+        $aAllModules = ['oxtest' => ['test/mytest', 'test1/mytest1']];
+        $aRemModules = ['oxtest' => ['test1/mytest1']];
+        $aMrgModules = ['oxtest' => ['test/mytest']];
         $this->assertEquals($aMrgModules, $oModuleList->diffModuleArrays($aAllModules, $aRemModules));
     }
 
@@ -156,9 +157,9 @@ class ModuleListTest extends \OxidTestCase
     public function testDiffModuleArraysRemoveChainAndKey()
     {
         $oModuleList = $this->getProxyClass('oxmodulelist');
-        $aAllModules = array('oxtest' => array('test/mytest', 'test1/mytest1'), 'oxtest2' => array('test2/mytest2'));
-        $aRemModules = array('oxtest' => array('test/mytest'), 'oxtest2' => array('test2/mytest2'));
-        $aMrgModules = array('oxtest' => array('test1/mytest1'));
+        $aAllModules = ['oxtest' => ['test/mytest', 'test1/mytest1'], 'oxtest2' => ['test2/mytest2']];
+        $aRemModules = ['oxtest' => ['test/mytest'], 'oxtest2' => ['test2/mytest2']];
+        $aMrgModules = ['oxtest' => ['test1/mytest1']];
         $this->assertEquals($aMrgModules, $oModuleList->diffModuleArrays($aAllModules, $aRemModules));
     }
 
@@ -169,12 +170,12 @@ class ModuleListTest extends \OxidTestCase
      */
     public function testGetActiveModuleInfoPathsNotSet()
     {
-        $modulePaths = array(
+        $modulePaths = [
             'testExt1' => 'testExt1',
-            'testExt2' => 'testExt2'
-        );
+            'testExt2' => 'testExt2',
+        ];
 
-        $oModuleList = $this->getMock(\OxidEsales\Eshop\Core\Module\ModuleList::class, array('getModuleConfigParametersByKey'));
+        $oModuleList = $this->getMock(\OxidEsales\Eshop\Core\Module\ModuleList::class, ['getModuleConfigParametersByKey']);
         $oModuleList->expects($this->once())->method('getModuleConfigParametersByKey')->with('Paths')->willReturn($modulePaths);
 
         $this->assertEquals($modulePaths, $oModuleList->getActiveModuleInfo());
@@ -187,12 +188,12 @@ class ModuleListTest extends \OxidTestCase
      */
     public function testGetModulePaths()
     {
-        $aModulePaths = array(
+        $aModulePaths = [
             'testExt1' => 'testExt1/testExt11',
-            'testExt2' => 'testExt2'
-        );
+            'testExt2' => 'testExt2',
+        ];
 
-        $this->getConfig()->setConfigParam("aModulePaths", $aModulePaths);
+        $this->getConfig()->setConfigParam('aModulePaths', $aModulePaths);
 
         $oModuleList = $this->getProxyClass('oxmodulelist');
 
@@ -208,7 +209,7 @@ class ModuleListTest extends \OxidTestCase
             ['module1', false],
             ['vendor1', true],
             ['notVendor', false],
-            ['this_directory_does_not_exist', false]
+            ['this_directory_does_not_exist', false],
         ];
     }
 
@@ -222,19 +223,19 @@ class ModuleListTest extends \OxidTestCase
         $structure = [
             'modules' => [
                 'module1' => [
-                    'metadata.php' => '<?php'
+                    'metadata.php' => '<?php',
                 ],
                 'vendor1' => [
                     'module2' => [
-                        'metadata.php' => '<?php'
-                    ]
+                        'metadata.php' => '<?php',
+                    ],
                 ],
                 'notVendor' => [
                     'someDirectory' => [
-                        'file.php' => '<?php'
-                    ]
-                ]
-            ]
+                        'file.php' => '<?php',
+                    ],
+                ],
+            ],
         ];
         $vfsStream = $this->getVfsStreamWrapper();
         $vfsStream->createStructure($structure);
@@ -248,9 +249,9 @@ class ModuleListTest extends \OxidTestCase
 
     public function testGetModuleFilesWhenFileWasSet()
     {
-        $aModuleFiles = array(
-            'myext1' => array("title" => "test title 1")
-        );
+        $aModuleFiles = [
+            'myext1' => ['title' => 'test title 1'],
+        ];
         $this->getConfig()->setConfigParam('aModuleFiles', $aModuleFiles);
         $oModuleList = oxNew('oxModuleList');
 
@@ -259,11 +260,11 @@ class ModuleListTest extends \OxidTestCase
 
     public function testGetModuleFilesWhenFileWasNotSet()
     {
-        $this->getConfig()->setConfigParam('aModuleFiles', array());
+        $this->getConfig()->setConfigParam('aModuleFiles', []);
 
         $oModuleList = oxNew('oxModuleList');
 
-        $this->assertSame(array(), $oModuleList->getModuleFiles());
+        $this->assertSame([], $oModuleList->getModuleFiles());
     }
 
     /**
@@ -274,8 +275,8 @@ class ModuleListTest extends \OxidTestCase
     public function testParseModuleChainsEmpty()
     {
         $moduleList = oxNew(\OxidEsales\Eshop\Core\Module\ModuleList::class);
-        $modules = array();
-        $modulesArray = array();
+        $modules = [];
+        $modulesArray = [];
         $this->assertEquals($modulesArray, $moduleList->parseModuleChains($modules));
     }
 
@@ -287,8 +288,8 @@ class ModuleListTest extends \OxidTestCase
     public function testParseModuleChainsSingle()
     {
         $moduleList = oxNew(\OxidEsales\Eshop\Core\Module\ModuleList::class);
-        $modules = array('oxtest' => 'test/mytest');
-        $modulesArray = array('oxtest' => array('test/mytest'));
+        $modules = ['oxtest' => 'test/mytest'];
+        $modulesArray = ['oxtest' => ['test/mytest']];
         $this->assertEquals($modulesArray, $moduleList->parseModuleChains($modules));
     }
 
@@ -300,8 +301,8 @@ class ModuleListTest extends \OxidTestCase
     public function testParseModuleChains()
     {
         $moduleList = oxNew(\OxidEsales\Eshop\Core\Module\ModuleList::class);
-        $modules = array('oxtest' => 'test/mytest&test1/mytest1');
-        $modulesArray = array('oxtest' => array('test/mytest', 'test1/mytest1'));
+        $modules = ['oxtest' => 'test/mytest&test1/mytest1'];
+        $modulesArray = ['oxtest' => ['test/mytest', 'test1/mytest1']];
         $this->assertEquals($modulesArray, $moduleList->parseModuleChains($modules));
     }
 }

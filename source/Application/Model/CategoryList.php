@@ -21,12 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Category list manager.
@@ -244,7 +244,7 @@ class CategoryList extends ListModel
         // load complete tree of active category, if it exists
         if ($oCat) {
             // select children here, siblings will be selected from union
-            $sDepthSnippet .= " or ($sViewName.oxparentid = " . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ")";
+            $sDepthSnippet .= " or ($sViewName.oxparentid = " . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxid->value) . ')';
         }
 
         // load 1'st category level (roots)
@@ -282,12 +282,12 @@ class CategoryList extends ListModel
 
         $sViewName = $this->getBaseObject()->getViewName();
 
-        return "UNION SELECT " . $this->_getSqlSelectFieldsForTree('maincats', $aColumns)
-               . " FROM oxcategories AS subcats"
+        return 'UNION SELECT ' . $this->_getSqlSelectFieldsForTree('maincats', $aColumns)
+               . ' FROM oxcategories AS subcats'
                . " LEFT JOIN $sViewName AS maincats on maincats.oxparentid = subcats.oxparentid"
-               . " WHERE subcats.oxrootid = " . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
-               . " AND subcats.oxleft <= " . (int) $oCat->oxcategories__oxleft->value
-               . " AND subcats.oxright >= " . (int) $oCat->oxcategories__oxright->value;
+               . ' WHERE subcats.oxrootid = ' . DatabaseProvider::getDb()->quote($oCat->oxcategories__oxrootid->value)
+               . ' AND subcats.oxleft <= ' . (int) $oCat->oxcategories__oxleft->value
+               . ' AND subcats.oxright >= ' . (int) $oCat->oxcategories__oxright->value;
     }
 
     /**
@@ -325,7 +325,7 @@ class CategoryList extends ListModel
      */
     public function buildTree($sActCat)
     {
-        startProfile("buildTree");
+        startProfile('buildTree');
 
         $this->_sActCat = $sActCat;
         $this->load();
@@ -348,7 +348,7 @@ class CategoryList extends ListModel
             $this->_ppBuildTree();
         }
 
-        stopProfile("buildTree");
+        stopProfile('buildTree');
     }
 
     /**
@@ -567,9 +567,9 @@ class CategoryList extends ListModel
      * @return array $aTree
      * @deprecated underscore prefix violates PSR12, will be renamed to "addDepthInfo" in next major
      */
-    protected function _addDepthInfo($aTree, $oCat, $sDepth = "") // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _addDepthInfo($aTree, $oCat, $sDepth = '') // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDepth .= "-";
+        $sDepth .= '-';
         $oCat->oxcategories__oxtitle->setValue($sDepth . ' ' . $oCat->oxcategories__oxtitle->value);
         $aTree[$oCat->getId()] = $oCat;
         $aSubCats = $oCat->getSubCats();
@@ -606,7 +606,7 @@ class CategoryList extends ListModel
             $rs = $database->select("select oxid, oxtitle from oxcategories where oxparentid = 'oxrootid' and $sWhere order by oxsort", false);
             if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
-                    $this->_aUpdateInfo[] = "<b>Processing : " . $rs->fields[1] . "</b>(" . $rs->fields[0] . ")<br>";
+                    $this->_aUpdateInfo[] = '<b>Processing : ' . $rs->fields[1] . '</b>(' . $rs->fields[0] . ')<br>';
                     if ($blVerbose) {
                         echo next($this->_aUpdateInfo);
                     }
@@ -674,12 +674,12 @@ class CategoryList extends ListModel
         }
 
         // Get sub categories of root categories
-        $database->execute("update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid", [
+        $database->execute('update oxcategories set oxrootid = :oxrootid where oxparentid = :oxparentid', [
             ':oxrootid' => $thisRoot,
-            ':oxparentid' => $oxRootId
+            ':oxparentid' => $oxRootId,
         ]);
-        $rs = $database->select("select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort", [
-            ':oxparentid' => $oxRootId
+        $rs = $database->select('select oxid, oxparentid from oxcategories where oxparentid = :oxparentid order by oxsort', [
+            ':oxparentid' => $oxRootId,
         ]);
         // If there are sub categories
         if ($rs && $rs->count() > 0) {
@@ -688,8 +688,8 @@ class CategoryList extends ListModel
                 $actOxid = $rs->fields[0];
 
                 // Get the data of the parent category to the current Cat
-                $rs3 = $database->select("select oxrootid, oxright from oxcategories where oxid = :oxid", [
-                    ':oxid' => $parentId
+                $rs3 = $database->select('select oxrootid, oxright from oxcategories where oxid = :oxid', [
+                    ':oxid' => $parentId,
                 ]);
                 while (!$rs3->EOF) {
                     $parentOxRootId = $rs3->fields[0];
@@ -697,31 +697,31 @@ class CategoryList extends ListModel
                     $rs3->fetchRow();
                 }
 
-                $query = "update oxcategories set oxleft = oxleft + 2
+                $query = 'update oxcategories set oxleft = oxleft + 2
                           where oxrootid = :oxrootid and
                                 oxleft > :parentRight and
                                 oxright >= :parentRight and
-                                oxid != :oxid";
+                                oxid != :oxid';
                 $database->execute($query, [
                     ':oxrootid' => $parentOxRootId,
                     ':parentRight' => $parentRight,
-                    ':oxid' => $actOxid
+                    ':oxid' => $actOxid,
                 ]);
 
-                $query = "update oxcategories set oxright = oxright + 2
+                $query = 'update oxcategories set oxright = oxright + 2
                           where oxrootid = :oxrootid and
                                 oxright >= :oxright and
-                                oxid != :oxid";
+                                oxid != :oxid';
                 $database->execute($query, [
                     ':oxrootid' => $parentOxRootId,
                     ':oxright' => $parentRight,
-                    ':oxid' => $actOxid
+                    ':oxid' => $actOxid,
                 ]);
 
-                $query = "update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1) where oxid = :oxid";
+                $query = 'update oxcategories set oxleft = :parentRight, oxright = (:parentRight + 1) where oxid = :oxid';
                 $database->execute($query, [
                     ':parentRight' => $parentRight,
-                    ':oxid' => $actOxid
+                    ':oxid' => $actOxid,
                 ]);
                 $this->_updateNodes($actOxid, false, $thisRoot);
                 $rs->fetchRow();

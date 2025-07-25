@@ -254,7 +254,7 @@ class UserController extends FrontendController
     public function isDownloadableProductWarning()
     {
         $basket = Registry::getSession()->getBasket();
-        if ($basket && Registry::getConfig()->getConfigParam("blEnableDownloads")) {
+        if ($basket && Registry::getConfig()->getConfigParam('blEnableDownloads')) {
             if ($basket->hasDownloadableProducts()) {
                 return true;
             }

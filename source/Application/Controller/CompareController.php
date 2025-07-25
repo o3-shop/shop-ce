@@ -275,7 +275,6 @@ class CompareController extends FrontendController
         $this->_setArticlesPerPage(0);
     }
 
-
     /**
      * Template variable getter. Returns comparison's article
      * list in order per page

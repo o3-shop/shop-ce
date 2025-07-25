@@ -21,7 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Component;
 
+use Exception;
 use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\User\UserShippingAddressUpdatableFields;
+use OxidEsales\Eshop\Application\Model\User\UserUpdatableFields;
+use OxidEsales\Eshop\Core\Contract\AbstractUpdatableFields;
 use OxidEsales\Eshop\Core\Controller\BaseController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
@@ -33,15 +37,11 @@ use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Field;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Form\FormFields;
 use OxidEsales\Eshop\Core\Form\FormFieldsTrimmer;
 use OxidEsales\Eshop\Core\Form\UpdatableFieldsConstructor;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
-use Exception;
-use OxidEsales\Eshop\Core\Contract\AbstractUpdatableFields;
-use OxidEsales\Eshop\Application\Model\User\UserUpdatableFields;
-use OxidEsales\Eshop\Application\Model\User\UserShippingAddressUpdatableFields;
 use OxidEsales\EshopCommunity\Application\Model\User;
 use Throwable;
 
@@ -156,7 +156,7 @@ class UserComponent extends BaseController
     {
         return $this->checkPsState();
     }
-    
+
     /**
      * If private sales enabled, checks:
      *  (1) if no session user and view can be accessed;
@@ -292,7 +292,7 @@ class UserComponent extends BaseController
     {
         return $this->afterLogin($oUser);
     }
-    
+
     /**
      * Special functionality which is performed after user logs in (or user is created without pass).
      * Performs additional checking if user is not BLOCKED
@@ -369,7 +369,7 @@ class UserComponent extends BaseController
     {
         return $this->afterLogout();
     }
-    
+
     /**
      * Special utility function which is executed right after
      * oxcmp_user::logout is called. Currently, it unsets such
@@ -569,8 +569,8 @@ class UserComponent extends BaseController
                 throw $exception;
             }
 
-            $sUserId = Registry::getSession()->getVariable("su");
-            $sRecEmail = Registry::getSession()->getVariable("re");
+            $sUserId = Registry::getSession()->getVariable('su');
+            $sRecEmail = Registry::getSession()->getVariable('re');
             if (Registry::getConfig()->getConfigParam('blInvitationsEnabled') && $sUserId && $sRecEmail) {
                 // setting registration credit points...
                 $oUser->setCreditPointsForRegistrant($sUserId, $sRecEmail);
@@ -718,7 +718,7 @@ class UserComponent extends BaseController
     {
         return $this->saveInvitor();
     }
-    
+
     /**
      * Saves invitor ID
      */
@@ -738,7 +738,7 @@ class UserComponent extends BaseController
     {
         return $this->saveDeliveryAddressState();
     }
-    
+
     /**
      * Saving show/hide delivery address state
      */
@@ -880,7 +880,7 @@ class UserComponent extends BaseController
     {
         return $this->getDelAddressData();
     }
-    
+
     /**
      * Returns delivery address from request. Before returning array is checked if
      * all needed data is there
@@ -920,7 +920,7 @@ class UserComponent extends BaseController
     {
         return $this->getLogoutLink();
     }
-    
+
     /**
      * Returns logout link with additional params
      *
@@ -1031,7 +1031,7 @@ class UserComponent extends BaseController
     private function trimAddress($address)
     {
         if (is_array($address)) {
-            $fields  = oxNew(FormFields::class, $address);
+            $fields = oxNew(FormFields::class, $address);
             $trimmer = oxNew(FormFieldsTrimmer::class);
 
             $address = (array)$trimmer->trim($fields);

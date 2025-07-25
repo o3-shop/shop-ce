@@ -76,18 +76,18 @@ class Rating extends BaseModel
 
         if ($iRatingLogsTimeout = $myConfig->getConfigParam('iRatingLogsTimeout')) {
             $sExpDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() - $iRatingLogsTimeout * 24 * 60 * 60);
-            $oDb->execute("delete from oxratings where oxtimestamp < :expDate", [
-                ':expDate' => $sExpDate
+            $oDb->execute('delete from oxratings where oxtimestamp < :expDate', [
+                ':expDate' => $sExpDate,
             ]);
         }
-        $sSelect = "select oxid from oxratings 
+        $sSelect = 'select oxid from oxratings 
             where oxuserid = :oxuserid 
                 and oxtype = :oxtype 
-                and oxobjectid = :oxobjectid";
+                and oxobjectid = :oxobjectid';
         $params = [
             ':oxuserid' => $sUserId,
             ':oxtype' => $sType,
-            ':oxobjectid' => $sObjectId
+            ':oxobjectid' => $sObjectId,
         ];
 
         if ($oDb->getOne($sSelect, $params)) {
@@ -96,7 +96,6 @@ class Rating extends BaseModel
 
         return true;
     }
-
 
     /**
      * calculates and return objects rating
@@ -110,23 +109,23 @@ class Rating extends BaseModel
      */
     public function getRatingAverage($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
-        $sQuerySnippet = " AND `oxobjectid` = :oxobjectid";
+        $sQuerySnippet = ' AND `oxobjectid` = :oxobjectid';
         if (is_array($aIncludedObjectsIds) && count($aIncludedObjectsIds) > 0) {
             $sQuerySnippet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
         }
 
-        $sSelect = "
+        $sSelect = '
             SELECT
                 AVG(`oxrating`)
             FROM `oxreviews`
             WHERE `oxrating` > 0
-                 AND `oxtype` = :oxtype"
-                   . $sQuerySnippet . "
-            LIMIT 1";
+                 AND `oxtype` = :oxtype'
+                   . $sQuerySnippet . '
+            LIMIT 1';
 
         $params = [
             ':oxobjectid' => $sObjectId,
-            ':oxtype' => $sType
+            ':oxtype' => $sType,
         ];
 
         $database = DatabaseProvider::getMaster();
@@ -149,25 +148,25 @@ class Rating extends BaseModel
      */
     public function getRatingCount($sObjectId, $sType, $aIncludedObjectsIds = null)
     {
-        $sQuerySnippet = " AND `oxobjectid` = :oxobjectid";
+        $sQuerySnippet = ' AND `oxobjectid` = :oxobjectid';
         if (is_array($aIncludedObjectsIds) && count($aIncludedObjectsIds) > 0) {
             $sQuerySnippet = " AND ( `oxobjectid` = :oxobjectid OR `oxobjectid` in ('" . implode("', '", $aIncludedObjectsIds) . "') )";
         }
 
-        $sSelect = "
+        $sSelect = '
             SELECT
                 COUNT(*)
             FROM `oxreviews`
             WHERE `oxrating` > 0
-                AND `oxtype` = :oxtype"
-                   . $sQuerySnippet . "
-            LIMIT 1";
+                AND `oxtype` = :oxtype'
+                   . $sQuerySnippet . '
+            LIMIT 1';
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = DatabaseProvider::getMaster();
         $iCount = $masterDb->getOne($sSelect, [
             ':oxobjectid' => $sObjectId,
-            ':oxtype' => $sType
+            ':oxtype' => $sType,
         ]);
 
         return $iCount;
@@ -212,7 +211,6 @@ class Rating extends BaseModel
 
         return $isDeleted;
     }
-
 
     /**
      * Returns true if Rating belongs to Product.

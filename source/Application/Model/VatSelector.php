@@ -145,7 +145,7 @@ class VatSelector extends Base
                  ORDER BY o2c.oxtime ";
 
         $fVat = $oDb->getOne($sSql, [
-            ':oxobjectid' => $oArticle->getId()
+            ':oxobjectid' => $oArticle->getId(),
         ]);
         if ($fVat !== false && $fVat !== null) {
             return $fVat;
@@ -164,21 +164,21 @@ class VatSelector extends Base
      */
     public function getArticleVat(Article $oArticle)
     {
-        startProfile("_assignPriceInternal");
+        startProfile('_assignPriceInternal');
         // article has its own VAT ?
 
         if (($dArticleVat = $oArticle->getCustomVAT()) !== null) {
-            stopProfile("_assignPriceInternal");
+            stopProfile('_assignPriceInternal');
 
             return $dArticleVat;
         }
         if (($dArticleVat = $this->_getVatForArticleCategory($oArticle)) !== false) {
-            stopProfile("_assignPriceInternal");
+            stopProfile('_assignPriceInternal');
 
             return $dArticleVat;
         }
 
-        stopProfile("_assignPriceInternal");
+        stopProfile('_assignPriceInternal');
 
         return Registry::getConfig()->getConfigParam('dDefaultVAT');
     }
@@ -215,7 +215,6 @@ class VatSelector extends Base
         return false;
     }
 
-
     /**
      * Returns country id which VAT should be applied to.
      * Depending on configuration option either user billing country or shipping country (if available) is returned.
@@ -227,7 +226,7 @@ class VatSelector extends Base
      */
     protected function _getVatCountry(User $oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $blUseShippingCountry = Registry::getConfig()->getConfigParam("blShippingCountryVat");
+        $blUseShippingCountry = Registry::getConfig()->getConfigParam('blShippingCountryVat');
 
         if ($blUseShippingCountry) {
             $aAddresses = $oUser->getUserAddresses($oUser->getId());

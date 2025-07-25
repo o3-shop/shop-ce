@@ -43,8 +43,8 @@ class VendorMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oVendor = oxNew(Vendor::class);
             $oVendor->loadInLang($this->_iEditLang, $soxId);
@@ -54,10 +54,10 @@ class VendorMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oVendor->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oVendor;
+            $this->_aViewData['edit'] = $oVendor;
 
             // category tree
-            $this->_createCategoryTree("artcattree");
+            $this->_createCategoryTree('artcattree');
 
             //Disable editing for derived articles
             if ($oVendor->isDerived()) {
@@ -67,14 +67,14 @@ class VendorMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
@@ -82,10 +82,10 @@ class VendorMain extends AdminDetailsController
             $oVendorMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class);
             $this->_aViewData['oxajax'] = $oVendorMainAjax->getColumns();
 
-            return "popups/vendor_main.tpl";
+            return 'popups/vendor_main.tpl';
         }
 
-        return "vendor_main.tpl";
+        return 'vendor_main.tpl';
     }
 
     /**
@@ -105,7 +105,7 @@ class VendorMain extends AdminDetailsController
         }
 
         $oVendor = oxNew(Vendor::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oVendor->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxvendor__oxid'] = null;
@@ -142,7 +142,7 @@ class VendorMain extends AdminDetailsController
 
         $oVendor = oxNew(Vendor::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oVendor->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxvendor__oxid'] = null;

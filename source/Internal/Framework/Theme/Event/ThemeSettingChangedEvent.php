@@ -31,7 +31,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class ThemeSettingChangedEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 
     /**
      * Configuration variable that was changed.

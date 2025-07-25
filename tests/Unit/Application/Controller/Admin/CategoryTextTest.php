@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\Category;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Category_Text class
  */
 class CategoryTextTest extends \OxidTestCase
 {
-
     /**
      * Category_Text::Render() test case
      *
@@ -37,8 +37,8 @@ class CategoryTextTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxcategory", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxcategory', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Category_Text');
@@ -46,7 +46,7 @@ class CategoryTextTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Category);
+        $this->assertTrue($aViewData['edit'] instanceof Category);
         $this->assertEquals('category_text.tpl', $sTplName);
     }
 
@@ -57,14 +57,14 @@ class CategoryTextTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Category_Text');
         $this->assertEquals('category_text.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -81,10 +81,10 @@ class CategoryTextTest extends \OxidTestCase
             $oView = oxNew('Category_Text');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in Category_Text::Save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in Category_Text::Save()');
 
             return;
         }
-        $this->fail("Error in Category_Text::Save()");
+        $this->fail('Error in Category_Text::Save()');
     }
 }

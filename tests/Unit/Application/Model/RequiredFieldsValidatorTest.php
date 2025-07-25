@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
+use oxField;
 
 /**
  * Testing oxRequiredFieldsValidator class.
@@ -28,7 +30,7 @@ class RequiredFieldsValidatorTest extends \OxidTestCase
 {
     public function testSetGetRequiredFields()
     {
-        $aRequiredFields = array('field1', 'field2');
+        $aRequiredFields = ['field1', 'field2'];
 
         $oAddressValidator = oxNew('oxRequiredFieldsValidator');
         $oAddressValidator->setRequiredFields($aRequiredFields);
@@ -43,19 +45,19 @@ class RequiredFieldsValidatorTest extends \OxidTestCase
      */
     public function providerValidateFields()
     {
-        return array(
-            array(array('field1' => 'value1', 'field2' => 'value2'), array(), true),
-            array(array('field1' => 'value1', 'field2' => 'value2', 'field3' => 'value3'), array(), true),
-            array(array('field1' => 'value1', 'field2' => 'value2', 'field3' => ''), array(), true),
-            array(array('field1' => 'value1', 'field2' => ''), array('field2'), false),
-            array(array('field1' => '', 'field2' => 'value2'), array('field1'), false),
-            array(array('field1' => '', 'field2' => ''), array('field1', 'field2'), false),
-            array(array('field1' => '', 'field2' => '', 'field3' => 'value3'), array('field1', 'field2'), false),
-            array(array('field1' => 'value1'), array('field2'), false),
-            array(array('field2' => 'value2'), array('field1'), false),
-            array(array('field2' => 'value2', 'field3' => 'value3'), array('field1'), false),
-            array(array(), array('field1', 'field2'), false),
-        );
+        return [
+            [['field1' => 'value1', 'field2' => 'value2'], [], true],
+            [['field1' => 'value1', 'field2' => 'value2', 'field3' => 'value3'], [], true],
+            [['field1' => 'value1', 'field2' => 'value2', 'field3' => ''], [], true],
+            [['field1' => 'value1', 'field2' => ''], ['field2'], false],
+            [['field1' => '', 'field2' => 'value2'], ['field1'], false],
+            [['field1' => '', 'field2' => ''], ['field1', 'field2'], false],
+            [['field1' => '', 'field2' => '', 'field3' => 'value3'], ['field1', 'field2'], false],
+            [['field1' => 'value1'], ['field2'], false],
+            [['field2' => 'value2'], ['field1'], false],
+            [['field2' => 'value2', 'field3' => 'value3'], ['field1'], false],
+            [[], ['field1', 'field2'], false],
+        ];
     }
 
     /**
@@ -66,7 +68,7 @@ class RequiredFieldsValidatorTest extends \OxidTestCase
      */
     public function testValidateFieldsWhenRequiredFieldsExists($aFields, $aInvalidFields, $blResult)
     {
-        $aRequiredFields = array('field1', 'field2');
+        $aRequiredFields = ['field1', 'field2'];
 
         $oAddressValidator = oxNew('oxRequiredFieldsValidator');
         $oAddressValidator->setRequiredFields($aRequiredFields);
@@ -82,7 +84,7 @@ class RequiredFieldsValidatorTest extends \OxidTestCase
     public function testValidateFieldsWithNoRequiredFields($aFields)
     {
         $oAddressValidator = oxNew('oxRequiredFieldsValidator');
-        $oAddressValidator->setRequiredFields(array());
+        $oAddressValidator->setRequiredFields([]);
 
         $this->assertTrue($oAddressValidator->validateFields($this->_createObject($aFields)));
     }
@@ -95,7 +97,7 @@ class RequiredFieldsValidatorTest extends \OxidTestCase
      */
     public function testGetInvalidFields($aFields, $aInvalidFields)
     {
-        $aRequiredFields = array('field1', 'field2');
+        $aRequiredFields = ['field1', 'field2'];
 
         $oAddressValidator = oxNew('oxRequiredFieldsValidator');
         $oAddressValidator->setRequiredFields($aRequiredFields);
@@ -113,7 +115,7 @@ class RequiredFieldsValidatorTest extends \OxidTestCase
     {
         $oObject = oxNew('oxBase');
         foreach ($aData as $sKey => $sValue) {
-            $sKey = "__" . $sKey;
+            $sKey = '__' . $sKey;
             $oObject->$sKey = new oxField($sValue);
         }
 

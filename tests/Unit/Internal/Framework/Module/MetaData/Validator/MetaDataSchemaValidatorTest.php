@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of O3-Shop.
@@ -21,9 +23,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Configuration\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataKeyException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataSchemataProvider;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataKeyException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataValueTypeException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\UnsupportedMetaDataVersionException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataSchemaValidator;
@@ -78,7 +80,7 @@ class MetaDataSchemaValidatorTest extends TestCase
                     'subkey1'        => 'value2',
                     'unsupportedKey' => 'value2',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -113,8 +115,8 @@ class MetaDataSchemaValidatorTest extends TestCase
                 'excludedsectionkey2' => [
                     'excludedsubkey1' => 'value2',
                     'excludedsubkey2' => 'value2',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -138,7 +140,7 @@ class MetaDataSchemaValidatorTest extends TestCase
                     'subkey1' => 'value2',
                     'subkey2' => 'value2',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -167,9 +169,9 @@ class MetaDataSchemaValidatorTest extends TestCase
             'section1' => [
                 [
                     'subKey1' => 'value1',
-                    'subKey2' => 'value1'
+                    'subKey2' => 'value1',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);
@@ -185,9 +187,9 @@ class MetaDataSchemaValidatorTest extends TestCase
             'section1' => [
                 [
                     // missing 'subKey1' => 'value1',
-                    'subKey2' => 'value1'
+                    'subKey2' => 'value1',
                 ],
-            ]
+            ],
         ];
 
         $metaDataSchemata = new MetaDataSchemataProvider($this->metaDataSchemata);

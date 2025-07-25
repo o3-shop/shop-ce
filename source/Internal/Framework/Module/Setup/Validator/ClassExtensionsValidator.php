@@ -23,9 +23,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\InvalidClassExtensionNamespaceException;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 
 class ClassExtensionsValidator implements ModuleConfigurationValidatorInterface
 {

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Attribute;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -28,7 +29,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Class manages category attributes
@@ -41,7 +41,7 @@ class AttributeCategoryAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field, table, visible, multilanguage, ident
             ['oxtitle', 'oxcategories', 1, 1, 0],
             ['oxdesc', 'oxcategories', 1, 1, 0],
@@ -59,7 +59,7 @@ class AttributeCategoryAjax extends ListComponentAjax
              ['oxtitle', 'oxattribute', 1, 1, 0],
              ['oxsort', 'oxcategory2attribute', 1, 0, 0],
              ['oxid', 'oxcategory2attribute', 0, 0, 1],
-         ]
+         ],
     ];
 
     /**
@@ -96,7 +96,7 @@ class AttributeCategoryAjax extends ListComponentAjax
         } else {
             $sQAdd = " from {$sCatTable} left join oxcategory2attribute " .
                      "on {$sCatTable}.oxid=oxcategory2attribute.oxobjectid " .
-                     " where oxcategory2attribute.oxattrid = " . $oDb->quote($sDiscountId) .
+                     ' where oxcategory2attribute.oxattrid = ' . $oDb->quote($sDiscountId) .
                      " and {$sCatTable}.oxshopid = '" . $myConfig->getShopId() . "' " .
                      " and {$sCatTable}.oxactive = '1' ";
         }
@@ -105,7 +105,7 @@ class AttributeCategoryAjax extends ListComponentAjax
             $sQAdd .= " and {$sCatTable}.oxid not in ( select {$sCatTable}.oxid " .
                       "from {$sCatTable} left join oxcategory2attribute " .
                       "on {$sCatTable}.oxid=oxcategory2attribute.oxobjectid " .
-                      " where oxcategory2attribute.oxattrid = " . $oDb->quote($sSynchDiscountId) .
+                      ' where oxcategory2attribute.oxattrid = ' . $oDb->quote($sSynchDiscountId) .
                       " and {$sCatTable}.oxshopid = '" . $myConfig->getShopId() . "' " .
                       " and {$sCatTable}.oxactive = '1' ) ";
         }
@@ -121,11 +121,11 @@ class AttributeCategoryAjax extends ListComponentAjax
         $aChosenCat = $this->getActionIds('oxcategory2attribute.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxcategory2attribute.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxcategory2attribute.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
-            $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
-            $sQ = "delete from oxcategory2attribute where oxcategory2attribute.oxid in (" . $sChosenCategories . ") ";
+            $sChosenCategories = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCat));
+            $sQ = 'delete from oxcategory2attribute where oxcategory2attribute.oxid in (' . $sChosenCategories . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
 
@@ -154,7 +154,7 @@ class AttributeCategoryAjax extends ListComponentAjax
             $database = DatabaseProvider::getMaster();
             foreach ($aAddCategory as $sAdd) {
                 $oNewGroup = oxNew(BaseModel::class);
-                $oNewGroup->init("oxcategory2attribute");
+                $oNewGroup->init('oxcategory2attribute');
                 $sOxSortField = 'oxcategory2attribute__oxsort';
                 $sObjectIdField = 'oxcategory2attribute__oxobjectid';
                 $sAttributeIdField = 'oxcategory2attribute__oxattrid';
@@ -162,10 +162,10 @@ class AttributeCategoryAjax extends ListComponentAjax
                 $oNewGroup->$sObjectIdField = new Field($sAdd);
                 $oNewGroup->$sAttributeIdField = new Field($oAttribute->$sOxIdField->value);
 
-                $sSql = "select max(oxsort) + 1 from oxcategory2attribute where oxobjectid = :oxobjectid";
+                $sSql = 'select max(oxsort) + 1 from oxcategory2attribute where oxobjectid = :oxobjectid';
 
                 $oNewGroup->$sOxSortField = new Field((int) $database->getOne($sSql, [
-                    ':oxobjectid' => $sAdd
+                    ':oxobjectid' => $sAdd,
                 ]));
                 $oNewGroup->save();
             }

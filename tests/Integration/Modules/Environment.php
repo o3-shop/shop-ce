@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -30,7 +31,6 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class Environment
 {
-
     /**
      * Shop Id in which will be prepared environment.
      *
@@ -137,8 +137,8 @@ class Environment
         $config = Registry::getConfig();
         $config->setConfigParam('aModules', null);
         $config->setConfigParam('aModuleTemplates', null);
-        $config->setConfigParam('aDisabledModules', array());
-        $config->setConfigParam('aModulePaths', array());
+        $config->setConfigParam('aDisabledModules', []);
+        $config->setConfigParam('aModulePaths', []);
         $config->setConfigParam('aModuleFiles', null);
         $config->setConfigParam('aModuleVersions', null);
         $config->setConfigParam('aModuleEvents', null);
@@ -158,7 +158,7 @@ class Environment
         $oConfig = Registry::getConfig();
         $oConfig->setShopId($this->getShopId());
         $oConfig->setConfigParam('sShopDir', $this->getPathToTestDataDirectory());
-        \OxidEsales\Eshop\Core\Registry::get("oxConfigFile")->setVar("sShopDir", $this->getPathToTestDataDirectory());
+        \OxidEsales\Eshop\Core\Registry::get('oxConfigFile')->setVar('sShopDir', $this->getPathToTestDataDirectory());
     }
 
     /**
@@ -190,7 +190,6 @@ class Environment
         $moduleInstaller = $this->getModuleInstaller($module);
         $moduleInstaller->activate($module);
     }
-
 
     /**
      * Deactivate a module, given by its ID.
@@ -231,7 +230,7 @@ class Environment
      */
     protected function getAllModules()
     {
-        $modules = array_diff(scandir($this->getPathToTestDataDirectory() . 'modules'), array('..', '.'));
+        $modules = array_diff(scandir($this->getPathToTestDataDirectory() . 'modules'), ['..', '.']);
 
         return $modules;
     }
@@ -241,9 +240,9 @@ class Environment
      */
     protected function loadShopParameters()
     {
-        $aParameters = array(
-            'aModules', 'aModuleEvents', 'aModuleVersions', 'aModuleFiles', 'aDisabledModules', 'aModuleTemplates', 'aModuleControllers'
-        );
+        $aParameters = [
+            'aModules', 'aModuleEvents', 'aModuleVersions', 'aModuleFiles', 'aDisabledModules', 'aModuleTemplates', 'aModuleControllers',
+        ];
         foreach ($aParameters as $sParameter) {
             Registry::getConfig()->setConfigParam($sParameter, $this->_getConfigValueFromDB($sParameter));
         }
@@ -259,13 +258,13 @@ class Environment
     protected function _getConfigValueFromDB($sVarName)
     {
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $sQuery = "SELECT " . Registry::getConfig()->getDecodeValueQuery() . "
+        $sQuery = 'SELECT ' . Registry::getConfig()->getDecodeValueQuery() . "
                    FROM `oxconfig`
                    WHERE `OXVARNAME` = '{$sVarName}'
                    AND `OXSHOPID` = {$this->getShopId()}";
 
         $sResult = $db->getOne($sQuery);
-        $aExtensionsToCheck = $sResult ? unserialize($sResult) : array();
+        $aExtensionsToCheck = $sResult ? unserialize($sResult) : [];
 
         return $aExtensionsToCheck;
     }

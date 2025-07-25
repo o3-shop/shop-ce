@@ -50,7 +50,6 @@ class AccountDownloadsController extends AccountController
      */
     protected $_oOrderFilesList = null;
 
-
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...
      *
@@ -65,7 +64,7 @@ class AccountDownloadsController extends AccountController
         /** @var SeoEncoder $oSeoEncoder */
         $oSeoEncoder = Registry::getSeoEncoder();
         $aPath['title'] = Registry::getLang()->translateString('MY_ACCOUNT', $iBaseLanguage, false);
-        $aPath['link'] = $oSeoEncoder->getStaticUrl($this->getViewConfig()->getSelfLink() . "cl=account");
+        $aPath['link'] = $oSeoEncoder->getStaticUrl($this->getViewConfig()->getSelfLink() . 'cl=account');
         $aPaths[] = $aPath;
 
         $aPath['title'] = Registry::getLang()->translateString('MY_DOWNLOADS', $iBaseLanguage, false);

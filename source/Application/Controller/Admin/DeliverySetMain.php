@@ -45,8 +45,8 @@ class DeliverySetMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $odeliveryset = oxNew(DeliverySet::class);
             $odeliveryset->loadInLang($this->_iEditLang, $soxId);
@@ -58,7 +58,7 @@ class DeliverySetMain extends AdminDetailsController
                 $odeliveryset->loadInLang(key($oOtherLang), $soxId);
             }
 
-            $this->_aViewData["edit"] = $odeliveryset;
+            $this->_aViewData['edit'] = $odeliveryset;
             //Disable editing for derived articles
             if ($odeliveryset->isDerived()) {
                 $this->_aViewData['readonly'] = true;
@@ -66,14 +66,14 @@ class DeliverySetMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
@@ -81,10 +81,10 @@ class DeliverySetMain extends AdminDetailsController
             $oDeliverysetMainAjax = oxNew(DeliverySetMainAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetMainAjax->getColumns();
 
-            return "popups/deliveryset_main.tpl";
+            return 'popups/deliveryset_main.tpl';
         }
 
-        return "deliveryset_main.tpl";
+        return 'deliveryset_main.tpl';
     }
 
     /**
@@ -101,7 +101,7 @@ class DeliverySetMain extends AdminDetailsController
 
         $oDelSet = oxNew(DeliverySet::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oDelSet->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxdeliveryset__oxid'] = null;
@@ -145,7 +145,7 @@ class DeliverySetMain extends AdminDetailsController
 
         $oDelSet = oxNew(DeliverySet::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oDelSet->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxdeliveryset__oxid'] = null;

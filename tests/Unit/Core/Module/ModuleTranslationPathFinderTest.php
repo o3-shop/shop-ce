@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Module;
 
 /**
@@ -27,7 +29,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Module;
  */
 class ModuleTranslationPathFinderTest extends \OxidTestCase
 {
-
     /**
      * Data provider for the test of the method findTranslationPath.
      *
@@ -35,23 +36,23 @@ class ModuleTranslationPathFinderTest extends \OxidTestCase
      */
     public function dataProvider_testFindTranslationPath()
     {
-        return array(
-            array(
+        return [
+            [
                 'language' => 'de',
                 'admin' => false,
-                'expectedFullPath' => 'MODULES/welcome_home/translations/de'
-            ),
-            array(
+                'expectedFullPath' => 'MODULES/welcome_home/translations/de',
+            ],
+            [
                 'language' => 'en',
                 'admin' => false,
-                'expectedFullPath' => 'MODULES/welcome_home/translations/en'
-            ),
-            array(
+                'expectedFullPath' => 'MODULES/welcome_home/translations/en',
+            ],
+            [
                 'language' => 'de',
                 'admin' => true,
-                'expectedFullPath' => 'MODULES/welcome_home/views/admin/de'
-            )
-        );
+                'expectedFullPath' => 'MODULES/welcome_home/views/admin/de',
+            ],
+        ];
     }
 
     /**
@@ -62,7 +63,7 @@ class ModuleTranslationPathFinderTest extends \OxidTestCase
     public function testFindTranslationPath($language, $admin, $expectedFullPath)
     {
         $mockedClassName = \OxidEsales\Eshop\Core\Module\ModuleTranslationPathFinder::class;
-        $pathFinderMock = $this->getMock($mockedClassName, array('getModulesDirectory'));
+        $pathFinderMock = $this->getMock($mockedClassName, ['getModulesDirectory']);
 
         $pathFinderMock->expects($this->once())->method('getModulesDirectory')->willReturn('MODULES/');
 
@@ -78,18 +79,18 @@ class ModuleTranslationPathFinderTest extends \OxidTestCase
      */
     public function dataProvider_testBothCaseApplicationFolders()
     {
-        return array(
-            array(
+        return [
+            [
                 'hasUpper' => true,
                 'hasLower' => false,
-                'expectedFullPath' => 'MODULES/welcome_home/Application/translations/de'
-            ),
-            array(
+                'expectedFullPath' => 'MODULES/welcome_home/Application/translations/de',
+            ],
+            [
                 'hasUpper' => false,
                 'hasLower' => true,
-                'expectedFullPath' => 'MODULES/welcome_home/application/translations/de'
-            )
-        );
+                'expectedFullPath' => 'MODULES/welcome_home/application/translations/de',
+            ],
+        ];
     }
 
     /**
@@ -104,7 +105,7 @@ class ModuleTranslationPathFinderTest extends \OxidTestCase
     public function testBothCaseApplicationFolders($hasUpper, $hasLower, $expectedFullPath)
     {
         $mockedClassName = \OxidEsales\Eshop\Core\Module\ModuleTranslationPathFinder::class;
-        $pathFinderMock = $this->getMock($mockedClassName, array('getModulesDirectory', 'hasUppercaseApplicationDirectory', 'hasLowercaseApplicationDirectory'));
+        $pathFinderMock = $this->getMock($mockedClassName, ['getModulesDirectory', 'hasUppercaseApplicationDirectory', 'hasLowercaseApplicationDirectory']);
 
         $pathFinderMock->expects($this->once())->method('getModulesDirectory')->willReturn('MODULES/');
         $pathFinderMock->expects($this->any())->method('hasUppercaseApplicationDirectory')->willReturn($hasUpper);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto
  * Price view mode: netto
@@ -24,32 +25,32 @@
  * 2. amount (3-4)
  * For product (1002) is set parameter "free shipping" ;
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
                 // oxarticles db fields
                 'oxid'                     => 1001,
                 'oxprice'                  => 20.00,
                 'oxvat'                    => 11,
                 // Amount in basket
                 'amount'                   => 1,
-                'scaleprices' => array(
-                   0 => array(
+                'scaleprices' => [
+                   0 => [
                         'oxamount'     => 2,
                         'oxamountto'   => 3,
                         'oxartid'      => 1001,
                         'oxaddperc'    => 10,
-                    ),
-                    1 => array(
+                    ],
+                    1 => [
                         'oxamount'     => 3,
                         'oxamountto'   => 4,
                         'oxartid'      => 1001,
                         'oxaddperc'    => 20,
-                    ),
-                ),
-        ),
-        1 => array(
+                    ],
+                ],
+        ],
+        1 => [
          // oxarticles db fields
                 'oxid'                  => 1002,
                 'oxprice'               => 200.00,
@@ -57,14 +58,12 @@ $aData = array(
                 // Amount in basket
                 'amount'                => 1,
             'oxfreeshipping'        => 1,
+        ],
+     ],
 
-
-        ),
-     ),
-
-    'discounts' => array(
+    'discounts' => [
         // oxdiscount DB fields
-        0 => array(
+        0 => [
             // ID needed for expectation later on, specify meaningful name
             'oxid'         => '%discount',
             'oxaddsum'     => 10,
@@ -73,15 +72,14 @@ $aData = array(
             'oxamountto' => 99999,
             'oxactive' => 1,
             'oxsort' => 10,
-        ),
-      ),
+        ],
+      ],
 
     // Additional costs
-    'costs' => array(
-
+    'costs' => [
         // Delivery
-        'delivery' => array(
-              0 => array(
+        'delivery' => [
+              0 => [
                 // oxdelivery DB fields
                 'oxactive' => 1,
                 'oxaddsum' => 10.00,
@@ -89,11 +87,11 @@ $aData = array(
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
         // Payment
-        'payment' => array(
-             0 => array(
+        'payment' => [
+             0 => [
                 // oxpayments DB fields
                 'oxaddsum' => 10.00,
                 'oxaddsumtype' => '%',
@@ -101,54 +99,54 @@ $aData = array(
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
         'oxaddsumrules'=>1,
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             1001 => array( '20,00', '20,00' ),
-             1002 => array( '200,00', '200,00' ),
-        ),
+        'articles' => [
+             1001 => [ '20,00', '20,00' ],
+             1002 => [ '200,00', '200,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '234,18',
             // Total NETTO
             'totalNetto'  => '220,00',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
+            'vats' => [
                 19 => '34,20',
             11 => '1,98',
-            ),
+            ],
             // Total discount amounts: discount id => total cost
-            'discounts' => array(
+            'discounts' => [
                 // Expectation for special discount with specified ID
                 '%discount' => '22,00',
-            ),
+            ],
 
             // Total delivery amounts
-            'delivery' => array(
+            'delivery' => [
                 'brutto' => '2,38',
                 'netto' => '2,00',
-                'vat' => '0,38'
-            ),
+                'vat' => '0,38',
+            ],
             // Total payment amounts
-            'payment' => array(
+            'payment' => [
                 'brutto' => '26,18',
                 'netto' => '22,00',
-                'vat' => '4,18'
-            ),
+                'vat' => '4,18',
+            ],
 
             // GRAND TOTAL
-            'grandTotal'  => '262,74'
-        ),
-    ),
+            'grandTotal'  => '262,74',
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
            'blEnterNetPrice' => true,
             'blShowNetPrice' => true,
             'blShowVATForDelivery'=> true,
@@ -158,8 +156,8 @@ $aData = array(
             'blDeliveryVatOnTop' => true,
             'blPaymentVatOnTop' => true,
             'blWrappingVatOnTop' => true,
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

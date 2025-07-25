@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxDb;
+use oxDb;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
 
 /**
@@ -27,7 +29,6 @@ use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
  */
 class VoucherserieExcludeTest extends \OxidTestCase
 {
-
     /**
      * Setting up environment
      */
@@ -39,7 +40,7 @@ class VoucherserieExcludeTest extends \OxidTestCase
 
     protected function _insertData()
     {
-        $sShopIdFields = "`OXSHOPID`";
+        $sShopIdFields = '`OXSHOPID`';
         $sShopIdValues = ShopIdCalculator::BASE_SHOP_ID;
 
         $sInsertSeries = "

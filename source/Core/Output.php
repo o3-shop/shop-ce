@@ -26,8 +26,8 @@ namespace OxidEsales\EshopCommunity\Core;
  */
 class Output extends \OxidEsales\Eshop\Core\Base
 {
-    const OUTPUT_FORMAT_HTML = 'html';
-    const OUTPUT_FORMAT_JSON = 'json';
+    public const OUTPUT_FORMAT_HTML = 'html';
+    public const OUTPUT_FORMAT_JSON = 'json';
 
     /**
      * Keels search engine status
@@ -103,7 +103,7 @@ class Output extends \OxidEsales\Eshop\Core\Base
         // DISPLAY IT
         $sVersion = $this->getConfig()->getVersion();
         $sEdition = $this->getConfig()->getFullEdition();
-        $sCurYear = date("Y");
+        $sCurYear = date('Y');
 
         // SHOW ONLY MAJOR VERSION NUMBER
         $aVersion = explode('.', $sVersion);
@@ -112,7 +112,7 @@ class Output extends \OxidEsales\Eshop\Core\Base
         $sShopMode = $this->getShopMode();
 
         // Replacing only once per page
-        $sSearch = "</head>";
+        $sSearch = '</head>';
         $sReplace = <<<HEADER
 </head>
 <!--
@@ -161,7 +161,6 @@ HEADER;
         // #669 PHP5 claims that you cant pas full this but should instead pass reference what is anyway a much better idea
         // removed "return" as by reference you dont need any return
     }
-
 
     /**
      * set page charset
@@ -224,11 +223,11 @@ HEADER;
     {
         switch ($this->_sOutputFormat) {
             case self::OUTPUT_FORMAT_JSON:
-                \OxidEsales\Eshop\Core\Registry::getUtils()->setHeader("Content-Type: application/json; charset=" . $this->_sCharset);
+                \OxidEsales\Eshop\Core\Registry::getUtils()->setHeader('Content-Type: application/json; charset=' . $this->_sCharset);
                 break;
             case self::OUTPUT_FORMAT_HTML:
             default:
-                \OxidEsales\Eshop\Core\Registry::getUtils()->setHeader("Content-Type: text/html; charset=" . $this->_sCharset);
+                \OxidEsales\Eshop\Core\Registry::getUtils()->setHeader('Content-Type: text/html; charset=' . $this->_sCharset);
                 break;
         }
     }

@@ -36,9 +36,9 @@ function smarty_function_oxvariantselect($params, &$smarty)
 {
     $sOutput = '';
     $oMdVariants = $params['value'];
-    $sSeparator  = $params['separator'];
+    $sSeparator = $params['separator'];
     //default selected art id
-    $sArtId      = $params['artid'];
+    $sArtId = $params['artid'];
 
     if (!$sArtId || !$oMdVariants->hasArticleId($sArtId)) {
         $sArtId = $oMdVariants->getArticleId();
@@ -80,7 +80,7 @@ function oxvariantselect_addSubvariants($oMdVariants, $iLevel, &$aSelectBoxes, &
         $blVisible = false;
         $sSelectedVariant = null;
         foreach ($oMdVariants as $sKey => $oVariant) {
-            $sSelectBoxName = "mdVariantSelect_" . $oVariant->getParentId();
+            $sSelectBoxName = 'mdVariantSelect_' . $oVariant->getParentId();
             $aSelectBoxes[$iLevel][] = $sSelectBoxName;
             $aOptions[$oVariant->getId()] = $oVariant->getName();
             if ($oVariant->hasArticleId($sArtId)) {
@@ -123,10 +123,10 @@ function oxvariantselect_addSubvariants($oMdVariants, $iLevel, &$aSelectBoxes, &
  */
 function oxvariantselect_formatSelectBox($sId, $aOptions, $iLevel, $blVisible, $sSelected)
 {
-    $sStyle = $blVisible ? "inline" : "none";
+    $sStyle = $blVisible ? 'inline' : 'none';
     $sRes = "<select class='md_select_variant' id='$sId' style='display:$sStyle'>\n";
     foreach ($aOptions as $sVal => $sName) {
-        $sSelText = ($sVal === $sSelected) ? " selected" : "";
+        $sSelText = ($sVal === $sSelected) ? ' selected' : '';
         $sRes .= " <option value='$sVal'$sSelText>$sName</option>\n";
     }
     $sRes .= "</select>\n";
@@ -154,7 +154,7 @@ function oxvariantselect_formatJsSelecBoxesArray($aSelectBoxes)
         }
     }
 
-    $sRes .= "--></script>";
+    $sRes .= '--></script>';
 
     return $sRes;
 }
@@ -177,7 +177,7 @@ function oxvariantselect_formatJsRealVariantArray($aRealVariants)
         $sRes .= " mdRealVariantsLinks['$sMdVarian'] = '" . str_replace('&amp;', '&', $sRealVariant['link']) . "';\n";
     }
 
-    $sRes .= "--></script>";
+    $sRes .= '--></script>';
 
     return $sRes;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Autoload;
 
-use OxidEsales\EshopCommunity\Application\Model\Basket;
-use OxidEsales\TestingLibrary\UnitTestCase;
 use oxBasket;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\EshopCommunity\Application\Model\Basket;
+use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**
  * Class typeHintTestBasket.
@@ -91,7 +93,7 @@ class TypeHintTest extends UnitTestCase
      */
     public function testTypeHintAliasingBackwardsCompatibilityWithNew()
     {
-        $basket = new \oxBasket;
+        $basket = new \oxBasket();
 
         $this->createOrder()->finalizeOrder($basket, $this->loadDefaultAdminUser());
     }

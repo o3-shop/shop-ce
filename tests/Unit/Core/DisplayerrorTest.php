@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class DisplayerrorTest extends \OxidTestCase
@@ -40,8 +42,8 @@ class DisplayerrorTest extends \OxidTestCase
      */
     public function testGetOxMessage()
     {
-        $this->_oDisplayError->setMessage("Test ");
-        $this->assertEquals("Test ", $this->_oDisplayError->getOxMessage());
+        $this->_oDisplayError->setMessage('Test ');
+        $this->assertEquals('Test ', $this->_oDisplayError->getOxMessage());
     }
 
     /**
@@ -57,13 +59,13 @@ class DisplayerrorTest extends \OxidTestCase
      */
     public function testGetValue()
     {
-        $this->assertEquals($this->_oDisplayError->getValue("whatever"), "");
+        $this->assertEquals($this->_oDisplayError->getValue('whatever'), '');
     }
 
     public function testFormatingMessage()
     {
-        $this->_oDisplayError->setMessage("Test %s string with %d values");
-        $this->_oDisplayError->setFormatParameters(array('formatting', 2));
-        $this->assertEquals("Test formatting string with 2 values", $this->_oDisplayError->getOxMessage());
+        $this->_oDisplayError->setMessage('Test %s string with %d values');
+        $this->_oDisplayError->setFormatParameters(['formatting', 2]);
+        $this->assertEquals('Test formatting string with 2 values', $this->_oDisplayError->getOxMessage());
     }
 }

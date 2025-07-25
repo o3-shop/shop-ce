@@ -37,7 +37,6 @@ use Webmozart\PathUtil\Path;
 
 class ModuleServicesActivationService implements ModuleServicesActivationServiceInterface
 {
-
     /**
      * @var ProjectYamlDaoInterface $dao
      */
@@ -118,7 +117,6 @@ class ModuleServicesActivationService implements ModuleServicesActivationService
 
         $this->dao->saveProjectConfigFile($projectConfig);
     }
-
 
     /**
      * @param string $moduleId

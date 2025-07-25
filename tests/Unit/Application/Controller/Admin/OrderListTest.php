@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxField;
-use \oxDb;
-use \oxTestModules;
+use oxDb;
+use oxTestModules;
 
 /**
  * Testing order_list class.
  */
 class OrderListTest extends \OxidTestCase
 {
-
     /**
      * order_list::Render() test case
      *
@@ -37,7 +37,7 @@ class OrderListTest extends \OxidTestCase
     public function testRender()
     {
         oxTestModules::addFunction('oxorder', 'load', '{ $this->oxorder__oxdeltype = new oxField("test"); $this->oxorder__oxtotalbrutsum = new oxField(10); $this->oxorder__oxcurrate = new oxField(10); }');
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('order_list');
@@ -57,18 +57,18 @@ class OrderListTest extends \OxidTestCase
         $oDb = oxDb::getDb();
         $oListObject = oxNew('oxOrder');
 
-        $this->setRequestParameter("addsearch", "oxorderarticles");
+        $this->setRequestParameter('addsearch', 'oxorderarticles');
         $oView = oxNew('order_list');
         $sQ = $oView->UNITbuildSelectString($oListObject);
-        $this->assertTrue(strpos($sQ, "oxorder where oxorder.oxpaid like " . $oDb->quote("%oxorderarticles%") . " and ") !== false);
+        $this->assertTrue(strpos($sQ, 'oxorder where oxorder.oxpaid like ' . $oDb->quote('%oxorderarticles%') . ' and ') !== false);
 
-        $this->setRequestParameter("addsearchfld", "oxorderarticles");
+        $this->setRequestParameter('addsearchfld', 'oxorderarticles');
         $sQ = $oView->UNITbuildSelectString($oListObject);
-        $this->assertTrue(strpos($sQ, "oxorder left join oxorderarticles on oxorderarticles.oxorderid=oxorder.oxid where ( oxorderarticles.oxartnum like " . $oDb->quote("%oxorderarticles%") . " or oxorderarticles.oxtitle like " . $oDb->quote("%oxorderarticles%") . " ) and ") !== false);
+        $this->assertTrue(strpos($sQ, 'oxorder left join oxorderarticles on oxorderarticles.oxorderid=oxorder.oxid where ( oxorderarticles.oxartnum like ' . $oDb->quote('%oxorderarticles%') . ' or oxorderarticles.oxtitle like ' . $oDb->quote('%oxorderarticles%') . ' ) and ') !== false);
 
-        $this->setRequestParameter("addsearchfld", "oxpayments");
+        $this->setRequestParameter('addsearchfld', 'oxpayments');
         $sQ = $oView->UNITbuildSelectString($oListObject);
-        $this->assertTrue(strpos($sQ, "oxorder left join oxpayments on oxpayments.oxid=oxorder.oxpaymenttype where oxpayments.oxdesc like " . $oDb->quote("%oxorderarticles%") . " and ") !== false);
+        $this->assertTrue(strpos($sQ, 'oxorder left join oxpayments on oxpayments.oxid=oxorder.oxpaymenttype where oxpayments.oxdesc like ' . $oDb->quote('%oxorderarticles%') . ' and ') !== false);
     }
 
     /**
@@ -78,13 +78,13 @@ class OrderListTest extends \OxidTestCase
      */
     public function testPrepareWhereQuery()
     {
-        oxTestModules::addFunction("oxlang", "isAdmin", "{return 1;}");
+        oxTestModules::addFunction('oxlang', 'isAdmin', '{return 1;}');
         $sExpQ = " and ( oxorder.oxfolder = 'ORDERFOLDER_NEW' )";
         if ($this->getConfig()->getEdition() === 'EE') {
             $sExpQ .= " and oxorder.oxshopid = '1'";
         }
         $oOrderList = oxNew('order_list');
-        $sQ = $oOrderList->UNITprepareWhereQuery(array(), "");
+        $sQ = $oOrderList->UNITprepareWhereQuery([], '');
         $this->assertEquals($sExpQ, $sQ);
     }
 
@@ -95,14 +95,14 @@ class OrderListTest extends \OxidTestCase
      */
     public function testPrepareWhereQueryIfFolderSelected()
     {
-        oxTestModules::addFunction("oxlang", "isAdmin", "{return 1;}");
+        oxTestModules::addFunction('oxlang', 'isAdmin', '{return 1;}');
         $this->setRequestParameter('folder', 'ORDERFOLDER_FINISHED');
         $sExpQ = " and ( oxorder.oxfolder = 'ORDERFOLDER_FINISHED' )";
         if ($this->getConfig()->getEdition() === 'EE') {
             $sExpQ .= " and oxorder.oxshopid = '1'";
         }
         $oOrderList = oxNew('order_list');
-        $sQ = $oOrderList->UNITprepareWhereQuery(array(), "");
+        $sQ = $oOrderList->UNITprepareWhereQuery([], '');
         $this->assertEquals($sExpQ, $sQ);
     }
 }

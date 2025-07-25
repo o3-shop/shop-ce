@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Registry;
 use stdClass;
-use Exception;
 
 /**
  * Admin article main user manager.
@@ -54,7 +54,7 @@ class UserMain extends AdminDetailsController
         // malladmin stuff
         $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
-        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == "malladmin";
+        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == 'malladmin';
 
         // User rights
         $aUserRights = [];
@@ -63,26 +63,26 @@ class UserMain extends AdminDetailsController
 
         $iPos = 0;
         $aUserRights[$iPos] = new stdClass();
-        $aUserRights[$iPos]->name = $oLang->translateString("user", $iTplLang);
-        $aUserRights[$iPos]->id = "user";
+        $aUserRights[$iPos]->name = $oLang->translateString('user', $iTplLang);
+        $aUserRights[$iPos]->id = 'user';
 
         if ($blisMallAdmin) {
             $iPos = count($aUserRights);
             $aUserRights[$iPos] = new stdClass();
-            $aUserRights[$iPos]->id = "malladmin";
-            $aUserRights[$iPos]->name = $oLang->translateString("Admin", $iTplLang);
+            $aUserRights[$iPos]->id = 'malladmin';
+            $aUserRights[$iPos]->name = $oLang->translateString('Admin', $iTplLang);
         }
 
         $aUserRights = $this->calculateAdditionalRights($aUserRights);
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oUser = oxNew(User::class);
             $oUser->load($soxId);
-            $this->_aViewData["edit"] = $oUser;
+            $this->_aViewData['edit'] = $oUser;
 
-            if (!($oUser->oxuser__oxrights->value == "malladmin" && !$blisMallAdmin)) {
+            if (!($oUser->oxuser__oxrights->value == 'malladmin' && !$blisMallAdmin)) {
                 // generate selected right
                 foreach ($aUserRights as $val) {
                     if ($val->id == $oUser->oxuser__oxrights->value) {
@@ -97,12 +97,12 @@ class UserMain extends AdminDetailsController
         $oCountryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
         $oCountryList->loadActiveCountries($oLang->getObjectTplLanguage());
 
-        $this->_aViewData["countrylist"] = $oCountryList;
+        $this->_aViewData['countrylist'] = $oCountryList;
 
-        $this->_aViewData["rights"] = $aUserRights;
+        $this->_aViewData['rights'] = $aUserRights;
 
         if ($this->_sSaveError) {
-            $this->_aViewData["sSaveError"] = $this->_sSaveError;
+            $this->_aViewData['sSaveError'] = $this->_sSaveError;
         }
 
         if (!$this->_allowAdminEdit($soxId)) {
@@ -112,10 +112,10 @@ class UserMain extends AdminDetailsController
             $oUserMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\UserMainAjax::class);
             $this->_aViewData['oxajax'] = $oUserMainAjax->getColumns();
 
-            return "popups/user_main.tpl";
+            return 'popups/user_main.tpl';
         }
 
-        return "user_main.tpl";
+        return 'user_main.tpl';
     }
 
     /**
@@ -140,7 +140,7 @@ class UserMain extends AdminDetailsController
             }
 
             $oUser = oxNew(User::class);
-            if ($soxId != "-1") {
+            if ($soxId != '-1') {
                 $oUser->load($soxId);
             } else {
                 $aParams['oxuser__oxid'] = null;
@@ -162,7 +162,7 @@ class UserMain extends AdminDetailsController
             $oUser->assign($aParams);
 
             // setting shop id for ONLY for new created user
-            if ($soxId == "-1") {
+            if ($soxId == '-1') {
                 $this->onUserCreation($oUser);
             }
 

@@ -27,7 +27,6 @@ namespace OxidEsales\EshopCommunity\Core\Contract;
  */
 interface ISelectList
 {
-
     /**
      * Returns selection list label
      *

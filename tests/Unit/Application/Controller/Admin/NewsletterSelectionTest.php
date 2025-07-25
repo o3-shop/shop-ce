@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxField;
-use \Exception;
-use \oxDb;
+use Exception;
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Newsletter_Selection class
@@ -56,7 +58,7 @@ class NewsletterSelectionTest extends \OxidTestCase
         $sInsert = "INSERT INTO `oxobject2group` VALUES ( 'test2', '{$shopId}', 'newstest', 'oxidnewcustomer', NOW() )";
         $oDB->Execute($sInsert);
 
-        $this->_oNewsSub = oxNew("oxnewssubscribed");
+        $this->_oNewsSub = oxNew('oxnewssubscribed');
         $this->_oNewsSub->setId('_testNewsSubscrId');
         $this->_oNewsSub->oxnewssubscribed__oxuserid = new oxField('_testUserId', oxField::T_RAW);
         $this->_oNewsSub->oxnewssubscribed__oxemail = new oxField('useremail@useremail.nl', oxField::T_RAW);
@@ -89,8 +91,8 @@ class NewsletterSelectionTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", 'newstest');
-        $oNewsletter = $this->getProxyClass("Newsletter_selection");
+        $this->setRequestParameter('oxid', 'newstest');
+        $oNewsletter = $this->getProxyClass('Newsletter_selection');
         $this->assertEquals('newsletter_selection.tpl', $oNewsletter->render());
         $aViewData = $oNewsletter->getNonPublicVar('_aViewData');
 
@@ -105,16 +107,16 @@ class NewsletterSelectionTest extends \OxidTestCase
      */
     public function testGetUserCount()
     {
-        $this->setRequestParameter("iStart", 0);
-        $this->setRequestParameter("oxid", 'newstest');
+        $this->setRequestParameter('iStart', 0);
+        $this->setRequestParameter('oxid', 'newstest');
         $oNewsletter = oxNew('Newsletter_selection');
         $this->assertEquals(1, $oNewsletter->getUserCount());
 
         $oDB = oxDb::getDb();
         $sDelete = "delete from oxobject2group where oxobjectid='_testUserId'";
         $oDB->Execute($sDelete);
-        $this->setRequestParameter("iStart", 0);
-        $this->setRequestParameter("oxid", 'newstest');
+        $this->setRequestParameter('iStart', 0);
+        $this->setRequestParameter('oxid', 'newstest');
         $oNewsletter = oxNew('Newsletter_selection');
         $this->assertEquals(0, $oNewsletter->getUserCount());
     }
@@ -134,10 +136,10 @@ class NewsletterSelectionTest extends \OxidTestCase
             $oView = oxNew('Newsletter_Selection');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Newsletter_Plain::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Newsletter_Plain::save()');
 
             return;
         }
-        $this->fail("error in Newsletter_Selection::save()");
+        $this->fail('error in Newsletter_Selection::save()');
     }
 }

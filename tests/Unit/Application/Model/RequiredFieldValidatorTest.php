@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 /**
@@ -26,21 +28,21 @@ class RequiredFieldValidatorTest extends \OxidTestCase
 {
     public function providerValidateFieldValue()
     {
-        return array(
-            array('value1', true),
-            array(' value1 ', true),
-            array(null, false),
-            array('', false),
-            array(' ', false),
-            array('    ', false),
-            array(array(), true),
-            array(array('value1'), true),
-            array(array('value1', 'value2'), true),
-            array(array(null), false),
-            array(array(''), false),
-            array(array('', 'value2'), false),
-            array(array('value1', ''), false),
-        );
+        return [
+            ['value1', true],
+            [' value1 ', true],
+            [null, false],
+            ['', false],
+            [' ', false],
+            ['    ', false],
+            [[], true],
+            [['value1'], true],
+            [['value1', 'value2'], true],
+            [[null], false],
+            [[''], false],
+            [['', 'value2'], false],
+            [['value1', ''], false],
+        ];
     }
 
     /**

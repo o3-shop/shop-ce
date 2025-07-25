@@ -50,12 +50,12 @@ class ArticleAttribute extends AdminDetailsController
         $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oArticle->load($soxId);
 
             if ($oArticle->isDerived()) {
-                $this->_aViewData["readonly"] = true;
+                $this->_aViewData['readonly'] = true;
             }
         }
 
@@ -64,14 +64,14 @@ class ArticleAttribute extends AdminDetailsController
             $oArticleAttributeAjax = oxNew(ArticleAttributeAjax::class);
             $this->_aViewData['oxajax'] = $oArticleAttributeAjax->getColumns();
 
-            return "popups/article_attribute.tpl";
+            return 'popups/article_attribute.tpl';
         } elseif ($iAoc == 2) {
             $oArticleSelectionAjax = oxNew(ArticleSelectionAjax::class);
             $this->_aViewData['oxajax'] = $oArticleSelectionAjax->getColumns();
 
-            return "popups/article_selection.tpl";
+            return 'popups/article_selection.tpl';
         }
 
-        return "article_attribute.tpl";
+        return 'article_attribute.tpl';
     }
 }

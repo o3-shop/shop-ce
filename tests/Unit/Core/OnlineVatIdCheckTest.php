@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \stdClass;
-use \oxCompanyVatIn;
-use \oxTestModules;
+use oxCompanyVatIn;
+use stdClass;
 
 class OnlineVatIdCheckTest extends \OxidTestCase
 {
@@ -32,7 +33,7 @@ class OnlineVatIdCheckTest extends \OxidTestCase
     {
         parent::setUp();
 
-        ini_set("soap.wsdl_cache_enabled", "0");
+        ini_set('soap.wsdl_cache_enabled', '0');
     }
 
     /**
@@ -129,11 +130,11 @@ class OnlineVatIdCheckTest extends \OxidTestCase
      */
     public function testCheckOnlineWithServiceNotReachable()
     {
-        $oOnlineVatIdCheck = $this->getMock($this->getProxyClassName("oxOnlineVatIdCheck"), array("_isServiceAvailable"));
+        $oOnlineVatIdCheck = $this->getMock($this->getProxyClassName('oxOnlineVatIdCheck'), ['_isServiceAvailable']);
         $oOnlineVatIdCheck->expects($this->once())->method('_isServiceAvailable')->will($this->returnValue(false));
 
         $this->assertEquals(false, $oOnlineVatIdCheck->UNITcheckOnline(new stdClass()));
-        $this->assertEquals("SERVICE_UNREACHABLE", $oOnlineVatIdCheck->getError());
+        $this->assertEquals('SERVICE_UNREACHABLE', $oOnlineVatIdCheck->getError());
     }
 
     /**
@@ -151,8 +152,8 @@ class OnlineVatIdCheckTest extends \OxidTestCase
     public function testGetWsdlUrl_custom()
     {
         $oOnline = oxNew('oxOnlineVatIdCheck');
-        $this->getConfig()->setConfigParam("sVatIdCheckInterfaceWsdl", "sVatIdCheckInterfaceWsdl");
-        $this->assertEquals("sVatIdCheckInterfaceWsdl", $oOnline->getWsdlUrl());
+        $this->getConfig()->setConfigParam('sVatIdCheckInterfaceWsdl', 'sVatIdCheckInterfaceWsdl');
+        $this->assertEquals('sVatIdCheckInterfaceWsdl', $oOnline->getWsdlUrl());
     }
 
     public function testValidate()
@@ -163,7 +164,7 @@ class OnlineVatIdCheckTest extends \OxidTestCase
         $oExpect->countryCode = 'LT';
         $oExpect->vatNumber = '1212';
 
-        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, array('_checkOnline'));
+        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, ['_checkOnline']);
         $oOnlineVatCheck->expects($this->once())->method('_checkOnline')->with($this->equalTo($oExpect));
 
         $oOnlineVatCheck->validate($oVatIn);
@@ -177,7 +178,7 @@ class OnlineVatIdCheckTest extends \OxidTestCase
         $oExpect->countryCode = 'LT';
         $oExpect->vatNumber = '1212';
 
-        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, array('_checkOnline'));
+        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, ['_checkOnline']);
         $oOnlineVatCheck->expects($this->once())->method('_checkOnline')->with($this->equalTo($oExpect))->will($this->returnValue(false));
 
         $this->assertFalse($oOnlineVatCheck->validate($oVatIn));

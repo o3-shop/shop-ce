@@ -24,9 +24,9 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Configuration\Dao;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentConfigurationDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentConfigurationExtender;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentWithOrphanSettingEvent;
 use PHPUnit\Framework\TestCase;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ShopEnvironmentConfigurationExtender;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -219,7 +219,7 @@ class ShopEnvironmentConfigurationExtenderTest extends TestCase
                     'moduleSettings' => [
                         'some-setting-2' => [
                             'value' => 'new-value-2',
-                        ]
+                        ],
                     ],
                 ],
             ],

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxDb;
+use oxField;
+use oxTestModules;
 
 class NewsTest extends \OxidTestCase
 {
@@ -44,7 +45,6 @@ class NewsTest extends \OxidTestCase
 
         $this->_oNews = oxNew('oxnews');
         $this->_oNews->load($oBaseNews->getId());
-
 
         $oNewGroup = oxNew('oxobject2group');
         $oNewGroup->oxobject2group__oxobjectid = new oxField($this->_oNews->getId(), oxField::T_RAW);
@@ -94,7 +94,7 @@ class NewsTest extends \OxidTestCase
     public function testGetLongDescTags()
     {
         $oNews = oxNew('oxnews');
-        $oNews->oxnews__oxlongdesc = new oxField("[{* *}]parsed");
+        $oNews->oxnews__oxlongdesc = new oxField('[{* *}]parsed');
         $this->assertEquals('parsed', $oNews->getLongDesc());
     }
 
@@ -110,9 +110,9 @@ class NewsTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('blCheckTemplates', false);
 
         $oNews = oxNew('oxnews');
-        $oNews->oxnews__oxlongdesc = new oxField("[{* *}]generated");
+        $oNews->oxnews__oxlongdesc = new oxField('[{* *}]generated');
         $oNews->getLongDesc();
-        $oNews->oxnews__oxlongdesc = new oxField("[{* *}]regenerated");
+        $oNews->oxnews__oxlongdesc = new oxField('[{* *}]regenerated');
         $this->assertEquals('regenerated', $oNews->getLongDesc());
     }
 
@@ -197,7 +197,7 @@ class NewsTest extends \OxidTestCase
     public function testInsert()
     {
         $oTestNews = oxNew('oxnews');
-        $oTestNews->oxnews__oxdate = new oxField("2009-05-17");
+        $oTestNews->oxnews__oxdate = new oxField('2009-05-17');
         $oTestNews->UNITinsert();
 
         $oNews = oxNew('oxnews');
@@ -205,7 +205,7 @@ class NewsTest extends \OxidTestCase
             $this->fail('insert failed');
         }
 
-        $this->assertEquals("17.05.2009", $oNews->oxnews__oxdate->value);
+        $this->assertEquals('17.05.2009', $oNews->oxnews__oxdate->value);
     }
 
     /**
@@ -214,7 +214,7 @@ class NewsTest extends \OxidTestCase
     public function testInsert_dateIsZero()
     {
         $oTestNews = oxNew('oxnews');
-        $oTestNews->oxnews__oxdate = new oxField("0000-00-00");
+        $oTestNews->oxnews__oxdate = new oxField('0000-00-00');
         $oTestNews->UNITinsert();
 
         $oNews = oxNew('oxnews');
@@ -222,7 +222,7 @@ class NewsTest extends \OxidTestCase
             $this->fail('insert failed');
         }
 
-        $this->assertEquals(date("d.m.Y"), $oNews->oxnews__oxdate->value);
+        $this->assertEquals(date('d.m.Y'), $oNews->oxnews__oxdate->value);
     }
 
     /**
@@ -238,7 +238,7 @@ class NewsTest extends \OxidTestCase
             $this->fail('insert failed');
         }
 
-        $this->assertEquals(date("d.m.Y"), $oNews->oxnews__oxdate->value);
+        $this->assertEquals(date('d.m.Y'), $oNews->oxnews__oxdate->value);
     }
 
     /**
@@ -278,9 +278,9 @@ class NewsTest extends \OxidTestCase
     {
         $oObj = $this->getProxyClass('oxnews');
         $oObj->disableLazyLoading();
-        $oObj->UNITsetFieldData("oxid", "asd< as");
-        $oObj->UNITsetFieldData("oxshortdeSc", "asd< as");
-        $oObj->UNITsetFieldData("oxlongDesc", "asd< as");
+        $oObj->UNITsetFieldData('oxid', 'asd< as');
+        $oObj->UNITsetFieldData('oxshortdeSc', 'asd< as');
+        $oObj->UNITsetFieldData('oxlongDesc', 'asd< as');
         $this->assertEquals('asd&lt; as', $oObj->oxnews__oxid->value);
         $this->assertEquals('asd&lt; as', $oObj->oxnews__oxshortdesc->value);
         $this->assertEquals('asd< as', $oObj->oxnews__oxlongdesc->value);
@@ -296,7 +296,7 @@ class NewsTest extends \OxidTestCase
         $oDB = oxDb::getDb(oxDB::FETCH_MODE_ASSOC);
         $oDB->execute($sSql);
 
-        oxTestModules::addFunction("oxutilsview", "parseThroughSmarty", "{return '<p>test text</p>';}");
+        oxTestModules::addFunction('oxutilsview', 'parseThroughSmarty', "{return '<p>test text</p>';}");
 
         $oNews = oxNew('oxnews');
         $oNews->load($this->_oNews->getId());

@@ -68,7 +68,6 @@ class ShopViewValidator
         return $this->_aMultiLangTables;
     }
 
-
     /**
      * Sets multi shop tables.
      *
@@ -129,7 +128,6 @@ class ShopViewValidator
         return $this->_aAllShopLanguages;
     }
 
-
     /**
      * Sets shop id.
      *
@@ -179,8 +177,8 @@ class ShopViewValidator
     {
         $blResult = false;
 
-        $blEndsWithShopId = preg_match("/[_]([0-9]+)$/", $sViewName, $aMatchEndsWithShopId);
-        $blContainsShopId = preg_match("/[_]([0-9]+)[_]/", $sViewName, $aMatchContainsShopId);
+        $blEndsWithShopId = preg_match('/[_]([0-9]+)$/', $sViewName, $aMatchEndsWithShopId);
+        $blContainsShopId = preg_match('/[_]([0-9]+)[_]/', $sViewName, $aMatchContainsShopId);
 
         if (
             (!$blEndsWithShopId && !$blContainsShopId) ||
@@ -192,7 +190,6 @@ class ShopViewValidator
 
         return $blResult;
     }
-
 
     /**
      * Returns list of shop specific views currently in database

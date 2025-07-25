@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
+use Exception;
+use oxDb;
 use OxidEsales\EshopCommunity\Application\Model\Article;
-use \oxDb;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Article_Stock class
  */
 class ArticleStockTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -49,7 +50,7 @@ class ArticleStockTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", oxDb::getDb()->getOne('select oxid from oxarticles where oxparentid != "" '));
+        $this->setRequestParameter('oxid', oxDb::getDb()->getOne('select oxid from oxarticles where oxparentid != "" '));
 
         // testing..
         $oView = oxNew('Article_Stock');
@@ -57,7 +58,7 @@ class ArticleStockTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Article);
+        $this->assertTrue($aViewData['edit'] instanceof Article);
         $this->assertEquals('article_stock.tpl', $sTplName);
     }
 
@@ -73,18 +74,18 @@ class ArticleStockTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'setLanguage', '{ return true; }');
         oxTestModules::addFunction('oxarticle', 'assign', '{ return true; }');
 
-        $this->setRequestParameter("editval", array("oxarticles__oxremindactive" => 1, "oxarticles__oxremindamount" => 1, "oxarticles__oxstock" => 2));
+        $this->setRequestParameter('editval', ['oxarticles__oxremindactive' => 1, 'oxarticles__oxremindamount' => 1, 'oxarticles__oxstock' => 2]);
 
         // testing..
         try {
             $oView = oxNew('Article_Stock');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Stock::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Stock::save()');
 
             return;
         }
-        $this->fail("error in Article_Stock::save()");
+        $this->fail('error in Article_Stock::save()');
     }
 
     /**
@@ -96,10 +97,10 @@ class ArticleStockTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxbase', 'save', '{ throw new Exception( "save" ); }');
         $this->setRequestParameter(
-            "editval",
-            array("oxprice2article__oxamountto" => 9,
-                             "pricetype"                   => "oxaddabs",
-                             "price"                       => 9)
+            'editval',
+            ['oxprice2article__oxamountto' => 9,
+                             'pricetype'                   => 'oxaddabs',
+                             'price'                       => 9]
         );
 
         // testing..
@@ -107,11 +108,11 @@ class ArticleStockTest extends \OxidTestCase
             $oView = oxNew('Article_Stock');
             $oView->addprice();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Stock::addprice()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Stock::addprice()');
 
             return;
         }
-        $this->fail("error in Article_Stock::save()");
+        $this->fail('error in Article_Stock::save()');
     }
 
     /**
@@ -124,25 +125,25 @@ class ArticleStockTest extends \OxidTestCase
         oxTestModules::addFunction('oxbase', 'save', '{ throw new Exception( "save" ); }');
         //set default params witch will be overriden
         $this->setRequestParameter(
-            "editval",
-            array("oxprice2article__oxamountto" => 9,
-                             "pricetype"                   => "oxaddabs",
-                             "price"                       => 9)
+            'editval',
+            ['oxprice2article__oxamountto' => 9,
+                             'pricetype'                   => 'oxaddabs',
+                             'price'                       => 9]
         );
         //set params passed to func
-        $sOXID = "oxid";
-        $aParams = array("oxprice2article__oxamountto" => 20, "pricetype" => "oxaddabs", "price" => 20);
+        $sOXID = 'oxid';
+        $aParams = ['oxprice2article__oxamountto' => 20, 'pricetype' => 'oxaddabs', 'price' => 20];
 
         // testing..
         try {
             $oView = oxNew('Article_Stock');
             $oView->addprice($sOXID, $aParams);
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Stock::addprice()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Stock::addprice()');
 
             return;
         }
-        $this->fail("error in Article_Stock::save()");
+        $this->fail('error in Article_Stock::save()');
     }
 
     /**
@@ -154,29 +155,29 @@ class ArticleStockTest extends \OxidTestCase
     {
         //set default params witch will be overriden
         $this->setRequestParameter(
-            "editval",
-            array("oxprice2article__oxamountto" => 9,
-                             "pricetype"                   => "oxaddabs",
-                             "price"                       => 9)
+            'editval',
+            ['oxprice2article__oxamountto' => 9,
+                             'pricetype'                   => 'oxaddabs',
+                             'price'                       => 9]
         );
         //set params passed to func
-        $sOXID = "_testId";
-        $aParams = array("oxprice2article__oxamountto" => 20, "pricetype" => "oxaddabs", "price" => 20);
+        $sOXID = '_testId';
+        $aParams = ['oxprice2article__oxamountto' => 20, 'pricetype' => 'oxaddabs', 'price' => 20];
 
         $oDb = oxDb::getDb();
 
         /** @var Article_Stock|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, array("resetContentCache"), array(), '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, ['resetContentCache'], [], '', false);
         $oView->expects($this->atLeastOnce())->method('resetContentCache');
 
         $oView->addprice($sOXID, $aParams);
-        $this->assertEquals("1", $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('1', $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
         $oView->addprice($sOXID, $aParams);
-        $this->assertEquals("1", $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('1', $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
         //update amount
-        $aParams = array("oxprice2article__oxamountto" => 100);
+        $aParams = ['oxprice2article__oxamountto' => 100];
         $oView->addprice($sOXID, $aParams);
-        $this->assertEquals("100", $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('100', $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
     }
 
     /**
@@ -188,10 +189,10 @@ class ArticleStockTest extends \OxidTestCase
     {
         //set default params witch will be overwritten
         $this->setRequestParameter(
-            "updateval",
-            array("_testId" => array("oxprice2article__oxamountto" => 50,
-                                                  "pricetype"                   => "oxaddabs",
-                                                  "price"                       => 20))
+            'updateval',
+            ['_testId' => ['oxprice2article__oxamountto' => 50,
+                                                  'pricetype'                   => 'oxaddabs',
+                                                  'price'                       => 20]]
         );
         $oDb = oxDb::getDb();
 
@@ -201,13 +202,13 @@ class ArticleStockTest extends \OxidTestCase
         $this->assertFalse($oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
 
         $this->setRequestParameter(
-            "editval",
-            array("oxprice2article__oxamountto" => 9,
-                             "pricetype"                   => "oxaddabs",
-                             "price"                       => 9)
+            'editval',
+            ['oxprice2article__oxamountto' => 9,
+                             'pricetype'                   => 'oxaddabs',
+                             'price'                       => 9]
         );
         $oView->updateprices();
-        $this->assertEquals("50", $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('50', $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
     }
 
     /**
@@ -220,17 +221,17 @@ class ArticleStockTest extends \OxidTestCase
         $oDb = oxDb::getDb();
         $oDb->execute("insert into oxprice2article set oxid='_testId', oxartid='_testArtId' ");
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, array("resetContentCache"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, ['resetContentCache']);
         $oView->expects($this->atLeastOnce())->method('resetContentCache');
 
         $this->setRequestParameter('oxid', '_testArtId');
         $oView->deleteprice();
-        $this->assertEquals("1", $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('1', $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
 
         $this->setRequestParameter('oxid', '');
         $this->setRequestParameter('priceid', '_testId');
         $oView->deleteprice();
-        $this->assertEquals("1", $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('1', $oDb->getOne("select 1 from oxprice2article where oxid='_testId'"));
 
         $this->setRequestParameter('oxid', '_testArtId');
         $this->setRequestParameter('priceid', '_testId');
@@ -249,25 +250,25 @@ class ArticleStockTest extends \OxidTestCase
 
         //set default params for first save
         $this->setRequestParameter(
-            "editval",
-            array("oxprice2article__oxamountto" => 123,
-                             "pricetype"                   => "oxaddabs", "price" => 9)
+            'editval',
+            ['oxprice2article__oxamountto' => 123,
+                             'pricetype'                   => 'oxaddabs', 'price' => 9]
         );
         //set oxid
-        $sOXID = "_testId";
+        $sOXID = '_testId';
 
         //expected shop id
         $sShopId = $this->getTestConfig()->getShopEdition() == 'EE' ? '2' : '1';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("getShopId"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopId']);
         $oConfig->expects($this->any())->method('getShopId')->will($this->returnValue($sShopId));
 
-        $oBase = $this->getMock(\OxidEsales\Eshop\Core\Model\BaseModel::class, array('isDerived'));
+        $oBase = $this->getMock(\OxidEsales\Eshop\Core\Model\BaseModel::class, ['isDerived']);
         $oBase->expects($this->any())->method('isDerived')->will($this->returnValue(false));
 
         oxTestModules::addModuleObject('oxbase', $oBase);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, array('getConfig', 'resetContentCache', 'getEditObjectId', 'oxNew'), array(), '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, ['getConfig', 'resetContentCache', 'getEditObjectId', 'oxNew'], [], '', false);
         $oView->expects($this->atLeastOnce())->method('getConfig')->will($this->returnValue($oConfig));
         $oView->expects($this->atLeastOnce())->method('resetContentCache');
         $oView->expects($this->atLeastOnce())->method('getEditObjectId')->will($this->returnValue('_testArtId'));
@@ -277,18 +278,18 @@ class ArticleStockTest extends \OxidTestCase
 
         //first add new stock price
         $oView->addprice($sOXID);
-        $this->assertEquals("123", $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('123', $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
 
         //pass update params
-        $aParams = array("oxprice2article__oxamountto" => 777, "pricetype" => "oxaddabs", "price" => 20);
+        $aParams = ['oxprice2article__oxamountto' => 777, 'pricetype' => 'oxaddabs', 'price' => 20];
         $oView->addprice($sOXID, $aParams);
-        $this->assertEquals("777", $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('777', $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
         $this->assertEquals($sShopId, $oDb->getOne("select oxshopid from oxprice2article where oxid='_testId'"));
 
         //update only amount to
-        $aParams = array("oxprice2article__oxamountto" => 10101);
+        $aParams = ['oxprice2article__oxamountto' => 10101];
         $oView->addprice($sOXID, $aParams);
-        $this->assertEquals("10101", $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
+        $this->assertEquals('10101', $oDb->getOne("select oxamountto from oxprice2article where oxid='_testId'"));
         $this->assertEquals($sShopId, $oDb->getOne("select oxshopid from oxprice2article where oxid='_testId'"));
     }
 }

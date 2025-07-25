@@ -23,11 +23,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
+use function is_array;
+
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ModuleSettingNotValidException;
-
-use function is_array;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 
 class EventsValidator implements ModuleConfigurationValidatorInterface
 {

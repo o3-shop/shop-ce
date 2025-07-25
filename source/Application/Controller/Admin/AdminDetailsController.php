@@ -51,7 +51,7 @@ class AdminDetailsController extends AdminController
         $language = Registry::getLang();
         $languageAbbr = $language->getLanguageAbbr($language->getTplLanguage());
 
-        return $languageAbbr === "de" ? 0 : 1;
+        return $languageAbbr === 'de' ? 0 : 1;
     }
 
     /**
@@ -285,7 +285,7 @@ class AdminDetailsController extends AdminController
      * @return string
      * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryTree" in next major
      */
-    protected function _getCategoryTree( // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _getCategoryTree(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         $sTplVarName,
         $sSelectedCatId,
         $sEditCatId = '',
@@ -411,10 +411,10 @@ class AdminDetailsController extends AdminController
             foreach ($aResetInfo as $sResetId => $iPos) {
                 switch ($sType) {
                     case 'vendor':
-                        $this->resetCounter("vendorArticle", $sResetId);
+                        $this->resetCounter('vendorArticle', $sResetId);
                         break;
                     case 'manufacturer':
-                        $this->resetCounter("manufacturerArticle", $sResetId);
+                        $this->resetCounter('manufacturerArticle', $sResetId);
                         break;
                 }
             }

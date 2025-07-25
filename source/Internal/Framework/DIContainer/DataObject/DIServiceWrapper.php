@@ -23,16 +23,16 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\DIContainer\DataObject;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Event\ShopAwareInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\MissingUpdateCallException;
+use OxidEsales\EshopCommunity\Internal\Framework\Event\ShopAwareInterface;
 
 class DIServiceWrapper
 {
-    const CALLS_SECTION = 'calls';
+    public const CALLS_SECTION = 'calls';
 
-    const SET_ACTIVE_SHOPS_METHOD = 'setActiveShops';
-    const SET_CONTEXT_METHOD = 'setContext';
-    const SET_CONTEXT_PARAMETER = '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface';
+    public const SET_ACTIVE_SHOPS_METHOD = 'setActiveShops';
+    public const SET_CONTEXT_METHOD = 'setContext';
+    public const SET_CONTEXT_PARAMETER = '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface';
 
     /** @var  string $key */
     private $key;
@@ -230,7 +230,6 @@ class DIServiceWrapper
         }
         throw new MissingUpdateCallException();
     }
-
 
     /**
      * @param string $methodName

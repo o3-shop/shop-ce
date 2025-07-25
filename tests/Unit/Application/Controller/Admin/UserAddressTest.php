@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use OxidEsales\EshopCommunity\Application\Model\User;
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\CountryList;
-
-use \Exception;
-use \oxTestModules;
+use OxidEsales\EshopCommunity\Application\Model\User;
+use oxTestModules;
 
 /**
  * Tests for User_Address class
  */
 class UserAddressTest extends \OxidTestCase
 {
-
     /**
      * User_Address::Render() test case
      *
@@ -38,11 +38,11 @@ class UserAddressTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "oxdefaultadmin");
-        $this->setRequestParameter("oxaddressid", "testaddressid");
+        $this->setRequestParameter('oxid', 'oxdefaultadmin');
+        $this->setRequestParameter('oxaddressid', 'testaddressid');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class, array("_allowAdminEdit"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class, ['_allowAdminEdit']);
         $oView->expects($this->once())->method('_allowAdminEdit')->will($this->returnValue(false));
         $this->assertEquals('user_address.tpl', $oView->render());
         $aViewData = $oView->getViewData();
@@ -67,23 +67,23 @@ class UserAddressTest extends \OxidTestCase
         oxTestModules::addFunction('oxaddress', 'assign', '{ return true; }');
         oxTestModules::addFunction('oxaddress', 'save', '{ throw new Exception( "save" ); }');
 
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("editval", array("oxaddress__oxid" => "testOxId"));
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('editval', ['oxaddress__oxid' => 'testOxId']);
 
         // testing..
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class, array("_allowAdminEdit"));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class, ['_allowAdminEdit']);
             $oView->expects($this->once())
                 ->method('_allowAdminEdit')
-                ->with($this->equalTo("testId"))
+                ->with($this->equalTo('testId'))
                 ->willReturn(true);
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in User_Address::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in User_Address::save()');
 
             return;
         }
-        $this->fail("Error in User_Address::save()");
+        $this->fail('Error in User_Address::save()');
     }
 
     /**
@@ -95,14 +95,14 @@ class UserAddressTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxaddress', 'delete', '{ return true; }');
 
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("editval", array("oxaddress__oxid" => "testOxId"));
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('editval', ['oxaddress__oxid' => 'testOxId']);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class, array("_allowAdminEdit"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserAddress::class, ['_allowAdminEdit']);
         $oView->expects($this->once())
             ->method('_allowAdminEdit')
-            ->with($this->equalTo("testId"))
+            ->with($this->equalTo('testId'))
             ->willReturn(true);
         $oView->delAddress();
     }

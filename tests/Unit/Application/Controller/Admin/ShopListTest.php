@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Shop_List class
@@ -34,17 +36,17 @@ class ShopListTest extends \OxidTestCase
         $this->markTestSkipped('Overwork due => tests are stoping without message.');
 
         // testing..
-        oxTestModules::addFunction("oxUtilsServer", "getOxCookie", "{return array(1);}");
-        oxTestModules::addFunction("oxUtils", "checkAccessRights", "{return true;}");
+        oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
+        oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
 
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
 
-        $oView = $this->getMock($this->getProxyClassName('Shop_List'), array('getSession'));
+        $oView = $this->getMock($this->getProxyClassName('Shop_List'), ['getSession']);
         $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
         $oView->init();
 
-        $this->assertEquals(array("oxshops" => array("oxname" => "asc")), $oView->getListSorting());
+        $this->assertEquals(['oxshops' => ['oxname' => 'asc']], $oView->getListSorting());
     }
 
     /**
@@ -64,15 +66,15 @@ class ShopListTest extends \OxidTestCase
     {
         // Force to set shop ID, as this method rewrite session value. So next line would be lost otherwise.
         $this->getConfig()->getShopId();
-        $this->getSession()->setVariable("malladmin", null);
-        $this->getSession()->setVariable("actshop", "testShopId");
+        $this->getSession()->setVariable('malladmin', null);
+        $this->getSession()->setVariable('actshop', 'testShopId');
 
-        $sViewName = getViewName("oxshops");
+        $sViewName = getViewName('oxshops');
 
         // testing..
         $oView = oxNew('Shop_List');
         $aWhere = $oView->buildWhere();
         $this->assertTrue(isset($aWhere[$sViewName . '.oxid']));
-        $this->assertEquals("testShopId", $aWhere[$sViewName . '.oxid']);
+        $this->assertEquals('testShopId', $aWhere[$sViewName . '.oxid']);
     }
 }

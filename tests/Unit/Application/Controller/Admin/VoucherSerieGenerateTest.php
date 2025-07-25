@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class VoucherSerieGenerateTest extends \OxidTestCase
 {
-
     /**
      * Cleanup
      *
@@ -33,8 +34,8 @@ class VoucherSerieGenerateTest extends \OxidTestCase
     public function tearDown(): void
     {
         // cleanup
-        $this->cleanUpTable("oxvouchers");
-        $this->cleanUpTable("oxvoucherseries");
+        $this->cleanUpTable('oxvouchers');
+        $this->cleanUpTable('oxvoucherseries');
 
         parent::tearDown();
     }
@@ -46,11 +47,10 @@ class VoucherSerieGenerateTest extends \OxidTestCase
      */
     public function testNextTick()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, array("generateVoucher"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, ['generateVoucher']);
         $oView->expects($this->exactly(2))
             ->method('generateVoucher')
             ->willReturnOnConsecutiveCalls(0, 1);
-
 
         $this->assertFalse($oView->nextTick(1));
         $this->assertEquals(1, $oView->nextTick(1));
@@ -63,12 +63,12 @@ class VoucherSerieGenerateTest extends \OxidTestCase
      */
     public function testGenerateVoucher()
     {
-        $this->getSession()->setVariable("voucherAmount", 100);
+        $this->getSession()->setVariable('voucherAmount', 100);
 
-        $oSerie = $this->getMock(\OxidEsales\Eshop\Application\Model\VoucherSerie::class, array("getId"));
-        $oSerie->expects($this->exactly(2))->method('getId')->will($this->returnValue("testId"));
+        $oSerie = $this->getMock(\OxidEsales\Eshop\Application\Model\VoucherSerie::class, ['getId']);
+        $oSerie->expects($this->exactly(2))->method('getId')->will($this->returnValue('testId'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, array("_getVoucherSerie"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, ['_getVoucherSerie']);
         $oView->expects($this->any())->method('_getVoucherSerie')->will($this->returnValue($oSerie));
         $this->assertEquals(1, $oView->generateVoucher(0));
         $this->assertEquals(2, $oView->generateVoucher(1));
@@ -81,17 +81,17 @@ class VoucherSerieGenerateTest extends \OxidTestCase
      */
     public function testRun()
     {
-        $this->setRequestParameter("iStart", 0);
+        $this->setRequestParameter('iStart', 0);
 
         // first generation call
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, array("nextTick", "stop"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, ['nextTick', 'stop']);
         $oView->expects($this->exactly(100))->method('nextTick')->will($this->returnValue(1));
         $oView->expects($this->never())->method('stop');
 
         $oView->run();
 
         // last generation call
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, array("nextTick", "stop"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieGenerate::class, ['nextTick', 'stop']);
         $oView->expects($this->once())->method('nextTick')->will($this->returnValue(false));
         $oView->expects($this->once())->method('stop');
 

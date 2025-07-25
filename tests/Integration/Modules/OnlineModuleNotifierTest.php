@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
@@ -65,7 +67,7 @@ class OnlineModuleNotifierTest extends BaseModuleTestCase
         $this->installModule('with_everything');
 
         /** @var oxOnlineModuleVersionNotifierCaller|MockObject $oCaller */
-        $oCaller = $this->getMock(\OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller::class, array('doRequest'), array(), '', false);
+        $oCaller = $this->getMock(\OxidEsales\Eshop\Core\OnlineModuleVersionNotifierCaller::class, ['doRequest'], [], '', false);
         $oCaller->method('doRequest')->with($this->equalTo($this->getExpectedRequest()));
 
         $oNotifier = new oxOnlineModuleVersionNotifier($oCaller, oxNew('oxModuleList'));
@@ -89,12 +91,12 @@ class OnlineModuleNotifierTest extends BaseModuleTestCase
         $oRequest->productId = 'Shop';
 
         $modules = new \StdClass();
-        $modules->module = array();
+        $modules->module = [];
 
-        $aModulesInfo = array();
-        $aModulesInfo[] = array('id' => 'extending_1_class', 'version' => '1.0', 'activeInShop' => array($sShopUrl));
-        $aModulesInfo[] = array('id' => 'extending_1_class_3_extensions', 'version' => '1.0', 'activeInShop' => array($sShopUrl));
-        $aModulesInfo[] = array('id' => 'with_everything', 'version' => '1.0', 'activeInShop' => array());
+        $aModulesInfo = [];
+        $aModulesInfo[] = ['id' => 'extending_1_class', 'version' => '1.0', 'activeInShop' => [$sShopUrl]];
+        $aModulesInfo[] = ['id' => 'extending_1_class_3_extensions', 'version' => '1.0', 'activeInShop' => [$sShopUrl]];
+        $aModulesInfo[] = ['id' => 'with_everything', 'version' => '1.0', 'activeInShop' => []];
 
         foreach ($aModulesInfo as $aModuleInfo) {
             $module = new \StdClass();

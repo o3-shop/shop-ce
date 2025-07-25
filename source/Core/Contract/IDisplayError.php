@@ -27,7 +27,6 @@ namespace OxidEsales\EshopCommunity\Core\Contract;
  */
 interface IDisplayError
 {
-
     /**
      * This method should return a localized message for displaying
      *

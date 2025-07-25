@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\FinderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidEshopPackage;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Webmozart\PathUtil\Path;

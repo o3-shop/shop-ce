@@ -44,7 +44,7 @@ class Locator extends Base
     /**
      * Locator type
      */
-    protected $_sType = "list";
+    protected $_sType = 'list';
 
     /**
      * Next product to currently loaded
@@ -433,7 +433,7 @@ class Locator extends Base
             $oLang = Registry::getLang();
             $sTitle = $oLang->translateString('RECOMMLIST');
             if ($sSearchRecomm !== null) {
-                $sTitle .= " / " . $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchFormRecomm . '"';
+                $sTitle .= ' / ' . $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchFormRecomm . '"';
             }
             $oLocatorTarget->setSearchTitle($sTitle);
             $oLocatorTarget->setActiveCategory($oRecommList);
@@ -504,7 +504,7 @@ class Locator extends Base
     {
         return $this->makeLink($sLink, $sParams);
     }
-    
+
     /**
      * Appends urs with currently passed parameters
      *
@@ -537,7 +537,7 @@ class Locator extends Base
     {
         return $this->findActPageNumber($iPageNr, $oIdList, $oArticle);
     }
-    
+
     /**
      * If page number is not passed trying to fetch it from list of ids. To search
      * for position in list, article ids list and current article id must be passed
@@ -578,7 +578,7 @@ class Locator extends Base
     {
         return $this->getPageNumber($iPageNr);
     }
-    
+
     /**
      * Gets current page number.
      *

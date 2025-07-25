@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \Smarty;
-use \oxRegistry;
+use oxRegistry;
+use Smarty;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/function.oxscript.php';
 if (file_exists($filePath)) {
@@ -31,17 +33,16 @@ if (file_exists($filePath)) {
 
 class PluginSmartyOxScriptTest extends \OxidTestCase
 {
-
     /**
      * Check for error if not existing file for include given.
      */
     public function testSmartyFunctionOxScript_includeNotExist()
     {
-        $this->getConfig()->setConfigParam("iDebug", -1);
+        $this->getConfig()->setConfigParam('iDebug', -1);
 
         $warningTriggered = false;
 
-        set_error_handler(function($errno, $errstr) use (&$warningTriggered) {
+        set_error_handler(function ($errno, $errstr) use (&$warningTriggered) {
             if ($errno === E_WARNING || $errno === E_USER_WARNING) {
                 $warningTriggered = true;
             }
@@ -49,13 +50,12 @@ class PluginSmartyOxScriptTest extends \OxidTestCase
         });
 
         $oSmarty = new Smarty();
-        $this->assertEquals('', smarty_function_oxscript(array('include' => 'somescript.js'), $oSmarty));
+        $this->assertEquals('', smarty_function_oxscript(['include' => 'somescript.js'], $oSmarty));
 
         restore_error_handler();
 
         $this->assertTrue($warningTriggered, 'Expected warning was not triggered');
     }
-
 
     /**
      * Check oxscript include
@@ -63,11 +63,11 @@ class PluginSmartyOxScriptTest extends \OxidTestCase
     public function testSmartyFunctionOxScript_includeExist()
     {
         $oSmarty = new Smarty();
-        $this->assertEquals('', smarty_function_oxscript(array('include' => 'http://someurl/src/js/libs/jquery.min.js'), $oSmarty));
+        $this->assertEquals('', smarty_function_oxscript(['include' => 'http://someurl/src/js/libs/jquery.min.js'], $oSmarty));
 
         $sOutput = '<script type="text/javascript" src="http://someurl/src/js/libs/jquery.min.js"></script>';
 
-        $this->assertEquals($sOutput, smarty_function_oxscript(array('inWidget' => false), $oSmarty));
+        $this->assertEquals($sOutput, smarty_function_oxscript(['inWidget' => false], $oSmarty));
     }
 
     /**
@@ -76,7 +76,7 @@ class PluginSmartyOxScriptTest extends \OxidTestCase
     public function testSmartyFunctionOxScript_widget_include()
     {
         $oSmarty = new Smarty();
-        $this->assertEquals('', smarty_function_oxscript(array('include' => 'http://someurl/src/js/libs/jquery.min.js'), $oSmarty));
+        $this->assertEquals('', smarty_function_oxscript(['include' => 'http://someurl/src/js/libs/jquery.min.js'], $oSmarty));
 
         $sOutput = <<<JS
 <script type='text/javascript'>
@@ -86,7 +86,7 @@ class PluginSmartyOxScriptTest extends \OxidTestCase
 </script>
 JS;
 
-        $this->assertEquals($sOutput, smarty_function_oxscript(array('widget' => 'somewidget', 'inWidget' => true), $oSmarty));
+        $this->assertEquals($sOutput, smarty_function_oxscript(['widget' => 'somewidget', 'inWidget' => true], $oSmarty));
     }
 
     /**
@@ -95,11 +95,11 @@ JS;
     public function testSmartyFunctionOxScript_add()
     {
         $oSmarty = new Smarty();
-        $this->assertEquals('', smarty_function_oxscript(array('add' => 'oxidadd'), $oSmarty));
+        $this->assertEquals('', smarty_function_oxscript(['add' => 'oxidadd'], $oSmarty));
 
         $sOutput = "<script type='text/javascript'>oxidadd</script>";
 
-        $this->assertEquals($sOutput, smarty_function_oxscript(array(), $oSmarty));
+        $this->assertEquals($sOutput, smarty_function_oxscript([], $oSmarty));
     }
 
     /**
@@ -107,13 +107,13 @@ JS;
      */
     public function addProvider()
     {
-        return array(
-            array('oxidadd', 'oxidadd'),
-            array('"oxidadd"', '"oxidadd"'),
-            array("'oxidadd'", "\\'oxidadd\\'"),
-            array("oxid\r\nadd", 'oxid\nadd'),
-            array("oxid\nadd", 'oxid\nadd'),
-        );
+        return [
+            ['oxidadd', 'oxidadd'],
+            ['"oxidadd"', '"oxidadd"'],
+            ["'oxidadd'", "\\'oxidadd\\'"],
+            ["oxid\r\nadd", 'oxid\nadd'],
+            ["oxid\nadd", 'oxid\nadd'],
+        ];
     }
 
     /**
@@ -124,9 +124,9 @@ JS;
     public function testSmartyFunctionOxScript_widget_add($sScript, $sScriptOutput)
     {
         $oSmarty = new Smarty();
-        $this->assertEquals('', smarty_function_oxscript(array('add' => $sScript), $oSmarty));
+        $this->assertEquals('', smarty_function_oxscript(['add' => $sScript], $oSmarty));
 
         $sOutput = "<script type='text/javascript'>window.addEventListener('load', function() { WidgetsHandler.registerFunction('$sScriptOutput', 'somewidget'); }, false )</script>";
-        $this->assertEquals($sOutput, smarty_function_oxscript(array('widget' => 'somewidget', 'inWidget' => true), $oSmarty));
+        $this->assertEquals($sOutput, smarty_function_oxscript(['widget' => 'somewidget', 'inWidget' => true], $oSmarty));
     }
 }

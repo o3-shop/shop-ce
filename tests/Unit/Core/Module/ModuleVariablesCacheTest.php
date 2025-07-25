@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -27,29 +29,29 @@ class ModuleVariablesCacheTest extends \OxidTestCase
 {
     public function testSetGetCache()
     {
-        $sTest = "test val";
+        $sTest = 'test val';
 
         $moduleCache = oxNew('oxFileCache');
 
-        $moduleCache->setToCache("testKey", $sTest);
-        $this->assertEquals($sTest, $moduleCache->getFromCache("testKey"));
+        $moduleCache->setToCache('testKey', $sTest);
+        $this->assertEquals($sTest, $moduleCache->getFromCache('testKey'));
     }
 
     public function testSetGetCacheSubShopSpecific()
     {
-        $sTest = "test val";
+        $sTest = 'test val';
 
         $moduleCache = oxNew('oxFileCache');
 
-        $moduleCache->setToCache("testKey", $sTest);
-        $this->assertEquals($sTest, $moduleCache->getFromCache("testKey"));
+        $moduleCache->setToCache('testKey', $sTest);
+        $this->assertEquals($sTest, $moduleCache->getFromCache('testKey'));
     }
 
     public function testGetCacheFileName()
     {
         $moduleCache = $this->getProxyClass('oxFileCache');
 
-        $sExpt = "config.all.testval.txt";
-        $this->assertEquals($sExpt, basename($moduleCache->getCacheFilePath("testVal")));
+        $sExpt = 'config.all.testval.txt';
+        $this->assertEquals($sExpt, basename($moduleCache->getCacheFilePath('testVal')));
     }
 }

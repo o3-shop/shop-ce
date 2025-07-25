@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Core\Field;
-use \oxTestModules;
+use oxTestModules;
 
 class FileTest extends \OxidTestCase
 {
@@ -42,7 +44,7 @@ class FileTest extends \OxidTestCase
      */
     protected function tearDown(): void
     {
-        oxDb::getDb()->execute("TRUNCATE TABLE `oxfiles`");
+        oxDb::getDb()->execute('TRUNCATE TABLE `oxfiles`');
         $this->cleanUpTable('oxorder');
         $this->cleanUpTable('oxorderarticles');
         $this->cleanUpTable('oxorderfiles');
@@ -57,12 +59,12 @@ class FileTest extends \OxidTestCase
         $sFilePath = $this->createFile('out/downloads/test.jpg', 'test jpg file');
 
         /** @var oxFile|PHPUnit\Framework\MockObject\MockObject $oFile */
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('getStoreLocation', 'isUnderDownloadFolder'));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['getStoreLocation', 'isUnderDownloadFolder']);
         $oFile->expects($this->any())->method('getStoreLocation')->will($this->returnValue($sFilePath));
         $oFile->expects($this->any())->method('isUnderDownloadFolder')->will($this->returnValue(true));
 
         /** @var oxUtils|PHPUnit\Framework\MockObject\MockObject $oUtils */
-        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('setHeader', 'showMessageAndExit'));
+        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['setHeader', 'showMessageAndExit']);
         $oUtils->expects($this->any())->method('setHeader');
         $oUtils->expects($this->once())->method('showMessageAndExit');
         oxTestModules::addModuleObject('oxUtils', $oUtils);
@@ -117,7 +119,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetStoreLocation()
     {
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('_getBaseDownloadDirPath', '_getFileLocation'));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['_getBaseDownloadDirPath', '_getFileLocation']);
         $oFile->expects($this->once())->method('_getBaseDownloadDirPath')->will($this->returnValue('aa'));
         $oFile->expects($this->once())->method('_getFileLocation')->will($this->returnValue('bb'));
 
@@ -131,7 +133,7 @@ class FileTest extends \OxidTestCase
     {
         $this->getConfig()->setConfigParam('sDownloadsDir', '/fullPath');
 
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('_getFileLocation'));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['_getFileLocation']);
         $oFile->expects($this->once())->method('_getFileLocation')->will($this->returnValue('fileName'));
 
         $this->assertEquals('/fullPath/fileName', $oFile->getStoreLocation());
@@ -144,7 +146,7 @@ class FileTest extends \OxidTestCase
     {
         $this->getConfig()->setConfigParam('sDownloadsDir', 'relativePath');
 
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('_getFileLocation'));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['_getFileLocation']);
         $oFile->expects($this->once())->method('_getFileLocation')->will($this->returnValue('fileName'));
 
         $this->assertEquals(getShopBasePath() . '/relativePath/fileName', $oFile->getStoreLocation());
@@ -155,7 +157,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetStoreLocationNotSet()
     {
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('_getFileLocation'));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['_getFileLocation']);
         $oFile->expects($this->once())->method('_getFileLocation')->will($this->returnValue('fileName'));
 
         $this->assertEquals(getShopBasePath() . '/out/downloads/fileName', $oFile->getStoreLocation());
@@ -213,13 +215,13 @@ class FileTest extends \OxidTestCase
 
         $this->assertTrue($oFile->delete('testId1'));
         $this->assertTrue(is_file($filePath));
-        $this->assertEquals(2, $oDb->getOne("SELECT COUNT(*) FROM `oxfiles`"));
+        $this->assertEquals(2, $oDb->getOne('SELECT COUNT(*) FROM `oxfiles`'));
 
         $oFile = oxNew('oxFile');
         $oFile->load('testId2');
         $this->assertTrue($oFile->delete());
         $this->assertFalse(is_file($filePath));
-        $this->assertEquals(1, $oDb->getOne("SELECT COUNT(*) FROM `oxfiles`"));
+        $this->assertEquals(1, $oDb->getOne('SELECT COUNT(*) FROM `oxfiles`'));
 
         $oFile = oxNew('oxFile');
 
@@ -237,12 +239,12 @@ class FileTest extends \OxidTestCase
 
         $sFileHah = md5_file($filePath);
 
-        $aFileInfo = array('tmp_name' => $filePath, 'name' => 'testFile');
+        $aFileInfo = ['tmp_name' => $filePath, 'name' => 'testFile'];
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getUploadedFile'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile']);
         $oConfig->expects($this->any())->method('getUploadedFile')->will($this->returnValue($aFileInfo));
 
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('getConfig', '_uploadFile', '_getHashedFileDir'), array(), '', false);
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['getConfig', '_uploadFile', '_getHashedFileDir'], [], '', false);
         $oFile->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
         $oFile->expects($this->any())->method('_uploadFile')->will($this->returnValue(true));
         $oFile->expects($this->any())->method('_getHashedFileDir')->will($this->returnValue('eb'));
@@ -259,16 +261,16 @@ class FileTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Wrong exception message.');
         $this->expectException('oxException');
-        $this->expectExceptionMessage("EXCEPTION_COULDNOTWRITETOFILE");
+        $this->expectExceptionMessage('EXCEPTION_COULDNOTWRITETOFILE');
 
         $filePath = $this->createFile('out/downloads/testFile', 'test jpg file');
 
-        $aFileInfo = array('tmp_name' => $filePath, 'name' => 'testFile');
+        $aFileInfo = ['tmp_name' => $filePath, 'name' => 'testFile'];
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getUploadedFile'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile']);
         $oConfig->expects($this->any())->method('getUploadedFile')->will($this->returnValue($aFileInfo));
 
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, array('getConfig', '_uploadFile', '_getHashedFileDir'), array(), '', false);
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['getConfig', '_uploadFile', '_getHashedFileDir'], [], '', false);
         $oFile->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
         $oFile->expects($this->any())->method('_uploadFile')->will($this->returnValue(false));
         $oFile->expects($this->any())->method('_getHashedFileDir')->will($this->returnValue('eb'));
@@ -307,7 +309,7 @@ class FileTest extends \OxidTestCase
         $oOrderArticle->save();
 
         $oFile = oxNew('oxFile');
-        $oFile->setId("fileId");
+        $oFile->setId('fileId');
         $this->assertTrue($oFile->hasValidDownloads());
     }
 
@@ -326,7 +328,7 @@ class FileTest extends \OxidTestCase
     public function testIsUploaded()
     {
         $oSubj = oxNew('oxFile');
-        $oSubj->oxfiles__oxstorehash = new oxField("hash5");
+        $oSubj->oxfiles__oxstorehash = new oxField('hash5');
         $this->assertTrue($oSubj->isUploaded());
     }
 
@@ -336,7 +338,7 @@ class FileTest extends \OxidTestCase
     public function testIsUploadedNegative()
     {
         $oSubj = oxNew('oxFile');
-        $oSubj->oxfiles__oxstorehash = new oxField("");
+        $oSubj->oxfiles__oxstorehash = new oxField('');
         $this->assertFalse($oSubj->isUploaded());
     }
 
@@ -345,7 +347,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetGlobalMaxDownloadsCount()
     {
-        $this->getConfig()->setConfigParam("iMaxDownloadsCount", 2);
+        $this->getConfig()->setConfigParam('iMaxDownloadsCount', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxmaxdownloads = new oxField(-1);
         $this->assertEquals(2, $oFile->getMaxDownloadsCount());
@@ -356,7 +358,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetMaxDownloadsCount()
     {
-        $this->getConfig()->setConfigParam("iMaxDownloadsCount", 2);
+        $this->getConfig()->setConfigParam('iMaxDownloadsCount', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxmaxdownloads = new oxField(0);
         $this->assertEquals(0, $oFile->getMaxDownloadsCount());
@@ -367,7 +369,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetGlobalMaxUnregisteredDownloadsCount()
     {
-        $this->getConfig()->setConfigParam("iMaxDownloadsCountUnregistered", 2);
+        $this->getConfig()->setConfigParam('iMaxDownloadsCountUnregistered', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxmaxunregdownloads = new oxField(-1);
         $this->assertEquals(2, $oFile->getMaxUnregisteredDownloadsCount());
@@ -378,7 +380,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetMaxUnregisteredDownloadsCount()
     {
-        $this->getConfig()->setConfigParam("iMaxDownloadsCountUnregistered", 2);
+        $this->getConfig()->setConfigParam('iMaxDownloadsCountUnregistered', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxmaxunregdownloads = new oxField(0);
         $this->assertEquals(0, $oFile->getMaxUnregisteredDownloadsCount());
@@ -389,7 +391,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetGlobalLinkExpirationTime()
     {
-        $this->getConfig()->setConfigParam("iLinkExpirationTime", 2);
+        $this->getConfig()->setConfigParam('iLinkExpirationTime', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxlinkexptime = new oxField(-1);
         $this->assertEquals(2, $oFile->getLinkExpirationTime());
@@ -400,7 +402,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetLinkExpirationTime()
     {
-        $this->getConfig()->setConfigParam("iLinkExpirationTime", 2);
+        $this->getConfig()->setConfigParam('iLinkExpirationTime', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxlinkexptime = new oxField(0);
         $this->assertEquals(0, $oFile->getLinkExpirationTime());
@@ -411,7 +413,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetGlobalDownloadExpirationTime()
     {
-        $this->getConfig()->setConfigParam("iDownloadExpirationTime", 2);
+        $this->getConfig()->setConfigParam('iDownloadExpirationTime', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxdownloadexptime = new oxField(-1);
         $this->assertEquals(2, $oFile->getDownloadExpirationTime());
@@ -422,7 +424,7 @@ class FileTest extends \OxidTestCase
      */
     public function testGetDownloadExpirationTime()
     {
-        $this->getConfig()->setConfigParam("iDownloadExpirationTime", 2);
+        $this->getConfig()->setConfigParam('iDownloadExpirationTime', 2);
         $oFile = oxNew('oxFile');
         $oFile->oxfiles__oxdownloadexptime = new oxField(0);
         $this->assertEquals(0, $oFile->getDownloadExpirationTime());

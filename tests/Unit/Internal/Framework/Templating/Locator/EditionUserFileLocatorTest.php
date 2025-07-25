@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -95,11 +97,11 @@ class EditionUserFileLocatorTest extends \PHPUnit\Framework\TestCase
                 'Application' => [
                     'views' => [
                         'admin' => [
-                            'user.xml' => '*this is menu xml for test*'
-                        ]
-                    ]
-                ]
-            ]
+                            'user.xml' => '*this is menu xml for test*',
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $this->vfsStreamDirectory = vfsStream::setup('root', null, $structure);
