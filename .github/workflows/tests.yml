@@ -183,7 +183,17 @@ jobs:
         run: |
           if [ -f junit.xml ]; then
             FAILURES=$(xmllint --xpath "count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
-            ERROR_OUTPUT=$(xmllint --xpath '//testcase[failure]/..' junit.xml 2>/dev/null | perl -ne 'while(/classname="([^"]+)" name="([^"]+)"/g){print "$1::$2\n"}')
+            ERROR_OUTPUT=$(
+              xmllint --xpath '//testcase[failure]/..' coverage/junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
+              while (/<testcase\b([^>]*)>/g) {
+              my $attr = $1;
+              my ($class) = $attr =~ /\bclass="([^"]*)"/;
+              my ($name)  = $attr =~ /\bname="([^"]*)"/;
+              print "$class::$name\n" if $class && $name;
+            }
+              '
+            )
+
             echo "FAILURES=$FAILURES"
             echo "ERROR_OUTPUT=$ERROR_OUTPUT"
              if [ "$FAILURES" -gt 0 ]; then
