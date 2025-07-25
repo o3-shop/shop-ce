@@ -621,8 +621,8 @@ INSERT INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`, `OXSNIPPET`, `OXTYPE`,
                           `OXTITLE`, `OXCONTENT`, `OXTITLE_1`, `OXCONTENT_1`, `OXACTIVE_2`, `OXTITLE_2`, `OXCONTENT_2`,
                           `OXACTIVE_3`, `OXTITLE_3`, `OXCONTENT_3`, `OXCATID`, `OXFOLDER`, `OXTERMVERSION`, `OXISPLAIN`)
 VALUES ('8709e45f31a86909e9f999222e80b1d0', 'oxstdfooter', 1, 1, 0, 1, 1, '', 'Standard Footer',
-        '<div>Demo des O3-Shops - <a href="https://o3-shop.com>besuchen Sie die Community-Homepage</a></div>', 'standard footer',
-        '<div>Demo of O3-Shop - <a href="https://www.o3-shop.com> Visit our community home page</a></div>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', '', '', 0),
+        '<div>Demo des O3-Shops - <a href="https://www.o3-shop.com">besuchen Sie die Community-Homepage</a></div>', 'standard footer',
+        '<div>Demo of O3-Shop - <a href="https://www.o3-shop.com"> Visit our community home page</a></div>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', '', '', 0),
 ('ad542e49bff479009.64538090', 'oxadminorderemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin', 'Folgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->value }] bestellt:<br>\r\n<br>', 'your order admin', 'The following products have been ordered in [{ $shop->oxshops__oxname->value }] right now:<br>\r\n<br>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
 ('c8d45408c4998f421.15746968', 'oxadminordernpemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin (Fremdländer)', '<div>\r\n<p> <span style="color: #ff0000;"><strong>Hinweis:</strong></span> Derzeit ist keine Liefermethode für dieses Land bekannt. Bitte Liefermöglichkeiten suchen und den Besteller unter Angabe der <strong>Lieferkosten</strong> informieren!\r\n&nbsp;
 </p> </div>
