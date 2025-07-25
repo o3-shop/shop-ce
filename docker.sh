@@ -122,7 +122,7 @@ rebuild_containers() {
 | Credentials    |
 | -------------- | ---------------------------- |
 | Shop URL       | http://localhost:8080        |
-| Admin URL      | http://localhoat:8080/admin/ |
+| Admin URL      | http://localhost:8080/admin/ |
 | Admin Login    | admin@example.com            |
 | Admin Password | admin123                     |
 | -------------- | ---------------------------- |
