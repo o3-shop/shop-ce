@@ -189,7 +189,7 @@ jobs:
               my $attr = $1;
               my ($class) = $attr =~ /\bclass="([^"]*)"/;
               my ($name)  = $attr =~ /\bname="([^"]*)"/;
-              print "$class"."::":"$name\n" if $class && $name;
+              print "$class"."::"."$name\n" if $class && $name;
             }
               '
             )
