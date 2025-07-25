@@ -169,7 +169,7 @@ class UserController extends FrontendController
                 $orderRemark = Registry::getSession()->getVariable('ordrem');
             } else {
                 // not connected so nowhere to save, we're going to use what we get from post
-                $orderRemark = '';
+                $orderRemark = Registry::getRequest()->getRequestEscapedParameter('order_remark', '');
             }
 
             $this->_sOrderRemark = $orderRemark ? Registry::getConfig()->checkParamSpecialChars($orderRemark) : false;
@@ -254,7 +254,7 @@ class UserController extends FrontendController
     public function isDownloadableProductWarning()
     {
         $basket = Registry::getSession()->getBasket();
-        if ($basket && Registry::getConfig()->getConfigParam("blEnableDownloads")) {
+        if ($basket && Registry::getConfig()->getConfigParam('blEnableDownloads')) {
             if ($basket->hasDownloadableProducts()) {
                 return true;
             }
