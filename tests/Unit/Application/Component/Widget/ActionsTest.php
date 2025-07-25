@@ -44,7 +44,6 @@ class ActionsTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->assertTrue(false);
         $action = oxNew('oxwActions');
         $this->assertSame('widget/product/action.tpl', $action->render());
     }
