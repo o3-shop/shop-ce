@@ -125,7 +125,7 @@ jobs:
           echo "::endgroup::"
           echo "::group::Apt Intall"
           sudo apt-get update
-          sudo apt-get install -y libxml2-utils
+          sudo apt-get install -y libxml2-utils perl
           echo "::endgroup::"
 
       - name: 🎨 Install Wave Theme
