@@ -231,7 +231,7 @@ jobs:
         run: |
           echo "## ❌ Some PHPUnit tests failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo ${{ env.FAILED_TESTS }} >> $GITHUB_STEP_SUMMARY
+          echo '${{ env.FAILED_TESTS }}' >> $GITHUB_STEP_SUMMARY
 
       - name: 💬 Comment Coverage on PR
         if: github.event_name == 'pull_request'
@@ -263,7 +263,8 @@ jobs:
             const failed = process.env.FAILED_TESTS || 'Unable to parse failures.';
             const body = `❌ **Some PHPUnit tests failed**:
             
-            ${failed}
+            '${failed}'
+            
             
             Please check your tests.`;
             github.rest.issues.createComment({
