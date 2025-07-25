@@ -125,7 +125,7 @@ jobs:
           echo "::endgroup::"
           echo "::group::Apt Intall"
           sudo apt-get update
-          sudo apt-get install -y libxml2-utils perl
+          sudo apt-get install -y libxml2-utils 
           echo "::endgroup::"
 
       - name: 🎨 Install Wave Theme
@@ -197,15 +197,7 @@ jobs:
             echo "FAILURES=$FAILURES"
             echo "ERROR_OUTPUT=$ERROR_OUTPUT"
              if [ "$FAILURES" -gt 0 ]; then
-                TESTS=$(xmllint --xpath '//testcase[failure]/..' coverage/junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
-              while (/<testcase\b([^>]*)>/g) {
-              my $attr = $1;
-              my ($class) = $attr =~ /\bclass="([^"]*)"/;
-              my ($name)  = $attr =~ /\bname="([^"]*)"/;
-              print "$class"."::"."$name\n" if $class && $name;
-            }
-              ')
-                echo "FAILED_TESTS=$TESTS" >> $GITHUB_ENV
+                echo "FAILED_TESTS=$ERROR_OUTPUT" >> $GITHUB_ENV
                 echo "TESTS_FAILED=true" >> $GITHUB_ENV
               else
                 echo "FAILED_TESTS=" >> $GITHUB_ENV
