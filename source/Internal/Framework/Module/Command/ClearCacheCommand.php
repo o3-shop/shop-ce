@@ -17,7 +17,6 @@ class ClearCacheCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $output->writeln('Clearing cache...');
 
         $DIR = __DIR__;
