@@ -32,13 +32,22 @@ jobs:
         run: php-cs-fixer check
         continue-on-error: true
 
-      - name: 💬 Comment on PR if style check fails
-        if: ${{ failure() && github.event_name == 'pull_request' }}
-        uses: thollander/actions-comment-pull-request@v3
+      - name: 📝 Save Code Style Results
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ "${{ steps.cs_check.outcome }}" == "failure" ]; then
+            echo "FAILED" > cs-fixer-result.txt
+          else
+            echo "PASSED" > cs-fixer-result.txt
+          fi
+
+      - name: 📤 Upload Code Style Results
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
         with:
-          message: |
-            Please check the code style. The PHP-CS-Fixer check failed.
-          comment_tag: cs-style-check
+          name: cs-fixer-result
+          path: cs-fixer-result.txt
+          retention-days: 1
 
       - name: 🔴 Fail if code style check failed
         if: steps.cs_check.outcome == 'failure'
@@ -233,47 +242,126 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '${{ env.FAILED_TESTS }}' >> $GITHUB_STEP_SUMMARY
 
-      - name: 💬 Comment Coverage on PR
+      - name: 📝 Save Test Results
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        run: |
+          # Create JSON result for this PHP version
+          cat > test-result-${{ matrix.php-version }}.json << EOF
+          {
+            "php_version": "${{ matrix.php-version }}",
+            "coverage": "${{ env.COVERAGE_PERCENTAGE }}",
+            "tests_failed": "${{ env.TESTS_FAILED }}",
+            "failed_tests": "${{ env.FAILED_TESTS }}"
+          }
+          EOF
+
+      - name: 📤 Upload Test Results
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const coverage = process.env.COVERAGE_PERCENTAGE;
-            if (coverage) {
-              const body = `## 📊 Coverage Report (PHP ${{ matrix.php-version }})
-
-              **Coverage: ${coverage}%**
-
-              ${coverage >= 80 ? '✅ Great coverage!' : coverage >= 60 ? '⚠️ Coverage could be improved' : '❌ Low coverage'}
-
-              [View detailed coverage report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: body
-              });
-            }
-
-      - name: 💬 Comment failed tests on PR
-        if: env.TESTS_FAILED == 'true' && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const failed = process.env.FAILED_TESTS || 'Unable to parse failures.';
-            const body = `❌ **Some PHPUnit tests failed**:
-            
-            '${failed}'
-            
-            
-            Please check your tests.`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
+          name: test-result-${{ matrix.php-version }}
+          path: test-result-${{ matrix.php-version }}.json
+          retention-days: 1
 
       - name: 🔴 Fail if tests failed
         if: env.TESTS_FAILED == 'true'
         run: exit 1
+
+  aggregate-results:
+    needs: [cs-fixer, test]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: 📥 Download Code Style Results
+        uses: actions/download-artifact@v4
+        with:
+          name: cs-fixer-result
+          path: ./cs-results
+          
+      - name: 📥 Download Test Results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-7.4
+          path: ./test-results
+          
+      - name: 📥 Download Test Results 8.0
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-8.0
+          path: ./test-results
+          
+      - name: 📥 Download Test Results 8.1
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-8.1
+          path: ./test-results
+          
+      - name: 📥 Download Test Results 8.2
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-8.2
+          path: ./test-results
+          
+      - name: 💬 Post Consolidated PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            let commentBody = '## 🧪 Test Results Summary\n\n';
+            
+            // Check for code style results
+            try {
+              const csResults = fs.readFileSync('./cs-results/cs-fixer-result.txt', 'utf8');
+              if (csResults.includes('FAILED')) {
+                commentBody += '### 🔴 Code Style Check\n❌ PHP-CS-Fixer check failed. Please check your code style.\n\n';
+              } else {
+                commentBody += '### ✅ Code Style Check\n✅ PHP-CS-Fixer check passed.\n\n';
+              }
+            } catch (error) {
+              commentBody += '### ⚠️ Code Style Check\n⚠️ No code style results available.\n\n';
+            }
+            
+            // Check for test results
+            commentBody += '### 📊 Coverage Report\n';
+            let hasFailures = false;
+            const phpVersions = ['7.4', '8.0', '8.1', '8.2'];
+            
+            phpVersions.forEach(version => {
+              try {
+                const filePath = `./test-results/test-result-${version}.json`;
+                if (fs.existsSync(filePath)) {
+                  const result = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                  const status = result.tests_failed === 'true' ? '❌' : '✅';
+                  const coverage = parseFloat(result.coverage) || 0;
+                  const coverageStatus = coverage >= 80 ? '✅' : coverage >= 60 ? '⚠️' : '❌';
+                  
+                  commentBody += `${status} **PHP ${result.php_version}**: Coverage ${result.coverage}% ${coverageStatus}\n`;
+                  
+                  if (result.tests_failed === 'true' && result.failed_tests) {
+                    hasFailures = true;
+                    commentBody += `   Failed tests: ${result.failed_tests}\n`;
+                  }
+                } else {
+                  commentBody += `⚠️ **PHP ${version}**: No results available\n`;
+                }
+              } catch (error) {
+                console.log(`Error processing PHP ${version}:`, error);
+                commentBody += `❌ **PHP ${version}**: Error processing results\n`;
+              }
+            });
+            
+            if (hasFailures) {
+              commentBody += '\n### ❌ Failed Tests\nPlease check the failed tests above.\n';
+            }
+            
+            commentBody += '\n[View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
