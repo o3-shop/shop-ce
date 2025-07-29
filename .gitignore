@@ -12,7 +12,7 @@ runned.txt
 # Cache
 /source/cache/
 !/source/cache/.htaccess
-!/source/cache/dir.txt
+!/source/cache/.gitkeep
 
 # Export
 /source/export/
