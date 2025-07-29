@@ -282,7 +282,25 @@ jobs:
       - name: 📥 Download Test Results
         uses: actions/download-artifact@v4
         with:
-          pattern: test-result-*
+          name: test-result-7.4
+          path: ./test-results
+          
+      - name: 📥 Download Test Results 8.0
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-8.0
+          path: ./test-results
+          
+      - name: 📥 Download Test Results 8.1
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-8.1
+          path: ./test-results
+          
+      - name: 📥 Download Test Results 8.2
+        uses: actions/download-artifact@v4
+        with:
+          name: test-result-8.2
           path: ./test-results
           
       - name: 💬 Post Consolidated PR Comment
@@ -309,12 +327,13 @@ jobs:
             // Check for test results
             commentBody += '### 📊 Coverage Report\n';
             let hasFailures = false;
-            const testResultFiles = fs.readdirSync('./test-results');
+            const phpVersions = ['7.4', '8.0', '8.1', '8.2'];
             
-            if (testResultFiles.length > 0) {
-              testResultFiles.forEach(file => {
-                try {
-                  const result = JSON.parse(fs.readFileSync(`./test-results/${file}`, 'utf8'));
+            phpVersions.forEach(version => {
+              try {
+                const filePath = `./test-results/test-result-${version}.json`;
+                if (fs.existsSync(filePath)) {
+                  const result = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                   const status = result.tests_failed === 'true' ? '❌' : '✅';
                   const coverage = parseFloat(result.coverage) || 0;
                   const coverageStatus = coverage >= 80 ? '✅' : coverage >= 60 ? '⚠️' : '❌';
@@ -325,16 +344,17 @@ jobs:
                     hasFailures = true;
                     commentBody += `   Failed tests: ${result.failed_tests}\n`;
                   }
-                } catch (error) {
-                  console.log(`Error processing ${file}:`, error);
+                } else {
+                  commentBody += `⚠️ **PHP ${version}**: No results available\n`;
                 }
-              });
-              
-              if (hasFailures) {
-                commentBody += '\n### ❌ Failed Tests\nPlease check the failed tests above.\n';
+              } catch (error) {
+                console.log(`Error processing PHP ${version}:`, error);
+                commentBody += `❌ **PHP ${version}**: Error processing results\n`;
               }
-            } else {
-              commentBody += '⚠️ No test results available.\n';
+            });
+            
+            if (hasFailures) {
+              commentBody += '\n### ❌ Failed Tests\nPlease check the failed tests above.\n';
             }
             
             commentBody += '\n[View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})';
