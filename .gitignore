@@ -54,6 +54,10 @@ composer.lock
 /source/Application/views/o3-theme/*
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
+!/source/out/pictures/category/icon/.gitkeep
+!/source/out/pictures/category/promo_icon/.gitkeep
+!/source/out/pictures/category/thumb/.gitkeep
+
 /source/out/pictures/master/manufacturer/*
 /source/out/pictures/master/product/*
 /source/out/pictures/master/wrapping/img_ecard_03_wp.jpg
