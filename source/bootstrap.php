@@ -233,6 +233,18 @@ spl_autoload_register([\OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload::
  */
 $configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.php');
 \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\ConfigFile::class, $configFile);
+
+/**
+ * Ensure tmp directory exists for shop functionality.
+ * This directory is required for caching, Smarty compilation, and other temporary files.
+ */
+$tmpDir = $configFile->getVar('sCompileDir');
+if ($tmpDir && !is_dir($tmpDir)) {
+    if (!mkdir($tmpDir, 0755, true)) {
+        trigger_error("Error: Could not create tmp directory '$tmpDir'. Please check permissions.", E_USER_WARNING);
+    }
+}
+
 unset($configFile);
 
 /**
