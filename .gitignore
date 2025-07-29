@@ -47,16 +47,16 @@ composer.lock
 /var/generated_services.yaml
 /tests/Integration/Internal/Container/Dao/generated_project.yaml
 /tests/.phpunit.result.cache
-
+/source/out/pictures/master/category/*
+!source/out/pictures/master/category/icon/.gitkeep
+!/source/out/pictures/master/category/promo_icon/.gitkeep
+!/source/out/pictures/master/category/thumb/.gitkeep
 .env
 /.phpstorm.meta.php/oxid.meta.php
 /source/Application/views/wave/*
 /source/Application/views/o3-theme/*
 /source/out/pictures/generated/*
-/source/out/pictures/master/category/*
-!source/out/pictures/master/category/icon/.gitkeep
-!/source/out/pictures/master/category/promo_icon/.gitkeep
-!/source/out/pictures/master/category/thumb/.gitkeep
+
 
 /source/out/pictures/master/manufacturer/*
 /source/out/pictures/master/product/*
