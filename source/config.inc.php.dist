@@ -49,6 +49,7 @@ $this->sSSLShopURL  = $_ENV['O3SHOP_CONF_SSLSHOPURL'];  // Shop SSL url, optiona
 $this->sAdminSSLURL = $_ENV['O3SHOP_CONF_ADMINSSLURL']; // Shop Admin SSL url, optional
 $this->sShopDir     = $_ENV['O3SHOP_CONF_SHOPDIR'];
 $this->sCompileDir  = $_ENV['O3SHOP_CONF_COMPILEDIR'];
+$this->sLogDir = $_ENV['O3SHOP_CONF_LOG_DIR'];
 
 /**
  * Force shop edition. Shop edition can still be forced here.

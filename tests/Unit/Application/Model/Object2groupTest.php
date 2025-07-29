@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
 
 class Object2groupTest extends \OxidTestCase
 {
@@ -41,7 +43,7 @@ class Object2groupTest extends \OxidTestCase
 
         $this->_oGroup = oxNew('oxobject2group');
         $this->_oGroup->oxobject2group__oxobjectid = new oxField($oNews->getId(), oxField::T_RAW);
-        $this->_oGroup->oxobject2group__oxgroupsid = new oxField("oxidnewcustomer", oxField::T_RAW);
+        $this->_oGroup->oxobject2group__oxgroupsid = new oxField('oxidnewcustomer', oxField::T_RAW);
         $this->_oGroup->Save();
 
         $this->_sObjID = $oNews->getId();
@@ -77,8 +79,8 @@ class Object2groupTest extends \OxidTestCase
     public function testSaveNew()
     {
         $this->_oGroup = oxNew('oxobject2group');
-        $this->_oGroup->oxobject2group__oxobjectid = new oxField("1111", oxField::T_RAW);
-        $this->_oGroup->oxobject2group__oxgroupsid = new oxField("oxidnewcustomer", oxField::T_RAW);
+        $this->_oGroup->oxobject2group__oxobjectid = new oxField('1111', oxField::T_RAW);
+        $this->_oGroup->oxobject2group__oxgroupsid = new oxField('oxidnewcustomer', oxField::T_RAW);
 
         $this->assertNotNull($this->_oGroup->Save());
     }
@@ -87,12 +89,12 @@ class Object2groupTest extends \OxidTestCase
     {
         $oGroup = oxNew('oxobject2group');
         $oGroup->oxobject2group__oxobjectid = new oxField($this->_sObjID, oxField::T_RAW);
-        $oGroup->oxobject2group__oxgroupsid = new oxField("oxidnewcustomer", oxField::T_RAW);
+        $oGroup->oxobject2group__oxgroupsid = new oxField('oxidnewcustomer', oxField::T_RAW);
         $oGroup->Save();
 
         $oGroup = oxNew('oxobject2group');
         $oGroup->oxobject2group__oxobjectid = new oxField($this->_sObjID, oxField::T_RAW);
-        $oGroup->oxobject2group__oxgroupsid = new oxField("oxidnewcustomer", oxField::T_RAW);
+        $oGroup->oxobject2group__oxgroupsid = new oxField('oxidnewcustomer', oxField::T_RAW);
 
         $this->assertNull($oGroup->Save());
     }

@@ -133,7 +133,6 @@ class DeliverySetList extends ListModel
         return $this;
     }
 
-
     /**
      * Creates delivery set list filter SQL to load current state delivery set list
      *
@@ -148,7 +147,7 @@ class DeliverySetList extends ListModel
     {
         $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset');
         $sQ = "select $sTable.* from $sTable ";
-        $sQ .= "where " . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
+        $sQ .= 'where ' . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
 
         // defining initial filter parameters
         $sUserId = null;
@@ -176,9 +175,9 @@ class DeliverySetList extends ListModel
 
         $oDb = DatabaseProvider::getDb();
 
-        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
-        $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetu' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
-        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetg' and oxobject2delivery.OXOBJECTID in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ") )" : '0';
+        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sCountryId) . ')' : '0';
+        $sUserSql = $sUserId ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetu' and oxobject2delivery.OXOBJECTID=" . $oDb->quote($sUserId) . ')' : '0';
+        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2delivery.oxid from oxobject2delivery where oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelsetg' and oxobject2delivery.OXOBJECTID in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ') )' : '0';
 
         $sQ .= "and (
                 if(EXISTS(select 1 from oxobject2delivery, $sCountryTable where $sCountryTable.oxid=oxobject2delivery.oxobjectid and oxobject2delivery.oxdeliveryid=$sTable.OXID and oxobject2delivery.oxtype='oxdelset' LIMIT 1),
@@ -337,9 +336,9 @@ class DeliverySetList extends ListModel
         } else {
             $sSubSql = $sTable;
         }
-        $sQ = "select $sTable.*, oxobject2delivery.oxobjectid from $sSubSql left join (select oxobject2delivery.* from oxobject2delivery where oxobject2delivery.oxtype = 'rdfadeliveryset' ) as oxobject2delivery on oxobject2delivery.oxdeliveryid=$sTable.oxid where " . $this->getBaseObject()->getSqlActiveSnippet() . " ";
+        $sQ = "select $sTable.*, oxobject2delivery.oxobjectid from $sSubSql left join (select oxobject2delivery.* from oxobject2delivery where oxobject2delivery.oxtype = 'rdfadeliveryset' ) as oxobject2delivery on oxobject2delivery.oxdeliveryid=$sTable.oxid where " . $this->getBaseObject()->getSqlActiveSnippet() . ' ';
         $this->selectString($sQ, [
-            ':oxdelid' => $sDelId
+            ':oxdelid' => $sDelId,
         ]);
     }
 }

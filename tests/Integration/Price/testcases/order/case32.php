@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  neto
@@ -15,37 +16,37 @@
  * Actions with order:
  *  1. update :changed products amounts
  */
-$aData = array(
-     'articles' => array(
-             0 => array(
+$aData = [
+     'articles' => [
+             0 => [
                      'oxid'       => '111',
                      'oxtitle'    => '111',
                      'oxprice'    => 55.55,
                      'oxvat'      => 15.55,
                      'oxstock'    => 999,
                      'amount'     => 6,
-             ),
-              1 => array(
+             ],
+              1 => [
                      'oxid'       => '222',
                      'oxtitle'    => '222',
                      'oxprice'    => 12.50,
                      'oxvat'      => 19,
                      'oxstock'    => 999,
                      'amount'     => 7,
-             ),
-     ),
-    'discounts' => array(
-            0 => array(
+             ],
+     ],
+    'discounts' => [
+            0 => [
                     'oxid'         => 'discount15fo678',
                     'oxaddsum'     => 15,
                     'oxaddsumtype' => '%',
                     'oxamount' => 1,
                     'oxamountto' => 99999,
                     'oxactive' => 1,
-                    'oxarticles' => array( 111, 222 ),
+                    'oxarticles' => [ 111, 222 ],
                     'oxsort' => 10,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'         => 'discountitm',
                     'oxaddsum'     => 0,
                     'oxaddsumtype' => 'itm',
@@ -55,35 +56,35 @@ $aData = array(
                     'oxitmartid' => 1004,
                     'oxitmamount' => 1,
                     'oxitmultiple' => 2,
-                    'oxarticles' => array( 111 ),
+                    'oxarticles' => [ 111 ],
                     'oxsort' => 20,
-                ),
-    ),
-    'costs' => array(
-        'wrapping' => array(
-                    0 => array(
+                ],
+    ],
+    'costs' => [
+        'wrapping' => [
+                    0 => [
                         'oxtype' => 'WRAP',
                         'oxname' => 'testWrap9001',
                         'oxprice' => 2.95,
                         'oxactive' => 1,
-                        'oxarticles' => array( 111 )
-                    ),
-                    1 => array(
+                        'oxarticles' => [ 111 ],
+                    ],
+                    1 => [
                         'oxtype' => 'WRAP',
                         'oxname' => 'testWrap9002',
                         'oxprice' => 2.95,
                         'oxactive' => 1,
-                        'oxarticles' => array( 222 )
-                    ),
-                    2 => array(
+                        'oxarticles' => [ 222 ],
+                    ],
+                    2 => [
                         'oxtype' => 'CARD',
                         'oxname' => 'testCard',
                         'oxprice' => 3,
                         'oxactive' => 1,
-            ),
-                ),
-        'delivery' => array(
-                    0 => array(
+            ],
+                ],
+        'delivery' => [
+                    0 => [
                             'oxactive' => 1,
                             'oxtitle' => 'Shipping costs for Example Set2: UPS 24 hrs Express: $12.90',
                             'oxaddsum' => 13,
@@ -93,104 +94,98 @@ $aData = array(
                             'oxparamend' => 99999,
                             'oxsort' => '5000',
                             'oxfixed' => 0,
-                            'oxdeliveryset' => array(
+                            'oxdeliveryset' => [
                                     'oxactive' => 1,
                                     'oxpos' => 30,
                                     'oxtitle' => 'Example Set2: UPS Express 24 hours',
-                            )
-                    ),
-            ),
-        'payment' => array(
-                0 => array(
+                            ],
+                    ],
+            ],
+        'payment' => [
+                0 => [
                     'oxaddsum' => 13,
                     'oxaddsumtype' => '%',
                     'oxfromamount' => 0,
                     'oxtoamount' => 1000000,
                     'oxchecked' => 1,
                     'oxaddsumrules'=>21,
-                ),
-        ),
-    ),
-    'expected' => array(
-        1 => array(
-            'articles' => array(
-                    '111' => array( '40,86', '245,16' ),
-                    '222' => array( '8,93', '62,51' ),
-
-                    ),
-            'totals' => array(
+                ],
+        ],
+    ],
+    'expected' => [
+        1 => [
+            'articles' => [
+                    '111' => [ '40,86', '245,16' ],
+                    '222' => [ '8,93', '62,51' ],
+                    ],
+            'totals' => [
                     'totalBrutto' => '357,67',
                     'discount' => '0,00',
                     'totalNetto'  => '307,67',
-                    'vats' => array(
+                    'vats' => [
                             15.55 => '38,12',
                             19 => '11,88',
-                    ),
-                    'delivery' => array(
+                    ],
+                    'delivery' => [
                             'brutto' => '40,00',
                             'neto' => '34,62',
                             'vat' => '5,38',
-
-                    ),
-                    'payment' => array(
+                    ],
+                    'payment' => [
                             'brutto' => '44,58',
                             'neto' => '38,58',
                             'vat' => '6,00',
-                    ),
+                    ],
                     'grandTotal'  => '483,60',
-            ),
-        ),
-        2 => array(
-            'articles' => array(
-                    '111' => array( '40,86', '122,58' ),
-                    '222' => array( '8,93', '62,51' ),
-                    ),
-            'totals' => array(
+            ],
+        ],
+        2 => [
+            'articles' => [
+                    '111' => [ '40,86', '122,58' ],
+                    '222' => [ '8,93', '62,51' ],
+                    ],
+            'totals' => [
                     'totalBrutto' => '216,03',
                     'discount' => '0,00',
                     'totalNetto'  => '185,09',
-                    'vats' => array(
+                    'vats' => [
                             15.55 => '19,06',
                             19 => '11,88',
-
-                    ),
-                    'delivery' => array(
+                    ],
+                    'delivery' => [
                             'brutto' => '24,06',
                             'neto' => '20,82',
                             'vat' => '3,24',
-
-                    ),
-                    'payment' => array(
+                    ],
+                    'payment' => [
                             'brutto' => '27,65',
                             'neto' => '23,92',
                             'vat' => '3,72',
-                    ),
+                    ],
                     'grandTotal'  => '300,24',
-            ),
-        ),
-    ),
-    'options' => array(
-            'config' => array(
+            ],
+        ],
+    ],
+    'options' => [
+            'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => true,
                 'blShowVATForDelivery'=> true,
                 'blShowVATForPayCharge'=> true,
                 'blShowVATForWrapping'=> true,
-                'sAdditionalServVATCalcMethod' => 'biggest_net'
-
-            ),
-    ),
-    'actions' => array(
-            '_changeConfigs' => array(
+                'sAdditionalServVATCalcMethod' => 'biggest_net',
+            ],
+    ],
+    'actions' => [
+            '_changeConfigs' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-            ),
-             '_changeArticles' => array(
-             0 => array(
+            ],
+             '_changeArticles' => [
+             0 => [
                       'oxid'       => '111',
                       'amount'     => 3,
-            ),
-            ),
-    ),
-
-);
+            ],
+            ],
+    ],
+];

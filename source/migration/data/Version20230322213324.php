@@ -43,9 +43,9 @@ final class Version20230322213324 extends AbstractMigration
         $this->skipIf(!$column->getType() instanceof BlobType, 'Config values are already decoded');
 
         $this->addSql('ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_UNENC` text;');
-        $this->addSql("UPDATE oxconfig SET `OXVARVALUE_UNENC` = DECODE(OXVARVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
+        $this->addSql("UPDATE oxconfig SET `OXVARVALUE_UNENC` = DECODE(OXVARVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;");
         $this->addSql('ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` text;');
-        $this->addSql("UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_UNENC` WHERE 1;");
+        $this->addSql('UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_UNENC` WHERE 1;');
         $this->addSql('ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_UNENC`;');
     }
 
@@ -60,11 +60,11 @@ final class Version20230322213324 extends AbstractMigration
 
         $this->skipIf($column->getType() instanceof BlobType, 'Config values are already encoded');
 
-        $this->addSql( 'ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_ENC` text;' );
-        $this->addSql( "UPDATE oxconfig SET `OXVARVALUE_ENC` = ENCODE(OXVARVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;" );
-        $this->addSql( 'ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` mediumblob;' );
-        $this->addSql( "UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_ENC` WHERE 1;" );
-        $this->addSql( 'ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_ENC`;' );
+        $this->addSql('ALTER TABLE oxconfig ADD COLUMN `OXVARVALUE_ENC` text;');
+        $this->addSql("UPDATE oxconfig SET `OXVARVALUE_ENC` = ENCODE(OXVARVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;");
+        $this->addSql('ALTER TABLE oxconfig MODIFY COLUMN `OXVARVALUE` mediumblob;');
+        $this->addSql('UPDATE oxconfig SET `OXVARVALUE` = `OXVARVALUE_ENC` WHERE 1;');
+        $this->addSql('ALTER TABLE oxconfig DROP COLUMN `OXVARVALUE_ENC`;');
     }
 
     public function isTransactional(): bool

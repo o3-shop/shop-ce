@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -38,7 +39,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class ModuleChainsGeneratorTest extends UnitTestCase
 {
-
     /**
      * @var \OxidEsales\Eshop\Core\Module\ModuleChainsGenerator
      */
@@ -63,7 +63,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
         }
 
         /** @var ModuleVariablesLocator|\PHPUnit\Framework\MockObject\MockObject $moduleVariablesLocatorMock */
-        $moduleVariablesLocatorMock = $this->getMock(ModuleVariablesLocator::class, array(), array(), '', false);
+        $moduleVariablesLocatorMock = $this->getMock(ModuleVariablesLocator::class, [], [], '', false);
 
         /**
          * Create a Mock with disabled constructor
@@ -100,7 +100,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
         }
 
         /** @var ModuleVariablesLocator|\PHPUnit\Framework\MockObject\MockObject $moduleVariablesLocatorMock */
-        $moduleVariablesLocatorMock = $this->getMock(ModuleVariablesLocator::class, array(), array(), '', false);
+        $moduleVariablesLocatorMock = $this->getMock(ModuleVariablesLocator::class, [], [], '', false);
 
         /**
          * Create a Mock with disabled constructor
@@ -117,7 +117,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
 
         //verify that the chain is filled and that the last class in chain is as expected
         $this->assertEquals(4, count($chain), $message);
-        $this->assertSame(basename($expectedResult), basename($chain[count($chain)-1]), $message);
+        $this->assertSame(basename($expectedResult), basename($chain[count($chain) - 1]), $message);
     }
 
     public function testGetDisabledModuleIds()
@@ -165,7 +165,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
                  \OxidEsales\Eshop\Application\Model\User::class => $mockedModules['module_3'] . '&' . $mockedModules['module_4'],
              ],
              'expectedResult' => $mockedModules['module_4'],
-             'message'        => 'oemodulefouruser is the last class in the chain'
+             'message'        => 'oemodulefouruser is the last class in the chain',
             ],
             ['mockedModules'  => $mockedModules,
              'modulesArray'   => [
@@ -173,7 +173,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
                  'oxuser'                                       => $mockedModules['module_1'] . '&' . $mockedModules['module_2'],
              ],
              'expectedResult' => $mockedModules['module_2'],
-             'message'        => 'oemoduletwouser is the last class in the chain'
+             'message'        => 'oemoduletwouser is the last class in the chain',
             ],
             ['mockedModules'  => $mockedModules,
              'modulesArray'   => [
@@ -181,7 +181,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
                  'oxuser'                                       => $mockedModules['module_2'] . '&' . $mockedModules['module_1'],
              ],
              'expectedResult' => $mockedModules['module_1'],
-             'message'        => 'oemoduleoneuser is the last class in the chain'
+             'message'        => 'oemoduleoneuser is the last class in the chain',
             ],
             ['mockedModules'  => $mockedModules,
              'modulesArray'   => [
@@ -189,7 +189,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
                  \OxidEsales\Eshop\Application\Model\User::class => $mockedModules['module_4'] . '&' . $mockedModules['module_3'],
              ],
              'expectedResult' => $mockedModules['module_3'],
-             'message'        => 'oemodulethreeuser is the last class in the chain'
+             'message'        => 'oemodulethreeuser is the last class in the chain',
             ],
         ];
     }
@@ -228,7 +228,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
         $container = ContainerFactory::getInstance()->getContainer();
         $installService = $container->get(ModuleInstallerInterface::class);
         $package = new OxidEshopPackage($moduleId, __DIR__ . '/Fixtures/' . $moduleId);
-        $package->setTargetDirectory('oeTest/'. $moduleId);
+        $package->setTargetDirectory('oeTest/' . $moduleId);
         $installService->install($package);
     }
 
@@ -257,7 +257,7 @@ class ModuleChainsGeneratorTest extends UnitTestCase
     /**
      * @return \OxidEsales\Eshop\Core\Module\ModuleChainsGenerator
      */
-    private function getModuleChainsGenerator() : ModuleChainsGenerator
+    private function getModuleChainsGenerator(): ModuleChainsGenerator
     {
         if (is_null($this->moduleChainsGenerator)) {
             $this->moduleChainsGenerator = new ModuleChainsGenerator(
@@ -268,10 +268,9 @@ class ModuleChainsGeneratorTest extends UnitTestCase
         return $this->moduleChainsGenerator;
     }
 
-
     protected function createModuleClassFile($extensionPath)
     {
-        $modulesDirectory = Registry::get("oxConfigFile")->getVar("sShopDir");
+        $modulesDirectory = Registry::get('oxConfigFile')->getVar('sShopDir');
         $moduleClassFilePath = "$modulesDirectory/modules/$extensionPath.php";
         if (!is_dir(dirname($moduleClassFilePath))) {
             if (!mkdir(dirname($moduleClassFilePath), 0755, true)) {

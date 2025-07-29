@@ -25,11 +25,11 @@ use oxException;
 use OxidEsales\Eshop\Core\Contract\IDisplayError;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Module\Module;
+use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectoryRepository;
 use OxidEsales\Eshop\Core\Module\ModuleTemplateBlockContentReader;
 use OxidEsales\Eshop\Core\Module\ModuleTemplateBlockPathFormatter;
 use OxidEsales\Eshop\Core\Module\ModuleTemplateBlockRepository;
 use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator;
-use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectoryRepository;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator as EshopShopIdCalculator;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
@@ -173,7 +173,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
      * @param string                                 $activeController     defines a name of the controller, which should
      *                                                                     handle the error.
      */
-    public function addErrorToDisplay($exception, $blFull = false, $useCustomDestination = false, $customDestination = "", $activeController = "")
+    public function addErrorToDisplay($exception, $blFull = false, $useCustomDestination = false, $customDestination = '', $activeController = '')
     {
         //default
         $destination = 'default';
@@ -272,10 +272,10 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
      */
     public function parseThroughSmarty($sDesc, $sOxid = null, $oActView = null, $blRecompile = false)
     {
-        startProfile("parseThroughSmarty");
+        startProfile('parseThroughSmarty');
 
-        if (!is_array($sDesc) && strpos($sDesc, "[{") === false) {
-            stopProfile("parseThroughSmarty");
+        if (!is_array($sDesc) && strpos($sDesc, '[{') === false) {
+            stopProfile('parseThroughSmarty');
 
             return $sDesc;
         }
@@ -293,7 +293,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
             $result = $this->getRenderedContent($sDesc, $oActView->getViewData(), $sOxid);
         }
 
-        stopProfile("parseThroughSmarty");
+        stopProfile('parseThroughSmarty');
 
         return $result;
     }
@@ -357,7 +357,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
 
         //check for the Smarty dir
         $compileDir = $config->getConfigParam('sCompileDir');
-        $smartyDir = $compileDir . "/smarty/";
+        $smartyDir = $compileDir . '/smarty/';
         if (!is_dir($smartyDir)) {
             @mkdir($smartyDir);
         }
@@ -388,7 +388,7 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
                 'ox_get_template',
                 'ox_get_timestamp',
                 'ox_get_secure',
-                'ox_get_trusted'
+                'ox_get_trusted',
             ]
         );
 

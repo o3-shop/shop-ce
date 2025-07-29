@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
 use OxidEsales\Eshop\Core\Registry;
@@ -28,7 +30,6 @@ use Psr\Log\Test\TestLogger;
  */
 class ModuleSimilarClassTest extends \OxidTestCase
 {
-    
     protected function tearDown(): void
     {
         Registry::set('logger', getLogger());
@@ -41,23 +42,23 @@ class ModuleSimilarClassTest extends \OxidTestCase
     public function testModuleSimilarName()
     {
         $wrapper = $this->getVfsStreamWrapper();
-        Registry::get("oxConfigFile")->setVar("sShopDir", $wrapper->getRootPath());
-        $wrapper->createStructure(array(
-            'modules' => array(
-                'testmodulesimilarname.php' => "<?php
+        Registry::get('oxConfigFile')->setVar('sShopDir', $wrapper->getRootPath());
+        $wrapper->createStructure([
+            'modules' => [
+                'testmodulesimilarname.php' => '<?php
                     class testModuleSimilarName extends testModuleSimilarName_parent {
                         public function sayHi() {
-                            return \"Hi!\";
+                            return "Hi!";
                         }
-                    }"
-            )
-        ));
+                    }',
+            ],
+        ]);
 
-        $extensions = array('oxbasketitem' => 'testmodulesimilarnameitem', 'oxbasket' => 'testmodulesimilarname');
+        $extensions = ['oxbasketitem' => 'testmodulesimilarnameitem', 'oxbasket' => 'testmodulesimilarname'];
         \OxidEsales\Eshop\Core\Registry::getUtilsObject()->setModuleVar('aModules', $extensions);
 
         $oTestMod = oxNew('oxBasket');
-        $this->assertEquals("Hi!", $oTestMod->sayHi());
+        $this->assertEquals('Hi!', $oTestMod->sayHi());
     }
 
     /**
@@ -66,17 +67,17 @@ class ModuleSimilarClassTest extends \OxidTestCase
     public function testModuleSimilarName_ClassNotExist()
     {
         $wrapper = $this->getVfsStreamWrapper();
-        Registry::get("oxConfigFile")->setVar("sShopDir", $wrapper->getRootPath());
-        $wrapper->createStructure(array(
-            'modules' => array(
-                'testmodulesimilarname.php' => "<?php
+        Registry::get('oxConfigFile')->setVar('sShopDir', $wrapper->getRootPath());
+        $wrapper->createStructure([
+            'modules' => [
+                'testmodulesimilarname.php' => '<?php
                     class testModuleSimilarName extends testModuleSimilarName_parent {
                         public function sayHi() {
-                            return \"Hi!\";
+                            return "Hi!";
                         }
-                    }"
-            )
-        ));
+                    }',
+            ],
+        ]);
         $logger = new TestLogger();
         Registry::set('logger', $logger);
 
@@ -84,7 +85,7 @@ class ModuleSimilarClassTest extends \OxidTestCase
          * Real error handling on missing files is disabled for the tests, but when the shop tries to include that not
          * existing file we expect an error to be thrown
          */
-        $extensions = array('oxbasketitem' => 'testmodulesimilar', 'oxbasket' => 'testmodulesimilarname');
+        $extensions = ['oxbasketitem' => 'testmodulesimilar', 'oxbasket' => 'testmodulesimilarname'];
         \OxidEsales\Eshop\Core\Registry::getUtilsObject()->setModuleVar('aModules', $extensions);
 
         $this->expectException(\OxidEsales\Eshop\Core\Exception\SystemComponentException::class);

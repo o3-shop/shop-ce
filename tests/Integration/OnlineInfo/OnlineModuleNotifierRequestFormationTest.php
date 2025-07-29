@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\OnlineInfo;
 
 use OxidEsales\Eshop\Core\Module\ModuleList;
@@ -26,10 +28,10 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidE
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstallerInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
-use \oxOnlineModuleVersionNotifier;
-use \oxOnlineModuleVersionNotifierCaller;
-use \oxRegistry;
-use \oxSimpleXml;
+use oxOnlineModuleVersionNotifier;
+use oxOnlineModuleVersionNotifierCaller;
+use oxRegistry;
+use oxSimpleXml;
 
 /**
  * Class Integration_OnlineInfo_FrontendServersInformationStoringTest
@@ -64,39 +66,39 @@ class OnlineModuleNotifierRequestFormationTest extends \OxidTestCase
         $this->activateModule('extending_1_class_3_extensions');
 
         $oConfig = oxRegistry::getConfig();
-        $oConfig->setConfigParam('sClusterId', array('generated_unique_cluster_id'));
+        $oConfig->setConfigParam('sClusterId', ['generated_unique_cluster_id']);
         $sEdition = $oConfig->getEdition();
         $sVersion = $oConfig->getVersion();
         $sShopUrl = $oConfig->getShopUrl();
 
-        $sXml = '<?xml version="1.0" encoding="utf-8"?>'."\n";
+        $sXml = '<?xml version="1.0" encoding="utf-8"?>' . "\n";
         $sXml .= '<omvnRequest>';
-        $sXml .=   '<pVersion>1.1</pVersion>';
-        $sXml .=   '<modules>';
-        $sXml .=     '<module>';
-        $sXml .=       '<id>extending_1_class</id>';
-        $sXml .=       '<version>1.0</version>';
-        $sXml .=       "<activeInShops><activeInShop>$sShopUrl</activeInShop></activeInShops>";
-        $sXml .=     '</module>';
-        $sXml .=     '<module>';
-        $sXml .=       '<id>extending_1_class_3_extensions</id>';
-        $sXml .=       '<version>1.0</version>';
-        $sXml .=       "<activeInShops><activeInShop>$sShopUrl</activeInShop></activeInShops>";
-        $sXml .=     '</module>';
-        $sXml .=   '</modules>';
-        $sXml .=   '<clusterId>generated_unique_cluster_id</clusterId>';
-        $sXml .=   "<edition>$sEdition</edition>";
-        $sXml .=   "<version>$sVersion</version>";
-        $sXml .=   "<shopUrl>$sShopUrl</shopUrl>";
-        $sXml .=   '<productId>Shop</productId>';
-        $sXml .= '</omvnRequest>'."\n";
+        $sXml .= '<pVersion>1.1</pVersion>';
+        $sXml .= '<modules>';
+        $sXml .= '<module>';
+        $sXml .= '<id>extending_1_class</id>';
+        $sXml .= '<version>1.0</version>';
+        $sXml .= "<activeInShops><activeInShop>$sShopUrl</activeInShop></activeInShops>";
+        $sXml .= '</module>';
+        $sXml .= '<module>';
+        $sXml .= '<id>extending_1_class_3_extensions</id>';
+        $sXml .= '<version>1.0</version>';
+        $sXml .= "<activeInShops><activeInShop>$sShopUrl</activeInShop></activeInShops>";
+        $sXml .= '</module>';
+        $sXml .= '</modules>';
+        $sXml .= '<clusterId>generated_unique_cluster_id</clusterId>';
+        $sXml .= "<edition>$sEdition</edition>";
+        $sXml .= "<version>$sVersion</version>";
+        $sXml .= "<shopUrl>$sShopUrl</shopUrl>";
+        $sXml .= '<productId>Shop</productId>';
+        $sXml .= '</omvnRequest>' . "\n";
 
         $curlMock = $this->getMockBuilder(\OxidEsales\Eshop\Core\Curl::class)
             ->setMethods(['execute','getStatusCode','setParameters'])
             ->getMock();
         $curlMock->expects($this->any())->method('execute')->will($this->returnValue(true));
         $curlMock->expects($this->any())->method('getStatusCode')->will($this->returnValue(200));
-        $curlMock->expects($this->atLeastOnce())->method('setParameters')->with($this->equalTo(array('xmlRequest' => $sXml)));
+        $curlMock->expects($this->atLeastOnce())->method('setParameters')->with($this->equalTo(['xmlRequest' => $sXml]));
 
         $oEmailBuilder = oxNew(OnlineServerEmailBuilder::class);
         $oOnlineModuleVersionNotifierCaller = new oxOnlineModuleVersionNotifierCaller($curlMock, $oEmailBuilder, new oxSimpleXml());

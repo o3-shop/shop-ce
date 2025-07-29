@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -24,7 +26,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryFilter;
 
 class QueryFilterTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @return array
      */
@@ -32,60 +33,60 @@ class QueryFilterTest extends \PHPUnit\Framework\TestCase
     {
         $data = [
             [
-                "select * from oxarticles",
+                'select * from oxarticles',
                 [],
-                false
+                false,
             ],
             [
-                "delete * from oxarticles",
+                'delete * from oxarticles',
                 [],
-                true
+                true,
             ],
             [
                 "insert into oxarticles values ('some values')",
                 [],
-                true
+                true,
             ],
             [
                 "update oxarticles set oxtitle = 'other title' where oxid = '_someid' ",
                 [],
-                true
+                true,
             ],
             [
                 "UPDATE oxarticles set oxtitle = 'other title' where oxid = '_someid' ",
                 [],
-                true
+                true,
             ],
             [
                 "update oxarticles set oxtitle = 'other title' where oxid = '_someid' ",
                 [
-                    'oxarticles'
+                    'oxarticles',
                 ],
-                false
+                false,
             ],
             [
-                "yadda yadda yadda insert into blabla ",
+                'yadda yadda yadda insert into blabla ',
                 [
-                    'ox'
+                    'ox',
                 ],
-                true
+                true,
             ],
             [
-                "yadda oxyadda yadda insert into oxblabla ",
+                'yadda oxyadda yadda insert into oxblabla ',
                 [
-                    'ox'
+                    'ox',
                 ],
-                false
+                false,
             ],
             [
-                "yadda yadda yadda oxsession blabla ",
+                'yadda yadda yadda oxsession blabla ',
                 [],
-                false
+                false,
             ],
             [
-                "yadda yadda yadda oxcache blabla ",
+                'yadda yadda yadda oxcache blabla ',
                 [],
-                false
+                false,
             ],
         ];
 

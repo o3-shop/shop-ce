@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Object_Seo class
  */
 class ObjectSeoTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -80,7 +81,7 @@ class ObjectSeoTest extends \OxidTestCase
      */
     public function testProcessParam()
     {
-        $sParam = "param";
+        $sParam = 'param';
 
         $oView = oxNew('Object_Seo');
         $this->assertEquals($sParam, $oView->processParam($sParam));
@@ -127,7 +128,7 @@ class ObjectSeoTest extends \OxidTestCase
     public function testGetStdUrl()
     {
         $oView = oxNew('Object_Seo');
-        $this->assertNull($oView->UNITgetStdUrl("anyid"));
+        $this->assertNull($oView->UNITgetStdUrl('anyid'));
     }
 
     /**
@@ -138,8 +139,8 @@ class ObjectSeoTest extends \OxidTestCase
     public function testGetEditLang()
     {
         // testing..
-        $oView = $this->getProxyClass("Object_Seo");
-        $oView->setNonPublicVar("_iEditLang", 999);
+        $oView = $this->getProxyClass('Object_Seo');
+        $oView->setNonPublicVar('_iEditLang', 999);
         $this->assertEquals(999, $oView->getEditLang());
     }
 
@@ -161,9 +162,9 @@ class ObjectSeoTest extends \OxidTestCase
      */
     public function testGetSeoEntryType()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, array("_getType"));
-        $oView->expects($this->once())->method('_getType')->will($this->returnValue("testType"));
-        $this->assertEquals("testType", $oView->UNITgetSeoEntryType());
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, ['_getType']);
+        $oView->expects($this->once())->method('_getType')->will($this->returnValue('testType'));
+        $this->assertEquals('testType', $oView->UNITgetSeoEntryType());
     }
 
     /**
@@ -187,37 +188,37 @@ class ObjectSeoTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Method not called.');
 
-        $this->setRequestParameter("aSeoData", array("oxseourl" => "testSeoUrl", "oxkeywords" => " testKeywords ", "oxdescription" => " testDescription ", "oxparams" => "testParams", "oxfixed" => 0));
+        $this->setRequestParameter('aSeoData', ['oxseourl' => 'testSeoUrl', 'oxkeywords' => ' testKeywords ', 'oxdescription' => ' testDescription ', 'oxparams' => 'testParams', 'oxfixed' => 0]);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Core\SeoEncoder::class, array("addSeoEntry"));
-        $oEncoder->expects($this->once())->method("addSeoEntry")->with(
-            $this->equalTo("objectId"),
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Core\SeoEncoder::class, ['addSeoEntry']);
+        $oEncoder->expects($this->once())->method('addSeoEntry')->with(
+            $this->equalTo('objectId'),
             $this->equalTo(1),
             $this->equalTo(1),
-            $this->equalTo("stdUrl"),
-            $this->equalTo("testSeoUrl"),
-            $this->equalTo("seoEntryType"),
+            $this->equalTo('stdUrl'),
+            $this->equalTo('testSeoUrl'),
+            $this->equalTo('seoEntryType'),
             $this->equalTo(0),
-            $this->equalTo("testKeywords"),
-            $this->equalTo("testDescription"),
-            $this->equalTo("param"),
+            $this->equalTo('testKeywords'),
+            $this->equalTo('testDescription'),
+            $this->equalTo('param'),
             $this->equalTo(true),
-            $this->equalTo("altSeoEntryId")
+            $this->equalTo('altSeoEntryId')
         );
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("getShopId"));
-        $oConfig->expects($this->once())->method("getShopId")->will($this->returnValue(1));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopId']);
+        $oConfig->expects($this->once())->method('getShopId')->will($this->returnValue(1));
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, array("getEditObjectId", "getConfig", "_getEncoder", "getEditLang", "_getStdUrl", "_getSeoEntryType", "processParam", "_getAltSeoEntryId"), array(), '', false);
-        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue("objectId"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, ['getEditObjectId', 'getConfig', '_getEncoder', 'getEditLang', '_getStdUrl', '_getSeoEntryType', 'processParam', '_getAltSeoEntryId'], [], '', false);
+        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('objectId'));
         $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
         $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
-        $oView->expects($this->once())->method('_getStdUrl')->will($this->returnValue("stdUrl"));
+        $oView->expects($this->once())->method('_getStdUrl')->will($this->returnValue('stdUrl'));
         $oView->expects($this->once())->method('getEditLang')->will($this->returnValue(1));
-        $oView->expects($this->once())->method('_getSeoEntryType')->will($this->returnValue("seoEntryType"));
-        $oView->expects($this->once())->method('processParam')->will($this->returnValue("param"));
-        $oView->expects($this->once())->method('_getAltSeoEntryId')->will($this->returnValue("altSeoEntryId"));
+        $oView->expects($this->once())->method('_getSeoEntryType')->will($this->returnValue('seoEntryType'));
+        $oView->expects($this->once())->method('processParam')->will($this->returnValue('param'));
+        $oView->expects($this->once())->method('_getAltSeoEntryId')->will($this->returnValue('altSeoEntryId'));
         $oView->save();
     }
 
@@ -230,18 +231,18 @@ class ObjectSeoTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Method not called.');
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Core\SeoEncoder::class, array("getMetaData"));
-        $oEncoder->expects($this->once())->method('getMetaData')->with($this->equalTo(1), $this->equalTo("MetaType"), $this->equalTo("shopid"), $this->equalTo(1))->will($this->returnValue("metaData"));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Core\SeoEncoder::class, ['getMetaData']);
+        $oEncoder->expects($this->once())->method('getMetaData')->with($this->equalTo(1), $this->equalTo('MetaType'), $this->equalTo('shopid'), $this->equalTo(1))->will($this->returnValue('metaData'));
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("getShopId"));
-        $oConfig->expects($this->once())->method('getShopId')->will($this->returnValue("shopid"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopId']);
+        $oConfig->expects($this->once())->method('getShopId')->will($this->returnValue('shopid'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, array("_getEncoder", "getEditObjectId", "getConfig", "getEditLang"), array(), '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, ['_getEncoder', 'getEditObjectId', 'getConfig', 'getEditLang'], [], '', false);
         $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
         $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue(1));
         $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
         $oView->expects($this->once())->method('getEditLang')->will($this->returnValue(1));
-        $this->assertEquals("metaData", $oView->getEntryMetaData("MetaType"));
+        $this->assertEquals('metaData', $oView->getEntryMetaData('MetaType'));
     }
 
     /**
@@ -257,10 +258,9 @@ class ObjectSeoTest extends \OxidTestCase
                                  ( 'objectid', 'ident', '{$ShopId}', '{$iLang}', 'stdurl', 'seourl', 'type', 1 )";
         oxDb::getDb()->execute($sQ);
 
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, array("getEditObjectId"));
-        $oView->expects($this->at(0))->method('getEditObjectId')->will($this->returnValue("objectid"));
-        $oView->expects($this->at(1))->method('getEditObjectId')->will($this->returnValue("notexistingobjectid"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ObjectSeo::class, ['getEditObjectId']);
+        $oView->expects($this->at(0))->method('getEditObjectId')->will($this->returnValue('objectid'));
+        $oView->expects($this->at(1))->method('getEditObjectId')->will($this->returnValue('notexistingobjectid'));
 
         $this->assertTrue($oView->isEntryFixed());
         $this->assertFalse($oView->isEntryFixed());

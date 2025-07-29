@@ -359,18 +359,18 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         $oDb = DatabaseProvider::getDb();
-        $categoryViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxobject2category");
+        $categoryViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
 
         // add main category caching;
-        $sQ = "select oxcatnid from " . $categoryViewName . " where oxobjectid = :oxobjectid order by oxtime";
+        $sQ = 'select oxcatnid from ' . $categoryViewName . ' where oxobjectid = :oxobjectid order by oxtime';
         $sIdent = md5($categoryViewName . $sArtId);
 
-        if (($sMainCatId = $this->_loadFromCache($sIdent, "oxarticle")) === false) {
+        if (($sMainCatId = $this->_loadFromCache($sIdent, 'oxarticle')) === false) {
             $sMainCatId = $oDb->getOne($sQ, [
-                ':oxobjectid' => $sArtId
+                ':oxobjectid' => $sArtId,
             ]);
             // storing in cache
-            $this->_saveInCache($sIdent, $sMainCatId, "oxarticle");
+            $this->_saveInCache($sIdent, $sMainCatId, 'oxarticle');
         }
 
         if ($sMainCatId) {
@@ -461,9 +461,9 @@ class SeoEncoderArticle extends SeoEncoder
                 // looking in cache ...
                 if (!isset(self::$_aTitleCache[$sParentId])) {
                     $oDb = DatabaseProvider::getDb();
-                    $sQ = "select oxtitle from " . $oArticle->getViewName() . " where oxid = :oxid";
+                    $sQ = 'select oxtitle from ' . $oArticle->getViewName() . ' where oxid = :oxid';
                     self::$_aTitleCache[$sParentId] = $oDb->getOne($sQ, [
-                        ':oxid' => $sParentId
+                        ':oxid' => $sParentId,
                     ]);
                 }
                 $sTitle = self::$_aTitleCache[$sParentId];
@@ -508,7 +508,7 @@ class SeoEncoderArticle extends SeoEncoder
                 $sSeoUri = Registry::get(SeoEncoderVendor::class)->getVendorUri($oVendor, $iLang);
                 $sSeoUri = $this->_processSeoUrl($sSeoUri . $sTitle, $oArticle->getId(), $iLang);
 
-                $aStdParams = ['cnid' => "v_" . $oVendor->getId(), 'listtype' => $this->_getListType()];
+                $aStdParams = ['cnid' => 'v_' . $oVendor->getId(), 'listtype' => $this->_getListType()];
                 $this->_saveToDb(
                     'oxarticle',
                     $oArticle->getId(),
@@ -710,11 +710,11 @@ class SeoEncoderArticle extends SeoEncoder
             case OXARTICLE_LINKTYPE_MANUFACTURER:
                 $sUri = $this->getArticleManufacturerUri($oArticle, $iLang);
                 break;
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+                // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             case OXARTICLE_LINKTYPE_RECOMM:
                 $sUri = $this->getArticleRecommUri($oArticle, $iLang);
                 break;
-            // END deprecated
+                // END deprecated
             case OXARTICLE_LINKTYPE_PRICECATEGORY: // goes price category urls to default (category urls)
             default:
                 $sUri = $this->getArticleUri($oArticle, $iLang);
@@ -740,13 +740,13 @@ class SeoEncoderArticle extends SeoEncoder
     {
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxarticle'", [
-            ':oxobjectid' => $oArticle->getId()
+            ':oxobjectid' => $oArticle->getId(),
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $oArticle->getId()
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $oArticle->getId(),
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $oArticle->getId()
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $oArticle->getId(),
         ]);
     }
 
@@ -797,5 +797,5 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $sSeoUrl;
-    }   
+    }
 }

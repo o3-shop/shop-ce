@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\SeoEncoderManufacturer;
-
-use \oxField;
-use \oxDb;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Manufacturer_Seo class
  */
 class ManufacturerSeoTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -77,10 +77,10 @@ class ManufacturerSeoTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxbase', 'load', '{ return true; }');
         oxTestModules::addFunction('oxbase', 'save', '{ return true; }');
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, array("getEditObjectId"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, ['getEditObjectId']);
         $oView->expects($this->atLeastOnce())->method('getEditObjectId')->will($this->returnValue(123));
 
         $this->assertNull($oView->save());
@@ -116,20 +116,19 @@ class ManufacturerSeoTest extends \OxidTestCase
     public function testIsEntrySuffixed()
     {
         $oManufacturer = oxNew('oxManufacturer');
-        $oManufacturer->setId("_test1");
+        $oManufacturer->setId('_test1');
         $oManufacturer->oxmanufacturers__oxshowsuffix = new oxField(1);
         $oManufacturer->save();
 
         $oManufacturer = oxNew('oxManufacturer');
-        $oManufacturer->setId("_test2");
+        $oManufacturer->setId('_test2');
         $oManufacturer->oxmanufacturers__oxshowsuffix = new oxField(0);
         $oManufacturer->save();
 
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, array("getEditObjectId"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, ['getEditObjectId']);
         $oView->expects($this->exactly(2))
             ->method('getEditObjectId')
-            ->willReturnOnConsecutiveCalls("_test1", "_test2");
+            ->willReturnOnConsecutiveCalls('_test1', '_test2');
 
         $this->assertTrue($oView->isEntrySuffixed());
         $this->assertFalse($oView->isEntrySuffixed());
@@ -145,17 +144,17 @@ class ManufacturerSeoTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         $oManufacturer = oxNew('oxManufacturer');
-        $oManufacturer->setId("_test1");
+        $oManufacturer->setId('_test1');
         $oManufacturer->oxmanufacturers__oxshowsuffix = new oxField(0);
         $oManufacturer->save();
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, array("getManufacturerUri"));
-        $oEncoder->expects($this->once())->method('getManufacturerUri')->will($this->returnValue("ManufacturerUri"));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, ['getManufacturerUri']);
+        $oEncoder->expects($this->once())->method('getManufacturerUri')->will($this->returnValue('ManufacturerUri'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, array("getEditObjectId", "_getEncoder"));
-        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue("_test1"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, ['getEditObjectId', '_getEncoder']);
+        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('_test1'));
         $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
-        $this->assertEquals("ManufacturerUri", $oView->getEntryUri());
+        $this->assertEquals('ManufacturerUri', $oView->getEntryUri());
     }
 
     /**
@@ -166,13 +165,13 @@ class ManufacturerSeoTest extends \OxidTestCase
     public function testGetStdUrl()
     {
         $oManufacturer = oxNew('oxManufacturer');
-        $oManufacturer->setId("_test1");
+        $oManufacturer->setId('_test1');
         $oManufacturer->oxmanufacturers__oxshowsuffix = new oxField(0);
         $oManufacturer->save();
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, array("getEditLang"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, ['getEditLang']);
         $oView->expects($this->once())->method('getEditLang')->will($this->returnValue(0));
 
-        $this->assertEquals($oManufacturer->getBaseStdLink(0, true, false), $oView->UNITgetStdUrl("_test1"));
+        $this->assertEquals($oManufacturer->getBaseStdLink(0, true, false), $oView->UNITgetStdUrl('_test1'));
     }
 }

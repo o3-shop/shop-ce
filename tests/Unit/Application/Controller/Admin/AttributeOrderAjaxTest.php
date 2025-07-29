@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Attribute_Order_Ajax class
@@ -64,7 +66,7 @@ class AttributeOrderAjaxTest extends \OxidTestCase
     public function testGetQuery()
     {
         $sOxid = '_testOxid';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
 
         $oView = oxNew('attribute_order_ajax');
         $sViewTable = $this->getVieTableName();
@@ -80,7 +82,7 @@ class AttributeOrderAjaxTest extends \OxidTestCase
     public function testGetSorting()
     {
         $oView = oxNew('attribute_order_ajax');
-        $this->assertEquals("order by oxcategory2attribute.oxsort", trim($oView->UNITgetSorting()));
+        $this->assertEquals('order by oxcategory2attribute.oxsort', trim($oView->UNITgetSorting()));
     }
 
     /**
@@ -92,13 +94,13 @@ class AttributeOrderAjaxTest extends \OxidTestCase
     {
         $this->markTestSkipped('Overwork due => tests are stoping without message.');
 
-        $this->getConfig()->setConfigParam("iDebug", 1);
+        $this->getConfig()->setConfigParam('iDebug', 1);
 
         $sViewTable = $this->getVieTableName();
 
-        $aData = array('startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '$sOxid' ", 'records' => array(), 'totalRecords' => 0);
+        $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '$sOxid' ", 'records' => [], 'totalRecords' => 0];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, array("_output"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, ['_output']);
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
         $oView->setsorting();
     }
@@ -111,15 +113,15 @@ class AttributeOrderAjaxTest extends \OxidTestCase
     public function testSetSortingOxid()
     {
         $sOxid = '_testObject';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->getConfig()->setConfigParam("iDebug", 1);
-        $this->setRequestParameter("sortoxid", 0);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->getConfig()->setConfigParam('iDebug', 1);
+        $this->setRequestParameter('sortoxid', 0);
 
         $sViewTable = $this->getVieTableName();
 
-        $aData = array('startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '$sOxid' ", 'records' => array(), 'totalRecords' => 0);
+        $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '$sOxid' ", 'records' => [], 'totalRecords' => 0];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, array("_output"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, ['_output']);
         $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
         ob_start();
         $oView->setsorting();
@@ -132,9 +134,9 @@ class AttributeOrderAjaxTest extends \OxidTestCase
      */
     private function getVieTableName()
     {
-        $sViewTable = "oxv_oxattribute_de";
+        $sViewTable = 'oxv_oxattribute_de';
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sViewTable = "oxv_oxattribute_1_de";
+            $sViewTable = 'oxv_oxattribute_1_de';
         }
 
         return $sViewTable;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -35,42 +36,42 @@ class BasketAdminTest extends AdminTestCase
     public function testFrontendPersParamSaveBasket()
     {
         // Active option (Product can be customized) for product with ID 1000
-        $this->_saveArticle("1000", array("oxisconfigurable" => 1));
+        $this->_saveArticle('1000', ['oxisconfigurable' => 1]);
 
         // Active config option (Don't save Shopping Carts of registered Users)
-        $this->_setShopParam("blPerfNoBasketSaving", '');
+        $this->_setShopParam('blPerfNoBasketSaving', '');
 
         $aOrderParams1 = $this->_getNewTestOrderParams();
 
-        $sOrderId = $this->callShopSC("oxOrder", "save", null, $aOrderParams1);
+        $sOrderId = $this->callShopSC('oxOrder', 'save', null, $aOrderParams1);
 
         $aOrderArticleParams1 = $this->_getOrderArticle1($sOrderId);
         $aOrderArticleParams2 = $this->_getOrderArticle2($sOrderId);
         $aOrderArticleParams3 = $this->_getOrderArticle3($sOrderId);
         $aOrderArticleParams4 = $this->_getOrderArticle4($sOrderId);
 
-        $this->callShopSC("oxOrderArticle", "save", null, $aOrderArticleParams1);
-        $this->callShopSC("oxOrderArticle", "save", null, $aOrderArticleParams2);
-        $this->callShopSC("oxOrderArticle", "save", null, $aOrderArticleParams3);
-        $this->callShopSC("oxOrderArticle", "save", null, $aOrderArticleParams4);
+        $this->callShopSC('oxOrderArticle', 'save', null, $aOrderArticleParams1);
+        $this->callShopSC('oxOrderArticle', 'save', null, $aOrderArticleParams2);
+        $this->callShopSC('oxOrderArticle', 'save', null, $aOrderArticleParams3);
+        $this->callShopSC('oxOrderArticle', 'save', null, $aOrderArticleParams4);
 
         //checking in Admin
-        $this->loginAdmin("Administer Orders", "Orders");
-        $this->openListItem("link=12");
-        $this->waitForText("Label: test label šÄßüл 1");
+        $this->loginAdmin('Administer Orders', 'Orders');
+        $this->openListItem('link=12');
+        $this->waitForText('Label: test label šÄßüл 1');
 
-        $firstArticle  = ['2 *', '1000', 'Test product 0 [EN]', '', '90,00 EUR'];
+        $firstArticle = ['2 *', '1000', 'Test product 0 [EN]', '', '90,00 EUR'];
         $secondArticle = ['2 *', '1000', 'Test product 0 [EN]', '', '90,00 EUR'];
-        $thirdArticle  = ['1 *', '1001', 'Test product 1 [EN]', 'test selection list [EN] šÄßüл : selvar3 [EN] šÄßüл -2,00 €', '93,00 EUR'];
+        $thirdArticle = ['1 *', '1001', 'Test product 1 [EN]', 'test selection list [EN] šÄßüл : selvar3 [EN] šÄßüл -2,00 €', '93,00 EUR'];
         $fourthArticle = ['1 *', '1001', 'Test product 1 [EN]', 'test selection list [EN] šÄßüл : selvar4 [EN] šÄßüл +2%', '97,00 EUR'];
 
         $matrix = [];
         $counter = null;
-        for ($i=1;$i<5; $i++) {
-            for ($j=1;$j<=6; $j++) {
+        for ($i = 1;$i < 5; $i++) {
+            for ($j = 1;$j <= 6; $j++) {
                 $identifier = "//table[2]/tbody/tr[$i]/td[$j]";
                 if ($this->isElementPresent($identifier)) {
-                    $matrix[$i-1][$j-1] = $this->getText($identifier);
+                    $matrix[$i - 1][$j - 1] = $this->getText($identifier);
                     if (6 == $j) {
                         $counter = $i;
                     }
@@ -82,17 +83,17 @@ class BasketAdminTest extends AdminTestCase
         $this->assertTrue(in_array($thirdArticle, $matrix));
         $this->assertTrue(in_array($fourthArticle, $matrix));
 
-        $this->openTab("Products");
-        $this->assertEquals("2", $this->getValue("//tr[@id='art.{$counter}']/td[1]/input"));
-        $this->assertEquals("Label: test label šÄßüл 1", $this->getText("//tr[@id='art.{$counter}']/td[5]"));
-        $this->assertEquals("45,00 EUR", $this->getText("//tr[@id='art.{$counter}']/td[7]"));
-        $this->assertEquals("90,00 EUR", $this->getText("//tr[@id='art.{$counter}']/td[8]"));
+        $this->openTab('Products');
+        $this->assertEquals('2', $this->getValue("//tr[@id='art.{$counter}']/td[1]/input"));
+        $this->assertEquals('Label: test label šÄßüл 1', $this->getText("//tr[@id='art.{$counter}']/td[5]"));
+        $this->assertEquals('45,00 EUR', $this->getText("//tr[@id='art.{$counter}']/td[7]"));
+        $this->assertEquals('90,00 EUR', $this->getText("//tr[@id='art.{$counter}']/td[8]"));
 
-        $this->type("//tr[@id='art.{$counter}']/td[1]/input", "3");
+        $this->type("//tr[@id='art.{$counter}']/td[1]/input", '3');
         $this->clickAndWait("//input[@value='Update']");
-        $this->waitForElementText("135,00 EUR", "//tr[@id='art.{$counter}']/td[8]");
-        $this->assertEquals("Label: test label šÄßüл 1", $this->getText("//tr[@id='art.{$counter}']/td[5]"));
-        $this->assertEquals("45,00 EUR", $this->getText("//tr[@id='art.{$counter}']/td[7]"));
+        $this->waitForElementText('135,00 EUR', "//tr[@id='art.{$counter}']/td[8]");
+        $this->assertEquals('Label: test label šÄßüл 1', $this->getText("//tr[@id='art.{$counter}']/td[5]"));
+        $this->assertEquals('45,00 EUR', $this->getText("//tr[@id='art.{$counter}']/td[7]"));
 
         //After recalculation fix sum total should be:
         $this->assertTextPresent('426,00');
@@ -105,7 +106,7 @@ class BasketAdminTest extends AdminTestCase
      */
     protected function _saveArticle($sArticleId, $aArticleParams, $iShopId = null)
     {
-        $this->callShopSC("oxArticle", "save", $sArticleId, $aArticleParams, null, $iShopId);
+        $this->callShopSC('oxArticle', 'save', $sArticleId, $aArticleParams, null, $iShopId);
     }
 
     /**
@@ -115,13 +116,13 @@ class BasketAdminTest extends AdminTestCase
      */
     protected function _setShopParam($sParamName, $sParamValue, $sModule = null)
     {
-        $aParams = array("type" => "bool", "value" => $sParamValue);
+        $aParams = ['type' => 'bool', 'value' => $sParamValue];
 
         if (!is_null($sModule)) {
-            $aParams = array_merge($aParams, array("module" => $sModule));
+            $aParams = array_merge($aParams, ['module' => $sModule]);
         }
 
-        $this->callShopSC("oxConfig", null, null, array($sParamName => $aParams));
+        $this->callShopSC('oxConfig', null, null, [$sParamName => $aParams]);
     }
 
     /**
@@ -129,7 +130,7 @@ class BasketAdminTest extends AdminTestCase
      */
     protected function _getNewTestOrderParams()
     {
-        $aOrderParams1 = array(
+        $aOrderParams1 = [
             'OXID' => 'e2a96db880623b02ff69617de634ba5f',
             'OXSHOPID' => 1,
             'OXUSERID' => 'testuser',
@@ -171,14 +172,14 @@ class BasketAdminTest extends AdminTestCase
             'OXDELTYPE' => 'testdelset',
             'OXTIMESTAMP' => '2014-03-07 09:27:13',
             'OXISNETTOMODE' => '0',
-        );
+        ];
 
         return $aOrderParams1;
     }
 
     protected function _getOrderArticle1($sOrderId)
     {
-        return array(
+        return [
             'OXID' => '4caac47d5f4a819c0853dd5d3b90287e',
             'OXORDERID' => $sOrderId,
             'OXAMOUNT' => '2',
@@ -209,12 +210,12 @@ class BasketAdminTest extends AdminTestCase
             'OXSTORNO' => '0',
             'OXORDERSHOPID' => '1',
             'OXISBUNDLE' => '0',
-        );
+        ];
     }
 
     protected function _getOrderArticle2($sOrderId)
     {
-        return array(
+        return [
             'OXID' => '3b61dc80172cd600af584b5abb5a6d4a',
             'OXORDERID' => $sOrderId,
             'OXAMOUNT' => '2',
@@ -245,12 +246,12 @@ class BasketAdminTest extends AdminTestCase
             'OXSTORNO' => '0',
             'OXORDERSHOPID' => '1',
             'OXISBUNDLE' => '0',
-        );
+        ];
     }
 
     protected function _getOrderArticle3($sOrderId)
     {
-        return array(
+        return [
             'OXID' => '1e5c3234fdc11195ddaf0face31c2998',
             'OXORDERID' => $sOrderId,
             'OXAMOUNT' => '1',
@@ -281,12 +282,12 @@ class BasketAdminTest extends AdminTestCase
             'OXSTORNO' => '0',
             'OXORDERSHOPID' => '1',
             'OXISBUNDLE' => '0',
-        );
+        ];
     }
 
     protected function _getOrderArticle4($sOrderId)
     {
-        return array(
+        return [
             'OXID' => '13453ad523bfcd0c1783fc225c534df1',
             'OXORDERID' => $sOrderId,
             'OXAMOUNT' => '1',
@@ -317,6 +318,6 @@ class BasketAdminTest extends AdminTestCase
             'OXSTORNO' => '0',
             'OXORDERSHOPID' => '1',
             'OXISBUNDLE' => '0',
-        );
+        ];
     }
 }

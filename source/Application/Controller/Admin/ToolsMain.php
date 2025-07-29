@@ -45,18 +45,18 @@ class ToolsMain extends AdminDetailsController
     public function render()
     {
         if (Registry::getConfig()->isDemoShop()) {
-            Registry::getUtils()->showMessageAndExit("Access denied !");
+            Registry::getUtils()->showMessageAndExit('Access denied !');
         }
 
         parent::render();
 
         $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
-        $this->_aViewData["blIsMallAdmin"] = $oAuthUser->oxuser__oxrights->value == "malladmin";
+        $this->_aViewData['blIsMallAdmin'] = $oAuthUser->oxuser__oxrights->value == 'malladmin';
 
         $blShowUpdateViews = Registry::getConfig()->getConfigParam('blShowUpdateViews');
         $this->_aViewData['showViewUpdate'] = !(isset($blShowUpdateViews) && !$blShowUpdateViews);
 
-        return "tools_main.tpl";
+        return 'tools_main.tpl';
     }
 }

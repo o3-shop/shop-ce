@@ -23,10 +23,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\ReviewPermissionException;
 use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Exception\ReviewPermissionException;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewServiceInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 
 class UserReviewBridge implements UserReviewBridgeInterface
 {

@@ -22,15 +22,15 @@
 namespace OxidEsales\EshopCommunity\Core;
 
 use Exception;
+use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Controller\OxidStartController;
 use OxidEsales\Eshop\Application\Model\Shop;
 use OxidEsales\Eshop\Core\Module\ModuleTemplatePathCalculator;
-use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
-use stdClass;
-use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Event\ShopConfigurationChangedEvent;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Event\SettingChangedEvent;
+use OxidEsales\EshopCommunity\Internal\Framework\Theme\Bridge\AdminThemeBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Theme\Event\ThemeSettingChangedEvent;
+use stdClass;
 
 //max integer
 define('MAX_64BIT_INTEGER', '18446744073709551615');
@@ -49,7 +49,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      * @deprecated since v6.5.0 (2019-11-28); Constant will be removed
      * because MySQL 8 removed ENCODE and DECODE methods
      */
-    const DEFAULT_CONFIG_KEY = 'fq45QS09_fqyx09239QQ';
+    public const DEFAULT_CONFIG_KEY = 'fq45QS09_fqyx09239QQ';
 
     // this column of params are defined in config.inc.php file,
     // so for backwards compatibility. names starts without underscore
@@ -184,7 +184,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
         'oxnews',
         // END deprecated
         'oxselectlist', 'oxwrapping',
-        'oxdeliveryset', 'oxdelivery', 'oxvendor', 'oxobject2category'
+        'oxdeliveryset', 'oxdelivery', 'oxvendor', 'oxobject2category',
     ];
 
     /**
@@ -336,14 +336,14 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @var string
      */
-    const OXMODULE_THEME_PREFIX = 'theme:';
+    public const OXMODULE_THEME_PREFIX = 'theme:';
 
     /**
      * prefix for oxModule field for modules in oxConfig and oxConfigDisplay tables
      *
      * @var string
      */
-    const OXMODULE_MODULE_PREFIX = 'module:';
+    public const OXMODULE_MODULE_PREFIX = 'module:';
 
     /**
      * Returns config parameter value if such parameter exists
@@ -414,7 +414,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
         if (empty($shopID) || !$configLoaded) {
             // if no config values where loaded (some problems with DB), throwing an exception
             $exception = new \OxidEsales\Eshop\Core\Exception\DatabaseException(
-                "Unable to load shop config values from database",
+                'Unable to load shop config values from database',
                 0,
                 new \Exception()
             );
@@ -589,16 +589,16 @@ class Config extends \OxidEsales\Eshop\Core\Base
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
         $params = [
-          ':oxshopid' => $shopID
+          ':oxshopid' => $shopID,
         ];
-        $select = "select
-                        oxvarname, oxvartype, " . $this->getDecodeValueQuery() . " as oxvarvalue
+        $select = 'select
+                        oxvarname, oxvartype, ' . $this->getDecodeValueQuery() . ' as oxvarvalue
                     from oxconfig
-                    where oxshopid = :oxshopid and ";
+                    where oxshopid = :oxshopid and ';
 
         if ($module) {
-            $select .= " oxmodule LIKE :oxmodule";
-            $params[':oxmodule'] = $module . "%";
+            $select .= ' oxmodule LIKE :oxmodule';
+            $params[':oxmodule'] = $module . '%';
         } else {
             $select .= "oxmodule = ''";
         }
@@ -889,7 +889,6 @@ class Config extends \OxidEsales\Eshop\Core\Base
         }
     }
 
-
     /**
      * Checks if WEB session is SSL. Returns true if yes.
      *
@@ -939,11 +938,11 @@ class Config extends \OxidEsales\Eshop\Core\Base
     public function isCurrentProtocol($url)
     {
         // Missing protocol, cannot proceed, assuming true.
-        if (!$url || (strpos($url, "http") !== 0)) {
+        if (!$url || (strpos($url, 'http') !== 0)) {
             return true;
         }
 
-        return (strpos($url, "https:") === 0) == $this->isSsl();
+        return (strpos($url, 'https:') === 0) == $this->isSsl();
     }
 
     /**
@@ -1481,7 +1480,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getMasterPictureDir($admin = false)
     {
-        return $this->getDir(null, $this->_sPictureDir . "/" . $this->_sMasterPictureDir, $admin);
+        return $this->getDir(null, $this->_sPictureDir . '/' . $this->_sMasterPictureDir, $admin);
     }
 
     /**
@@ -1494,7 +1493,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getMasterPicturePath($file, $admin = false)
     {
-        return $this->getDir($file, $this->_sPictureDir . "/" . $this->_sMasterPictureDir, $admin);
+        return $this->getDir($file, $this->_sPictureDir . '/' . $this->_sMasterPictureDir, $admin);
     }
 
     /**
@@ -1509,7 +1508,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      *
      * @return string
      */
-    public function getPictureUrl($file, $admin = false, $ssl = null, $lang = null, $shopId = null, $defPic = "master/nopic.jpg")
+    public function getPictureUrl($file, $admin = false, $ssl = null, $lang = null, $shopId = null, $defPic = 'master/nopic.jpg')
     {
         if ($altUrl = Registry::getPictureHandler()->getAltImageUrl('', $file, $ssl)) {
             return $altUrl;
@@ -1762,7 +1761,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getEdition()
     {
-        return "CE";
+        return 'CE';
     }
 
     /**
@@ -1773,8 +1772,8 @@ class Config extends \OxidEsales\Eshop\Core\Base
     public function getFullEdition()
     {
         $edition = $this->getEdition();
-        if ($edition == "CE") {
-            $edition = "Community Edition";
+        if ($edition == 'CE') {
+            $edition = 'Community Edition';
         }
 
         return $edition;
@@ -1801,7 +1800,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getRevision()
     {
-        $fileName = $this->getConfigParam('sShopDir') . "/pkg.rev";
+        $fileName = $this->getConfigParam('sShopDir') . '/pkg.rev';
 
         $rev = false;
 
@@ -1823,9 +1822,9 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getPackageInfo()
     {
-        $fileName = $this->getConfigParam('sShopDir') . "/pkg.info";
+        $fileName = $this->getConfigParam('sShopDir') . '/pkg.info';
         $rev = @file_get_contents($fileName);
-        $rev = str_replace("\n", "<br>", $rev);
+        $rev = str_replace("\n", '<br>', $rev);
 
         if (!$rev) {
             return false;
@@ -1884,9 +1883,9 @@ class Config extends \OxidEsales\Eshop\Core\Base
                 break;
             case 'bool':
                 //config param
-                $varVal = (($varVal == 'true' || $varVal) && $varVal && strcasecmp($varVal, "false"));
+                $varVal = (($varVal == 'true' || $varVal) && $varVal && strcasecmp($varVal, 'false'));
                 //db value
-                $value = $varVal ? "1" : "";
+                $value = $varVal ? '1' : '';
                 break;
             case 'num':
                 //config param
@@ -1910,22 +1909,22 @@ class Config extends \OxidEsales\Eshop\Core\Base
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
         $newOXID = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUID();
 
-        $query = "delete from oxconfig where oxshopid = :oxshopid and oxvarname = :oxvarname and oxmodule = :oxmodule";
+        $query = 'delete from oxconfig where oxshopid = :oxshopid and oxvarname = :oxvarname and oxmodule = :oxmodule';
         $db->execute($query, [
             ':oxshopid' => $shopId,
             ':oxvarname' => $varName,
-            ':oxmodule' => $module ?: ''
+            ':oxmodule' => $module ?: '',
         ]);
 
-        $query = "insert into oxconfig (oxid, oxshopid, oxmodule, oxvarname, oxvartype, oxvarvalue)
-                  values (:oxid, :oxshopid, :oxmodule, :oxvarname, :oxvartype, :value)";
+        $query = 'insert into oxconfig (oxid, oxshopid, oxmodule, oxvarname, oxvartype, oxvarvalue)
+                  values (:oxid, :oxshopid, :oxmodule, :oxvarname, :oxvartype, :value)';
         $db->execute($query, [
             ':oxid' => $newOXID,
             ':oxshopid' => $shopId,
             ':oxmodule' => $module ?: '',
             ':oxvarname' => $varName,
             ':oxvartype' => $varType,
-            ':value' => $value ?? ''
+            ':value' => $value ?? '',
         ]);
 
         $this->informServicesAfterConfigurationChanged($varName, $shopId, $module);
@@ -1955,11 +1954,11 @@ class Config extends \OxidEsales\Eshop\Core\Base
 
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
 
-        $query = "select oxvartype, " . $this->getDecodeValueQuery() . " as oxvarvalue from oxconfig where oxshopid = :oxshopid and oxmodule = :oxmodule and oxvarname = :oxvarname";
+        $query = 'select oxvartype, ' . $this->getDecodeValueQuery() . ' as oxvarvalue from oxconfig where oxshopid = :oxshopid and oxmodule = :oxmodule and oxvarname = :oxvarname';
         $rs = $db->select($query, [
             ':oxshopid' => $shopId,
             ':oxmodule' => $module,
-            ':oxvarname' => $varName
+            ':oxvarname' => $varName,
         ]);
 
         if ($rs != false && $rs->count() > 0) {
@@ -2002,7 +2001,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      * because MySQL 8 removed ENCODE and DECODE methods
      *
      */
-    public function getDecodeValueQuery($fieldName = "oxvarvalue")
+    public function getDecodeValueQuery($fieldName = 'oxvarvalue')
     {
         return " $fieldName ";
     }
@@ -2018,7 +2017,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
         if (!isset($productive)) {
             $query = 'select oxproductive from oxshops where oxid = :oxid';
             $productive = (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($query, [
-                ':oxid' => $this->getShopId()
+                ':oxid' => $this->getShopId(),
             ]);
             $this->setConfigParam('blProductive', $productive);
         }
@@ -2248,7 +2247,7 @@ class Config extends \OxidEsales\Eshop\Core\Base
      */
     public function getShopIds()
     {
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol("SELECT `oxid` FROM `oxshops`");
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol('SELECT `oxid` FROM `oxshops`');
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \Exception;
-use \oxField;
-use \oxException;
-use \oxRegistry;
-use \oxTestModules;
+use Exception;
+use oxException;
+use oxField;
+use oxTestModules;
 
 /**
  * Tests for Account class
  */
 class AccountPasswordTest extends \OxidTestCase
 {
-
     /**
      * Testing Account_Newsletter::changePassword()
      *
@@ -39,12 +39,12 @@ class AccountPasswordTest extends \OxidTestCase
     public function testChangePasswordNoUser()
     {
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue(false));
 
         $this->assertNull($oView->changePassword());
@@ -62,19 +62,19 @@ class AccountPasswordTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ return "ERROR_MESSAGE_INPUT_EMPTYPASS"; }');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("checkPassword"));
-        $oUser->expects($this->any())->method('checkPassword')->will($this->returnValue(new Exception("ERROR_MESSAGE_INPUT_EMPTYPASS")));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkPassword']);
+        $oUser->expects($this->any())->method('checkPassword')->will($this->returnValue(new Exception('ERROR_MESSAGE_INPUT_EMPTYPASS')));
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
-        $this->assertEquals("ERROR_MESSAGE_INPUT_EMPTYPASS", $oView->changePassword());
+        $this->assertEquals('ERROR_MESSAGE_INPUT_EMPTYPASS', $oView->changePassword());
         $this->assertFalse($oView->isPasswordChanged());
     }
 
@@ -88,19 +88,19 @@ class AccountPasswordTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ return "ERROR_MESSAGE_PASSWORD_TOO_SHORT"; }');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("checkPassword"));
-        $oUser->expects($this->any())->method('checkPassword')->will($this->returnValue(new Exception("ERROR_MESSAGE_PASSWORD_TOO_SHORT")));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkPassword']);
+        $oUser->expects($this->any())->method('checkPassword')->will($this->returnValue(new Exception('ERROR_MESSAGE_PASSWORD_TOO_SHORT')));
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
-        $this->assertEquals("ERROR_MESSAGE_PASSWORD_TOO_SHORT", $oView->changePassword());
+        $this->assertEquals('ERROR_MESSAGE_PASSWORD_TOO_SHORT', $oView->changePassword());
         $this->assertFalse($oView->isPasswordChanged());
     }
 
@@ -114,19 +114,19 @@ class AccountPasswordTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ return "ACCOUNT_PASSWORD_ERRPASSWDONOTMATCH"; }');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("checkPassword"));
-        $oUser->expects($this->any())->method('checkPassword')->will($this->returnValue(new Exception("ACCOUNT_PASSWORD_ERRPASSWDONOTMATCH")));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkPassword']);
+        $oUser->expects($this->any())->method('checkPassword')->will($this->returnValue(new Exception('ACCOUNT_PASSWORD_ERRPASSWDONOTMATCH')));
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
-        $this->assertEquals("ACCOUNT_PASSWORD_ERRPASSWDONOTMATCH", $oView->changePassword());
+        $this->assertEquals('ACCOUNT_PASSWORD_ERRPASSWDONOTMATCH', $oView->changePassword());
         $this->assertFalse($oView->isPasswordChanged());
     }
 
@@ -141,20 +141,20 @@ class AccountPasswordTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ return "ACCOUNT_PASSWORD_ERRINCORRECTCURRENTPASSW"; }');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("checkPassword", "isSamePassword"));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkPassword', 'isSamePassword']);
         $oUser->expects($this->any())->method('checkPassword');
         $oUser->expects($this->any())->method('isSamePassword')->will($this->returnValue(false));
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
-        $this->assertEquals("ACCOUNT_PASSWORD_ERRINCORRECTCURRENTPASSW", $oView->changePassword());
+        $this->assertEquals('ACCOUNT_PASSWORD_ERRINCORRECTCURRENTPASSW', $oView->changePassword());
         $this->assertFalse($oView->isPasswordChanged());
     }
 
@@ -165,25 +165,24 @@ class AccountPasswordTest extends \OxidTestCase
      */
     public function testChangePassword()
     {
-        $this->setRequestParameter('password_old', "oldpassword");
-        $this->setRequestParameter('password_new', "newpassword");
-        $this->setRequestParameter('password_new_confirm', "newpassword");
+        $this->setRequestParameter('password_old', 'oldpassword');
+        $this->setRequestParameter('password_new', 'newpassword');
+        $this->setRequestParameter('password_new_confirm', 'newpassword');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
-
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("checkPassword", "isSamePassword", "setPassword", "save"));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['checkPassword', 'isSamePassword', 'setPassword', 'save']);
         $oUser->expects($this->any())->method('checkPassword');
-        $oUser->expects($this->any())->method('isSamePassword')->with($this->equalTo("oldpassword"))->will($this->returnValue(true));
-        $oUser->expects($this->any())->method('setPassword')->with($this->equalTo("newpassword"));
+        $oUser->expects($this->any())->method('isSamePassword')->with($this->equalTo('oldpassword'))->will($this->returnValue(true));
+        $oUser->expects($this->any())->method('setPassword')->with($this->equalTo('newpassword'));
         $oUser->expects($this->any())->method('save')->will($this->returnValue(true));
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
         $this->assertNull($oView->changePassword());
@@ -197,10 +196,10 @@ class AccountPasswordTest extends \OxidTestCase
      */
     public function testIsPasswordChanged()
     {
-        $oView = $this->getProxyClass("Account_Password");
+        $oView = $this->getProxyClass('Account_Password');
         $this->assertFalse($oView->isPasswordChanged());
 
-        $oView->setNonPublicVar("_blPasswordChanged", true);
+        $oView->setNonPublicVar('_blPasswordChanged', true);
         $this->assertTrue($oView->isPasswordChanged());
     }
 
@@ -212,7 +211,7 @@ class AccountPasswordTest extends \OxidTestCase
     public function testRenderNoUser()
     {
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue(false));
 
         $this->assertEquals('page/account/login.tpl', $oView->render());
@@ -226,10 +225,10 @@ class AccountPasswordTest extends \OxidTestCase
     public function testRender()
     {
         $oUser = oxNew('oxuser');
-        $oUser->oxuser__oxpassword = new oxField("testPassword");
+        $oUser->oxuser__oxpassword = new oxField('testPassword');
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
         $this->assertEquals('page/account/password.tpl', $oView->render());
@@ -268,12 +267,12 @@ class AccountPasswordTest extends \OxidTestCase
         $this->setRequestParameter('password_new_confirm', $sPass);
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUser */
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('isSamePassword'));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['isSamePassword']);
 
         /** @var oxInputValidator|PHPUnit\Framework\MockObject\MockObject $oInputValidator */
         $oInputValidator = $this->getMock('oxInputValidator');
@@ -288,7 +287,7 @@ class AccountPasswordTest extends \OxidTestCase
             ->will($this->throwException(new oxException('ChangePass user test')));
 
         /** @var Account_Password|PHPUnit\Framework\MockObject\MockObject $oView */
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, array('getUser'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountPasswordController::class, ['getUser']);
         $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
 
         $oView->changePassword();

@@ -45,7 +45,6 @@ class OrderFile extends BaseModel
      */
     protected $_sClassName = 'oxorderfile';
 
-
     /**
      * Initialises the instance
      *
@@ -157,7 +156,7 @@ class OrderFile extends BaseModel
             'oxorderfiles__oxordernr',
             'oxorderfiles__oxorderdate',
             'oxorderfiles__oxispaid',
-            'oxorderfiles__oxpurchasedonly'
+            'oxorderfiles__oxpurchasedonly',
         ];
 
         if (in_array($sFieldName, $aFieldNames)) {

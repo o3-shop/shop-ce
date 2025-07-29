@@ -81,7 +81,7 @@ class PaymentCountryAjax extends ListComponentAjax
         if ($sSynchCountryId && $sSynchCountryId != $sCountryId) {
             $sQAdd .= "and $sCountryTable.oxid not in ( ";
             $sQAdd .= "select $sCountryTable.oxid from oxobject2payment left join $sCountryTable on $sCountryTable.oxid=oxobject2payment.oxobjectid ";
-            $sQAdd .= "where oxobject2payment.oxpaymentid = " . $oDb->quote($sSynchCountryId) . " and oxobject2payment.oxtype = 'oxcountry' ) ";
+            $sQAdd .= 'where oxobject2payment.oxpaymentid = ' . $oDb->quote($sSynchCountryId) . " and oxobject2payment.oxtype = 'oxcountry' ) ";
         }
 
         return $sQAdd;
@@ -99,13 +99,13 @@ class PaymentCountryAjax extends ListComponentAjax
             $sCountryTable = $this->_getViewName('oxcountry');
             $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->_getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Payment = oxNew(BaseModel::class);
                 $oObject2Payment->init('oxobject2payment');
                 $oObject2Payment->oxobject2payment__oxpaymentid = new Field($soxId);
                 $oObject2Payment->oxobject2payment__oxobjectid = new Field($sChosenCntr);
-                $oObject2Payment->oxobject2payment__oxtype = new Field("oxcountry");
+                $oObject2Payment->oxobject2payment__oxtype = new Field('oxcountry');
                 $oObject2Payment->save();
             }
         }
@@ -118,10 +118,10 @@ class PaymentCountryAjax extends ListComponentAjax
     {
         $aChosenCntr = $this->_getActionIds('oxobject2payment.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2payment.* " . $this->_getQuery());
+            $sQ = $this->_addFilter('delete oxobject2payment.* ' . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2payment where oxobject2payment.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2payment where oxobject2payment.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }

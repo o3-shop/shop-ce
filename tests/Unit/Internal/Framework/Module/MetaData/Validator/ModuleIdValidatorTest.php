@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,8 +22,8 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\MetaData\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\ModuleIdNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\ModuleIdNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\ModuleIdValidator;
 use PHPUnit\Framework\TestCase;
 
@@ -30,11 +32,10 @@ use PHPUnit\Framework\TestCase;
  */
 class ModuleIdValidatorTest extends TestCase
 {
-
     public function testValidateWhenValid(): void
     {
         $metaData = [
-            MetaDataProvider::METADATA_ID => 'some_id'
+            MetaDataProvider::METADATA_ID => 'some_id',
         ];
 
         $validator = new ModuleIdValidator();
@@ -57,7 +58,7 @@ class ModuleIdValidatorTest extends TestCase
     {
         $this->expectException(ModuleIdNotValidException::class);
         $metaData = [
-            MetaDataProvider::METADATA_ID => $moduleId
+            MetaDataProvider::METADATA_ID => $moduleId,
         ];
 
         $validator = new ModuleIdValidator();

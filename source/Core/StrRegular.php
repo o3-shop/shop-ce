@@ -335,7 +335,7 @@ class StrRegular
      */
     public function hasSpecialChars($sStr)
     {
-        return $this->preg_match("/(" . implode("|", $this->_aUmls) . "|(&amp;))/", $sStr);
+        return $this->preg_match('/(' . implode('|', $this->_aUmls) . '|(&amp;))/', $sStr);
     }
 
     /**
@@ -362,7 +362,7 @@ class StrRegular
     public function jsonEncode($data)
     {
         if (is_array($data)) {
-            $ret = "";
+            $ret = '';
             $blWasOne = false;
             $blNumerical = true;
             reset($data);
@@ -381,7 +381,7 @@ class StrRegular
                     $ret .= '"' . addslashes($key) . '":' . $this->jsonEncode($val);
                 }
 
-                return "{" . $ret . "}";
+                return '{' . $ret . '}';
             }
         } else {
             return '"' . addcslashes((string) $data, "\r\n\t\"\\") . '"';

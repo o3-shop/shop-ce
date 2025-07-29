@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto
  * Price view mode: netto
@@ -18,31 +19,30 @@
  * Vat and rounding issue. 2 products.
  * for all products VAT=33%, for one product VAT=50% spec. one discount for basket= 10%. Mode Neto-Neto
  */
-$aData = array(
+$aData = [
     // Articles
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             // oxarticles db fields
             'oxid'                     => 111,
             'oxprice'                  => 0.55,
             'oxvat'                    => 33,
             // Amount in basket
             'amount'                   => 1,
-        ),
-        1 => array(
+        ],
+        1 => [
          // oxarticles db fields
             'oxid'                     => 1112,
             'oxprice'                  => 945.95,
             'oxvat'                    => 50,
             // Amount in basket
             'amount'                   => 2,
-        ),
-
-    ),
+        ],
+    ],
     // Discounts
-    'discounts' => array(
+    'discounts' => [
         // oxdiscount DB fields
-        0 => array(
+        0 => [
             // 10% discount for basket
             'oxid'         => 'discountforbasket10%',
             'oxaddsum'     => 10,
@@ -51,14 +51,13 @@ $aData = array(
             'oxamountto' => 99999,
             'oxactive' => 1,
             'oxsort' => 10,
-        ),
-    ),
+        ],
+    ],
     // Additional costs
-    'costs' => array(
-
+    'costs' => [
         // Delivery
-        'delivery' => array(
-            0 => array(
+        'delivery' => [
+            0 => [
                 // oxdelivery DB fields
                 'oxactive' => 1,
                 'oxaddsum' => 55,
@@ -67,66 +66,64 @@ $aData = array(
                 'oxfinalize' => 1,
                  'oxparam'=> 0.1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
         // Payment
-        'payment' => array(
-            0 => array(
+        'payment' => [
+            0 => [
                 // oxpayments DB fields
                 'oxaddsum' => 55,
                 'oxaddsumtype' => 'abs',
                 'oxfromamount' => 0,
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
-            ),
-        ),
-
-    ),
+            ],
+        ],
+    ],
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-             111 => array( '0,55', '0,55' ),
-             1112 => array( '945,95', '1.891,90' ),
-
-        ),
+        'articles' => [
+             111 => [ '0,55', '0,55' ],
+             1112 => [ '945,95', '1.891,90' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '2.554,72',
             // Total NETTO
             'totalNetto'  => '1.892,45',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
+            'vats' => [
                 33 => '0,16',
                 50 => '851,36',
-            ),
+            ],
             // Total discount amounts: discount id => total cost
-            'discounts' => array(
+            'discounts' => [
                 // Expectation for special discount with specified ID
-                'discountforbasket10%' => '189,25'
-            ),
+                'discountforbasket10%' => '189,25',
+            ],
 
             // Total delivery amounts
-            'delivery' => array(
+            'delivery' => [
                 'brutto' => '1.561,28',
                 'netto' => '1.040,85',
-                'vat' => '520,43'
-            ),
+                'vat' => '520,43',
+            ],
             // Total payment amounts
-            'payment' => array(
+            'payment' => [
                 'brutto' => '82,50',
                 'netto' => '55,00',
-                'vat' => '27,50'
-            ),
+                'vat' => '27,50',
+            ],
             // GRAND TOTAL
-            'grandTotal'  => '4.198,50'
-        ),
-    ),
+            'grandTotal'  => '4.198,50',
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => true,
             'blShowNetPrice' => true,
             'blShowVATForPayCharge' => true,
@@ -134,9 +131,8 @@ $aData = array(
             'blPaymentVatOnTop'=>true,
             'blDeliveryVatOnTop'=>true,
             'blPaymentVatOnTop'=>true,
-
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

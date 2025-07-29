@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,10 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ThemeMain;
 use OxidEsales\EshopCommunity\Core\Theme;
-
-use Exception;
 use OxidTestCase;
 use oxTestModules;
 
@@ -58,7 +58,7 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testSetTheme()
     {
-        $oTM = $this->getMock(ThemeMain::class, array('getEditObjectId'));
+        $oTM = $this->getMock(ThemeMain::class, ['getEditObjectId']);
         $oTM->expects($this->any())->method('getEditObjectId')->will($this->returnValue('azure'));
 
         oxTestModules::addFunction('oxTheme', 'load($name)', '{if ($name != "azure") throw new Exception("FAIL TO LOAD"); return true;}');
@@ -77,7 +77,7 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionInRender()
     {
-        $oTM = $this->getMock(ThemeMain::class, array('themeInConfigFile'));
+        $oTM = $this->getMock(ThemeMain::class, ['themeInConfigFile']);
         $oTM->expects($this->once())->method('themeInConfigFile');
         $oTM->render();
     }
@@ -98,8 +98,8 @@ class ThemeMainTest extends OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oConfig               = oxNew('oxConfig');
-        $oConfig->sTheme       = 'azure';
+        $oConfig = oxNew('oxConfig');
+        $oConfig->sTheme = 'azure';
         $oConfig->sCustomTheme = null;
 
         $oView = oxNew('Theme_Main');
@@ -114,8 +114,8 @@ class ThemeMainTest extends OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oConfig               = oxNew('oxConfig');
-        $oConfig->sTheme       = null;
+        $oConfig = oxNew('oxConfig');
+        $oConfig->sTheme = null;
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
@@ -129,8 +129,8 @@ class ThemeMainTest extends OxidTestCase
     public function testThemeConfigExceptionSThemeSCustomTheme()
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
-        $oConfig               = oxNew('oxConfig');
-        $oConfig->sTheme       = 'azure';
+        $oConfig = oxNew('oxConfig');
+        $oConfig->sTheme = 'azure';
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');

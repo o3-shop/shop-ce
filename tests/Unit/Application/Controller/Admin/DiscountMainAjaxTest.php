@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Discount_Main_Ajax class
  */
 class DiscountMainAjaxTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -60,7 +61,7 @@ class DiscountMainAjaxTest extends \OxidTestCase
      */
     public function testGetQuery()
     {
-        $sTable = getViewName("oxcountry");
+        $sTable = getViewName('oxcountry');
 
         $oView = oxNew('discount_main_ajax');
         $sQuery = "from $sTable where $sTable.oxactive = '1'";
@@ -75,8 +76,8 @@ class DiscountMainAjaxTest extends \OxidTestCase
     public function testGetQueryOxid()
     {
         $sOxid = '_testOxid';
-        $this->setRequestParameter("oxid", $sOxid);
-        $sTable = getViewName("oxcountry");
+        $this->setRequestParameter('oxid', $sOxid);
+        $sTable = getViewName('oxcountry');
 
         $oView = oxNew('discount_main_ajax');
         $sQuery = "from oxobject2discount, $sTable where $sTable.oxid=oxobject2discount.oxobjectid";
@@ -92,8 +93,8 @@ class DiscountMainAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testSynchoxid';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $sTable = getViewName("oxcountry");
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $sTable = getViewName('oxcountry');
 
         $oView = oxNew('discount_main_ajax');
         $sQuery = "from $sTable where $sTable.oxactive = '1' and";
@@ -111,8 +112,8 @@ class DiscountMainAjaxTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountMainAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testO2DRemove1', '_testO2DRemove2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountMainAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testO2DRemove1', '_testO2DRemove2']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->removeDiscCountry();
@@ -127,8 +128,8 @@ class DiscountMainAjaxTest extends \OxidTestCase
     public function testRemoveDiscCountryAll()
     {
         $sOxid = '_testDiscount';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
 
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
@@ -147,9 +148,9 @@ class DiscountMainAjaxTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         $sSynchoxid = '_testDiscount';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountMainAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('oxidmiddlecust', 'oxidgoodcust')));
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountMainAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['oxidmiddlecust', 'oxidgoodcust']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->addDiscCountry();
@@ -164,8 +165,8 @@ class DiscountMainAjaxTest extends \OxidTestCase
     public function testAddDiscCountryAll()
     {
         $sSynchoxid = '_testDiscountNew';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $this->setRequestParameter('all', true);
 
         $iCount = oxDb::getDb()->getOne("select count(oxid) from oxcountry where oxactive='1'");
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,21 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\CategoryList;
-use \oxField;
-use \oxDb;
 use OxidEsales\EshopCommunity\Application\Model\ManufacturerList;
-use \oxTestModules;
 use OxidEsales\EshopCommunity\Application\Model\VendorList;
+use oxTestModules;
 
 /**
  * Tests for Article_List class
  */
 class ArticleListTest extends \OxidTestCase
 {
-
     /**
      * Test building sql where with specified "folder" param
      *  for oxarticles, oxorder, oxcontents tables
@@ -44,7 +45,7 @@ class ArticleListTest extends \OxidTestCase
 
         $this->setRequestParameter('folder', $sObjects . 'TestFolderName');
 
-        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, array("getItemList"));
+        $oAdminList = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, ['getItemList']);
         $oAdminList->expects($this->once())->method('getItemList')->will($this->returnValue(null));
         $aBuildWhere = $oAdminList->buildWhere();
         $this->assertEquals('oxArticleTestFolderName', $aBuildWhere[getViewName('oxarticles') . '.oxfolder']);
@@ -57,23 +58,23 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testRenderSelectingProductCategory()
     {
-        $this->setRequestParameter("where", array("oxarticles" => array("oxtitle" => "testValue")));
+        $this->setRequestParameter('where', ['oxarticles' => ['oxtitle' => 'testValue']]);
 
-        $sCatId = oxDb::getDb()->getOne("select oxid from oxcategories");
-        $this->setRequestParameter("art_category", "cat@@" . $sCatId);
+        $sCatId = oxDb::getDb()->getOne('select oxid from oxcategories');
+        $this->setRequestParameter('art_category', 'cat@@' . $sCatId);
         // testing..
         $oView = oxNew('Article_List');
         $this->assertEquals('article_list.tpl', $oView->render());
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["cattree"] instanceof CategoryList);
-        $this->assertTrue($aViewData["cattree"]->offsetExists($sCatId));
-        $this->assertEquals(1, $aViewData["cattree"]->offsetGet($sCatId)->selected);
-        $this->assertTrue($aViewData["mnftree"] instanceof ManufacturerList);
-        $this->assertTrue($aViewData["vndtree"] instanceof VendorList);
-        $this->assertTrue(isset($aViewData["pwrsearchinput"]));
-        $this->assertEquals("testValue", $aViewData["pwrsearchinput"]);
+        $this->assertTrue($aViewData['cattree'] instanceof CategoryList);
+        $this->assertTrue($aViewData['cattree']->offsetExists($sCatId));
+        $this->assertEquals(1, $aViewData['cattree']->offsetGet($sCatId)->selected);
+        $this->assertTrue($aViewData['mnftree'] instanceof ManufacturerList);
+        $this->assertTrue($aViewData['vndtree'] instanceof VendorList);
+        $this->assertTrue(isset($aViewData['pwrsearchinput']));
+        $this->assertEquals('testValue', $aViewData['pwrsearchinput']);
     }
 
     /**
@@ -83,21 +84,21 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testRenderSelectingProductManufacturer()
     {
-        $sManId = oxDb::getDb()->getOne("select oxid from oxmanufacturers");
-        $this->setRequestParameter("art_category", "mnf@@" . $sManId);
+        $sManId = oxDb::getDb()->getOne('select oxid from oxmanufacturers');
+        $this->setRequestParameter('art_category', 'mnf@@' . $sManId);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, array("getItemList"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, ['getItemList']);
         $oView->expects($this->any())->method('getItemList')->will($this->returnValue(oxNew('oxarticlelist')));
         $this->assertEquals('article_list.tpl', $oView->render());
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["cattree"] instanceof CategoryList);
-        $this->assertTrue($aViewData["mnftree"] instanceof ManufacturerList);
-        $this->assertTrue($aViewData["mnftree"]->offsetExists($sManId));
-        $this->assertEquals(1, $aViewData["mnftree"]->offsetGet($sManId)->selected);
-        $this->assertTrue($aViewData["vndtree"] instanceof VendorList);
+        $this->assertTrue($aViewData['cattree'] instanceof CategoryList);
+        $this->assertTrue($aViewData['mnftree'] instanceof ManufacturerList);
+        $this->assertTrue($aViewData['mnftree']->offsetExists($sManId));
+        $this->assertEquals(1, $aViewData['mnftree']->offsetGet($sManId)->selected);
+        $this->assertTrue($aViewData['vndtree'] instanceof VendorList);
     }
 
     /**
@@ -107,39 +108,39 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testRenderSelectingProductVendor()
     {
-        $sVndId = oxDb::getDb()->getOne("select oxid from oxvendor");
-        $this->setRequestParameter("art_category", "vnd@@" . $sVndId);
-        $this->getConfig()->setConfigParam("blSkipFormatConversion", false);
+        $sVndId = oxDb::getDb()->getOne('select oxid from oxvendor');
+        $this->setRequestParameter('art_category', 'vnd@@' . $sVndId);
+        $this->getConfig()->setConfigParam('blSkipFormatConversion', false);
 
         $oArticle1 = oxNew('oxArticle');
-        $oArticle1->oxarticles__oxtitle = new oxField("title1");
-        $oArticle1->oxarticles__oxtitle->fldtype = "datetime";
+        $oArticle1->oxarticles__oxtitle = new oxField('title1');
+        $oArticle1->oxarticles__oxtitle->fldtype = 'datetime';
 
         $oArticle2 = oxNew('oxArticle');
-        $oArticle2->oxarticles__oxtitle = new oxField("title2");
-        $oArticle2->oxarticles__oxtitle->fldtype = "timestamp";
+        $oArticle2->oxarticles__oxtitle = new oxField('title2');
+        $oArticle2->oxarticles__oxtitle->fldtype = 'timestamp';
 
         $oArticle3 = oxNew('oxArticle');
-        $oArticle3->oxarticles__oxtitle = new oxField("title3");
-        $oArticle3->oxarticles__oxtitle->fldtype = "date";
+        $oArticle3->oxarticles__oxtitle = new oxField('title3');
+        $oArticle3->oxarticles__oxtitle->fldtype = 'date';
 
         $oList = oxNew('oxList');
-        $oList->offsetSet("1", $oArticle1);
-        $oList->offsetSet("2", $oArticle2);
-        $oList->offsetSet("3", $oArticle3);
+        $oList->offsetSet('1', $oArticle1);
+        $oList->offsetSet('2', $oArticle2);
+        $oList->offsetSet('3', $oArticle3);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, array("getItemList"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, ['getItemList']);
         $oView->expects($this->any())->method('getItemList')->will($this->returnValue($oList));
         $this->assertEquals('article_list.tpl', $oView->render());
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["cattree"] instanceof CategoryList);
-        $this->assertTrue($aViewData["mnftree"] instanceof ManufacturerList);
-        $this->assertTrue($aViewData["vndtree"] instanceof VendorList);
-        $this->assertTrue($aViewData["vndtree"]->offsetExists($sVndId));
-        $this->assertEquals(1, $aViewData["vndtree"]->offsetGet($sVndId)->selected);
+        $this->assertTrue($aViewData['cattree'] instanceof CategoryList);
+        $this->assertTrue($aViewData['mnftree'] instanceof ManufacturerList);
+        $this->assertTrue($aViewData['vndtree'] instanceof VendorList);
+        $this->assertTrue($aViewData['vndtree']->offsetExists($sVndId));
+        $this->assertEquals(1, $aViewData['vndtree']->offsetGet($sVndId)->selected);
     }
 
     /**
@@ -149,9 +150,9 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testBuildSelectStringCategory()
     {
-        $sTable = getViewName("oxarticles");
-        $sO2CView = getViewName("oxobject2category");
-        $this->setRequestParameter("art_category", "cat@@testCategory");
+        $sTable = getViewName('oxarticles');
+        $sO2CView = getViewName('oxobject2category');
+        $this->setRequestParameter('art_category', 'cat@@testCategory');
 
         $oProduct = oxNew('oxArticle');
         $sQ = $oProduct->buildSelectString(null);
@@ -168,8 +169,8 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testBuildSelectStringManufacturer()
     {
-        $sTable = getViewName("oxarticles");
-        $this->setRequestParameter("art_category", "mnf@@testManufacturer");
+        $sTable = getViewName('oxarticles');
+        $this->setRequestParameter('art_category', 'mnf@@testManufacturer');
 
         $oProduct = oxNew('oxArticle');
         $sQ = $oProduct->buildSelectString(null);
@@ -185,8 +186,8 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testBuildSelectStringVendor()
     {
-        $sTable = getViewName("oxarticles");
-        $this->setRequestParameter("art_category", "vnd@@testVendor");
+        $sTable = getViewName('oxarticles');
+        $this->setRequestParameter('art_category', 'vnd@@testVendor');
 
         $oProduct = oxNew('oxArticle');
         $sQ = $oProduct->buildSelectString(null);
@@ -202,11 +203,11 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testBuildWhere()
     {
-        $this->setRequestParameter("folder", "testFolder");
+        $this->setRequestParameter('folder', 'testFolder');
         $sViewName = getViewName('oxarticles');
 
         $oView = oxNew('Article_List');
-        $this->assertEquals(array("$sViewName.oxfolder" => "testFolder"), $oView->buildWhere());
+        $this->assertEquals(["$sViewName.oxfolder" => 'testFolder'], $oView->buildWhere());
     }
 
     /**
@@ -220,7 +221,7 @@ class ArticleListTest extends \OxidTestCase
         $sQ = $oProduct->buildSelectString(null);
 
         $oView = oxNew('Article_List');
-        $this->assertEquals($sQ . " and " . getViewName('oxarticles') . ".oxparentid = '' ", $oView->UNITbuildSelectString($oProduct));
+        $this->assertEquals($sQ . ' and ' . getViewName('oxarticles') . ".oxparentid = '' ", $oView->UNITbuildSelectString($oProduct));
     }
 
     /**
@@ -232,17 +233,17 @@ class ArticleListTest extends \OxidTestCase
     {
         $this->markTestSkipped('Overwork due => tests are stoping without message.');
 
-        oxTestModules::addFunction("oxUtilsServer", "getOxCookie", "{return array(1);}");
-        oxTestModules::addFunction("oxUtils", "checkAccessRights", "{return true;}");
+        oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
+        oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
         oxTestModules::addFunction('oxarticle', 'load', '{ return true; }');
         oxTestModules::addFunction('oxarticle', 'delete', '{ return true; }');
 
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, array("_authorize", 'getSession'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, ['_authorize', 'getSession']);
         $oView->expects($this->any())->method('_authorize')->will($this->returnValue(true));
         $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
         $oView->deleteEntry();
@@ -255,7 +256,7 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testGetSearchFields()
     {
-        $aSkipFields = array("oxblfixedprice", "oxvarselect", "oxamitemid", "oxamtaskid", "oxpixiexport", "oxpixiexported");
+        $aSkipFields = ['oxblfixedprice', 'oxvarselect', 'oxamitemid', 'oxamtaskid', 'oxpixiexport', 'oxpixiexported'];
         $oView = oxNew('Article_List');
 
         $oArticle = oxNew('oxArticle');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \stdClass;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxField;
+use oxRegistry;
+use stdClass;
 
 /**
  * Testing oxuserpayment class
@@ -87,7 +89,7 @@ class UserpaymentTest extends \OxidTestCase
      */
     public function testGetDynValuesForTestCase()
     {
-        $aDynValues = array();
+        $aDynValues = [];
 
         $oVal = new stdClass();
         $oVal->name = 'lsbankname';
@@ -123,7 +125,6 @@ class UserpaymentTest extends \OxidTestCase
         $oUserPayment->setDynValues('aDynValues');
         $oUserPayment->getNonPublicVar('_aDynValues', 'aDynValues');
     }
-
 
     /**
      * Checking if payment encryption key is good
@@ -266,7 +267,7 @@ class UserpaymentTest extends \OxidTestCase
         $this->markTestSkipped('Bug: does not match');
         $this->_oUpay->oxuserpayments__oxvalue = new oxField('123456789', oxField::T_RAW);
         $this->_oUpay->save();
-        $this->assertEquals("BC6965B93A1329A1EB", oxDb::getDb()->getOne("SELECT hex(oxvalue) FROM oxuserpayments WHERE oxid='_testOxId'"));
+        $this->assertEquals('BC6965B93A1329A1EB', oxDb::getDb()->getOne("SELECT hex(oxvalue) FROM oxuserpayments WHERE oxid='_testOxId'"));
     }
 
     /**
@@ -297,10 +298,10 @@ class UserpaymentTest extends \OxidTestCase
 
         $sShopId = $this->getConfig()->GetBaseShopId();
         foreach ($aUserPaymentId as $iCnt => $sUserPaymentId) {
-            $sOrderId = "_test" . (time() + $iCnt);
+            $sOrderId = '_test' . (time() + $iCnt);
             $sOrderDate = "2011-03-1{$iCnt} 10:55:13";
 
-            $oDb->execute($sQ, array($sOrderId, $sShopId, $sUserId, $sOrderDate, $iCnt + 1, $sUserPaymentId));
+            $oDb->execute($sQ, [$sOrderId, $sShopId, $sUserId, $sOrderDate, $iCnt + 1, $sUserPaymentId]);
         }
     }
 
@@ -310,7 +311,7 @@ class UserpaymentTest extends \OxidTestCase
     public function testGetPaymentByPaymentType()
     {
         // inserting few test orders
-        $this->_insertTestOrders(array('_testOxId5', '_testOxId4', '_testOxId3', '_testOxId2', '_testOxId'), '_testUserId');
+        $this->_insertTestOrders(['_testOxId5', '_testOxId4', '_testOxId3', '_testOxId2', '_testOxId'], '_testUserId');
 
         $oUser = oxNew('oxUser');
         $oUser->setId('_testUserId');

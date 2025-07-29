@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Delivery_Payment_Ajax class
@@ -87,7 +89,7 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     public function testGetQuery()
     {
         $oView = oxNew('deliveryset_payment_ajax');
-        $this->assertEquals("from oxv_oxpayments_de where 1", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from oxv_oxpayments_de where 1', trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -98,7 +100,7 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testAction';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('deliveryset_payment_ajax');
         $this->assertEquals("from oxv_oxpayments_de where 1 and oxv_oxpayments_de.oxid not in ( select oxv_oxpayments_de.oxid from oxobject2payment, oxv_oxpayments_de where oxobject2payment.oxobjectid = '" . $sSynchoxid . "'and oxobject2payment.oxpaymentid = oxv_oxpayments_de.oxid and oxobject2payment.oxtype = 'oxdelset' )", trim($oView->UNITgetQuery()));
@@ -112,7 +114,7 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     public function testGetQueryOxid()
     {
         $sOxid = '_testAction';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
 
         $oView = oxNew('deliveryset_payment_ajax');
         $this->assertEquals("from oxobject2payment, oxv_oxpayments_de where oxobject2payment.oxobjectid = '" . $sOxid . "' and oxobject2payment.oxpaymentid = oxv_oxpayments_de.oxid and oxobject2payment.oxtype = 'oxdelset'", trim($oView->UNITgetQuery()));
@@ -127,8 +129,8 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     {
         $sOxid = '_testAction';
         $sSynchoxid = '_testActionSynch';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('deliveryset_payment_ajax');
         $this->assertEquals("from oxobject2payment, oxv_oxpayments_de where oxobject2payment.oxobjectid = '" . $sOxid . "' and oxobject2payment.oxpaymentid = oxv_oxpayments_de.oxid and oxobject2payment.oxtype = 'oxdelset' and oxv_oxpayments_de.oxid not in ( select oxv_oxpayments_de.oxid from oxobject2payment, oxv_oxpayments_de where oxobject2payment.oxobjectid = '" . $sSynchoxid . "'and oxobject2payment.oxpaymentid = oxv_oxpayments_de.oxid and oxobject2payment.oxtype = 'oxdelset' )", trim($oView->UNITgetQuery()));
@@ -143,8 +145,8 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: test is not working as expected.');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testDeliverysetPayment1', '_testDeliverysetPayment2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDeliverysetPayment1', '_testDeliverysetPayment2']));
 
         $sSql = "select count(oxid) from oxobject2payment where oxid in ('_testDeliverysetPayment1', '_testDeliverysetPayment2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -160,8 +162,8 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     public function testRemovePayFromSetAll()
     {
         $sOxid = '_testDeliverysetPaymentRemoveAll';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
 
         $sSql = "select count(oxobject2payment.oxid) from oxobject2payment, oxv_oxpayments_de where oxobject2payment.oxobjectid = '" . $sOxid . "' and oxobject2payment.oxpaymentid = oxv_oxpayments_de.oxid and oxobject2payment.oxtype = 'oxdelset'";
         $oView = oxNew('deliveryset_payment_ajax');
@@ -180,13 +182,13 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
         $this->markTestSkipped('Bug: test is not working as expected.');
 
         $sSynchoxid = '_testActionAddPayment';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $sSql = "select count(oxid) from oxobject2payment where oxobjectid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testActionAdd1', '_testActionAdd2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addPayToSet();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -200,8 +202,8 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
     public function testAddPayToSetAll()
     {
         $sSynchoxid = '_testActionAddPaymentAll';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
+        $this->setRequestParameter('all', true);
 
         //count how much articles gets filtered
         $iCount = oxDb::getDb()->getOne("select count(oxv_oxpayments_de.oxid) from oxv_oxpayments_de where 1 and oxv_oxpayments_de.oxid not in ( select oxv_oxpayments_de.oxid from oxobject2payment, oxv_oxpayments_de where oxobject2payment.oxobjectid = '" . $sSynchoxid . "'and oxobject2payment.oxpaymentid = oxv_oxpayments_de.oxid and oxobject2payment.oxtype = 'oxdelset' )");
@@ -209,8 +211,8 @@ class DeliverysetPaymentAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2payment where oxobjectid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testActionAdd1', '_testActionAdd2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetPaymentAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addPayToSet();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

@@ -113,7 +113,7 @@ class Search extends Base
         $sSelect = $this->_getSearchSelect($sSearchParamForQuery, $sInitialSearchCat, $sInitialSearchVendor, $sInitialSearchManufacturer, false);
         if ($sSelect) {
             $sPartial = substr($sSelect, strpos($sSelect, ' from '));
-            $sSelect = "select count( " . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
+            $sSelect = 'select count( ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage) . ".oxid ) $sPartial ";
 
             $iCnt = DatabaseProvider::getDb()->getOne($sSelect);
         }
@@ -151,10 +151,10 @@ class Search extends Base
 
             $sQ = "select 1 from $sCatTable 
                 where $sCatTable.oxid = :oxid ";
-            $sQ .= "and " . $oCategory->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oCategory->getSqlActiveSnippet();
 
             $params = [
-                ':oxid' => $sInitialSearchCat
+                ':oxid' => $sInitialSearchCat,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -170,10 +170,10 @@ class Search extends Base
 
             $sQ = "select 1 from $sVndTable 
                 where $sVndTable.oxid = :oxid ";
-            $sQ .= "and " . $oVendor->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oVendor->getSqlActiveSnippet();
 
             $params = [
-                ':oxid' => $sInitialSearchVendor
+                ':oxid' => $sInitialSearchVendor,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -189,10 +189,10 @@ class Search extends Base
 
             $sQ = "select 1 from $sManTable 
                 where $sManTable.oxid = :oxid ";
-            $sQ .= "and " . $oManufacturer->getSqlActiveSnippet();
+            $sQ .= 'and ' . $oManufacturer->getSqlActiveSnippet();
 
             $params = [
-                ':oxid' => $sInitialSearchManufacturer
+                ':oxid' => $sInitialSearchManufacturer,
             ];
 
             if (!$oDb->getOne($sQ, $params)) {
@@ -238,11 +238,11 @@ class Search extends Base
         $sSelect .= " and {$sArticleTable}.oxparentid = '' and {$sArticleTable}.oxissearch = 1 ";
 
         if ($sInitialSearchVendor) {
-            $sSelect .= " and {$sArticleTable}.oxvendorid = " . $oDb->quote($sInitialSearchVendor) . " ";
+            $sSelect .= " and {$sArticleTable}.oxvendorid = " . $oDb->quote($sInitialSearchVendor) . ' ';
         }
 
         if ($sInitialSearchManufacturer) {
-            $sSelect .= " and {$sArticleTable}.oxmanufacturerid = " . $oDb->quote($sInitialSearchManufacturer) . " ";
+            $sSelect .= " and {$sArticleTable}.oxmanufacturerid = " . $oDb->quote($sInitialSearchManufacturer) . ' ';
         }
 
         $sSelect .= $sWhere;

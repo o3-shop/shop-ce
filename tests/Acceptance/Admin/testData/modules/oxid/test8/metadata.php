@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,7 +22,7 @@
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'test8',
     'title'        => 'Test module #8 (in vendor dir, does not extend any class)',
     'description'  => 'Adds PayPal logo in partner box',
@@ -30,9 +31,9 @@ $aModule = array(
     'author'       => 'OXID eSales',
     'url'          => 'http://www.oxid-esales.com',
     'email'        => 'info@oxid-esales.com',
-    'extend'       => array(
-    ),
-    'blocks'    => array(
-        array("template"=>"widget/sidebar/partners.tpl", "block"=>"partner_logos", "file"=>"oepaypalpartnerbox.tpl"),
-    ),
-);
+    'extend'       => [
+    ],
+    'blocks'    => [
+        ['template'=>'widget/sidebar/partners.tpl', 'block'=>'partner_logos', 'file'=>'oepaypalpartnerbox.tpl'],
+    ],
+];

@@ -51,13 +51,13 @@ class ArticleCrossselling extends AdminDetailsController
         $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         // cross-selling
-        $this->createCategoryTree("artcattree");
+        $this->createCategoryTree('artcattree');
 
         // accessoires
-        $this->createCategoryTree("artcattree2");
+        $this->createCategoryTree('artcattree2');
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oArticle->load($soxId);
 
@@ -71,14 +71,14 @@ class ArticleCrossselling extends AdminDetailsController
             $oArticleCrossellingAjax = oxNew(ArticleCrosssellingAjax::class);
             $this->_aViewData['oxajax'] = $oArticleCrossellingAjax->getColumns();
 
-            return "popups/article_crossselling.tpl";
+            return 'popups/article_crossselling.tpl';
         } elseif ($iAoc == 2) {
             $oArticleAccessoiresAjax = oxNew(ArticleAccessoriesAjax::class);
             $this->_aViewData['oxajax'] = $oArticleAccessoiresAjax->getColumns();
 
-            return "popups/article_accessories.tpl";
+            return 'popups/article_accessories.tpl';
         }
 
-        return "article_crossselling.tpl";
+        return 'article_crossselling.tpl';
     }
 }

@@ -118,7 +118,7 @@ class MediaUrl extends MultiLanguageModel
      */
     public function delete($sOXID = null)
     {
-        $sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . "/out/media/" .
+        $sFilePath = Registry::getConfig()->getConfigParam('sShopDir') . '/out/media/' .
                      basename($this->oxmediaurls__oxurl->value);
 
         if ($this->oxmediaurls__oxisuploaded->value) {
@@ -142,11 +142,11 @@ class MediaUrl extends MultiLanguageModel
         $sDesc = $this->oxmediaurls__oxdesc->value;
 
         if (strpos($sUrl, 'youtube.com')) {
-            $sYoutubeUrl = str_replace("www.youtube.com/watch?v=", "www.youtube.com/embed/", $sUrl);
+            $sYoutubeUrl = str_replace('www.youtube.com/watch?v=', 'www.youtube.com/embed/', $sUrl);
             $sYoutubeUrl = preg_replace('/&amp;/', '?', $sYoutubeUrl, 1);
         }
         if (strpos($sUrl, 'youtu.be')) {
-            $sYoutubeUrl = str_replace("youtu.be/", "www.youtube.com/embed/", $sUrl);
+            $sYoutubeUrl = str_replace('youtu.be/', 'www.youtube.com/embed/', $sUrl);
         }
 
         $sYoutubeTemplate = '%s<br><iframe width="425" height="344" src="%s" frameborder="0" allowfullscreen></iframe>';

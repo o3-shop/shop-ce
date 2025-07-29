@@ -40,7 +40,7 @@ use OxidEsales\Eshop\Core\SystemEventHandler;
 class LoginController extends AdminController
 {
     /** Login page view id. */
-    const VIEW_ID = 'login';
+    public const VIEW_ID = 'login';
 
     /**
      * Sets value for _sThisAction to "login".
@@ -48,7 +48,7 @@ class LoginController extends AdminController
     public function __construct()
     {
         Registry::getConfig()->setConfigParam('blAdmin', true);
-        $this->_sThisAction = "login";
+        $this->_sThisAction = 'login';
     }
 
     /**
@@ -76,14 +76,14 @@ class LoginController extends AdminController
 
         if ($myConfig->isDemoShop()) {
             // demo
-            $this->addTplParam("user", "admin");
-            $this->addTplParam("pwd", "admin");
+            $this->addTplParam('user', 'admin');
+            $this->addTplParam('pwd', 'admin');
         }
         //#533 user profile
-        $this->addTplParam("profiles", Registry::getUtils()->loadAdminProfile($myConfig->getConfigParam('aInterfaceProfiles')));
+        $this->addTplParam('profiles', Registry::getUtils()->loadAdminProfile($myConfig->getConfigParam('aInterfaceProfiles')));
 
         $aLanguages = $this->getAvailableLanguages();
-        $this->addTplParam("aLanguages", $aLanguages);
+        $this->addTplParam('aLanguages', $aLanguages);
 
         // setting templates language to selected language id
         foreach ($aLanguages as $iKey => $oLang) {
@@ -93,7 +93,7 @@ class LoginController extends AdminController
             }
         }
 
-        return "login.tpl";
+        return 'login.tpl';
     }
 
     /**
@@ -124,9 +124,9 @@ class LoginController extends AdminController
 
         try { // trying to log in
             $session = Registry::getSession();
-            $adminProfiles = $session->getVariable("aAdminProfiles");
+            $adminProfiles = $session->getVariable('aAdminProfiles');
             $session->initNewSession();
-            $session->setVariable("aAdminProfiles", $adminProfiles);
+            $session->setVariable('aAdminProfiles', $adminProfiles);
 
             /** @var User $oUser */
             $oUser = oxNew(User::class);
@@ -138,7 +138,7 @@ class LoginController extends AdminController
 
             $iSubshop = (int) $oUser->oxuser__oxrights->value;
             if ($iSubshop) {
-                Registry::getSession()->setVariable("shp", $iSubshop);
+                Registry::getSession()->setVariable('shp', $iSubshop);
                 Registry::getSession()->setVariable('currentadminshop', $iSubshop);
                 Registry::getConfig()->setShopId($iSubshop);
             }
@@ -160,15 +160,15 @@ class LoginController extends AdminController
 
         // #533
         if (isset($sProfile)) {
-            $aProfiles = Registry::getSession()->getVariable("aAdminProfiles");
+            $aProfiles = Registry::getSession()->getVariable('aAdminProfiles');
             if ($aProfiles && isset($aProfiles[$sProfile])) {
                 // setting cookie to store last locally used profile
-                $myUtilsServer->setOxCookie("oxidadminprofile", $sProfile . "@" . implode("@", $aProfiles[$sProfile]), time() + 31536000, "/");
-                Registry::getSession()->setVariable("profile", $aProfiles[$sProfile]);
+                $myUtilsServer->setOxCookie('oxidadminprofile', $sProfile . '@' . implode('@', $aProfiles[$sProfile]), time() + 31536000, '/');
+                Registry::getSession()->setVariable('profile', $aProfiles[$sProfile]);
             }
         } else {
             //deleting cookie info, as setting profile to default
-            $myUtilsServer->setOxCookie("oxidadminprofile", "", time() - 3600, "/");
+            $myUtilsServer->setOxCookie('oxidadminprofile', '', time() - 3600, '/');
         }
 
         // languages
@@ -178,13 +178,13 @@ class LoginController extends AdminController
             $iLang = key($aLanguages);
         }
 
-        $myUtilsServer->setOxCookie("oxidadminlanguage", $aLanguages[$iLang]->abbr, time() + 31536000, "/");
+        $myUtilsServer->setOxCookie('oxidadminlanguage', $aLanguages[$iLang]->abbr, time() + 31536000, '/');
 
         //P
         //\OxidEsales\Eshop\Core\Registry::getSession()->setVariable( "blAdminTemplateLanguage", $iLang );
         Registry::getLang()->setTplLanguage($iLang);
 
-        return "admin_start";
+        return 'admin_start';
     }
 
     /**

@@ -49,22 +49,22 @@ class NewsletterPreview extends AdminDetailsController
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if ($soxId != "-1" && isset($soxId)) {
+        if ($soxId != '-1' && isset($soxId)) {
             // load object
             $oNewsletter = oxNew(Newsletter::class);
             $oNewsletter->load($soxId);
-            $this->_aViewData["edit"] = $oNewsletter;
+            $this->_aViewData['edit'] = $oNewsletter;
 
             // user
-            $sUserID = Registry::getSession()->getVariable("auth");
+            $sUserID = Registry::getSession()->getVariable('auth');
 
             // assign values to the newsletter and show it
             $oNewsletter->prepare($sUserID, Registry::getConfig()->getConfigParam('bl_perfLoadAktion'));
 
-            $this->_aViewData["previewhtml"] = $oNewsletter->getHtmlText();
-            $this->_aViewData["previewtext"] = $oNewsletter->getPlainText();
+            $this->_aViewData['previewhtml'] = $oNewsletter->getHtmlText();
+            $this->_aViewData['previewtext'] = $oNewsletter->getPlainText();
         }
 
-        return "newsletter_preview.tpl";
+        return 'newsletter_preview.tpl';
     }
 }

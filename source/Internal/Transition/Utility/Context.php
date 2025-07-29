@@ -23,14 +23,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Transition\Utility;
 
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\DatabaseProvider;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\Exception\AdminUserNotFoundException;
+use OxidEsales\Facts\Config\ConfigFile as FactsConfigFile;
 use PDO;
 use Psr\Log\LogLevel;
 use Webmozart\PathUtil\Path;
-use OxidEsales\Facts\Config\ConfigFile as FactsConfigFile;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Config;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\Exception\AdminUserNotFoundException;
 
 class Context extends BasicContext implements ContextInterface
 {

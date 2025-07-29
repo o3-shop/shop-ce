@@ -247,10 +247,10 @@ final class ModuleConfigurationInstallerTest extends TestCase
                     ModuleSettingsDataMapper::MAPPING_KEY => [
                         'settingToOverwrite' => [
                             'value' => 'overwrittenValue',
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

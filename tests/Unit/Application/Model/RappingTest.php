@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxWrapping;
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
+use oxWrapping;
 
 class testOxWrapping extends oxWrapping
 {
@@ -57,7 +59,7 @@ class RappingTest extends \OxidTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->sTableName = getViewName("oxwrapping");
+        $this->sTableName = getViewName('oxwrapping');
 
         // card
         // not active
@@ -176,7 +178,7 @@ class RappingTest extends \OxidTestCase
     public function testGetNoSslDynImageDir()
     {
         $this->markTestSkipped('Bug: get url instead of seo');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getPictureUrl'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getPictureUrl']);
         $oConfig->expects($this->once())->method('getPictureUrl')
             ->with(
                 $this->equalTo(null),
@@ -187,7 +189,7 @@ class RappingTest extends \OxidTestCase
             )
             ->will($this->returnValue('testDynPath'));
 
-        $oWrapping = $this->getMock(\OxidEsales\Eshop\Application\Model\Wrapping::class, array('getConfig'), array(), '', false);
+        $oWrapping = $this->getMock(\OxidEsales\Eshop\Application\Model\Wrapping::class, ['getConfig'], [], '', false);
         $oWrapping->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
         $oWrapping->oxwrapping__oxshopid = new oxField('123');
 
@@ -390,11 +392,11 @@ class RappingTest extends \OxidTestCase
      */
     public function testGetFPrice()
     {
-        $oPrice = $this->getMock(\OxidEsales\Eshop\Core\Price::class, array('getBruttoPrice'));
+        $oPrice = $this->getMock(\OxidEsales\Eshop\Core\Price::class, ['getBruttoPrice']);
         $oPrice->expects($this->once())->method('getBruttoPrice')->will($this->returnValue(11.588));
-        $oWrap = $this->getProxyClass("oxWrapping");
+        $oWrap = $this->getProxyClass('oxWrapping');
         $oWrap->setNonPublicVar('_oPrice', $oPrice);
-        $this->assertEquals("11,59", $oWrap->getFPrice());
+        $this->assertEquals('11,59', $oWrap->getFPrice());
     }
 
     public function testGetPictureUrl()
@@ -402,8 +404,8 @@ class RappingTest extends \OxidTestCase
         $oWrap = oxNew('oxwrapping');
         $this->assertNull($oWrap->getPictureUrl());
 
-        $oWrap->load("a6840cc0ec80b3991.74884864");
-        $this->assertEquals($this->getConfig()->getPictureUrl("master/wrapping/img_geschenkpapier_1_wp.gif", false, null, null, 1), $oWrap->getPictureUrl());
+        $oWrap->load('a6840cc0ec80b3991.74884864');
+        $this->assertEquals($this->getConfig()->getPictureUrl('master/wrapping/img_geschenkpapier_1_wp.gif', false, null, null, 1), $oWrap->getPictureUrl());
     }
 
     /**
@@ -411,8 +413,8 @@ class RappingTest extends \OxidTestCase
      */
     public function testSetWrappingVatOnTop()
     {
-        $oWrapping = $this->getProxyClass("oxwrapping");
+        $oWrapping = $this->getProxyClass('oxwrapping');
         $oWrapping->setWrappingVatOnTop(true);
-        $this->assertTrue($oWrapping->getNonPublicVar("_blWrappingVatOnTop"));
+        $this->assertTrue($oWrapping->getNonPublicVar('_blWrappingVatOnTop'));
     }
 }

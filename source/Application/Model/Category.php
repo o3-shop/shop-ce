@@ -299,47 +299,47 @@ class Category extends MultiLanguageModel implements IUrl
             $myUtilsPic->safePictureDelete($this->oxcategories__oxicon->value, $sDir . Registry::getUtilsFile()->getImageDirByType('CICO'), 'oxcategories', 'oxicon');
             $myUtilsPic->safePictureDelete($this->oxcategories__oxpromoicon->value, $sDir . Registry::getUtilsFile()->getImageDirByType('PICO'), 'oxcategories', 'oxpromoicon');
 
-            $query = "UPDATE oxcategories SET OXLEFT = OXLEFT - 2
+            $query = 'UPDATE oxcategories SET OXLEFT = OXLEFT - 2
                       WHERE OXROOTID = :oxrootid AND
                             OXLEFT > :oxleft AND
-                            OXSHOPID = :oxshopid";
+                            OXSHOPID = :oxshopid';
             $oDb->execute($query, [
                 ':oxrootid' => $this->oxcategories__oxrootid->value,
                 ':oxleft' => (int) $this->oxcategories__oxleft->value,
-                ':oxshopid' => $this->getShopId()
+                ':oxshopid' => $this->getShopId(),
             ]);
 
-            $query = "UPDATE oxcategories SET OXRIGHT = OXRIGHT - 2
+            $query = 'UPDATE oxcategories SET OXRIGHT = OXRIGHT - 2
                       WHERE OXROOTID = :oxrootid AND
                             OXRIGHT > :oxright AND
-                            OXSHOPID = :oxshopid";
+                            OXSHOPID = :oxshopid';
             $oDb->execute($query, [
                 ':oxrootid' => $this->oxcategories__oxrootid->value,
                 ':oxright' => (int) $this->oxcategories__oxright->value,
-                ':oxshopid' => $this->getShopId()
+                ':oxshopid' => $this->getShopId(),
             ]);
 
             // delete entry
             $blRet = parent::delete($sOXID);
 
             // delete links to articles
-            $oDb->execute("delete from oxobject2category where oxobject2category.oxcatnid = :oxid", [
-                ':oxid' => $sOXID
+            $oDb->execute('delete from oxobject2category where oxobject2category.oxcatnid = :oxid', [
+                ':oxid' => $sOXID,
             ]);
 
             // #657 ADDITIONAL delete links to attributes
-            $oDb->execute("delete from oxcategory2attribute where oxcategory2attribute.oxobjectid = :oxid", [
-                ':oxid' => $sOXID
+            $oDb->execute('delete from oxcategory2attribute where oxcategory2attribute.oxobjectid = :oxid', [
+                ':oxid' => $sOXID,
             ]);
 
             // A. removing assigned:
             // - deliveries
-            $oDb->execute("delete from oxobject2delivery where oxobject2delivery.oxobjectid = :oxid", [
-                ':oxid' => $sOXID
+            $oDb->execute('delete from oxobject2delivery where oxobject2delivery.oxobjectid = :oxid', [
+                ':oxid' => $sOXID,
             ]);
             // - discounts
-            $oDb->execute("delete from oxobject2discount where oxobject2discount.oxobjectid = :oxid", [
-                ':oxid' => $sOXID
+            $oDb->execute('delete from oxobject2discount where oxobject2discount.oxobjectid = :oxid', [
+                ':oxid' => $sOXID,
             ]);
 
             Registry::get(SeoEncoderCategory::class)->onDeleteCategory($this);
@@ -641,7 +641,7 @@ class Category extends MultiLanguageModel implements IUrl
         }
 
         //always returns shop url, not admin
-        return $sUrl . "index.php?cl=alist" . ($blAddId ? "&amp;cnid=" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=alist' . ($blAddId ? '&amp;cnid=' . $this->getId() : '');
     }
 
     /**
@@ -828,7 +828,7 @@ class Category extends MultiLanguageModel implements IUrl
         $oDb = DatabaseProvider::getDb();
 
         return $oDb->getOne('select oxrootid from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxcategories') . ' where oxid = :oxid', [
-            ':oxid' => $sCategoryId
+            ':oxid' => $sCategoryId,
         ]);
     }
 
@@ -858,7 +858,7 @@ class Category extends MultiLanguageModel implements IUrl
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($this->oxcategories__oxparentid->value != "oxrootid") {
+        if ($this->oxcategories__oxparentid->value != 'oxrootid') {
             // load parent
             $oParent = oxNew(Category::class);
             //#M317 check if parent is loaded
@@ -868,26 +868,26 @@ class Category extends MultiLanguageModel implements IUrl
 
             // update existing nodes
             $oDb = DatabaseProvider::getDb();
-            $query = "UPDATE oxcategories SET OXLEFT = OXLEFT + 2
+            $query = 'UPDATE oxcategories SET OXLEFT = OXLEFT + 2
                       WHERE OXROOTID = :oxrootid AND
                             OXLEFT > :oxleft AND
                             OXRIGHT >= :oxright AND
-                            OXSHOPID = :oxshopid ";
+                            OXSHOPID = :oxshopid ';
             $oDb->execute($query, [
                 ':oxrootid' => $oParent->oxcategories__oxrootid->value,
                 ':oxleft' => (int) $oParent->oxcategories__oxright->value,
                 ':oxright' => (int) $oParent->oxcategories__oxright->value,
-                ':oxshopid' => $this->getShopId()
+                ':oxshopid' => $this->getShopId(),
             ]);
 
-            $query = "UPDATE oxcategories SET OXRIGHT = OXRIGHT + 2
+            $query = 'UPDATE oxcategories SET OXRIGHT = OXRIGHT + 2
                       WHERE OXROOTID = :oxrootid AND
                             OXRIGHT >= :oxright AND
-                            OXSHOPID = :oxshopid";
+                            OXSHOPID = :oxshopid';
             $oDb->execute($query, [
                 ':oxrootid' => $oParent->oxcategories__oxrootid->value,
                 ':oxright' => (int) $oParent->oxcategories__oxright->value,
-                ':oxshopid' => $this->getShopId()
+                ':oxshopid' => $this->getShopId(),
             ]);
 
             if (!$this->getId()) {
@@ -929,8 +929,8 @@ class Category extends MultiLanguageModel implements IUrl
         // Function is called from inside a transaction in Category::save (see ESDEV-3804 and ESDEV-3822).
         // No need to explicitly force master here.
         $database = DatabaseProvider::getDb();
-        $sOldParentID = $database->getOne("select oxparentid from oxcategories where oxid = :oxid", [
-            ':oxid' => $this->getId()
+        $sOldParentID = $database->getOne('select oxparentid from oxcategories where oxid = :oxid', [
+            ':oxid' => $this->getId(),
         ]);
 
         if ($this->_blIsSeoObject && $this->isAdmin()) {
@@ -954,16 +954,16 @@ class Category extends MultiLanguageModel implements IUrl
 
             $iTreeSize = $sOldParentRight - $sOldParentLeft + 1;
 
-            $sNewRootID = $database->getOne("select oxrootid from oxcategories where oxid = :oxid", [
-                ':oxid' => $this->oxcategories__oxparentid->value
+            $sNewRootID = $database->getOne('select oxrootid from oxcategories where oxid = :oxid', [
+                ':oxid' => $this->oxcategories__oxparentid->value,
             ]);
 
             // If empty rootID, we set it to category's oxid
-            if ($sNewRootID == "") {
+            if ($sNewRootID == '') {
                 $sNewRootID = $this->getId();
             }
-            $sNewParentLeft = $database->getOne("select oxleft from oxcategories where oxid = :oxid", [
-                ':oxid' => $this->oxcategories__oxparentid->value
+            $sNewParentLeft = $database->getOne('select oxleft from oxcategories where oxid = :oxid', [
+                ':oxid' => $this->oxcategories__oxparentid->value,
             ]);
 
             // if (!$sNewParentLeft) {
@@ -976,10 +976,10 @@ class Category extends MultiLanguageModel implements IUrl
             // New parent-ID can not be set to it's child
             if ($sNewParentLeft > $sOldParentLeft && $sNewParentLeft < $sOldParentRight && $this->oxcategories__oxrootid->value == $sNewRootID) {
                 // Restoring old oxparentid, stopping further actions
-                $sRestoreOld = "UPDATE oxcategories SET OXPARENTID = :oxparentid WHERE oxid = :oxid";
+                $sRestoreOld = 'UPDATE oxcategories SET OXPARENTID = :oxparentid WHERE oxid = :oxid';
                 $database->execute($sRestoreOld, [
                     ':oxparentid' => $sOldParentID,
-                    ':oxid' => $this->getId()
+                    ':oxid' => $this->getId(),
                 ]);
 
                 return false;
@@ -995,32 +995,32 @@ class Category extends MultiLanguageModel implements IUrl
 
             //echo "Size=$iTreeSize, NewStart=$iMoveAfter, delta=$iDelta";
 
-            $sAddOld = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($this->oxcategories__oxrootid->value) . ";";
-            $sAddNew = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($sNewRootID) . ";";
+            $sAddOld = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($this->oxcategories__oxrootid->value) . ';';
+            $sAddNew = " and oxshopid = '" . $this->getShopId() . "' and OXROOTID = " . $database->quote($sNewRootID) . ';';
 
             // Updating everything after new position
             $params = [':treeSize' => $iTreeSize, ':offset' => $iMoveAfter];
-            $database->execute("UPDATE oxcategories SET OXLEFT = (OXLEFT + :treeSize) WHERE OXLEFT >= :offset" . $sAddNew, $params);
-            $database->execute("UPDATE oxcategories SET OXRIGHT = (OXRIGHT + :treeSize) WHERE OXRIGHT >= :offset" . $sAddNew, $params);
+            $database->execute('UPDATE oxcategories SET OXLEFT = (OXLEFT + :treeSize) WHERE OXLEFT >= :offset' . $sAddNew, $params);
+            $database->execute('UPDATE oxcategories SET OXRIGHT = (OXRIGHT + :treeSize) WHERE OXRIGHT >= :offset' . $sAddNew, $params);
 
-            $sChangeRootID = "";
+            $sChangeRootID = '';
             if ($this->oxcategories__oxrootid->value != $sNewRootID) {
-                $sChangeRootID = ", OXROOTID=" . $database->quote($sNewRootID);
+                $sChangeRootID = ', OXROOTID=' . $database->quote($sNewRootID);
             }
 
             // Updating subtree
-            $query = "UPDATE oxcategories SET OXLEFT = (OXLEFT + :delta), OXRIGHT = (OXRIGHT + :delta) " . $sChangeRootID .
-                     "WHERE OXLEFT >= :oxleft AND OXRIGHT <= :oxright" . $sAddOld;
+            $query = 'UPDATE oxcategories SET OXLEFT = (OXLEFT + :delta), OXRIGHT = (OXRIGHT + :delta) ' . $sChangeRootID .
+                     'WHERE OXLEFT >= :oxleft AND OXRIGHT <= :oxright' . $sAddOld;
             $database->execute($query, [
                 ':delta' => $iDelta,
                 ':oxleft' => $sOldParentLeft,
-                ':oxright' => $sOldParentRight
+                ':oxright' => $sOldParentRight,
             ]);
 
             // Updating everything after old position
             $params = [':treeSize' => $iTreeSize, ':offset' => $sOldParentRight + 1];
-            $database->execute("UPDATE oxcategories SET OXLEFT = (OXLEFT - :treeSize) WHERE OXLEFT >= :offset" . $sAddOld, $params);
-            $database->execute("UPDATE oxcategories SET OXRIGHT = (OXRIGHT - :treeSize) WHERE OXRIGHT >= :offset" . $sAddOld, $params);
+            $database->execute('UPDATE oxcategories SET OXLEFT = (OXLEFT - :treeSize) WHERE OXLEFT >= :offset' . $sAddOld, $params);
+            $database->execute('UPDATE oxcategories SET OXRIGHT = (OXRIGHT - :treeSize) WHERE OXRIGHT >= :offset' . $sAddOld, $params);
             //echo "<br>3.) - $iTreeSize, >= ".($sOldParentRight+1);
         }
 
@@ -1069,7 +1069,7 @@ class Category extends MultiLanguageModel implements IUrl
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return Registry::getPictureHandler()->getPicUrl("category/icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl('category/icon/', $sIcon, $sSize);
         }
     }
 
@@ -1083,7 +1083,7 @@ class Category extends MultiLanguageModel implements IUrl
         if (($sIcon = $this->oxcategories__oxthumb->value)) {
             $sSize = Registry::getConfig()->getConfigParam('sCatThumbnailsize');
 
-            return Registry::getPictureHandler()->getPicUrl("category/thumb/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl('category/thumb/', $sIcon, $sSize);
         }
     }
 
@@ -1097,7 +1097,7 @@ class Category extends MultiLanguageModel implements IUrl
         if (($sIcon = $this->oxcategories__oxpromoicon->value)) {
             $sSize = Registry::getConfig()->getConfigParam('sCatPromotionsize');
 
-            return Registry::getPictureHandler()->getPicUrl("category/promo_icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl('category/promo_icon/', $sIcon, $sSize);
         }
     }
 
@@ -1200,7 +1200,7 @@ class Category extends MultiLanguageModel implements IUrl
         $sField = "`{$sTable}`.`{$sField}`";
         $sSql = "SELECT $sField FROM `{$sTable}` WHERE `OXROOTID` = :oxrootid AND `OXPARENTID` != 'oxrootid'";
         $aResult = DatabaseProvider::getDb()->getCol($sSql, [
-            ':oxrootid' => $sOXID
+            ':oxrootid' => $sOXID,
         ]);
 
         return $aResult;

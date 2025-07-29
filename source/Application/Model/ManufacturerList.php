@@ -113,10 +113,9 @@ class ManufacturerList extends ListModel
         //Load manufacturer list
         $this->loadManufacturerList();
 
-
         //Create fake manufacturer root category
         $this->_oRoot = oxNew(Manufacturer::class);
-        $this->_oRoot->load("root");
+        $this->_oRoot->load('root');
 
         //category fields
         $this->_addCategoryFields($this->_oRoot);

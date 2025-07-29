@@ -344,10 +344,9 @@ class ThankYouController extends FrontendController
         $aPaths = [];
         $aPath = [];
 
-
         $iLang = Registry::getLang()->getBaseLanguage();
         $aPath['title'] = Registry::getLang()->translateString('ORDER_COMPLETED', $iLang, false);
-        $aPath['link']  = $this->getLink();
+        $aPath['link'] = $this->getLink();
         $aPaths[] = $aPath;
 
         return $aPaths;

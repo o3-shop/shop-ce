@@ -41,7 +41,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class ContainerBuilder
 {
-
     /**
      * @var BasicContextInterface
      */
@@ -122,7 +121,7 @@ class ContainerBuilder
         $allEditionPaths = [
             BasicContext::COMMUNITY_EDITION => [
                 $this->context->getCommunityEditionSourcePath(),
-            ]
+            ],
         ];
 
         return $allEditionPaths[$this->context->getEdition()];

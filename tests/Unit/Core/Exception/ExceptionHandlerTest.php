@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Exception;
 
 use OxidEsales\Eshop\Core\Exception\ExceptionHandler;
@@ -72,10 +74,9 @@ class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
         ];
     }
 
-
     public function testSetIDebug()
     {
-        $oTestObject = $this->getProxyClass("oxexceptionhandler");
+        $oTestObject = $this->getProxyClass('oxexceptionhandler');
         $oTestObject->setIDebug(2);
         //nothing should happen in unittests
         $this->assertEquals(2, $oTestObject->getNonPublicVar('_iDebug'));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Category;
-use \oxField;
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Tests for Category_Main class
@@ -73,8 +75,8 @@ class CategoryMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
-        oxTestModules::addFunction("oxcategory", "isDerived", "{return true;}");
+        $this->setRequestParameter('oxid', 'testId');
+        oxTestModules::addFunction('oxcategory', 'isDerived', '{return true;}');
 
         // testing..
         $oView = oxNew('Category_Main');
@@ -91,14 +93,14 @@ class CategoryMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Category_Main');
         $this->assertEquals('category_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -108,12 +110,12 @@ class CategoryMainTest extends \OxidTestCase
      */
     public function testSaveActiveSet0()
     {
-        $aParams = array("oxcategories__oxactive"   => 0,
-                         "oxcategories__oxparentid" => "oxrootid",
-                         "oxcategories__oxtitle"    => "Test category title for unit");
+        $aParams = ['oxcategories__oxactive'   => 0,
+                         'oxcategories__oxparentid' => 'oxrootid',
+                         'oxcategories__oxtitle'    => 'Test category title for unit'];
 
-        $this->setRequestParameter("oxid", -1);
-        $this->setRequestParameter("editval", $aParams);
+        $this->setRequestParameter('oxid', -1);
+        $this->setRequestParameter('editval', $aParams);
 
         $oView = oxNew('Category_Main');
         $oView->save();
@@ -130,13 +132,13 @@ class CategoryMainTest extends \OxidTestCase
     public function testSave()
     {
         oxTestModules::addFunction('oxcategory', 'save', '{ return true; }');
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Category_Main');
         $oView->save();
 
-        $this->assertEquals("1", $oView->getViewDataElement("updatelist"));
+        $this->assertEquals('1', $oView->getViewDataElement('updatelist'));
     }
 
     /**
@@ -147,13 +149,13 @@ class CategoryMainTest extends \OxidTestCase
     public function testSaveDefaultOxid()
     {
         oxTestModules::addFunction('oxcategory', 'save', '{ $this->oxcategories__oxid = new oxField( "testId" ); return true; }');
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Category_Main');
         $oView->save();
 
-        $this->assertEquals("1", $oView->getViewDataElement("updatelist"));
+        $this->assertEquals('1', $oView->getViewDataElement('updatelist'));
     }
 
     /**
@@ -163,14 +165,14 @@ class CategoryMainTest extends \OxidTestCase
      */
     public function testSaveinnlang()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
         oxTestModules::addFunction('oxcategory', 'save', '{ return true; }');
 
         // testing..
         $oView = oxNew('Category_Main');
         $oView->saveinnlang();
 
-        $this->assertEquals("1", $oView->getViewDataElement("updatelist"));
+        $this->assertEquals('1', $oView->getViewDataElement('updatelist'));
     }
 
     /**
@@ -180,14 +182,14 @@ class CategoryMainTest extends \OxidTestCase
      */
     public function testSaveinnlangDefaultOxid()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
         oxTestModules::addFunction('oxcategory', 'save', '{ $this->oxcategories__oxid = new oxField( "testId" ); return true; }');
 
         // testing..
         $oView = oxNew('Category_Main');
         $oView->saveinnlang();
 
-        $this->assertEquals("1", $oView->getViewDataElement("updatelist"));
+        $this->assertEquals('1', $oView->getViewDataElement('updatelist'));
     }
 
     /**
@@ -288,18 +290,18 @@ class CategoryMainTest extends \OxidTestCase
     public function testDeletePicture_demoShopMode()
     {
         $this->markTestSkipped('Bug: Error: Call to a member function getOxMessage() on bool.');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("isDemoShop"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
         $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
 
-        oxRegistry::getSession()->deleteVariable("Errors");
+        oxRegistry::getSession()->deleteVariable('Errors');
 
         /** @var \OxidEsales\Eshop\Application\Controller\Admin\CategoryMain $oView */
-        $oView = $this->getProxyClass("Category_Main");
+        $oView = $this->getProxyClass('Category_Main');
         $oView->setConfig($oConfig);
         $oView->deletePicture();
 
-        $aEx = oxRegistry::getSession()->getVariable("Errors");
-        $oEx = unserialize($aEx["default"][0]);
+        $aEx = oxRegistry::getSession()->getVariable('Errors');
+        $oEx = unserialize($aEx['default'][0]);
         $sExpMsg = oxRegistry::getLang()->translateString('CATEGORY_PICTURES_UPLOADISDISABLED');
 
         $this->assertFalse(empty($sExpMsg), 'no translation for CATEGORY_PICTURES_UPLOADISDISABLED');

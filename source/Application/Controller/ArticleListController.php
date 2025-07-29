@@ -561,7 +561,7 @@ class ArticleListController extends FrontendController
 
         if ($titlePageSuffix = $this->getTitlePageSuffix()) {
             if ($meta) {
-                $meta .= ", ";
+                $meta .= ', ';
             }
             $meta .= $titlePageSuffix;
         }
@@ -644,7 +644,7 @@ class ArticleListController extends FrontendController
             }
 
             if (count($keywordsList) > 0) {
-                $keywords = implode(", ", $keywordsList);
+                $keywords = implode(', ', $keywordsList);
             }
         }
 
@@ -678,7 +678,7 @@ class ArticleListController extends FrontendController
                 );
 
                 //removing dots from string (they are not cleaned up during general string cleanup)
-                $description = $stringModifier->preg_replace("/\./", " ", $description);
+                $description = $stringModifier->preg_replace("/\./", ' ', $description);
 
                 if ($stringModifier->strlen($description) > $maxTextLength) {
                     $midText = $stringModifier->substr($description, 0, $maxTextLength);
@@ -792,14 +792,13 @@ class ArticleListController extends FrontendController
             if ($defaultSorting = $category->getDefaultSorting()) {
                 $articleViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
                 $sortBy = $articleViewName . '.' . $defaultSorting;
-                $sortDirection = ($category->getDefaultSortingMode()) ? "desc" : "asc";
+                $sortDirection = ($category->getDefaultSortingMode()) ? 'desc' : 'asc';
                 $sorting = ['sortby' => $sortBy, 'sortdir' => $sortDirection];
             }
         }
 
         return $sorting;
     }
-
 
     /**
      * Returns title suffix used in template
@@ -822,7 +821,7 @@ class ArticleListController extends FrontendController
     public function getTitlePageSuffix()
     {
         if (($activePage = $this->getActPage())) {
-            return Registry::getLang()->translateString('PAGE') . " " . ($activePage + 1);
+            return Registry::getLang()->translateString('PAGE') . ' ' . ($activePage + 1);
         }
     }
 

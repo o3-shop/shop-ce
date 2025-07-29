@@ -114,7 +114,6 @@ class VendorList extends ListModel
         //Load vendor list
         $this->loadVendorList();
 
-
         //Create fake vendor root category
         $this->_oRoot = oxNew(Vendor::class);
         $this->_oRoot->load('root');
@@ -166,7 +165,7 @@ class VendorList extends ListModel
      */
     protected function _addCategoryFields($oVendor) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oVendor->oxcategories__oxid = new Field("v_" . $oVendor->oxvendor__oxid->value);
+        $oVendor->oxcategories__oxid = new Field('v_' . $oVendor->oxvendor__oxid->value);
         $oVendor->oxcategories__oxicon = $oVendor->oxvendor__oxicon;
         $oVendor->oxcategories__oxtitle = $oVendor->oxvendor__oxtitle;
         $oVendor->oxcategories__oxdesc = $oVendor->oxvendor__oxshortdesc;

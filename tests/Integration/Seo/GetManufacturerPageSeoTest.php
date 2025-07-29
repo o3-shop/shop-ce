@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop Community Edition.
  *
@@ -19,13 +20,12 @@
  * @copyright (C) OXID eSales AG 2003-2016
  * @version   O3-Shop CE
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Seo;
 
-use \OxidEsales\TestingLibrary\UnitTestCase;
-use \OxidEsales\Facts\Facts;
-
-use \OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
-use \OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
+use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**
  * Class GetManufacturerSeoTest
@@ -63,7 +63,6 @@ class GetManufacturerSeoTest extends UnitTestCase
             $manufacturerPageUrl
         );
     }
-
 
     /**
      * Test SeoEncoderManufacturer::getManufacturerPageUrl().
@@ -122,9 +121,9 @@ class GetManufacturerSeoTest extends UnitTestCase
      */
     private function getExpectedManufacturerPageUrl($page)
     {
-        $shopUrl        = $this->getConfig()->getCurrentShopUrl();
-        $seoUrl         = $this->getSeoUrl();
-        $pagePostfix    = '?pgNr=' . $page;
+        $shopUrl = $this->getConfig()->getCurrentShopUrl();
+        $seoUrl = $this->getSeoUrl();
+        $pagePostfix = '?pgNr=' . $page;
 
         return $shopUrl . $seoUrl . $pagePostfix;
     }
@@ -148,6 +147,6 @@ class GetManufacturerSeoTest extends UnitTestCase
      */
     private function setManufacturersPerPage($itemsPerPage)
     {
-        $this->setConfigParam("aNrofCatArticles", [$itemsPerPage]);
+        $this->setConfigParam('aNrofCatArticles', [$itemsPerPage]);
     }
 }

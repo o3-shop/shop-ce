@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use OxidEsales\EshopCommunity\Core\Field;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Session;
+use OxidEsales\EshopCommunity\Core\Field;
 use OxidEsales\TestingLibrary\UnitTestCase;
-use \oxTestModules;
-use PHPUnit\Framework\MockObject\MockObject;
+use oxTestModules;
 
 /**
  * Tests for Account class
@@ -40,9 +41,9 @@ class AccountControllerTest extends UnitTestCase
      */
     public function testRenderConfirmTerms()
     {
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", true);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', true);
 
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array('confirmTerms', 'getUser'));
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['confirmTerms', 'getUser']);
         $oUserView->expects($this->any())->method('confirmTerms')->will($this->returnValue(true));
         $oUserView->expects($this->any())->method('getUser')->will($this->returnValue(true));
         $this->assertEquals('page/privatesales/login.tpl', $oUserView->render());
@@ -56,8 +57,8 @@ class AccountControllerTest extends UnitTestCase
     public function testRenderNoTerms()
     {
         $oUser = oxNew('oxUser');
-        $oUser->oxuser__oxpassword = new Field("psw");
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array('confirmTerms', 'getUser', 'getOrderCnt', "isEnabledPrivateSales"));
+        $oUser->oxuser__oxpassword = new Field('psw');
+        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['confirmTerms', 'getUser', 'getOrderCnt', 'isEnabledPrivateSales']);
         $oUserView->expects($this->any())->method('confirmTerms')->will($this->returnValue(false));
         $oUserView->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
         $oUserView->expects($this->any())->method('getOrderCnt');
@@ -86,12 +87,12 @@ class AccountControllerTest extends UnitTestCase
     {
         $this->setRequestParameter('term', false);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("isEnabledPrivateSales", "getUser"));
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("isTermsAccepted"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['isEnabledPrivateSales', 'getUser']);
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['isTermsAccepted']);
 
         $oView->expects($this->once())->method('isEnabledPrivateSales')->will($this->returnValue(true));
-        $oUser->expects($this->once())->method("isTermsAccepted")->will($this->returnValue(false));
-        $oView->expects($this->once())->method("getUser")->will($this->returnValue($oUser));
+        $oUser->expects($this->once())->method('isTermsAccepted')->will($this->returnValue(false));
+        $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
 
         $this->assertTrue($oView->confirmTerms());
     }
@@ -105,12 +106,12 @@ class AccountControllerTest extends UnitTestCase
     {
         $this->setRequestParameter('listtype', 'testListType');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("getArticleId"));
-        $oView->expects($this->once())->method("getArticleId")->will($this->returnValue(false));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getArticleId']);
+        $oView->expects($this->once())->method('getArticleId')->will($this->returnValue(false));
         $this->assertFalse($oView->getListType());
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("getArticleId"));
-        $oView->expects($this->once())->method("getArticleId")->will($this->returnValue(true));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getArticleId']);
+        $oView->expects($this->once())->method('getArticleId')->will($this->returnValue(true));
         $this->assertEquals('testListType', $oView->getListType());
     }
 
@@ -123,13 +124,13 @@ class AccountControllerTest extends UnitTestCase
     {
         $this->setRequestParameter('searchparam', 'testparam');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("getArticleId"));
-        $oView->expects($this->exactly(2))->method("getArticleId")->will($this->returnValue(false));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getArticleId']);
+        $oView->expects($this->exactly(2))->method('getArticleId')->will($this->returnValue(false));
         $this->assertFalse($oView->getSearchParam());
         $this->assertFalse($oView->getSearchParamForHtml());
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("getArticleId"));
-        $oView->expects($this->exactly(2))->method("getArticleId")->will($this->returnValue(true));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getArticleId']);
+        $oView->expects($this->exactly(2))->method('getArticleId')->will($this->returnValue(true));
         $this->assertEquals('testparam', $oView->getSearchParam());
         $this->assertEquals('testparam', $oView->getSearchParamForHtml());
     }
@@ -159,15 +160,15 @@ class AccountControllerTest extends UnitTestCase
      */
     public function testGetOrderCnt()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("getUser"));
-        $oView->expects($this->once())->method("getUser")->will($this->returnValue(false));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getUser']);
+        $oView->expects($this->once())->method('getUser')->will($this->returnValue(false));
         $this->assertEquals(0, $oView->getOrderCnt());
 
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("getOrderCount"));
-        $oUser->expects($this->once())->method("getOrderCount")->will($this->returnValue(999));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getOrderCount']);
+        $oUser->expects($this->once())->method('getOrderCount')->will($this->returnValue(999));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array("getUser"));
-        $oView->expects($this->once())->method("getUser")->will($this->returnValue($oUser));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getUser']);
+        $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $this->assertEquals(999, $oView->getOrderCnt());
     }
 
@@ -180,11 +181,11 @@ class AccountControllerTest extends UnitTestCase
     {
         $this->setRequestParameter('sourcecl', null);
 
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getLoginStatus"));
-        $oCmp->expects($this->never())->method("getLoginStatus")->will($this->returnValue(1));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getLoginStatus']);
+        $oCmp->expects($this->never())->method('getLoginStatus')->will($this->returnValue(1));
 
-        $oView = $this->getProxyClass("Account");
-        $oView->setNonPublicVar("_oaComponents", array("oxcmp_user" => $oCmp));
+        $oView = $this->getProxyClass('Account');
+        $oView->setNonPublicVar('_oaComponents', ['oxcmp_user' => $oCmp]);
         $this->assertNull($oView->redirectAfterLogin());
     }
 
@@ -200,17 +201,17 @@ class AccountControllerTest extends UnitTestCase
         $this->setRequestParameter('sourcecl', 'testsource');
         $this->setRequestParameter('anid', 'testanid');
 
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, array("getLoginStatus"));
-        $oCmp->expects($this->once())->method("getLoginStatus")->will($this->returnValue(1));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UserComponent::class, ['getLoginStatus']);
+        $oCmp->expects($this->once())->method('getLoginStatus')->will($this->returnValue(1));
 
-        $oView = $this->getProxyClass("Account");
-        $oView->setNonPublicVar("_oaComponents", array("oxcmp_user" => $oCmp));
+        $oView = $this->getProxyClass('Account');
+        $oView->setNonPublicVar('_oaComponents', ['oxcmp_user' => $oCmp]);
 
         $sParams = '';
         // building redirect link
         foreach ($oView->getNavigationParams() as $sName => $sValue) {
-            if ($sValue && $sName != "sourcecl") {
-                $sParams .= '&' . rawurlencode($sName) . "=" . rawurlencode($sValue);
+            if ($sValue && $sName != 'sourcecl') {
+                $sParams .= '&' . rawurlencode($sName) . '=' . rawurlencode($sValue);
             }
         }
         $sUrl = $this->getConfig()->getShopUrl() . 'index.php?cl=testsource' . $sParams;
@@ -247,13 +248,13 @@ class AccountControllerTest extends UnitTestCase
         $oUser->oxuser__oxpassword = new Field(1);
 
         $oView = $this->getMock(
-            "account",
-            array("redirectAfterLogin",
-                             "getUser", "isEnabledPrivateSales")
+            'account',
+            ['redirectAfterLogin',
+                             'getUser', 'isEnabledPrivateSales']
         );
 
-        $oView->expects($this->once())->method("redirectAfterLogin")->will($this->returnValue(1));
-        $oView->expects($this->once())->method("getUser")->will($this->returnValue($oUser));
+        $oView->expects($this->once())->method('redirectAfterLogin')->will($this->returnValue(1));
+        $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $oView->expects($this->any())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
         $this->assertEquals('page/account/dashboard.tpl', $oView->render());
@@ -267,19 +268,19 @@ class AccountControllerTest extends UnitTestCase
     public function testRenderNoUser()
     {
         $this->setRequestParameter('aid', 'testanid');
-        $this->getConfig()->setConfigParam("blPsLoginEnabled", true);
+        $this->getConfig()->setConfigParam('blPsLoginEnabled', true);
 
         $oUser = oxNew('oxuser');
         $oUser->oxuser__oxpassword = new Field(1);
 
         $oView = $this->getMock(
-            "account",
-            array("redirectAfterLogin",
-                             "getUser", 'isActive')
+            'account',
+            ['redirectAfterLogin',
+                             'getUser', 'isActive']
         );
 
-        $oView->expects($this->once())->method("redirectAfterLogin")->will($this->returnValue(1));
-        $oView->expects($this->once())->method("getUser")->will($this->returnValue(false));
+        $oView->expects($this->once())->method('redirectAfterLogin')->will($this->returnValue(1));
+        $oView->expects($this->once())->method('getUser')->will($this->returnValue(false));
         $oView->expects($this->any())->method('isActive')->will($this->returnValue(true));
 
         $this->assertEquals('page/privatesales/login.tpl', $oView->render());
@@ -297,7 +298,7 @@ class AccountControllerTest extends UnitTestCase
         $oUser = oxNew('oxuser');
         $oUser->oxuser__oxusername = new Field($sUsername);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array('getUser', 'getLink'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getUser', 'getLink']);
         $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $oView->expects($this->once())->method('getLink')->will($this->returnValue($sLink));
 
@@ -335,7 +336,7 @@ class AccountControllerTest extends UnitTestCase
      */
     public function testGetCompareItemsCnt()
     {
-        $this->getSession()->setVariable('aFiltcompproducts', array('1', '2'));
+        $this->getSession()->setVariable('aFiltcompproducts', ['1', '2']);
 
         $oAcc = oxNew('account');
         $this->assertEquals(2, $oAcc->getCompareItemsCnt());
@@ -352,14 +353,13 @@ class AccountControllerTest extends UnitTestCase
         $oUser = oxNew('oxUser');
         $oUser->oxuser__oxusername = new Field('Jon');
 
-        $oActiveView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, array('getClassName'));
+        $oActiveView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getClassName']);
         $oActiveView->expects($this->any())->method('getClassName')->will($this->returnValue('account'));
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getActiveView'), array(), '', false);
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveView'], [], '', false);
         $oConfig->expects($this->any())->method('getActiveView')->will($this->returnValue($oActiveView));
 
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, array('getUser', 'getConfig'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getUser', 'getConfig']);
         $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 

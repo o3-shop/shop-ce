@@ -37,7 +37,7 @@ class File extends BaseModel
     /**
      * No active user exception code.
      */
-    const NO_USER = 2;
+    public const NO_USER = 2;
 
     /**
      * Object core table name
@@ -87,7 +87,7 @@ class File extends BaseModel
      *
      * @var string
      */
-    protected $_sManualUploadDir = "uploads";
+    protected $_sManualUploadDir = 'uploads';
 
     /**
      * Initialises the instance
@@ -166,7 +166,7 @@ class File extends BaseModel
         }
 
         //no path is set
-        $sPath = getShopBasePath() . "/out/downloads/";
+        $sPath = getShopBasePath() . '/out/downloads/';
 
         return $sPath;
     }
@@ -345,7 +345,7 @@ class File extends BaseModel
         $iCount = $oDb->getOne(
             'SELECT COUNT(*) FROM `oxfiles` WHERE `OXSTOREHASH` = :oxstorehash',
             [
-                ':oxstorehash' => $this->oxfiles__oxstorehash->value
+                ':oxstorehash' => $this->oxfiles__oxstorehash->value,
             ]
         );
         if (!$iCount) {
@@ -379,13 +379,13 @@ class File extends BaseModel
             throw new StandardException('EXCEPTION_NOFILE');
         }
 
-        $oUtils->setHeader("Pragma: public");
-        $oUtils->setHeader("Expires: 0");
-        $oUtils->setHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0, private");
+        $oUtils->setHeader('Pragma: public');
+        $oUtils->setHeader('Expires: 0');
+        $oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0, private');
         $oUtils->setHeader('Content-Disposition: attachment;filename=' . $sFileName);
-        $oUtils->setHeader("Content-Type: application/octet-stream");
+        $oUtils->setHeader('Content-Type: application/octet-stream');
         if ($iFileSize = $this->getSize()) {
-            $oUtils->setHeader("Content-Length: " . $iFileSize);
+            $oUtils->setHeader('Content-Length: ' . $iFileSize);
         }
         readfile($sFileLocations);
         $oUtils->showMessageAndExit(null);
@@ -426,7 +426,7 @@ class File extends BaseModel
                         AND `oxorderarticles`.`oxstorno` = 0";
             $params = [
                 ':oxfileid' => $this->getId(),
-                ':oxvaliduntil' => date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime())
+                ':oxvaliduntil' => date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime()),
             ];
 
             if ($oDb->getOne($sSql, $params)) {
@@ -447,7 +447,7 @@ class File extends BaseModel
         $iMaxCount = $this->oxfiles__oxmaxdownloads->value;
         //if value is -1, takes global options
         if ($iMaxCount < 0) {
-            $iMaxCount = Registry::getConfig()->getConfigParam("iMaxDownloadsCount");
+            $iMaxCount = Registry::getConfig()->getConfigParam('iMaxDownloadsCount');
         }
 
         return $iMaxCount;
@@ -463,7 +463,7 @@ class File extends BaseModel
         $iMaxCount = $this->oxfiles__oxmaxunregdownloads->value;
         //if value is -1, takes global options
         if ($iMaxCount < 0) {
-            $iMaxCount = Registry::getConfig()->getConfigParam("iMaxDownloadsCountUnregistered");
+            $iMaxCount = Registry::getConfig()->getConfigParam('iMaxDownloadsCountUnregistered');
         }
 
         return $iMaxCount;
@@ -479,7 +479,7 @@ class File extends BaseModel
         $iExpTime = $this->oxfiles__oxlinkexptime->value;
         //if value is -1, takes global options
         if ($iExpTime < 0) {
-            $iExpTime = Registry::getConfig()->getConfigParam("iLinkExpirationTime");
+            $iExpTime = Registry::getConfig()->getConfigParam('iLinkExpirationTime');
         }
 
         return $iExpTime;
@@ -495,7 +495,7 @@ class File extends BaseModel
         $iExpTime = $this->oxfiles__oxdownloadexptime->value;
         //if value is -1, takes global options
         if ($iExpTime < 0) {
-            $iExpTime = Registry::getConfig()->getConfigParam("iDownloadExpirationTime");
+            $iExpTime = Registry::getConfig()->getConfigParam('iDownloadExpirationTime');
         }
 
         return $iExpTime;

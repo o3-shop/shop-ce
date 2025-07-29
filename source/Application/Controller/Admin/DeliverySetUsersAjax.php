@@ -88,7 +88,7 @@ class DeliverySetUsersAjax extends ListComponentAjax
     {
         $myConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
-        
+
         $oDb = DatabaseProvider::getDb();
         $sId = $oRequest->getRequestEscapedParameter('oxid');
         $sSynchId = $oRequest->getRequestEscapedParameter('synchoxid');
@@ -104,7 +104,7 @@ class DeliverySetUsersAjax extends ListComponentAjax
         } elseif ($sSynchId && $sSynchId != $sId) {
             // selected group ?
             $sQAdd = " from oxobject2group left join $sUserTable on $sUserTable.oxid = oxobject2group.oxobjectid ";
-            $sQAdd .= " where oxobject2group.oxgroupsid = " . $oDb->quote($sId);
+            $sQAdd .= ' where oxobject2group.oxgroupsid = ' . $oDb->quote($sId);
             if (!$myConfig->getConfigParam('blMallUsers')) {
                 $sQAdd .= "and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
             }
@@ -131,10 +131,10 @@ class DeliverySetUsersAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -152,13 +152,13 @@ class DeliverySetUsersAjax extends ListComponentAjax
             $sUserTable = $this->getViewName('oxuser');
             $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenUsr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
                 $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
                 $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenUsr);
-                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxdelsetu");
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxdelsetu');
                 $oObject2Delivery->save();
             }
         }

@@ -55,7 +55,7 @@ class UserAddressList extends ListModel
                 LEFT JOIN {$sViewName} AS oxcountry ON oxaddress.oxcountryid = oxcountry.oxid
                 WHERE oxaddress.oxuserid = :oxuserid";
         $this->selectString($sSelect, [
-            ':oxuserid' => $sUserId
+            ':oxuserid' => $sUserId,
         ]);
     }
 }

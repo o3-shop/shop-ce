@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Timestamp;
 
 use oxDb;
@@ -40,7 +42,7 @@ class TimestampTest extends \OxidTestCase
             $this->cleanUpTable($aTable[1]);
         }
 
-        oxDb::getDb()->execute("DELETE FROM `oxshops` WHERE `oxid` = 1");
+        oxDb::getDb()->execute('DELETE FROM `oxshops` WHERE `oxid` = 1');
 
         parent::tearDown();
     }
@@ -50,46 +52,46 @@ class TimestampTest extends \OxidTestCase
      */
     public function objectNames()
     {
-        $aNames = array(
-            array('oxActions', 'oxactions', 'oxtitle'),
-            array('oxAddress', 'oxaddress', 'oxcompany'),
-            array('oxArticle', 'oxarticles', 'oxtitle'),
-            array('oxAttribute', 'oxattribute', 'oxtitle'),
-            array('oxCategory', 'oxcategories', 'oxtitle'),
-            array('oxContent', 'oxcontents', 'oxtitle'),
-            array('oxCountry', 'oxcountry', 'oxtitle'),
-            array('oxDelivery', 'oxdelivery', 'oxtitle'),
-            array('oxDeliverySet', 'oxdeliveryset', 'oxtitle'),
-            array('oxDiscount', 'oxdiscount', 'oxtitle'),
-            array('oxFile', 'oxfiles', 'oxfilename'),
-            array('oxGroups', 'oxgroups', 'oxtitle'),
-            array('oxLinks', 'oxlinks', 'oxurl'),
-            array('oxManufacturer', 'oxmanufacturers', 'oxtitle'),
-            array('oxMediaUrl', 'oxmediaurls', 'oxurl'),
-            array('oxNews', 'oxnews', 'oxshortdesc'),
-            array('oxOrder', 'oxorder', 'oxdelstreet'),
-            array('oxOrderArticle', 'oxorderarticles', 'oxtitle'),
-            array('oxOrderFile', 'oxorderfiles', 'oxfilename'),
-            array('oxPayment', 'oxpayments', 'oxdesc'),
-            array('oxPriceAlarm', 'oxpricealarm', 'oxemail'),
-            array('oxRating', 'oxratings', 'oxobjectid'),
-            array('oxRecommList', 'oxrecommlists', 'oxtitle'),
-            array('oxRemark', 'oxremark', 'oxtext'),
-            array('oxReview', 'oxreviews', 'oxtext'),
-            array('oxSelectList', 'oxselectlist', 'oxtitle'),
-            array('oxShop', 'oxshops', 'oxname'),
-            array('oxState', 'oxstates', 'oxtitle'),
-            array('oxUser', 'oxuser', 'oxusername'),
-            array('oxUserBasketItem', 'oxuserbasketitems', 'oxsellist'),
-            array('oxUserBasket', 'oxuserbaskets', 'oxtitle'),
-            array('oxUserPayment', 'oxuserpayments', 'oxuserid'),
-            array('oxVendor', 'oxvendor', 'oxtitle'),
-            array('oxVoucher', 'oxvouchers', 'oxvouchernr'),
-            array('oxVoucherSerie', 'oxvoucherseries', 'oxserienr'),
-        );
+        $aNames = [
+            ['oxActions', 'oxactions', 'oxtitle'],
+            ['oxAddress', 'oxaddress', 'oxcompany'],
+            ['oxArticle', 'oxarticles', 'oxtitle'],
+            ['oxAttribute', 'oxattribute', 'oxtitle'],
+            ['oxCategory', 'oxcategories', 'oxtitle'],
+            ['oxContent', 'oxcontents', 'oxtitle'],
+            ['oxCountry', 'oxcountry', 'oxtitle'],
+            ['oxDelivery', 'oxdelivery', 'oxtitle'],
+            ['oxDeliverySet', 'oxdeliveryset', 'oxtitle'],
+            ['oxDiscount', 'oxdiscount', 'oxtitle'],
+            ['oxFile', 'oxfiles', 'oxfilename'],
+            ['oxGroups', 'oxgroups', 'oxtitle'],
+            ['oxLinks', 'oxlinks', 'oxurl'],
+            ['oxManufacturer', 'oxmanufacturers', 'oxtitle'],
+            ['oxMediaUrl', 'oxmediaurls', 'oxurl'],
+            ['oxNews', 'oxnews', 'oxshortdesc'],
+            ['oxOrder', 'oxorder', 'oxdelstreet'],
+            ['oxOrderArticle', 'oxorderarticles', 'oxtitle'],
+            ['oxOrderFile', 'oxorderfiles', 'oxfilename'],
+            ['oxPayment', 'oxpayments', 'oxdesc'],
+            ['oxPriceAlarm', 'oxpricealarm', 'oxemail'],
+            ['oxRating', 'oxratings', 'oxobjectid'],
+            ['oxRecommList', 'oxrecommlists', 'oxtitle'],
+            ['oxRemark', 'oxremark', 'oxtext'],
+            ['oxReview', 'oxreviews', 'oxtext'],
+            ['oxSelectList', 'oxselectlist', 'oxtitle'],
+            ['oxShop', 'oxshops', 'oxname'],
+            ['oxState', 'oxstates', 'oxtitle'],
+            ['oxUser', 'oxuser', 'oxusername'],
+            ['oxUserBasketItem', 'oxuserbasketitems', 'oxsellist'],
+            ['oxUserBasket', 'oxuserbaskets', 'oxtitle'],
+            ['oxUserPayment', 'oxuserpayments', 'oxuserid'],
+            ['oxVendor', 'oxvendor', 'oxtitle'],
+            ['oxVoucher', 'oxvouchers', 'oxvouchernr'],
+            ['oxVoucherSerie', 'oxvoucherseries', 'oxserienr'],
+        ];
 
         if ($this->getTestConfig()->getShopEdition() == 'EE') {
-            $aNames[] = array('oxRole', 'oxroles', 'oxtitle');
+            $aNames[] = ['oxRole', 'oxroles', 'oxtitle'];
         }
 
         return $aNames;
@@ -102,8 +104,8 @@ class TimestampTest extends \OxidTestCase
      */
     public function testOnInsertDb($objectName, $tableName)
     {
-        $sInsertSql = "INSERT INTO `$tableName` SET `oxid` = '".$this->formTestIdByTable($tableName)."'";
-        $sSelectSql = "SELECT `oxtimestamp` FROM `$tableName` WHERE `oxid` = '".$this->formTestIdByTable($tableName)."'";
+        $sInsertSql = "INSERT INTO `$tableName` SET `oxid` = '" . $this->formTestIdByTable($tableName) . "'";
+        $sSelectSql = "SELECT `oxtimestamp` FROM `$tableName` WHERE `oxid` = '" . $this->formTestIdByTable($tableName) . "'";
 
         $oDb = oxDb::getDb();
 
@@ -120,9 +122,9 @@ class TimestampTest extends \OxidTestCase
      */
     public function testOnUpdateDb($objectName, $tableName, $modifyField)
     {
-        $sInsertSql = "INSERT INTO `$tableName` SET `oxid` = '".$this->formTestIdByTable($tableName)."', `oxtimestamp` = '0000-00-00 00:00:00' ";
-        $sUpdateSql = "UPDATE `$tableName` SET `$modifyField` = '_testmodified' WHERE `oxid` = '".$this->formTestIdByTable($tableName)."'";
-        $sSelectSql = "SELECT `oxtimestamp` FROM `$tableName` WHERE `oxid` = '".$this->formTestIdByTable($tableName)."'";
+        $sInsertSql = "INSERT INTO `$tableName` SET `oxid` = '" . $this->formTestIdByTable($tableName) . "', `oxtimestamp` = '0000-00-00 00:00:00' ";
+        $sUpdateSql = "UPDATE `$tableName` SET `$modifyField` = '_testmodified' WHERE `oxid` = '" . $this->formTestIdByTable($tableName) . "'";
+        $sSelectSql = "SELECT `oxtimestamp` FROM `$tableName` WHERE `oxid` = '" . $this->formTestIdByTable($tableName) . "'";
 
         $oDb = oxDb::getDb();
 
@@ -213,7 +215,7 @@ class TimestampTest extends \OxidTestCase
         foreach ($aTableNames as $sKey => $aTable) {
             $sTableName = $aTable[0];
             $sSelectSql = "SHOW COLUMNS FROM `$sTableName` LIKE 'oxtimestamp'";
-            $this->assertEquals("OXTIMESTAMP", $oDb->getOne($sSelectSql), "No OXTIMESTAMP field in TABLE: $sTableName");
+            $this->assertEquals('OXTIMESTAMP', $oDb->getOne($sSelectSql), "No OXTIMESTAMP field in TABLE: $sTableName");
         }
     }
 

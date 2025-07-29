@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxCompanyVatIn;
+use oxCompanyVatIn;
 
 class CompanyVatInTest extends \OxidTestCase
 {
@@ -46,20 +48,20 @@ class CompanyVatInTest extends \OxidTestCase
 
     public function vatInProviderForCountryCode()
     {
-        return array(
-            array('LT12345', 'LT'),
-            array(' LT12345', 'LT'),
-            array('lt12345', 'LT'),
-            array('LT 12345', 'LT'),
-            array('LT-12 345', 'LT'),
-            array('LT.123.45', 'LT'),
-            array('LT,123,45', 'LT'),
-            array('', ''),
-            array(null, ''),
-            array(1, '1'),
-            array('1111', '11'),
-            array('abcd', 'AB')
-        );
+        return [
+            ['LT12345', 'LT'],
+            [' LT12345', 'LT'],
+            ['lt12345', 'LT'],
+            ['LT 12345', 'LT'],
+            ['LT-12 345', 'LT'],
+            ['LT.123.45', 'LT'],
+            ['LT,123,45', 'LT'],
+            ['', ''],
+            [null, ''],
+            [1, '1'],
+            ['1111', '11'],
+            ['abcd', 'AB'],
+        ];
     }
 
     /**
@@ -73,18 +75,18 @@ class CompanyVatInTest extends \OxidTestCase
 
     public function vatInProviderForNumbers()
     {
-        return array(
-            array('LT12345', '12345'),
-            array(' LT12345', '12345'),
-            array('LT12345 ', '12345'),
-            array(' LT12345 ', '12345'),
-            array('', ''),
-            array('1111', '11'),
-            array('abcd', 'cd'),
-            array('LT 12345', '12345'),
-            array('LT-12 345', '12345'),
-            array('LT.123.45', '.123.45'),
-            array('LT,123,45', ',123,45'),
-        );
+        return [
+            ['LT12345', '12345'],
+            [' LT12345', '12345'],
+            ['LT12345 ', '12345'],
+            [' LT12345 ', '12345'],
+            ['', ''],
+            ['1111', '11'],
+            ['abcd', 'cd'],
+            ['LT 12345', '12345'],
+            ['LT-12 345', '12345'],
+            ['LT.123.45', '.123.45'],
+            ['LT,123,45', ',123,45'],
+        ];
     }
 }

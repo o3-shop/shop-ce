@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -31,7 +32,7 @@ class Test2ContentController extends Test2ContentController_parent
     public function getTitle()
     {
         $contentTitle = parent::getTitle();
-        $contentTitle = $contentTitle . " - Module_2_Controller";// . $content->getTitle();
+        $contentTitle = $contentTitle . ' - Module_2_Controller';// . $content->getTitle();
 
         return $contentTitle;
     }

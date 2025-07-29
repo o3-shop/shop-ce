@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
-use OxidEsales\Codeception\Page\Home;
-use OxidEsales\Codeception\Page\Account\UserOrderHistory;
 use OxidEsales\Codeception\Module\Translation\Translator;
+use OxidEsales\Codeception\Page\Account\UserOrderHistory;
+use OxidEsales\Codeception\Page\Home;
 
 class MainCest
 {
@@ -30,7 +31,7 @@ class MainCest
     {
         $homePage = new Home($I);
         $I->amOnPage($homePage->URL);
-        $I->see(Translator::translate("HOME"));
+        $I->see(Translator::translate('HOME'));
     }
 
     /**
@@ -42,7 +43,7 @@ class MainCest
         $homePage = new Home($I);
         $I->amOnPage($homePage->URL);
 
-        $I->see(Translator::translate("HOME"));
+        $I->see(Translator::translate('HOME'));
         $I->see(Translator::translate('START_BARGAIN_HEADER'));
 
         // open category
@@ -62,8 +63,8 @@ class MainCest
         $I->waitForElement('h1', 10);
         $I->see(Translator::translate('LOGIN'), 'h1');
 
-        $I->fillField($orderHistoryPage->loginUserNameField,'example_test@oxid-esales.dev');
-        $I->fillField($orderHistoryPage->loginUserPasswordField,'useruser');
+        $I->fillField($orderHistoryPage->loginUserNameField, 'example_test@oxid-esales.dev');
+        $I->fillField($orderHistoryPage->loginUserPasswordField, 'useruser');
         $I->click($orderHistoryPage->loginButton);
 
         $I->see(Translator::translate('ORDER_HISTORY'), 'h1');

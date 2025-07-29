@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,11 +27,11 @@ $sMetadataVersion = '2.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'          => 'Vendor1/ModuleChainExtension44',
     'title'       => 'Test O3-Shop class module chain extension 4.4',
     'description' => 'The module class and the chain extended O3-Shop class life in their namespaces.',
     'thumbnail'   => 'picture.png',
     'version'     => '1.0',
     'author'      => 'OXID eSales AG',
-);
+];

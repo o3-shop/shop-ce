@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
 
 /**
  * Testing oxaddress class.
  */
 class AddressTest extends \OxidTestCase
 {
-
     /**
      * Test address object to string generator.
      *
@@ -42,7 +43,7 @@ class AddressTest extends \OxidTestCase
         $oSubj->oxaddress__oxstreetnr = new oxField('StreetNr');
         $oSubj->oxaddress__oxcity = new oxField('Kaunas');
 
-        $this->assertEquals("Fname Lname, Street StreetNr, Kaunas", $oSubj->toString());
+        $this->assertEquals('Fname Lname, Street StreetNr, Kaunas', $oSubj->toString());
     }
 
     /**
@@ -57,7 +58,7 @@ class AddressTest extends \OxidTestCase
         $oSubj->oxaddress__oxstreetnr = new oxField('StreetNr');
         $oSubj->oxaddress__oxcity = new oxField('Kaunas');
 
-        $this->assertEquals("Street StreetNr, Kaunas", $oSubj->toString());
+        $this->assertEquals('Street StreetNr, Kaunas', $oSubj->toString());
     }
 
     /**
@@ -73,7 +74,7 @@ class AddressTest extends \OxidTestCase
         $oSubj->oxaddress__oxstreetnr = new oxField('StreetNr');
         $oSubj->oxaddress__oxcity = new oxField('Kaunas');
 
-        $this->assertEquals("Lname, Street StreetNr, Kaunas", $oSubj->toString());
+        $this->assertEquals('Lname, Street StreetNr, Kaunas', $oSubj->toString());
     }
 
     /**
@@ -90,7 +91,7 @@ class AddressTest extends \OxidTestCase
         $oSubj->oxaddress__oxstreetnr = new oxField('StreetNr');
         $oSubj->oxaddress__oxcity = new oxField('Kaunas');
 
-        $this->assertEquals("Fname Lname, Street StreetNr, Kaunas", $oSubj->toString());
+        $this->assertEquals('Fname Lname, Street StreetNr, Kaunas', $oSubj->toString());
     }
 
     /**
@@ -100,8 +101,8 @@ class AddressTest extends \OxidTestCase
      */
     public function testToStringMagicMocked()
     {
-        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Model\Address::class, array("toString"));
-        $oSubj->expects($this->once())->method('toString')->will($this->returnValue("teststr"));
+        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Model\Address::class, ['toString']);
+        $oSubj->expects($this->once())->method('toString')->will($this->returnValue('teststr'));
         (string) $oSubj;
     }
 
@@ -150,7 +151,7 @@ class AddressTest extends \OxidTestCase
         $iAlternateStateId = 'AK';
 
         /** @var oxState|PHPUnit\Framework\MockObject\MockObject $oStateMock */
-        $oStateMock = $this->getMock(\OxidEsales\Eshop\Application\Model\State::class, array('getTitleById'));
+        $oStateMock = $this->getMock(\OxidEsales\Eshop\Application\Model\State::class, ['getTitleById']);
 
         $oStateMock->expects($this->exactly(4))
             ->method('getTitleById')
@@ -163,7 +164,7 @@ class AddressTest extends \OxidTestCase
             ->willReturnOnConsecutiveCalls('Kalifornien', 'Alaska', 'California', 'Alaska');
 
         /** @var oxUser|PHPUnit\Framework\MockObject\MockObject $oUserMock */
-        $oAddressMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Address::class, array('_getStateObject', 'getStateId'));
+        $oAddressMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Address::class, ['_getStateObject', 'getStateId']);
 
         $oAddressMock->expects($this->any())
             ->method('_getStateObject')
@@ -174,20 +175,20 @@ class AddressTest extends \OxidTestCase
             ->will($this->returnValue($iAlternateStateId));
 
         $sExpected = oxDb::getDb()->getOne('SELECT oxtitle FROM oxstates WHERE oxid = "' . $iStateId . '"');
-        $this->assertSame($sExpected, $oAddressMock->getStateTitle($iStateId), "State title is correct");
+        $this->assertSame($sExpected, $oAddressMock->getStateTitle($iStateId), 'State title is correct');
 
         $sExpected = oxDb::getDb()->getOne('SELECT oxtitle FROM oxstates WHERE oxid = "' . $iAlternateStateId . '"');
-        $this->assertSame($sExpected, $oAddressMock->getStateTitle(), "State title is correct when ID is not passed");
+        $this->assertSame($sExpected, $oAddressMock->getStateTitle(), 'State title is correct when ID is not passed');
 
         $this->setLanguage(1);
 
         $sExpected = oxDb::getDb()->getOne('SELECT oxtitle_1 FROM oxstates WHERE oxid = "' . $iStateId . '"');
-        $this->assertSame($sExpected, $oAddressMock->getStateTitle($iStateId), "State title is correct");
+        $this->assertSame($sExpected, $oAddressMock->getStateTitle($iStateId), 'State title is correct');
 
         $sExpected = oxDb::getDb()->getOne(
             'SELECT oxtitle_1 FROM oxstates WHERE oxid = "' . $iAlternateStateId . '"'
         );
-        $this->assertSame($sExpected, $oAddressMock->getStateTitle(), "State title is correct when ID is not passed");
+        $this->assertSame($sExpected, $oAddressMock->getStateTitle(), 'State title is correct when ID is not passed');
     }
 
     /**

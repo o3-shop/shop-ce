@@ -25,5 +25,4 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exce
 
 class ExtensionNotInChainException extends \Exception
 {
-
 }

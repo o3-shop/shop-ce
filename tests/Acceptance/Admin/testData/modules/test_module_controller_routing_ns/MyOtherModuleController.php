@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,16 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\test_module_controller_routing_ns;
 
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\test_module_controller_routing_ns\MyModuleController;
-
 /**
  * Class MyOtherModuleController
  * @package OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\test_module_controller_routing_ns
  */
 class MyOtherModuleController extends MyModuleController
 {
-    const MESSAGE_PREFIX = 'MyOtherModuleController - ';
+    public const MESSAGE_PREFIX = 'MyOtherModuleController - ';
 
     /**
      * Current view template

@@ -34,7 +34,7 @@ class QueryFilter implements QueryFilterInterface
     private $logThese = [
         'insert into',
         'update ',
-        'delete '
+        'delete ',
     ];
 
     /**
@@ -42,7 +42,7 @@ class QueryFilter implements QueryFilterInterface
      */
     private $skipThese = [
         'oxsession',
-        'oxcache'
+        'oxcache',
     ];
 
     /**

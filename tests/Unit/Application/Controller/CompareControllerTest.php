@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
 use OxidEsales\Eshop\Core\DatabaseProvider;
-use \oxTestModules;
 use OxidEsales\Eshop\Core\Registry;
+use oxTestModules;
 
 /**
  * Tests for compare class
@@ -64,11 +66,11 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testMoveLeft()
     {
-        $this->setRequestParameter('aid', "testId2");
-        $aItems = array("testId1" => "testVal1", "testId2" => "testVal2", "testId3" => "testVal3");
-        $aResult = array("testId1" => true, "testId2" => true, "testId3" => true);
+        $this->setRequestParameter('aid', 'testId2');
+        $aItems = ['testId1' => 'testVal1', 'testId2' => 'testVal2', 'testId3' => 'testVal3'];
+        $aResult = ['testId1' => true, 'testId2' => true, 'testId3' => true];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array("getCompareItems", "setCompareItems"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['getCompareItems', 'setCompareItems']);
         $oView->expects($this->once())->method('getCompareItems')->will($this->returnValue($aItems));
         $oView->expects($this->once())->method('setCompareItems')->with($this->equalTo($aResult));
         $oView->moveLeft();
@@ -79,9 +81,9 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testMoveLeftSkipsIfNoAnid()
     {
-        $this->setRequestParameter('aid', "");
+        $this->setRequestParameter('aid', '');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array("getCompareItems", "setCompareItems"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['getCompareItems', 'setCompareItems']);
         $oView->expects($this->never())->method('getCompareItems');
         $oView->expects($this->never())->method('setCompareItems');
         $oView->moveLeft();
@@ -92,11 +94,11 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testMoveRight()
     {
-        $this->setRequestParameter('aid', "testId2");
-        $aItems = array("testId1" => "testVal1", "testId2" => "testVal2", "testId3" => "testVal3");
-        $aResult = array("testId1" => true, "testId2" => true, "testId3" => true);
+        $this->setRequestParameter('aid', 'testId2');
+        $aItems = ['testId1' => 'testVal1', 'testId2' => 'testVal2', 'testId3' => 'testVal3'];
+        $aResult = ['testId1' => true, 'testId2' => true, 'testId3' => true];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array("getCompareItems", "setCompareItems"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['getCompareItems', 'setCompareItems']);
         $oView->expects($this->once())->method('getCompareItems')->will($this->returnValue($aItems));
         $oView->expects($this->once())->method('setCompareItems')->with($this->equalTo($aResult));
         $oView->moveRight();
@@ -107,9 +109,9 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testMoveRightSkipsIfNoAnId()
     {
-        $this->setRequestParameter('aid', "");
+        $this->setRequestParameter('aid', '');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array("getCompareItems", "setCompareItems"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['getCompareItems', 'setCompareItems']);
         $oView->expects($this->never())->method('getCompareItems');
         $oView->expects($this->never())->method('setCompareItems');
         $oView->moveRight();
@@ -122,7 +124,7 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     {
         $oView = oxNew('compare');
 
-        $this->assertEquals("page/compare/compare.tpl", $oView->render());
+        $this->assertEquals('page/compare/compare.tpl', $oView->render());
     }
 
     /**
@@ -133,7 +135,7 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $oView = oxNew('compare');
 
         $oView->inPopup();
-        $this->assertEquals("compare_popup.tpl", $oView->render());
+        $this->assertEquals('compare_popup.tpl', $oView->render());
     }
 
     /**
@@ -141,10 +143,10 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetOrderCnt()
     {
-        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("getOrderCount"));
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getOrderCount']);
         $oUser->expects($this->once())->method('getOrderCount')->will($this->returnValue(999));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array("getUser"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['getUser']);
         $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
 
         $this->assertEquals(999, $oView->getOrderCnt());
@@ -155,14 +157,14 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testSetCompareItemsGetCompareItems()
     {
-        $this->getSession()->setVariable('aFiltcompproducts', array("testItems1"));
+        $this->getSession()->setVariable('aFiltcompproducts', ['testItems1']);
         $oView = oxNew('compare');
-        $this->assertEquals(array("testItems1"), $oView->getCompareItems());
+        $this->assertEquals(['testItems1'], $oView->getCompareItems());
 
         $oView = oxNew('compare');
-        $oView->setCompareItems(array("testItems2"));
-        $this->assertEquals(array("testItems2"), $oView->getCompareItems());
-        $this->assertEquals(array("testItems2"), Registry::getSession()->getVariable('aFiltcompproducts'));
+        $oView->setCompareItems(['testItems2']);
+        $this->assertEquals(['testItems2'], $oView->getCompareItems());
+        $this->assertEquals(['testItems2'], Registry::getSession()->getVariable('aFiltcompproducts'));
     }
 
     /**
@@ -170,12 +172,12 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetCompArtList()
     {
-        $oCompare = $this->getProxyClass("compare");
-        $oArticle = oxNew("oxArticle");
+        $oCompare = $this->getProxyClass('compare');
+        $oArticle = oxNew('oxArticle');
         $oArticle->load('1672');
-        $oCompare->setNonPublicVar("_aCompItems", array('1672' => $oArticle));
+        $oCompare->setNonPublicVar('_aCompItems', ['1672' => $oArticle]);
         $aArtList = $oCompare->getCompArtList();
-        $this->assertEquals(array('1672'), array_keys($aArtList));
+        $this->assertEquals(['1672'], array_keys($aArtList));
     }
 
     /**
@@ -183,9 +185,9 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetCompareItemsCnt()
     {
-        $oCompare = $this->getProxyClass("compare");
-        $oArticle = oxNew("oxArticle");
-        $oCompare->setNonPublicVar("_aCompItems", array('1672' => $oArticle, '2000' => $oArticle));
+        $oCompare = $this->getProxyClass('compare');
+        $oArticle = oxNew('oxArticle');
+        $oCompare->setNonPublicVar('_aCompItems', ['1672' => $oArticle, '2000' => $oArticle]);
         $this->assertEquals(2, $oCompare->getCompareItemsCnt());
     }
 
@@ -206,9 +208,9 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetAttributeList()
     {
-        $oCompare = $this->getProxyClass("compare");
-        $oArticle = oxNew("oxArticle");
-        $oCompare->setNonPublicVar("_oArtList", array('1672' => $oArticle, '6b661dda79318ca64ca06e97e4fbcb0a' =>$oArticle));
+        $oCompare = $this->getProxyClass('compare');
+        $oArticle = oxNew('oxArticle');
+        $oCompare->setNonPublicVar('_oArtList', ['1672' => $oArticle, '6b661dda79318ca64ca06e97e4fbcb0a' =>$oArticle]);
         $aAttributes = $oCompare->getAttributeList();
 
         $sSelect = "select oxattrid, oxvalue from oxobject2attribute where oxobjectid = '1672'";
@@ -227,13 +229,13 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetSimilarRecommListIds()
     {
-        $sArrayKey = "articleId";
-        $aArrayKeys = array($sArrayKey);
-        $oArtList = array($sArrayKey => "zyyy");
+        $sArrayKey = 'articleId';
+        $aArrayKeys = [$sArrayKey];
+        $oArtList = [$sArrayKey => 'zyyy'];
 
-        $oSearch = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array("getCompArtList"));
-        $oSearch->expects($this->once())->method("getCompArtList")->will($this->returnValue($oArtList));
-        $this->assertEquals($aArrayKeys, $oSearch->getSimilarRecommListIds(), "getSimilarRecommListIds() should return array of keys from result of getCompArtList()");
+        $oSearch = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['getCompArtList']);
+        $oSearch->expects($this->once())->method('getCompArtList')->will($this->returnValue($oArtList));
+        $this->assertEquals($aArrayKeys, $oSearch->getSimilarRecommListIds(), 'getSimilarRecommListIds() should return array of keys from result of getCompArtList()');
     }
 
     /**
@@ -241,8 +243,8 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetPageNavigation()
     {
-        $oCompare = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array('generatePageNavigation'));
-        $oCompare->expects($this->any())->method('generatePageNavigation')->will($this->returnValue("aaa"));
+        $oCompare = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['generatePageNavigation']);
+        $oCompare->expects($this->any())->method('generatePageNavigation')->will($this->returnValue('aaa'));
         $this->assertEquals('aaa', $oCompare->getPageNavigation());
     }
 
@@ -251,7 +253,7 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testSetNoPaging()
     {
-        $oCompare = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, array('_setArticlesPerPage'));
+        $oCompare = $this->getMock(\OxidEsales\Eshop\Application\Controller\CompareController::class, ['_setArticlesPerPage']);
 
         $oCompare->expects($this->once())->method('_setArticlesPerPage')->with($this->equalTo(0));
         $oCompare->setNoPaging();
@@ -263,7 +265,7 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function testSetArticlesPerPage()
     {
         $cl = oxTestModules::addFunction('compare', '_getArticlesPerPage', '{return $this->_iArticlesPerPage;}');
-        $oCompare = new $cl;
+        $oCompare = new $cl();
 
         $oCompare->UNITsetArticlesPerPage(5);
         $this->assertEquals(5, $oCompare->_getArticlesPerPage());
@@ -279,8 +281,8 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function testGetBreadCrumb()
     {
         $oCompare = oxNew('Compare');
-        $aCatPath = array();
-        $aResult = array();
+        $aCatPath = [];
+        $aResult = [];
 
         $aCatPath['title'] = Registry::getLang()->translateString('MY_ACCOUNT', 0, false);
         $aCatPath['link'] = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->getStaticUrl($oCompare->getViewConfig()->getSelfLink() . 'cl=account');
@@ -300,15 +302,15 @@ class CompareControllerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testChangeArtListOrderWithNotExistingProduct()
     {
-        $oSubj = $this->getProxyClass("Compare");
-        $aItems = array("1126" => true, "nonExistingVal" => true, "1127" => true);
+        $oSubj = $this->getProxyClass('Compare');
+        $aItems = ['1126' => true, 'nonExistingVal' => true, '1127' => true];
         $oArtList = oxNew('oxArticleList');
         $oArtList->loadIds(array_keys($aItems));
 
         $oResList = $oSubj->UNITchangeArtListOrder($aItems, $oArtList);
 
-        $this->assertArrayHasKey("1126", $oResList);
-        $this->assertArrayNotHasKey("nonExistingVal", $oResList);
-        $this->assertArrayHasKey("1127", $oResList);
+        $this->assertArrayHasKey('1126', $oResList);
+        $this->assertArrayNotHasKey('nonExistingVal', $oResList);
+        $this->assertArrayHasKey('1127', $oResList);
     }
 }

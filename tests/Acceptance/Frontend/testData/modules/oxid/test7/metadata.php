@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -21,14 +22,14 @@
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'test7',
     'title'        => 'Test module #7',
     'description'  => 'Appends test7 to content title',
     'thumbnail'    => 'module.png',
     'version'      => '1.0',
     'author'       => 'OXID',
-    'extend'      => array(
-        'content' => 'oxid/test7/view/myinfo7'
-    )
-);
+    'extend'      => [
+        'content' => 'oxid/test7/view/myinfo7',
+    ],
+];

@@ -24,7 +24,7 @@ namespace OxidEsales\EshopCommunity\Core;
 /**
  * Including pictures generator functions file
  */
-require_once __DIR__ . "/utils/oxpicgenerator.php";
+require_once __DIR__ . '/utils/oxpicgenerator.php';
 
 /**
  * Image manipulation class
@@ -36,7 +36,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aImageTypes = ["GIF" => IMAGETYPE_GIF, "JPG" => IMAGETYPE_JPEG, "PNG" => IMAGETYPE_PNG, "JPEG" => IMAGETYPE_JPEG];
+    protected $_aImageTypes = ['GIF' => IMAGETYPE_GIF, 'JPG' => IMAGETYPE_JPEG, 'PNG' => IMAGETYPE_PNG, 'JPEG' => IMAGETYPE_JPEG];
 
     /**
      * Resizes image to desired width and height, returns true on success.
@@ -119,7 +119,6 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
         return $blDeleted;
     }
 
-
     /**
      * Checks if current picture file is used in more than one table entry, returns
      * true if one, false if more than one.
@@ -159,7 +158,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
         $query = "SELECT count(*) FROM $sTable WHERE $sField = :picturename group by $sField ";
 
         return $masterDb->getOne($query, [
-            ':picturename' => (string) $sPicName
+            ':picturename' => (string) $sPicName,
         ]);
     }
 
@@ -228,21 +227,21 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
      */
     protected function _resize($aImageInfo, $sSrc, $hDestinationImage, $sTarget, $iNewWidth, $iNewHeight, $iGdVer, $blDisableTouch, $iDefQuality) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        startProfile("PICTURE_RESIZE");
+        startProfile('PICTURE_RESIZE');
 
         $blSuccess = false;
         switch ($aImageInfo[2]) { //Image type
-            case ($this->_aImageTypes["GIF"]):
+            case ($this->_aImageTypes['GIF']):
                 //php does not process gifs until 7th July 2004 (see lzh licensing)
-                if (function_exists("imagegif")) {
+                if (function_exists('imagegif')) {
                     $blSuccess = resizeGif($sSrc, $sTarget, $iNewWidth, $iNewHeight, $aImageInfo[0], $aImageInfo[1], $iGdVer);
                 }
                 break;
-            case ($this->_aImageTypes["JPEG"]):
-            case ($this->_aImageTypes["JPG"]):
+            case ($this->_aImageTypes['JPEG']):
+            case ($this->_aImageTypes['JPG']):
                 $blSuccess = resizeJpeg($sSrc, $sTarget, $iNewWidth, $iNewHeight, $aImageInfo, $iGdVer, $hDestinationImage, $iDefQuality);
                 break;
-            case ($this->_aImageTypes["PNG"]):
+            case ($this->_aImageTypes['PNG']):
                 $blSuccess = resizePng($sSrc, $sTarget, $iNewWidth, $iNewHeight, $aImageInfo, $iGdVer, $hDestinationImage);
                 break;
         }
@@ -251,7 +250,7 @@ class UtilsPic extends \OxidEsales\Eshop\Core\Base
             @touch($sTarget);
         }
 
-        stopProfile("PICTURE_RESIZE");
+        stopProfile('PICTURE_RESIZE');
 
         return $blSuccess;
     }

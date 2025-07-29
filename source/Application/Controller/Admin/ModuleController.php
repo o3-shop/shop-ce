@@ -41,6 +41,6 @@ class ModuleController extends AdminController
     {
         parent::render();
 
-        return "module.tpl";
+        return 'module.tpl';
     }
 }

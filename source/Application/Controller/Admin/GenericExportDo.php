@@ -39,28 +39,28 @@ class GenericExportDo extends DynamicExportBaseController
      *
      * @var string
      */
-    public $sClassDo = "genExport_do";
+    public $sClassDo = 'genExport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genExport_main";
+    public $sClassMain = 'genExport_main';
 
     /**
      * Export file name
      *
      * @var string
      */
-    public $sExportFileName = "genexport";
+    public $sExportFileName = 'genexport';
 
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "dynbase_do.tpl";
+    protected $_sThisTemplate = 'dynbase_do.tpl';
 
     /**
      * Does Export line by line on position iCnt
@@ -79,17 +79,17 @@ class GenericExportDo extends DynamicExportBaseController
         if ($oArticle = $this->getOneArticle($iCnt, $blContinue)) {
             $myConfig = Registry::getConfig();
             $context = [
-                "sCustomHeader" => Registry::getSession()->getVariable("sExportCustomHeader"),
-                "linenr"        => $iCnt,
-                "article"       => $oArticle,
-                "spr"           => $myConfig->getConfigParam('sCSVSign'),
-                "encl"          => $myConfig->getConfigParam('sGiCsvFieldEncloser')
+                'sCustomHeader' => Registry::getSession()->getVariable('sExportCustomHeader'),
+                'linenr'        => $iCnt,
+                'article'       => $oArticle,
+                'spr'           => $myConfig->getConfigParam('sCSVSign'),
+                'encl'          => $myConfig->getConfigParam('sGiCsvFieldEncloser'),
             ];
             $context['oxEngineTemplateId'] = $this->getViewId();
 
             $this->write(
                 $this->getRenderer()->renderTemplate(
-                    "genexport.tpl",
+                    'genexport.tpl',
                     $context
                 )
             );
@@ -121,8 +121,8 @@ class GenericExportDo extends DynamicExportBaseController
     {
         $sLine = $this->removeSID($sLine);
 
-        $sLine = str_replace(["\r\n", "\n"], "", $sLine);
-        $sLine = str_replace("<br>", "\n", $sLine);
+        $sLine = str_replace(["\r\n", "\n"], '', $sLine);
+        $sLine = str_replace('<br>', "\n", $sLine);
 
         fwrite($this->fpFile, $sLine . "\n");
     }

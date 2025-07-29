@@ -41,19 +41,19 @@ class RssFeed extends Base
     /**
      * timeout in seconds for regenerating data (3h)
      */
-    const CACHE_TTL = 10800;
+    public const CACHE_TTL = 10800;
 
     /**
      * Rss data Ids for cache
      */
-    const RSS_TOPSHOP = 'RSS_TopShop';
-    const RSS_NEWARTS = 'RSS_NewArts';
-    const RSS_CATARTS = 'RSS_CatArts';
+    public const RSS_TOPSHOP = 'RSS_TopShop';
+    public const RSS_NEWARTS = 'RSS_NewArts';
+    public const RSS_CATARTS = 'RSS_CatArts';
     // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
-    const RSS_ARTRECOMMLISTS = 'RSS_ARTRECOMMLISTS';
-    const RSS_RECOMMLISTARTS = 'RSS_RECOMMLISTARTS';
+    public const RSS_ARTRECOMMLISTS = 'RSS_ARTRECOMMLISTS';
+    public const RSS_RECOMMLISTARTS = 'RSS_RECOMMLISTARTS';
     // END deprecated
-    const RSS_BARGAIN = 'RSS_Bargain';
+    public const RSS_BARGAIN = 'RSS_Bargain';
 
     /**
      * _aChannel channel data to be passed to view
@@ -75,7 +75,7 @@ class RssFeed extends Base
         $aOxActionToCacheIds = [
             'oxbargain' => 'RSS_BARGAIN',
             'oxtop5' => 'RSS_TopShop',
-            'oxnewest' => 'RSS_NewArts'
+            'oxnewest' => 'RSS_NewArts',
         ];
 
         $sFileCacheName = $aOxActionToCacheIds[$sOxActionId];
@@ -181,7 +181,6 @@ class RssFeed extends Base
         return false;
     }
 
-
     /**
      * _getLastBuildDate check if changed data and renew last build date if needed
      * returns result as string
@@ -226,7 +225,6 @@ class RssFeed extends Base
 
         return Registry::getUtils()->toFileCache($this->_getCacheId($name), $aData);
     }
-
 
     /**
      * _getArticleItems create channel items from article list
@@ -336,7 +334,7 @@ class RssFeed extends Base
     {
         $oShop = Registry::getConfig()->getActiveShop();
 
-        return $oShop->oxshops__oxname->value . "/" . $sTitle;
+        return $oShop->oxshops__oxname->value . '/' . $sTitle;
     }
 
     /**
@@ -421,7 +419,7 @@ class RssFeed extends Base
      */
     public function getTopInShopUrl()
     {
-        return $this->_prepareUrl("cl=rss&amp;fnc=topshop", $this->getTopInShopTitle());
+        return $this->_prepareUrl('cl=rss&amp;fnc=topshop', $this->getTopInShopTitle());
     }
 
     /**
@@ -450,7 +448,6 @@ class RssFeed extends Base
         );
     }
 
-
     /**
      * get title for 'Newest Shop Articles' rss feed
      *
@@ -475,7 +472,7 @@ class RssFeed extends Base
      */
     public function getNewestArticlesUrl()
     {
-        return $this->_prepareUrl("cl=rss&amp;fnc=newarts", $this->getNewestArticlesTitle());
+        return $this->_prepareUrl('cl=rss&amp;fnc=newarts', $this->getNewestArticlesTitle());
     }
 
     /**
@@ -502,7 +499,6 @@ class RssFeed extends Base
             $this->getNewestArticlesUrl()
         );
     }
-
 
     /**
      * get title for 'Category Articles' rss feed
@@ -561,7 +557,7 @@ class RssFeed extends Base
         $oLang = Registry::getLang();
 
         return $this->_prepareUrl(
-            "cl=rss&amp;fnc=catarts&amp;cat=" . urlencode($oCat->getId()),
+            'cl=rss&amp;fnc=catarts&amp;cat=' . urlencode($oCat->getId()),
             sprintf($oLang->translateString('CATEGORY_PRODUCTS_S', $oLang->getBaseLanguage()), $oCat->oxcategories__oxtitle->value)
         );
     }
@@ -599,7 +595,6 @@ class RssFeed extends Base
         );
     }
 
-
     /**
      * get title for 'Search Articles' rss feed
      *
@@ -632,17 +627,17 @@ class RssFeed extends Base
      */
     protected function _getSearchParamsUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sParams = "searchparam=" . urlencode($sSearch);
+        $sParams = 'searchparam=' . urlencode($sSearch);
         if ($sCatId) {
-            $sParams .= "&amp;searchcnid=" . urlencode($sCatId);
+            $sParams .= '&amp;searchcnid=' . urlencode($sCatId);
         }
 
         if ($sVendorId) {
-            $sParams .= "&amp;searchvendor=" . urlencode($sVendorId);
+            $sParams .= '&amp;searchvendor=' . urlencode($sVendorId);
         }
 
         if ($sManufacturerId) {
-            $sParams .= "&amp;searchmanufacturer=" . urlencode($sManufacturerId);
+            $sParams .= '&amp;searchmanufacturer=' . urlencode($sManufacturerId);
         }
 
         return $sParams;
@@ -726,7 +721,7 @@ class RssFeed extends Base
     public function getSearchArticlesUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId)
     {
         $oLang = Registry::getLang();
-        $sUrl = $this->_prepareUrl("cl=rss&amp;fnc=searcharts", $oLang->translateString('SEARCH', $oLang->getBaseLanguage()));
+        $sUrl = $this->_prepareUrl('cl=rss&amp;fnc=searcharts', $oLang->translateString('SEARCH', $oLang->getBaseLanguage()));
 
         $sJoin = '?';
         if (strpos($sUrl, '?') !== false) {
@@ -767,7 +762,7 @@ class RssFeed extends Base
             $this->_getSearchParamsTranslation('SEARCH_FOR_PRODUCTS_CATEGORY_VENDOR_MANUFACTURER', Str::getStr()->htmlspecialchars($sSearch), $sCatId, $sVendorId, $sManufacturerId),
             $this->_getArticleItems($oArtList),
             $this->getSearchArticlesUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId),
-            $this->_getShopUrl() . "cl=search&amp;" . $this->_getSearchParamsUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId)
+            $this->_getShopUrl() . 'cl=search&amp;' . $this->_getSearchParamsUrl($sSearch, $sCatId, $sVendorId, $sManufacturerId)
         );
     }
 
@@ -803,8 +798,8 @@ class RssFeed extends Base
         $iLang = $oLang->getBaseLanguage();
 
         return $this->_prepareUrl(
-            "cl=rss&amp;fnc=recommlists&amp;anid=" . $oArticle->getId(),
-            $oLang->translateString("LISTMANIA", $iLang) . "/" . $oArticle->oxarticles__oxtitle->value
+            'cl=rss&amp;fnc=recommlists&amp;anid=' . $oArticle->getId(),
+            $oLang->translateString('LISTMANIA', $iLang) . '/' . $oArticle->oxarticles__oxtitle->value
         );
     }
 
@@ -902,8 +897,8 @@ class RssFeed extends Base
         $iLang = $oLang->getBaseLanguage();
 
         return $this->_prepareUrl(
-            "cl=rss&amp;fnc=recommlistarts&amp;recommid=" . $oRecommList->getId(),
-            $oLang->translateString("LISTMANIA", $iLang) . "/" . $oRecommList->oxrecommlists__oxtitle->value
+            'cl=rss&amp;fnc=recommlistarts&amp;recommid=' . $oRecommList->getId(),
+            $oLang->translateString('LISTMANIA', $iLang) . '/' . $oRecommList->oxrecommlists__oxtitle->value
         );
     }
 
@@ -961,7 +956,7 @@ class RssFeed extends Base
      */
     public function getBargainUrl()
     {
-        return $this->_prepareUrl("cl=rss&amp;fnc=bargain", $this->getBargainTitle());
+        return $this->_prepareUrl('cl=rss&amp;fnc=bargain', $this->getBargainTitle());
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,13 +22,13 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapter;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\EventsValidator;
-use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\ModuleEvents;
-use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\Event;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ModuleSettingNotValidException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\EventsValidator;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapter;
+use OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\TestData\TestModule\ModuleEvents;
+use PHPUnit\Framework\TestCase;
 
 class EventsModuleSettingValidatorTest extends TestCase
 {
@@ -89,7 +91,7 @@ class EventsModuleSettingValidatorTest extends TestCase
     {
         return [
             [new Event('invalidEvent', 'noCallableMethod')],
-            [new Event('', '')]
+            [new Event('', '')],
         ];
     }
 

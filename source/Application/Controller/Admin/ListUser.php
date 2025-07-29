@@ -57,8 +57,8 @@ class ListUser extends UserList
     public function render()
     {
         parent::render();
-        $this->_aViewData["menustructure"] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
+        $this->_aViewData['menustructure'] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
 
-        return "list_user.tpl";
+        return 'list_user.tpl';
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxI18n;
-use \stdClass;
-use \oxField;
-use \oxlist;
-use \oxListObject;
+use oxField;
+use oxI18n;
+use oxlist;
+use oxListObject;
+use stdClass;
 
 class TestElement extends oxI18n
 {
@@ -45,8 +47,8 @@ class ListTest extends \OxidTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->_oList = oxNew("oxlist");
-        $this->_oList->init("oxtest", "oxtest");
+        $this->_oList = oxNew('oxlist');
+        $this->_oList->init('oxtest', 'oxtest');
     }
 
     /**
@@ -63,23 +65,23 @@ class ListTest extends \OxidTestCase
     public function testSplArrayAccess()
     {
         $oTest = new stdClass();
-        $oTest->sTest = "HELLO";
+        $oTest->sTest = 'HELLO';
 
         $this->_oList[1] = $oTest;
 
         $oRes = $this->_oList[1];
 
-        $this->assertEquals("HELLO", $oRes->sTest);
+        $this->assertEquals('HELLO', $oRes->sTest);
     }
 
     public function testSplIterator()
     {
         $oTest = new stdClass();
-        $oTest->sTest = "HELLO";
+        $oTest->sTest = 'HELLO';
         $this->_oList[] = $oTest;
 
         $oTest = new stdClass();
-        $oTest->sTest = " AGAIN";
+        $oTest->sTest = ' AGAIN';
         $this->_oList[] = $oTest;
 
         $sTest = '';
@@ -87,18 +89,18 @@ class ListTest extends \OxidTestCase
             $sTest .= $oObject->sTest;
         }
 
-        $this->assertEquals("HELLO AGAIN", $sTest);
+        $this->assertEquals('HELLO AGAIN', $sTest);
     }
 
     public function testAssign()
     {
         $oTest = oxNew('oxList');
-        $oTest[] = "A";
-        $oTest[] = "B";
-        $oTest[] = "C";
-        $oTest[] = "D";
+        $oTest[] = 'A';
+        $oTest[] = 'B';
+        $oTest[] = 'C';
+        $oTest[] = 'D';
 
-        $aTest = array(1, 2, 3);
+        $aTest = [1, 2, 3];
 
         $oTest->assign($aTest);
 
@@ -112,12 +114,11 @@ class ListTest extends \OxidTestCase
 
     public function testAssignArray()
     {
-        $aData = array();
-        $aData[] = array('oxid' => 1, 'oxtitle' => 'name1');
-        $aData[] = array('oxid' => 2, 'oxtitle' => 'name2');
-        $aData[] = array('oxid' => 3, 'oxtitle' => 'name3');
-        $aData[] = array('oxid' => 4, 'oxtitle' => 'name4');
-
+        $aData = [];
+        $aData[] = ['oxid' => 1, 'oxtitle' => 'name1'];
+        $aData[] = ['oxid' => 2, 'oxtitle' => 'name2'];
+        $aData[] = ['oxid' => 3, 'oxtitle' => 'name3'];
+        $aData[] = ['oxid' => 4, 'oxtitle' => 'name4'];
 
         $oList = oxNew('oxList');
         $oList->init('oxCategory');
@@ -136,15 +137,15 @@ class ListTest extends \OxidTestCase
     public function testSplCount()
     {
         $oTest = new stdClass();
-        $oTest->sTest = "HELLO";
+        $oTest->sTest = 'HELLO';
         $this->_oList[] = $oTest;
 
         $oTest = new stdClass();
-        $oTest->sTest = " AGAIN";
+        $oTest->sTest = ' AGAIN';
         $this->_oList[] = $oTest;
 
         $oTest = new stdClass();
-        $oTest->sTest = " !";
+        $oTest->sTest = ' !';
         $this->_oList[] = $oTest;
 
         $this->assertEquals(3, count($this->_oList));
@@ -154,11 +155,11 @@ class ListTest extends \OxidTestCase
     public function testClear()
     {
         $oTest = new stdClass();
-        $oTest->sTest = "HELLO";
+        $oTest->sTest = 'HELLO';
         $this->_oList[] = $oTest;
 
         $oTest = new stdClass();
-        $oTest->sTest = " AGAIN";
+        $oTest->sTest = ' AGAIN';
         $this->_oList[] = $oTest;
 
         $this->_oList->clear();
@@ -169,33 +170,33 @@ class ListTest extends \OxidTestCase
     public function testOxidAsIndex()
     {
         $oTest = new stdClass();
-        $oTest->oxtest__oxid = new oxField("123", oxField::T_RAW);
+        $oTest->oxtest__oxid = new oxField('123', oxField::T_RAW);
         $oTest->oxtest__oxany = new oxField('test', oxField::T_RAW);
         $this->_oList[] = $oTest;
-        $this->assertTrue(isset($this->_oList["123"]));
+        $this->assertTrue(isset($this->_oList['123']));
         $this->assertFalse(isset($this->_oList[0]));
-        $this->assertEquals($this->_oList["123"]->oxtest__oxany->value, 'test');
+        $this->assertEquals($this->_oList['123']->oxtest__oxany->value, 'test');
     }
 
     public function testSelectString()
     {
-        $oAction = oxNew("oxBase");
+        $oAction = oxNew('oxBase');
         $oAction->init('oxactions');
         $oAction->setId('_test1');
         $oAction->oxactions__oxtitle = new oxField('action1', oxField::T_RAW);
         $oAction->save();
 
-        $oAction = oxNew("oxBase");
+        $oAction = oxNew('oxBase');
         $oAction->init('oxactions');
         $oAction->setId('_test2');
         $oAction->oxactions__oxtitle = new oxField('action2', oxField::T_RAW);
         $oAction->save();
 
-        $oAction = oxNew("oxBase");
+        $oAction = oxNew('oxBase');
         $oAction->init('oxactions');
         $oAction->blIsClonedAndKeptProperty = true;
 
-        $oList = $this->getMock(\OxidEsales\Eshop\Core\Model\ListModel::class, array('getBaseObject'));
+        $oList = $this->getMock(\OxidEsales\Eshop\Core\Model\ListModel::class, ['getBaseObject']);
         $oList->expects($this->once())->method('getBaseObject')->will($this->returnValue($oAction));
         $oList->init('oxactions');
 
@@ -213,13 +214,13 @@ class ListTest extends \OxidTestCase
 
     public function testSelectStringIfLimitIsSet()
     {
-        $oAction = oxNew("oxBase");
+        $oAction = oxNew('oxBase');
         $oAction->init('oxactions');
         $oAction->setId('_test1');
         $oAction->oxactions__oxtitle = new oxField('action1', oxField::T_RAW);
         $oAction->save();
 
-        $oAction = oxNew("oxBase");
+        $oAction = oxNew('oxBase');
         $oAction->init('oxactions');
         $oAction->setId('_test2');
         $oAction->oxactions__oxtitle = new oxField('action2', oxField::T_RAW);
@@ -258,8 +259,8 @@ class ListTest extends \OxidTestCase
 
     public function testSelectStringEmpty()
     {
-        $oList = oxNew("oxlist");
-        $oList->init("oxBase", "oxactions");
+        $oList = oxNew('oxlist');
+        $oList->init('oxBase', 'oxactions');
         $oList->selectString("select * from oxactions where oxid = 'non existant' ");
         $this->assertEquals(0, $oList->count());
     }
@@ -267,25 +268,25 @@ class ListTest extends \OxidTestCase
     public function testContainsFieldValue()
     {
         $oTest = new stdClass();
-        $oTest->oxtest__oxid = new oxField("123", oxField::T_RAW);
+        $oTest->oxtest__oxid = new oxField('123', oxField::T_RAW);
         $oTest->oxtest__oxany = new oxField('test', oxField::T_RAW);
         $this->_oList[] = $oTest;
-        $this->assertTrue($this->_oList->containsFieldValue('test', "oxany"));
-        $this->assertFalse($this->_oList->containsFieldValue('test', "oxid"));
-        $this->assertFalse($this->_oList->containsFieldValue('test', "none"));
+        $this->assertTrue($this->_oList->containsFieldValue('test', 'oxany'));
+        $this->assertFalse($this->_oList->containsFieldValue('test', 'oxid'));
+        $this->assertFalse($this->_oList->containsFieldValue('test', 'none'));
     }
 
     public function testGetList()
     {
-        $oList = oxNew("oxcountrylist");
+        $oList = oxNew('oxcountrylist');
         $oList->getList();
         $this->assertEquals(5, count($oList));
-        $this->assertEquals("DE", $oList["a7c40f631fc920687.20179984"]->oxcountry__oxisoalpha2->value);
+        $this->assertEquals('DE', $oList['a7c40f631fc920687.20179984']->oxcountry__oxisoalpha2->value);
     }
 
     public function testGetListReturns()
     {
-        $oList = oxNew("oxcountrylist");
+        $oList = oxNew('oxcountrylist');
         $oReturn = $oList->getList();
         $this->assertEquals($oReturn, $oList);
     }
@@ -295,7 +296,7 @@ class ListTest extends \OxidTestCase
         $oList = oxNew('oxlist');
         $oList->offsetSet('xxx', 'yyy');
 
-        $this->assertEquals(array('xxx' => 'yyy'), $oList->getArray());
+        $this->assertEquals(['xxx' => 'yyy'], $oList->getArray());
     }
 
     public function testOffsetGet()
@@ -318,10 +319,10 @@ class ListTest extends \OxidTestCase
 
     public function testArrayKeys()
     {
-        $aArray = array('a' => 'a1',
+        $aArray = ['a' => 'a1',
                         'b' => 'b1',
                         'c' => 'c1',
-                        'd' => 'd1');
+                        'd' => 'd1'];
 
         $oList = oxNew('oxlist');
         $oList->assign($aArray);
@@ -331,19 +332,19 @@ class ListTest extends \OxidTestCase
 
     public function testReverse()
     {
-        $aArray = array('a' => 'a1', 'b' => 'b1');
+        $aArray = ['a' => 'a1', 'b' => 'b1'];
 
         $oList = oxNew('oxlist');
         $oList->assign($aArray);
 
-        $this->assertEquals($aArray = array('b' => 'b1', 'a' => 'a1'), $oList->reverse());
+        $this->assertEquals($aArray = ['b' => 'b1', 'a' => 'a1'], $oList->reverse());
     }
 
     public function testSetsInListAttritbue()
     {
-        $sQ = "select * from oxarticles limit 0,5";
+        $sQ = 'select * from oxarticles limit 0,5';
         $oSubj = oxNew('oxList');
-        $oSubj->init(\OxidEsales\EshopCommunity\Tests\Unit\Core\TestElement::class, "oxarticles");
+        $oSubj->init(\OxidEsales\EshopCommunity\Tests\Unit\Core\TestElement::class, 'oxarticles');
         $oSubj->selectString($sQ);
 
         $oElement = new TestElement();
@@ -356,11 +357,11 @@ class ListTest extends \OxidTestCase
 
     public function testAssignElement()
     {
-        $aDbFields = array("field1" => "val1");
-        $oListObjectMock = $this->getMock(\OxidEsales\Eshop\Core\Model\BaseModel::class, array('assign'));
+        $aDbFields = ['field1' => 'val1'];
+        $oListObjectMock = $this->getMock(\OxidEsales\Eshop\Core\Model\BaseModel::class, ['assign']);
         $oListObjectMock->expects($this->once())->method('assign')->with($aDbFields);
 
-        $oSubj = $this->getProxyClass("oxList");
+        $oSubj = $this->getProxyClass('oxList');
         $oSubj->UNITassignElement($oListObjectMock, $aDbFields);
     }
 
@@ -371,16 +372,16 @@ class ListTest extends \OxidTestCase
      */
     public function testGetFieldLongName()
     {
-        $sFieldName = "testFieldNames";
-        $sCoreTable = "testCoreTable";
+        $sFieldName = 'testFieldNames';
+        $sCoreTable = 'testCoreTable';
 
-        $oSubj = $this->getProxyClass("oxList");
+        $oSubj = $this->getProxyClass('oxList');
 
-        $oSubj->setNonPublicVar("_sCoreTable", "");
+        $oSubj->setNonPublicVar('_sCoreTable', '');
         $this->assertEquals($sFieldName, $oSubj->UNITgetFieldLongName($sFieldName));
 
-        $oSubj->setNonPublicVar("_sCoreTable", $sCoreTable);
-        $this->assertEquals($sCoreTable . "__" . $sFieldName, $oSubj->UNITgetFieldLongName($sFieldName));
+        $oSubj->setNonPublicVar('_sCoreTable', $sCoreTable);
+        $this->assertEquals($sCoreTable . '__' . $sFieldName, $oSubj->UNITgetFieldLongName($sFieldName));
     }
 
     public function testUnsetForeach()
@@ -477,10 +478,10 @@ class ListTest extends \OxidTestCase
      */
     public function testRewind()
     {
-        $aArray = array(1 => '1',
+        $aArray = [1 => '1',
                         2 => '2',
                         3 => '3',
-                        4 => '4');
+                        4 => '4'];
 
         $oList = oxNew('oxlist');
         $oList->assign($aArray);

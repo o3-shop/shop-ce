@@ -39,12 +39,12 @@ class AdminNavigation extends AdminDetailsController
 
         parent::render();
 
-        $this->addTplParam("oxid", $this->getEditObjectId());
+        $this->addTplParam('oxid', $this->getEditObjectId());
 
         $roleElementsList = oxNew(RightsRolesElementsList::class);
         $this->addTplParam('roleElementsList', $roleElementsList);
 
-        return "adminnavigation.tpl";
+        return 'adminnavigation.tpl';
     }
 
     public function save()

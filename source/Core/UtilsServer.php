@@ -64,7 +64,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
      *
      * @return bool
      */
-    public function setOxCookie($sName, $sValue = "", $iExpire = 0, $sPath = '/', $sDomain = null, $blToSession = true, $blSecure = false, $blHttpOnly = true)
+    public function setOxCookie($sName, $sValue = '', $iExpire = 0, $sPath = '/', $sDomain = null, $blToSession = true, $blSecure = false, $blHttpOnly = true)
     {
         if ($blToSession && !$this->isAdmin()) {
             $this->_saveSessionCookie($sName, $sValue, $iExpire, $sPath, $sDomain);
@@ -202,7 +202,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         }
 
         // from php doc: .. You may also replace an argument with an empty string ("") in order to skip that argument..
-        return $sPath ? $sPath : "";
+        return $sPath ? $sPath : '';
     }
 
     /**
@@ -218,7 +218,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
      */
     protected function _getCookieDomain($sDomain) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sDomain = $sDomain ? $sDomain : "";
+        $sDomain = $sDomain ? $sDomain : '';
 
         // on special cases, like separate domain for SSL, cookies must be defined on domain specific path
         // please have a look at
@@ -262,13 +262,13 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
      */
     public function getRemoteAddress()
     {
-        if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-            $sIP = $_SERVER["HTTP_X_FORWARDED_FOR"];
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $sIP = $_SERVER['HTTP_X_FORWARDED_FOR'];
             $sIP = preg_replace('/,.*$/', '', $sIP);
-        } elseif (isset($_SERVER["HTTP_CLIENT_IP"])) {
-            $sIP = $_SERVER["HTTP_CLIENT_IP"];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $sIP = $_SERVER['HTTP_CLIENT_IP'];
         } else {
-            $sIP = $_SERVER["REMOTE_ADDR"];
+            $sIP = $_SERVER['REMOTE_ADDR'];
         }
 
         return $sIP;
@@ -317,7 +317,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
 
         $passwordServiceBridge = $this->getContainer()->get(PasswordServiceBridgeInterface::class);
 
-        $this->_aUserCookie[$shopId] = $userName . '@@@' .  $passwordServiceBridge->hash($passwordHash . $salt);
+        $this->_aUserCookie[$shopId] = $userName . '@@@' . $passwordServiceBridge->hash($passwordHash . $salt);
         $this->setOxCookie('oxid_' . $shopId, $this->_aUserCookie[$shopId], \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $timeout, '/', null, true, $blSsl);
         $this->setOxCookie('oxid_' . $shopId . '_autologin', '1', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime() + $timeout, '/', null, true, false);
     }
@@ -378,7 +378,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     public function isTrustedClientIp()
     {
         $blTrusted = false;
-        $aTrustedIPs = (array) $this->getConfig()->getConfigParam("aTrustedIPs");
+        $aTrustedIPs = (array) $this->getConfig()->getConfigParam('aTrustedIPs');
         if (count($aTrustedIPs)) {
             $blTrusted = in_array($this->getRemoteAddress(), $aTrustedIPs);
         }
@@ -396,7 +396,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     public function processUserAgentInfo($sAgent)
     {
         if ($sAgent) {
-            $sAgent = getStr()->preg_replace("/MSIE(\s)?(\S)*(\s)/", "", (string) $sAgent);
+            $sAgent = getStr()->preg_replace("/MSIE(\s)?(\S)*(\s)/", '', (string) $sAgent);
         }
 
         return $sAgent;
@@ -412,7 +412,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
     public function isCurrentUrl($sURL)
     {
         // Missing protocol, cannot proceed, assuming true.
-        if (!$sURL || (strpos($sURL, "http") !== 0)) {
+        if (!$sURL || (strpos($sURL, 'http') !== 0)) {
             return true;
         }
 
@@ -447,8 +447,7 @@ class UtilsServer extends \OxidEsales\Eshop\Core\Base
         $sUrlHost = isset($matches[3]) ? $matches[3] : null;
 
         preg_match("/^(https?:\/\/)?(www\.)?([^\/]+)/i", $sServerHost, $matches);
-        $sRealHost =  isset($matches[3]) ? $matches[3] : null;
-
+        $sRealHost = isset($matches[3]) ? $matches[3] : null;
 
         //fetch the path from SCRIPT_NAME and ad it to the $sServerHost
         $sScriptName = $this->getServerVar('SCRIPT_NAME');

@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: brutto
@@ -17,34 +18,31 @@
  * Short description:
  * if in shop there are two products with different VATs. and both products have same total value
  */
-$aData = array(
+$aData = [
     // Product
-    'articles' => array(
-         0 => array(
+    'articles' => [
+         0 => [
             // oxarticles db fields
             'oxid'                     => 1001,
             'oxprice'                  => 20.00,
             'oxvat'                    => 10,
             // Amount in basket
             'amount'                   => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
             // oxarticles db fields
             'oxid'                     => 1002,
             'oxprice'                  => 200.00,
             'oxvat'                    => 19,
             // Amount in basket
             'amount'                   => 1,
-
-        ),
-
-    ),
+        ],
+    ],
     // Additional costs
-    'costs' => array(
-   
+    'costs' => [
         // Delivery
-        'delivery' => array(
-            0 => array(
+        'delivery' => [
+            0 => [
                 // oxdelivery DB fields
                 'oxactive' => 1,
                 'oxaddsum' => 55.00,
@@ -52,61 +50,60 @@ $aData = array(
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
         // Payment
-        'payment' => array(
-            0 => array(
+        'payment' => [
+            0 => [
                 // oxpayments DB fields
                 'oxaddsum' => 275,
                 'oxaddsumtype' => 'abs',
                 'oxfromamount' => 0,
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
 
     // TEST EXPECTATIONS
-    'expected' => array(
+    'expected' => [
         // Article expected prices: ARTICLE ID => ( Unit price, Total Price )
-        'articles' => array(
-            1001 => array( '20,00', '200,00' ),
-            1002 => array( '200,00', '200,00' ),
-        ),
+        'articles' => [
+            1001 => [ '20,00', '200,00' ],
+            1002 => [ '200,00', '200,00' ],
+        ],
         // Expectations of other totals
-        'totals' => array(
+        'totals' => [
             // Total BRUTTO
             'totalBrutto' => '400,00',
             // Total NETTO
             'totalNetto'  => '349,89',
             // Total VAT amount: vat% => total cost
-            'vats' => array(
+            'vats' => [
                 19 => '31,93',
                 10 => '18,18',
-
-            ),
+            ],
             // Total delivery amounts
-            'delivery' => array(
+            'delivery' => [
                 'brutto' => '261,80',
                 'netto' => '220,00',
-                'vat' => '41,80'
-            ),
+                'vat' => '41,80',
+            ],
             // Total payment amounts
-            'payment' => array(
+            'payment' => [
                 'brutto' => '327,25',
                 'netto' => '275,00',
-                'vat' => '52,25'
-            ),
-         
+                'vat' => '52,25',
+            ],
+
             // GRAND TOTAL
-            'grandTotal'  => '989,05'
-        ),
-    ),
+            'grandTotal'  => '989,05',
+        ],
+    ],
     // Test case options
-    'options' => array(
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'blShowVATForDelivery'=> true,
@@ -116,8 +113,8 @@ $aData = array(
             'blDeliveryVatOnTop' => true,
             'blPaymentVatOnTop' => true,
             'blWrappingVatOnTop' => true,
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

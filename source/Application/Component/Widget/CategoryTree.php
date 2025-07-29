@@ -19,10 +19,10 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace  OxidEsales\EshopCommunity\Application\Component\Widget;
+namespace OxidEsales\EshopCommunity\Application\Component\Widget;
 
-use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoaderInterface;
 
 /**
@@ -56,7 +56,7 @@ class CategoryTree extends \OxidEsales\Eshop\Application\Component\Widget\Widget
     {
         parent::render();
 
-        if ($sTpl = $this->getViewParameter("sWidgetType")) {
+        if ($sTpl = $this->getViewParameter('sWidgetType')) {
             $sTemplateName = 'widget/' . basename($sTpl) . '/categorylist.tpl';
             /** @var TemplateLoaderInterface $templateLoader */
             $templateLoader = $this->getContainer()->get('oxid_esales.templating.template.loader');
@@ -75,7 +75,7 @@ class CategoryTree extends \OxidEsales\Eshop\Application\Component\Widget\Widget
      */
     public function getDeepLevel()
     {
-        return $this->getViewParameter("deepLevel");
+        return $this->getViewParameter('deepLevel');
     }
 
     /**

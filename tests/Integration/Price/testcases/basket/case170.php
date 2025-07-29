@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: netto
@@ -17,101 +18,99 @@
  *  2. Delivery +
  * Short description:
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'                     => 9005,
             'oxprice'                  => 1001,
             'oxvat'                    => 19,
             'amount'                   => 3,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'                     => 9006,
             'oxprice'                  => 0.5,
             'oxvat'                    => 19,
             'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
             'oxid'         => 'shopdiscount50for9005',
             'oxaddsum'     => 50,
             'oxaddsumtype' => '%',
             'oxamount' => 1,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 9005 ),
+            'oxarticles' => [ 9005 ],
             'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'         => 'shopdiscount-10for9006',
             'oxaddsum'     => -10,
             'oxaddsumtype' => '%',
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 9006 ),
+            'oxarticles' => [ 9006 ],
             'oxsort' => 20,
-        ),
-
-
-    ),
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+        ],
+    ],
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxtitle' => '6_abs_del',
                 'oxactive' => 1,
                 'oxaddsum' => 10,
                 'oxaddsumtype' => '%',
                 'oxdeltype' => 'p',
                 'oxfinalize' => 2,
-                'oxparamend' => 99999
-            ),
-        ),
-        'payment' => array(
-            0 => array(
+                'oxparamend' => 99999,
+            ],
+        ],
+        'payment' => [
+            0 => [
                 'oxtitle' => '1 abs payment',
                 'oxaddsum' => 10,
                 'oxaddsumtype' => 'abs',
                 'oxfromamount' => 0,
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-             9005 => array( '595,60', '1.786,80' ),
-             9006 => array( '0,66', '0,66' ),
-        ),
-        'totals' => array(
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+             9005 => [ '595,60', '1.786,80' ],
+             9006 => [ '0,66', '0,66' ],
+        ],
+        'totals' => [
             'totalBrutto' => '1.787,46',
             'totalNetto'  => '1.502,07',
-            'vats' => array(
-                19 => '285,39'
-            ),
-            'delivery' => array(
+            'vats' => [
+                19 => '285,39',
+            ],
+            'delivery' => [
                 'brutto' => '178,75',
                 'netto' => '150,21',
-                'vat' => '28,54'
-            ),
-            'payment' => array(
+                'vat' => '28,54',
+            ],
+            'payment' => [
                 'brutto' => '10,00',
              //   'netto' => '8,40',
              //   'vat' => '1,60'
-            ),
-            'grandTotal'  => '1.976,21'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+            ],
+            'grandTotal'  => '1.976,21',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => true,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => true,
                 'sAdditionalServVATCalcMethod' => 'biggest_net',
                 'blShowVATForPayCharge' => false,
                 'blShowVATForDelivery' => true,
-        ),
+        ],
         'activeCurrencyRate' => 1.00,
-    ),
-);
+    ],
+];

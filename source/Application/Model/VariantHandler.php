@@ -46,7 +46,7 @@ class VariantHandler extends Base
      *
      * @var string
      */
-    protected $_sMdSeparator = " | ";
+    protected $_sMdSeparator = ' | ';
 
     /**
      * Multidimensional variant tree structure
@@ -77,7 +77,7 @@ class VariantHandler extends Base
     {
         $oMdVariants = oxNew(MdVariant::class);
         $oMdVariants->setParentId($sParentId);
-        $oMdVariants->setName("_parent_product_");
+        $oMdVariants->setName('_parent_product_');
         foreach ($oVariants as $sKey => $oVariant) {
             $aNames = explode(trim($this->_sMdSeparator), $oVariant->oxarticles__oxvarselect->value);
             foreach ($aNames as $sNameKey => $sName) {
@@ -115,20 +115,20 @@ class VariantHandler extends Base
             $oSel->setEnableMultilang(false);
             $oSel->init('oxselectlist');
             $oSel->load($sSelId);
-            $sVarNameUpdate = "";
+            $sVarNameUpdate = '';
             foreach ($aConfLanguages as $sKey => $sLang) {
                 $sPrefix = $myLang->getLanguageTag($sKey);
-                $aSelValues = $myUtils->assignValuesFromText($oSel->{"oxselectlist__oxvaldesc" . $sPrefix}->value);
+                $aSelValues = $myUtils->assignValuesFromText($oSel->{'oxselectlist__oxvaldesc' . $sPrefix}->value);
                 foreach ($aSelValues as $sI => $oValue) {
                     $aValues[$sI][$sKey] = $oValue;
                 }
-                $aSelTitle[$sKey] = $oSel->{"oxselectlist__oxtitle" . $sPrefix}->value;
+                $aSelTitle[$sKey] = $oSel->{'oxselectlist__oxtitle' . $sPrefix}->value;
                 $sMdSeparator = ($oArticle->oxarticles__oxvarname->value) ? $this->_sMdSeparator : '';
                 if ($sVarNameUpdate) {
-                    $sVarNameUpdate .= ", ";
+                    $sVarNameUpdate .= ', ';
                 }
                 $sVarName = DatabaseProvider::getDb()->quote($sMdSeparator . $aSelTitle[$sKey]);
-                $sVarNameUpdate .= "oxvarname" . $sPrefix . " = CONCAT(oxvarname" . $sPrefix . ", " . $sVarName . ")";
+                $sVarNameUpdate .= 'oxvarname' . $sPrefix . ' = CONCAT(oxvarname' . $sPrefix . ', ' . $sVarName . ')';
             }
             $oMDVariants = $this->_assignValues($aValues, $oVariants, $oArticle, $aConfLanguages);
             if ($myConfig->getConfigParam('blUseMultidimensionVariants')) {
@@ -175,8 +175,8 @@ class VariantHandler extends Base
                         foreach ($aConfLanguages as $sKey => $sLang) {
                             $oValue = $aValues[$i][$sKey];
                             $sPrefix = $myLang->getLanguageTag($sKey);
-                            $aVarselect[$oSimpleVariant->oxarticles__oxid->value][$sKey] = $oVariant->{"oxarticles__oxvarselect" . $sPrefix}->value;
-                            $oVariant->{'oxarticles__oxvarselect' . $sPrefix}->setValue($oVariant->{"oxarticles__oxvarselect" . $sPrefix}->value . $this->_sMdSeparator . $oValue->name);
+                            $aVarselect[$oSimpleVariant->oxarticles__oxid->value][$sKey] = $oVariant->{'oxarticles__oxvarselect' . $sPrefix}->value;
+                            $oVariant->{'oxarticles__oxvarselect' . $sPrefix}->setValue($oVariant->{'oxarticles__oxvarselect' . $sPrefix}->value . $this->_sMdSeparator . $oValue->name);
                         }
                         $oVariant->oxarticles__oxsort->setValue($oVariant->oxarticles__oxsort->value * 10);
                         $oVariant->save();
@@ -188,7 +188,7 @@ class VariantHandler extends Base
                             $sPrefix = $myLang->getLanguageTag($sKey);
                             $aParams['oxarticles__oxvarselect' . $sPrefix] = $sVarselect . $this->_sMdSeparator . $oValue->name;
                         }
-                        $aParams['oxarticles__oxartnum'] = $oSimpleVariant->oxarticles__oxartnum->value . "-" . $iCounter;
+                        $aParams['oxarticles__oxartnum'] = $oSimpleVariant->oxarticles__oxartnum->value . '-' . $iCounter;
                         $aParams['oxarticles__oxprice'] = $oSimpleVariant->oxarticles__oxprice->value + $dPriceMod;
                         $aParams['oxarticles__oxsort'] = $oSimpleVariant->oxarticles__oxsort->value * 10 + 10 * $iCounter;
                         $aParams['oxarticles__oxstock'] = 0;
@@ -198,7 +198,7 @@ class VariantHandler extends Base
                         if ($myConfig->getConfigParam('blUseMultidimensionVariants')) {
                             $oAttrList = oxNew(Attribute::class);
                             $aIds = $oAttrList->getAttributeAssigns($oSimpleVariant->oxarticles__oxid->value);
-                            $aMDVariants["mdvar_" . $sVarId] = $aIds;
+                            $aMDVariants['mdvar_' . $sVarId] = $aIds;
                         }
                     }
                     if ($myConfig->getConfigParam('blUseMultidimensionVariants')) {
@@ -214,7 +214,7 @@ class VariantHandler extends Base
                     $sPrefix = $myLang->getLanguageTag($sKey);
                     $aParams['oxarticles__oxvarselect' . $sPrefix] = $oValue->name;
                 }
-                $aParams['oxarticles__oxartnum'] = $oArticle->oxarticles__oxartnum->value . "-" . $iCounter;
+                $aParams['oxarticles__oxartnum'] = $oArticle->oxarticles__oxartnum->value . '-' . $iCounter;
                 $aParams['oxarticles__oxprice'] = $oArticle->oxarticles__oxprice->value + $dPriceMod;
                 $aParams['oxarticles__oxsort'] = $iCounter * 100; // reduction
                 $aParams['oxarticles__oxstock'] = 0;
@@ -275,7 +275,7 @@ class VariantHandler extends Base
         $aParams['oxarticles__oxactive'] = 0;
 
         // shopid
-        $sShopID = Registry::getSession()->getVariable("actshop");
+        $sShopID = Registry::getSession()->getVariable('actshop');
         $aParams['oxarticles__oxshopid'] = $sShopID;
 
         // variant-handling
@@ -301,7 +301,7 @@ class VariantHandler extends Base
     protected function _updateArticleVarName($sUpdate, $sArtId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = DatabaseProvider::getDb();
-        $sUpdate = "update oxarticles set " . $sUpdate . " where oxid = :oxid";
+        $sUpdate = 'update oxarticles set ' . $sUpdate . ' where oxid = :oxid';
         $oDb->execute($sUpdate, [':oxid' => $sArtId]);
     }
 
@@ -517,7 +517,7 @@ class VariantHandler extends Base
                 'selections'     => $aVariantSelections,
                 'rawselections'  => $aRawVariantSelections,
                 'oActiveVariant' => $oCurrentVariant,
-                'blPerfectFit'   => $blPerfectFit
+                'blPerfectFit'   => $blPerfectFit,
             ];
         }
 

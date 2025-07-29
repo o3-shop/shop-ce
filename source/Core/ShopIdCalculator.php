@@ -29,7 +29,7 @@ namespace OxidEsales\EshopCommunity\Core;
 class ShopIdCalculator
 {
     /** Shop id which is used for CE/PE eShops. */
-    const BASE_SHOP_ID = 1;
+    public const BASE_SHOP_ID = 1;
 
     /** @var array */
     private static $urlMap;
@@ -86,7 +86,7 @@ class ShopIdCalculator
         }
 
         //get from file cache
-        $aMap = $this->getVariablesCache()->getFromCache("urlMap");
+        $aMap = $this->getVariablesCache()->getFromCache('urlMap');
         if (!is_null($aMap)) {
             self::$urlMap = $aMap;
 
@@ -95,7 +95,7 @@ class ShopIdCalculator
 
         $aMap = [];
 
-        $sSelect = "SELECT oxshopid, oxvarname, oxvarvalue " .
+        $sSelect = 'SELECT oxshopid, oxvarname, oxvarvalue ' .
             "FROM oxconfig WHERE oxvarname in ('aLanguageURLs','sMallShopURL','sMallSSLShopURL')";
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -124,7 +124,7 @@ class ShopIdCalculator
         }
 
         //save to cache
-        $this->getVariablesCache()->setToCache("urlMap", $aMap);
+        $this->getVariablesCache()->setToCache('urlMap', $aMap);
         self::$urlMap = $aMap;
 
         return $aMap;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Article;
-use \oxField;
-use \oxDb;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Article_Review class
  */
 class ArticleReviewTest extends \OxidTestCase
 {
-
     /**
      * Article_Review test setup
      *
@@ -65,8 +66,8 @@ class ArticleReviewTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", $this->getTestArticleId());
-        $this->setRequestParameter("rev_oxid", "_test_i1");
+        $this->setRequestParameter('oxid', $this->getTestArticleId());
+        $this->setRequestParameter('rev_oxid', '_test_i1');
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
 
         // testing..
@@ -75,7 +76,7 @@ class ArticleReviewTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Article);
+        $this->assertTrue($aViewData['edit'] instanceof Article);
 
         $this->assertEquals('article_review.tpl', $sTplName);
     }
@@ -87,22 +88,22 @@ class ArticleReviewTest extends \OxidTestCase
      */
     public function testSave()
     {
-        $oReview = oxNew("oxreview");
-        $oReview->setId("_testReviewId");
+        $oReview = oxNew('oxreview');
+        $oReview->setId('_testReviewId');
         $oReview->oxreviews__oxactive = new oxField(1);
-        $oReview->oxreviews__oxobjectid = new oxField("_testObjectId");
-        $oReview->oxreviews__oxtype = new oxField("oxarticle");
+        $oReview->oxreviews__oxobjectid = new oxField('_testObjectId');
+        $oReview->oxreviews__oxtype = new oxField('oxarticle');
         $oReview->save();
 
         $oDb = oxDb::getDb();
 
         $this->assertTrue((bool) $oDb->getOne("select 1 from oxreviews where oxid = '_testReviewId'"));
 
-        $this->setRequestParameter("rev_oxid", "_testReviewId");
-        $this->setRequestParameter("editval", array('oxreviews__oxtext' => 6, 'oxreviews__oxrating' => 6));
-        $this->getConfig()->setConfigParam("blGBModerate", "_testReviewId");
+        $this->setRequestParameter('rev_oxid', '_testReviewId');
+        $this->setRequestParameter('editval', ['oxreviews__oxtext' => 6, 'oxreviews__oxrating' => 6]);
+        $this->getConfig()->setConfigParam('blGBModerate', '_testReviewId');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleReview::class, array("resetContentCache"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleReview::class, ['resetContentCache']);
         $oView->expects($this->once())->method('resetContentCache');
         $oView->save();
 
@@ -116,19 +117,19 @@ class ArticleReviewTest extends \OxidTestCase
      */
     public function testDelete()
     {
-        $oReview = oxNew("oxreview");
-        $oReview->setId("testReviewId");
+        $oReview = oxNew('oxreview');
+        $oReview->setId('testReviewId');
         $oReview->oxreviews__oxactive = new oxField(1);
-        $oReview->oxreviews__oxobjectid = new oxField("testObjectId");
-        $oReview->oxreviews__oxtype = new oxField("oxarticle");
+        $oReview->oxreviews__oxobjectid = new oxField('testObjectId');
+        $oReview->oxreviews__oxtype = new oxField('oxarticle');
         $oReview->save();
 
         $oDb = oxDb::getDb();
 
         $this->assertTrue((bool) $oDb->getOne("select 1 from oxreviews where oxid = 'testReviewId'"));
-        $this->setRequestParameter("rev_oxid", "testReviewId");
+        $this->setRequestParameter('rev_oxid', 'testReviewId');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleReview::class, array("resetContentCache"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleReview::class, ['resetContentCache']);
         $oView->expects($this->once())->method('resetContentCache');
 
         $oView->delete();

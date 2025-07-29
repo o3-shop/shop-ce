@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleBundleAjax;
 use OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax;
@@ -34,7 +35,6 @@ use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use stdClass;
-use Exception;
 
 /**
  * Admin article extended parameters' manager.
@@ -68,10 +68,10 @@ class ArticleExtend extends AdminDetailsController
 
         $oxId = $this->getEditObjectId();
 
-        $this->createCategoryTree("artcattree");
+        $this->createCategoryTree('artcattree');
 
         // all categories
-        if (isset($oxId) && $oxId != "-1") {
+        if (isset($oxId) && $oxId != '-1') {
             // load object
             $article->loadInLang($this->_iEditLang, $oxId);
 
@@ -87,15 +87,15 @@ class ArticleExtend extends AdminDetailsController
                 $lang = new stdClass();
                 $lang->sLangDesc = $language;
                 $lang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $lang;
+                $this->_aViewData['otherlang'][$id] = clone $lang;
             }
 
             // variant handling
             if ($article->oxarticles__oxparentid->value) {
                 $parentArticle = oxNew(Article::class);
                 $parentArticle->load($article->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $parentArticle;
-                $this->_aViewData["oxparentid"] = $article->oxarticles__oxparentid->value;
+                $this->_aViewData['parentarticle'] = $parentArticle;
+                $this->_aViewData['oxparentid'] = $article->oxarticles__oxparentid->value;
             }
         }
 
@@ -106,18 +106,18 @@ class ArticleExtend extends AdminDetailsController
             $oArticleExtendAjax = oxNew(ArticleExtendAjax::class);
             $this->_aViewData['oxajax'] = $oArticleExtendAjax->getColumns();
 
-            return "popups/article_extend.tpl";
+            return 'popups/article_extend.tpl';
         } elseif ($iAoc == 2) {
             $oArticleBundleAjax = oxNew(ArticleBundleAjax::class);
             $this->_aViewData['oxajax'] = $oArticleBundleAjax->getColumns();
 
-            return "popups/article_bundle.tpl";
+            return 'popups/article_bundle.tpl';
         }
 
         //load media files
         $this->_aViewData['aMediaUrls'] = $article->getMediaUrls();
 
-        return "article_extend.tpl";
+        return 'article_extend.tpl';
     }
 
     /**
@@ -130,8 +130,8 @@ class ArticleExtend extends AdminDetailsController
     {
         parent::save();
 
-        $aMyFile = Registry::getConfig()->getUploadedFile("myfile");
-        $aMediaFile = Registry::getConfig()->getUploadedFile("mediaFile");
+        $aMyFile = Registry::getConfig()->getUploadedFile('myfile');
+        $aMediaFile = Registry::getConfig()->getUploadedFile('mediaFile');
         if (is_array($aMyFile['name']) && reset($aMyFile['name']) || $aMediaFile['name']) {
             $myConfig = Registry::getConfig();
             if ($myConfig->isDemoShop()) {
@@ -267,7 +267,7 @@ class ArticleExtend extends AdminDetailsController
     public function getUnitsArray()
     {
         if ($this->_aUnitsArray === null) {
-            $this->_aUnitsArray = Registry::getLang()->getSimilarByKey("_UNIT_", $this->_iEditLang, false);
+            $this->_aUnitsArray = Registry::getLang()->getSimilarByKey('_UNIT_', $this->_iEditLang, false);
         }
 
         return $this->_aUnitsArray;
@@ -307,7 +307,7 @@ class ArticleExtend extends AdminDetailsController
         $query .= " and {$articleTable}.oxid = :oxid";
 
         $resultFromDatabase = $database->select($query, [
-            ':oxid' => $article->$bundleIdField->value
+            ':oxid' => $article->$bundleIdField->value,
         ]);
 
         $articleNumber = new Field();
@@ -316,7 +316,7 @@ class ArticleExtend extends AdminDetailsController
         if ($resultFromDatabase && $resultFromDatabase->count() > 0) {
             while (!$resultFromDatabase->EOF) {
                 $articleNumber = new Field($resultFromDatabase->fields[1]);
-                $articleTitle = new Field($resultFromDatabase->fields[0] . " " . $resultFromDatabase->fields[2]);
+                $articleTitle = new Field($resultFromDatabase->fields[0] . ' ' . $resultFromDatabase->fields[2]);
                 $resultFromDatabase->fetchRow();
             }
         }

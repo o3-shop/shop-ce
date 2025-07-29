@@ -38,14 +38,14 @@ class GenericImportMain extends AdminDetailsController
      *
      * @var string
      */
-    public $sClassDo = "genImport_do";
+    public $sClassDo = 'genImport_do';
 
     /**
      * Export ui class name
      *
      * @var string
      */
-    public $sClassMain = "genImport_main";
+    public $sClassMain = 'genImport_main';
 
     /**
      * Csv file path
@@ -73,7 +73,7 @@ class GenericImportMain extends AdminDetailsController
      *
      * @var string
      */
-    protected $_sDefaultStringTerminator = ";";
+    protected $_sDefaultStringTerminator = ';';
 
     /**
      * Default Csv file field encloser
@@ -87,7 +87,7 @@ class GenericImportMain extends AdminDetailsController
      *
      * @var string
      */
-    protected $_sThisTemplate = "genimport_main.tpl";
+    protected $_sThisTemplate = 'genimport_main.tpl';
 
     /**
      * Creates shop object, passes shop data to Smarty engine and returns name of
@@ -267,7 +267,7 @@ class GenericImportMain extends AdminDetailsController
         $aRow = [];
 
         //getting first row
-        if (($rFile = @fopen($sPath, "r")) !== false) {
+        if (($rFile = @fopen($sPath, 'r')) !== false) {
             $aRow = fgetcsv($rFile, $iMaxLineLength, $this->getCsvFieldsTerminator(), $this->getCsvFieldsEncloser());
             fclose($rFile);
         }
@@ -478,7 +478,7 @@ class GenericImportMain extends AdminDetailsController
     {
         $error = oxNew(DisplayError::class);
         $error->setFormatParameters([htmlspecialchars($invalidData)]);
-        $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
+        $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
         Registry::getUtilsView()->addErrorToDisplay($error);
     }
 }

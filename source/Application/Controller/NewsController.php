@@ -52,7 +52,6 @@ class NewsController extends FrontendController
      */
     protected $_blBargainAction = true;
 
-
     /**
      * Page navigation
      *
@@ -91,7 +90,6 @@ class NewsController extends FrontendController
 
         return $this->_oNewsList;
     }
-
 
     /**
      * Returns Bread Crumb - you are here page1/page2/page3...

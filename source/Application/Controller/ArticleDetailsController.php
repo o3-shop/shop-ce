@@ -176,7 +176,6 @@ class ArticleDetailsController extends FrontendController
      */
     protected $_aSimilarRecommListIds = null;
 
-
     /**
      * Marked which defines if current view is sortable or not
      *
@@ -214,7 +213,7 @@ class ArticleDetailsController extends FrontendController
      */
     protected function _getAddUrlParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($this->getListType() == "search") {
+        if ($this->getListType() == 'search') {
             return $this->getDynUrlParams();
         }
     }
@@ -251,7 +250,6 @@ class ArticleDetailsController extends FrontendController
 
         return $parameters;
     }
-
 
     /**
      * Processes product by setting link type and in case list type is search adds search parameters to details link
@@ -309,9 +307,9 @@ class ArticleDetailsController extends FrontendController
         $this->addTplParam('renderPartial', $renderPartial);
 
         switch ($renderPartial) {
-            case "productInfo":
+            case 'productInfo':
                 return 'page/details/ajax/fullproductinfo.tpl';
-            case "detailsMain":
+            case 'detailsMain':
                 return 'page/details/ajax/productmain.tpl';
             default:
                 // can not be removed, as it is used for breadcrumb loading
@@ -381,13 +379,13 @@ class ArticleDetailsController extends FrontendController
 
             if ($categoryTree = $this->getCategoryTree()) {
                 foreach ($categoryTree->getPath() as $category) {
-                    $keywords .= ", " . trim($category->oxcategories__oxtitle->value);
+                    $keywords .= ', ' . trim($category->oxcategories__oxtitle->value);
                 }
             }
 
             // Adding search keys info
             if ($searchKeys = trim($article->oxarticles__oxsearchkeys->value)) {
-                $keywords .= ", " . $searchKeys;
+                $keywords .= ', ' . $searchKeys;
             }
 
             $keywords = parent::_prepareMetaKeyword($keywords, $removeDuplicatedWords);
@@ -566,10 +564,10 @@ class ArticleDetailsController extends FrontendController
                 $this->_iLinkType = OXARTICLE_LINKTYPE_VENDOR;
             } elseif ('manufacturer' == $listType) {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_MANUFACTURER;
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+                // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             } elseif ('recommlist' == $listType) {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_RECOMM;
-            // END deprecated
+                // END deprecated
             } else {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_CATEGORY;
 
@@ -892,10 +890,10 @@ class ArticleDetailsController extends FrontendController
     {
         if ('search' == $this->getListType()) {
             $paths = $this->_getSearchBreadCrumb();
-        // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
         } elseif ('recommlist' == $this->getListType()) {
             $paths = $this->_getRecommendationListBredCrumb();
-        // END deprecated
+            // END deprecated
         } elseif ('vendor' == $this->getListType()) {
             $paths = $this->_getVendorBreadCrumb();
         } else {
@@ -1040,16 +1038,16 @@ class ArticleDetailsController extends FrontendController
     public function getRDFaNormalizedRating()
     {
         $config = Registry::getConfig();
-        $minRating = $config->getConfigParam("iRDFaMinRating");
-        $maxRating = $config->getConfigParam("iRDFaMaxRating");
+        $minRating = $config->getConfigParam('iRDFaMinRating');
+        $maxRating = $config->getConfigParam('iRDFaMaxRating');
 
         $article = $this->getProduct();
         $count = $article->oxarticles__oxratingcnt->value;
         if (isset($minRating) && isset($maxRating) && $maxRating != '' && $minRating != '' && $count > 0) {
             $normalizedRating = [];
             $value = ((4 * ($article->oxarticles__oxrating->value - $minRating) / ($maxRating - $minRating))) + 1;
-            $normalizedRating["count"] = $count;
-            $normalizedRating["value"] = round($value, 2);
+            $normalizedRating['count'] = $count;
+            $normalizedRating['value'] = round($value, 2);
 
             return $normalizedRating;
         }
@@ -1072,8 +1070,8 @@ class ArticleDetailsController extends FrontendController
             $from = Registry::getUtilsDate()->getTime();
 
             $through = $from + ($days * 24 * 60 * 60);
-            $validity["from"] = date('Y-m-d\TH:i:s', $from) . "Z";
-            $validity["through"] = date('Y-m-d\TH:i:s', $through) . "Z";
+            $validity['from'] = date('Y-m-d\TH:i:s', $from) . 'Z';
+            $validity['through'] = date('Y-m-d\TH:i:s', $through) . 'Z';
 
             return $validity;
         }
@@ -1088,7 +1086,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaBusinessFnc()
     {
-        return Registry::getConfig()->getConfigParam("sRDFaBusinessFnc");
+        return Registry::getConfig()->getConfigParam('sRDFaBusinessFnc');
     }
 
     /**
@@ -1098,7 +1096,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaCustomers()
     {
-        return Registry::getConfig()->getConfigParam("aRDFaCustomers");
+        return Registry::getConfig()->getConfigParam('aRDFaCustomers');
     }
 
     /**
@@ -1108,7 +1106,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaVAT()
     {
-        return Registry::getConfig()->getConfigParam("iRDFaVAT");
+        return Registry::getConfig()->getConfigParam('iRDFaVAT');
     }
 
     /**
@@ -1118,7 +1116,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaGenericCondition()
     {
-        return Registry::getConfig()->getConfigParam("iRDFaCondition");
+        return Registry::getConfig()->getConfigParam('iRDFaCondition');
     }
 
     /**
@@ -1187,7 +1185,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaDeliveryChargeSpecLoc()
     {
-        return Registry::getConfig()->getConfigParam("sRDFaDeliveryChargeSpecLoc");
+        return Registry::getConfig()->getConfigParam('sRDFaDeliveryChargeSpecLoc');
     }
 
     /**
@@ -1197,7 +1195,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaPaymentChargeSpecLoc()
     {
-        return Registry::getConfig()->getConfigParam("sRDFaPaymentChargeSpecLoc");
+        return Registry::getConfig()->getConfigParam('sRDFaPaymentChargeSpecLoc');
     }
 
     /**
@@ -1207,7 +1205,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function getRDFaBusinessEntityLoc()
     {
-        return Registry::getConfig()->getConfigParam("sRDFaBusinessEntityLoc");
+        return Registry::getConfig()->getConfigParam('sRDFaBusinessEntityLoc');
     }
 
     /**
@@ -1217,7 +1215,7 @@ class ArticleDetailsController extends FrontendController
      */
     public function showRDFaProductStock()
     {
-        return Registry::getConfig()->getConfigParam("blShowRDFaProductStock");
+        return Registry::getConfig()->getConfigParam('blShowRDFaProductStock');
     }
 
     /**
@@ -1252,7 +1250,7 @@ class ArticleDetailsController extends FrontendController
 
         if ($this->getListType() != 'search' && $activeCategory && $activeCategory instanceof Category) {
             if ($categorySorting = $activeCategory->getDefaultSorting()) {
-                $sortingDirection = ($activeCategory->getDefaultSortingMode()) ? "desc" : "asc";
+                $sortingDirection = ($activeCategory->getDefaultSortingMode()) ? 'desc' : 'asc';
                 $sorting = ['sortby' => $categorySorting, 'sortdir' => $sortingDirection];
             }
         }
@@ -1338,8 +1336,8 @@ class ArticleDetailsController extends FrontendController
         $sessionToken = Registry::getSession()->getVariable('sess_stoken');
 
         $searchPath['title'] = sprintf($translatedString, $this->getSearchParamForHtml());
-        $searchPath['link'] = $selfLink . 'stoken=' . $sessionToken . "&amp;cl=search&amp;" .
-                            "searchparam=" . $this->getSearchParamForHtml();
+        $searchPath['link'] = $selfLink . 'stoken=' . $sessionToken . '&amp;cl=search&amp;' .
+                            'searchparam=' . $this->getSearchParamForHtml();
 
         $paths[] = $searchPath;
 

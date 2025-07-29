@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -34,7 +35,7 @@ class Test3ContentController extends Test3ContentController_parent
 
         // The commented things are not working atm or will not be implemented.
         // $content = new Test1Content();
-        $contentTitle = $contentTitle . "Mod3";
+        $contentTitle = $contentTitle . 'Mod3';
 
         return $contentTitle;
     }

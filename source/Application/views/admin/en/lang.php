@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,12 +21,10 @@
 
 $sLangName = 'English';
 
-
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
 // -------------------------------
 $aLang = [
-
     'charset'          => 'UTF-8',
     'fullDateFormat'   => 'Y-m-d H:i:s',
     'simpleDateFormat' => 'Y-m-d',
@@ -804,9 +803,9 @@ $aLang = [
     'NEWS_MAIN_SHOWFORGROUP'                         => 'Visible for User Group',
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Invisible for User Group',
     // END deprecated
-    'NAVIGATION_SYSREQ_MESSAGE'                      => "System health check shows setup/server setup of this O3-Shop might be broken. Probably this O3-Shop behaves strange in some cases. Please fix this as soon as possible. Support for fixing find in ",
-    'NAVIGATION_SYSREQ_MESSAGE2'                     => "<b>system health check</b>.",
-    'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => "The permanent system health check has been deactivated. You can re-activate it in the Perform. tab at Master settings -> Core settings. To check it anyway, please click on this link: ",
+    'NAVIGATION_SYSREQ_MESSAGE'                      => 'System health check shows setup/server setup of this O3-Shop might be broken. Probably this O3-Shop behaves strange in some cases. Please fix this as soon as possible. Support for fixing find in ',
+    'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>system health check</b>.',
+    'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'The permanent system health check has been deactivated. You can re-activate it in the Perform. tab at Master settings -> Core settings. To check it anyway, please click on this link: ',
     'NAVIGATION_SHOPFRONT'                           => "Shop's start page",
     'NAVIGATION_FULLVIEW'                            => 'show expert menu',
     'NAVIGATION_REDUCEDVIEW'                         => 'show user menu',
@@ -872,8 +871,8 @@ $aLang = [
     'ORDER_MAIN_DELTYPE'                                 => 'Shipped with',
     'ORDER_MAIN_UPDATE_DELPAY'                           => 'Update',
     'ORDER_MAIN_SEND_DOWNLOADS'                          => 'Ordered download links',
-    'ORDER_MAIN_PAYMENT_INFORMATION'                     => "Payment Information",
-    'ORDER_MAIN_SHIPPING_INFORMATION'                    => "Shipping Information",
+    'ORDER_MAIN_PAYMENT_INFORMATION'                     => 'Payment Information',
+    'ORDER_MAIN_SHIPPING_INFORMATION'                    => 'Shipping Information',
     'ORDER_REMARK_REMARK'                                => '[Remark]',
     'ORDER_REMARK_ORDER'                                 => '[Order]',
     'ORDER_REMARK_USER'                                  => '[Reg.]',
@@ -1964,7 +1963,6 @@ $aLang = [
     'OXDIAG_MODIFIEDHINTS1'                       => 'O3-Shop has sophisticated possibility to extend it by modules without changing shipped files. It\'s not recommended and not needed to change shop files. See also our <a href="http://blog.oxid-esales.com/2009/02/how-extend-oxid-eshop-with-modules-part-1/" target=_blank>tutorials</a>.',
     'OXDIAG_MODIFIEDHINTS2'                       => 'It is possible to use your own templates without changing shipped ones.',
     'OXDIAG_VERSIONMISMATCHHINTS'                 => 'Apparently one or more updates went wrong. See details link for more information about more details for each file. A left over file which is not any longer included in O3-Shop could also be a <u>possible</u> reason for version mismatch. Find information about update in our <a href="http://www.oxid-esales.com/en/support-services/documentation-and-help/oxid-eshop/installation/oxid-eshop-update-installation" target=_blank>Documentation and help</a>.',
-
 
     'OXDIAG_HOME'                     => 'OXID Diagnostics',
     'OXDIAG_ABOUT'                    => 'This Diagnostics tool collects technical information about your shop and server. This information might be useful before updating, installing modules or on diagnostics.',

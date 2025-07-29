@@ -37,21 +37,21 @@ class VoucherSerieExport extends VoucherSerieMain
      *
      * @var string
      */
-    public $sClassDo = "voucherserie_export";
+    public $sClassDo = 'voucherserie_export';
 
     /**
      * Export file extension
      *
      * @var string
      */
-    public $sExportFileType = "csv";
+    public $sExportFileType = 'csv';
 
     /**
      * Current class template name.
      *
      * @var string
      */
-    protected $_sThisTemplate = "voucherserie_export.tpl";
+    protected $_sThisTemplate = 'voucherserie_export.tpl';
 
     /**
      * Number of records to export per tick
@@ -102,10 +102,10 @@ class VoucherSerieExport extends VoucherSerieMain
      */
     protected function _getExportFileName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSessionFileName = Registry::getSession()->getVariable("sExportFileName");
+        $sSessionFileName = Registry::getSession()->getVariable('sExportFileName');
         if (!$sSessionFileName) {
             $sSessionFileName = md5(Registry::getSession()->getId() . Registry::getUtilsObject()->generateUId());
-            Registry::getSession()->setVariable("sExportFileName", $sSessionFileName);
+            Registry::getSession()->setVariable('sExportFileName', $sSessionFileName);
         }
 
         return $sSessionFileName;
@@ -119,7 +119,7 @@ class VoucherSerieExport extends VoucherSerieMain
      */
     protected function _getExportFilePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return Registry::getConfig()->getConfigParam('sShopDir') . "/export/" . $this->_getExportFileName();
+        return Registry::getConfig()->getConfigParam('sShopDir') . '/export/' . $this->_getExportFileName();
     }
 
     /**
@@ -128,16 +128,16 @@ class VoucherSerieExport extends VoucherSerieMain
     public function download()
     {
         $oUtils = Registry::getUtils();
-        $oUtils->setHeader("Pragma: public");
-        $oUtils->setHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        $oUtils->setHeader("Expires: 0");
-        $oUtils->setHeader("Content-Disposition: attachment; filename=vouchers.csv");
-        $oUtils->setHeader("Content-Type: application/csv");
+        $oUtils->setHeader('Pragma: public');
+        $oUtils->setHeader('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        $oUtils->setHeader('Expires: 0');
+        $oUtils->setHeader('Content-Disposition: attachment; filename=vouchers.csv');
+        $oUtils->setHeader('Content-Type: application/csv');
         $sFile = $this->_getExportFilePath();
         if (file_exists($sFile) && is_readable($sFile)) {
             readfile($sFile);
         }
-        $oUtils->showMessageAndExit("");
+        $oUtils->showMessageAndExit('');
     }
 
     /**
@@ -147,7 +147,7 @@ class VoucherSerieExport extends VoucherSerieMain
     {
         $blContinue = true;
 
-        $this->fpFile = @fopen($this->_sFilePath, "a");
+        $this->fpFile = @fopen($this->_sFilePath, 'a');
         if (!isset($this->fpFile) || !$this->fpFile) {
             // we do have an error !
             $this->stop(ERR_FILEIO);
@@ -190,9 +190,9 @@ class VoucherSerieExport extends VoucherSerieMain
         if ($oSerie = $this->_getVoucherSerie()) {
             $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-            $sSelect = "select oxvouchernr from oxvouchers where oxvoucherserieid = :oxvoucherserieid";
+            $sSelect = 'select oxvouchernr from oxvouchers where oxvoucherserieid = :oxvoucherserieid';
             $rs = $oDb->selectLimit($sSelect, $this->iExportPerTick, $iStart, [
-                ':oxvoucherserieid' => $oSerie->getId()
+                ':oxvoucherserieid' => $oSerie->getId(),
             ]);
 
             if (!$rs->EOF) {
@@ -201,7 +201,8 @@ class VoucherSerieExport extends VoucherSerieMain
                 // writing header text
                 if ($iStart == 0) {
                     $this->write(
-                        Registry::getLang()->translateString("VOUCHERSERIE_MAIN_VOUCHERSTATISTICS", Registry::getLang()->getTplLanguage(), true));
+                        Registry::getLang()->translateString('VOUCHERSERIE_MAIN_VOUCHERSTATISTICS', Registry::getLang()->getTplLanguage(), true)
+                    );
                 }
             }
 

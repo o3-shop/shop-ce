@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
 
 /**
  * Update from v6.0.0-rc.2 to v6.0.0-rc.3
@@ -35,9 +35,9 @@ class Version20171018144650 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // All tables should have the same default character set and collation
-        $this->addSql("ALTER table `oxinvitations` COLLATE utf8_general_ci;");
+        $this->addSql('ALTER table `oxinvitations` COLLATE utf8_general_ci;');
 
-        $this->addSql("ALTER table `oxobject2action` COLLATE utf8_general_ci;");
+        $this->addSql('ALTER table `oxobject2action` COLLATE utf8_general_ci;');
     }
 
     /**

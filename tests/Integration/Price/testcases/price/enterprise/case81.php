@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: brutto
  * Price view mode: brutto
@@ -6,151 +7,147 @@
  * Price type: range
  *
  */
-$aData = array(
-    'articles' => array(
-            0 => array(
+$aData = [
+    'articles' => [
+            0 => [
                     'oxid'                      => '_testId_1',
                     'oxpricea'                  => 100,
-                    'inheritToShops'           => array(2)
-            ),
-            1 => array(
+                    'inheritToShops'           => [2],
+            ],
+            1 => [
                     'oxid'                      => '_testId_1_child_1',
                     'oxpricea'                  => 100,
                     'oxparentid'                => '_testId_1',
-                    'field2shop' => array(
+                    'field2shop' => [
                             'oxshopid' => 2,
                             'oxpricea' => 50,
-                    ),
-                    'inheritToShops'                => array(2),
-            ),
-            2 => array(
+                    ],
+                    'inheritToShops'                => [2],
+            ],
+            2 => [
                     'oxid'                      => '_testId_1_child_1',
                     'oxpricea'                  => 100,
                     'oxparentid'                => '_testId_1',
-                    'field2shop' => array(
+                    'field2shop' => [
                             'oxshopid' => 2,
                             'oxpricea' => 150,
-                    ),
-                    'inheritToShops'                => array(2),
-            ),
+                    ],
+                    'inheritToShops'                => [2],
+            ],
 
-            3 => array(
+            3 => [
                 'oxid'                      => '_testId_2',
                 'oxpricea'                  => 50,
-                'inheritToShops'           => array(2)
-            ),
-            4 => array(
+                'inheritToShops'           => [2],
+            ],
+            4 => [
                     'oxid'                      => '_testId_2_child_1',
                     'oxpricea'                  => 70,
                     'oxparentid'                => '_testId_2',
-                    'field2shop' => array(
+                    'field2shop' => [
                             'oxshopid' => 2,
                             'oxpricea' => 30,
-                    ),
-                    'inheritToShops'                => array(2),
-            ),
-            5 => array(
+                    ],
+                    'inheritToShops'                => [2],
+            ],
+            5 => [
                     'oxid'                      => '_testId_2_child_2',
                     'oxpricea'                  => 80,
                     'oxparentid'                => '_testId_2',
-                    'field2shop' => array(
+                    'field2shop' => [
                             'oxshopid' => 2,
                             'oxpricea' => 30,
-                    ),
-                    'inheritToShops'           => array(2)
-            ),
+                    ],
+                    'inheritToShops'           => [2],
+            ],
 
-            6 => array(
+            6 => [
                     'oxid'                      => '_testId_3',
                     'oxpricea'                  => 80,
-                    'inheritToShops'           => array(2)
-            ),
-            7 => array(
+                    'inheritToShops'           => [2],
+            ],
+            7 => [
                     'oxid'                      => '_testId_3_child_1',
                     'oxpricea'                  => 70,
                     'oxparentid'                => '_testId_3',
-                    'field2shop' => array(
+                    'field2shop' => [
                             'oxshopid' => 2,
                             'oxpricea' => 60,
-                    ),
-                    'inheritToShops'                => array(2),
-            ),
+                    ],
+                    'inheritToShops'                => [2],
+            ],
 
-            8 => array(
+            8 => [
                     'oxid'                     => '_testId_4',
                     'oxprice'                  => 80,
                     'oxpricea'                 => 80,
-                    'inheritToShops'           => array(2)
-            ),
+                    'inheritToShops'           => [2],
+            ],
+    ],
 
-    ),
-
-    'shop' => array(
-            0 => array(
+    'shop' => [
+            0 => [
                     'oxactive'      => 1,
                     'oxid'          => 2,
                     'oxparentid'    => 1,
                     'oxname'        => 'subshop',
                     'oxisinherited' => 1,
-                    'activeshop'    => true
-            ),
-    ),
+                    'activeshop'    => true,
+            ],
+    ],
 
-    'user' => array(
+    'user' => [
             'oxid'          => '_testUser',
             'oxactive'      => 1,
             'oxusername'    => 'aGroupUser',
+    ],
 
-    ),
-
-    'group' => array(
-            0 => array(
+    'group' => [
+            0 => [
                     'oxid'              => 'oxidpricea',
                     'oxactive'          => 1,
                     'oxtitle'           => 'Price A',
-                    'oxobject2group'    => array( '_testUser' ),
-            ),
+                    'oxobject2group'    => [ '_testUser' ],
+            ],
+    ],
 
-    ),
-
-   'expected' => array(
-            '_testId_1' => array(
+   'expected' => [
+            '_testId_1' => [
                     'base_price' => '100,00',
                     'price' => '100,00',
                     'min_price' => '100,00',
                     'var_min_price' => '100,00',
-                    'is_range_price' => false
-            ),
-            '_testId_2' => array(
+                    'is_range_price' => false,
+            ],
+            '_testId_2' => [
                     'base_price' => '50,00',
                     'price' => '50,00',
                     'min_price' => '50,00',
                     'var_min_price' => '70,00',
-                    'is_range_price' => true
-            ),
-            '_testId_3' => array(
+                    'is_range_price' => true,
+            ],
+            '_testId_3' => [
                     'base_price' => '80,00',
                     'price' => '80,00',
                     'min_price' => '70,00',
                     'var_min_price' => '70,00',
-                    'is_range_price' => true
-            ),
-            '_testId_4' => array(
+                    'is_range_price' => true,
+            ],
+            '_testId_4' => [
                     'base_price' => '80,00',
                     'price' => '80,00',
                     'min_price' => '80,00',
-                    'is_range_price' => false
-            ),
+                    'is_range_price' => false,
+            ],
+    ],
 
-    ),
-
-    'options' => array(
-            'config' => array(
+    'options' => [
+            'config' => [
                     'blEnterNetPrice' => false,
                     'blShowNetPrice' => false,
                     'blVariantParentBuyable' => 1,
                     'blMallCustomPrice' => 0,
-            ),
-            'activeCurrencyRate' => 1
-    ),
-);
+            ],
+            'activeCurrencyRate' => 1,
+    ],
+];

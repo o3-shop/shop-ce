@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
@@ -28,7 +29,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Admin selectlist list manager.
@@ -105,7 +105,7 @@ class LanguageList extends AdminListController
         parent::render();
         $this->_aViewData['mylist'] = $this->getLanguagesList();
 
-        return "language_list.tpl";
+        return 'language_list.tpl';
     }
 
     /**
@@ -134,9 +134,9 @@ class LanguageList extends AdminListController
 
         foreach ($aLanguages as $sKey => $sValue) {
             $sOxId = $sValue->oxid;
-            $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]["active"])) ? 1 : $aLangParams[$sOxId]["active"];
-            $aLanguages[$sKey]->default = (bool)($aLangParams[$sOxId]["baseId"] == $sDefaultLang);
-            $aLanguages[$sKey]->sort = $aLangParams[$sOxId]["sort"];
+            $aLanguages[$sKey]->active = (!isset($aLangParams[$sOxId]['active'])) ? 1 : $aLangParams[$sOxId]['active'];
+            $aLanguages[$sKey]->default = (bool)($aLangParams[$sOxId]['baseId'] == $sDefaultLang);
+            $aLanguages[$sKey]->sort = $aLangParams[$sOxId]['sort'];
         }
 
         if (is_array($aLangParams)) {
@@ -245,5 +245,5 @@ class LanguageList extends AdminListController
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
-    }    
+    }
 }

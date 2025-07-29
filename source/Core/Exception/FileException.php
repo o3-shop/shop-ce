@@ -97,7 +97,7 @@ class FileException extends \OxidEsales\Eshop\Core\Exception\StandardException
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty File --> " . $this->_sErrFileName . "\n" . "Error Code --> " . $this->_sFileError;
+        return __CLASS__ . '-' . parent::getString() . ' Faulty File --> ' . $this->_sErrFileName . "\n" . 'Error Code --> ' . $this->_sFileError;
     }
 
     /**

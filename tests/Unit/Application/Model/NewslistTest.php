@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
+use oxField;
 
 class NewslistTest extends \OxidTestCase
 {
-    public $aNews = array();
+    public $aNews = [];
 
     /**
      * Initialize the fixture.
@@ -34,7 +36,7 @@ class NewslistTest extends \OxidTestCase
     {
         parent::setUp();
         // cleaning
-        $this->aNews = array();
+        $this->aNews = [];
 
         $this->aNews[0] = oxNew('oxnews');
         $this->aNews[0]->setId(1);
@@ -51,7 +53,7 @@ class NewslistTest extends \OxidTestCase
         $this->aNews[1]->save();
 
         $oNewGroup = oxNew('oxBase');
-        $oNewGroup->init('oxobject2group', "core");
+        $oNewGroup->init('oxobject2group', 'core');
         $oNewGroup->oxobject2group__oxobjectid = new oxField($this->aNews[1]->getId(), oxField::T_RAW);
         $oNewGroup->oxobject2group__oxgroupsid = new oxField('oxidadmin', oxField::T_RAW);
         $oNewGroup->Save();

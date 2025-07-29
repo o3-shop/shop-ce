@@ -96,9 +96,9 @@ class Address extends BaseModel
         $sCity = $this->oxaddress__oxcity->value;
 
         //format it
-        $sAddress = "";
+        $sAddress = '';
         if ($sFirstName || $sLastName) {
-            $sAddress = $sFirstName . ($sFirstName ? " " : "") . "$sLastName, ";
+            $sAddress = $sFirstName . ($sFirstName ? ' ' : '') . "$sLastName, ";
         }
         $sAddress .= "$sStreet $sStreetNr, $sCity";
 
@@ -124,7 +124,6 @@ class Address extends BaseModel
     {
         return $this->oxaddress__oxstateid->value;
     }
-
 
     /**
      * Get state title

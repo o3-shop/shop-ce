@@ -62,12 +62,11 @@ register_shutdown_function(
 
             /** write to log */
             $time = microtime(true);
-            $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
+            $micro = sprintf('%06d', ($time - floor($time)) * 1000000);
             $date = new \DateTime(date('Y-m-d H:i:s.' . $micro, $time));
             $timestamp = $date->format('d M H:i:s.u Y');
             $message = "[$timestamp] " . $logMessage . PHP_EOL;
             file_put_contents(OX_LOG_FILE, $message, FILE_APPEND);
-
 
             $bootstrapConfigFileReader = new \BootstrapConfigFileReader();
             if (!$bootstrapConfigFileReader->isDebugMode()) {
@@ -123,7 +122,8 @@ class BootstrapConfigFileReader
         trigger_error(
             'Undefined property via __get(): ' . $name .
             ' in ' . $trace[0]['file'] .
-            ' on line ' . $trace[0]['line']);
+            ' on line ' . $trace[0]['line']
+        );
 
         return null;
     }
@@ -142,7 +142,7 @@ class BootstrapConfigFileReader
      */
     public function __construct()
     {
-        include OX_BASE_PATH . "config.inc.php";
+        include OX_BASE_PATH . 'config.inc.php';
     }
 
     /**
@@ -160,13 +160,13 @@ class BootstrapConfigFileReader
 /**
  * Ensure shop config and autoload files are available.
  */
-$configMissing = !is_readable(OX_BASE_PATH . "config.inc.php");
+$configMissing = !is_readable(OX_BASE_PATH . 'config.inc.php');
 if ($configMissing || !is_readable(VENDOR_PATH . 'autoload.php')) {
     if ($configMissing) {
         $message = sprintf(
             "Error: Config file '%s' could not be found! Please use '%s.dist' to make a copy.",
-            OX_BASE_PATH . "config.inc.php",
-            OX_BASE_PATH . "config.inc.php"
+            OX_BASE_PATH . 'config.inc.php',
+            OX_BASE_PATH . 'config.inc.php'
         );
     } else {
         $message = "Error: Autoload file missing. Make sure you have ran the 'composer install' command.";
@@ -227,12 +227,11 @@ spl_autoload_register([OxidEsales\EshopCommunity\Core\Autoload\BackwardsCompatib
 require_once CORE_AUTOLOADER_PATH . 'ModuleAutoload.php';
 spl_autoload_register([\OxidEsales\EshopCommunity\Core\Autoload\ModuleAutoload::class, 'autoload']);
 
-
 /**
  * Store the shop configuration in the Registry prior including the custom bootstrap functionality.
  * Like this the shop configuration is available there.
  */
-$configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . "config.inc.php");
+$configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.php');
 \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\ConfigFile::class, $configFile);
 unset($configFile);
 
@@ -243,7 +242,7 @@ $debugMode = (bool) \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\
 set_exception_handler(
     [
         new \OxidEsales\Eshop\Core\Exception\ExceptionHandler($debugMode),
-        'handleUncaughtException'
+        'handleUncaughtException',
     ]
 );
 unset($debugMode);
@@ -281,8 +280,8 @@ if (!function_exists('oxTriggerOfflinePageDisplay')) {
     {
         // Do not display the offline page, if this running in CLI mode
         if ('cli' !== strtolower(php_sapi_name())) {
-            header("HTTP/1.1 500 Internal Server Error");
-            header("Connection: close");
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Connection: close');
 
             /**
              * Render an error message.
@@ -305,7 +304,7 @@ if (!function_exists('oxTriggerOfflinePageDisplay')) {
 function writeToLog($message)
 {
     $time = microtime(true);
-    $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
+    $micro = sprintf('%06d', ($time - floor($time)) * 1000000);
     $date = new \DateTime(date('Y-m-d H:i:s.' . $micro, $time));
     $timestamp = $date->format('d M H:i:s.u Y');
 

@@ -36,12 +36,12 @@ class Field // extends \OxidEsales\Eshop\Core\Base
     /**
      * escaping functionality type: expected value is escaped text.
      */
-    const T_TEXT = 1;
+    public const T_TEXT = 1;
 
     /**
      * escaping functionality type: expected value is not escaped (raw) text.
      */
-    const T_RAW = 2;
+    public const T_RAW = 2;
 
     /**
      * Constructor
@@ -99,7 +99,7 @@ class Field // extends \OxidEsales\Eshop\Core\Base
             case 'value':
                 return ($this->value !== null);
                 break;
-            //return true;
+                //return true;
         }
         return false;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -44,10 +45,10 @@ abstract class FlowThemeTestCase extends AcceptanceTestCase
     public function loginInFrontend($userName, $userPass, $waitForLogin = true)
     {
         $this->click("//div[contains(@class, 'showLogin')]/button");
-        $this->waitForItemAppear("loginBox");
+        $this->waitForItemAppear('loginBox');
 
-        $this->type("loginEmail", $userName);
-        $this->type("loginPasword", $userPass);
+        $this->type('loginEmail', $userName);
+        $this->type('loginPasword', $userPass);
 
         $this->clickAndWait("//div[@id='loginBox']/button");
 

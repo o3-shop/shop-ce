@@ -129,13 +129,13 @@ class SeoEncoderContent extends SeoEncoder
     {
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcontent'", [
-            ':oxobjectid' => $sId
+            ':oxobjectid' => $sId,
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $sId
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $sId,
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $sId
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $sId,
         ]);
     }
 

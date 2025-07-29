@@ -73,8 +73,8 @@ class ExceptionHandler
     public function __call($sMethod, $aArgs)
     {
         if (defined('OXID_PHP_UNIT')) {
-            if (substr($sMethod, 0, 4) == "UNIT") {
-                $sMethod = str_replace("UNIT", "_", $sMethod);
+            if (substr($sMethod, 0, 4) == 'UNIT') {
+                $sMethod = str_replace('UNIT', '_', $sMethod);
             }
             if (method_exists($this, $sMethod)) {
                 return call_user_func_array([& $this, $sMethod], $aArgs);
@@ -82,7 +82,7 @@ class ExceptionHandler
         }
 
         throw new \OxidEsales\Eshop\Core\Exception\SystemComponentException(
-            "Function '$sMethod' does not exist or is not accessible! (" . __CLASS__ . ")" . PHP_EOL
+            "Function '$sMethod' does not exist or is not accessible! (" . __CLASS__ . ')' . PHP_EOL
         );
     }
 
@@ -246,7 +246,7 @@ class ExceptionHandler
     public function getFormattedException($exception)
     {
         $time = microtime(true);
-        $micro = sprintf("%06d", ($time - floor($time)) * 1000000);
+        $micro = sprintf('%06d', ($time - floor($time)) * 1000000);
         $date = new \DateTime(date('Y-m-d H:i:s.' . $micro, $time));
         $timestamp = $date->format('d M H:i:s.u Y');
 

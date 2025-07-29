@@ -45,10 +45,10 @@ class AdminlinksMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         $oLinks = oxNew(Links::class, Registry::get(TableViewNameGenerator::class)->getViewName('oxlinks'));
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oLinks->loadInLang($this->_iEditLang, $soxId);
 
             $oOtherLang = $oLinks->getAvailableInLangs();
@@ -56,7 +56,7 @@ class AdminlinksMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oLinks->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oLinks;
+            $this->_aViewData['edit'] = $oLinks;
 
             //Disable editing for derived items
             if ($oLinks->isDerived()) {
@@ -64,26 +64,26 @@ class AdminlinksMain extends AdminDetailsController
             }
 
             // remove already created languages
-            $this->_aViewData["posslang"] = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
+            $this->_aViewData['posslang'] = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
         // generate editor
-        $this->_aViewData["editor"] = $this->generateTextEditor(
-            "100%",
+        $this->_aViewData['editor'] = $this->generateTextEditor(
+            '100%',
             255,
             $oLinks,
-            "oxlinks__oxurldesc",
-            "links.tpl.css"
+            'oxlinks__oxurldesc',
+            'links.tpl.css'
         );
 
-        return "adminlinks_main.tpl";
+        return 'adminlinks_main.tpl';
     }
 
     /**
@@ -104,15 +104,15 @@ class AdminlinksMain extends AdminDetailsController
         // adds space to the end of URL description to keep new added links visible
         // if URL description left empty
         if (isset($aParams['oxlinks__oxurldesc']) && strlen($aParams['oxlinks__oxurldesc']) == 0) {
-            $aParams['oxlinks__oxurldesc'] .= " ";
+            $aParams['oxlinks__oxurldesc'] .= ' ';
         }
 
         if (!$aParams['oxlinks__oxinsert']) {
             // sets default (?) date format to output
             // else if possible - changes date format to system compatible
-            $sDate = date(Registry::getLang()->translateString("simpleDateFormat"));
-            if ($sDate == "simpleDateFormat") {
-                $aParams['oxlinks__oxinsert'] = date("Y-m-d");
+            $sDate = date(Registry::getLang()->translateString('simpleDateFormat'));
+            if ($sDate == 'simpleDateFormat') {
+                $aParams['oxlinks__oxinsert'] = date('Y-m-d');
             } else {
                 $aParams['oxlinks__oxinsert'] = $sDate;
             }
@@ -121,7 +121,7 @@ class AdminlinksMain extends AdminDetailsController
         $iEditLanguage = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
         $oLinks = oxNew(Links::class, Registry::get(TableViewNameGenerator::class)->getViewName('oxlinks'));
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             //$oLinks->load( $soxId );
             $oLinks->loadInLang($iEditLanguage, $soxId);
 
@@ -164,7 +164,7 @@ class AdminlinksMain extends AdminDetailsController
         $oLinks = oxNew(Links::class, Registry::get(TableViewNameGenerator::class)->getViewName('oxlinks'));
         $iEditLanguage = Registry::getRequest()->getRequestEscapedParameter('editlanguage');
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oLinks->loadInLang($iEditLanguage, $soxId);
         } else {
             $aParams['oxlinks__oxid'] = null;

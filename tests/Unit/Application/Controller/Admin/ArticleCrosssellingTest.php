@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\Article;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Article_Crossselling class
  */
 class ArticleCrosssellingTest extends \OxidTestCase
 {
-
     /**
      * Article_Crossselling::Render() test case
      *
@@ -36,7 +37,7 @@ class ArticleCrosssellingTest extends \OxidTestCase
     public function testRender()
     {
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
-        $this->setRequestParameter("oxid", "1126");
+        $this->setRequestParameter('oxid', '1126');
 
         // testing..
         $oView = oxNew('Article_Crossselling');
@@ -44,8 +45,8 @@ class ArticleCrosssellingTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Article);
-        $this->assertTrue($aViewData["readonly"]);
+        $this->assertTrue($aViewData['edit'] instanceof Article);
+        $this->assertTrue($aViewData['readonly']);
 
         $this->assertEquals('article_crossselling.tpl', $sTplName);
     }

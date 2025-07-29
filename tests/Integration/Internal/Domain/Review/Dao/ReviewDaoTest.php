@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,12 +22,12 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Domain\Review\Dao;
 
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridge;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Service\UserReviewService;
-use OxidEsales\Eshop\Application\Model\Review;
-use OxidEsales\Eshop\Core\Field;
 
 class ReviewDaoTest extends \PHPUnit\Framework\TestCase
 {

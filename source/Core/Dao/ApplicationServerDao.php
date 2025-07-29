@@ -31,7 +31,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     /**
      * The name of config option for saving servers data information.
      */
-    const CONFIG_NAME_FOR_SERVER_INFO = 'aServersData_';
+    public const CONFIG_NAME_FOR_SERVER_INFO = 'aServersData_';
 
     /**
      * @var \OxidEsales\Eshop\Core\DataObject\ApplicationServer[]
@@ -95,10 +95,10 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
     {
         unset($this->appServer[$id]);
 
-        $query = "DELETE FROM oxconfig WHERE oxvarname = :oxvarname and oxshopid = :oxshopid";
+        $query = 'DELETE FROM oxconfig WHERE oxvarname = :oxvarname and oxshopid = :oxshopid';
         $this->database->execute($query, [
             ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $id,
-            ':oxshopid' => $this->config->getBaseShopId()
+            ':oxshopid' => $this->config->getBaseShopId(),
         ]);
     }
 
@@ -172,13 +172,13 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      */
     protected function update($appServer)
     {
-        $query = "UPDATE oxconfig SET oxvarvalue = :value
-                  WHERE oxvarname = :oxvarname and oxshopid = :oxshopid";
+        $query = 'UPDATE oxconfig SET oxvarvalue = :value
+                  WHERE oxvarname = :oxvarname and oxshopid = :oxshopid';
 
         $parameter = [
             ':value' => $this->convertAppServerToConfigOption($appServer),
             ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $appServer->getId(),
-            ':oxshopid' => $this->config->getBaseShopId()
+            ':oxshopid' => $this->config->getBaseShopId(),
         ];
 
         $this->database->execute($query, $parameter);
@@ -199,7 +199,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
             ':oxshopid' => $this->config->getBaseShopId(),
             ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $appServer->getId(),
             ':oxvartype' => 'arr',
-            ':value' => $this->convertAppServerToConfigOption($appServer)
+            ':value' => $this->convertAppServerToConfigOption($appServer),
         ];
 
         $this->database->execute($query, $parameter);
@@ -214,14 +214,14 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      */
     private function selectDataById($id)
     {
-        $query = "SELECT " . $this->config->getDecodeValueQuery() .
-            " as oxvarvalue FROM oxconfig 
+        $query = 'SELECT ' . $this->config->getDecodeValueQuery() .
+            ' as oxvarvalue FROM oxconfig 
             WHERE oxvarname = :oxvarname 
-              AND oxshopid = :oxshopid FOR UPDATE";
+              AND oxshopid = :oxshopid FOR UPDATE';
 
         $parameter = [
-            ":oxvarname" => self::CONFIG_NAME_FOR_SERVER_INFO . $id,
-            ":oxshopid" => $this->config->getBaseShopId()
+            ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . $id,
+            ':oxshopid' => $this->config->getBaseShopId(),
         ];
 
         $this->database->setFetchMode(\OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface::FETCH_MODE_ASSOC);
@@ -235,13 +235,13 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
      */
     private function selectAllData()
     {
-        $query = "SELECT oxvarname, " . $this->config->getDecodeValueQuery() . " as oxvarvalue
+        $query = 'SELECT oxvarname, ' . $this->config->getDecodeValueQuery() . ' as oxvarvalue
                     FROM oxconfig
-                    WHERE oxvarname like :oxvarname AND oxshopid = :oxshopid";
+                    WHERE oxvarname like :oxvarname AND oxshopid = :oxshopid';
 
         $parameter = [
-            ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . "%",
-            ':oxshopid' => $this->config->getBaseShopId()
+            ':oxvarname' => self::CONFIG_NAME_FOR_SERVER_INFO . '%',
+            ':oxshopid' => $this->config->getBaseShopId(),
         ];
 
         $this->database->setFetchMode(\OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface::FETCH_MODE_ASSOC);
@@ -322,7 +322,7 @@ class ApplicationServerDao implements \OxidEsales\Eshop\Core\Dao\ApplicationServ
             'timestamp'         => $appServer->getTimestamp(),
             'ip'                => $appServer->getIp(),
             'lastFrontendUsage' => $appServer->getLastFrontendUsage(),
-            'lastAdminUsage'    => $appServer->getLastAdminUsage()
+            'lastAdminUsage'    => $appServer->getLastAdminUsage(),
         ];
 
         return serialize($serverData);

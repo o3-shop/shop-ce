@@ -34,7 +34,7 @@ class BasketContentMarkGenerator
     /**
      * Default value for explanation mark.
      */
-    const DEFAULT_EXPLANATION_MARK = '**';
+    public const DEFAULT_EXPLANATION_MARK = '**';
 
     /**
      * Marks added to array by article type.

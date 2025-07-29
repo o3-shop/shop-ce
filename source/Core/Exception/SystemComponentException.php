@@ -72,7 +72,7 @@ class SystemComponentException extends \OxidEsales\Eshop\Core\Exception\Standard
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Faulty component --> " . $this->_sComponent;
+        return __CLASS__ . '-' . parent::getString() . ' Faulty component --> ' . $this->_sComponent;
     }
 
     /**

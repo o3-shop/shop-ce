@@ -62,15 +62,15 @@ class ArticleVariant extends AdminDetailsController
 
         // all selectlists
         $oAllSel = oxNew(ListModel::class);
-        $oAllSel->init("oxselectlist");
+        $oAllSel->init('oxselectlist');
         $sQ = "select * from $sSLViewName";
         $oAllSel->selectString($sQ);
-        $this->_aViewData["allsel"] = $oAllSel;
+        $this->_aViewData['allsel'] = $oAllSel;
 
         $oArticle = oxNew(Article::class);
-        $this->_aViewData["edit"] = $oArticle;
+        $this->_aViewData['edit'] = $oArticle;
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oArticle->loadInLang($this->_iEditLang, $soxId);
 
@@ -78,10 +78,10 @@ class ArticleVariant extends AdminDetailsController
                 $this->_aViewData['readonly'] = true;
             }
 
-            $_POST["language"] = $_GET["language"] = $this->_iEditLang;
+            $_POST['language'] = $_GET['language'] = $this->_iEditLang;
             $oVariants = $oArticle->getAdminVariants($this->_iEditLang);
 
-            $this->_aViewData["mylist"] = $oVariants;
+            $this->_aViewData['mylist'] = $oVariants;
 
             // load object in other languages
             $oOtherLang = $oArticle->getAvailableInLangs();
@@ -94,32 +94,32 @@ class ArticleVariant extends AdminDetailsController
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             if ($oArticle->oxarticles__oxparentid->value) {
-                $this->_aViewData["parentarticle"] = $this->getProductParent($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
-                $this->_aViewData["issubvariant"] = 1;
+                $this->_aViewData['parentarticle'] = $this->getProductParent($oArticle->oxarticles__oxparentid->value);
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['issubvariant'] = 1;
                 // A. disable variant information editing for variant
-                $this->_aViewData["readonly"] = 1;
+                $this->_aViewData['readonly'] = 1;
             }
             $this->_aViewData['editlanguage'] = $this->_iEditLang;
 
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = $oLang;
+                $this->_aViewData['otherlang'][$id] = $oLang;
             }
         }
 
-        return "article_variant.tpl";
+        return 'article_variant.tpl';
     }
 
     /**
@@ -140,7 +140,7 @@ class ArticleVariant extends AdminDetailsController
 
         // variant-handling
         $sParentId = $this->getEditObjectId();
-        if (isset($sParentId) && $sParentId && $sParentId != "-1") {
+        if (isset($sParentId) && $sParentId && $sParentId != '-1') {
             $aParams['oxarticles__oxparentid'] = $sParentId;
         } else {
             unset($aParams['oxarticles__oxparentid']);
@@ -148,7 +148,7 @@ class ArticleVariant extends AdminDetailsController
         /** @var Article $oArticle */
         $oArticle = oxNew(Article::class);
 
-        if ($sOXID != "-1") {
+        if ($sOXID != '-1') {
             $oArticle->loadInLang($this->_iEditLang, $sOXID);
         }
 
@@ -168,7 +168,7 @@ class ArticleVariant extends AdminDetailsController
         // #0004473
         $oArticle->resetRemindStatus();
 
-        if ($sOXID == "-1") {
+        if ($sOXID == '-1') {
             if ($oParent = $this->getProductParent($oArticle->oxarticles__oxparentid->value)) {
                 // assign field from parent for new variant
                 // #4406
@@ -302,7 +302,7 @@ class ArticleVariant extends AdminDetailsController
         $this->resetContentCache();
 
         $oArticle = oxNew(Article::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oArticle->loadInLang($this->_iEditLang, $soxId);
         }
 
@@ -311,7 +311,6 @@ class ArticleVariant extends AdminDetailsController
         $oArticle->setLanguage($this->_iEditLang);
         $oArticle->save();
     }
-
 
     /**
      * Add selection list

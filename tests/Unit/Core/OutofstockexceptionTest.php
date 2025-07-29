@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class OutofstockexceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
@@ -24,7 +26,7 @@ class OutofstockexceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
     private $testObject = null;
     private $message = 'Erik was here..';
     private $amount = 13;
-    private $basketIndex = "05848170643ab0deb9914566391c0c63";
+    private $basketIndex = '05848170643ab0deb9914566391c0c63';
 
     /**
      * Initialize the fixture.
@@ -45,7 +47,7 @@ class OutofstockexceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $this->assertEquals($this->message, $this->testObject->getMessage());
 
         $this->testObject->setDestination(null);
-        $this->assertEquals($this->message . ": " . $this->amount, $this->testObject->getMessage());
+        $this->assertEquals($this->message . ': ' . $this->amount, $this->testObject->getMessage());
     }
 
     public function testSetGetRemainingAmount()

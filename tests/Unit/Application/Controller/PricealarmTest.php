@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,13 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxDb;
+use oxRegistry;
+use oxTestModules;
 
 class PricealarmTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -34,7 +34,7 @@ class PricealarmTest extends \OxidTestCase
      */
     protected function tearDown(): void
     {
-        $this->cleanUpTable("oxpricealarm", "oxartid");
+        $this->cleanUpTable('oxpricealarm', 'oxartid');
 
         parent::tearDown();
     }
@@ -63,12 +63,12 @@ class PricealarmTest extends \OxidTestCase
 
         $oPriceAlarm = $this->getProxyClass('pricealarm');
 
-        $this->setRequestParameter("pa", array("email" => "ladyGaga"));
+        $this->setRequestParameter('pa', ['email' => 'ladyGaga']);
         $oPriceAlarm->addme();
 
-        $this->assertEquals(0, $oPriceAlarm->getNonPublicVar("_iPriceAlarmStatus"));
+        $this->assertEquals(0, $oPriceAlarm->getNonPublicVar('_iPriceAlarmStatus'));
 
-        $sSql = "select count(oxid) from oxpricealarm";
+        $sSql = 'select count(oxid) from oxpricealarm';
         $this->assertEquals(0, $oDb->getOne($sSql));
     }
 
@@ -77,29 +77,29 @@ class PricealarmTest extends \OxidTestCase
         $oPriceAlarm = $this->getProxyClass('pricealarm');
         oxTestModules::addFunction('oxEmail', 'sendPricealarmNotification', '{return 999;}');
 
-        $this->getSession()->setVariable('usr', "testUserId");
-        $aParams["email"] = "goodemail@ladyGagaFans.lt";
-        $aParams["aid"] = "_testArtId";
-        $aParams["price"] = "10";
+        $this->getSession()->setVariable('usr', 'testUserId');
+        $aParams['email'] = 'goodemail@ladyGagaFans.lt';
+        $aParams['aid'] = '_testArtId';
+        $aParams['price'] = '10';
 
-        $aParams["mano"] = "101";
+        $aParams['mano'] = '101';
 
-        $this->setRequestParameter("pa", $aParams);
+        $this->setRequestParameter('pa', $aParams);
         $oPriceAlarm->addme();
 
-        $this->assertEquals(999, $oPriceAlarm->getNonPublicVar("_iPriceAlarmStatus"));
+        $this->assertEquals(999, $oPriceAlarm->getNonPublicVar('_iPriceAlarmStatus'));
 
-        $sSql = "select * from oxpricealarm";
+        $sSql = 'select * from oxpricealarm';
 
         $oDb = oxDb::getDb(oxDB::FETCH_MODE_ASSOC);
         $aAlarm = $oDb->getRow($sSql);
 
-        $this->assertEquals($aParams["email"], $aAlarm["OXEMAIL"]);
-        $this->assertEquals($aParams["aid"], $aAlarm["OXARTID"]);
-        $this->assertEquals($aParams["price"], $aAlarm["OXPRICE"]);
-        $this->assertEquals("testUserId", $aAlarm["OXUSERID"]);
-        $this->assertEquals("EUR", $aAlarm["OXCURRENCY"]);
-        $this->assertEquals(0, $aAlarm["OXLANG"]);
+        $this->assertEquals($aParams['email'], $aAlarm['OXEMAIL']);
+        $this->assertEquals($aParams['aid'], $aAlarm['OXARTID']);
+        $this->assertEquals($aParams['price'], $aAlarm['OXPRICE']);
+        $this->assertEquals('testUserId', $aAlarm['OXUSERID']);
+        $this->assertEquals('EUR', $aAlarm['OXCURRENCY']);
+        $this->assertEquals(0, $aAlarm['OXLANG']);
     }
 
     public function testAddme_savesCurrentActiveLang()
@@ -109,15 +109,15 @@ class PricealarmTest extends \OxidTestCase
         $oPriceAlarm = $this->getProxyClass('pricealarm');
         oxTestModules::addFunction('oxEmail', 'sendPricealarmNotification', '{return 999;}');
 
-        $this->getSession()->setVariable('usr', "testUserId");
-        $aParams["email"] = "goodemail@ladyGagaFans.lt";
+        $this->getSession()->setVariable('usr', 'testUserId');
+        $aParams['email'] = 'goodemail@ladyGagaFans.lt';
 
         oxRegistry::getLang()->setBaseLanguage(1);
-        $this->setRequestParameter("pa", $aParams);
+        $this->setRequestParameter('pa', $aParams);
 
         $oPriceAlarm->addme();
 
-        $sSql = "select oxlang from oxpricealarm";
+        $sSql = 'select oxlang from oxpricealarm';
         $iLang = $oDb->getOne($sSql);
 
         $this->assertEquals(1, $iLang);

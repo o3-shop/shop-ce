@@ -45,7 +45,7 @@ class SeoUrlLogic
                 $sUrl = $oObject->getLink();
             } elseif ($sOxid) {
                 //minimising aricle object loading
-                if (strtolower($sType) == "oxarticle") {
+                if (strtolower($sType) == 'oxarticle') {
                     $oObject->disablePriceLoad();
                     $oObject->setNoVariantLoading(true);
                 }

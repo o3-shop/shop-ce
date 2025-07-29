@@ -17,8 +17,8 @@ namespace OxidEsales\EshopCommunity\Core\Exception;
 
 class AccessDeniedException extends \OxidEsales\Eshop\Core\Exception\StandardException
 {
-    public function __construct( $sMessage = "access denied", $iCode = 0, \Exception $previous = null )
+    public function __construct($sMessage = 'access denied', $iCode = 0, \Exception $previous = null)
     {
-        parent::__construct( $sMessage, $iCode, $previous );
+        parent::__construct($sMessage, $iCode, $previous);
     }
 }

@@ -21,13 +21,13 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Class manages deliveryset payment
@@ -40,7 +40,7 @@ class DeliverySetPaymentAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field, table, visible, multilanguage, ident
             ['oxdesc', 'oxpayments', 1, 1, 0],
             ['oxaddsum', 'oxpayments', 1, 0, 0],
@@ -104,10 +104,10 @@ class DeliverySetPaymentAjax extends ListComponentAjax
     {
         $aChosenCntr = $this->getActionIds('oxobject2payment.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2payment.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2payment.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2payment where oxobject2payment.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2payment where oxobject2payment.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -127,7 +127,7 @@ class DeliverySetPaymentAjax extends ListComponentAjax
             $sPayTable = $this->getViewName('oxpayments');
             $aChosenSets = $this->getAll($this->addFilter("select $sPayTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenSets)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
             $database = DatabaseProvider::getMaster();
             foreach ($aChosenSets as $sChosenSet) {
@@ -135,14 +135,14 @@ class DeliverySetPaymentAjax extends ListComponentAjax
                 // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
                 $sID = $database->getOne("select oxid from oxobject2payment where oxpaymentid = :oxpaymentid and oxobjectid = :oxobjectid and oxtype = 'oxdelset'", [
                     ':oxpaymentid' => $sChosenSet,
-                    ':oxobjectid' => $soxId
+                    ':oxobjectid' => $soxId,
                 ]);
                 if (!isset($sID) || !$sID) {
                     $oObject = oxNew(BaseModel::class);
                     $oObject->init('oxobject2payment');
                     $oObject->oxobject2payment__oxpaymentid = new Field($sChosenSet);
                     $oObject->oxobject2payment__oxobjectid = new Field($soxId);
-                    $oObject->oxobject2payment__oxtype = new Field("oxdelset");
+                    $oObject->oxobject2payment__oxtype = new Field('oxdelset');
                     $oObject->save();
                 }
             }

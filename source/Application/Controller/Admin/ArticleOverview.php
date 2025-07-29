@@ -54,7 +54,7 @@ class ArticleOverview extends AdminDetailsController
         $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oDB = $this->getDatabase();
 
             // load object
@@ -63,23 +63,23 @@ class ArticleOverview extends AdminDetailsController
             $sShopID = $myConfig->getShopID();
 
             $sSelect = $this->formOrderAmountQuery($soxId);
-            $this->_aViewData["totalordercnt"] = $iTotalOrderCnt = (float) $oDB->getOne($sSelect);
+            $this->_aViewData['totalordercnt'] = $iTotalOrderCnt = (float) $oDB->getOne($sSelect);
 
             $sSelect = $this->formSoldOutAmountQuery($soxId);
-            $this->_aViewData["soldcnt"] = $iSoldCnt = (float) $oDB->getOne($sSelect);
+            $this->_aViewData['soldcnt'] = $iSoldCnt = (float) $oDB->getOne($sSelect);
 
             $sSelect = $this->formCanceledAmountQuery($soxId);
-            $this->_aViewData["canceledcnt"] = $iCanceledCnt = (float) $oDB->getOne($sSelect);
+            $this->_aViewData['canceledcnt'] = $iCanceledCnt = (float) $oDB->getOne($sSelect);
 
             // not yet processed
-            $this->_aViewData["leftordercnt"] = $iTotalOrderCnt - $iSoldCnt - $iCanceledCnt;
+            $this->_aViewData['leftordercnt'] = $iTotalOrderCnt - $iSoldCnt - $iCanceledCnt;
 
             // position in top ten
-            $sSelect = "select oxartid,sum(oxamount) as cnt from oxorderarticles " .
-                       "where oxordershopid = :oxordershopid group by oxartid order by cnt desc";
+            $sSelect = 'select oxartid,sum(oxamount) as cnt from oxorderarticles ' .
+                       'where oxordershopid = :oxordershopid group by oxartid order by cnt desc';
 
             $rs = $oDB->select($sSelect, [
-                ':oxordershopid' => $sShopID
+                ':oxordershopid' => $sShopID,
             ]);
             $iTopPos = 0;
             $iPos = 0;
@@ -93,14 +93,14 @@ class ArticleOverview extends AdminDetailsController
                 }
             }
 
-            $this->_aViewData["postopten"] = $iTopPos;
-            $this->_aViewData["toptentotal"] = $iPos;
+            $this->_aViewData['postopten'] = $iTopPos;
+            $this->_aViewData['toptentotal'] = $iPos;
         }
 
-        $this->_aViewData["afolder"] = $myConfig->getConfigParam('aProductfolder');
-        $this->_aViewData["aSubclass"] = $myConfig->getConfigParam('aArticleClasses');
+        $this->_aViewData['afolder'] = $myConfig->getConfigParam('aProductfolder');
+        $this->_aViewData['aSubclass'] = $myConfig->getConfigParam('aArticleClasses');
 
-        return "article_overview.tpl";
+        return 'article_overview.tpl';
     }
 
     /**
@@ -122,8 +122,8 @@ class ArticleOverview extends AdminDetailsController
      */
     protected function formOrderAmountQuery($oxId)
     {
-        $query = "select sum(oxamount) from oxorderarticles ";
-        $query .= "where oxartid=" . $this->getDatabase()->quote($oxId);
+        $query = 'select sum(oxamount) from oxorderarticles ';
+        $query .= 'where oxartid=' . $this->getDatabase()->quote($oxId);
 
         return $query;
     }
@@ -138,10 +138,10 @@ class ArticleOverview extends AdminDetailsController
      */
     protected function formSoldOutAmountQuery($oxId)
     {
-        return "select sum(oxorderarticles.oxamount) from  oxorderarticles, oxorder " .
+        return 'select sum(oxorderarticles.oxamount) from  oxorderarticles, oxorder ' .
             "where (oxorder.oxpaid>0 or oxorder.oxsenddate > 0) and oxorderarticles.oxstorno != '1' " .
-            "and oxorderarticles.oxartid=" . $this->getDatabase()->quote($oxId) .
-            "and oxorder.oxid =oxorderarticles.oxorderid";
+            'and oxorderarticles.oxartid=' . $this->getDatabase()->quote($oxId) .
+            'and oxorder.oxid =oxorderarticles.oxorderid';
     }
 
     /**
@@ -155,7 +155,7 @@ class ArticleOverview extends AdminDetailsController
     protected function formCanceledAmountQuery($soxId)
     {
         return "select sum(oxamount) from oxorderarticles where oxstorno = '1' " .
-            "and oxartid=" . $this->getDatabase()->quote($soxId);
+            'and oxartid=' . $this->getDatabase()->quote($soxId);
     }
 
     /**

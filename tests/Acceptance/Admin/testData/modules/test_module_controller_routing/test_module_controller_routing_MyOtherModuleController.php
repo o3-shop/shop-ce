@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -18,14 +19,12 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-use OxidEsales\Eshop\Core\Registry;
-
 /**
  * Class test_module_controller_routing_MyOtherModuleController
  */
 class test_module_controller_routing_MyOtherModuleController extends test_module_controller_routing_MyModuleController
 {
-    const MESSAGE_PREFIX = 'MyOtherModuleController - ';
+    public const MESSAGE_PREFIX = 'MyOtherModuleController - ';
 
     /**
      * Current view template

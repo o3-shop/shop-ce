@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Language component test
@@ -28,7 +30,6 @@ use \oxTestModules;
 
 class CmpLangTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -70,8 +71,8 @@ class CmpLangTest extends \OxidTestCase
         $oLangView->setConfig($oConfig);
         $oLangView->init();
         $oLang = $oLangView->render();
-        $sExpLink0 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket";
-        $sExpLink1 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket&amp;lang=1";
+        $sExpLink0 = $this->getConfig()->getShopCurrentURL(0) . 'cl=basket';
+        $sExpLink1 = $this->getConfig()->getShopCurrentURL(0) . 'cl=basket&amp;lang=1';
 
         $this->assertEquals($sExpLink0, $oLang[0]->link);
         $this->assertEquals($sExpLink1, $oLang[1]->link);
@@ -91,8 +92,8 @@ class CmpLangTest extends \OxidTestCase
         $oLangView->setConfig($oConfig);
         $oLangView->init();
         $oLang = $oLangView->render();
-        $sExpLink0 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket&amp;fnc=changebasket";
-        $sExpLink1 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket&amp;fnc=changebasket&amp;lang=1";
+        $sExpLink0 = $this->getConfig()->getShopCurrentURL(0) . 'cl=basket&amp;fnc=changebasket';
+        $sExpLink1 = $this->getConfig()->getShopCurrentURL(0) . 'cl=basket&amp;fnc=changebasket&amp;lang=1';
 
         $this->assertEquals($sExpLink0, $oLang[0]->link);
         $this->assertEquals($sExpLink1, $oLang[1]->link);

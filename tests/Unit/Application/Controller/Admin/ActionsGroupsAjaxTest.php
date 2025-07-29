@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Actions_List class
  */
 class ActionsGroupsAjaxTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -68,8 +69,8 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
     public function testRemovePromotionGroup()
     {
         $this->markTestSkipped('Bug: Failed asserting that true is false.');
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testId1', '_testId2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testId1', '_testId2']));
 
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testGroupDelete'"));
         $oView->removePromotionGroup();
@@ -83,8 +84,8 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
      */
     public function testRemovePromotionGroupAll()
     {
-        $this->setRequestParameter("all", true);
-        $this->setRequestParameter("oxid", '_testGroupDeleteAll');
+        $this->setRequestParameter('all', true);
+        $this->setRequestParameter('oxid', '_testGroupDeleteAll');
 
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testGroupDeleteAll'"));
 
@@ -101,10 +102,10 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
     public function testAddPromotionGroup()
     {
         $this->markTestSkipped('Bug: Got "2" but expected 0.');
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, array("_getActionIds"));
-        $this->setRequestParameter("synchoxid", '_testActionAdd');
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['_getActionIds']);
+        $this->setRequestParameter('synchoxid', '_testActionAdd');
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testGroupAdd1', '_testGroupAdd2')));
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testActionAdd'"));
         $oView->addPromotionGroup();
@@ -118,11 +119,11 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
      */
     public function testAddPromotionGroupAll()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, array("_getActionIds"));
-        $this->setRequestParameter("synchoxid", '_testActionAdd');
-        $this->setRequestParameter("all", true);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['_getActionIds']);
+        $this->setRequestParameter('synchoxid', '_testActionAdd');
+        $this->setRequestParameter('all', true);
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testGroupAdd1', '_testGroupAdd2')));
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testActionAdd'"));
         $oView->addPromotionGroup();
@@ -150,7 +151,7 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testGroupGetQuerySynchoxid';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('actions_groups_ajax');
         $this->assertEquals("from oxv_oxgroups_de where 1  and oxv_oxgroups_de.oxid not in ( select oxv_oxgroups_de.oxid from oxobject2action, oxv_oxgroups_de where oxv_oxgroups_de.oxid=oxobject2action.oxobjectid  and oxobject2action.oxactionid = '$sSynchoxid' and oxobject2action.oxclass = 'oxgroups' )", trim($oView->UNITgetQuery()));
@@ -164,7 +165,7 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
     public function testGetQueryOxid()
     {
         $sOxid = '_testGroupGetQuery';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
 
         $oView = oxNew('actions_groups_ajax');
         $this->assertEquals("from oxobject2action, oxv_oxgroups_de where oxv_oxgroups_de.oxid=oxobject2action.oxobjectid  and oxobject2action.oxactionid = '$sOxid' and oxobject2action.oxclass = 'oxgroups'", trim($oView->UNITgetQuery()));
@@ -179,8 +180,8 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
     {
         $sOxid = '_testGroupGetQuery';
         $sSynchoxid = '_testGroupGetQuerySynchoxid';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $oView = oxNew('actions_groups_ajax');
         $this->assertEquals("from oxobject2action, oxv_oxgroups_de where oxv_oxgroups_de.oxid=oxobject2action.oxobjectid  and oxobject2action.oxactionid = '$sOxid' and oxobject2action.oxclass = 'oxgroups'  and oxv_oxgroups_de.oxid not in ( select oxv_oxgroups_de.oxid from oxobject2action, oxv_oxgroups_de where oxv_oxgroups_de.oxid=oxobject2action.oxobjectid  and oxobject2action.oxactionid = '$sSynchoxid' and oxobject2action.oxclass = 'oxgroups' )", trim($oView->UNITgetQuery()));

@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\File;
@@ -28,7 +29,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 
 /**
  * Admin article files parameters manager.
@@ -71,7 +71,7 @@ class ArticleFiles extends AdminDetailsController
             $oParentArticle = oxNew(Article::class);
             $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
             $oArticle->oxarticles__oxisdownloadable = new Field($oParentArticle->oxarticles__oxisdownloadable->value);
-            $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
+            $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
         }
 
         return $this->_sThisTemplate;
@@ -217,7 +217,7 @@ class ArticleFiles extends AdminDetailsController
      */
     public function getConfigOptionValue($iOption)
     {
-        return ($iOption < 0) ? "" : $iOption;
+        return ($iOption < 0) ? '' : $iOption;
     }
 
     /**
@@ -246,17 +246,17 @@ class ArticleFiles extends AdminDetailsController
             $aParams = [];
         }
 
-        if (!isset($aParams["oxfiles__oxdownloadexptime"]) || $aParams["oxfiles__oxdownloadexptime"] == "") {
-            $aParams["oxfiles__oxdownloadexptime"] = -1;
+        if (!isset($aParams['oxfiles__oxdownloadexptime']) || $aParams['oxfiles__oxdownloadexptime'] == '') {
+            $aParams['oxfiles__oxdownloadexptime'] = -1;
         }
-        if (!isset($aParams["oxfiles__oxlinkexptime"]) || $aParams["oxfiles__oxlinkexptime"] == "") {
-            $aParams["oxfiles__oxlinkexptime"] = -1;
+        if (!isset($aParams['oxfiles__oxlinkexptime']) || $aParams['oxfiles__oxlinkexptime'] == '') {
+            $aParams['oxfiles__oxlinkexptime'] = -1;
         }
-        if (!isset($aParams["oxfiles__oxmaxunregdownloads"]) || $aParams["oxfiles__oxmaxunregdownloads"] == "") {
-            $aParams["oxfiles__oxmaxunregdownloads"] = -1;
+        if (!isset($aParams['oxfiles__oxmaxunregdownloads']) || $aParams['oxfiles__oxmaxunregdownloads'] == '') {
+            $aParams['oxfiles__oxmaxunregdownloads'] = -1;
         }
-        if (!isset($aParams["oxfiles__oxmaxdownloads"]) || $aParams["oxfiles__oxmaxdownloads"] == "") {
-            $aParams["oxfiles__oxmaxdownloads"] = -1;
+        if (!isset($aParams['oxfiles__oxmaxdownloads']) || $aParams['oxfiles__oxmaxdownloads'] == '') {
+            $aParams['oxfiles__oxmaxdownloads'] = -1;
         }
 
         return $aParams;

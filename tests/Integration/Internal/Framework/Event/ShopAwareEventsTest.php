@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -51,7 +53,7 @@ class ShopAwareEventsTest extends \PHPUnit\Framework\TestCase
             ])->getMock();
 
         $context->method('getCommunityEditionSourcePath')->willReturn(
-            (new Facts)->getCommunityEditionSourcePath()
+            (new Facts())->getCommunityEditionSourcePath()
         );
         $context->method('getGeneratedServicesFilePath')->willReturn(__DIR__ . '/generated_project.yaml');
         $context->method('getConfigurationDirectoryPath')->willReturn(__DIR__);

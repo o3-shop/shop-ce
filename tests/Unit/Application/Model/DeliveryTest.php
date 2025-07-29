@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 use oxArticleHelper;
-use \oxDelivery;
+use oxDb;
+use oxDelivery;
 use oxDeliveryHelper;
-use \oxField;
-use \oxDb;
+use oxField;
 
 class modOxDelivery extends oxDelivery
 {
@@ -74,8 +76,8 @@ class DeliveryTest extends \OxidTestCase
 
     /** @var oxBasketItem $_oBasketItem */
     protected $_oBasketItem = null;
-    public $aArticleIds = array();
-    public $aCategoryIds = array();
+    public $aArticleIds = [];
+    public $aCategoryIds = [];
 
     /**
      * Initialize the fixture.
@@ -91,7 +93,7 @@ class DeliveryTest extends \OxidTestCase
         $this->cleanUpTable('oxobject2delivery');
         $this->cleanUpTable('oxarticles');
 
-        $this->aArticleIds = array();
+        $this->aArticleIds = [];
 
         $oDelivery = oxNew('oxDelivery');
         $oDelivery->setId('_testDeliveryId');
@@ -101,7 +103,7 @@ class DeliveryTest extends \OxidTestCase
 
         // insert test articles
         for ($i = 1; $i <= 3; $i++) {
-            $oArticle = oxNew("oxArticle");
+            $oArticle = oxNew('oxArticle');
             $oArticle->setId('_testArticleId' . $i);
             $oArticle->oxarticles__oxtitle = new oxField('testArticle' . $i, oxField::T_RAW);
             $oArticle->oxarticles__oxartnum = new oxField(1000 + $i, oxField::T_RAW);
@@ -132,12 +134,11 @@ class DeliveryTest extends \OxidTestCase
         $sQ .= '("_testId6", "' . $this->_sOxId . '", "category_id3", "oxcategories" )';
         oxDb::getInstance()->getDb()->Execute($sQ);
 
-        $this->aCategoryIds = array("category_id1", "category_id2", "category_id3");
+        $this->aCategoryIds = ['category_id1', 'category_id2', 'category_id3'];
 
         // preparing basket item
 
-
-        $this->_oBasketItem = $this->getProxyClass("oxbasketitem");
+        $this->_oBasketItem = $this->getProxyClass('oxbasketitem');
         $this->_oBasketItem->init('_testArticleId1', 2);
 
         $oPrice = oxNew('oxprice');
@@ -473,8 +474,8 @@ class DeliveryTest extends \OxidTestCase
         $oDelivery->save();
         $oDelivery = oxNew('oxDelivery');
         $oDelivery->load('_testDeliveryId');
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId1");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId1');
         $oArticle->oxarticles__oxfreeshipping = new oxField(true, oxField::T_RAW);
         $oArticle->save();
         $oBasket = oxNew('oxBasket');
@@ -492,14 +493,14 @@ class DeliveryTest extends \OxidTestCase
     {
         $oDelivery = oxNew('oxDelivery');
         $oDelivery->load('_testDeliveryId');
-        $oBasketItem = $this->getProxyClass("oxbasketitem");
+        $oBasketItem = $this->getProxyClass('oxbasketitem');
         $oBasketItem->init('_testArticleId1', 1);
-        $oBasketItem->setNonPublicVar("_oArticle", null);
-        $oBasket = $this->getProxyClass("oxbasket");
-        $oBasket->setNonPublicVar("_aBasketContents", array($oBasketItem));
+        $oBasketItem->setNonPublicVar('_oArticle', null);
+        $oBasket = $this->getProxyClass('oxbasket');
+        $oBasket->setNonPublicVar('_aBasketContents', [$oBasketItem]);
 
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId1");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId1');
         $oArticle->oxarticles__oxfreeshipping = new oxField(true, oxField::T_RAW);
         $oArticle->oxarticles__oxstock = new oxField(0, oxField::T_RAW);
         $oArticle->oxarticles__oxstockflag = new oxField(2, oxField::T_RAW);
@@ -532,7 +533,6 @@ class DeliveryTest extends \OxidTestCase
         }
     }
 
-
     /*
      * Testing if blank (or the one which does not have any categories assigned) delivery returns 0
      */
@@ -555,7 +555,6 @@ class DeliveryTest extends \OxidTestCase
             $this->assertTrue(in_array($sId, $this->aCategoryIds));
         }
     }
-
 
     /*
      * Testing if hasArticles() returns false, when no articles are assiged
@@ -700,12 +699,12 @@ class DeliveryTest extends \OxidTestCase
         $oDelivery->oxdelivery__oxfixed = new oxField('2', oxField::T_RAW);
 
         /** @var oxOrderArticle|PHPUnit\Framework\MockObject\MockObject $oOrderArticle */
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array(), array(), '', false);
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, [], [], '', false);
         $oOrderArticle->expects($this->any())->method('getArticle')->will($this->returnValue($this->_oBasketItem->getArticle()));
         $oOrderArticle->expects($this->any())->method('isOrderArticle')->will($this->returnValue(true));
 
         /** @var oxBasketItem $oBasketItem|PHPUnit\Framework\MockObject\MockObject */
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array(), array(), '', false);
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, [], [], '', false);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($oOrderArticle));
 
         $this->assertEquals(5, $oDelivery->getDeliveryAmount($oBasketItem));
@@ -748,12 +747,12 @@ class DeliveryTest extends \OxidTestCase
         $oDelivery->oxdelivery__oxfixed = new oxField('2', oxField::T_RAW);
 
         /** @var oxOrderArticle|PHPUnit\Framework\MockObject\MockObject $oOrderArticle */
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array(), array(), '', false);
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, [], [], '', false);
         $oOrderArticle->expects($this->any())->method('getArticle')->will($this->returnValue($this->_oBasketItem->getArticle()));
         $oOrderArticle->expects($this->any())->method('isOrderArticle')->will($this->returnValue(true));
 
         /** @var oxBasketItem $oBasketItem|PHPUnit\Framework\MockObject\MockObject */
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, array(), array(), '', false);
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, [], [], '', false);
         $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($oOrderArticle));
 
         $this->assertEquals(48, $oDelivery->getDeliveryAmount($oBasketItem));
@@ -797,7 +796,6 @@ class DeliveryTest extends \OxidTestCase
         $this->assertFalse($oDelivery->getblFreeShipping());
     }
 
-
     /*
      * Testing getDeliveryAmount() - _dPrice sums on every basket item
      */
@@ -827,18 +825,18 @@ class DeliveryTest extends \OxidTestCase
         $oPrice = oxNew('oxprice');
         $oPrice->setPrice(256, 0);
 
-        $oBasketItem1 = oxNew("oxBasketItem");
+        $oBasketItem1 = oxNew('oxBasketItem');
         $oBasketItem1->init('_testArticleId2', 2);
         $oBasketItem1->setPrice($oPrice);
         $oBasketItem1->getArticle()->oxarticles__oxfreeshipping = new oxField(true);
 
-        $oBasketItem2 = oxNew("oxBasketItem");
+        $oBasketItem2 = oxNew('oxBasketItem');
         $oBasketItem2->init('_testArticleId2', 2);
         $oBasketItem2->setPrice($oPrice);
         $oBasketItem2->getArticle()->oxarticles__oxfreeshipping = new oxField(false);
 
         // 2 basket items
-        $aBasketContents = array($this->_oBasketItem, $oBasketItem1, $oBasketItem2);
+        $aBasketContents = [$this->_oBasketItem, $oBasketItem1, $oBasketItem2];
 
         // test for delivery by amount
         $oDelivery = oxNew('oxDelivery');
@@ -1051,7 +1049,7 @@ class DeliveryTest extends \OxidTestCase
 
     public function testIsForArticle()
     {
-        $oDelivery = $this->getMock(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\modOxDelivery::class, array('_checkDeliveryAmount', 'getCalculationRule'));
+        $oDelivery = $this->getMock(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\modOxDelivery::class, ['_checkDeliveryAmount', 'getCalculationRule']);
         $oDelivery->expects($this->once())->method('_checkDeliveryAmount')->will($this->returnValue(true));
         $calculateMoreThanOncePerCartRule = 123;
         $oDelivery->expects($this->any())->method('getCalculationRule')->will($this->returnValue($calculateMoreThanOncePerCartRule));
@@ -1064,8 +1062,8 @@ class DeliveryTest extends \OxidTestCase
 
     public function testIsForArticleIfArticleIsFreeShipped()
     {
-        $oDelivery = $this->getProxyClass("oxdelivery");
-        $oDelivery->setNonPublicVar("_blFreeShipping", true);
+        $oDelivery = $this->getProxyClass('oxdelivery');
+        $oDelivery->setNonPublicVar('_blFreeShipping', true);
         $oDelivery->load('_testDeliveryId');
         $blReturn = $oDelivery->UNITisForArticle($this->_oBasketItem, 2);
         $this->assertFalse($blReturn);
@@ -1086,14 +1084,14 @@ class DeliveryTest extends \OxidTestCase
         //standard delivery id for rest EU
         $oD->load('1b842e7352422a708.01472527');
         $aCountries = $oD->getCountriesISO();
-        $this->assertEquals(2, count($aCountries), "Failed getting countries code");
-        $this->assertEquals(array("AT", "CH"), $aCountries);
+        $this->assertEquals(2, count($aCountries), 'Failed getting countries code');
+        $this->assertEquals(['AT', 'CH'], $aCountries);
     }
 
     public function testSetDelVatOnTop()
     {
-        $oDelivery = $this->getProxyClass("oxdelivery");
+        $oDelivery = $this->getProxyClass('oxdelivery');
         $oDelivery->setDelVatOnTop(true);
-        $this->assertTrue($oDelivery->getNonPublicVar("_blDelVatOnTop"));
+        $this->assertTrue($oDelivery->getNonPublicVar('_blDelVatOnTop'));
     }
 }

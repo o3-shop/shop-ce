@@ -101,7 +101,7 @@ class SmartyPluginDirectoriesValidator implements ModuleConfigurationValidatorIn
     private function isEmptyArray(array $directories): bool
     {
         if (count($directories) == 1) {
-            if ($directories[0] === "") {
+            if ($directories[0] === '') {
                 return true;
             }
         }

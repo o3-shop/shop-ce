@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -21,7 +22,6 @@
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core;
 
 use Exception;
-use InvalidArgumentException;
 use oxDb;
 use OxidEsales\Eshop\Core\ConfigFile;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -193,7 +193,7 @@ class DatabaseTest extends UnitTestCase
         $connection = DatabaseProvider::getDb();
 
         $result = $connection->getRow("SHOW VARIABLES LIKE  'character_set_connection';");
-        $this->assertSame("utf8", $result[1]);
+        $this->assertSame('utf8', $result[1]);
     }
 
     /**
@@ -209,7 +209,7 @@ class DatabaseTest extends UnitTestCase
         $connection = DatabaseProvider::getDb();
 
         $result = $connection->getRow("SHOW VARIABLES LIKE  'character_set_connection';");
-        $this->assertSame("utf8mb4", $result[1]);
+        $this->assertSame('utf8mb4', $result[1]);
     }
 
     /**
@@ -231,7 +231,7 @@ class DatabaseTest extends UnitTestCase
      */
     protected function createConnectionMock()
     {
-        $connectionMock = $this->getMock('Connection', array('connect'));
+        $connectionMock = $this->getMock('Connection', ['connect']);
         $connectionMock->expects($this->once())->method('connect');
 
         return $connectionMock;
@@ -251,7 +251,7 @@ class DatabaseTest extends UnitTestCase
 
         $dbMock = $this->getMock(
             'OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database',
-            array('isConnectionEstablished', 'getConnectionFromDriverManager', 'createConnectionErrorMessage', 'setFetchMode', 'closeConnection')
+            ['isConnectionEstablished', 'getConnectionFromDriverManager', 'createConnectionErrorMessage', 'setFetchMode', 'closeConnection']
         );
         $dbMock->expects($this->once())
             ->method('getConnectionFromDriverManager')
@@ -273,11 +273,12 @@ class DatabaseTest extends UnitTestCase
         $exception = null;
         try {
             $db->select('update oxactions set oxtitle = "testValue" where oxid = "oxcatoffer"');
-        } catch (\Exception $exception) {}
+        } catch (\Exception $exception) {
+        }
 
         $this->assertInstanceOf(\InvalidArgumentException::class, $exception);
         $this->assertNotEquals(
-            ["testValue"],
+            ['testValue'],
             $db->select('select oxtitle from oxactions where oxid = "oxcatoffer"')->fetchAll()[0]
         );
     }

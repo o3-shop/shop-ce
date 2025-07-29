@@ -281,7 +281,7 @@ class SearchController extends FrontendController
         $oRequest = Registry::getRequest();
 
         if ($sParam = $oRequest->getRequestEscapedParameter('searchparam', true)) {
-            $sAddParams .= "&amp;searchparam=" . rawurlencode($sParam);
+            $sAddParams .= '&amp;searchparam=' . rawurlencode($sParam);
         }
 
         if ($sParam = $oRequest->getRequestEscapedParameter('searchcnid')) {
@@ -460,7 +460,6 @@ class SearchController extends FrontendController
 
         return $this->_oPageNavigation;
     }
-
 
     /**
      * Template variable getter. Returns active search

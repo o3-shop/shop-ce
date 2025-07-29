@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +30,6 @@ class ModuleSettingsBooleanConverterTest extends TestCase
 {
     public function convertToTrueDataProvider()
     {
-
         return [
             ['true'],
             ['True'],
@@ -48,9 +49,9 @@ class ModuleSettingsBooleanConverterTest extends TestCase
             [
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'type' => 'bool', 'value' => $value
+                        'type' => 'bool', 'value' => $value,
                     ],
-                ]
+                ],
             ];
         $converter = new ModuleSettingsBooleanConverter();
 
@@ -60,7 +61,6 @@ class ModuleSettingsBooleanConverterTest extends TestCase
 
     public function convertToFalseDataProvider()
     {
-
         return [
             ['false'],
             ['False'],
@@ -80,9 +80,9 @@ class ModuleSettingsBooleanConverterTest extends TestCase
             [
                 MetaDataProvider::METADATA_SETTINGS => [
                     [
-                        'type' => 'bool', 'value' => $value
+                        'type' => 'bool', 'value' => $value,
                     ],
-                ]
+                ],
             ];
         $converter = new ModuleSettingsBooleanConverter();
 
@@ -98,10 +98,10 @@ class ModuleSettingsBooleanConverterTest extends TestCase
                 [
                     MetaDataProvider::METADATA_SETTINGS => [
                         [
-                            'type' => 'str', 'value' => 'any'
+                            'type' => 'str', 'value' => 'any',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
     }

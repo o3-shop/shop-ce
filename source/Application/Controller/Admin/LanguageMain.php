@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\DbMetaDataHandler;
@@ -30,7 +31,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 use PDOException;
 
 /**
@@ -81,17 +81,17 @@ class LanguageMain extends AdminDetailsController
     {
         parent::render();
 
-        $sOxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $sOxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         //loading languages info from config
         $this->_aLangData = $this->getLanguages();
 
-        if (isset($sOxId) && $sOxId != "-1") {
+        if (isset($sOxId) && $sOxId != '-1') {
             //checking if translations files exists
             $this->checkLangTranslations($sOxId);
-            $this->_aViewData["edit"] = $this->getLanguageInfo($sOxId);
+            $this->_aViewData['edit'] = $this->getLanguageInfo($sOxId);
         }
 
-        return "language_main.tpl";
+        return 'language_main.tpl';
     }
 
     /**
@@ -174,7 +174,7 @@ class LanguageMain extends AdminDetailsController
         //sort parameters, urls and languages arrays by language base id
         $this->sortLangArraysByBaseId();
 
-        $this->_aViewData["updatelist"] = "1";
+        $this->_aViewData['updatelist'] = '1';
 
         if ($this->isValidLanguageData($this->_aLangData)) {
             //saving languages info
@@ -229,7 +229,7 @@ class LanguageMain extends AdminDetailsController
         $aLangData['desc'] = $this->_aLangData['lang'][$sOxId];
         $aLangData['baseurl'] = $this->_aLangData['urls'][$aLangData['baseId']];
         $aLangData['basesslurl'] = $this->_aLangData['sslUrls'][$aLangData['baseId']];
-        $aLangData['default'] = (bool)($this->_aLangData['params'][$sOxId]["baseId"] == $sDefaultLang);
+        $aLangData['default'] = (bool)($this->_aLangData['params'][$sOxId]['baseId'] == $sDefaultLang);
 
         return $aLangData;
     }
@@ -326,7 +326,7 @@ class LanguageMain extends AdminDetailsController
             }
         }
     }
-    
+
     /**
      * Sort languages, languages parameters, urls, ssl urls arrays according
      * base land ID
@@ -720,7 +720,7 @@ class LanguageMain extends AdminDetailsController
                 $blValid = false;
                 $error = oxNew(DisplayError::class);
                 $error->setFormatParameters([htmlspecialchars($mLanguageDataParameters)]);
-                $error->setMessage("SHOP_CONFIG_ERROR_INVALID_VALUE");
+                $error->setMessage('SHOP_CONFIG_ERROR_INVALID_VALUE');
                 Registry::getUtilsView()->addErrorToDisplay($error);
             }
         }

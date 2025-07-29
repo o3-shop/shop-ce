@@ -97,15 +97,15 @@ class Attribute extends MultiLanguageModel
 
         // remove attributes from articles also
         $oDb = DatabaseProvider::getDb();
-        $sDelete = "delete from oxobject2attribute where oxattrid = :oxattrid";
+        $sDelete = 'delete from oxobject2attribute where oxattrid = :oxattrid';
         $oDb->execute($sDelete, [
-            ':oxattrid' => $sOXID
+            ':oxattrid' => $sOXID,
         ]);
 
         // #657 ADDITIONAL removes attribute connection to category
-        $sDelete = "delete from oxcategory2attribute where oxattrid = :oxattrid";
+        $sDelete = 'delete from oxcategory2attribute where oxattrid = :oxattrid';
         $oDb->execute($sDelete, [
-            ':oxattrid' => $sOXID
+            ':oxattrid' => $sOXID,
         ]);
 
         return parent::delete($sOXID);
@@ -127,11 +127,11 @@ class Attribute extends MultiLanguageModel
             $sAttrId = $this->_createAttribute($aSelTitle);
         }
         foreach ($aMDVariants as $sVarId => $oValue) {
-            if (strpos($sVarId, "mdvar_") === 0) {
+            if (strpos($sVarId, 'mdvar_') === 0) {
                 foreach ($oValue as $sId) {
                     $sVarId = substr($sVarId, 6);
                     $oNewAssign = oxNew(BaseModel::class);
-                    $oNewAssign->init("oxobject2attribute");
+                    $oNewAssign->init('oxobject2attribute');
                     $sNewId = Registry::getUtilsObject()->generateUID();
                     if ($oNewAssign->load($sId)) {
                         $oNewAssign->oxobject2attribute__oxobjectid = new Field($sVarId);
@@ -142,7 +142,7 @@ class Attribute extends MultiLanguageModel
             } else {
                 $oNewAssign = oxNew(MultiLanguageModel::class);
                 $oNewAssign->setEnableMultilang(false);
-                $oNewAssign->init("oxobject2attribute");
+                $oNewAssign->init('oxobject2attribute');
                 $oNewAssign->oxobject2attribute__oxobjectid = new Field($sVarId);
                 $oNewAssign->oxobject2attribute__oxattrid = new Field($sAttrId);
                 foreach ($aConfLanguages as $sKey => $sLang) {
@@ -169,7 +169,7 @@ class Attribute extends MultiLanguageModel
         $sAttViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxattribute');
 
         return $oDb->getOne("select oxid from $sAttViewName where LOWER(oxtitle) = :oxtitle ", [
-            ':oxtitle' => Str::getStr()->strtolower($sSelTitle)
+            ':oxtitle' => Str::getStr()->strtolower($sSelTitle),
         ]);
     }
 
@@ -212,12 +212,12 @@ class Attribute extends MultiLanguageModel
         if ($sArtId) {
             $oDb = DatabaseProvider::getDb();
 
-            $sSelect = "select o2a.oxid from oxobject2attribute as o2a ";
-            $sSelect .= "where o2a.oxobjectid = :oxobjectid order by o2a.oxpos";
+            $sSelect = 'select o2a.oxid from oxobject2attribute as o2a ';
+            $sSelect .= 'where o2a.oxobjectid = :oxobjectid order by o2a.oxpos';
 
             $aIds = [];
             $rs = $oDb->select($sSelect, [
-                ':oxobjectid' => $sArtId
+                ':oxobjectid' => $sArtId,
             ]);
             if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
@@ -229,7 +229,6 @@ class Attribute extends MultiLanguageModel
             return $aIds;
         }
     }
-
 
     /**
      * Set attribute title

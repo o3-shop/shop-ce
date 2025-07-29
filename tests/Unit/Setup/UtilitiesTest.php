@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Setup;
 
+use Exception;
 use OxidEsales\EshopCommunity\Setup\Utilities;
-use \Exception;
 
 require_once getShopBasePath() . '/Setup/functions.php';
 
@@ -54,7 +56,7 @@ class UtilitiesTest extends \OxidTestCase
 
         parent::setUp();
 
-        $this->configTestPath = __DIR__ .'/../testData/Setup';
+        $this->configTestPath = __DIR__ . '/../testData/Setup';
         $this->removeTestFile();
     }
 
@@ -63,12 +65,12 @@ class UtilitiesTest extends \OxidTestCase
      */
     protected function tearDown(): void
     {
-        if (isset($_POST["testPostVarName"])) {
-            unset($_POST["testPostVarName"]);
+        if (isset($_POST['testPostVarName'])) {
+            unset($_POST['testPostVarName']);
         }
 
-        if (isset($_GET["testGetVarName"])) {
-            unset($_GET["testGetVarName"]);
+        if (isset($_GET['testGetVarName'])) {
+            unset($_GET['testGetVarName']);
         }
 
         // restore
@@ -102,18 +104,18 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testGetDefaultPathParams()
     {
-        $sTmp = "tmp/";
+        $sTmp = 'tmp/';
 
         $_SERVER['PATH_TRANSLATED'] = null;
         $_SERVER['HTTP_REFERER'] = null;
-        $_SERVER['SCRIPT_FILENAME'] = "/var/www/ee440setup/setup/index.php";
-        $_SERVER['SCRIPT_NAME'] = "/ee440setup/setup/index.php";
-        $_SERVER['HTTP_HOST'] = "127.0.0.1:1001";
+        $_SERVER['SCRIPT_FILENAME'] = '/var/www/ee440setup/setup/index.php';
+        $_SERVER['SCRIPT_NAME'] = '/ee440setup/setup/index.php';
+        $_SERVER['HTTP_HOST'] = '127.0.0.1:1001';
 
         // paths
-        $aParams['sShopDir'] = "/var/www/ee440setup/";
+        $aParams['sShopDir'] = '/var/www/ee440setup/';
         $aParams['sCompileDir'] = $aParams['sShopDir'] . $sTmp;
-        $aParams['sShopURL'] = "https://127.0.0.1:1001/ee440setup/";
+        $aParams['sShopURL'] = 'https://127.0.0.1:1001/ee440setup/';
 
         $oUtils = new Utilities();
         $this->assertEquals($aParams, $oUtils->getDefaultPathParams());
@@ -124,18 +126,18 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testGetDefaultPathParamsIfPathTranslatedIsEmpty()
     {
-        $sTmp = "tmp/";
+        $sTmp = 'tmp/';
 
         $_SERVER['PATH_TRANSLATED'] = '';
         $_SERVER['HTTP_REFERER'] = null;
-        $_SERVER['SCRIPT_FILENAME'] = "/var/www/ee440setup/setup/index.php";
-        $_SERVER['SCRIPT_NAME'] = "/ee440setup/setup/index.php";
-        $_SERVER['HTTP_HOST'] = "127.0.0.1:1001";
+        $_SERVER['SCRIPT_FILENAME'] = '/var/www/ee440setup/setup/index.php';
+        $_SERVER['SCRIPT_NAME'] = '/ee440setup/setup/index.php';
+        $_SERVER['HTTP_HOST'] = '127.0.0.1:1001';
 
         // paths
-        $aParams['sShopDir'] = "/var/www/ee440setup/";
+        $aParams['sShopDir'] = '/var/www/ee440setup/';
         $aParams['sCompileDir'] = $aParams['sShopDir'] . $sTmp;
-        $aParams['sShopURL'] = "https://127.0.0.1:1001/ee440setup/";
+        $aParams['sShopURL'] = 'https://127.0.0.1:1001/ee440setup/';
 
         $oUtils = new Utilities();
         $this->assertEquals($aParams, $oUtils->getDefaultPathParams());
@@ -149,7 +151,7 @@ class UtilitiesTest extends \OxidTestCase
         if (!function_exists('getenv')) {
             $this->markTestSkipped('getenv() function is not available.');
         }
-        if (getenv("CI") == true) {
+        if (getenv('CI') == true) {
             $this->markTestSkipped('Skipping test in CI environment.');
         }
 
@@ -168,12 +170,12 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testGetRequestVar()
     {
-        $_POST["testPostVarName"] = "testPostVarValue";
-        $_GET["testGetVarName"] = "testGetVarValue";
+        $_POST['testPostVarName'] = 'testPostVarValue';
+        $_GET['testGetVarName'] = 'testGetVarValue';
 
         $oUtils = new Utilities();
-        $this->assertEquals("testPostVarValue", $oUtils->getRequestVar("testPostVarName"));
-        $this->assertEquals("testGetVarValue", $oUtils->getRequestVar("testGetVarName"));
+        $this->assertEquals('testPostVarValue', $oUtils->getRequestVar('testPostVarName'));
+        $this->assertEquals('testGetVarValue', $oUtils->getRequestVar('testGetVarName'));
     }
 
     /**
@@ -182,9 +184,9 @@ class UtilitiesTest extends \OxidTestCase
     public function testPreparePath()
     {
         $oUtils = new Utilities();
-        $this->assertEquals("c:/www/oxid", $oUtils->preparePath('c:\\www\\oxid\\'));
-        $this->assertEquals("/htdocs/eshop", $oUtils->preparePath('/htdocs/eshop/'));
-        $this->assertEquals("/o/x/i/d", $oUtils->preparePath('/o/x/i/d/'));
+        $this->assertEquals('c:/www/oxid', $oUtils->preparePath('c:\\www\\oxid\\'));
+        $this->assertEquals('/htdocs/eshop', $oUtils->preparePath('/htdocs/eshop/'));
+        $this->assertEquals('/o/x/i/d', $oUtils->preparePath('/o/x/i/d/'));
     }
 
     /**
@@ -193,11 +195,11 @@ class UtilitiesTest extends \OxidTestCase
     public function testExtractBasePath()
     {
         $oUtils = new Utilities();
-        $this->assertEquals("nothing", $oUtils->extractRewriteBase("nothing"));
-        $this->assertEquals("/folder", $oUtils->extractRewriteBase("http://www.shop.com/folder/"));
-        $this->assertEquals("www.shop.com/folder", $oUtils->extractRewriteBase("www.shop.com/folder/"));
-        $this->assertEquals("/folder", $oUtils->extractRewriteBase("http://www.shop.com/folder"));
-        $this->assertEquals("/folder", $oUtils->extractRewriteBase("http://shop.com/folder"));
+        $this->assertEquals('nothing', $oUtils->extractRewriteBase('nothing'));
+        $this->assertEquals('/folder', $oUtils->extractRewriteBase('http://www.shop.com/folder/'));
+        $this->assertEquals('www.shop.com/folder', $oUtils->extractRewriteBase('www.shop.com/folder/'));
+        $this->assertEquals('/folder', $oUtils->extractRewriteBase('http://www.shop.com/folder'));
+        $this->assertEquals('/folder', $oUtils->extractRewriteBase('http://shop.com/folder'));
     }
 
     /**
@@ -206,8 +208,8 @@ class UtilitiesTest extends \OxidTestCase
     public function testIsValidEmail()
     {
         $oUtils = new Utilities();
-        $this->assertFalse($oUtils->isValidEmail("admin"));
-        $this->assertTrue($oUtils->isValidEmail("shop@admin.com"));
+        $this->assertFalse($oUtils->isValidEmail('admin'));
+        $this->assertTrue($oUtils->isValidEmail('shop@admin.com'));
     }
 
     /**
@@ -251,7 +253,7 @@ class UtilitiesTest extends \OxidTestCase
         $configParameters = [
             'sShopDir' => $destinationDirectory,
             'dbPwd'    => $password,
-            'sShopURL' => $url
+            'sShopURL' => $url,
         ];
 
         //check
@@ -290,45 +292,45 @@ class UtilitiesTest extends \OxidTestCase
     {
         return [
             [
-                "Regular text with no ANSI controls",
-                "Regular text with no ANSI controls",
-                "No ANSI codes used",
+                'Regular text with no ANSI controls',
+                'Regular text with no ANSI controls',
+                'No ANSI codes used',
             ],
             [
                 "Test of \e[1;31mcolored\e[0m text",
-                "Test of colored text",
-                "Red foreground color",
+                'Test of colored text',
+                'Red foreground color',
             ],
             [
                 "Test of \e[44mbackground\e[0m text",
-                "Test of background text",
-                "Blue background color",
+                'Test of background text',
+                'Blue background color',
             ],
             [
                 "Test of \e[1;31m\e[44mcolored background\e[0m text",
-                "Test of colored background text",
-                "Red foreground with blue background color",
+                'Test of colored background text',
+                'Red foreground with blue background color',
             ],
             [
                 "\e[0m\e[0m\e[0m\e[0m",
-                "",
-                "ANSI control codes only, empty text",
+                '',
+                'ANSI control codes only, empty text',
             ],
             [
                 "\e[0ma\e[0m\n\e[0mb\e[0m",
                 "a\nb",
-                "ANSI control codes combined with new lines and simple text",
+                'ANSI control codes combined with new lines and simple text',
             ],
             [
-                "",
-                "",
-                "Empty string",
+                '',
+                '',
+                'Empty string',
             ],
             [
                 null,
-                "",
-                "Null converted to empty string",
-            ]
+                '',
+                'Null converted to empty string',
+            ],
         ];
     }
 

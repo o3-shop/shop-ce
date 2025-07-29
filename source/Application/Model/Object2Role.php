@@ -22,8 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
-use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
+use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;

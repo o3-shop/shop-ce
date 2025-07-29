@@ -43,24 +43,24 @@ class NewsText extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         $oNews = oxNew(News::class);
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $iNewsLang = Registry::getRequest()->getRequestEscapedParameter('newslang');
 
             if (!isset($iNewsLang)) {
                 $iNewsLang = $this->_iEditLang;
             }
 
-            $this->_aViewData["newslang"] = $iNewsLang;
+            $this->_aViewData['newslang'] = $iNewsLang;
             $oNews->loadInLang($iNewsLang, $soxId);
 
             foreach (Registry::getLang()->getLanguageNames() as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             // Disable editing for derived items.
@@ -68,11 +68,11 @@ class NewsText extends AdminDetailsController
                 $this->_aViewData['readonly'] = true;
             }
 
-            $this->_aViewData["edit"] = $oNews;
+            $this->_aViewData['edit'] = $oNews;
         }
-        $this->_aViewData["editor"] = $this->generateTextEditor("100%", 255, $oNews, "oxnews__oxlongdesc", "news.tpl.css");
+        $this->_aViewData['editor'] = $this->generateTextEditor('100%', 255, $oNews, 'oxnews__oxlongdesc', 'news.tpl.css');
 
-        return "news_text.tpl";
+        return 'news_text.tpl';
     }
 
     /**
@@ -95,7 +95,7 @@ class NewsText extends AdminDetailsController
             $iNewsLang = $this->_iEditLang;
         }
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oNews->loadInLang($iNewsLang, $soxId);
         } else {
             $aParams['oxnews__oxid'] = null;

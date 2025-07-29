@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop Community Edition.
  *
@@ -19,6 +20,7 @@
  * @copyright (C) OXID eSales AG 2003-2016
  * @version   O3-Shop CE
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Seo;
 
 use OxidEsales\Eshop\Application\Model\Article;
@@ -62,7 +64,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $this->cleanRegistry();
         $this->cleanSeoTable();
 
-        $facts = new \OxidEsales\Facts\Facts;
+        $facts = new \OxidEsales\Facts\Facts();
         $this->seoUrl = ('EE' == $facts->getEdition()) ? 'Party/Bar-Equipment/' : 'Geschenke/';
         $this->categoryOxid = ('EE' == $facts->getEdition()) ? '30e44ab8593023055.23928895' : '8a142c3e4143562a5.46426637';
         oxNew(\OxidEsales\Eshop\Application\Model\ArticleList::class)->renewPriceUpdateTime();
@@ -147,11 +149,11 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $redirectUrl = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->fetchSeoUrl($requestUrl);
         $this->assertFalse($redirectUrl);
 
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $utils->expects($this->never())->method('redirect');
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
-        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, array('getRequestUrl'));
+        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, ['getRequestUrl']);
         $request->expects($this->any())->method('getRequestUrl')->will($this->returnValue($requestUrl));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Request::class, $request);
 
@@ -177,7 +179,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $redirectUrl = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->fetchSeoUrl($requestUrl);
         $this->assertEquals($this->seoUrl, $redirectUrl);
 
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $utils->expects($this->once())->method('redirect')
             ->with(
                 $this->equalTo($shopUrl . $redirectUrl),
@@ -186,7 +188,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
             );
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
-        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, array('getRequestUrl'));
+        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, ['getRequestUrl']);
         $request->expects($this->any())->method('getRequestUrl')->will($this->returnValue($requestUrl));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Request::class, $request);
 
@@ -215,7 +217,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $redirectUrl = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->fetchSeoUrl($requestUrl);
         $this->assertEquals($this->seoUrl . '?pgNr=2', $redirectUrl);
 
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $utils->expects($this->once())->method('redirect')
             ->with(
                 $this->equalTo($shopUrl . $redirectUrl),
@@ -224,7 +226,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
             );
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
-        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, array('getRequestUrl'));
+        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, ['getRequestUrl']);
         $request->expects($this->any())->method('getRequestUrl')->will($this->returnValue($requestUrl));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Request::class, $request);
 
@@ -252,7 +254,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $redirectUrl = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->fetchSeoUrl($requestUrl);
         $this->assertEquals($this->seoUrl . '?pgNr=1', $redirectUrl);
 
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $utils->expects($this->once())->method('redirect')
             ->with(
                 $this->equalTo($shopUrl . $redirectUrl),
@@ -261,7 +263,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
             );
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
-        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, array('getRequestUrl'));
+        $request = $this->getMock(\OxidEsales\Eshop\Core\Request::class, ['getRequestUrl']);
         $request->expects($this->any())->method('getRequestUrl')->will($this->returnValue($requestUrl));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Request::class, $request);
 
@@ -290,10 +292,10 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $redirectUrl = \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->fetchSeoUrl($requestUrl);
         $this->assertEquals($this->seoUrl . '?pgNr=20', $redirectUrl);
     }
-    
+
     public function providerTestDecodeNewSeoUrl()
     {
-        $facts = new \OxidEsales\Facts\Facts;
+        $facts = new \OxidEsales\Facts\Facts();
         $this->seoUrl = ('EE' == $facts->getEdition()) ? 'Party/Bar-Equipment/' : 'Geschenke/';
         $this->categoryOxid = ('EE' == $facts->getEdition()) ? '30e44ab8593023055.23928895' : '8a142c3e4143562a5.46426637';
 
@@ -302,14 +304,14 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $data['plain_seo_url'] = ['params'   => $this->seoUrl,
                                   'expected' => ['cl'   => 'alist',
                                                  'cnid' => $this->categoryOxid,
-                                                 'lang' => '0']
+                                                 'lang' => '0'],
         ];
 
         $data['old_style_paginated_page'] = ['params'   => $this->seoUrl . '2/',
                                              'expected' => ['cl'   => 'alist',
                                                             'cnid' => $this->categoryOxid,
                                                             'lang' => '0',
-                                                            'pgNr' => 1]
+                                                            'pgNr' => 1],
         ];
 
         return $data;
@@ -328,7 +330,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $this->callCurl('');   //call shop start page to have all seo urls for main categories generated
         $this->callCurl($this->seoUrl);  //call shop seo page, this will create all paginated pages
 
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $utils->expects($this->never())->method('redirect');
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
@@ -340,7 +342,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
     public function providerTestProcessingSeoCallNewSeoUrl()
     {
-        $facts = new \OxidEsales\Facts\Facts;
+        $facts = new \OxidEsales\Facts\Facts();
         $this->seoUrl = ('EE' == $facts->getEdition()) ? 'Party/Bar-Equipment/' : 'Geschenke/';
         $this->categoryOxid = ('EE' == $facts->getEdition()) ? '30e44ab8593023055.23928895' : '8a142c3e4143562a5.46426637';
 
@@ -350,7 +352,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
                                   'get'      => [],
                                   'expected' => ['cl'   => 'alist',
                                                  'cnid' => $this->categoryOxid,
-                                                 'lang' => '0']
+                                                 'lang' => '0'],
         ];
 
         $data['paginated_page'] = ['request'  => $this->seoUrl . '2/',
@@ -358,7 +360,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
                                    'expected' => ['cl'   => 'alist',
                                                   'cnid' => $this->categoryOxid,
                                                   'lang' => '0',
-                                                  'pgNr' => '1']
+                                                  'pgNr' => '1'],
         ];
 
         $data['pgnr_as_get'] = ['params'   => $this->seoUrl . '?pgNr=2',
@@ -366,7 +368,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
                                 'expected' => ['cl'   => 'alist',
                                                'cnid' => $this->categoryOxid,
                                                'lang' => '0',
-                                               'pgNr' => '2']
+                                               'pgNr' => '2'],
         ];
 
         return $data;
@@ -391,7 +393,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
     {
         $this->callCurl(''); //call shop start page to have all seo urls for main categories generated
 
-        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, array('redirect'));
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
         $utils->expects($this->never())->method('redirect');
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
 
@@ -433,7 +435,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetVendorPageUrl()
     {
-        $facts = new \OxidEsales\Facts\Facts;
+        $facts = new \OxidEsales\Facts\Facts();
         if ('EE' != $facts->getEdition()) {
             $this->markTestSkipped('missing testdata');
         }
@@ -464,7 +466,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testGetManufacturerPageUrl()
     {
-        $facts = new \OxidEsales\Facts\Facts;
+        $facts = new \OxidEsales\Facts\Facts();
         if ('EE' != $facts->getEdition()) {
             $this->markTestSkipped('missing testdata');
         }
@@ -512,7 +514,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
     public function providerCheckSeoUrl()
     {
-        $facts = new \OxidEsales\Facts\Facts;
+        $facts = new \OxidEsales\Facts\Facts();
         $oxidLiving = ('EE' != $facts->getEdition()) ? '8a142c3e44ea4e714.31136811' : '30e44ab83b6e585c9.63147165';
 
         $data = [
@@ -527,7 +529,7 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
             ['index.php?cl=alist&cnid=' . $oxidLiving, ['HTTP/1.1 200 OK'], ['ROBOTS'], []],
             ['index.php?cl=alist&cnid=' . $oxidLiving . '&pgNr=0', ['HTTP/1.1 200 OK'], ['ROBOTS'], []],
             ['index.php?cl=alist&cnid=' . $oxidLiving . '&pgNr=100', ['HTTP/1.1 302 Found'], [], ['index.php?cl=alist&cnid=' . $oxidLiving]],
-            ['index.php?cl=alist&cnid=' . $oxidLiving . '&pgNr=200', ['HTTP/1.1 302 Found'], [], ['index.php?cl=alist&cnid=' . $oxidLiving]]
+            ['index.php?cl=alist&cnid=' . $oxidLiving . '&pgNr=200', ['HTTP/1.1 302 Found'], [], ['index.php?cl=alist&cnid=' . $oxidLiving]],
         ];
 
         if (('EE' == $facts->getEdition())) {
@@ -669,10 +671,10 @@ class PaginationSeoTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $shopId = $this->getConfig()->getBaseShopId();
 
         $category = oxNew(Category::class);
-        $category->oxcategories__oxactive       = new Field(1, Field::T_RAW);
-        $category->oxcategories__oxparentid     = new Field('oxrootid', Field::T_RAW);
-        $category->oxcategories__oxshopid       = new Field($shopId, Field::T_RAW);
-        $category->oxcategories__oxtitle        = new Field($seoUrl, Field::T_RAW);
+        $category->oxcategories__oxactive = new Field(1, Field::T_RAW);
+        $category->oxcategories__oxparentid = new Field('oxrootid', Field::T_RAW);
+        $category->oxcategories__oxshopid = new Field($shopId, Field::T_RAW);
+        $category->oxcategories__oxtitle = new Field($seoUrl, Field::T_RAW);
         $category->save();
 
         for ($i = 1; $i <= 20; $i++) {

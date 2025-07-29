@@ -48,17 +48,17 @@ class OrderRemark extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
         $sRemoxId = Registry::getRequest()->getRequestEscapedParameter('rem_oxid');
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oOrder = oxNew(Order::class);
             $oOrder->load($soxId);
 
             // all remark
             $oRems = oxNew(ListModel::class);
-            $oRems->init("oxremark");
+            $oRems->init('oxremark');
             $sUserIdField = 'oxorder__oxuserid';
-            $sSelect = "select * from oxremark where oxparentid = :oxparentid order by oxcreate desc";
+            $sSelect = 'select * from oxremark where oxparentid = :oxparentid order by oxcreate desc';
             $oRems->selectString($sSelect, [
-                ':oxparentid' => $oOrder->$sUserIdField->value
+                ':oxparentid' => $oOrder->$sUserIdField->value,
             ]);
             foreach ($oRems as $key => $val) {
                 if ($val->oxremark__oxid->value == $sRemoxId) {
@@ -68,17 +68,17 @@ class OrderRemark extends AdminDetailsController
                 }
             }
 
-            $this->_aViewData["allremark"] = $oRems;
+            $this->_aViewData['allremark'] = $oRems;
 
             if (isset($sRemoxId)) {
                 $oRemark = oxNew(Remark::class);
                 $oRemark->load($sRemoxId);
-                $this->_aViewData["remarktext"] = $oRemark->oxremark__oxtext->value;
-                $this->_aViewData["remarkheader"] = $oRemark->oxremark__oxheader->value;
+                $this->_aViewData['remarktext'] = $oRemark->oxremark__oxtext->value;
+                $this->_aViewData['remarkheader'] = $oRemark->oxremark__oxheader->value;
             }
         }
 
-        return "order_remark.tpl";
+        return 'order_remark.tpl';
     }
 
     /**
@@ -94,10 +94,12 @@ class OrderRemark extends AdminDetailsController
             $oRemark->load(Registry::getRequest()->getRequestEscapedParameter('rem_oxid'));
 
             $oRemark->oxremark__oxtext = new Field(
-                Registry::getRequest()->getRequestEscapedParameter('remarktext'));
+                Registry::getRequest()->getRequestEscapedParameter('remarktext')
+            );
             $oRemark->oxremark__oxheader = new Field(
-                Registry::getRequest()->getRequestEscapedParameter('remarkheader'));
-            $oRemark->oxremark__oxtype = new Field("r");
+                Registry::getRequest()->getRequestEscapedParameter('remarkheader')
+            );
+            $oRemark->oxremark__oxtype = new Field('r');
             $oRemark->oxremark__oxparentid = new Field($oOrder->oxorder__oxuserid->value);
             $oRemark->save();
         }

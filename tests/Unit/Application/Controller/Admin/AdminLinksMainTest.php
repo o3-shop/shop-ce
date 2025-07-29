@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
-use \oxTestModules;
+use oxDb;
 
 /**
  * Tests for Adminlinks_Main class
  */
 class AdminLinksMainTest extends \OxidTestCase
 {
-
     /**
      * Adminlinks_Main::render() test case
      *
@@ -35,8 +35,8 @@ class AdminLinksMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", -1);
-        $this->setRequestParameter("saved_oxid", -1);
+        $this->setRequestParameter('oxid', -1);
+        $this->setRequestParameter('saved_oxid', -1);
 
         // testing..
         $oView = oxNew('Adminlinks_main');
@@ -44,7 +44,7 @@ class AdminLinksMainTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertEquals('-1', $aViewData["oxid"]);
+        $this->assertEquals('-1', $aViewData['oxid']);
         $this->assertEquals('adminlinks_main.tpl', $sTplName);
     }
 
@@ -55,7 +55,7 @@ class AdminLinksMainTest extends \OxidTestCase
      */
     public function testRenderWithExistingLink()
     {
-        $this->setRequestParameter("oxid", oxDb::getDb()->getOne("select oxid from oxlinks"));
+        $this->setRequestParameter('oxid', oxDb::getDb()->getOne('select oxid from oxlinks'));
 
         // testing..
         $oView = oxNew('Adminlinks_main');
@@ -63,8 +63,8 @@ class AdminLinksMainTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertNotNull($aViewData["edit"]);
-        $this->assertEquals("adminlinks_main.tpl", $sTplName);
+        $this->assertNotNull($aViewData['edit']);
+        $this->assertEquals('adminlinks_main.tpl', $sTplName);
     }
 
     /**
@@ -74,15 +74,15 @@ class AdminLinksMainTest extends \OxidTestCase
      */
     public function testSaveinnlang()
     {
-        $this->setRequestParameter("oxid", "xxx");
+        $this->setRequestParameter('oxid', 'xxx');
 
         // testing..
         $oView = oxNew('Adminlinks_main');
         $oView->saveinnlang();
         $aViewData = $oView->getViewData();
 
-        $this->assertNotNull($aViewData["updatelist"]);
-        $this->assertEquals(1, $aViewData["updatelist"]);
+        $this->assertNotNull($aViewData['updatelist']);
+        $this->assertEquals(1, $aViewData['updatelist']);
     }
 
     /**
@@ -92,14 +92,14 @@ class AdminLinksMainTest extends \OxidTestCase
      */
     public function testSave()
     {
-        $this->setRequestParameter("oxid", "xxx");
+        $this->setRequestParameter('oxid', 'xxx');
 
         // testing..
         $oView = oxNew('Adminlinks_main');
         $oView->save();
         $aViewData = $oView->getViewData();
 
-        $this->assertNotNull($aViewData["updatelist"]);
-        $this->assertEquals(1, $aViewData["updatelist"]);
+        $this->assertNotNull($aViewData['updatelist']);
+        $this->assertEquals(1, $aViewData['updatelist']);
     }
 }

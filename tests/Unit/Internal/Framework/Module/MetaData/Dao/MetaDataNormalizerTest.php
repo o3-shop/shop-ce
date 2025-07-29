@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -57,7 +59,7 @@ class MetaDataNormalizerTest extends TestCase
             'settings' => [
                 ['constraints' => '1|2|3'],
                 ['constraints' => 'le|la|les'],
-            ]
+            ],
         ];
 
         $this->assertSame(
@@ -65,7 +67,7 @@ class MetaDataNormalizerTest extends TestCase
                 'settings' => [
                     ['constraints' => ['1', '2', '3']],
                     ['constraints' => ['le', 'la', 'les']],
-                ]
+                ],
             ],
             (new MetaDataNormalizer())->normalizeData($metadata)
         );
@@ -84,7 +86,7 @@ class MetaDataNormalizerTest extends TestCase
             [
                 $fieldName => [
                     'en' => $value,
-                ]
+                ],
             ],
             (new MetaDataNormalizer())->normalizeData($metadata)
         );

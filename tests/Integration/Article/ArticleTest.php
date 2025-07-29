@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Article;
 
 use oxField;
@@ -37,9 +39,9 @@ class ArticleTest extends \OxidTestCase
 
     public function testArticleParentFieldsInChild_ParentUpdate_SetParentValueToChild()
     {
-        $aParentFields = array('oxarticles__oxnonmaterial',
+        $aParentFields = ['oxarticles__oxnonmaterial',
                                'oxarticles__oxfreeshipping',
-                               'oxarticles__oxisdownloadable');
+                               'oxarticles__oxisdownloadable'];
 
         $oProduct = oxNew('oxArticle');
         $oProduct->setId('_testArticleParent');
@@ -79,9 +81,9 @@ class ArticleTest extends \OxidTestCase
 
     public function testArticleParentFieldsInChild_AddChild_ChildTakeParentValue()
     {
-        $aParentFields = array('oxarticles__oxnonmaterial',
+        $aParentFields = ['oxarticles__oxnonmaterial',
                                'oxarticles__oxfreeshipping',
-                               'oxarticles__oxisdownloadable');
+                               'oxarticles__oxisdownloadable'];
 
         $oProduct = oxNew('oxArticle');
         $oProduct->setId('_testArticleParent');
@@ -105,12 +107,11 @@ class ArticleTest extends \OxidTestCase
         }
     }
 
-
     public function testArticleParentFieldsInChild_UpdateChild_ChildTakeParentValue()
     {
-        $aParentFields = array('oxarticles__oxnonmaterial',
+        $aParentFields = ['oxarticles__oxnonmaterial',
                                'oxarticles__oxfreeshipping',
-                               'oxarticles__oxisdownloadable');
+                               'oxarticles__oxisdownloadable'];
 
         $oProduct = oxNew('oxArticle');
         $oProduct->setId('_testArticleParent');

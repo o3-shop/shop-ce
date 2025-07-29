@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Attribute_List class
  */
 class AttributeListTest extends \OxidTestCase
 {
-
     /**
      * Attribute_List::Init() test case
      *
@@ -36,18 +37,18 @@ class AttributeListTest extends \OxidTestCase
     {
         $this->markTestSkipped('Overwork due => tests are stoping without message.');
 
-        oxTestModules::addFunction("oxUtilsServer", "getOxCookie", "{return array(1);}");
-        oxTestModules::addFunction("oxUtils", "checkAccessRights", "{return true;}");
+        oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
+        oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
 
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
 
-        $oView = $this->getMock($this->getProxyClassName('Attribute_List'), array('getSession'));
+        $oView = $this->getMock($this->getProxyClassName('Attribute_List'), ['getSession']);
         $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
 
         $oView->init();
 
-        $this->assertEquals("oxattribute", $oView->getNonPublicVar("_sListClass"));
+        $this->assertEquals('oxattribute', $oView->getNonPublicVar('_sListClass'));
     }
 
     /**

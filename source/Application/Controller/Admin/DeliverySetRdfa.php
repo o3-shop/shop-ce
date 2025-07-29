@@ -42,7 +42,7 @@ class DeliverySetRdfa extends PaymentRdfa
      *
      * @var string
      */
-    protected $_sThisTemplate = "deliveryset_rdfa.tpl";
+    protected $_sThisTemplate = 'deliveryset_rdfa.tpl';
 
     /**
      * Predefined delivery methods
@@ -50,14 +50,14 @@ class DeliverySetRdfa extends PaymentRdfa
      * @var array
      */
     protected $_aRDFaDeliveries = [
-        "DeliveryModeDirectDownload" => 0,
-        "DeliveryModeFreight"        => 0,
-        "DeliveryModeMail"           => 0,
-        "DeliveryModeOwnFleet"       => 0,
-        "DeliveryModePickUp"         => 0,
-        "DHL"                        => 1,
-        "FederalExpress"             => 1,
-        "UPS"                        => 1
+        'DeliveryModeDirectDownload' => 0,
+        'DeliveryModeFreight'        => 0,
+        'DeliveryModeMail'           => 0,
+        'DeliveryModeOwnFleet'       => 0,
+        'DeliveryModePickUp'         => 0,
+        'DHL'                        => 1,
+        'FederalExpress'             => 1,
+        'UPS'                        => 1,
     ];
 
     /**
@@ -73,13 +73,13 @@ class DeliverySetRdfa extends PaymentRdfa
         $sOxIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSql = "DELETE FROM oxobject2delivery WHERE oxdeliveryid = :oxdeliveryid AND OXTYPE = 'rdfadeliveryset'";
         $oDb->execute($sSql, [
-            ':oxdeliveryid' => $sOxIdParameter
+            ':oxdeliveryid' => $sOxIdParameter,
         ]);
 
         // Save new mappings
         foreach ($aRDFaDeliveries as $sDelivery) {
             $oMapping = oxNew(BaseModel::class);
-            $oMapping->init("oxobject2delivery");
+            $oMapping->init('oxobject2delivery');
             $oMapping->assign($aParams);
             $oMapping->oxobject2delivery__oxobjectid = new Field($sDelivery);
             $oMapping->save();
@@ -121,7 +121,7 @@ class DeliverySetRdfa extends PaymentRdfa
         $aRDFaDeliveries = [];
         $sSelect = 'select oxobjectid from oxobject2delivery where oxdeliveryid = :oxdeliveryid and oxtype = "rdfadeliveryset" ';
         $rs = $oDb->select($sSelect, [
-            ':oxdeliveryid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
+            ':oxdeliveryid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
         ]);
         if ($rs && $rs->count()) {
             while (!$rs->EOF) {

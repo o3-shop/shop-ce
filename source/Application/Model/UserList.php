@@ -37,7 +37,6 @@ class UserList extends ListModel
         parent::__construct('oxuser');
     }
 
-
     /**
      * Load searched user list with wishlist
      *
@@ -53,15 +52,15 @@ class UserList extends ListModel
             return;
         }
 
-        $sSelect = "select oxuser.oxid, oxuser.oxfname, oxuser.oxlname from oxuser ";
-        $sSelect .= "left join oxuserbaskets on oxuserbaskets.oxuserid = oxuser.oxid ";
+        $sSelect = 'select oxuser.oxid, oxuser.oxfname, oxuser.oxlname from oxuser ';
+        $sSelect .= 'left join oxuserbaskets on oxuserbaskets.oxuserid = oxuser.oxid ';
         $sSelect .= "where oxuserbaskets.oxid is not null and oxuserbaskets.oxtitle = 'wishlist' ";
-        $sSelect .= "and oxuserbaskets.oxpublic = 1 ";
-        $sSelect .= "and ( oxuser.oxusername = :search or oxuser.oxlname = :search)";
-        $sSelect .= "and ( select 1 from oxuserbasketitems where oxuserbasketitems.oxbasketid = oxuserbaskets.oxid limit 1)";
+        $sSelect .= 'and oxuserbaskets.oxpublic = 1 ';
+        $sSelect .= 'and ( oxuser.oxusername = :search or oxuser.oxlname = :search)';
+        $sSelect .= 'and ( select 1 from oxuserbasketitems where oxuserbasketitems.oxbasketid = oxuserbaskets.oxid limit 1)';
 
         $this->selectString($sSelect, [
-            ':search' => "$sSearchStr"
+            ':search' => "$sSearchStr",
         ]);
     }
 }

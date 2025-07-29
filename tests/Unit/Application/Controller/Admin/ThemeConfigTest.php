@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class ThemeConfigTest extends \OxidTestCase
 {
-
     /**
      * Shop_Config::Render() test case
      *
@@ -44,7 +45,7 @@ class ThemeConfigTest extends \OxidTestCase
     public function testGetModuleForConfigVars()
     {
         $sThemeName = 'testtheme';
-        $oTheme_Config = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ThemeConfiguration::class, array('getEditObjectId'));
+        $oTheme_Config = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ThemeConfiguration::class, ['getEditObjectId']);
         $oTheme_Config->expects($this->any())->method('getEditObjectId')->will($this->returnValue($sThemeName));
         $this->assertEquals('theme:' . $sThemeName, $oTheme_Config->UNITgetModuleForConfigVars());
     }
@@ -64,29 +65,29 @@ class ThemeConfigTest extends \OxidTestCase
         $sThemeName = 'testtheme';
 
         // Check if saveShopConfVar is called with correct values.
-        $aParams = array($sName => $sValue);
+        $aParams = [$sName => $sValue];
 
         /** @var oxConfig|PHPUnit\Framework\MockObject\MockObject $oConfig */
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getShopId', 'getRequestParameter', 'saveShopConfVar', '_loadVarsFromDb'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopId', 'getRequestParameter', 'saveShopConfVar', '_loadVarsFromDb']);
         $oConfig->expects($this->any())->method('getShopId')->will($this->returnValue($iShopId));
         $oConfig->expects($this->any())->method('getRequestParameter')->will($this->returnValue($aParams));
         $oConfig->expects($this->any())->method('_loadVarsFromDb')->will($this->returnValue(true));
         $oConfig->setConfigParam('blClearCacheOnLogout', true);
 
-        $valueMap = array(
-            array('bool', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true),
-            array('str', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true),
-            array('arr', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true),
-            array('aarr', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true),
-            array('select', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true),
-        );
+        $valueMap = [
+            ['bool', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true],
+            ['str', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true],
+            ['arr', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true],
+            ['aarr', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true],
+            ['select', $sName, $sValue, $iShopId, 'theme:' . $sThemeName, true],
+        ];
         $oConfig->expects($this->exactly(6))->method('saveShopConfVar')->will($this->returnValueMap($valueMap));
 
         /** @var Theme_Config|PHPUnit\Framework\MockObject\MockObject $oTheme_Config */
         $oTheme_Config = $this->getMock(
             'Theme_Config',
-            array('getEditObjectId', '_serializeConfVar'),
-            array(),
+            ['getEditObjectId', '_serializeConfVar'],
+            [],
             '',
             false
         );

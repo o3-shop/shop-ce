@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +29,6 @@ use PHPUnit\Framework\TestCase;
  */
 class IncludeDynamicLogicTest extends TestCase
 {
-
     /** @var IncludeDynamicLogic */
     private $includeDynamicLogic;
 
@@ -70,7 +70,7 @@ class IncludeDynamicLogicTest extends TestCase
             [['type' => 'custom'], []],
             [['type' => 'custom', 'param1' => 'val1', 'param2' => 2], ['_custom_param1' => 'val1', '_custom_param2' => 2]],
             [['type' => 'custom', 'file' => 'file.tpl'], []],
-            [['type' => 'custom', 'file' => 'file.tpl', 'param' => 'val'], ['_custom_param' => 'val']]
+            [['type' => 'custom', 'file' => 'file.tpl', 'param' => 'val'], ['_custom_param' => 'val']],
         ];
     }
 

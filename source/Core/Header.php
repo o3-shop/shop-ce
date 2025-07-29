@@ -69,7 +69,7 @@ class Header
      */
     public function setNonCacheable()
     {
-        $header = "Cache-Control: no-cache;";
+        $header = 'Cache-Control: no-cache;';
         $this->setHeader($header);
     }
 }

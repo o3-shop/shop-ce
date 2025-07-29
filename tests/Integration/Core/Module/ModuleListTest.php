@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -184,11 +186,11 @@ class ModuleListTest extends TestCase
 
         Registry::getConfig()->setConfigParam('aModules', $moduleExtensions);
 
-        $expectedDeletedExtensions = array(
-            'moduleWhichHasNoMetadata' => array(
-                'files' => array('moduleWhichHasNoMetadata/metadata.php')
-            ),
-        );
+        $expectedDeletedExtensions = [
+            'moduleWhichHasNoMetadata' => [
+                'files' => ['moduleWhichHasNoMetadata/metadata.php'],
+            ],
+        ];
 
         $this->assertEquals(
             $expectedDeletedExtensions,
@@ -202,7 +204,6 @@ class ModuleListTest extends TestCase
         $this->installModule($moduleId);
         $this->activateModule($moduleId);
 
-
         $module = oxNew(Module::class);
         $module->load($moduleId);
 
@@ -211,7 +212,7 @@ class ModuleListTest extends TestCase
                 $moduleId => [
                     'extensions' => [
                         'OxidEsales\Eshop\Application\Model\Article' => ['OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\oxid\InvalidNamespaceModule1\Model\NonExistentFile'],
-                    ]
+                    ],
                 ],
             ],
             oxNew(ModuleList::class)->getDeletedExtensions()
@@ -229,7 +230,8 @@ class ModuleListTest extends TestCase
             [
                 'OxidEsales\Eshop\Application\Controller\ContentController' => ['OxidEsales\EshopCommunity\Tests\Integration\Core\Module\Fixtures\with_class_extenstions2\Controllers\ContentController'],
                 'OxidEsales\Eshop\Application\Model\Article'         => ['with_class_extensions/ModuleArticle'],
-            ], oxNew(ModuleList::class)->getModulesWithExtendedClass()
+            ],
+            oxNew(ModuleList::class)->getModulesWithExtendedClass()
         );
     }
 
@@ -239,8 +241,9 @@ class ModuleListTest extends TestCase
 
         $this->assertEquals(
             [
-                'with_class_extensions' => 'with_class_extensions'
-            ], oxNew(ModuleList::class)->extractModulePaths()
+                'with_class_extensions' => 'with_class_extensions',
+            ],
+            oxNew(ModuleList::class)->extractModulePaths()
         );
     }
 
@@ -253,11 +256,11 @@ class ModuleListTest extends TestCase
                 'with_multiple_extensions/articleExtension3',
             ],
             'OxidEsales\Eshop\Application\Model\Order'   => [
-                'with_multiple_extensions/oxOrder'
+                'with_multiple_extensions/oxOrder',
             ],
             'OxidEsales\Eshop\Application\Model\Basket'  => [
-                'with_multiple_extensions/basketExtension'
-            ]
+                'with_multiple_extensions/basketExtension',
+            ],
         ];
 
         $this->installModule('with_multiple_extensions');
@@ -278,7 +281,7 @@ class ModuleListTest extends TestCase
             'OxidEsales\Eshop\Application\Model\Article' => 'with_multiple_extensions/articleExtension1&with_multiple_extensions/articleExtension2&with_multiple_extensions/articleExtension3',
             'OxidEsales\Eshop\Application\Model\Order'   => 'with_multiple_extensions/oxOrder',
             'OxidEsales\Eshop\Application\Model\Basket'  => 'with_multiple_extensions/basketExtension',
-            'OxidEsales\Eshop\Application\Controller\ContentController' => 'OxidEsales\EshopCommunity\Tests\Integration\Core\Module\Fixtures\with_class_extenstions2\Controllers\ContentController'
+            'OxidEsales\Eshop\Application\Controller\ContentController' => 'OxidEsales\EshopCommunity\Tests\Integration\Core\Module\Fixtures\with_class_extenstions2\Controllers\ContentController',
         ];
 
         $this->installModule('with_multiple_extensions');

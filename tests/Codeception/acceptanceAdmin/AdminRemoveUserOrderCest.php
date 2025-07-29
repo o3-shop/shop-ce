@@ -48,11 +48,11 @@ final class AdminRemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 5
+                'OXSTOCK'  => 5,
             ]
         );
         $orders = $adminPanel->openOrders();
-        $orders = $orders->find($orders->orderNumberInput, "2");
+        $orders = $orders->find($orders->orderNumberInput, '2');
         $orders->deleteOrder();
 
         $I->waitForPageLoad();
@@ -61,7 +61,7 @@ final class AdminRemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 6
+                'OXSTOCK'  => 6,
             ]
         );
     }
@@ -77,11 +77,11 @@ final class AdminRemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 5
+                'OXSTOCK'  => 5,
             ]
         );
         $orders = $adminPanel->openOrders();
-        $orders = $orders->find($orders->orderNumberInput, "2");
+        $orders = $orders->find($orders->orderNumberInput, '2');
         $orders->cancelOrder();
 
         $I->waitForPageLoad();
@@ -90,11 +90,10 @@ final class AdminRemoveUserOrderCest
             'oxarticles',
             [
                 'OXARTNUM' => '1002-1',
-                'OXSTOCK'  => 6
+                'OXSTOCK'  => 6,
             ]
         );
     }
-
 
     /** @param AcceptanceAdminTester $I */
     private function insertAnOrderInDatabase(AcceptanceAdminTester $I): void
@@ -122,7 +121,7 @@ final class AdminRemoveUserOrderCest
                 'OXTRANSSTATUS' => 'OK',
                 'OXFOLDER' => 'ORDERFOLDER_NEW',
                 'OXDELTYPE' => 'oxidstandard',
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00'),
             ]
         );
 
@@ -146,7 +145,7 @@ final class AdminRemoveUserOrderCest
                 'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00'),
                 'OXSEARCHKEYS' => 'šÄßüл1002',
                 'OXISSEARCH' => 1,
-                'OXORDERSHOPID' => 1
+                'OXORDERSHOPID' => 1,
             ]
         );
     }

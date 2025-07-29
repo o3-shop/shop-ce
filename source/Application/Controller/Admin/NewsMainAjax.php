@@ -84,12 +84,12 @@ class NewsMainAjax extends ListComponentAjax
             $sQAdd = " from $sGroupTable where 1 ";
         } else {
             $sQAdd = " from oxobject2group left join $sGroupTable on oxobject2group.oxgroupsid=$sGroupTable.oxid ";
-            $sQAdd .= " where oxobject2group.oxobjectid = " . $oDb->quote($sDiscountId);
+            $sQAdd .= ' where oxobject2group.oxobjectid = ' . $oDb->quote($sDiscountId);
         }
 
         if ($sSynchDiscountId && $sSynchDiscountId != $sDiscountId) {
             $sQAdd .= ' and ' . $sGroupTable . '.oxid not in ( select ' . $sGroupTable . '.oxid from oxobject2group left join ' . $sGroupTable . ' on oxobject2group.oxgroupsid=' . $sGroupTable . '.oxid ';
-            $sQAdd .= " where oxobject2group.oxobjectid = " . $oDb->quote($sSynchDiscountId) . " ) ";
+            $sQAdd .= ' where oxobject2group.oxobjectid = ' . $oDb->quote($sSynchDiscountId) . ' ) ';
         }
 
         return $sQAdd;
@@ -102,10 +102,10 @@ class NewsMainAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxobject2group.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2group.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2group.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -123,7 +123,7 @@ class NewsMainAjax extends ListComponentAjax
             $aAddGroups = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddGroups)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddGroups)) {
             foreach ($aAddGroups as $sAddgroup) {
                 $oNewGroup = oxNew(Object2Group::class);
                 $oNewGroup->oxobject2group__oxobjectid = new Field($soxId);

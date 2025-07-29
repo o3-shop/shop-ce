@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of O3-Shop.
@@ -23,9 +25,9 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\S
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationHandlingService;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Handler\ModuleConfigurationHandlerInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ModuleSettingNotValidException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Handler\ModuleConfigurationHandlerInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Service\ModuleConfigurationHandlingService;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\ModuleConfigurationValidatorInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -67,7 +69,6 @@ class ModuleConfigurationHandlingServiceTest extends TestCase
             ->setValue('value');
 
         $moduleConfiguration->addModuleSetting($setting);
-
 
         $handler = $this->getMockBuilder(ModuleConfigurationHandlerInterface::class)->getMock();
 

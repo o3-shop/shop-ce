@@ -39,7 +39,7 @@ class IfContentLogic
         ) {
             $oContent = $sOxid ? $aContentCache[$sOxid] : $aContentCache[$sIdent];
         } else {
-            $oContent = oxNew("oxContent");
+            $oContent = oxNew('oxContent');
             $blLoaded = $sOxid ? $oContent->load($sOxid) : ($oContent->loadbyIdent($sIdent));
             if ($blLoaded && $oContent->isActive()) {
                 $aContentCache[$oContent->getId()] = $aContentCache[$oContent->getLoadId()] = $oContent;

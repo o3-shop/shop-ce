@@ -68,8 +68,8 @@ class NewsList extends ListModel
             // performance - only join if user is logged in
             $sSelect = "select $sSelectFields from $sNewsViewName ";
             $sSelect .= "left join oxobject2group on oxobject2group.oxobjectid=$sNewsViewName.oxid where ";
-            $sSelect .= "oxobject2group.oxgroupsid in ( select oxgroupsid from oxobject2group where oxobjectid = :oxobjectid ) or ";
-            $sSelect .= "( oxobject2group.oxgroupsid is null ) ";
+            $sSelect .= 'oxobject2group.oxgroupsid in ( select oxgroupsid from oxobject2group where oxobjectid = :oxobjectid ) or ';
+            $sSelect .= '( oxobject2group.oxgroupsid is null ) ';
 
             $params[':oxobjectid'] = $oUser->getId();
         } else {
@@ -77,7 +77,7 @@ class NewsList extends ListModel
             $sSelect .= "left join oxobject2group on oxobject2group.oxobjectid=$sNewsViewName.oxid where oxobject2group.oxgroupsid is null ";
         }
 
-        $sSelect .= " and " . $oBaseObject->getSqlActiveSnippet();
+        $sSelect .= ' and ' . $oBaseObject->getSqlActiveSnippet();
         $sSelect .= " and $sNewsViewName.oxshortdesc <> '' ";
         $sSelect .= " group by $sNewsViewName.oxid order by $sNewsViewName.oxdate desc ";
 
@@ -102,15 +102,15 @@ class NewsList extends ListModel
         if ($oUser = $this->getUser()) {
             // performance - only join if user is logged in
             $sSelect .= "left join oxobject2group on oxobject2group.oxobjectid=$sNewsViewName.oxid where ";
-            $sSelect .= "oxobject2group.oxgroupsid in ( select oxgroupsid from oxobject2group where oxobjectid = :oxobjectid ) or ";
-            $sSelect .= "( oxobject2group.oxgroupsid is null ) ";
+            $sSelect .= 'oxobject2group.oxgroupsid in ( select oxgroupsid from oxobject2group where oxobjectid = :oxobjectid ) or ';
+            $sSelect .= '( oxobject2group.oxgroupsid is null ) ';
 
             $params[':oxobjectid'] = $oUser->getId();
         } else {
             $sSelect .= "left join oxobject2group on oxobject2group.oxobjectid=$sNewsViewName.oxid where oxobject2group.oxgroupsid is null ";
         }
 
-        $sSelect .= " and " . $oBaseObject->getSqlActiveSnippet();
+        $sSelect .= ' and ' . $oBaseObject->getSqlActiveSnippet();
 
         // loading only if there is some data
         $iRecCnt = (int) $oDb->getOne($sSelect, $params);

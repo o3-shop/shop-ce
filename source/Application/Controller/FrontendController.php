@@ -45,8 +45,8 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Str;
 use OxidEsales\Eshop\Core\ViewConfig;
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Core\SortingValidator;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingBridgeInterface;
 use stdClass;
 
 // view indexing state for search engines:
@@ -323,7 +323,7 @@ class FrontendController extends BaseController
         // @deprecated 6.5.6 "News" feature will be removed completely
         'oxcmp_news' => 0,
         // END deprecated
-        'oxcmp_basket'     => 1
+        'oxcmp_basket'     => 1,
     ];
 
     /**
@@ -525,7 +525,7 @@ class FrontendController extends BaseController
                     // logging "not found" url
                     $database = DatabaseProvider::getDb();
                     $database->execute(
-                        "replace oxseologs ( oxstdurl, oxident, oxshopid, oxlang ) values ( ?, ?, ?, ? ) ",
+                        'replace oxseologs ( oxstdurl, oxident, oxshopid, oxlang ) values ( ?, ?, ?, ? ) ',
                         [$requestUrl, $id, $shopId, $languageId]
                     );
                 }
@@ -606,11 +606,11 @@ class FrontendController extends BaseController
         $config = Registry::getConfig();
         $viewId = $this->generateViewIdBase();
 
-        $viewId .= "|" . ((int) $this->_blForceNoIndex) . '|' . ((int) $this->isRootCatChanged());
+        $viewId .= '|' . ((int) $this->_blForceNoIndex) . '|' . ((int) $this->isRootCatChanged());
 
         // #0004798: SSL should be included in viewId
         if ($config->isSsl()) {
-            $viewId .= "|ssl";
+            $viewId .= '|ssl';
         }
 
         // #0002866: external global viewID addition
@@ -701,7 +701,6 @@ class FrontendController extends BaseController
     {
         return $this->_blIsOrderStep;
     }
-
 
     /**
      * Active category setter
@@ -913,7 +912,6 @@ class FrontendController extends BaseController
     {
         return 'listorder';
     }
-
 
     /**
      * Returns page sort ident. It is used as ident in session variable aSorting[ident]
@@ -1367,11 +1365,11 @@ class FrontendController extends BaseController
     {
         $stringModifier = Str::getStr();
         if (is_array($input)) {
-            $input = implode(" ", $input);
+            $input = implode(' ', $input);
         }
 
         // removing some usually met characters ...
-        $input = $stringModifier->preg_replace("/[" . preg_quote($this->_sRemoveMetaChars, "/") . "]/", " ", $input);
+        $input = $stringModifier->preg_replace('/[' . preg_quote($this->_sRemoveMetaChars, '/') . ']/', ' ', $input);
 
         // splitting by word
         $strings = $stringModifier->preg_split("/[\s,]+/", $input);
@@ -1513,7 +1511,6 @@ class FrontendController extends BaseController
         return Registry::getConfig()->getActiveShop()->oxshops__oxtitleprefix->value;
     }
 
-
     /**
      * Returns full page title
      *
@@ -1532,7 +1529,6 @@ class FrontendController extends BaseController
 
         return $this->replaceDoubleQuotesWithHTMLCharacters($title);
     }
-
 
     /**
      * returns object, associated with current view.
@@ -1616,7 +1612,6 @@ class FrontendController extends BaseController
 
         return $url;
     }
-
 
     /**
      * Get link of current view. In url its include also page number if it is list page
@@ -1825,7 +1820,6 @@ class FrontendController extends BaseController
 
         return $this->_aSortColumns;
     }
-
 
     /**
      * Set sorting columns
@@ -2104,11 +2098,11 @@ class FrontendController extends BaseController
             if ($pageNavigation->actPage <= $tmpVal) {
                 $startNo = 2;
                 $finishNo = $tmpVal + 1;
-            // actual page is at the end
+                // actual page is at the end
             } elseif ($pageNavigation->actPage >= $pageNavigation->NrOfPages - $tmpVal + 1) {
                 $startNo = $pageNavigation->NrOfPages - $tmpVal;
                 $finishNo = $pageNavigation->NrOfPages - 1;
-            // actual page is in the middle
+                // actual page is in the middle
             } else {
                 $startNo = $pageNavigation->actPage - $tmpVal2;
                 $finishNo = $pageNavigation->actPage + $tmpVal2;
@@ -2668,7 +2662,7 @@ class FrontendController extends BaseController
             $this->_blCanAcceptFormData = false;
 
             $formId = Registry::getRequest()->getRequestEscapedParameter('uformid');
-            $sessionFormId = Registry::getSession()->getVariable("sessionuformid");
+            $sessionFormId = Registry::getSession()->getVariable('sessionuformid');
 
             // testing if form and session ids matches
             if ($formId && $formId === $sessionFormId) {
@@ -2929,7 +2923,7 @@ class FrontendController extends BaseController
      */
     public function getNewBasketItemMsgType()
     {
-        return (int) Registry::getConfig()->getConfigParam("iNewBasketItemMessage");
+        return (int) Registry::getConfig()->getConfigParam('iNewBasketItemMessage');
     }
 
     /**
@@ -2941,7 +2935,7 @@ class FrontendController extends BaseController
      */
     public function isActive($name)
     {
-        return Registry::getConfig()->getConfigParam("bl" . $name . "Enabled");
+        return Registry::getConfig()->getConfigParam('bl' . $name . 'Enabled');
     }
 
     /**
@@ -2951,7 +2945,7 @@ class FrontendController extends BaseController
      */
     public function isEnabledDownloadableFiles()
     {
-        return (bool) Registry::getConfig()->getConfigParam("blEnableDownloads");
+        return (bool) Registry::getConfig()->getConfigParam('blEnableDownloads');
     }
 
     /**

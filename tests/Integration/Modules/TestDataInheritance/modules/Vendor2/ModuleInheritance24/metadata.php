@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -26,11 +27,11 @@ $sMetadataVersion = '2.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'Vendor2/ModuleInheritance24', // maybe find a better name for that
     'title'        => 'Test PHP class inheritance 2.4',
     'description'  => 'Namespace module class extends other module namespace class which extends from shop namespace class',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-);
+];

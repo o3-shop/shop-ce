@@ -95,7 +95,7 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Remaining Amount --> " . $this->_iRemainingAmount;
+        return __CLASS__ . '-' . parent::getString() . ' Remaining Amount --> ' . $this->_iRemainingAmount;
     }
 
     /**
@@ -131,9 +131,9 @@ class OutOfStockException extends \OxidEsales\Eshop\Core\Exception\ArticleExcept
     {
         // in case destination not set, overriding default error message
         if (!$sDestination) {
-            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ": " . $this->getRemainingAmount();
+            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ': ' . $this->getRemainingAmount();
         } else {
-            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ": ";
+            $this->message = \OxidEsales\Eshop\Core\Registry::getLang()->translateString($this->getMessage()) . ': ';
         }
     }
 }

@@ -34,7 +34,6 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      */
     protected $_aDbTablesFields = null;
 
-
     /**
      *
      * @var array
@@ -51,7 +50,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
      *
      * @var array Tables which should be skipped from resetting
      */
-    protected $_aSkipTablesOnReset = ["oxcountry"];
+    protected $_aSkipTablesOnReset = ['oxcountry'];
 
     /**
      * When creating views, always use those fields from core table.
@@ -90,7 +89,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
     public function tableExists($tableName)
     {
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
-        $tables = $db->getAll("show tables like " . $db->quote($tableName));
+        $tables = $db->getAll('show tables like ' . $db->quote($tableName));
 
         return count($tables) > 0;
     }
@@ -189,7 +188,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
     public function getAllTables()
     {
         if (empty($this->_aTables)) {
-            $tables = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getAll("show tables");
+            $tables = \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getAll('show tables');
 
             foreach ($tables as $tableInfo) {
                 if ($this->validateTableName($tableInfo[0])) {
@@ -240,9 +239,9 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
         );
 
         return "CREATE TABLE `{$tableSet}` (" .
-               "`OXID` char(32) NOT NULL, " .
-               "PRIMARY KEY (`OXID`)) " .
-               "DEFAULT CHARACTER SET latin1 COLLATE latin1_general_ci ENGINE= " . $tableStatus[1] . " " .
+               '`OXID` char(32) NOT NULL, ' .
+               'PRIMARY KEY (`OXID`)) ' .
+               'DEFAULT CHARACTER SET latin1 COLLATE latin1_general_ci ENGINE= ' . $tableStatus[1] . ' ' .
                "COMMENT='" . $tableStatus[17] . "'";
     }
 
@@ -270,9 +269,9 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
         preg_match("/.*,\s+(['`]?" . preg_quote($field, '/') . "['`]?\s+[^,]+),.*/", $tableSql, $match);
         $fieldSql = $match[1];
 
-        $sql = "";
+        $sql = '';
         if (!empty($fieldSql)) {
-            $fieldSql = preg_replace("/" . preg_quote($field, '/') . "/", $newField, $fieldSql);
+            $fieldSql = preg_replace('/' . preg_quote($field, '/') . '/', $newField, $fieldSql);
             $sql = "ALTER TABLE `$tableSet` ADD " . $fieldSql;
             if ($this->tableExists($tableSet) && $this->fieldExists($prevField, $tableSet)) {
                 $sql .= " AFTER `$prevField`";
@@ -281,7 +280,6 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
 
         return $sql;
     }
-
 
     /**
      * Get sql for new multi-language field index creation
@@ -314,7 +312,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
             foreach ($index as $key => $indexQuery) {
                 if (preg_match("/\([^)]*\b" . $field . "\b[^)]*\)/i", $indexQuery)) {
                     //removing index name - new will be added automaticly
-                    $indexQuery = preg_replace("/(.*\bKEY\s+)`[^`]+`/", "$1", $indexQuery);
+                    $indexQuery = preg_replace("/(.*\bKEY\s+)`[^`]+`/", '$1', $indexQuery);
 
                     if ($usingTableSet) {
                         // replacing multiple fields to one (#3269)
@@ -323,11 +321,11 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
                         //replacing previous field name with new one
                         $indexQuery = preg_replace("/\b" . $field . "\b/", $newField, $indexQuery);
                     }
-                    $indexQueries[] = "ADD " . $indexQuery;
+                    $indexQueries[] = 'ADD ' . $indexQuery;
                 }
             }
             if (count($indexQueries)) {
-                $sql = ["ALTER TABLE `$tableSet` " . implode(", ", $indexQueries)];
+                $sql = ["ALTER TABLE `$tableSet` " . implode(', ', $indexQueries)];
             }
         }
 
@@ -346,8 +344,8 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
             return $this->_iCurrentMaxLangId;
         }
 
-        $table = $tableSet = "oxarticles";
-        $field = $fieldSet = "oxtitle";
+        $table = $tableSet = 'oxarticles';
+        $field = $fieldSet = 'oxtitle';
         $lang = 0;
         while ($this->tableExists($tableSet) && $this->fieldExists($fieldSet, $tableSet)) {
             $lang++;
@@ -472,7 +470,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
         $fields = $this->getMultilangFields($tableName);
         if (is_array($fields) && count($fields) > 0) {
             foreach ($fields as $fieldName) {
-                $fieldName = $fieldName . "_" . $langId;
+                $fieldName = $fieldName . '_' . $langId;
 
                 if ($this->fieldExists($fieldName, $tableName)) {
                     //resetting field value to default
@@ -573,7 +571,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
 
         $this->safeGuardAdditionalMultiLanguageTables();
 
-        $shops = $db->getAll("select * from oxshops");
+        $shops = $db->getAll('select * from oxshops');
 
         $tables = $tables ? $tables : $config->getConfigParam('aMultiShopTables');
 
@@ -596,7 +594,6 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
 
         return $success;
     }
-
 
     /**
      * Make sure that e.g. OXID is always used from core table when creating views.
@@ -661,7 +658,7 @@ class DbMetaDataHandler extends \OxidEsales\Eshop\Core\Base
 
         if (is_array($fields) && count($fields) > 0) {
             foreach ($fields as $field) {
-                $newFieldName = $field . "_" . $languageId;
+                $newFieldName = $field . '_' . $languageId;
                 if ($languageId > 1) {
                     $previousLanguage = $languageId - 1;
                     $previousField = $field . '_' . $previousLanguage;

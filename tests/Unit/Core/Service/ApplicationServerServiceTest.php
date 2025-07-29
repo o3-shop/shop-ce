@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -33,18 +35,18 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
 
     public function testLoadAppServerList()
     {
-        $appServerDao = $this->getApplicationServerDaoMock("findAll", ['foundAppServer']);
+        $appServerDao = $this->getApplicationServerDaoMock('findAll', ['foundAppServer']);
 
         $service = $this->getApplicationServerService($appServerDao);
 
-        $this->assertEquals(array('foundAppServer'), $service->loadAppServerList());
+        $this->assertEquals(['foundAppServer'], $service->loadAppServerList());
     }
 
     public function testDeleteAppServer()
     {
         $id = 'testId';
 
-        $appServerDao = $this->getApplicationServerDaoMock("delete", $id);
+        $appServerDao = $this->getApplicationServerDaoMock('delete', $id);
 
         $service = $this->getApplicationServerService($appServerDao);
 
@@ -55,7 +57,7 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
     {
         $id = 'testId';
 
-        $appServerDao = $this->getApplicationServerDaoMock("findAppServer", $id);
+        $appServerDao = $this->getApplicationServerDaoMock('findAppServer', $id);
 
         $service = $this->getApplicationServerService($appServerDao);
 
@@ -67,7 +69,7 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
         $this->expectException(\OxidEsales\Eshop\Core\Exception\NoResultException::class);
         $id = 'testId';
 
-        $appServerDao = $this->getApplicationServerDaoMock("findAppServer", null);
+        $appServerDao = $this->getApplicationServerDaoMock('findAppServer', null);
 
         $service = $this->getApplicationServerService($appServerDao);
 
@@ -121,7 +123,7 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
         $server->setIp('127.0.0.1');
         $server->setLastAdminUsage('adminUsageTimestamp');
 
-        $appServerDao = $this->getApplicationServerDaoMock("findAll", [$server]);
+        $appServerDao = $this->getApplicationServerDaoMock('findAll', [$server]);
 
         $service = $this->getApplicationServerService($appServerDao);
 
@@ -138,7 +140,7 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
         $server->setIp('127.0.0.1');
         $server->setLastAdminUsage('adminUsageTimestamp');
 
-        $appServerDao = $this->getApplicationServerDaoMock("findAll", [$server]);
+        $appServerDao = $this->getApplicationServerDaoMock('findAll', [$server]);
 
         $service = $this->getApplicationServerService($appServerDao);
 
@@ -147,7 +149,7 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
 
     public function testLoadActiveAppServerListIfNoServersFound()
     {
-        $appServerDao = $this->getApplicationServerDaoMock("findAll", []);
+        $appServerDao = $this->getApplicationServerDaoMock('findAll', []);
 
         $service = $this->getApplicationServerService($appServerDao);
 

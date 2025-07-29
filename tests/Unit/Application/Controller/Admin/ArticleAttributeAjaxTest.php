@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Actions_Order_Ajax class
@@ -93,7 +95,7 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
     public function testGetQuery()
     {
         $oView = oxNew('article_attribute_ajax');
-        $this->assertEquals("from " . $this->getAttributeViewTable() . " where " . $this->getAttributeViewTable() . ".oxid not in ( select " . $this->getObject2AttributeViewTable() . ".oxattrid from " . $this->getObject2AttributeViewTable() . " left join " . $this->getAttributeViewTable() . " on " . $this->getAttributeViewTable() . ".oxid=" . $this->getObject2AttributeViewTable() . ".oxattrid  where " . $this->getObject2AttributeViewTable() . ".oxobjectid = '' )", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from ' . $this->getAttributeViewTable() . ' where ' . $this->getAttributeViewTable() . '.oxid not in ( select ' . $this->getObject2AttributeViewTable() . '.oxattrid from ' . $this->getObject2AttributeViewTable() . ' left join ' . $this->getAttributeViewTable() . ' on ' . $this->getAttributeViewTable() . '.oxid=' . $this->getObject2AttributeViewTable() . '.oxattrid  where ' . $this->getObject2AttributeViewTable() . ".oxobjectid = '' )", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -104,9 +106,9 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
     public function testGetQueryOxid()
     {
         $sOxid = '_testArticleAttributeOxid';
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
         $oView = oxNew('article_attribute_ajax');
-        $this->assertEquals("from " . $this->getObject2AttributeViewTable() . " left join " . $this->getAttributeViewTable() . " on " . $this->getAttributeViewTable() . ".oxid=" . $this->getObject2AttributeViewTable() . ".oxattrid  where " . $this->getObject2AttributeViewTable() . ".oxobjectid = '$sOxid'", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from ' . $this->getObject2AttributeViewTable() . ' left join ' . $this->getAttributeViewTable() . ' on ' . $this->getAttributeViewTable() . '.oxid=' . $this->getObject2AttributeViewTable() . '.oxattrid  where ' . $this->getObject2AttributeViewTable() . ".oxobjectid = '$sOxid'", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -117,8 +119,8 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
     public function testRemoveAttr()
     {
         $this->markTestSkipped('Bug: "2" does not match 0');
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class, array("_getActionIds"));
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testAttribute1', '_testAttribute2')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testAttribute1', '_testAttribute2']));
 
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxobject2attribute where oxobjectid='_testObjectId'"));
         $oView->removeAttr();
@@ -133,8 +135,8 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
     public function testRemoveAttrAll()
     {
         $sOxid = '_testObjectId2';
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('all', true);
         $oView = oxNew('article_attribute_ajax');
 
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2attribute where oxobjectid='$sOxid'"));
@@ -150,11 +152,11 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
     public function testAddAttr()
     {
         $this->markTestSkipped('Bug: "0" does not match 2');
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class, array("_getActionIds"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class, ['_getActionIds']);
         $sSynchOxid = '_testObjectIdAdd1';
-        $this->setRequestParameter("synchoxid", $sSynchOxid);
+        $this->setRequestParameter('synchoxid', $sSynchOxid);
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(array('_testAttributeAdd1', '_testAttributeAdd2')));
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testAttributeAdd1', '_testAttributeAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2attribute where oxobjectid='$sSynchOxid'"));
         $oView->addAttr();
@@ -169,10 +171,10 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
     public function testAddAttrAll()
     {
         $sSynchOxid = '_testObjectIdAdd1';
-        $this->setRequestParameter("synchoxid", $sSynchOxid);
-        $this->setRequestParameter("all", true);
+        $this->setRequestParameter('synchoxid', $sSynchOxid);
+        $this->setRequestParameter('all', true);
 
-        $iCount = oxDb::getDb()->getOne("select count(oxid) from " . $this->getAttributeViewTable() . " where " . $this->getAttributeViewTable() . ".oxid not in ( select " . $this->getObject2AttributeViewTable() . ".oxattrid from " . $this->getObject2AttributeViewTable() . " left join " . $this->getAttributeViewTable() . " on " . $this->getAttributeViewTable() . ".oxid=" . $this->getObject2AttributeViewTable() . ".oxattrid  where " . $this->getObject2AttributeViewTable() . ".oxobjectid = '$sSynchOxid' )");
+        $iCount = oxDb::getDb()->getOne('select count(oxid) from ' . $this->getAttributeViewTable() . ' where ' . $this->getAttributeViewTable() . '.oxid not in ( select ' . $this->getObject2AttributeViewTable() . '.oxattrid from ' . $this->getObject2AttributeViewTable() . ' left join ' . $this->getAttributeViewTable() . ' on ' . $this->getAttributeViewTable() . '.oxid=' . $this->getObject2AttributeViewTable() . '.oxattrid  where ' . $this->getObject2AttributeViewTable() . ".oxobjectid = '$sSynchOxid' )");
         $this->assertGreaterThan(0, $iCount);
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2attribute where oxobjectid='$sSynchOxid'"));
         $oView = oxNew('article_attribute_ajax');
@@ -191,9 +193,9 @@ class ArticleAttributeAjaxTest extends \OxidTestCase
         $sAttrOxid = '_testAttributeSaveAttr';
         $sAttrValue = '_testAttrValue';
 
-        $this->setRequestParameter("oxid", $sOxid);
-        $this->setRequestParameter("attr_oxid", $sAttrOxid);
-        $this->setRequestParameter("attr_value", $sAttrValue);
+        $this->setRequestParameter('oxid', $sOxid);
+        $this->setRequestParameter('attr_oxid', $sAttrOxid);
+        $this->setRequestParameter('attr_value', $sAttrValue);
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2attribute where oxvalue='$sAttrValue'"));
 

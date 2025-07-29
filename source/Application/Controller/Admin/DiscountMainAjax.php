@@ -85,12 +85,12 @@ class DiscountMainAjax extends ListComponentAjax
             $sQAdd = " from $sCountryTable where $sCountryTable.oxactive = '1' ";
         } else {
             $sQAdd = " from oxobject2discount, $sCountryTable where $sCountryTable.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= "and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxcountry' ";
+            $sQAdd .= 'and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) . " and oxobject2discount.oxtype = 'oxcountry' ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= "and $sCountryTable.oxid not in ( select $sCountryTable.oxid from oxobject2discount, $sCountryTable where $sCountryTable.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= "and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxcountry' ) ";
+            $sQAdd .= 'and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) . " and oxobject2discount.oxtype = 'oxcountry' ) ";
         }
 
         return $sQAdd;
@@ -103,10 +103,10 @@ class DiscountMainAjax extends ListComponentAjax
     {
         $aChosenCntr = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
-            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ") ";
+            $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -124,13 +124,13 @@ class DiscountMainAjax extends ListComponentAjax
             $sCountryTable = $this->getViewName('oxcountry');
             $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aChosenCntr)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {
             foreach ($aChosenCntr as $sChosenCntr) {
                 $oObject2Discount = oxNew(BaseModel::class);
                 $oObject2Discount->init('oxobject2discount');
                 $oObject2Discount->oxobject2discount__oxdiscountid = new Field($soxId);
                 $oObject2Discount->oxobject2discount__oxobjectid = new Field($sChosenCntr);
-                $oObject2Discount->oxobject2discount__oxtype = new Field("oxcountry");
+                $oObject2Discount->oxobject2discount__oxtype = new Field('oxcountry');
                 $oObject2Discount->save();
             }
         }

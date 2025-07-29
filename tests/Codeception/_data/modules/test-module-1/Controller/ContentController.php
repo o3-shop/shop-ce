@@ -21,5 +21,4 @@
 
 class ContentController extends \OxidEsales\Eshop\Application\Controller\ContentController
 {
-    
 }

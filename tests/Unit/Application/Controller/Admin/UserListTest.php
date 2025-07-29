@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
-use \oxTestModules;
+use Exception;
+use oxTestModules;
 
 /**
  * Tests for User_List class
  */
 class UserListTest extends \OxidTestCase
 {
-
     /**
      * User_List::Init() test case
      *
@@ -35,21 +36,21 @@ class UserListTest extends \OxidTestCase
      */
     public function testInit()
     {
-        $oUser1 = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("inGroup"));
+        $oUser1 = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['inGroup']);
         $oUser1->expects($this->once())->method('inGroup')->will($this->returnValue(true));
 
-        $oUser2 = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array("inGroup"));
+        $oUser2 = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['inGroup']);
         $oUser1->expects($this->once())->method('inGroup')->will($this->returnValue(false));
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, array("_authorize", "getItemList", "_allowAdminEdit"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, ['_authorize', 'getItemList', '_allowAdminEdit']);
         $oView->expects($this->any())->method('_authorize')->will($this->returnValue(true));
-        $oView->expects($this->any())->method('getItemList')->will($this->returnValue(array($oUser1, $oUser2)));
+        $oView->expects($this->any())->method('getItemList')->will($this->returnValue([$oUser1, $oUser2]));
         $oView->expects($this->any())->method('_allowAdminEdit')->will($this->returnValue(false));
         $oView->render();
 
         $this->assertTrue(isset($oUser1->blacklist));
-        $this->assertEquals("1", $oUser1->blacklist);
+        $this->assertEquals('1', $oUser1->blacklist);
         $this->assertTrue(isset($oUser1->blPreventDelete));
         $this->assertTrue($oUser1->blPreventDelete);
 
@@ -68,19 +69,19 @@ class UserListTest extends \OxidTestCase
         oxTestModules::addFunction('oxuser', 'isDerived', '{ return false; }');
         oxTestModules::addFunction('oxuser', 'delete', '{ throw new Exception( "deleteEntry" ); }');
 
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, array("_allowAdminEdit"));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, ['_allowAdminEdit']);
             $oView->expects($this->any())->method('_allowAdminEdit')->will($this->returnValue(true));
             $oView->deleteEntry();
         } catch (Exception $oExcp) {
-            $this->assertEquals("deleteEntry", $oExcp->getMessage(), "Error in User_List::deleteEntry()");
+            $this->assertEquals('deleteEntry', $oExcp->getMessage(), 'Error in User_List::deleteEntry()');
 
             return;
         }
-        $this->fail("Error in User_List::deleteEntry()");
+        $this->fail('Error in User_List::deleteEntry()');
     }
 
     /**
@@ -93,27 +94,27 @@ class UserListTest extends \OxidTestCase
         oxTestModules::addFunction('oxuser', 'isDerived', '{ return false; }');
         oxTestModules::addFunction('oxuser', 'delete', '{ throw new Exception( "deleteEntry" ); }');
 
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, array("_allowAdminEdit", "buildWhere"));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, ['_allowAdminEdit', 'buildWhere']);
             $oView->expects($this->any())->method('_allowAdminEdit')->will($this->returnValue(true));
             $oView->expects($this->any())->method('buildWhere')->will($this->returnValue([]));
             $oView->getItemList();
             $oView->deleteEntry();
         } catch (Exception $oExcp) {
-            $this->assertEquals("deleteEntry", $oExcp->getMessage(), "Error in User_List::deleteEntry()");
+            $this->assertEquals('deleteEntry', $oExcp->getMessage(), 'Error in User_List::deleteEntry()');
             try {
-                $oView->expects($this->any())->method('buildWhere')->will($this->throwException(new Exception("list was empty")));
+                $oView->expects($this->any())->method('buildWhere')->will($this->throwException(new Exception('list was empty')));
                 $oView->getItemList();
             } catch (Exception $oNewExcp) {
-                $this->assertEquals("list was empty", $oNewExcp->getMessage(), "Error in User_List::deleteEntry()");
+                $this->assertEquals('list was empty', $oNewExcp->getMessage(), 'Error in User_List::deleteEntry()');
             }
 
             return;
         }
-        $this->fail("Error in User_List::deleteEntry()");
+        $this->fail('Error in User_List::deleteEntry()');
     }
 
     /**
@@ -123,7 +124,7 @@ class UserListTest extends \OxidTestCase
      */
     public function testPrepareWhereQuery()
     {
-        $sQ = " and (  oxuser.oxlname testFilter or oxuser.oxlname testFilter  or  oxuser.oxfname testFilter or oxuser.oxfname testFilter ) ";
+        $sQ = ' and (  oxuser.oxlname testFilter or oxuser.oxlname testFilter  or  oxuser.oxfname testFilter or oxuser.oxfname testFilter ) ';
 
         oxTestModules::addFunction('oxUtilsString', 'prepareStrForSearch', '{ return "testUml"; }');
 
@@ -131,10 +132,10 @@ class UserListTest extends \OxidTestCase
         $aWhere['oxuser.oxlname'] = 'testLastName';
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, array("_isSearchValue", "_processFilter", "_buildFilter"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\UserList::class, ['_isSearchValue', '_processFilter', '_buildFilter']);
         $oView->expects($this->any())->method('_isSearchValue')->will($this->returnValue(true));
-        $oView->expects($this->any())->method('_processFilter')->will($this->returnValue("testValue"));
-        $oView->expects($this->any())->method('_buildFilter')->will($this->returnValue("testFilter"));
+        $oView->expects($this->any())->method('_processFilter')->will($this->returnValue('testValue'));
+        $oView->expects($this->any())->method('_buildFilter')->will($this->returnValue('testFilter'));
         $this->assertEquals($sQ, $oView->UNITprepareWhereQuery($aWhere, ''));
     }
 

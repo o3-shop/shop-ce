@@ -73,7 +73,7 @@ class WidgetControl extends \OxidEsales\Eshop\Core\ShopControl
         //$aParams = ( isset($aParams) ) ? $aParams : \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter( 'oxwparams' );
 
         if (!isset($viewsChain) && \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxwparent')) {
-            $viewsChain = explode("|", \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxwparent'));
+            $viewsChain = explode('|', \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxwparent'));
         }
 
         parent::start($class, $function, $parameters, $viewsChain);
@@ -121,7 +121,7 @@ class WidgetControl extends \OxidEsales\Eshop\Core\ShopControl
     {
         $config = $this->getConfig();
         $activeViewsIds = $config->getActiveViewsIds();
-        $activeViewsIds = array_map("strtolower", $activeViewsIds);
+        $activeViewsIds = array_map('strtolower', $activeViewsIds);
         $classKey = Registry::getControllerClassNameResolver()->getIdByClassName($class);
         $classKey = !is_null($classKey) ? $classKey : $class; //fallback
 

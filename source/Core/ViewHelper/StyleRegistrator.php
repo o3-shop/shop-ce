@@ -26,8 +26,8 @@ namespace OxidEsales\EshopCommunity\Core\ViewHelper;
  */
 class StyleRegistrator
 {
-    const CONDITIONAL_STYLES_PARAMETER_NAME = 'conditional_styles';
-    const STYLES_PARAMETER_NAME = 'styles';
+    public const CONDITIONAL_STYLES_PARAMETER_NAME = 'conditional_styles';
+    public const STYLES_PARAMETER_NAME = 'styles';
 
     /**
      * Separate query part #3305.
@@ -80,7 +80,7 @@ class StyleRegistrator
         }
 
         if (empty($url) && $config->getConfigParam('iDebug') != 0) {
-            $error = "{oxstyle} resource not found: " . getStr()->htmlspecialchars($file);
+            $error = '{oxstyle} resource not found: ' . getStr()->htmlspecialchars($file);
             trigger_error($error, E_USER_WARNING);
         }
 

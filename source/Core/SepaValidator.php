@@ -94,7 +94,7 @@ class SepaValidator
         'TR' => 26,
         'AE' => 23,
         'GB' => 22,
-        'VG' => 24
+        'VG' => 24,
     ];
 
     /**

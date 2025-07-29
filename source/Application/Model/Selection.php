@@ -140,6 +140,6 @@ class Selection
      */
     public function getLink()
     {
-        return "#";
+        return '#';
     }
 }

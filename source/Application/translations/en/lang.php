@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$sLangName  = "English";
+$sLangName = 'English';
 
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
@@ -745,13 +745,11 @@ $aLang = [
 
 'WISHLIST_PRODUCTS'                                           => 'These products are on the wish list of %s. If you want to please him/her, purchase one or more of these products.',
 
-
 'BETA_NOTE'                                                   => 'Welcome to ',
 'BETA_NOTE_RELEASE_BETA'                                      => 'Beta',
 'BETA_NOTE_RELEASE_RC'                                        => 'Release candidate',
 'BETA_NOTE_MIDDLE'                                            => ' of O3-Shop ',
 'BETA_NOTE_FAQ'                                               => '. Please refer to our %s if you have any questions.',
-
 
 'NO_LISTMANIA_LIST'                                           => 'There is no listmania lists at the moment. To create a new list, please ',
 'DETAILS_VPE_MESSAGE'                                         => 'This product can only be ordered in packaging units of %s',
@@ -774,7 +772,6 @@ $aLang = [
 'THANK_YOU_FOR_ORDER'                                         => 'Thank you for ordering at',
 'PRICE_ALERT_THANK_YOU_MESSAGE'                               => 'Many thanks for the transmission of your wished price of %s %s. You will receive an e-mail as soon as this is reached.',
 'THANK_YOU_MESSAGE'                                           => 'Thank you for your message to %s.',
-
 
 'ALL_BRANDS'                                                  => 'All brands',
 'BY_BRAND'                                                    => 'By brand',

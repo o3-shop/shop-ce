@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
-use \oxDb;
+use Exception;
+use oxDb;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Shop_Seo class
  */
 class ShopSeoTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -52,8 +53,8 @@ class ShopSeoTest extends \OxidTestCase
         if ($this->getConfig()->getEdition() === 'EE') {
             $shopId = 1;
         }
-        $oView = $this->getProxyClass("Shop_Seo");
-        $oView->setNonPublicVar("_sEditObjectId", $shopId);
+        $oView = $this->getProxyClass('Shop_Seo');
+        $oView->setNonPublicVar('_sEditObjectId', $shopId);
         $this->assertEquals('shop_seo.tpl', $oView->render());
     }
 
@@ -64,7 +65,7 @@ class ShopSeoTest extends \OxidTestCase
      */
     public function testLoadActiveUrl()
     {
-        $aData = oxDb::getDb(oxDB::FETCH_MODE_ASSOC)->getAll("select oxseourl, oxlang, oxobjectid, oxshopid from oxseo limit 1");
+        $aData = oxDb::getDb(oxDB::FETCH_MODE_ASSOC)->getAll('select oxseourl, oxlang, oxobjectid, oxshopid from oxseo limit 1');
 
         // defining parameters
         $sObjectId = $aData[0]['oxobjectid'];
@@ -72,25 +73,25 @@ class ShopSeoTest extends \OxidTestCase
         $sSeoUrl = $aData[0]['oxseourl'];
         $iLangId = $aData[0]['oxlang'];
 
-        $this->setRequestParameter('aStaticUrl', array("oxseo__oxobjectid" => $sObjectId));
+        $this->setRequestParameter('aStaticUrl', ['oxseo__oxobjectid' => $sObjectId]);
 
         // testing..
-        $oView = $this->getProxyClass("Shop_Seo");
-        $oView->setNonPublicVar("_sActSeoObject", $sObjectId);
+        $oView = $this->getProxyClass('Shop_Seo');
+        $oView->setNonPublicVar('_sActSeoObject', $sObjectId);
         $oView->UNITloadActiveUrl($iShopId);
-        $aUrlData = $oView->getViewDataElement("aSeoUrls");
+        $aUrlData = $oView->getViewDataElement('aSeoUrls');
 
-        $this->assertEquals($sObjectId, $oView->getViewDataElement("sActSeoObject"));
+        $this->assertEquals($sObjectId, $oView->getViewDataElement('sActSeoObject'));
         $this->assertTrue(isset($aUrlData[$iLangId]));
         $this->assertEquals($sObjectId, $aUrlData[$iLangId][0]);
         $this->assertEquals($sSeoUrl, $aUrlData[$iLangId][1]);
 
         //
-        $oView->setNonPublicVar("_sActSeoObject", null);
+        $oView->setNonPublicVar('_sActSeoObject', null);
         $oView->UNITloadActiveUrl($iShopId);
-        $aUrlData = $oView->getViewDataElement("aSeoUrls");
+        $aUrlData = $oView->getViewDataElement('aSeoUrls');
 
-        $this->assertEquals($sObjectId, $oView->getViewDataElement("sActSeoObject"));
+        $this->assertEquals($sObjectId, $oView->getViewDataElement('sActSeoObject'));
         $this->assertTrue(isset($aUrlData[$iLangId]));
         $this->assertEquals($sObjectId, $aUrlData[$iLangId][0]);
         $this->assertEquals($sSeoUrl, $aUrlData[$iLangId][1]);
@@ -110,9 +111,9 @@ class ShopSeoTest extends \OxidTestCase
         oxTestModules::addFunction('oxshop', 'setLanguage', '{ return true; }');
         oxTestModules::addFunction('oxshop', 'save', '{ return true; }');
 
-        $this->setRequestParameter('aStaticUrl', array("staticUrl"));
+        $this->setRequestParameter('aStaticUrl', ['staticUrl']);
 
-        $aTasks = array("saveConfVars", "resetContentCache");
+        $aTasks = ['saveConfVars', 'resetContentCache'];
 
         // testing..
         try {
@@ -122,11 +123,11 @@ class ShopSeoTest extends \OxidTestCase
             }
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("encodeStaticUrls", $oExcp->getMessage(), "Error in Shop_Seo::save()");
+            $this->assertEquals('encodeStaticUrls', $oExcp->getMessage(), 'Error in Shop_Seo::save()');
 
             return;
         }
-        $this->fail("Error in Shop_Seo::save()");
+        $this->fail('Error in Shop_Seo::save()');
     }
 
     /**
@@ -137,19 +138,18 @@ class ShopSeoTest extends \OxidTestCase
     public function testProcessUrls()
     {
         // defining parameters
-        $aUrls = array('oxseo__oxstdurl' => "stdurl",
-                       'oxseo__oxseourl' => array("seourl1", "seourl2"));
+        $aUrls = ['oxseo__oxstdurl' => 'stdurl',
+                       'oxseo__oxseourl' => ['seourl1', 'seourl2']];
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopSeo::class, array("_cleanupUrl"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopSeo::class, ['_cleanupUrl']);
         $oView->expects($this->exactly(3))
             ->method('_cleanupUrl')
             ->withConsecutive(
-                [$this->equalTo("stdurl")],
-                [$this->equalTo("seourl1")],
-                [$this->equalTo("seourl2")]
+                [$this->equalTo('stdurl')],
+                [$this->equalTo('seourl1')],
+                [$this->equalTo('seourl2')]
             );
-
 
         $aUrls = $oView->UNITprocessUrls($aUrls);
     }
@@ -163,7 +163,7 @@ class ShopSeoTest extends \OxidTestCase
     {
         // testing..
         $oView = oxNew('Shop_Seo');
-        $this->assertEquals("&amp;", $oView->UNITcleanupUrl("&amp;&amp;&&"));
+        $this->assertEquals('&amp;', $oView->UNITcleanupUrl('&amp;&amp;&&'));
     }
 
     /**
@@ -181,11 +181,11 @@ class ShopSeoTest extends \OxidTestCase
             $oView = oxNew('Shop_Seo');
             $oView->dropSeoIds();
         } catch (Exception $oExcp) {
-            $this->assertEquals("markAsExpired", $oExcp->getMessage(), "error in Shop_Seo::dropSeoIds()");
+            $this->assertEquals('markAsExpired', $oExcp->getMessage(), 'error in Shop_Seo::dropSeoIds()');
 
             return;
         }
-        $this->fail("error in Shop_Seo::dropSeoIds()");
+        $this->fail('error in Shop_Seo::dropSeoIds()');
     }
 
     /**
@@ -195,8 +195,8 @@ class ShopSeoTest extends \OxidTestCase
      */
     public function testDeleteStaticUrl()
     {
-        $this->setRequestParameter('aStaticUrl', array("oxseo__oxobjectid" => "testObjectId"));
-        $this->setRequestParameter('oxid', "1");
+        $this->setRequestParameter('aStaticUrl', ['oxseo__oxobjectid' => 'testObjectId']);
+        $this->setRequestParameter('oxid', '1');
 
         $oDb = oxDb::getDb();
 

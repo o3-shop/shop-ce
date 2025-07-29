@@ -34,8 +34,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UninstallModuleConfigurationCommand extends Command
 {
-    const MESSAGE_REMOVE_WAS_SUCCESSFULL = 'Module configuration for module %s has been removed.';
-    const MESSAGE_REMOVE_FAILED = 'An error occurred while removing module %s configuration.';
+    public const MESSAGE_REMOVE_WAS_SUCCESSFULL = 'Module configuration for module %s has been removed.';
+    public const MESSAGE_REMOVE_FAILED = 'An error occurred while removing module %s configuration.';
 
     /**
      * @var ModuleConfigurationInstallerInterface

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -29,7 +31,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class SepaValidatorTest extends \OxidTestCase
 {
-
     /**
      * Test case to check getting IBAN registry records
      */
@@ -39,7 +40,7 @@ class SepaValidatorTest extends \OxidTestCase
 
         $aIBANRegistry = $oSepaValidator->getIBANCodeLengths();
 
-        $this->assertNotNull($aIBANRegistry['DE'], "IBAN length for SEPA country (DE) must be not null");
+        $this->assertNotNull($aIBANRegistry['DE'], 'IBAN length for SEPA country (DE) must be not null');
     }
 
     /**
@@ -50,7 +51,7 @@ class SepaValidatorTest extends \OxidTestCase
     {
         $oSepaValidator = oxNew('oxSepaValidator');
 
-        $this->assertTrue($oSepaValidator->isValidIBAN("MT84MALT011000012345MTLCAST001S"), "IBAN must be valid");
+        $this->assertTrue($oSepaValidator->isValidIBAN('MT84MALT011000012345MTLCAST001S'), 'IBAN must be valid');
     }
 
     /**
@@ -61,7 +62,7 @@ class SepaValidatorTest extends \OxidTestCase
     {
         $oSepaValidator = oxNew('oxSepaValidator');
 
-        $this->assertFalse($oSepaValidator->isValidIBAN("NX9386011117947"), "IBAN must be not valid");
+        $this->assertFalse($oSepaValidator->isValidIBAN('NX9386011117947'), 'IBAN must be not valid');
     }
 
     /**
@@ -72,7 +73,7 @@ class SepaValidatorTest extends \OxidTestCase
     {
         $oSepaValidator = oxNew('oxSepaValidator');
 
-        $this->assertTrue($oSepaValidator->isValidBIC("ASPKAT2L"), "BIC must be valid");
+        $this->assertTrue($oSepaValidator->isValidBIC('ASPKAT2L'), 'BIC must be valid');
     }
 
     /**
@@ -83,6 +84,6 @@ class SepaValidatorTest extends \OxidTestCase
     {
         $oSepaValidator = oxNew('oxSepaValidator');
 
-        $this->assertFalse($oSepaValidator->isValidBIC("AAAACCX"), "BIC must be not valid");
+        $this->assertFalse($oSepaValidator->isValidBIC('AAAACCX'), 'BIC must be not valid');
     }
 }

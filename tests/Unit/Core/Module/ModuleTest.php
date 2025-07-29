@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\Eshop\Core\Module\Module;
@@ -24,8 +26,7 @@ use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use oxModule;
-use \shop;
-use \oxRegistry;
+use oxRegistry;
 
 /**
  * @group module
@@ -63,23 +64,22 @@ class ModuleTest extends \OxidTestCase
      */
     public function testLoadByDir()
     {
-        $aModulesPaths = array("testModuleId" => "test/path");
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array("load", "getModulePaths"));
+        $aModulesPaths = ['testModuleId' => 'test/path'];
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['load', 'getModulePaths']);
         $oModule->expects($this->exactly(2))
             ->method('getModulePaths')
             ->willReturn($aModulesPaths);
         $oModule->expects($this->exactly(2))
             ->method('load')
             ->withConsecutive(
-                [$this->equalTo("noSuchTest/path")],
-                [$this->equalTo("testModuleId")]
+                [$this->equalTo('noSuchTest/path')],
+                [$this->equalTo('testModuleId')]
             )
             ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->assertFalse($oModule->loadByDir("noSuchTest/path"));
-        $this->assertTrue($oModule->loadByDir("test/path"));
+        $this->assertFalse($oModule->loadByDir('noSuchTest/path'));
+        $this->assertTrue($oModule->loadByDir('test/path'));
     }
-
 
     /**
      * oxModule::getInfo() test case
@@ -88,16 +88,16 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetInfo()
     {
-        $aModule = array(
+        $aModule = [
             'id'    => 'testModuleId',
-            'title' => 'testModuleTitle'
-        );
+            'title' => 'testModuleTitle',
+        ];
 
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
-        $this->assertEquals("testModuleId", $oModule->getInfo("id"));
-        $this->assertEquals("testModuleTitle", $oModule->getInfo("title"));
+        $this->assertEquals('testModuleId', $oModule->getInfo('id'));
+        $this->assertEquals('testModuleTitle', $oModule->getInfo('title'));
     }
 
     /**
@@ -107,20 +107,20 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetInfo_usingLanguage()
     {
-        $aModule = array(
+        $aModule = [
             'title'       => 'testModuleTitle',
-            'description' => array("en" => "test EN value", "de" => "test DE value")
-        );
+            'description' => ['en' => 'test EN value', 'de' => 'test DE value'],
+        ];
 
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
-        $this->assertEquals('testModuleTitle', $oModule->getInfo("title"));
-        $this->assertEquals('testModuleTitle', $oModule->getInfo("title", 1));
+        $this->assertEquals('testModuleTitle', $oModule->getInfo('title'));
+        $this->assertEquals('testModuleTitle', $oModule->getInfo('title', 1));
 
-        $this->assertEquals("test DE value", $oModule->getInfo("description", 0));
-        $this->assertEquals("test EN value", $oModule->getInfo("description", 1));
-        $this->assertEquals("test EN value", $oModule->getInfo("description", 2));
+        $this->assertEquals('test DE value', $oModule->getInfo('description', 0));
+        $this->assertEquals('test EN value', $oModule->getInfo('description', 1));
+        $this->assertEquals('test EN value', $oModule->getInfo('description', 2));
     }
 
     /**
@@ -130,10 +130,10 @@ class ModuleTest extends \OxidTestCase
      */
     public function testIsActiveEmpty()
     {
-        $aModules = array();
-        $this->getConfig()->setConfigParam("aModules", $aModules);
+        $aModules = [];
+        $this->getConfig()->setConfigParam('aModules', $aModules);
 
-        $aExtend = array('extend' => array());
+        $aExtend = ['extend' => []];
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aExtend);
 
@@ -147,7 +147,7 @@ class ModuleTest extends \OxidTestCase
      */
     public function testIsActiveInactive()
     {
-        $aModule = array('extend' => array('oxtest' => 'test/mytest'));
+        $aModule = ['extend' => ['oxtest' => 'test/mytest']];
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
@@ -161,10 +161,10 @@ class ModuleTest extends \OxidTestCase
      */
     public function testIsActiveInactiveChain()
     {
-        $aModules = array('oxtest' => 'test1/mytest1&test2/mytest2');
-        $this->getConfig()->setConfigParam("aModules", $aModules);
+        $aModules = ['oxtest' => 'test1/mytest1&test2/mytest2'];
+        $this->getConfig()->setConfigParam('aModules', $aModules);
 
-        $aExtend = array('extend' => array('oxtest' => 'test/mytest'), 'id' => 'test');
+        $aExtend = ['extend' => ['oxtest' => 'test/mytest'], 'id' => 'test'];
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aExtend);
 
@@ -178,10 +178,10 @@ class ModuleTest extends \OxidTestCase
      */
     public function testIsActiveDeactivated()
     {
-        $aDisabledModules = array('test');
-        $this->getConfig()->setConfigParam("aDisabledModules", $aDisabledModules);
+        $aDisabledModules = ['test'];
+        $this->getConfig()->setConfigParam('aDisabledModules', $aDisabledModules);
 
-        $aModule = array('id' => 'test');
+        $aModule = ['id' => 'test'];
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
@@ -195,10 +195,10 @@ class ModuleTest extends \OxidTestCase
      */
     public function testIsActiveDeactivatedChain()
     {
-        $aDisabledModules = array('mytest1', 'test', 'test2');
-        $this->getConfig()->setConfigParam("aDisabledModules", $aDisabledModules);
+        $aDisabledModules = ['mytest1', 'test', 'test2'];
+        $this->getConfig()->setConfigParam('aDisabledModules', $aDisabledModules);
 
-        $aModule = array('id' => 'test');
+        $aModule = ['id' => 'test'];
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
@@ -212,8 +212,8 @@ class ModuleTest extends \OxidTestCase
      */
     public function testIsActiveWithNonExistingModuleLoaded()
     {
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array("getDisabledModules"));
-        $oModule->expects($this->any())->method('getDisabledModules')->will($this->returnValue(array()));
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getDisabledModules']);
+        $oModule->expects($this->any())->method('getDisabledModules')->will($this->returnValue([]));
         $oModule->load('non_existing_module');
 
         $this->assertFalse($oModule->isActive());
@@ -221,10 +221,10 @@ class ModuleTest extends \OxidTestCase
 
     public function providerGetMetadataPath()
     {
-        return array(
-            array("oe/module/"),
-            array("oe/module"),
-        );
+        return [
+            ['oe/module/'],
+            ['oe/module'],
+        ];
     }
 
     /**
@@ -238,14 +238,14 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetMetadataPath($sModuleId)
     {
-        $sModId = "testModule";
+        $sModId = 'testModule';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getModulesDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getModulesDir']);
         $oConfig->expects($this->any())
             ->method('getModulesDir')
-            ->will($this->returnValue("/var/path/to/modules/"));
+            ->will($this->returnValue('/var/path/to/modules/'));
 
-        $oModuleStub = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array('getModulePath', 'getConfig'));
+        $oModuleStub = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getModulePath', 'getConfig']);
         $oModuleStub->expects($this->any())
             ->method('getModulePath')
             ->will($this->returnValue($sModuleId));
@@ -254,12 +254,12 @@ class ModuleTest extends \OxidTestCase
             ->method('getConfig')
             ->will($this->returnValue($oConfig));
 
-        $aModule = array('id' => $sModId);
+        $aModule = ['id' => $sModId];
         /** @var oxModule $oModule */
         $oModule = $oModuleStub;
         $oModule->setModuleData($aModule);
 
-        $this->assertEquals("/var/path/to/modules/oe/module/metadata.php", $oModule->getMetadataPath());
+        $this->assertEquals('/var/path/to/modules/oe/module/metadata.php', $oModule->getMetadataPath());
 
         return true;
     }
@@ -271,24 +271,24 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetModuleFullPath()
     {
-        $sModId = "testModule";
+        $sModId = 'testModule';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getModulesDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getModulesDir']);
         $oConfig->expects($this->any())
             ->method('getModulesDir')
-            ->will($this->returnValue("/var/path/to/modules/"));
+            ->will($this->returnValue('/var/path/to/modules/'));
 
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array('getModulePath', 'getConfig'));
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getModulePath', 'getConfig']);
         $oModule->expects($this->any())
             ->method('getModulePath')
             ->with($this->equalTo($sModId))
-            ->will($this->returnValue("oe/module/"));
+            ->will($this->returnValue('oe/module/'));
 
         $oModule->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($oConfig));
 
-        $this->assertEquals("/var/path/to/modules/oe/module/", $oModule->getModuleFullPath($sModId));
+        $this->assertEquals('/var/path/to/modules/oe/module/', $oModule->getModuleFullPath($sModId));
     }
 
     /**
@@ -298,27 +298,27 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetModuleFullPathWhenModuleIdNotGiven()
     {
-        $sModId = "testModule";
+        $sModId = 'testModule';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getModulesDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getModulesDir']);
         $oConfig->expects($this->any())
             ->method('getModulesDir')
-            ->will($this->returnValue("/var/path/to/modules/"));
+            ->will($this->returnValue('/var/path/to/modules/'));
 
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array('getModulePath', 'getConfig'));
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getModulePath', 'getConfig']);
         $oModule->expects($this->any())
             ->method('getModulePath')
             ->with($this->equalTo($sModId))
-            ->will($this->returnValue("oe/module/"));
+            ->will($this->returnValue('oe/module/'));
 
         $oModule->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($oConfig));
 
-        $aModule = array('id' => $sModId);
+        $aModule = ['id' => $sModId];
         $oModule->setModuleData($aModule);
 
-        $this->assertEquals("/var/path/to/modules/oe/module/", $oModule->getModuleFullPath());
+        $this->assertEquals('/var/path/to/modules/oe/module/', $oModule->getModuleFullPath());
     }
 
     /**
@@ -328,14 +328,14 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetModuleFullPathWhenNoModulePathExists()
     {
-        $sModId = "testModule";
+        $sModId = 'testModule';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getModulesDir'));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getModulesDir']);
         $oConfig->expects($this->any())
             ->method('getModulesDir')
-            ->will($this->returnValue("/var/path/to/modules/"));
+            ->will($this->returnValue('/var/path/to/modules/'));
 
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array('getModulePath', 'getConfig'));
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getModulePath', 'getConfig']);
         $oModule->expects($this->any())
             ->method('getModulePath')
             ->with($this->equalTo($sModId))
@@ -353,9 +353,9 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetId()
     {
-        $aModule = array(
-            'id' => 'testModuleId'
-        );
+        $aModule = [
+            'id' => 'testModuleId',
+        ];
 
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
@@ -365,27 +365,27 @@ class ModuleTest extends \OxidTestCase
 
     public function testGetFilesWhenModuleHasFiles()
     {
-        $aModule = array(
+        $aModule = [
             'id'    => 'testModuleId',
-            'files' => array('class' => 'vendor/module/path/class.php')
-        );
+            'files' => ['class' => 'vendor/module/path/class.php'],
+        ];
 
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
-        $this->assertEquals(array('class' => 'vendor/module/path/class.php'), $oModule->getFiles());
+        $this->assertEquals(['class' => 'vendor/module/path/class.php'], $oModule->getFiles());
     }
 
     public function testGetFilesWhenModuleHasNoFiles()
     {
-        $aModule = array(
-            'id' => 'testModuleId'
-        );
+        $aModule = [
+            'id' => 'testModuleId',
+        ];
 
         $oModule = oxNew('oxModule');
         $oModule->setModuleData($aModule);
 
-        $this->assertEquals(array(), $oModule->getFiles());
+        $this->assertEquals([], $oModule->getFiles());
     }
 
     /**
@@ -393,14 +393,14 @@ class ModuleTest extends \OxidTestCase
      */
     public function testGetControllersWithMissingControllersKey()
     {
-        $metaData = array(
-            'id' => 'testModuleId'
-        );
+        $metaData = [
+            'id' => 'testModuleId',
+        ];
 
         $module = oxNew(Module::class);
         $module->setModuleData($metaData);
 
-        $this->assertEquals(array(), $module->getControllers(), 'If key controllers is not set in metadata.php, Module::getControllers() will return an empty array');
+        $this->assertEquals([], $module->getControllers(), 'If key controllers is not set in metadata.php, Module::getControllers() will return an empty array');
     }
 
     /**
@@ -416,10 +416,10 @@ class ModuleTest extends \OxidTestCase
     {
         $expectedControllers = ['controller_id' => 'ControllerName'];
 
-        $metaData = array(
+        $metaData = [
             'id' => 'testModuleId',
-            'controllers' => $metaDataControllers
-        );
+            'controllers' => $metaDataControllers,
+        ];
 
         $module = oxNew(Module::class);
         $module->setModuleData($metaData);
@@ -433,22 +433,22 @@ class ModuleTest extends \OxidTestCase
             [
                 'metaDataControllers' => ['controller_id' => 'ControllerName'],
                 'expectedResult' => ['controller_id' => 'ControllerName'],
-                'message' => 'Controller value is not converted to lowercase'
+                'message' => 'Controller value is not converted to lowercase',
             ],
             [
                 'metaDataControllers' => ['Controller_Id' => 'ControllerName'],
                 'expectedResult' => ['controller_id' => 'ControllerName'],
-                'message' => 'Controller Id is converted to lowercase'
+                'message' => 'Controller Id is converted to lowercase',
             ],
             [
                 'metaDataControllers' => [],
                 'expectedResult' => [],
-                'message' => 'An empty array is returned, if controllers is an empty array'
+                'message' => 'An empty array is returned, if controllers is an empty array',
             ],
             [
                 'metaDataControllers' => null,
                 'expectedResult' => [],
-                'message' => 'An empty array is returned, if controllers is null'
+                'message' => 'An empty array is returned, if controllers is null',
             ],
         ];
     }
@@ -466,10 +466,10 @@ class ModuleTest extends \OxidTestCase
     public function testGetControllersWithWrongMetadataValue($metaDataControllers, $expectedException)
     {
         $this->expectException($expectedException);
-        $metaData = array(
+        $metaData = [
             'id' => 'testModuleId',
-            'controllers' => $metaDataControllers
-        );
+            'controllers' => $metaDataControllers,
+        ];
 
         $module = oxNew(Module::class);
         $module->setModuleData($metaData);
@@ -484,23 +484,23 @@ class ModuleTest extends \OxidTestCase
         return [
           [
               'metaDataControllers' => false,
-              'expectedException' => $expectedException
+              'expectedException' => $expectedException,
           ],
           [
               'metaDataControllers' => '',
-              'expectedException' => $expectedException
+              'expectedException' => $expectedException,
           ],
           [
               'metaDataControllers' => 'string',
-              'expectedException' => $expectedException
+              'expectedException' => $expectedException,
           ],
           [
               'metaDataControllers' => 1,
-              'expectedException' => $expectedException
+              'expectedException' => $expectedException,
           ],
           [
               'metaDataControllers' => new \stdClass(),
-              'expectedException' => $expectedException
+              'expectedException' => $expectedException,
           ],
         ];
     }
@@ -552,10 +552,10 @@ class ModuleTest extends \OxidTestCase
     public function testHasMetadata()
     {
         $oModule = $this->getProxyClass('oxmodule');
-        $oModule->setNonPublicVar("_blMetadata", false);
+        $oModule->setNonPublicVar('_blMetadata', false);
         $this->assertFalse($oModule->hasMetadata());
 
-        $oModule->setNonPublicVar("_blMetadata", true);
+        $oModule->setNonPublicVar('_blMetadata', true);
         $this->assertTrue($oModule->hasMetadata());
     }
 
@@ -567,13 +567,12 @@ class ModuleTest extends \OxidTestCase
     public function testIsRegistered()
     {
         $oModule = $this->getProxyClass('oxmodule');
-        $oModule->setNonPublicVar("_blRegistered", false);
+        $oModule->setNonPublicVar('_blRegistered', false);
         $this->assertFalse($oModule->isRegistered());
 
-        $oModule->setNonPublicVar("_blRegistered", true);
+        $oModule->setNonPublicVar('_blRegistered', true);
         $this->assertTrue($oModule->isRegistered());
     }
-
 
     /**
      * oxModule::getTitle() test case
@@ -583,10 +582,10 @@ class ModuleTest extends \OxidTestCase
     public function testGetTitle()
     {
         $iLang = oxRegistry::getLang()->getTplLanguage();
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array('getInfo'));
-        $oModule->expects($this->once())->method('getInfo')->with($this->equalTo("title"), $this->equalTo($iLang))->will($this->returnValue("testTitle"));
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getInfo']);
+        $oModule->expects($this->once())->method('getInfo')->with($this->equalTo('title'), $this->equalTo($iLang))->will($this->returnValue('testTitle'));
 
-        $this->assertEquals("testTitle", $oModule->getTitle());
+        $this->assertEquals('testTitle', $oModule->getTitle());
     }
 
     /**
@@ -597,10 +596,10 @@ class ModuleTest extends \OxidTestCase
     public function testGetDescription()
     {
         $iLang = oxRegistry::getLang()->getTplLanguage();
-        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, array('getInfo'));
-        $oModule->expects($this->once())->method('getInfo')->with($this->equalTo("description"), $this->equalTo($iLang))->will($this->returnValue("testDesc"));
+        $oModule = $this->getMock(\OxidEsales\Eshop\Core\Module\Module::class, ['getInfo']);
+        $oModule->expects($this->once())->method('getInfo')->with($this->equalTo('description'), $this->equalTo($iLang))->will($this->returnValue('testDesc'));
 
-        $this->assertEquals("testDesc", $oModule->getDescription());
+        $this->assertEquals('testDesc', $oModule->getDescription());
     }
 
     public function testGetIdByPathWithProjectConfiguration()
@@ -618,7 +617,7 @@ class ModuleTest extends \OxidTestCase
 
         $shopConfigurationDao->save($shopConfiguration);
 
-        $module = "oe/testModule/mytest";
+        $module = 'oe/testModule/mytest';
 
         $moduleClass = oxNew(Module::class);
         $this->assertEquals('testModule', $moduleClass->getIdByPath($module));
@@ -626,11 +625,11 @@ class ModuleTest extends \OxidTestCase
 
     public function testGetIdByPathUnknownPath()
     {
-        $aDisabledModules = array('test1');
-        $aModulePaths = array("ModuleName2" => "oe/ModuleName2");
-        $this->getConfig()->setConfigParam("aDisabledModules", $aDisabledModules);
-        $this->getConfig()->setConfigParam("aModulePaths", $aModulePaths);
-        $sModule = "ModuleName/myorder";
+        $aDisabledModules = ['test1'];
+        $aModulePaths = ['ModuleName2' => 'oe/ModuleName2'];
+        $this->getConfig()->setConfigParam('aDisabledModules', $aDisabledModules);
+        $this->getConfig()->setConfigParam('aModulePaths', $aModulePaths);
+        $sModule = 'ModuleName/myorder';
 
         $oModule = oxNew('oxModule');
         $oModule->getIdByPath($sModule);
@@ -639,11 +638,11 @@ class ModuleTest extends \OxidTestCase
 
     public function testGetIdByPathUnknownPathNotDir()
     {
-        $aDisabledModules = array('test1');
-        $aModulePaths = array("ModuleName2" => "oe/ModuleName2");
-        $this->getConfig()->setConfigParam("aDisabledModules", $aDisabledModules);
-        $this->getConfig()->setConfigParam("aModulePaths", $aModulePaths);
-        $sModule = "myorder";
+        $aDisabledModules = ['test1'];
+        $aModulePaths = ['ModuleName2' => 'oe/ModuleName2'];
+        $this->getConfig()->setConfigParam('aDisabledModules', $aDisabledModules);
+        $this->getConfig()->setConfigParam('aModulePaths', $aModulePaths);
+        $sModule = 'myorder';
 
         $oModule = oxNew('oxModule');
         $oModule->getIdByPath($sModule);

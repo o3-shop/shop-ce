@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \Smarty;
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
+use Smarty;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/modifier.oxmultilangassign.php';
 if (file_exists($filePath)) {
@@ -32,7 +34,6 @@ if (file_exists($filePath)) {
 
 class SmartyModifieroxmultilangassignTest extends \OxidTestCase
 {
-
     /**
      * Provides data to testSimpleAssignments
      *
@@ -40,12 +41,11 @@ class SmartyModifieroxmultilangassignTest extends \OxidTestCase
      */
     public function provider()
     {
-        return array(
-            array('FIRST_NAME', 0, 'Vorname'),
-            array('FIRST_NAME', 1, 'First name'),
-            array('VAT', 1, 'VAT')
-
-        );
+        return [
+            ['FIRST_NAME', 0, 'Vorname'],
+            ['FIRST_NAME', 1, 'First name'],
+            ['VAT', 1, 'VAT'],
+        ];
     }
 
     /**
@@ -66,12 +66,12 @@ class SmartyModifieroxmultilangassignTest extends \OxidTestCase
      */
     public function withArgumentsProvider()
     {
-        return array(
-            array('MANUFACTURER_S', 0, 'Opel', '| Hersteller: Opel'),
-            array('MANUFACTURER_S', 1, 'Opel', 'Manufacturer: Opel'),
-            array('INVITE_TO_SHOP', 0, array('Admin', 'OXID Shop'), 'Eine Einladung von Admin OXID Shop zu besuchen.'),
-            array('INVITE_TO_SHOP', 1, array('Admin', 'OXID Shop'), 'An invitation from Admin to visit OXID Shop')
-        );
+        return [
+            ['MANUFACTURER_S', 0, 'Opel', '| Hersteller: Opel'],
+            ['MANUFACTURER_S', 1, 'Opel', 'Manufacturer: Opel'],
+            ['INVITE_TO_SHOP', 0, ['Admin', 'OXID Shop'], 'Eine Einladung von Admin OXID Shop zu besuchen.'],
+            ['INVITE_TO_SHOP', 1, ['Admin', 'OXID Shop'], 'An invitation from Admin to visit OXID Shop'],
+        ];
     }
 
     /**
@@ -92,18 +92,18 @@ class SmartyModifieroxmultilangassignTest extends \OxidTestCase
      */
     public function missingTranslationProviderFrontend()
     {
-        return array(
-            array(
+        return [
+            [
                 true,
                 'MY_MISING_TRANSLATION',
                 'MY_MISING_TRANSLATION',
-            ),
-            array(
+            ],
+            [
                 false,
                 'ident' => 'MY_MISING_TRANSLATION',
                 'ERROR: Translation for MY_MISING_TRANSLATION not found!',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -130,12 +130,12 @@ class SmartyModifieroxmultilangassignTest extends \OxidTestCase
      */
     public function missingTranslationProviderAdmin()
     {
-        return array(
-            array(
+        return [
+            [
                 'MY_MISING_TRANSLATION',
                 'ERROR: Translation for MY_MISING_TRANSLATION not found!',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -82,7 +84,7 @@ class CacheResourcePluginTest extends \PHPUnit\Framework\TestCase
     {
         $smarty = $this->getMockBuilder(\Smarty::class)->getMock();
         $resource = $this->getSmartyExtensionObject();
-        $this->assertTrue($resource::getSecure("templateName", $smarty));
+        $this->assertTrue($resource::getSecure('templateName', $smarty));
     }
 
     public function testGetTrusted()

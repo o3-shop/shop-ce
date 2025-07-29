@@ -148,7 +148,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
      *
      * @var array
      */
-    protected $_aPersistentParams = ["actshop", "lang", "currency", "language", "tpllanguage"];
+    protected $_aPersistentParams = ['actshop', 'lang', 'currency', 'language', 'tpllanguage'];
 
     /**
      * Order steps which should not accept force_sid
@@ -158,7 +158,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
     private $orderControllers = [
         'payment',
         'order',
-        'thankyou'
+        'thankyou',
     ];
 
     /**
@@ -352,7 +352,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
                     strpos($_SERVER['HTTP_USER_AGENT'], 'AOL') !== false
                 ) {
                     session_cache_limiter('');
-                    Registry::getUtils()->setHeader("Cache-Control: no-store, private, must-revalidate, proxy-revalidate, post-check=0, pre-check=0, max-age=0, s-maxage=0");
+                    Registry::getUtils()->setHeader('Cache-Control: no-store, private, must-revalidate, proxy-revalidate, post-check=0, pre-check=0, max-age=0, s-maxage=0');
                 }
             } else {
                 session_cache_limiter('');
@@ -396,7 +396,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
         $this->_initNewSessionChallenge();
 
         // (re)setting actual user agent when initiating new session
-        $this->setVariable("sessionagent", Registry::getUtilsServer()->getServerVar('HTTP_USER_AGENT'));
+        $this->setVariable('sessionagent', Registry::getUtilsServer()->getServerVar('HTTP_USER_AGENT'));
     }
 
     /**
@@ -408,7 +408,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
             $this->_sessionStart();
 
             // (re)setting actual user agent when initiating new session
-            $this->setVariable("sessionagent", Registry::getUtilsServer()->getServerVar('HTTP_USER_AGENT'));
+            $this->setVariable('sessionagent', Registry::getUtilsServer()->getServerVar('HTTP_USER_AGENT'));
         }
 
         $sessionId = $this->_getNewSessionId(false);
@@ -525,7 +525,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
 
         //no cookie?
         if (!$blDisableSid && $this->getId() && ($blForceSid || !$blUseCookies || !$this->_getCookieSid())) {
-            $sRet = ($blForceSid ? $this->getForcedName() : $this->getName()) . "=" . $this->getId();
+            $sRet = ($blForceSid ? $this->getForcedName() : $this->getName()) . '=' . $this->getId();
         }
 
         if ($this->isAdmin()) {
@@ -548,10 +548,10 @@ class Session extends \OxidEsales\Eshop\Core\Base
     {
         $sSid = $sToken = '';
         if ($this->isSidNeeded()) {
-            $sSid = "<input type=\"hidden\" name=\"" . $this->getName() . "\" value=\"" . $this->getId() . "\" />";
+            $sSid = '<input type="hidden" name="' . $this->getName() . '" value="' . $this->getId() . '" />';
         }
         if ($this->getId()) {
-            $sToken = "<input type=\"hidden\" name=\"stoken\" value=\"" . $this->getSessionChallengeToken() . "\" />";
+            $sToken = '<input type="hidden" name="stoken" value="' . $this->getSessionChallengeToken() . '" />';
         }
 
         return $sToken . $sSid;
@@ -604,9 +604,9 @@ class Session extends \OxidEsales\Eshop\Core\Base
         return $serializedBasket &&
             $this->isClassInSerializedObject($serializedBasket, $basketClass) &&
             $this->isClassInSerializedObject($serializedBasket, $basketItemClass) &&
-            $this->isClassOrNullInSerializedObjectAfterField($serializedBasket, "oPrice", $priceClass) &&
-            $this->isClassOrNullInSerializedObjectAfterField($serializedBasket, "oProductsPriceList", $priceListClass) &&
-            $this->isClassOrNullInSerializedObjectAfterField($serializedBasket, "oUser", $userClass);
+            $this->isClassOrNullInSerializedObjectAfterField($serializedBasket, 'oPrice', $priceClass) &&
+            $this->isClassOrNullInSerializedObjectAfterField($serializedBasket, 'oProductsPriceList', $priceListClass) &&
+            $this->isClassOrNullInSerializedObjectAfterField($serializedBasket, 'oUser', $userClass);
     }
 
     /**
@@ -847,7 +847,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
      */
     protected function _forceSessionStart() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return (!Registry::getUtils()->isSearchEngine()) && (((bool) $this->getConfig()->getConfigParam('blForceSessionStart')) || $this->getConfig()->getRequestParameter("su") || $this->_blForceNewSession);
+        return (!Registry::getUtils()->isSearchEngine()) && (((bool) $this->getConfig()->getConfigParam('blForceSessionStart')) || $this->getConfig()->getRequestParameter('su') || $this->_blForceNewSession);
     }
 
     /**
@@ -907,7 +907,7 @@ class Session extends \OxidEsales\Eshop\Core\Base
                 $blDisableCookieCheck = $myConfig->getConfigParam('blDisableCookieCheck');
                 $blUseCookies = $this->_getSessionUseCookies();
                 if (!$blDisableCookieCheck && $blUseCookies) {
-                    $blSwapped = $this->_checkCookies($myUtilsServer->getOxCookie('sid_key'), $this->getVariable("sessioncookieisset"));
+                    $blSwapped = $this->_checkCookies($myUtilsServer->getOxCookie('sid_key'), $this->getVariable('sessioncookieisset'));
                 }
             }
         }
@@ -966,22 +966,22 @@ class Session extends \OxidEsales\Eshop\Core\Base
         //if cookie was there once but now is gone it means we have to reset
         if ($blSessCookieSetOnce && !$sCookieSid) {
             if ($myConfig->getConfigParam('iDebug')) {
-                $this->_sErrorMsg = "Cookie not found, creating new SID...<br>";
+                $this->_sErrorMsg = 'Cookie not found, creating new SID...<br>';
                 $this->_sErrorMsg .= "Cookie: $sCookieSid<br>";
                 $this->_sErrorMsg .= "Session: $blSessCookieSetOnce<br>";
-                $this->_sErrorMsg .= "URL: " . $sCurrUrl . "<br>";
+                $this->_sErrorMsg .= 'URL: ' . $sCurrUrl . '<br>';
             }
             $blSwapped = true;
         }
 
         //if we detect the cookie then set session var for possible later use
-        if ($sCookieSid == "oxid" && !$blSessCookieSetOnce) {
+        if ($sCookieSid == 'oxid' && !$blSessCookieSetOnce) {
             if (!is_array($aSessCookieSetOnce)) {
                 $aSessCookieSetOnce = [];
             }
 
-            $aSessCookieSetOnce[$sCurrUrl] = "ox_true";
-            $this->setVariable("sessioncookieisset", $aSessCookieSetOnce);
+            $aSessCookieSetOnce[$sCurrUrl] = 'ox_true';
+            $this->setVariable('sessioncookieisset', $aSessCookieSetOnce);
         }
 
         //if we have no cookie then try to set it
@@ -1023,10 +1023,10 @@ class Session extends \OxidEsales\Eshop\Core\Base
     {
         $myConfig = $this->getConfig();
         if ($myConfig->getConfigParam('blMallSharedBasket') == 0) {
-            return $myConfig->getShopId() . "_basket";
+            return $myConfig->getShopId() . '_basket';
         }
 
-        return "basket";
+        return 'basket';
     }
 
     /**

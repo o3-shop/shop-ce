@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Price;
 
 use oxDb;
@@ -26,7 +28,7 @@ use oxOrderArticle;
 use oxRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 
-require_once __DIR__. '/BasketConstruct.php';
+require_once __DIR__ . '/BasketConstruct.php';
 
 /**
  * Final order calculation test
@@ -49,12 +51,12 @@ require_once __DIR__. '/BasketConstruct.php';
 class OrderTest extends BaseTestCase
 {
     /** @var string Test case directory */
-    private $testCaseDirectory = "testcases/order";
+    private $testCaseDirectory = 'testcases/order';
 
     /** @var array Specified test cases (optional) */
-    private $testCases = array(
+    private $testCases = [
         // "testCase.php"
-    );
+    ];
 
     /**
      * Initialize the fixture.
@@ -71,21 +73,21 @@ class OrderTest extends BaseTestCase
     protected function reset()
     {
         $database = oxDb::getDb();
-        $database->execute("TRUNCATE oxarticles");
-        $database->execute("TRUNCATE oxcategories");
-        $database->execute("TRUNCATE oxdiscount");
-        $database->execute("TRUNCATE oxobject2discount");
-        $database->execute("TRUNCATE oxwrapping");
-        $database->execute("TRUNCATE oxdelivery");
-        $database->execute("TRUNCATE oxdel2delset");
-        $database->execute("TRUNCATE oxobject2payment");
-        $database->execute("TRUNCATE oxobject2category");
-        $database->execute("TRUNCATE oxvouchers");
-        $database->execute("TRUNCATE oxvoucherseries");
-        $database->execute("TRUNCATE oxuser");
-        $database->execute("TRUNCATE oxdeliveryset");
-        $database->execute("TRUNCATE oxpayments");
-        $database->execute("TRUNCATE oxprice2article");
+        $database->execute('TRUNCATE oxarticles');
+        $database->execute('TRUNCATE oxcategories');
+        $database->execute('TRUNCATE oxdiscount');
+        $database->execute('TRUNCATE oxobject2discount');
+        $database->execute('TRUNCATE oxwrapping');
+        $database->execute('TRUNCATE oxdelivery');
+        $database->execute('TRUNCATE oxdel2delset');
+        $database->execute('TRUNCATE oxobject2payment');
+        $database->execute('TRUNCATE oxobject2category');
+        $database->execute('TRUNCATE oxvouchers');
+        $database->execute('TRUNCATE oxvoucherseries');
+        $database->execute('TRUNCATE oxuser');
+        $database->execute('TRUNCATE oxdeliveryset');
+        $database->execute('TRUNCATE oxpayments');
+        $database->execute('TRUNCATE oxprice2article');
     }
 
     /**
@@ -108,7 +110,7 @@ class OrderTest extends BaseTestCase
     public function testOrderCalculation($testCase)
     {
         if (isset($testCase['skipped']) && $testCase['skipped'] == 1) {
-            $this->markTestSkipped("testcase is skipped");
+            $this->markTestSkipped('testcase is skipped');
         }
         // expectations
         $expected = $testCase['expected'];
@@ -123,12 +125,12 @@ class OrderTest extends BaseTestCase
 
         // Mocking _sendOrderByEmail, cause Jenkins return err, while mailing after saving order
         /** @var oxOrder|MockObject $order */
-        $order = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, array(
+        $order = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, [
             '_sendOrderByEmail',
             'validateDeliveryAddress',
             'validateDelivery',
             'validatePayment',
-        ));
+        ]);
 
         $order->expects($this->any())->method('_sendOrderByEmail')->will($this->returnValue(0));
         $order->expects($this->any())->method('validateDeliveryAddress')->will($this->returnValue(0));
@@ -251,7 +253,7 @@ class OrderTest extends BaseTestCase
             $orderArticle->oxorderarticles__oxartnum = new oxField($product->oxarticles__oxartnum->value);
             $orderArticle->oxorderarticles__oxamount = new oxField($amount);
             $orderArticle->oxorderarticles__oxselvariant = new oxField(oxRegistry::getConfig()->getRequestParameter('sel'));
-            $order->recalculateOrder(array($orderArticle));
+            $order->recalculateOrder([$orderArticle]);
         }
     }
 

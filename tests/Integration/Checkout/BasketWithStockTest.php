@@ -47,7 +47,6 @@ final class BasketWithStockTest extends UnitTestCase
 
     public function testAddToBasketWithinStockWillAddExpectedAmount(): void
     {
-
         $basket = oxNew(Basket::class);
         $expectedCount = self::PRODUCT_STOCK_SIZE - 1;
 

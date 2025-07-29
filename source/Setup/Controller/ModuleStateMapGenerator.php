@@ -37,10 +37,10 @@ use OxidEsales\Eshop\Core\SystemRequirements;
  */
 class ModuleStateMapGenerator
 {
-    const MODULE_ID_KEY = 'module';
-    const MODULE_STATE_KEY = 'state';
-    const MODULE_NAME_KEY = 'modulename';
-    const MODULE_STATE_HTML_CLASS_KEY = 'class';
+    public const MODULE_ID_KEY = 'module';
+    public const MODULE_STATE_KEY = 'state';
+    public const MODULE_NAME_KEY = 'modulename';
+    public const MODULE_STATE_HTML_CLASS_KEY = 'class';
 
     /** @var array Raw array taken from `SystemRequirements::getSystemInfo` */
     private $systemRequirementsInfo = [];

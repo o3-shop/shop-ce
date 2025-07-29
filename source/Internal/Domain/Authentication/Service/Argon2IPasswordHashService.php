@@ -46,7 +46,6 @@ class Argon2IPasswordHashService implements PasswordHashServiceInterface
     /** @var int $threads */
     private $threads;
 
-
     /**
      * @param PasswordPolicyInterface $passwordPolicy
      * @param int                     $memoryCost
@@ -120,7 +119,7 @@ class Argon2IPasswordHashService implements PasswordHashServiceInterface
         return [
                 'memory_cost' => $this->memoryCost,
                 'time_cost' => $this->timeCost,
-                'threads' => $this->threads
+                'threads' => $this->threads,
         ];
     }
 }

@@ -27,7 +27,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 
 interface ShopConfigurationDaoInterface
 {
-
     /**
      * @param int $shopId
      *

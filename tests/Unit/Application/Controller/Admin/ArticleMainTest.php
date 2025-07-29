@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,24 +18,24 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \Exception;
+use Exception;
+use oxDb;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\CategoryList;
-use \oxField;
-use \oxDb;
 use OxidEsales\EshopCommunity\Application\Model\ManufacturerList;
-use \oxTestModules;
-use oxRegistry;
 use OxidEsales\EshopCommunity\Application\Model\VendorList;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Tests for Article_Main class
  */
 class ArticleMainTest extends \OxidTestCase
 {
-
     /**
      * Setup fixture
      */
@@ -74,13 +75,13 @@ class ArticleMainTest extends \OxidTestCase
 
         oxTestModules::addFunction('oxarticle', 'load', '{ return true; }');
         oxTestModules::addFunction('oxarticle', 'save', '{ return true; }');
-        $this->getConfig()->setConfigParam("blDisableDublArtOnCopy", true);
+        $this->getConfig()->setConfigParam('blDisableDublArtOnCopy', true);
 
-        $aTasks = array("_copyCategories", "_copyAttributes", "_copySelectlists",
-                        "_copyCrossseling", "_copyAccessoires", "_copyStaffelpreis",
-                        "_copyArtExtends");
+        $aTasks = ['_copyCategories', '_copyAttributes', '_copySelectlists',
+                        '_copyCrossseling', '_copyAccessoires', '_copyStaffelpreis',
+                        '_copyArtExtends'];
 
-        $aTasks[] = "resetContentCache";
+        $aTasks[] = 'resetContentCache';
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, $aTasks);
         $oView->expects($this->once())->method('_copyCategories');
@@ -97,7 +98,7 @@ class ArticleMainTest extends \OxidTestCase
         $sProdId = $oDb->getOne("select oxid from oxarticles where oxparentid !=''");
         $sParentId = $oDb->getOne("select oxparentid from oxarticles where oxid ='{$sProdId}'");
 
-        $oView->copyArticle($sProdId, "_testArtId", $sParentId);
+        $oView->copyArticle($sProdId, '_testArtId', $sParentId);
     }
 
     /**
@@ -117,7 +118,7 @@ class ArticleMainTest extends \OxidTestCase
         $this->addToDatabase("INSERT INTO `{$sO2CView}` (`OXID`, `OXOBJECTID`, `OXCATNID`, `OXPOS`, `OXTIME`) VALUES ('" . $oUtils->generateUId() . "', '_testArtId', '_testCatId2', '0', '0');", 'oxobject2category');
         $this->addTeardownSql("delete from `{$sO2CView}` where OXOBJECTID = '_testArtId'");
         $oView = oxNew('Article_Main');
-        $oView->UNITcopyCategories("_testArtId", "_testArtId2");
+        $oView->UNITcopyCategories('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("select count(*) from {$sO2CView} where oxobjectid = '_testArtId2'"));
     }
@@ -138,7 +139,7 @@ class ArticleMainTest extends \OxidTestCase
         $oDb->execute("INSERT INTO `oxobject2attribute` (OXID,OXOBJECTID,OXATTRID,OXVALUE,OXPOS,OXVALUE_1,OXVALUE_2,OXVALUE_3) VALUES ('" . $oUtils->generateUId() . "', '_testArtId', '_testObjId', '0', '0', '0', '0', '0' );");
 
         $oView = oxNew('Article_Main');
-        $oView->UNITcopyAttributes("_testArtId", "_testArtId2");
+        $oView->UNITcopyAttributes('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("select count(*) from oxobject2attribute where oxobjectid = '_testArtId2'"));
     }
@@ -159,7 +160,7 @@ class ArticleMainTest extends \OxidTestCase
         $oDb->execute("INSERT INTO `oxobject2selectlist` (OXID,OXOBJECTID,OXSELNID,OXSORT) VALUES ('" . $oUtils->generateUId() . "', '_testArtId', '_testObjId', 0);");
 
         $oView = oxNew('Article_Main');
-        $oView->UNITcopySelectlists("_testArtId", "_testArtId2");
+        $oView->UNITcopySelectlists('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("select count(*) from oxobject2selectlist where oxobjectid = '_testArtId2'"));
     }
@@ -180,7 +181,7 @@ class ArticleMainTest extends \OxidTestCase
         $oDb->execute("INSERT INTO `oxfiles` (`OXID`, `OXARTID`, `OXFILENAME`) VALUES ('" . $oUtils->generateUId() . "', '_testArtId', '_testObjId');");
 
         $oView = oxNew('Article_Main');
-        $oView->UNITcopyFiles("_testArtId", "_testArtId2");
+        $oView->UNITcopyFiles('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("SELECT COUNT(*) FROM `oxfiles` WHERE `oxartid` = '_testArtId2'"));
     }
@@ -201,7 +202,7 @@ class ArticleMainTest extends \OxidTestCase
         $oDb->execute("INSERT INTO `oxobject2article` (OXID,OXOBJECTID,OXARTICLENID,OXSORT) VALUES ('" . $oUtils->generateUId() . "', '_testObjId', '_testArtId', 0);");
 
         $oView = oxNew('Article_Main');
-        $oView->UNITcopyCrossseling("_testArtId", "_testArtId2");
+        $oView->UNITcopyCrossseling('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("select count(*) from oxobject2article where oxarticlenid = '_testArtId2'"));
     }
@@ -222,7 +223,7 @@ class ArticleMainTest extends \OxidTestCase
         $oDb->execute("INSERT INTO `oxaccessoire2article` (OXID,OXOBJECTID,OXARTICLENID,OXSORT) VALUES ('" . $oUtils->generateUId() . "', '_testObjId', '_testArtId', 0);");
 
         $oView = oxNew('Article_Main');
-        $oView->UNITcopyAccessoires("_testArtId", "_testArtId2");
+        $oView->UNITcopyAccessoires('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("select count(*) from oxaccessoire2article where oxarticlenid = '_testArtId2'"));
     }
@@ -243,7 +244,7 @@ class ArticleMainTest extends \OxidTestCase
         $oDb->execute("INSERT INTO `oxprice2article` (OXID,OXSHOPID,OXARTID,OXADDABS,OXADDPERC,OXAMOUNT,OXAMOUNTTO) VALUES ('" . $oUtils->generateUId() . "', '{$iShopId}', '_testArtId', 0.5, 0, 4, 5);");
 
         $oView = oxNew('Article_Main');
-        $oView->UNITcopyStaffelpreis("_testArtId", "_testArtId2");
+        $oView->UNITcopyStaffelpreis('_testArtId', '_testArtId2');
 
         $this->assertEquals(2, $oDb->getOne("select count(*) from oxprice2article where oxartid = '_testArtId2'"));
     }
@@ -259,13 +260,13 @@ class ArticleMainTest extends \OxidTestCase
 
         try {
             $oView = oxNew('Article_Main');
-            $oView->UNITcopyArtExtends("old", "new");
+            $oView->UNITcopyArtExtends('old', 'new');
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Main::_copyArtExtends()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Main::_copyArtExtends()');
 
             return;
         }
-        $this->fail("error in Article_Main::_copyArtExtends()");
+        $this->fail('error in Article_Main::_copyArtExtends()');
     }
 
     /**
@@ -275,7 +276,7 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testSaveinnlang()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, array("save"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['save']);
         $oView->expects($this->once())->method('save');
         $oView->saveinnlang();
     }
@@ -292,9 +293,9 @@ class ArticleMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'assign', '{ return true; }');
         oxTestModules::addFunction('oxarticle', 'save', '{ throw new Exception( "save" ); }');
 
-        $this->setRequestParameter("oxid", "123");
-        $this->setRequestParameter("oxparentid", "testPArentId");
-        $this->setRequestParameter("editval", array('oxarticles__oxvat' => '', 'oxarticles__oxprice' => 999));
+        $this->setRequestParameter('oxid', '123');
+        $this->setRequestParameter('oxparentid', 'testPArentId');
+        $this->setRequestParameter('editval', ['oxarticles__oxvat' => '', 'oxarticles__oxprice' => 999]);
 
         // testing..
         try {
@@ -306,11 +307,11 @@ class ArticleMainTest extends \OxidTestCase
 
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Article_Main::saveinnlang()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Article_Main::saveinnlang()');
 
             return;
         }
-        $this->fail("error in Article_Main::saveinnlang()");
+        $this->fail('error in Article_Main::saveinnlang()');
     }
 
     /**
@@ -322,14 +323,14 @@ class ArticleMainTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
         $sOxid = oxDb::getDb()->getOne("select oxid from oxarticles where oxparentid !='' ");
-        $this->setRequestParameter("oxid", $sOxid);
+        $this->setRequestParameter('oxid', $sOxid);
         //$this->setRequestParameter( "voxid", "-1" );
         //$this->setRequestParameter( "oxparentid", oxDb::getDb()->getOne( "select oxparentid from oxarticles where oxid ='{$sOxid}' " ) );
 
-        $oView = $this->getProxyClass("Article_Main");
-        $oView->setNonPublicVar("_sSavedId", $sOxid);
+        $oView = $this->getProxyClass('Article_Main');
+        $oView->setNonPublicVar('_sSavedId', $sOxid);
 
-        $this->assertEquals("article_main.tpl", $oView->render());
+        $this->assertEquals('article_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue($aViewData['edit'] instanceof Article);
     }
@@ -345,16 +346,16 @@ class ArticleMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'isDerived', '{ return true; }');
         $sOxid = $oDb->getOne("select oxid from oxarticles where oxparentid !='' ");
         $sParentOxid = $oDb->getOne("select oxparentid from oxarticles where oxid ='{$sOxid}' ");
-        $this->setRequestParameter("voxid", "-1");
-        $this->setRequestParameter("oxparentid", $sParentOxid);
+        $this->setRequestParameter('voxid', '-1');
+        $this->setRequestParameter('oxparentid', $sParentOxid);
 
         $oView = oxNew('Article_Main');
-        $this->assertEquals("article_main.tpl", $oView->render());
+        $this->assertEquals('article_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue($aViewData['edit'] instanceof Article);
         $this->assertTrue($aViewData['parentarticle'] instanceof Article);
         $this->assertEquals($sParentOxid, $aViewData['oxparentid']);
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -365,7 +366,7 @@ class ArticleMainTest extends \OxidTestCase
     public function testAddDefaultValues()
     {
         $oView = oxNew('Article_Main');
-        $this->assertEquals("aaa", $oView->addDefaultValues("aaa"));
+        $this->assertEquals('aaa', $oView->addDefaultValues('aaa'));
     }
 
     /**
@@ -376,18 +377,18 @@ class ArticleMainTest extends \OxidTestCase
     public function testGetTitle()
     {
         $oO1 = oxNew('oxArticle');
-        $oO1->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array("__get"));
-        $oO1->oxarticles__oxtitle->expects($this->once())->method('__get')->will($this->returnValue("oxtitle"));
+        $oO1->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
+        $oO1->oxarticles__oxtitle->expects($this->once())->method('__get')->will($this->returnValue('oxtitle'));
 
         $oO2 = oxNew('oxArticle');
-        $oO2->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array("__get"));
+        $oO2->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oO2->oxarticles__oxtitle->expects($this->once())->method('__get')->will($this->returnValue(null));
-        $oO2->oxarticles__oxvarselect = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array("__get"));
-        $oO2->oxarticles__oxvarselect->expects($this->once())->method('__get')->will($this->returnValue("oxvarselect"));
+        $oO2->oxarticles__oxvarselect = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
+        $oO2->oxarticles__oxvarselect->expects($this->once())->method('__get')->will($this->returnValue('oxvarselect'));
 
         $oView = oxNew('Article_Main');
-        $this->assertEquals("oxtitle", $oView->UNITgetTitle($oO1));
-        $this->assertEquals("oxvarselect", $oView->UNITgetTitle($oO2));
+        $this->assertEquals('oxtitle', $oView->UNITgetTitle($oO1));
+        $this->assertEquals('oxvarselect', $oView->UNITgetTitle($oO2));
     }
 
     /**
@@ -397,7 +398,7 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testGetCategoryList()
     {
-        $iListSize = oxDb::getDb()->getOne("select count(*) from oxcategories");
+        $iListSize = oxDb::getDb()->getOne('select count(*) from oxcategories');
 
         $oView = oxNew('Article_Main');
         $oList = $oView->getCategoryList();
@@ -412,7 +413,7 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testGetVendorList()
     {
-        $iListSize = oxDb::getDb()->getOne("select count(*) from oxvendor");
+        $iListSize = oxDb::getDb()->getOne('select count(*) from oxvendor');
 
         $oView = oxNew('Article_Main');
         $oList = $oView->getVendorList();
@@ -427,7 +428,7 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testGetManufacturerList()
     {
-        $iListSize = oxDb::getDb()->getOne("select count(*) from oxmanufacturers");
+        $iListSize = oxDb::getDb()->getOne('select count(*) from oxmanufacturers');
 
         $oView = oxNew('Article_Main');
         $oList = $oView->getManufacturerList();
@@ -444,10 +445,10 @@ class ArticleMainTest extends \OxidTestCase
     {
         $this->getConfig()->setConfigParam('blWarnOnSameArtNums', true);
         $this->setRequestParameter('fnc', 'copyArticle');
-        $oArtView = $this->getProxyClass("article_main");
+        $oArtView = $this->getProxyClass('article_main');
         $oArtView->copyArticle('2000', '_testArtId');
         $aViewData = $oArtView->getNonPublicVar('_aViewData');
-        $this->assertEquals(1, $aViewData["errorsavingatricle"]);
+        $this->assertEquals(1, $aViewData['errorsavingatricle']);
     }
 
     /**
@@ -467,9 +468,9 @@ class ArticleMainTest extends \OxidTestCase
         $oArticle->oxarticles__oxtitle = new oxField($aParams['oxarticles__oxtitle']);
         $oArticle->save();
 
-        $this->setRequestParameter("editval", $aParams);
+        $this->setRequestParameter('editval', $aParams);
 
-        $oArtView = $this->getProxyClass("article_main");
+        $oArtView = $this->getProxyClass('article_main');
         $oArtView->save();
 
         $oArticle = oxNew('oxArticle');
@@ -488,20 +489,20 @@ class ArticleMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'assignRecord', '{ return true; }');
         oxTestModules::addFunction('article_main', 'saveAdditionalArticleData', '{ throw new Exception( "saveAdditionalArticleData" ); }');
 
-        $this->setRequestParameter("oxid", -1);
-        $this->setRequestParameter("oxparentid", "-1");
-        $this->setRequestParameter("editval", array("oxarticles__oxparentid" => "-1", "oxarticles__oxartnum" => "123", "oxarticles__oxprice" => "123", "oxarticles__oxactive" => 1));
+        $this->setRequestParameter('oxid', -1);
+        $this->setRequestParameter('oxparentid', '-1');
+        $this->setRequestParameter('editval', ['oxarticles__oxparentid' => '-1', 'oxarticles__oxartnum' => '123', 'oxarticles__oxprice' => '123', 'oxarticles__oxactive' => 1]);
 
         $oArtView = oxNew('article_main');
 
         try {
             $oArtView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("saveAdditionalArticleData", $oExcp->getMessage(), "error in Article_Main::save()");
+            $this->assertEquals('saveAdditionalArticleData', $oExcp->getMessage(), 'error in Article_Main::save()');
 
             return;
         }
-        $this->fail("error in Article_Main::save()");
+        $this->fail('error in Article_Main::save()');
     }
 
     /**
@@ -515,10 +516,10 @@ class ArticleMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'assignRecord', '{ return true; }');
         oxTestModules::addFunction('article_main', 'saveAdditionalArticleData', '{ throw new Exception( "saveAdditionalArticleData" ); }');
 
-        $this->setRequestParameter("oxid", -1);
-        $this->setRequestParameter("oxparentid", "132");
-        $this->setRequestParameter("editval", array("oxarticles__oxparentid" => "-1", "oxarticles__oxartnum" => "123", "oxarticles__oxprice" => "123", "oxarticles__oxactive" => 1));
-        $this->setRequestParameter("art_category", -1);
+        $this->setRequestParameter('oxid', -1);
+        $this->setRequestParameter('oxparentid', '132');
+        $this->setRequestParameter('editval', ['oxarticles__oxparentid' => '-1', 'oxarticles__oxartnum' => '123', 'oxarticles__oxprice' => '123', 'oxarticles__oxactive' => 1]);
+        $this->setRequestParameter('art_category', -1);
 
         $oArtView = oxNew('article_main');
         $oArtView->setCategoryId('_testCategoryId');
@@ -526,11 +527,11 @@ class ArticleMainTest extends \OxidTestCase
         try {
             $oArtView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("saveAdditionalArticleData", $oExcp->getMessage(), "error in Article_Main::save()");
+            $this->assertEquals('saveAdditionalArticleData', $oExcp->getMessage(), 'error in Article_Main::save()');
 
             return;
         }
-        $this->fail("error in Article_Main::save()");
+        $this->fail('error in Article_Main::save()');
     }
 
     /**
@@ -542,37 +543,37 @@ class ArticleMainTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Array does not match ');
         $oVar1 = oxNew('oxArticle');
-        $oVar1->oxarticles__oxid = new oxField("testId1");
+        $oVar1->oxarticles__oxid = new oxField('testId1');
 
         $oVar2 = oxNew('oxArticle');
-        $oVar2->oxarticles__oxid = new oxField("testId2");
+        $oVar2->oxarticles__oxid = new oxField('testId2');
 
         $oParentVariants = oxNew('oxList');
-        $oParentVariants->offsetSet("var1", $oVar1);
-        $oParentVariants->offsetSet("var2", $oVar2);
+        $oParentVariants->offsetSet('var1', $oVar1);
+        $oParentVariants->offsetSet('var2', $oVar2);
 
-        $oParentArticle = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, array("getAdminVariants"));
+        $oParentArticle = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['getAdminVariants']);
         $oParentArticle->expects($this->once())->method('getAdminVariants')->will($this->returnValue($oParentVariants));
-        $oParentArticle->oxarticles__oxid = new oxField("testParentId");
+        $oParentArticle->oxarticles__oxid = new oxField('testParentId');
 
         $oVariants = oxNew('oxList');
-        $oVariants->offsetSet("var1", $oVar1);
-        $oVariants->offsetSet("var2", $oVar2);
+        $oVariants->offsetSet('var1', $oVar1);
+        $oVariants->offsetSet('var2', $oVar2);
 
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array("getAdminVariants"));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getAdminVariants']);
         $oArticle->expects($this->once())->method('getAdminVariants')->will($this->returnValue($oVariants));
-        $oArticle->oxarticles__oxid = new oxField("testId2");
+        $oArticle->oxarticles__oxid = new oxField('testId2');
 
-        $aData = array(array("testParentId", "testTitle"),
-                       array("testId1", " - testTitle"),
-                       array("testId2", " - testTitle"),
-                       array("testId1", " -- testTitle"),
-                       array("testId2", " -- testTitle"));
+        $aData = [['testParentId', 'testTitle'],
+                       ['testId1', ' - testTitle'],
+                       ['testId2', ' - testTitle'],
+                       ['testId1', ' -- testTitle'],
+                       ['testId2', ' -- testTitle']];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, array("_getTitle"));
-        $oView->expects($this->atLeastOnce())->method('_getTitle')->will($this->returnValue("testTitle"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['_getTitle']);
+        $oView->expects($this->atLeastOnce())->method('_getTitle')->will($this->returnValue('testTitle'));
         $oView->UNITformJumpList($oArticle, $oParentArticle);
-        $this->assertEquals($aData, $oView->getViewDataElement("thisvariantlist"));
+        $this->assertEquals($aData, $oView->getViewDataElement('thisvariantlist'));
     }
 
     /**
@@ -584,27 +585,27 @@ class ArticleMainTest extends \OxidTestCase
     {
         $this->markTestSkipped('Bug: Array does not match ');
         $oVar1 = oxNew('oxArticle');
-        $oVar1->oxarticles__oxid = new oxField("testId1");
+        $oVar1->oxarticles__oxid = new oxField('testId1');
 
         $oVar2 = oxNew('oxArticle');
-        $oVar2->oxarticles__oxid = new oxField("testId2");
+        $oVar2->oxarticles__oxid = new oxField('testId2');
 
         $oVariants = oxNew('oxList');
-        $oVariants->offsetSet("var1", $oVar1);
-        $oVariants->offsetSet("var2", $oVar2);
+        $oVariants->offsetSet('var1', $oVar1);
+        $oVariants->offsetSet('var2', $oVar2);
 
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array("getAdminVariants"));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getAdminVariants']);
         $oArticle->expects($this->once())->method('getAdminVariants')->will($this->returnValue($oVariants));
-        $oArticle->oxarticles__oxid = new oxField("testId2");
+        $oArticle->oxarticles__oxid = new oxField('testId2');
 
-        $aData = array(array("testId2", "testTitle"),
-                       array("testId1", " - testTitle"),
-                       array("testId2", " - testTitle"));
+        $aData = [['testId2', 'testTitle'],
+                       ['testId1', ' - testTitle'],
+                       ['testId2', ' - testTitle']];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, array("_getTitle"));
-        $oView->expects($this->atLeastOnce())->method('_getTitle')->will($this->returnValue("testTitle"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['_getTitle']);
+        $oView->expects($this->atLeastOnce())->method('_getTitle')->will($this->returnValue('testTitle'));
         $oView->UNITformJumpList($oArticle, null);
-        $this->assertEquals($aData, $oView->getViewDataElement("thisvariantlist"));
+        $this->assertEquals($aData, $oView->getViewDataElement('thisvariantlist'));
     }
 
     /**
@@ -615,7 +616,7 @@ class ArticleMainTest extends \OxidTestCase
     public function testCopyArticleSkipsRating()
     {
         $oArt = oxNew('oxArticle');
-        $oArt->setId("_testArtId");
+        $oArt->setId('_testArtId');
         $oArt->oxarticles__oxrating = new oxField(10);
         $oArt->oxarticles__oxratingcnt = new oxField(110);
         $oArt->save();

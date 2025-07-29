@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,7 @@
  * Character list for replacement in SEO URL's
  * @var array SEO replacement list
  */
-$aSeoReplaceChars = array(
+$aSeoReplaceChars = [
     '�' => 'ae',
     '�' => 'oe',
     '�' => 'ue',
@@ -30,8 +31,8 @@ $aSeoReplaceChars = array(
     '�' => 'Oe',
     '�' => 'Ue',
     '�' => 'ss',
-);
+];
 
-$aLang = array(
-    'charset' => "UTF-8",
-);
+$aLang = [
+    'charset' => 'UTF-8',
+];
