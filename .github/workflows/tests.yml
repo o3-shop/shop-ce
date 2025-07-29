@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true
 
       - name: 💬 Comment on PR if style check fails
-        if: ${{ failure() && github.event_name == 'pull_request' }}
+        if: steps.cs_check.outcome == 'failure' && github.event_name == 'pull_request'
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
