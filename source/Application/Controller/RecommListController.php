@@ -202,7 +202,7 @@ class RecommListController extends ArticleListController
     public function getAddSeoUrlParams()
     {
         $sAddParams = parent::getAddSeoUrlParams();
-        if ($sParam = Registry::getRequest()->getRequestEscapedParameter('searchrecomm', true)) {
+        if ($sParam = Registry::getRequest()->getRequestParameter('searchrecomm')) {
             $sAddParams .= '&amp;searchrecomm=' . rawurlencode($sParam);
         }
 
@@ -243,7 +243,7 @@ class RecommListController extends ArticleListController
                 }
             }
 
-            if (($sReviewText = trim((string) Registry::getRequest()->getRequestEscapedParameter('rvw_txt', true)))) {
+            if (($sReviewText = trim((string) Registry::getRequest()->getRequestParameter('rvw_txt')))) {
                 $oReview = oxNew(Review::class);
                 $oReview->oxreviews__oxobjectid = new Field($oRecommList->getId());
                 $oReview->oxreviews__oxtype = new Field('oxrecommlist');
@@ -434,7 +434,7 @@ class RecommListController extends ArticleListController
     {
         if ($this->_sSearch === null) {
             $this->_sSearch = false;
-            if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('searchrecomm', false)) {
+            if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('searchrecomm')) {
                 $this->_sSearch = $sSearch;
             }
         }

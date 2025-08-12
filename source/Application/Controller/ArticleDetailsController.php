@@ -428,7 +428,7 @@ class ArticleDetailsController extends FrontendController
                 }
             }
 
-            if (($reviewText = trim((string) Registry::getRequest()->getRequestEscapedParameter('rvw_txt', true)))) {
+            if (($reviewText = trim((string) Registry::getRequest()->getRequestParameter('rvw_txt')))) {
                 $review = oxNew(Review::class);
                 $review->oxreviews__oxobjectid = new Field($article->getId());
                 $review->oxreviews__oxtype = new Field('oxarticle');

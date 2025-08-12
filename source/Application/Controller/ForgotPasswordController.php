@@ -104,8 +104,8 @@ class ForgotPasswordController extends FrontendController
      */
     public function updatePassword()
     {
-        $sNewPass = Registry::getRequest()->getRequestEscapedParameter('password_new', true);
-        $sConfPass = Registry::getRequest()->getRequestEscapedParameter('password_new_confirm', true);
+        $sNewPass = Registry::getRequest()->getRequestParameter('password_new');
+        $sConfPass = Registry::getRequest()->getRequestParameter('password_new_confirm');
 
         $oUser = oxNew(User::class);
 

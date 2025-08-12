@@ -229,7 +229,7 @@ class AccountWishlistController extends AccountController
             return false;
         }
 
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestParameter('editval');
         if (is_array($aParams)) {
             $oUtilsView = Registry::getUtilsView();
             $oParams = (object) $aParams;

@@ -164,7 +164,7 @@ class SearchController extends FrontendController
         $oRequest = Registry::getRequest();
 
         // #1184M - special char search
-        $sSearchParamForQuery = trim($oRequest->getRequestEscapedParameter('searchparam', true));
+        $sSearchParamForQuery = trim($oRequest->getRequestParameter('searchparam'));
 
         // searching in category ?
         $sInitialSearchCat = $this->_sSearchCatId = rawurldecode($oRequest->getRequestEscapedParameter('searchcnid'));
@@ -233,10 +233,10 @@ class SearchController extends FrontendController
         $oRequest = Registry::getRequest();
         if (Registry::getConfig()->getConfigParam('bl_rssSearch')) {
             $oRss = oxNew(RssFeed::class);
-            $sSearch = $oRequest->getRequestEscapedParameter('searchparam', true);
-            $sCnid = $oRequest->getRequestEscapedParameter('searchcnid', true);
-            $sVendor = $oRequest->getRequestEscapedParameter('searchvendor', true);
-            $sManufacturer = $oRequest->getRequestEscapedParameter('searchmanufacturer', true);
+            $sSearch = $oRequest->getRequestParameter('searchparam');
+            $sCnid = $oRequest->getRequestParameter('searchcnid');
+            $sVendor = $oRequest->getRequestParameter('searchvendor');
+            $sManufacturer = $oRequest->getRequestParameter('searchmanufacturer');
             $sSearchArticlesTitle = $oRss->getSearchArticlesTitle($sSearch, $sCnid, $sVendor, $sManufacturer);
             $sSearchArticlesUrl = $oRss->getSearchArticlesUrl($sSearch, $sCnid, $sVendor, $sManufacturer);
             $this->addRssFeed($sSearchArticlesTitle, $sSearchArticlesUrl, 'searchArticles');
@@ -280,7 +280,7 @@ class SearchController extends FrontendController
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
         $oRequest = Registry::getRequest();
 
-        if ($sParam = $oRequest->getRequestEscapedParameter('searchparam', true)) {
+        if ($sParam = $oRequest->getRequestParameter('searchparam')) {
             $sAddParams .= '&amp;searchparam=' . rawurlencode($sParam);
         }
 
@@ -385,7 +385,7 @@ class SearchController extends FrontendController
         if ($this->_sSearchParam === null) {
             $this->_sSearchParam = false;
             if ($this->_isSearchClass()) {
-                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
+                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
             }
         }
 

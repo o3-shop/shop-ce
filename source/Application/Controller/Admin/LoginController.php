@@ -118,8 +118,8 @@ class LoginController extends AdminController
         $myUtilsServer = Registry::getUtilsServer();
         $myUtilsView = Registry::getUtilsView();
 
-        $sUser = Registry::getRequest()->getRequestEscapedParameter('user', true);
-        $sPass = Registry::getRequest()->getRequestEscapedParameter('pwd', true);
+        $sUser = Registry::getRequest()->getRequestParameter('user');
+        $sPass = Registry::getRequest()->getRequestParameter('pwd');
         $sProfile = Registry::getRequest()->getRequestEscapedParameter('profile');
 
         try { // trying to log in

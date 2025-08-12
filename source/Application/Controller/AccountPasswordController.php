@@ -89,9 +89,9 @@ class AccountPasswordController extends AccountController
             return;
         }
 
-        $sOldPass = Registry::getRequest()->getRequestEscapedParameter('password_old', true);
-        $sNewPass = Registry::getRequest()->getRequestEscapedParameter('password_new', true);
-        $sConfPass = Registry::getRequest()->getRequestEscapedParameter('password_new_confirm', true);
+        $sOldPass = Registry::getRequest()->getRequestParameter('password_old');
+        $sNewPass = Registry::getRequest()->getRequestParameter('password_new');
+        $sConfPass = Registry::getRequest()->getRequestParameter('password_new_confirm');
 
         /** @var InputValidator $oInputValidator */
         $oInputValidator = Registry::getInputValidator();

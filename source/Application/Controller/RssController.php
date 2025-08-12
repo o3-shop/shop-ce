@@ -209,7 +209,7 @@ class RssController extends FrontendController
     public function searcharts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssSearch')) {
-            $sSearchParameter = Registry::getRequest()->getRequestEscapedParameter('searchparam', true);
+            $sSearchParameter = Registry::getRequest()->getRequestParameter('searchparam');
             $sCatId = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
             $sVendorId = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
             $sManufacturerId = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');

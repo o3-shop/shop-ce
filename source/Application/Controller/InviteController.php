@@ -123,7 +123,7 @@ class InviteController extends AccountController
             Registry::getUtils()->redirect($oConfig->getShopHomeUrl());
         }
 
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestParameter('editval');
         $oUser = $this->getUser();
         if (!is_array($aParams) || !$oUser) {
             return;

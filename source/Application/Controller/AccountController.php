@@ -316,7 +316,7 @@ class AccountController extends FrontendController
         if ($this->_sSearchParam === null) {
             $this->_sSearchParam = false;
             if ($this->getArticleId()) {
-                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
+                $this->_sSearchParam = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
             }
         }
 
