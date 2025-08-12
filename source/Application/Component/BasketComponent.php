@@ -324,7 +324,7 @@ class BasketComponent extends BaseController
 
         // special treatment
         // search param
-        $sParam = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
+        $sParam = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
         $sPosition .= $sParam ? 'searchparam=' . $sParam . '&' : '';
 
         // current page number

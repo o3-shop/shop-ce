@@ -169,7 +169,7 @@ class UserController extends FrontendController
                 $orderRemark = Registry::getSession()->getVariable('ordrem');
             } else {
                 // not connected so nowhere to save, we're going to use what we get from post
-                $orderRemark = Registry::getRequest()->getRequestEscapedParameter('order_remark', '');
+                $orderRemark = Registry::getRequest()->getRequestParameter('order_remark');
             }
 
             $this->_sOrderRemark = $orderRemark ? Registry::getConfig()->checkParamSpecialChars($orderRemark) : false;

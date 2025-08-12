@@ -320,7 +320,7 @@ class Locator extends Base
     {
         if (($oSearchCat = $oLocatorTarget->getActSearch())) {
             // #1834/1184M - specialchar search
-            $sSearchParam = Registry::getRequest()->getRequestEscapedParameter('searchparam', true);
+            $sSearchParam = Registry::getRequest()->getRequestParameter('searchparam');
             $sSearchFormParam = Registry::getRequest()->getRequestEscapedParameter('searchparam');
             $sSearchLinkParam = rawurlencode($sSearchParam);
 
@@ -398,7 +398,7 @@ class Locator extends Base
             $iPage = $this->findActPageNumber($oLocatorTarget->getActPage(), $oIdList, $oCurrArticle);
 
             $sAddSearch = '';
-            $sSearchRecomm = Registry::getRequest()->getRequestEscapedParameter('searchrecomm', true);
+            $sSearchRecomm = Registry::getRequest()->getRequestParameter('searchrecomm');
 
             if ($sSearchRecomm !== null) {
                 $sSearchFormRecomm = Registry::getRequest()->getRequestEscapedParameter('searchrecomm');

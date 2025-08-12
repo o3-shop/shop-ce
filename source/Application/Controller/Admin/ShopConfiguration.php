@@ -175,7 +175,7 @@ class ShopConfiguration extends AdminDetailsController
 
         $configValidator = oxNew(NoJsValidator::class);
         foreach ($this->_aConfParams as $existingConfigType => $existingConfigName) {
-            $requestValue = Registry::getRequest()->getRequestEscapedParameter($existingConfigName, true);
+            $requestValue = Registry::getRequest()->getRequestParameter($existingConfigName);
             if (is_array($requestValue)) {
                 foreach ($requestValue as $configName => $newConfigValue) {
                     $oldValue = $config->getConfigParam($configName);

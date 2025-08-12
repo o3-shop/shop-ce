@@ -1412,9 +1412,9 @@ class FrontendController extends BaseController
         // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
         $params['recommid'] = $oRequest->getRequestEscapedParameter('recommid');
 
-        $params['searchrecomm'] = $oRequest->getRequestEscapedParameter('searchrecomm', true);
+        $params['searchrecomm'] = $oRequest->getRequestParameter('searchrecomm');
         // END deprecated
-        $params['searchparam'] = $oRequest->getRequestEscapedParameter('searchparam', true);
+        $params['searchparam'] = $oRequest->getRequestParameter('searchparam');
 
         $params['searchvendor'] = $oRequest->getRequestEscapedParameter('searchvendor');
         $params['searchcnid'] = $oRequest->getRequestEscapedParameter('searchcnid');
@@ -1561,17 +1561,17 @@ class FrontendController extends BaseController
                 break;
             case 'search':
                 $result .= "&amp;listtype={$listType}";
-                if ($searchParamForLink = rawurlencode($oRequest->getRequestEscapedParameter('searchparam', true))) {
+                if ($searchParamForLink = rawurlencode($oRequest->getRequestParameter('searchparam'))) {
                     $result .= "&amp;searchparam={$searchParamForLink}";
                 }
 
-                if (($var = $oRequest->getRequestEscapedParameter('searchcnid', true))) {
+                if (($var = $oRequest->getRequestParameter('searchcnid'))) {
                     $result .= '&amp;searchcnid=' . rawurlencode(rawurldecode($var));
                 }
-                if (($var = $oRequest->getRequestEscapedParameter('searchvendor', true))) {
+                if (($var = $oRequest->getRequestParameter('searchvendor'))) {
                     $result .= '&amp;searchvendor=' . rawurlencode(rawurldecode($var));
                 }
-                if (($var = $oRequest->getRequestEscapedParameter('searchmanufacturer', true))) {
+                if (($var = $oRequest->getRequestParameter('searchmanufacturer'))) {
                     $result .= '&amp;searchmanufacturer=' . rawurlencode(rawurldecode($var));
                 }
                 break;
@@ -1714,7 +1714,7 @@ class FrontendController extends BaseController
         }
 
         // #1184M - specialchar search
-        if ($value = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true))) {
+        if ($value = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'))) {
             $url .= "&amp;searchparam={$value}";
         }
 
@@ -1974,7 +1974,7 @@ class FrontendController extends BaseController
             $this->_sAdditionalParams .= 'cl=' . Registry::getConfig()->getTopActiveView()->getClassName();
 
             // #1834M - special char search
-            $searchParamForLink = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
+            $searchParamForLink = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
             if (isset($searchParamForLink)) {
                 $this->_sAdditionalParams .= "&amp;searchparam={$searchParamForLink}";
             }

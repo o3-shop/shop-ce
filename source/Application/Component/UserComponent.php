@@ -245,7 +245,7 @@ class UserComponent extends BaseController
     public function login()
     {
         $sUser = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
-        $sPassword = Registry::getRequest()->getRequestEscapedParameter('lgn_pwd', true);
+        $sPassword = Registry::getRequest()->getRequestParameter('lgn_pwd');
         $sCookie = Registry::getRequest()->getRequestEscapedParameter('lgn_cook');
 
         $this->setLoginStatus(USER_LOGIN_FAIL);
@@ -514,12 +514,12 @@ class UserComponent extends BaseController
         $sUser = $oRequest->getRequestEscapedParameter('lgn_usr');
 
         // first pass
-        $sPassword = $oRequest->getRequestEscapedParameter('lgn_pwd', true);
+        $sPassword = $oRequest->getRequestParameter('lgn_pwd');
 
         // second pass
-        $sPassword2 = $oRequest->getRequestEscapedParameter('lgn_pwd2', true);
+        $sPassword2 = $oRequest->getRequestParameter('lgn_pwd2');
 
-        $aInvAddress = $oRequest->getRequestEscapedParameter('invadr', true);
+        $aInvAddress = $oRequest->getRequestParameter('invadr');
 
         $aInvAddress = $this->cleanAddress($aInvAddress, oxNew(UserUpdatableFields::class));
         $aInvAddress = $this->trimAddress($aInvAddress);
@@ -616,7 +616,7 @@ class UserComponent extends BaseController
 
             // order remark
             //V #427: order remark for new users
-            $sOrderRemark = Registry::getRequest()->getRequestEscapedParameter('order_remark', true);
+            $sOrderRemark = Registry::getRequest()->getRequestParameter('order_remark');
             if ($sOrderRemark) {
                 Registry::getSession()->setVariable('ordrem', $sOrderRemark);
             }
@@ -805,7 +805,7 @@ class UserComponent extends BaseController
         $aDelAddress = $this->trimAddress($aDelAddress);
 
         // if user company name, username and additional info has special chars
-        $aInvAddress = Registry::getRequest()->getRequestEscapedParameter('invadr', true);
+        $aInvAddress = Registry::getRequest()->getRequestParameter('invadr');
         $aInvAddress = $this->cleanAddress($aInvAddress, oxNew(UserUpdatableFields::class));
         $aInvAddress = $this->trimAddress($aInvAddress);
 
@@ -853,7 +853,7 @@ class UserComponent extends BaseController
         $this->resetPermissions();
 
         // order remark
-        $sOrderRemark = Registry::getRequest()->getRequestEscapedParameter('order_remark', true);
+        $sOrderRemark = Registry::getRequest()->getRequestParameter('order_remark');
 
         if ($sOrderRemark) {
             Registry::getSession()->setVariable('ordrem', $sOrderRemark);
@@ -892,7 +892,7 @@ class UserComponent extends BaseController
         // if user company name, username and additional info has special chars
         $blShowShipAddressParameter = Registry::getRequest()->getRequestEscapedParameter('blshowshipaddress');
         $blShowShipAddressVariable = Registry::getSession()->getVariable('blshowshipaddress');
-        $sDeliveryAddressParameter = Registry::getRequest()->getRequestEscapedParameter('deladr', true);
+        $sDeliveryAddressParameter = Registry::getRequest()->getRequestParameter('deladr');
         $aDeladr = ($blShowShipAddressParameter || $blShowShipAddressVariable) ? $sDeliveryAddressParameter : [];
         $aDelAddress = $aDeladr;
 

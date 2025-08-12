@@ -250,9 +250,9 @@ class AccountRecommlistController extends AccountController
                 $this->_sThisTemplate = 'page/account/recommendationedit.tpl';
             }
 
-            $sTitle = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_title', true));
-            $sAuthor = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_author', true));
-            $sText = trim((string) Registry::getRequest()->getRequestEscapedParameter('recomm_desc', true));
+            $sTitle = trim((string) Registry::getRequest()->getRequestParameter('recomm_title'));
+            $sAuthor = trim((string) Registry::getRequest()->getRequestParameter('recomm_author'));
+            $sText = trim((string) Registry::getRequest()->getRequestParameter('recomm_desc'));
 
             $oRecommList->oxrecommlists__oxtitle = new Field($sTitle);
             $oRecommList->oxrecommlists__oxauthor = new Field($sAuthor);

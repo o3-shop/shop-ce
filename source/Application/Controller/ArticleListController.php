@@ -359,7 +359,7 @@ class ArticleListController extends FrontendController
     {
         $baseLanguageId = Registry::getLang()->getBaseLanguage();
         // store this into session
-        $attributeFilter = Registry::getRequest()->getRequestEscapedParameter('attrfilter', true);
+        $attributeFilter = Registry::getRequest()->getRequestParameter('attrfilter');
         $activeCategory = Registry::getRequest()->getRequestEscapedParameter('cnid');
 
         if (!empty($attributeFilter)) {

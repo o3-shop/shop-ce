@@ -241,7 +241,7 @@ class ReviewController extends ArticleDetailsController
                     }
                 }
 
-                if (($sReviewText = trim((string) Registry::getRequest()->getRequestEscapedParameter('rvw_txt', true)))) {
+                if (($sReviewText = trim((string) Registry::getRequest()->getRequestParameter('rvw_txt')))) {
                     $oReview = oxNew(Review::class);
                     $oReview->oxreviews__oxobjectid = new Field($oActObject->getId());
                     $oReview->oxreviews__oxtype = new Field($sType);
