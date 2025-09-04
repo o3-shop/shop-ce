@@ -1,4 +1,5 @@
 !.gitkeep
+!**/.gitkeep
 # Shop configuration
 /source/config.inc.php
 
