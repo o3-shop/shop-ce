@@ -54,9 +54,6 @@ composer.lock
 /source/Application/views/o3-theme/*
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
-!source/out/pictures/master/category/icon/.gitkeep
-!/source/out/pictures/master/category/promo_icon/.gitkeep
-!/source/out/pictures/master/category/thumb/.gitkeep
 
 /source/out/pictures/master/manufacturer/*
 /source/out/pictures/master/product/*
@@ -69,5 +66,7 @@ composer.lock
 docker/database/data
 docker/mailpit/data
 coverage
+
+!.gitkeep
 
 .php-cs-fixer.cache
