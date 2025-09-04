@@ -1,5 +1,4 @@
 !.gitkeep
-!**/.gitkeep
 # Shop configuration
 /source/config.inc.php
 
@@ -67,7 +66,10 @@ composer.lock
 /var/generated/generated_services.yaml
 docker/database/data
 docker/mailpit/data
-coverage
+coverage/*
 
 .php-cs-fixer.cache
+
+!**/.gitkeep
+
 
