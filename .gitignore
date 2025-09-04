@@ -11,13 +11,11 @@ runned.txt
 !/source/log/.htaccess
 
 # Cache
-/source/cache/
+/source/cache/*
 !/source/cache/.htaccess
-!/source/cache/.gitkeep
 
 # Export
-/source/export/
-!/source/export/.gitkeep
+/source/export/*
 
 # Temporary files
 /source/tmp/
