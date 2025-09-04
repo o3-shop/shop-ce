@@ -1,3 +1,4 @@
+!.gitkeep
 # Shop configuration
 /source/config.inc.php
 
@@ -69,4 +70,3 @@ coverage
 
 .php-cs-fixer.cache
 
-*!.gitkeep
