@@ -67,7 +67,7 @@ if (!function_exists('getCountryList')) {
         [$language, $country] = explode('-', $language);
 
         if (!empty($country)) {
-            $names = json_decode(file_get_contents("http://country.io/names.json"), true);
+            $names = json_decode(file_get_contents('http://country.io/names.json'), true);
             $bCountries = $aCountries;
             $aCountries['en'] = [array_search($names[strtoupper($country)], $bCountries['en']) => $names[strtoupper($country)]];
             $aCountries['de'] = [array_search($names[strtoupper($country)], $bCountries['de']) => $names[strtoupper($country)]];
