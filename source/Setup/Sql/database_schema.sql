@@ -5,16 +5,16 @@ SET @@session.sql_mode = '';
 
 create table o3rightsroles
 (
-    OXID char(32) not null
-        primary key,
-    SHOPID int not null,
-    TITLE varchar(255) not null,
-    ACTIVE tinyint(1) not null,
-    OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
-    TITLE_1 varchar(255) not null,
-    TITLE_2 varchar(255) not null,
-    TITLE_3 varchar(255) not null,
-    OXSHOPID int not null
+    OXID char(32) character set latin1 collate latin1_general_ci NOT NULL
+        PRIMARY KEY,
+    SHOPID int NOT NULL,
+    TITLE varchar(255) NOT NULL,
+    ACTIVE tinyint(1) NOT NULL,
+    OXTIMESTAMP datetime default CURRENT_TIMESTAMP NOT NULL,
+    TITLE_1 varchar(255) NOT NULL,
+    TITLE_2 varchar(255) NOT NULL,
+    TITLE_3 varchar(255) NOT NULL,
+    OXSHOPID int NOT NULL
 )
     collate=utf8_unicode_ci;
 create index SHOPNAVIGATION
@@ -22,12 +22,12 @@ create index SHOPNAVIGATION
 
 create table o3object2role
 (
-    OXID char(32) not null
-        primary key,
-    OXSHOPID char(32) not null,
-    OBJECTID char(32) not null,
-    ROLEID char(32) not null,
-    OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
+    OXID char(32) character set latin1 collate latin1_general_ci NOT NULL
+        PRIMARY KEY,
+    OXSHOPID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OBJECTID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    ROLEID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OXTIMESTAMP datetime default CURRENT_TIMESTAMP NOT NULL,
     constraint ROLEOBJECT_IDX
         unique (ROLEID, OBJECTID)
 )
@@ -35,12 +35,12 @@ create table o3object2role
 
 create table o3rightsroleselements
 (
-    ELEMENTID char(32) not null,
-    OBJECTID char(32) not null,
-    OXTIMESTAMP datetime default CURRENT_TIMESTAMP not null,
-    OXID char(32) not null
-        primary key,
-    TYPE int default 1 not null comment 'right type: 0 = hidden, 1 = editable, 2 = readonly'
+    ELEMENTID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OBJECTID char(32) character set latin1 collate latin1_general_ci NOT NULL,
+    OXTIMESTAMP datetime default CURRENT_TIMESTAMP NOT NULL,
+    OXID char(32) character set latin1 collate latin1_general_ci NOT NULL
+        PRIMARY KEY,
+    TYPE int default 1 NOT NULL comment 'right type: 0 = hidden, 1 = editable, 2 = readonly'
 )
     collate=utf8_unicode_ci;
 create index ROLETYPE_IDX
