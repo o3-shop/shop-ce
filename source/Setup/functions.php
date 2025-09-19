@@ -62,6 +62,24 @@ if (!function_exists('getCountryList')) {
 
         include "$cePath/$relativePath";
 
+        $language = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 5);
+
+        [$language, $country] = explode('-', $language);
+
+        if (!empty($country)) {
+            $names = json_decode(file_get_contents('http://country.io/names.json'), true);
+            $bCountries = $aCountries;
+            $aCountries['en'] = [array_search($names[strtoupper($country)], $bCountries['en']) => $names[strtoupper($country)]];
+            $aCountries['de'] = [array_search($names[strtoupper($country)], $bCountries['de']) => $names[strtoupper($country)]];
+            foreach ($bCountries as $lang => $countries) {
+                foreach ($countries as $code => $name) {
+                    if ($code != array_search($names[strtoupper($country)], $bCountries['en'])) {
+                        $aCountries[$lang][$code] = $name;
+                    }
+                }
+            }
+        }
+
         return $aCountries;
     }
 }
