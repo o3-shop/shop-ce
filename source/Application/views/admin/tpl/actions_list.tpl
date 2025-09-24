@@ -101,7 +101,7 @@ window.onload = function ()
                 [{oxmultilang ident="PROMOTIONS_MAIN_TYPE_ACTION"}]
             [{/if}]
         </a></div></td>
-    <td class="[{$listclass}]">[{if !$listitem->isOx() && !$readonly && $listitem->oxactions__oxtype->value > 0}]<a href="Javascript:top.oxid.admin.deleteThis('[{$listitem->oxactions__oxid->value}]');" class="delete" id="del.[{$_cnt}]" [{include file="help.tpl" helpid=item_delete}]></a>[{/if}]</td>
+    <td class="[{$listclass}]">[{if !$listitem->isOx() && !$readonly && $listitem->oxactions__oxnodelete->value == 0}]<a href="Javascript:top.oxid.admin.deleteThis('[{$listitem->oxactions__oxid->value}]');" class="delete" id="del.[{$_cnt}]" [{include file="help.tpl" helpid=item_delete}]></a>[{/if}]</td>
     [{/block}]
 </tr>
 [{if $blWhite == "2"}]
