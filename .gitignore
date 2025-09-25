@@ -1,3 +1,4 @@
+!.gitkeep
 # Shop configuration
 /source/config.inc.php
 
@@ -10,13 +11,11 @@ runned.txt
 !/source/log/.htaccess
 
 # Cache
-/source/cache/
+/source/cache/*
 !/source/cache/.htaccess
-!/source/cache/dir.txt
 
 # Export
-/source/export/
-!/source/export/.gitkeep
+/source/export/*
 
 # Temporary files
 /source/tmp/
@@ -54,6 +53,7 @@ composer.lock
 /source/Application/views/o3-theme/*
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
+
 /source/out/pictures/master/manufacturer/*
 /source/out/pictures/master/product/*
 /source/out/pictures/master/wrapping/img_ecard_03_wp.jpg
@@ -67,5 +67,6 @@ docker/mailpit/data
 coverage
 
 !/source/tmp/!.gitkeep
-
 .php-cs-fixer.cache
+
+!**/.gitkeep
