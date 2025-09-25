@@ -66,4 +66,6 @@ docker/database/data
 docker/mailpit/data
 coverage
 
+!source/tmp/.gitkeep
+
 .php-cs-fixer.cache
