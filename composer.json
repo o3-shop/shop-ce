@@ -98,7 +98,7 @@
                 "shop_tests_path": "SHOP_TESTS_PATH",
                 "partial_module_paths": "PARTIAL_MODULE_PATHS"
             }
-        },
+        }
     },
     "config": {
         "allow-plugins": {
