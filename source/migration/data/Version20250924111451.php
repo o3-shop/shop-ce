@@ -31,12 +31,12 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20250924111451 extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'Add OXNODELETE column to oxactions and oxcontents tables for deletion protection';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
@@ -45,12 +45,12 @@ final class Version20250924111451 extends AbstractMigration
         $this->addSql("ALTER TABLE `oxcontents` ADD COLUMN `OXNODELETE` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = must not be deleted, 0 = default' AFTER `OXISPLAIN`");
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
-        $this->addSql("ALTER TABLE `oxactions` DROP COLUMN `OXNODELETE`");
+        $this->addSql('ALTER TABLE `oxactions` DROP COLUMN `OXNODELETE`');
 
-        $this->addSql("ALTER TABLE `oxcontents` DROP COLUMN `OXNODELETE`");
+        $this->addSql('ALTER TABLE `oxcontents` DROP COLUMN `OXNODELETE`');
     }
 }
