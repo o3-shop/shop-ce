@@ -103,8 +103,7 @@
             }
         },
         "branch-alias": {
-            "dev-main": "62-fix-installupdate-process-for-version-151-dependency-and-file-permission-issues",
-            "dev-fixes": "62-fix-installupdate-process-for-version-151-dependency-and-file-permission-issues"
+            "dev-main": "1.5-dev"
         }
     },
     "config": {
