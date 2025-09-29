@@ -94,7 +94,7 @@ function ShowMenueFields( iVal)
                   [{oxmultilang ident="GENERAL_IDENT"}].
                   </td>
                   <td class="edittext">
-                  <input type="text" class="editinput" size="28" maxlength="[{$edit->oxcontents__oxloadid->fldmax_length}]" name="editval[oxcontents__oxloadid]" value="[{$edit->oxcontents__oxloadid->value}]" [{$readonly}]>
+                  <input type="text" class="editinput" size="28" maxlength="[{$edit->oxcontents__oxloadid->fldmax_length}]" name="editval[oxcontents__oxloadid]" value="[{$edit->oxcontents__oxloadid->value}]" [{$readonly}][{if $edit->oxcontents__oxnodelete->value}]disabled[{/if}]>
                   [{oxinputhelp ident="HELP_GENERAL_IDENT"}]
                   </td>
                 </tr>
