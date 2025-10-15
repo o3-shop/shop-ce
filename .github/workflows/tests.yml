@@ -311,6 +311,8 @@ jobs:
           
       - name: 💬 Post Consolidated PR Comment
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_O3 }}
         with:
           script: |
             const fs = require('fs');
