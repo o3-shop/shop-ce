@@ -39,7 +39,7 @@ jobs:
         continue-on-error: true
 
       - name: 📝 Save Code Style Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         run: |
           if [ "${{ steps.cs_check.outcome }}" == "failure" ]; then
             echo "FAILED" > cs-fixer-result.txt
@@ -48,7 +48,7 @@ jobs:
           fi
 
       - name: 📤 Upload Code Style Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         uses: actions/upload-artifact@v4
         with:
           name: cs-fixer-result
@@ -102,7 +102,7 @@ jobs:
       - name: 🏷 Set Dynamic Composer Root Version
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             BRANCH_NAME="${{ github.head_ref }}"
           fi
           if [[ "$BRANCH_NAME" == "main" ]]; then
@@ -242,14 +242,14 @@ jobs:
           fi
 
       - name: 💡 Add failed test summary if not PR
-        if: env.TESTS_FAILED == 'true' && github.event_name != 'pull_request'
+        if: env.TESTS_FAILED == 'true' && github.event_name != 'pull_request_target'
         run: |
           echo "## ❌ Some PHPUnit tests failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '${{ env.FAILED_TESTS }}' >> $GITHUB_STEP_SUMMARY
 
       - name: 📝 Save Test Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         run: |
           # Create JSON result for this PHP version
           cat > test-result-${{ matrix.php-version }}.json << EOF
@@ -262,7 +262,7 @@ jobs:
           EOF
 
       - name: 📤 Upload Test Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         uses: actions/upload-artifact@v4
         with:
           name: test-result-${{ matrix.php-version }}
