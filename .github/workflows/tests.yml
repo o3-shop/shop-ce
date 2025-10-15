@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['**']
-  pull_request:
+  pull_request_target:
     branches: ['**']
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
         run: |
           wget -q https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.66.0/php-cs-fixer.phar -O php-cs-fixer.phar
           chmod +x php-cs-fixer.phar
-          sudo mv php-cs-fixer.phar /usr/local/bin/php-cs-fixer
+          sudo mv php-cs-fixer.phar /usr/local/bin/php-cs-fixer 
 
       - name: ℹ️ Show PHP-CS-Fixer version
         run: php-cs-fixer --version
@@ -39,7 +39,7 @@ jobs:
         continue-on-error: true
 
       - name: 📝 Save Code Style Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         run: |
           if [ "${{ steps.cs_check.outcome }}" == "failure" ]; then
             echo "FAILED" > cs-fixer-result.txt
@@ -48,7 +48,7 @@ jobs:
           fi
 
       - name: 📤 Upload Code Style Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         uses: actions/upload-artifact@v4
         with:
           name: cs-fixer-result
@@ -102,7 +102,7 @@ jobs:
       - name: 🏷 Set Dynamic Composer Root Version
         run: |
           BRANCH_NAME="${{ github.ref_name }}"
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
             BRANCH_NAME="${{ github.head_ref }}"
           fi
           if [[ "$BRANCH_NAME" == "main" ]]; then
@@ -242,14 +242,14 @@ jobs:
           fi
 
       - name: 💡 Add failed test summary if not PR
-        if: env.TESTS_FAILED == 'true' && github.event_name != 'pull_request'
+        if: env.TESTS_FAILED == 'true' && github.event_name != 'pull_request_target'
         run: |
           echo "## ❌ Some PHPUnit tests failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '${{ env.FAILED_TESTS }}' >> $GITHUB_STEP_SUMMARY
 
       - name: 📝 Save Test Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         run: |
           # Create JSON result for this PHP version
           cat > test-result-${{ matrix.php-version }}.json << EOF
@@ -262,7 +262,7 @@ jobs:
           EOF
 
       - name: 📤 Upload Test Results
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request_target'
         uses: actions/upload-artifact@v4
         with:
           name: test-result-${{ matrix.php-version }}
@@ -276,7 +276,7 @@ jobs:
   aggregate-results:
     needs: [cs-fixer, test]
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request_target'
     
     steps:
       - name: 📥 Download Code Style Results
@@ -284,33 +284,35 @@ jobs:
         with:
           name: cs-fixer-result
           path: ./cs-results
-          
+
       - name: 📥 Download Test Results
         uses: actions/download-artifact@v4
         with:
           name: test-result-7.4
           path: ./test-results
-          
+
       - name: 📥 Download Test Results 8.0
         uses: actions/download-artifact@v4
         with:
           name: test-result-8.0
           path: ./test-results
-          
+
       - name: 📥 Download Test Results 8.1
         uses: actions/download-artifact@v4
         with:
           name: test-result-8.1
           path: ./test-results
-          
+
       - name: 📥 Download Test Results 8.2
         uses: actions/download-artifact@v4
         with:
           name: test-result-8.2
           path: ./test-results
-          
+
       - name: 💬 Post Consolidated PR Comment
         uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.CUSTOM_PAT }}
         with:
           script: |
             const fs = require('fs');
@@ -343,9 +345,9 @@ jobs:
                   const status = result.tests_failed === 'true' ? '❌' : '✅';
                   const coverage = parseFloat(result.coverage) || 0;
                   const coverageStatus = coverage >= 80 ? '✅' : coverage >= 60 ? '⚠️' : '❌';
-                  
+            
                   commentBody += `${status} **PHP ${result.php_version}**: Coverage ${result.coverage}% ${coverageStatus}\n`;
-                  
+            
                   if (result.tests_failed === 'true' && result.failed_tests) {
                     hasFailures = true;
                     commentBody += `   Failed tests: ${result.failed_tests}\n`;
