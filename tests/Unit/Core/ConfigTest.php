@@ -171,7 +171,10 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetLogsDir()
     {
-        $this->markTestSkipped('Bug: test is not working on a windows machine.');
+        $this->setConfigParam('sLogDir', 'some/log/dir/');
+        $this->assertEquals($this->getConfig()->getConfigParam('sShopDir') . 'some/log/dir/', $this->getConfig()->getLogsDir());
+
+        $this->setConfigParam('sLogDir', null);
         $this->assertEquals($this->getConfig()->getConfigParam('sShopDir') . 'log/', $this->getConfig()->getLogsDir());
     }
 
