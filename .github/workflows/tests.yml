@@ -28,7 +28,7 @@ jobs:
         run: |
           wget -q https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.66.0/php-cs-fixer.phar -O php-cs-fixer.phar
           chmod +x php-cs-fixer.phar
-          sudo mv php-cs-fixer.phar /usr/local/bin/php-cs-fixer
+          sudo mv php-cs-fixer.phar /usr/local/bin/php-cs-fixer 
 
       - name: ℹ️ Show PHP-CS-Fixer version
         run: php-cs-fixer --version
