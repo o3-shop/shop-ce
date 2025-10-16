@@ -212,7 +212,7 @@ class Controller extends Core
         $session->setSessionParam('aDB', $databaseConfigValues);
 
         // check if important parameters are set
-        if (!$databaseConfigValues['dbHost'] || !$databaseConfigValues['dbName']) {
+        if (!$databaseConfigValues['dbHost'] || !$databaseConfigValues['dbName'] || !$databaseConfigValues['dbUser'] || !$databaseConfigValues['dbPwd']) {
             $setup->setNextStep($setup->getStep('STEP_DB_INFO'));
             $view->setMessage($language->getText('ERROR_FILL_ALL_FIELDS'));
 
