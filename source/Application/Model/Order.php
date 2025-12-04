@@ -38,7 +38,7 @@ use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Price as ShopPrice;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
+use OxidEsales\Eshop\Core\Exception\DatabaseException;
 use stdClass;
 
 /**

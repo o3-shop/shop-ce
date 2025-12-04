@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use OxidEsales\EshopCommunity\Application\Model\User;
+use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 
 /**

@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Core\Smarty\Plugin;
 
-use OxidEsales\EshopCommunity\Core\Registry;
+use OxidEsales\Eshop\Core\Registry;
 
 /** @deprecated class will be removed in O3-Shop v7.0 */
 final class StringInputParser

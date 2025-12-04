@@ -23,7 +23,7 @@ namespace OxidEsales\EshopCommunity\Core;
 use DOMNode;
 use DOMXPath;
 use OxidEsales\Eshop\Core\Controller\BaseController;
-use OxidEsales\Eshop\Core\Exception\AccessDeniedException;
+use OxidEsales\EshopCommunity\Core\Exception\AccessDeniedException;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElement;
 use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 

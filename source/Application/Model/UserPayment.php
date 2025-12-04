@@ -25,7 +25,7 @@ use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
+use OxidEsales\Eshop\Core\Exception\DatabaseException;
 
 /**
  * User payment manager.

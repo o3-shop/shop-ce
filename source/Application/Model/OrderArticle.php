@@ -30,7 +30,7 @@ use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Application\Model\Contract\ArticleInterface;
+use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
 
 /**
  * Order article manager.
