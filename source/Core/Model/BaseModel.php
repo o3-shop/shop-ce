@@ -31,8 +31,8 @@ DEFINE('ACTION_UPDATE', 3);
 DEFINE('ACTION_UPDATE_STOCK', 4);
 
 use Exception;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Exception\DatabaseException;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelDeleteEvent;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelInsertEvent;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;

@@ -22,8 +22,8 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
-use OxidEsales\EshopCommunity\Core\Model\ListModel;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Model\ListModel;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 

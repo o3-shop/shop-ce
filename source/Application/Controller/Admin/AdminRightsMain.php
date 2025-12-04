@@ -23,8 +23,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Application\Controller\Admin\NavigationTree;
 use OxidEsales\Eshop\Application\Model\RightsRoles;
-use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList;
 use stdClass;
 
 class AdminRightsMain extends AdminDetailsController
