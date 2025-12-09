@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Core\Controller;
 
-use OxidEsales\EshopCommunity\Core\ShopVersion;
+use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterRequestProcessedEvent;
 
 /**
