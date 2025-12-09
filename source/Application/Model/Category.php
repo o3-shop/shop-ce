@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\AttributeList;
+use OxidEsales\Eshop\Application\Model\Category as EshopCategory;
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -763,7 +765,7 @@ class Category extends MultiLanguageModel implements IUrl
      */
     public function getCatInLang($oActCategory = null)
     {
-        $oCategoryInDefaultLanguage = oxNew(Category::class);
+        $oCategoryInDefaultLanguage = oxNew(EshopCategory::class);
         if ($this->isPriceCategory()) {
             // get it in base language
             $oCategoryInDefaultLanguage->loadInLang(0, $this->getId());
@@ -800,7 +802,7 @@ class Category extends MultiLanguageModel implements IUrl
             if ($this->_oParent) {
                 $oCat = $this->_oParent;
             } else {
-                $oCat = oxNew(Category::class);
+                $oCat = oxNew(EshopCategory::class);
                 if (!$oCat->load($this->oxcategories__oxparentid->value)) {
                     $oCat = null;
                 } else {
@@ -860,7 +862,7 @@ class Category extends MultiLanguageModel implements IUrl
     {
         if ($this->oxcategories__oxparentid->value != 'oxrootid') {
             // load parent
-            $oParent = oxNew(Category::class);
+            $oParent = oxNew(EshopCategory::class);
             //#M317 check if parent is loaded
             if (!$oParent->load($this->oxcategories__oxparentid->value)) {
                 return false;

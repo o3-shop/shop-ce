@@ -22,6 +22,10 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Discount;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucher;
+use OxidEsales\Eshop\Application\Model\VoucherSerie;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
@@ -297,7 +301,7 @@ class Voucher extends BaseModel
             $oSeries = $this->getSerie();
             if (!$oSeries->oxvoucherseries__oxallowsameseries->value) {
                 foreach ($aVouchers as $voucherId => $voucherNr) {
-                    $oVoucher = oxNew(Voucher::class);
+                    $oVoucher = oxNew(EshopVoucher::class);
                     $oVoucher->load($voucherId);
                     if ($this->oxvouchers__oxvoucherserieid->value == $oVoucher->oxvouchers__oxvoucherserieid->value) {
                         $oEx = oxNew(VoucherException::class);

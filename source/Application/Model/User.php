@@ -24,6 +24,20 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use function bin2hex;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Application\Model\Groups;
+use OxidEsales\Eshop\Application\Model\NewsSubscribed;
+use OxidEsales\Eshop\Application\Model\Object2Group;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Application\Model\Rating;
+use OxidEsales\Eshop\Application\Model\Remark;
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\State;
+use OxidEsales\Eshop\Application\Model\User as EshopUser;
+use OxidEsales\Eshop\Application\Model\UserBasket;
+use OxidEsales\Eshop\Application\Model\UserAddressList;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
@@ -874,7 +888,7 @@ class User extends BaseModel
         } elseif ($this->getId()) {
             $sDeliveryCountry = $this->oxuser__oxcountryid->value;
         } else {
-            $oUser = oxNew(User::class);
+            $oUser = oxNew(EshopUser::class);
             if ($oUser->loadActiveUser()) {
                 $sDeliveryCountry = $oUser->oxuser__oxcountryid->value;
             }
