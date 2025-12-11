@@ -2,57 +2,106 @@ name: PR Comment Aggregator
 
 on:
   workflow_run:
-    workflows: ["Code Quality"]  # Exact workflow name
-    types: [completed]                   # Fires after it finished (any result)
-    branches: ['**']
+    workflows: ["Code Quality"]
+    types: [completed]
 
 permissions:
   issues: write
   pull-requests: write
+  actions: read
 
 jobs:
   aggregate-results:
     runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion != 'cancelled'
 
     steps:
+      - name: 🔍 Get PR Number
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            
+            // Get PR number from the workflow run
+            const prNumber = context.payload.workflow_run.pull_requests[0]?.number;
+            
+            if (!prNumber) {
+              console.log('No PR number found, skipping comment');
+              core.setOutput('pr_number', '');
+              return;
+            }
+            
+            console.log(`Found PR #${prNumber}`);
+            core.setOutput('pr_number', prNumber);
+
       - name: 📥 Download Code Style Results
+        if: steps.pr.outputs.pr_number != ''
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: cs-fixer-result
           path: ./cs-results
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: 📥 Download Test Results
+      - name: 📥 Download Test Results 7.4
+        if: steps.pr.outputs.pr_number != ''
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: test-result-7.4
           path: ./test-results
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: 📥 Download Test Results 8.0
+        if: steps.pr.outputs.pr_number != ''
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: test-result-8.0
           path: ./test-results
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: 📥 Download Test Results 8.1
+        if: steps.pr.outputs.pr_number != ''
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: test-result-8.1
           path: ./test-results
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: 📥 Download Test Results 8.2
+        if: steps.pr.outputs.pr_number != ''
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: test-result-8.2
           path: ./test-results
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: 💬 Post Consolidated PR Comment
+        if: steps.pr.outputs.pr_number != ''
         uses: actions/github-script@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.CUSTOM_PAT }}
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const path = require('path');
+            
+            const prNumber = ${{ steps.pr.outputs.pr_number }};
             
             let commentBody = '## 🧪 Test Results Summary\n\n';
             
@@ -101,11 +150,34 @@ jobs:
               commentBody += '\n### ❌ Failed Tests\nPlease check the failed tests above.\n';
             }
             
-            commentBody += '\n[View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})';
+            commentBody += `\n[View detailed results](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${{ github.event.workflow_run.id }})`;
             
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // Find existing comment to update or create new one
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: commentBody
+              issue_number: prNumber,
             });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🧪 Test Results Summary')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+              console.log('Updated existing comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+              console.log('Created new comment');
+            }
