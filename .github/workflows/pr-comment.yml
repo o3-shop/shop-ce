@@ -1,6 +1,9 @@
-name: PR-Comment
+name: PR Comment Aggregator
+
 on:
-  pull_request_target:
+  workflow_run:
+    workflows: ["Code Quality"]  # Exact workflow name
+    types: [completed]                   # Fires after it finished (any result)
     branches: ['**']
 
 permissions:
@@ -9,9 +12,7 @@ permissions:
 
 jobs:
   aggregate-results:
-    needs: [code-quality]
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request_target'
 
     steps:
       - name: 📥 Download Code Style Results
