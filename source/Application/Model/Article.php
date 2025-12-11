@@ -22,8 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Article as EshopArticle;
 use OxidEsales\Eshop\Application\Model\AmountPriceList;
+use OxidEsales\Eshop\Application\Model\Article as EshopArticle;
 use OxidEsales\Eshop\Application\Model\ArticleList;
 use OxidEsales\Eshop\Application\Model\AttributeList;
 use OxidEsales\Eshop\Application\Model\Category;
