@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\ArticleList;
+
 /**
  * Maintenance task handler. Maintenance tasks are called periodically, by cronTab (configure on your needs)
  *

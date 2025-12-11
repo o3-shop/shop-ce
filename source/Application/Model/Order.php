@@ -22,8 +22,21 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
-use OxidEsales\Eshop\Application\Model\Payment as EshopPayment;
-use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucherModel;
+use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\Country;
+use OxidEsales\Eshop\Application\Model\DeliveryList;
+use OxidEsales\Eshop\Application\Model\DeliverySet;
+use OxidEsales\Eshop\Application\Model\OrderArticle;
+use OxidEsales\Eshop\Application\Model\Payment;
+use OxidEsales\Eshop\Application\Model\PaymentGateway;
+use OxidEsales\Eshop\Application\Model\RequiredAddressFields;
+use OxidEsales\Eshop\Application\Model\RequiredFieldsValidator;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Application\Model\UserBasket;
+use OxidEsales\Eshop\Application\Model\UserPayment;
+use OxidEsales\Eshop\Application\Model\Voucher;
+use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\Counter;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
@@ -152,7 +165,7 @@ class Order extends BaseModel
     /**
      * Payment type
      *
-     * @var EshopPayment
+     * @var Payment
      */
     protected $_oPaymentType = null;
 
@@ -1009,7 +1022,7 @@ class Order extends BaseModel
      */
     protected function _setPayment($sPaymentid) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $oPayment = oxNew(EshopPayment::class);
+        $oPayment = oxNew(Payment::class);
 
         if (!$oPayment->load($sPaymentid)) {
             return null;
@@ -1175,7 +1188,7 @@ class Order extends BaseModel
 
         if (is_array($this->_aVoucherList)) {
             foreach ($this->_aVoucherList as $sVoucherId => $oSimpleVoucher) {
-                $oVoucher = oxNew(EshopVoucherModel::class);
+                $oVoucher = oxNew(Voucher::class);
                 $oVoucher->load($sVoucherId);
                 $oVoucher->markAsUsed($this->oxorder__oxid->value, $oUser->oxuser__oxid->value, $oSimpleVoucher->dVoucherdiscount);
 
@@ -2169,7 +2182,7 @@ class Order extends BaseModel
     {
         $voucherIds = array_keys($basket->getVouchers());
         foreach ($voucherIds as $voucherId) {
-            $voucher = oxNew(EshopVoucherModel::class);
+            $voucher = oxNew(Voucher::class);
             $voucher->load($voucherId);
             if ($voucher->getFieldData('oxorderid')) {
                 return self::ORDER_STATE_VOUCHERERROR;
@@ -2427,7 +2440,7 @@ class Order extends BaseModel
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = DatabaseProvider::getMaster();
 
-        $paymentModel = oxNew(EshopPayment::class);
+        $paymentModel = oxNew(Payment::class);
         $tableName = $paymentModel->getViewName();
 
         $sql = "
@@ -2458,7 +2471,7 @@ class Order extends BaseModel
     private function isValidPayment($basket, $oUser = null)
     {
         $paymentId = $basket->getPaymentId();
-        $paymentModel = oxNew(EshopPayment::class);
+        $paymentModel = oxNew(Payment::class);
         $paymentModel->load($paymentId);
 
         $dynamicValues = $this->getDynamicValues();

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\RequiredFieldValidator as EshopRequiredFieldValidator;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 
 /**
@@ -58,7 +59,7 @@ class RequiredFieldsValidator
     public function __construct($oFieldValidator = null)
     {
         if (is_null($oFieldValidator)) {
-            $oFieldValidator = oxNew(RequiredFieldValidator::class);
+            $oFieldValidator = oxNew(EshopRequiredFieldValidator::class);
         }
         $this->setFieldValidator($oFieldValidator);
     }
