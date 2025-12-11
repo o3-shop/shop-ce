@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Core;
 
 use OxidEsales\Eshop\Application\Component\Widget\WidgetController;
+use OxidEsales\Eshop\Application\Controller\StartController;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererInterface;
@@ -144,6 +146,9 @@ class WidgetControl extends \OxidEsales\Eshop\Core\ShopControl
 
         $widgetViewObject = parent::_initializeViewObject($class, $function, $parameters, null);
 
+        if (is_a($widgetViewObject, StartController::class)) {
+            Registry::getUtils()->redirect('index.php', true, 302);
+        }
         if (!is_a($widgetViewObject, WidgetController::class)) {
             /** @var ObjectException $exception */
             $exception = oxNew(ObjectException::class, get_class($widgetViewObject) . ' is not an instance of ' . WidgetController::class);
