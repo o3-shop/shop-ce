@@ -2995,27 +2995,6 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Get more details link
-     *
-     * @return string
-     */
-    public function getMoreDetailLink()
-    {
-        if ($this->_sMoreDetailLink == null) {
-            // and assign special article values
-            $this->_sMoreDetailLink = Registry::getConfig()->getShopHomeUrl() . 'cl=moredetails';
-
-            // not always it is ok, as not all the time active category is the same as primary article cat.
-            if ($sActCat = Registry::getRequest()->getRequestEscapedParameter('cnid')) {
-                $this->_sMoreDetailLink .= '&amp;cnid=' . $sActCat;
-            }
-            $this->_sMoreDetailLink .= '&amp;anid=' . $this->getId();
-        }
-
-        return $this->_sMoreDetailLink;
-    }
-
-    /**
      * Get to basket link
      *
      * @return string
