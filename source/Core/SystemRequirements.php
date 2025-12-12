@@ -337,6 +337,15 @@ class SystemRequirements
             $sPath . '../var/',
             $sTmp,
         ];
+
+        // Try to create the folders, in case they do not yet exist. In case it fails, the error handling later will handle it
+        foreach ($aPathsToCheck as $sPathToCheck) {
+            if (!file_exists($sPathToCheck)) {
+                /** @noinspection MkdirRaceConditionInspection */
+                mkdir($sPathToCheck, 0700, true);
+            }
+        }
+
         $iModStat = 2;
         $sPathToCheck = reset($aPathsToCheck);
         while ($sPathToCheck) {
