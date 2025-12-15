@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Actions;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;

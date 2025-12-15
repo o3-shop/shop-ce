@@ -21,6 +21,10 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Attribute;
+use OxidEsales\Eshop\Application\Model\MdVariant;
+use OxidEsales\Eshop\Application\Model\VariantSelectList;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;

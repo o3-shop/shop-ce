@@ -72,10 +72,10 @@ class WidgetControl extends \OxidEsales\Eshop\Core\ShopControl
      */
     public function start($class = null, $function = null, $parameters = null, $viewsChain = null)
     {
-        //$aParams = ( isset($aParams) ) ? $aParams : \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter( 'oxwparams' );
+        //$aParams = ( isset($aParams) ) ? $aParams : Registry::getConfig()->getRequestParameter( 'oxwparams' );
 
-        if (!isset($viewsChain) && \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxwparent')) {
-            $viewsChain = explode('|', \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('oxwparent'));
+        if (!isset($viewsChain) && Registry::getConfig()->getRequestParameter('oxwparent')) {
+            $viewsChain = explode('|', Registry::getConfig()->getRequestParameter('oxwparent'));
         }
 
         parent::start($class, $function, $parameters, $viewsChain);
@@ -149,6 +149,7 @@ class WidgetControl extends \OxidEsales\Eshop\Core\ShopControl
         if (is_a($widgetViewObject, StartController::class)) {
             Registry::getUtils()->redirect('index.php', true, 302);
         }
+
         if (!is_a($widgetViewObject, WidgetController::class)) {
             /** @var ObjectException $exception */
             $exception = oxNew(ObjectException::class, get_class($widgetViewObject) . ' is not an instance of ' . WidgetController::class);

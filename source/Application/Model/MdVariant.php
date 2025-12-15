@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\MdVariant as EshopMdVariant;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -177,7 +178,7 @@ class MdVariant extends Base
             }
         }
 
-        $oNewSubvariant = oxNew(MdVariant::class);
+        $oNewSubvariant = oxNew(EshopMdVariant::class);
         $oNewSubvariant->setName($sName);
         $oNewSubvariant->setId(md5($sName . $this->getId()));
         $oNewSubvariant->setParentId($this->getId());

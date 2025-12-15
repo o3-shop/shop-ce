@@ -72,3 +72,6 @@ coverage
 !**/.gitkeep
 
 dir.txt
+oxideshop.log
+/source/modules/testmodule/metadata.php
+/var/configuration-backup/shops/1.yaml

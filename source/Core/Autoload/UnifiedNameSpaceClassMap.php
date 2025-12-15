@@ -2165,6 +2165,18 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Model\RightsRolesElement'                      => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\RightsRolesElement::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Application\Model\RightsRolesElementsList'                 => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\RightsRolesElementsList::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Model\RssFeed'                                 => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\RssFeed::class,
         'isAbstract'       => false,

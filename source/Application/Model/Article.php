@@ -22,7 +22,18 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\AmountPriceList;
+use OxidEsales\Eshop\Application\Model\Article as EshopArticle;
+use OxidEsales\Eshop\Application\Model\ArticleList;
+use OxidEsales\Eshop\Application\Model\AttributeList;
+use OxidEsales\Eshop\Application\Model\Category;
 use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
+use OxidEsales\Eshop\Application\Model\Manufacturer;
+use OxidEsales\Eshop\Application\Model\Rating;
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\SimpleVariantList;
+use OxidEsales\Eshop\Application\Model\VariantHandler;
+use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -3339,7 +3350,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         if ($this->oxarticles__oxparentid && ($sParentId = $this->oxarticles__oxparentid->value)) {
             $sIndex = $sParentId . '_' . $this->getLanguage();
             if (!isset(self::$_aLoadedParents[$sIndex])) {
-                self::$_aLoadedParents[$sIndex] = oxNew(Article::class);
+                self::$_aLoadedParents[$sIndex] = oxNew(EshopArticle::class);
                 self::$_aLoadedParents[$sIndex]->_blLoadPrice = false;
                 self::$_aLoadedParents[$sIndex]->_blLoadVariants = false;
 
@@ -4883,7 +4894,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
             $rs = $database->select($query, [
                 ':oxparentid' => $sOXID,
             ]);
-            $oArticle = oxNew(Article::class);
+            $oArticle = oxNew(EshopArticle::class);
             if ($rs && $rs->count() > 0) {
                 while (!$rs->EOF) {
                     $oArticle->setId($rs->fields[0]);
