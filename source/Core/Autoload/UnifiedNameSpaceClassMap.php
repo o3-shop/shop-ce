@@ -1649,12 +1649,6 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
-    'OxidEsales\Eshop\Application\Controller\MoreDetailsController'              => [
-        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\MoreDetailsController::class,
-        'isAbstract'       => false,
-        'isInterface'      => false,
-        'isDeprecated'     => false,
-    ],
     'OxidEsales\Eshop\Application\Controller\NewsController'                     => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\NewsController::class,
         'isAbstract'       => false,

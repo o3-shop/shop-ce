@@ -5467,34 +5467,6 @@ class ArticleTest extends \OxidTestCase
     }
 
     /**
-     * Test get more details link.
-     *
-     * @return null
-     */
-    public function testGetMoreDetailLink()
-    {
-        $oArticle = $this->getProxyClass('oxarticle');
-        $oArticle->setNonPublicVar('_sMoreDetailLink', 'testDetailsLink');
-        $this->assertEquals('testDetailsLink', $oArticle->getMoreDetailLink());
-    }
-
-    /**
-     * Test get more details link with all request parameters.
-     *
-     * @return null
-     */
-    public function testGetMoreDetailLinkTestingIfAllRequestParamsAreSet()
-    {
-        oxTestModules::addFunction('oxUtilsUrl', 'processUrl($url, $blFinalUrl = true, $aParams = NULL, $iLang = NULL)', '{return "PROC".$url.(int)$final."CORP";}');
-
-        $this->setRequestParameter('cnid', 'yyy');
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getId']);
-        $oArticle->expects($this->once())->method('getId')->will($this->returnValue('xxx'));
-
-        $this->assertEquals('PROC' . $this->getConfig()->getShopUrl() . 'index.php' . '0CORPcl=moredetails&amp;cnid=yyy&amp;anid=xxx', $oArticle->getMoreDetailLink());
-    }
-
-    /**
      * test get to basket link.
      *
      * @return null

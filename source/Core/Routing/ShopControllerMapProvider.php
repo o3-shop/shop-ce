@@ -287,7 +287,6 @@ class ShopControllerMapProvider implements \OxidEsales\Eshop\Core\Contract\Contr
         'exceptionerror'                       => \OxidEsales\Eshop\Application\Controller\ExceptionErrorController::class,
         'forgotpwd'                            => \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class,
         'invite'                               => \OxidEsales\Eshop\Application\Controller\InviteController::class,
-        'moredetails'                          => \OxidEsales\Eshop\Application\Controller\MoreDetailsController::class,
         'recommadd'                            => \OxidEsales\Eshop\Application\Controller\RecommendationAddController::class,
         'register'                             => \OxidEsales\Eshop\Application\Controller\RegisterController::class,
         'suggest'                              => \OxidEsales\Eshop\Application\Controller\SuggestController::class,

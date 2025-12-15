@@ -327,7 +327,6 @@ return [
     'links'                               => 'OxidEsales\\Eshop\\Application\\Controller\\LinksController',
     'mallstart'                           => 'OxidEsales\\Eshop\\Application\\Controller\\MallStartController',
     'manufacturerlist'                    => 'OxidEsales\\Eshop\\Application\\Controller\\ManufacturerListController',
-    'moredetails'                         => 'OxidEsales\\Eshop\\Application\\Controller\\MoreDetailsController',
     'news'                                => 'OxidEsales\\Eshop\\Application\\Controller\\NewsController',
     'newsletter'                          => 'OxidEsales\\Eshop\\Application\\Controller\\NewsletterController',
     'order'                               => 'OxidEsales\\Eshop\\Application\\Controller\\OrderController',
