@@ -128,14 +128,14 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
                 $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
                 $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_INPUT_NOTALLFIELDS'));
 
-                return $this->_addValidationError('oxuser__oxpassword', $exception);
+                $this->_addValidationError('oxuser__oxpassword', $exception);
             } else {
                 // 2. entered wrong password
                 if (!$user->isSamePassword($newPassword)) {
                     $exception = oxNew(\OxidEsales\Eshop\Core\Exception\UserException::class);
                     $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH'));
 
-                    return $this->_addValidationError('oxuser__oxpassword', $exception);
+                    $this->_addValidationError('oxuser__oxpassword', $exception);
                 }
             }
         }
@@ -145,7 +145,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
             $exception = oxNew(\OxidEsales\Eshop\Core\Exception\UserException::class);
             $exception->setMessage(sprintf(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('ERROR_MESSAGE_USER_USEREXISTS'), $login));
 
-            return $this->_addValidationError('oxuser__oxusername', $exception);
+            $this->_addValidationError('oxuser__oxusername', $exception);
         }
 
         return $login;
