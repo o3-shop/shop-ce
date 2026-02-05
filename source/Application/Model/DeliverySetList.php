@@ -264,7 +264,16 @@ class DeliverySetList extends ListModel
             $oDelList = Registry::get(DeliveryList::class);
 
             $oCur = Registry::getConfig()->getActShopCurrencyObject();
-            $dBasketPrice = $oBasket->getPriceForPayment() / $oCur->rate;
+            if (isset($oCur->rate) && $oCur->rate > 0) {
+                $dBasketPrice = $oBasket->getPriceForPayment() / $oCur->rate;
+            } else {
+                // Fallback: use price as-is or log error
+                $dBasketPrice = $oBasket->getPriceForPayment();
+                // Log the issue
+                $this->getLogger()->error('Currency rate is zero or invalid', [
+                    'currency' => $oCur
+                ]);
+            }
 
             // checking if these ship sets available (number of possible payment methods > 0)
             foreach ($this as $sShipSetId => $oShipSet) {
