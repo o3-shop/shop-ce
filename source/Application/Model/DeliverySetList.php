@@ -271,7 +271,7 @@ class DeliverySetList extends ListModel
                 $dBasketPrice = $oBasket->getPriceForPayment();
                 // Log the issue
                 $this->getLogger()->error('Currency rate is zero or invalid', [
-                    'currency' => $oCur
+                    'currency' => $oCur,
                 ]);
             }
 
