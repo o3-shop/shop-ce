@@ -40,11 +40,8 @@ class DeliverySetListTest extends UnitTestCase
         $logger = new TestLogger();
         Registry::set('logger', $logger);
 
-
         $basketMock->expects($this->once())->method('getPriceForPayment')->willReturn(100);
         $basketPrice = $deliverySetList->getBasketPrice($basketMock, $oCur);
-
-
 
         $this->assertTrue(
             $logger->hasErrorThatContains(
