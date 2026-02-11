@@ -511,8 +511,15 @@ class Delivery extends MultiLanguageModel
 
         if ($this->getConditionType() == self::CONDITION_TYPE_PRICE) {
             $oCur = Registry::getConfig()->getActShopCurrencyObject();
-            $iAmount /= $oCur->rate;
-        }
+
+            if (isset($oCur->rate) && $oCur->rate > 0) {
+                $iAmount /= $oCur->rate;
+            } else {
+                // Log the issue
+                Registry::getLogger()->error('Currency rate is zero or invalid', [
+                    'currency' => $oCur,
+                ]);
+            }
 
         if ($iAmount >= $this->getConditionFrom() && $iAmount <= $this->getConditionTo()) {
             $blResult = true;

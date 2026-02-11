@@ -479,7 +479,16 @@ class Payment extends MultiLanguageModel
         }
 
         $oCur = $myConfig->getActShopCurrencyObject();
-        $dBasketPrice = $dBasketPrice / $oCur->rate;
+
+        if (isset($oCur->rate) && $oCur->rate > 0) {
+            $dBasketPrice = $dBasketPrice / $oCur->rate;
+        } else {
+            // Fallback: use price as-is or log error
+            // Log the issue
+            Registry::getLogger()->error('Currency rate is zero or invalid', [
+                'currency' => $oCur,
+            ]);
+        }
 
         if ($sShipSetId) {
             $aPaymentList = Registry::get(PaymentList::class)->getPaymentList($sShipSetId, $dBasketPrice, $oUser);
