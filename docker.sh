@@ -35,16 +35,20 @@ start_containers() {
         echo "Docker containers started successfully"
         $DOCKER_COMPOSE ps
         echo "
-| Credentials    |
-| -------------- | ---------------------------- |
++----------------+------------------------------+
+| Credentials    |                              |
++----------------+------------------------------+
 | Shop URL       | http://localhost:8080        |
 | Admin URL      | http://localhost:8080/admin/ |
 | Admin Login    | admin@example.com            |
 | Admin Password | admin123                     |
-| -------------- | ---------------------------- |
++----------------+------------------------------+
+| Mailpit URL    | http://localhost:8025        |
++----------------+------------------------------+
 | Adminer URL    | http://localhost:8081        |
 | DB Root User   | root                         |
 | DB Root PW     | supersecret                  |
++----------------+------------------------------+
 "
       return 0
     else
