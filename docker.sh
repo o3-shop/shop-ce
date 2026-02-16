@@ -119,7 +119,7 @@ run_tests() {
   done
 
   echo -e "${GREEN}✓ All containers are running – executing tests${NC}"
-  docker exec -i "$target_container" ./run-tests.sh
+  docker exec -i "$target_container" ./run-tests.sh "$@"
 }
 
 run_php_cs_fixer() {
@@ -183,7 +183,8 @@ case "$1" in
         rebuild_containers || exit 127
         ;;
     test)
-        run_tests || exit 127
+        shift
+        run_tests "$@" || exit 127
         ;;
     test-all)
         run_full_test_with_cs_fixer || exit 127
