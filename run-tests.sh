@@ -31,8 +31,23 @@ echo "----------------------------------------"
 # Record start time
 START_TIME=$(date +%s)
 
+# Determine test targets (use arguments if provided, else default to tests/Unit)
+if [ $# -eq 0 ]; then
+    TEST_TARGETS="/var/www/html/tests/Unit"
+else
+    TEST_TARGETS=""
+    for arg in "$@"; do
+        if [[ "$arg" == /* ]]; then
+            TEST_TARGETS="$TEST_TARGETS $arg"
+        else
+            # Prefix with /var/www/html/ if not an absolute path
+            TEST_TARGETS="$TEST_TARGETS /var/www/html/$arg"
+        fi
+    done
+fi
+
 # Run the tests and store exit code
-runtests /var/www/html/tests/Unit --colors=always --coverage-clover /var/www/html/coverage/coverage.xml --coverage-html /var/www/html/coverage/html --log-junit /var/www/html/coverage/junit.xml
+runtests $TEST_TARGETS --colors=always --coverage-clover /var/www/html/coverage/coverage.xml --coverage-html /var/www/html/coverage/html --log-junit /var/www/html/coverage/junit.xml
 TEST_EXIT_CODE=$?
 
 # Record end time

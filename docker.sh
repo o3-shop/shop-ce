@@ -35,16 +35,20 @@ start_containers() {
         echo "Docker containers started successfully"
         $DOCKER_COMPOSE ps
         echo "
-| Credentials    |
-| -------------- | ---------------------------- |
++----------------+------------------------------+
+| Credentials    |                              |
++----------------+------------------------------+
 | Shop URL       | http://localhost:8080        |
 | Admin URL      | http://localhost:8080/admin/ |
 | Admin Login    | admin@example.com            |
 | Admin Password | admin123                     |
-| -------------- | ---------------------------- |
++----------------+------------------------------+
+| Mailpit URL    | http://localhost:8025        |
++----------------+------------------------------+
 | Adminer URL    | http://localhost:8081        |
 | DB Root User   | root                         |
 | DB Root PW     | supersecret                  |
++----------------+------------------------------+
 "
       return 0
     else
@@ -119,7 +123,7 @@ run_tests() {
   done
 
   echo -e "${GREEN}✓ All containers are running – executing tests${NC}"
-  docker exec -i "$target_container" ./run-tests.sh
+  docker exec -i "$target_container" ./run-tests.sh "$@"
 }
 
 run_php_cs_fixer() {
@@ -183,7 +187,8 @@ case "$1" in
         rebuild_containers || exit 127
         ;;
     test)
-        run_tests || exit 127
+        shift
+        run_tests "$@" || exit 127
         ;;
     test-all)
         run_full_test_with_cs_fixer || exit 127
