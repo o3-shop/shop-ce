@@ -452,6 +452,8 @@ $aLang = [
 'RECIPIENT_EMAIL'                                             => 'E-Mail des Empfängers',
 'RECIPIENT_NAME'                                              => 'Name des Empfängers',
 'RECOMMEND'                                                   => 'Empfehlen',
+'RECOMMLIST'                                                  => 'Empfehlungsliste',
+'RECOMMLIST_SEARCH'                                           => 'Suche',
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'RECOMMENDED_PRODUCTS'                                        => 'Meine Artikelempfehlung',
 /** end deprecated */
