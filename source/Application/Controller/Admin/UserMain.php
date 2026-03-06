@@ -70,7 +70,7 @@ class UserMain extends AdminDetailsController
             $iPos = count($aUserRights);
             $aUserRights[$iPos] = new stdClass();
             $aUserRights[$iPos]->id = 'malladmin';
-            $aUserRights[$iPos]->name = $oLang->translateString('Admin', $iTplLang);
+            $aUserRights[$iPos]->name = $oLang->translateString('mallAdmin', $iTplLang);
         }
 
         $aUserRights = $this->calculateAdditionalRights($aUserRights);
