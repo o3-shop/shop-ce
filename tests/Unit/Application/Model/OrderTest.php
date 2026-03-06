@@ -1666,6 +1666,9 @@ class OrderTest extends \OxidTestCase
             3,
             $order->finalizeOrder($basket, $user)
         );
+
+        // The debug log entry "Order already exists" is expected in this test case
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**
