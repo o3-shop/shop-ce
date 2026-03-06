@@ -639,15 +639,15 @@ class CmpBasketTest extends \OxidTestCase
 
     public function testRender()
     {
-        $this->markTestSkipped('Bug: Failed asserting that two variables reference the same object.');
         $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['calculateBasket']);
         $oBasket->expects($this->once())->method('calculateBasket')->with($this->equalTo(false))->will($this->returnValue(null));
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oBasket));
 
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getSession']);
-        $o->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
+        $o = oxNew(\OxidEsales\Eshop\Application\Component\BasketComponent::class);
         $this->assertSame($oBasket, $o->render());
     }
 
@@ -716,17 +716,17 @@ class CmpBasketTest extends \OxidTestCase
      */
     public function testIsRootCatChanged_ShowCatChangeWarning()
     {
-        $this->markTestSkipped('Bug: false is not true');
-        $oB = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['showCatChangeWarning', 'setCatChangeWarningState']);
+        $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['showCatChangeWarning', 'setCatChangeWarningState']);
         $oB->expects($this->once())->method('showCatChangeWarning')->will($this->returnValue(true));
         $oB->expects($this->once())->method('setCatChangeWarningState')->will($this->returnValue(null));
 
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oS->expects($this->once())->method('getBasket')->will($this->returnValue($oB));
 
-        $oCB = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getSession',]);
-        $oCB->expects($this->once())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
+        $oCB = oxNew(\OxidEsales\Eshop\Application\Component\BasketComponent::class);
         $this->assertTrue($oCB->isRootCatChanged());
     }
 
@@ -746,8 +746,6 @@ class CmpBasketTest extends \OxidTestCase
 
     public function testInitReservationNotTimeouted()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
         $this->getConfig()->setConfigParam('iBasketReservationCleanPerRequest', 320);
 
@@ -759,21 +757,20 @@ class CmpBasketTest extends \OxidTestCase
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
         $oS->expects($this->never())->method('getBasket');
 
-        $oCB = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getSession']);
-        $oCB->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
+        $oCB = oxNew(\OxidEsales\Eshop\Application\Component\BasketComponent::class);
         $oCB->init();
     }
 
     public function testInitReservationTimeouted()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
         // also check the default (hardcoded) value is 200, if iBasketReservationCleanPerRequest is 0
         $this->getConfig()->setConfigParam('iBasketReservationCleanPerRequest', 0);
 
-        $oB = $this->getMock('stdclass', ['deleteBasket', 'getProductsCount']);
+        $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['deleteBasket', 'getProductsCount']);
         $oB->expects($this->once())->method('deleteBasket')->will($this->returnValue(0));
         $oB->expects($this->once())->method('getProductsCount')->will($this->returnValue(1));
 
@@ -785,9 +782,10 @@ class CmpBasketTest extends \OxidTestCase
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
         $oS->expects($this->once())->method('getBasket')->will($this->returnValue($oB));
 
-        $oCB = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getSession']);
-        $oCB->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
+        $oCB = oxNew(\OxidEsales\Eshop\Application\Component\BasketComponent::class);
         $oCB->init();
     }
 
@@ -808,19 +806,19 @@ class CmpBasketTest extends \OxidTestCase
 
     public function testExecuteUserChoiceElseCase()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oB = $this->getMock('stdclass', ['deleteBasket']);
+        $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['deleteBasket']);
         $oB->expects($this->once())->method('deleteBasket')->will($this->returnValue(null));
 
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oS->expects($this->once())->method('getBasket')->will($this->returnValue($oB));
 
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
+
         $oP = $this->getMock('stdclass', ['setRootCatChanged']);
         $oP->expects($this->once())->method('setRootCatChanged')->will($this->returnValue(null));
 
-        $oCB = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getSession', 'getParent']);
-        $oCB->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oCB = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getParent']);
         $oCB->expects($this->any())->method('getParent')->will($this->returnValue($oP));
 
         $this->assertNull($oCB->executeuserchoice());

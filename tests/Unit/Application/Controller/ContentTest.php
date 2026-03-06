@@ -101,8 +101,6 @@ class ContentTest extends \OxidTestCase
      */
     public function testCanShowContent()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ContentController::class, ['getUser', 'isEnabledPrivateSales'], [], '', false);
         $oView->expects($this->any())->method('getUser')->will($this->returnValue(false));
         $oView->expects($this->any())->method('isEnabledPrivateSales')->will($this->returnValue(true));
@@ -125,13 +123,20 @@ class ContentTest extends \OxidTestCase
      */
     public function testGetContentIdIfAgb()
     {
-        $this->markTestSkipped('Bug: Need to be fixed');
-        $sContentId = oxDb::getDb(oxDB::FETCH_MODE_ASSOC)->getOne("SELECT oxid FROM oxcontents WHERE oxloadid = 'oxagb' ");
+        // Insert a clean test content record (original demo data has trailing newlines in oxid)
+        $sContentId = '_testAgbContent';
+        $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
+        $oContent->setId($sContentId);
+        $oContent->oxcontents__oxloadid = new \OxidEsales\Eshop\Core\Field('oxagb_test');
+        $oContent->oxcontents__oxactive = new \OxidEsales\Eshop\Core\Field(1);
+        $oContent->oxcontents__oxshopid = new \OxidEsales\Eshop\Core\Field($this->getConfig()->getShopId());
+        $oContent->save();
+
         $this->setRequestParameter('oxcid', $sContentId);
         $this->getConfig()->setConfigParam('blPsLoginEnabled', true);
 
         $oView = oxNew('content');
-        $this->assertEquals($oView->getContentId(), $sContentId);
+        $this->assertEquals($sContentId, $oView->getContentId());
     }
 
     /**
@@ -211,8 +216,6 @@ class ContentTest extends \OxidTestCase
      */
     public function testPrepareMetaKeyword()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         $oContent = oxNew('oxArticle');
         $oContent->oxcontents__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oContent->oxcontents__oxtitle->expects($this->once())->method('__get')->will($this->returnValue('testtitle'));

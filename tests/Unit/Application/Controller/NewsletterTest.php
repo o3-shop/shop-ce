@@ -42,6 +42,7 @@ class NewsletterTest extends \OxidTestCase
 
         $oUser = oxNew('oxuser');
         $oUser->setId('test');
+        $oUser->oxuser__oxusername = new \OxidEsales\Eshop\Core\Field('test@newsletter.test', \OxidEsales\Eshop\Core\Field::T_RAW);
         $oUser->save();
     }
 
