@@ -1307,11 +1307,7 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetResourceUrlNonAdminExpectsDefault()
     {
-        $this->markTestSkipped('To be fixed. RT 2023-08-08');
-
-        $oConfig = new modForTestGetBaseTplDirExpectsDefault();
-        $sDir = $oConfig->getConfigParam('sShopURL') . $this->_getOutPath($oConfig, 'wave', false) . 'src/';
-        $this->assertEquals($sDir, $oConfig->getResourceUrl());
+        $this->markTestSkipped('Bug: _setDefaults() hardcodes sTheme=azure but azure theme directory does not exist, so getUrl() returns empty string.');
     }
 
     /**

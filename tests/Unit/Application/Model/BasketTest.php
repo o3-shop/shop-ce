@@ -2894,7 +2894,6 @@ class BasketTest extends \OxidTestCase
      */
     public function testCalcBasketDiscount()
     {
-        $this->markTestSkipped('Bug: 0 does not match 1');
         $oDiscount2 = oxNew('oxDiscount');
         $oDiscount2->setId('_testDiscountId2');
         $oDiscount2->oxdiscount__oxtitle = new oxField('Test discount title 2', oxField::T_RAW);
@@ -2935,7 +2934,6 @@ class BasketTest extends \OxidTestCase
      */
     public function testCalcBasketDiscountWithSpecialPrice()
     {
-        $this->markTestSkipped('Bug: 0 does not match 1');
         $oDiscount2 = oxNew('oxDiscount');
         $oDiscount2->setId('_testDiscountId2');
         $oDiscount2->oxdiscount__oxtitle = new oxField('Test discount title 2', oxField::T_RAW);
@@ -3761,7 +3759,6 @@ class BasketTest extends \OxidTestCase
      */
     public function testCalcBasketDiscountMinimizeDiscountIfBiggerThanTotal()
     {
-        $this->markTestSkipped('Bug: 0 does not match 1');
         $oDiscount2 = oxNew('oxDiscount');
         $oDiscount2->setId('_testDiscountId2');
         $oDiscount2->oxdiscount__oxtitle = new oxField('Test discount title 123', oxField::T_RAW);
@@ -3801,7 +3798,6 @@ class BasketTest extends \OxidTestCase
      */
     public function testCalcBasketDiscountIfDiscountIsMinus()
     {
-        $this->markTestSkipped('Bug: 0 does not match 1');
         $oDiscount2 = oxNew('oxDiscount');
         $oDiscount2->setId('_testDiscountId2');
         $oDiscount2->oxdiscount__oxtitle = new oxField('Test discount title 123', oxField::T_RAW);

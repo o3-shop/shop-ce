@@ -749,8 +749,6 @@ class BaseTest extends \OxidTestCase
 
     public function testGetUpdateFieldsWithUseSkipSaveFieldsOff()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $base = new _oxBase();
         $base->init('oxactions');
         $base->oxactions__oxid = new oxField('test1', oxField::T_RAW);
@@ -765,7 +763,6 @@ class BaseTest extends \OxidTestCase
 
     public function testGetUpdateFieldsWithUseSkipSaveFieldsOn()
     {
-        $this->markTestSkipped('Bug: get empty string');
         $base = new _oxBase();
         $base->init('oxactions');
         $base->oxactions__oxid = new oxField('test1', oxField::T_RAW);

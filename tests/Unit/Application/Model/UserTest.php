@@ -60,6 +60,7 @@ class UserTest_oxNewsSubscribed extends oxnewssubscribed
     {
         if ($sOXID == 'oxid') {
             $this->loadFromUserID = true;
+            return true;
         }
     }
 
@@ -67,6 +68,7 @@ class UserTest_oxNewsSubscribed extends oxnewssubscribed
     {
         if ($sEmail == 'email') {
             $this->loadFromEMail = true;
+            return true;
         }
     }
 }
@@ -382,8 +384,8 @@ class UserTest extends \OxidTestCase
      */
     public function testAcceptTerms()
     {
-        $this->markTestSkipped('Need to be fixed');
         $oDb = $this->getDb();
+        $sVersion = oxNew(\OxidEsales\Eshop\Application\Model\Content::class)->getTermsVersion();
 
         $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin'"));
 
@@ -391,14 +393,14 @@ class UserTest extends \OxidTestCase
         $oUser->load('oxdefaultadmin');
         $oUser->acceptTerms();
 
-        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='1'"));
+        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion=" . $oDb->quote($sVersion)));
 
         $oDb->execute("update oxacceptedterms set oxtermversion='0'");
         $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='0'"));
-        $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='1'"));
+        $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion=" . $oDb->quote($sVersion)));
 
         $oUser->acceptTerms();
-        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='1'"));
+        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion=" . $oDb->quote($sVersion)));
     }
 
     /**
@@ -883,7 +885,6 @@ class UserTest extends \OxidTestCase
     // 2. loading subscription by user id
     public function testGetNewsSubscriptionNoUserReturnsByOxid()
     {
-        $this->markTestSkipped('Bug: null = true');
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\UserTest_oxNewsSubscribed::class, 'oxnewssubscribed');
         $oUser = oxNew('oxUser');
         $oUser->setId('oxid');
@@ -893,7 +894,6 @@ class UserTest extends \OxidTestCase
     // 3. loading subscription by user email
     public function testGetNewsSubscriptionNoUserReturnsByEmail()
     {
-        $this->markTestSkipped('Bug: null = true');
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\UserTest_oxNewsSubscribed::class, 'oxnewssubscribed');
         $oUser = oxNew('oxUser');
         $oUser->oxuser__oxusername = new oxField('email', oxField::T_RAW);
@@ -2668,15 +2668,14 @@ class UserTest extends \OxidTestCase
 
     public function testGetWishListId()
     {
-        $this->markTestSkipped("Bug: Failed asserting that null matches expected 'testwishid'.");
         $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getWishId']);
         $oBasketItem->expects($this->once())->method('getWishId')->will($this->returnValue('testwishid'));
         $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->once())->method('getContents')->will($this->returnValue([$oBasketItem]));
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oBasket));
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getSession']);
-        $oUserView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+        $oUserView = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $this->assertEquals('testwishid', $oUserView->UNITgetWishListId());
     }
 

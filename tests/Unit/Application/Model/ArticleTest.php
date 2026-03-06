@@ -3269,20 +3269,19 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetArticleVat()
     {
-        // Production Article.php uses Registry::get(VatSelector::class) where VatSelector::class
-        // resolves to the EshopCommunity namespace (same namespace as Article itself).
-        // We must use the same class name for Registry::set() to match the storage key.
-        $oVatSelector1 = $this->getMock(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, ['getArticleVat']);
+        // Article.php has 'use OxidEsales\Eshop\Application\Model\VatSelector' so
+        // Registry::get(VatSelector::class) resolves to the Eshop (unified) namespace.
+        $oVatSelector1 = $this->getMock(\OxidEsales\Eshop\Application\Model\VatSelector::class, ['getArticleVat']);
         $oVatSelector1->expects($this->any())->method('getArticleVat')->will($this->returnValue(99));
-        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, $oVatSelector1);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\VatSelector::class, $oVatSelector1);
 
         $oA = oxNew('oxArticle');
         $this->assertEquals(99, $oA->getArticleVat());
 
         // Replace with new VatSelector returning 98
-        $oVatSelector2 = $this->getMock(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, ['getArticleVat']);
+        $oVatSelector2 = $this->getMock(\OxidEsales\Eshop\Application\Model\VatSelector::class, ['getArticleVat']);
         $oVatSelector2->expects($this->any())->method('getArticleVat')->will($this->returnValue(98));
-        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, $oVatSelector2);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\VatSelector::class, $oVatSelector2);
 
         // cached value, do not recalculate
         $this->assertEquals(99, $oA->getArticleVat());
@@ -3331,7 +3330,6 @@ class ArticleTest extends \OxidTestCase
      */
     public function testApplyUserVAT()
     {
-        $this->markTestSkipped('Bug: 7.0 does not match 19');
         oxTestModules::addFunction('oxVatSelector', 'getUserVat', '{return 19;}');
 
         $oPrice = oxNew('oxPrice');
@@ -3478,7 +3476,6 @@ class ArticleTest extends \OxidTestCase
      */
     public function testDelete()
     {
-        $this->markTestSkipped('Bug: 0 does not match expected 1');
         $oVariant = $this->_createVariant('_testVar', '_testArt');
 
         oxTestModules::addFunction('oxSeoEncoderArticle', 'onDeleteArticle', '{$this->onDeleteArticleCnt++;}');

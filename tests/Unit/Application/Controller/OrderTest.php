@@ -533,7 +533,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecuteWithWrongStockThrowsException()
     {
-        $this->markTestSkipped('Bug: exception is not thrown');
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{throw $aA[0];}');
 
         $this->setupConfigForOrderExecute();
@@ -546,13 +545,19 @@ class OrderTest extends \OxidTestCase
         $basketItem->expects($this->any())->method('getArticle')->will($this->returnValue($product));
         $basketItem->expects($this->any())->method('getAmount')->will($this->returnValue(999));
 
-        //setting basket info
         $basket = $this->getBasketMock($basketItem);
 
-        $session = $this->getSessionMock($basket);
-        $session->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
+        // Use real session with token challenge instead of mocked getSession
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+        oxRegistry::getSession()->setBasket($basket);
 
-        $order = $this->getOrderMock($session);
+        $user = oxNew('oxUser');
+        $user->load('_testUserId');
+
+        $order = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep', 'getUser', 'getPayment']);
+        $order->expects($this->any())->method('getUser')->will($this->returnValue($user));
+        $order->expects($this->any())->method('getPayment')->will($this->returnValue(true));
 
         $this->expectException('oxOutOfStockException');
         $this->assertNull($order->execute());
