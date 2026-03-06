@@ -32,6 +32,10 @@
  */
 function smarty_modifier_oxmultilangsal($sIdent)
 {
+    if (empty($sIdent)) {
+        return '';
+    }
+
     $oLang = \OxidEsales\Eshop\Core\Registry::getLang();
     $iLang = $oLang->getTplLanguage();
 

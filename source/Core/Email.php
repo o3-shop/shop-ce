@@ -688,7 +688,7 @@ class Email extends PHPMailer
         }
 
         $this->setSubject($subject);
-        $this->setRecipient($shop->oxshops__oxowneremail->value, $language->translateString('order'));
+        $this->setRecipient($shop->oxshops__oxowneremail->value, $language->translateString('ORDER'));
 
         if ($user->oxuser__oxusername->value != 'admin') {
             $fullName = $user->oxuser__oxfname->getRawValue() . ' ' . $user->oxuser__oxlname->getRawValue();
