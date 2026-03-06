@@ -288,6 +288,9 @@ class SessionTest extends \OxidTestCase
         $this->assertNotNull($oExcp);
         $this->assertTrue($oExcp instanceof \OxidEsales\EshopCommunity\Core\Exception\ExceptionToDisplay);
         $this->assertEquals('Different browser (oldone, none), creating new SID...<br>', $oExcp->getOxMessage());
+
+        // Clear expected log warning from translation of debug session message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testIsSidNeededPassingCustomUrl()

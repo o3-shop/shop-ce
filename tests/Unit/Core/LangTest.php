@@ -518,6 +518,9 @@ class LangTest extends \OxidTestCase
         $this->assertEquals('blafoowashere123', $oLang->translateString('blafoowashere123'));
         $this->assertEquals('', $oLang->translateString(''));
         $this->assertEquals('\/ß[]~ä#-', $oLang->translateString("\/ß[]~ä#-"));
+
+        // Clear expected log warnings about missing translations for gibberish strings
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     // in non amdin mode
@@ -529,6 +532,9 @@ class LangTest extends \OxidTestCase
         $this->assertEquals('blafoowashere123', $oLang->translateString('blafoowashere123'));
         $this->assertEquals('', $oLang->translateString(''));
         $this->assertEquals('\/ß[]~ä#-', $oLang->translateString("\/ß[]~ä#-"));
+
+        // Clear expected log warnings about missing translations for gibberish strings
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testFormatsCurrencyUsingDefaultValues()
@@ -1770,6 +1776,9 @@ class LangTest extends \OxidTestCase
         $oLang = oxNew('oxLang');
         $oLang->translateString('NOT_EXISTING_KEY');
         $this->assertFalse($oLang->isTranslated());
+
+        // Clear expected log warning about missing translation for non-existing key
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testIsTranslatedInTranslationActionTranslationFound()

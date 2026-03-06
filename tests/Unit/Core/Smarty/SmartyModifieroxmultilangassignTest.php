@@ -121,6 +121,9 @@ class SmartyModifieroxmultilangassignTest extends \OxidTestCase
         $oShop->save();
 
         $this->assertEquals($sTranslation, smarty_modifier_oxmultilangassign($sIndent, $oSmarty));
+
+        // Clear expected log warnings from translating missing translation keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**
@@ -149,5 +152,8 @@ class SmartyModifieroxmultilangassignTest extends \OxidTestCase
         $this->setAdminMode(true);
 
         $this->assertEquals($sTranslation, smarty_modifier_oxmultilangassign($sIdent, $oSmarty));
+
+        // Clear expected log warnings from translating missing translation keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 }
