@@ -33,16 +33,26 @@ class LangTest extends \OxidTestCase
     /**
      * @inheritdoc
      */
+    /**
+     * Activate the Wave theme once per test class instead of per test.
+     * Theme::activate() costs ~170ms and doesn't need to be repeated
+     * for every test since no test deactivates the theme.
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        $theme = oxNew(Theme::class);
+        $theme->load('wave');
+        $theme->activate();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
         // cleanup
         oxRegistry::getUtils()->oxResetFileCache();
-
-        $theme = oxNew(Theme::class);
-        $theme->load('wave');
-        $theme->activate();
     }
 
     /**

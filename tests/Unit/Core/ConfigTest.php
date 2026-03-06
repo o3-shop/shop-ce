@@ -122,6 +122,20 @@ class ConfigTest extends OxidTestCase
      * @return void
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
+    /**
+     * Activate the Wave theme once per test class instead of per test.
+     * Theme::activate() costs ~170ms and doesn't need to be repeated
+     * for every test since no test deactivates the theme.
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        $theme = oxNew(Theme::class);
+        $theme->load('wave');
+        $theme->activate();
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -129,10 +143,6 @@ class ConfigTest extends OxidTestCase
 
         // copying
         $this->_iCurr = $this->getSession()->getVariable('currency');
-
-        $theme = oxNew(Theme::class);
-        $theme->load('wave');
-        $theme->activate();
     }
 
     /**

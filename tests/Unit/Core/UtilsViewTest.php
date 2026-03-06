@@ -28,13 +28,23 @@ use stdClass;
 
 class UtilsViewTest extends \OxidTestCase
 {
-    public function setup(): void
+    /**
+     * Activate the Wave theme once per test class instead of per test.
+     * Theme::activate() costs ~170ms and doesn't need to be repeated
+     * for every test since no test deactivates the theme.
+     */
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
 
         $theme = oxNew(Theme::class);
         $theme->load('wave');
         $theme->activate();
+    }
+
+    public function setup(): void
+    {
+        parent::setUp();
     }
 
     public function testGetTemplateDirsContainsAWave()
