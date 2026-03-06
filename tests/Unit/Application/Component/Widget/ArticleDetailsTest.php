@@ -803,15 +803,14 @@ class ArticleDetailsTest extends \OxidTestCase
 
     public function testGetRatingCount_active()
     {
-        $this->markTestSkipped('Bug: Method does not get called.');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('blShowVariantReviews'))->will($this->returnValue(true));
+        // getRatingCount() uses Registry::getConfig()->getConfigParam(), not $this->getConfig(),
+        // so we set the param on the real config instead of mocking getConfig on the view.
+        $this->getConfig()->setConfigParam('blShowVariantReviews', true);
 
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getArticleRatingCount']);
         $oProduct->expects($this->once())->method('getArticleRatingCount')->will($this->returnValue(123));
 
-        $oView = $this->getMock($this->getProxyClassName('oxwArticleDetails'), ['getConfig', 'isReviewActive', 'getProduct']);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock($this->getProxyClassName('oxwArticleDetails'), ['isReviewActive', 'getProduct']);
         $oView->expects($this->once())->method('isReviewActive')->will($this->returnValue(true));
         $oView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
 
@@ -857,29 +856,26 @@ class ArticleDetailsTest extends \OxidTestCase
      */
     public function testGetVariantSelections()
     {
-        $this->markTestSkipped('Bug: Method was not expected to call.');
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getVariantSelections']);
         $oProduct->expects($this->once())->method('getVariantSelections')->will($this->returnValue('varselections'));
-        //$oProduct->expects( $this->never() )->method( "getId" );
 
-        // no parent
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', '_getParentProduct']);
+        // no parent — production calls getParentProduct (without underscore)
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', 'getParentProduct']);
         $oView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
-        $oView->expects($this->once())->method('_getParentProduct')->will($this->returnValue(false));
+        $oView->expects($this->once())->method('getParentProduct')->will($this->returnValue(false));
 
         $this->assertEquals('varselections', $oView->getVariantSelections());
 
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getVariantSelections']);
         $oProduct->expects($this->never())->method('getVariantSelections')->will($this->returnValue('varselections'));
-        //$oProduct->expects( $this->once() )->method( 'getId');
 
         $oParent = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getVariantSelections']);
         $oParent->expects($this->once())->method('getVariantSelections')->will($this->returnValue('parentselections'));
 
         // has parent
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', '_getParentProduct']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', 'getParentProduct']);
         $oView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
-        $oView->expects($this->once())->method('_getParentProduct')->will($this->returnValue($oParent));
+        $oView->expects($this->once())->method('getParentProduct')->will($this->returnValue($oParent));
 
         $this->assertEquals('parentselections', $oView->getVariantSelections());
     }

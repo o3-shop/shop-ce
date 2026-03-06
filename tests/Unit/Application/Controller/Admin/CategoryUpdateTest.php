@@ -36,14 +36,12 @@ class CategoryUpdateTest extends \OxidTestCase
      */
     public function testGetCatListUpdateInfo()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         // testing..
         $oCategoryList = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, ['getUpdateInfo']);
         $oCategoryList->expects($this->once())->method('getUpdateInfo');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategoryUpdate::class, ['_getCategoryList']);
-        $oView->expects($this->once())->method('_getCategoryList')->will($this->returnValue($oCategoryList));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategoryUpdate::class, ['getCategoryList']);
+        $oView->expects($this->once())->method('getCategoryList')->will($this->returnValue($oCategoryList));
         $oView->getCatListUpdateInfo();
     }
 

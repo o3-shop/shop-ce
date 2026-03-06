@@ -317,7 +317,6 @@ class ShopControlTest extends \OxidTestCase
      */
     public function testRenderTemplateNotFound()
     {
-        $this->markTestSkipped('Bug: test is not working on a windows machine.');
         ContainerFactory::resetContainer();
         $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['render']);
         $oView->expects($this->once())->method('render')->will($this->returnValue('wrongTpl'));
@@ -395,7 +394,6 @@ class ShopControlTest extends \OxidTestCase
 
     public function testProcessJson()
     {
-        $this->markTestSkipped('not working');
         ContainerFactory::resetContainer();
         $this->getConfig()->setConfigParam('sTheme', 'wave');
 
@@ -423,9 +421,12 @@ class ShopControlTest extends \OxidTestCase
         $oOut->expects($this->once())
             ->method('sendHeaders')
             ->willReturn(null);
-        $oOut->expects($this->once())
+        $oOut->expects($this->exactly(2))
             ->method('output')
-            ->with($this->equalTo($controllerClassName), $this->anything());
+            ->withConsecutive(
+                [$this->equalTo('errors'), $this->equalTo([])],
+                [$this->equalTo($controllerClassName), $this->anything()]
+            );
         $oOut->expects($this->once())
             ->method('flushOutput')
             ->willReturn(null);

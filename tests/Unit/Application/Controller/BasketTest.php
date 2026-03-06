@@ -131,11 +131,8 @@ class BasketTest extends \OxidTestCase
 
     public function testShowBackToShop()
     {
-        $this->markTestSkipped('Bug: false is not same as true');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(2))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(3));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(2))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 3);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
 
         $this->assertEquals(false, $o->showBackToShop());
         $this->getSession()->setVariable('_backtoshop', 1);
@@ -182,42 +179,30 @@ class BasketTest extends \OxidTestCase
 
     public function testBackToShop()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getSession()->setVariable('_backtoshop', 'asd');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(1))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(2));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 2);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertSame(null, $o->backToShop());
     }
 
     public function testBackToShopShowPage()
     {
-        $this->markTestSkipped('Bug: Get null back');
-
         $this->getSession()->setVariable('_backtoshop', 'asd');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(1))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(3));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 3);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertSame('asd', $o->backToShop());
 
-        $this->assertSame(null, oxRegistry::getSession()->getVariable('_backtoshop'));
+        $this->assertSame(null, \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('_backtoshop'));
     }
 
     public function testBackToShopShowPageNoPage()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getSession()->setVariable('_backtoshop', '');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(1))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(3));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 3);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertSame(null, $o->backToShop());
 
-        $this->assertSame('', oxRegistry::getSession()->getVariable('_backtoshop'));
+        $this->assertSame('', \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('_backtoshop'));
     }
 
     /**

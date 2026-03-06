@@ -368,7 +368,6 @@ class ReviewTest extends \OxidTestCase
 
     public function testSaveReviewIfOnlyRatingIsSet()
     {
-        $this->markTestSkipped('Bug: "test" is not false');
         $this->setRequestParameter('rvw_txt', null);
         $this->setRequestParameter('artrating', '4');
         $this->setRequestParameter('anid', 'test');
@@ -460,12 +459,13 @@ class ReviewTest extends \OxidTestCase
 
     public function testGetReviewsForArticle()
     {
-        $this->markTestSkipped('Bug: get null back');
         oxTestModules::addFunction('oxreview', 'loadList', '{$o=new oxlist();$o[0]="asd";$o->args=$aA;return $o;}');
         $oReview = $this->getProxyClass('review');
         $oArticle = oxNew('oxArticle');
         $oArticle->load('2000');
         $oReview->setNonPublicVar('_oProduct', $oArticle);
+        // Bypass _additionalChecksForArticle() which can redirect
+        $oReview->setNonPublicVar('_blIsInitialized', true);
         $oResult = $oReview->getReviews();
         $this->assertEquals('oxarticle', $oResult->args[0]);
         $this->assertEquals('2000', current($oResult->args[1]));

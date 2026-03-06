@@ -34,25 +34,18 @@ class CmpShopTest extends \OxidTestCase
      */
     public function testRenderNoActiveShop()
     {
-        $this->markTestSkipped('Bug: Method not called.');
+        $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getClassKey']);
+        $oView->expects($this->once())->method('getClassKey')->will($this->returnValue('test'));
+        $this->getConfig()->setActiveView($oView);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getClassName']);
-        $oView->expects($this->once())->method('getClassName')->will($this->returnValue('test'));
-
-        $oShop = oxNew('oxShop');
+        $oShop = $this->getConfig()->getActiveShop();
         $oShop->oxshops__oxactive = new oxField(0);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['showOfflinePage']);
         $oUtils->expects($this->once())->method('showOfflinePage');
         Registry::set(\OxidEsales\Eshop\Core\Utils::class, $oUtils);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam', 'getActiveView', 'getActiveShop']);
-        $oConfig->expects($this->once())->method('getActiveView')->will($this->returnValue($oView));
-        $oConfig->expects($this->any())->method('getConfigParam')->will($this->returnValue(false));
-        $oConfig->expects($this->once())->method('getActiveShop')->will($this->returnValue($oShop));
-
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\ShopComponent::class, ['getConfig', 'isAdmin'], [], '', false);
-        $oCmp->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\ShopComponent::class, ['isAdmin']);
         $oCmp->expects($this->once())->method('isAdmin')->will($this->returnValue(false));
 
         $oCmp->render();

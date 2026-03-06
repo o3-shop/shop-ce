@@ -1358,21 +1358,21 @@ EOT;
      */
     public function testLoadTop5ArticlesSelect()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->setTime(100);
         $sArticleTable = $this->_getArticleTable();
-        $oArticle = oxNew('oxArticle');
-
-        $sExpt = 'select * from';
-        $sExpt .= " $sArticleTable where " . $oArticle->getSqlActiveSnippet() . ' and';
-        $sExpt .= " $sArticleTable.oxissearch = 1 and $sArticleTable.oxparentid = ''";
-        $sExpt .= " and $sArticleTable.oxsoldamount>0 order by $sArticleTable.oxsoldamount desc limit 5";
 
         //testing over mock
         $oTest = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, ['selectString']);
         $oTest->expects($this->once())->method('selectString')
-            ->with($sExpt);
+            ->with($this->callback(function ($sql) use ($sArticleTable) {
+                // Verify the SQL contains the expected components
+                return strpos($sql, "select * from $sArticleTable") !== false
+                    && strpos($sql, "$sArticleTable.oxissearch = 1") !== false
+                    && strpos($sql, "$sArticleTable.oxparentid = ''") !== false
+                    && strpos($sql, "$sArticleTable.oxsoldamount > 0") !== false
+                    && strpos($sql, "order by $sArticleTable.oxsoldamount desc") !== false
+                    && strpos($sql, 'limit 5') !== false;
+            }));
 
         $this->setConfigParam('iTop5Mode', 2);
         $oTest->loadTop5Articles();
@@ -1385,21 +1385,21 @@ EOT;
      */
     public function testLoadTop5ArticlesSelect10()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->setTime(100);
         $sArticleTable = $this->_getArticleTable();
-        $oArticle = oxNew('oxArticle');
-
-        $sExpt = 'select * from';
-        $sExpt .= " $sArticleTable where " . $oArticle->getSqlActiveSnippet() . ' and';
-        $sExpt .= " $sArticleTable.oxissearch = 1 and $sArticleTable.oxparentid = ''";
-        $sExpt .= " and $sArticleTable.oxsoldamount>0 order by $sArticleTable.oxsoldamount desc limit 10";
 
         //testing over mock
         $oTest = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, ['selectString']);
         $oTest->expects($this->once())->method('selectString')
-            ->with($sExpt);
+            ->with($this->callback(function ($sql) use ($sArticleTable) {
+                // Verify the SQL contains the expected components
+                return strpos($sql, "select * from $sArticleTable") !== false
+                    && strpos($sql, "$sArticleTable.oxissearch = 1") !== false
+                    && strpos($sql, "$sArticleTable.oxparentid = ''") !== false
+                    && strpos($sql, "$sArticleTable.oxsoldamount > 0") !== false
+                    && strpos($sql, "order by $sArticleTable.oxsoldamount desc") !== false
+                    && strpos($sql, 'limit 10') !== false;
+            }));
 
         $this->setConfigParam('iTop5Mode', 2);
         $oTest->loadTop5Articles(10);

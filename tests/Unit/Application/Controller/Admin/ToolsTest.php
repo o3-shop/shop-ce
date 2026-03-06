@@ -47,15 +47,11 @@ class ToolsTest extends \OxidTestCase
      */
     public function testRenderDemoshop()
     {
-        $this->markTestSkipped('Bug: smth is not working');
         oxTestModules::addFunction('oxUtils', 'showMessageAndExit', '{ return "Access denied !"; }');
-
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ToolsController::class, ['getConfig'], [], '', false);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ToolsController::class);
         $this->assertEquals('Access denied !', $oView->render());
     }
 }

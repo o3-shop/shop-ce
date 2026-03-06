@@ -364,8 +364,6 @@ class ViewTest extends \OxidTestCase
      */
     public function testExecuteNewActionNonSsl()
     {
-        $this->markTestSkipped("Bug: -'shopurl/index.php?cl=details&someparam=12&sid=SID'
-+'index.php?cl=details&someparam=12&sid=SID");
         $this->getSession()->setId('SID');
 
         oxAddClassModule('oxUtilsHelper', 'oxutils');
@@ -385,16 +383,12 @@ class ViewTest extends \OxidTestCase
 
         $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getConfig']);
         $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-        $sUrl = $oView->_executeNewAction('details');
+        $oView->UNITexecuteNewAction('details');
         $this->assertEquals('shopurl/index.php?cl=details&' . $this->getSession()->sid(), oxUtilsHelper::$sRedirectUrl);
 
-        $oConfig = $this->createMock(\OxidEsales\Eshop\Core\Config::class);
-        $oConfig->expects($this->exactly(2))
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam', 'isSsl', 'getSslShopUrl', 'getShopUrl']);
+        $oConfig->expects($this->any())
             ->method('getConfigParam')
-            ->withConsecutive(
-                [$this->anything()], // First call - replace with specific parameter if known
-                [$this->anything()]  // Second call - replace with specific parameter if known
-            )
             ->willReturnOnConsecutiveCalls(false, 'oxid.php');
 
         $oConfig->expects($this->once())->method('isSsl')->will($this->returnValue(false));
@@ -403,7 +397,7 @@ class ViewTest extends \OxidTestCase
 
         $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getConfig']);
         $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-        $sUrl = $oView->_executeNewAction('details?someparam=12');
+        $oView->UNITexecuteNewAction('details?someparam=12');
         $this->assertEquals('shopurl/index.php?cl=details&someparam=12&' . $this->getSession()->sid(), oxUtilsHelper::$sRedirectUrl);
     }
 

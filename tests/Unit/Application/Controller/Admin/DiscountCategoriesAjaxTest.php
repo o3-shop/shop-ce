@@ -119,10 +119,8 @@ class DiscountCategoriesAjaxTest extends \OxidTestCase
      */
     public function testRemoveDiscCat()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testO2DRemove1', '_testO2DRemove2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testO2DRemove1', '_testO2DRemove2']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->removeDiscCat();
@@ -154,12 +152,10 @@ class DiscountCategoriesAjaxTest extends \OxidTestCase
      */
     public function testAddDiscCat()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sSynchoxid = '_testDiscount';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testCatAdd1', '_testCatAdd1']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DiscountCategoriesAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testCatAdd1', '_testCatAdd1']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2discount where oxdiscountid='_testDiscount'"));
 
         $oView->addDiscCat();

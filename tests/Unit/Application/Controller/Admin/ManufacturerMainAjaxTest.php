@@ -207,10 +207,8 @@ class ManufacturerMainAjaxTest extends \OxidTestCase
      */
     public function testRemoveManufacturer()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class, ['_getActionIds', 'resetCounter']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle1', '_testArticle2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class, ['getActionIds', 'resetCounter']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle1', '_testArticle2']));
         $oView->expects($this->once())->method('resetCounter')->with($this->equalTo('manufacturerArticle'));
         $this->assertEquals(2, oxDb::getDb()->getOne('select count(oxid) from ' . $this->getArticleViewTable() . " where oxmanufacturerid in('_testRemove1', '_testRemove2')"));
         $oView->removeManufacturer();
@@ -243,13 +241,11 @@ class ManufacturerMainAjaxTest extends \OxidTestCase
      */
     public function testAddManufacturer()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sSynchoxid = '_testAddManufacturer';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class, ['_getActionIds', 'resetCounter']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle1', '_testArticle2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class, ['getActionIds', 'resetCounter']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle1', '_testArticle2']));
         $oView->expects($this->once())->method('resetCounter')->with($this->equalTo('manufacturerArticle'));
 
         $this->assertEquals(0, oxDb::getDb()->getOne('select count(oxid) from ' . $this->getArticleViewTable() . " where oxmanufacturerid = '" . $sSynchoxid . "'"));

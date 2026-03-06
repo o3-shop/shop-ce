@@ -168,8 +168,6 @@ class ContentTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         $oContent = oxNew('oxContent');
         $oContent->setId('testContent');
 
@@ -188,8 +186,6 @@ class ContentTest extends \OxidTestCase
      */
     public function testRenderPsOn()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         oxTestModules::addFunction('oxUtils', 'redirect', '{ throw new Exception("redirect"); }');
 
         $this->setRequestParameter('oxcid', $this->_oObj->getId());

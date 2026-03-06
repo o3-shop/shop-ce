@@ -96,14 +96,12 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionSTheme()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oConfig = oxNew('oxConfig');
+        // Production code uses Registry::getConfig()->sTheme, so set it on the real config
+        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
         $oConfig->sTheme = 'azure';
-        $oConfig->sCustomTheme = null;
+        unset($oConfig->sCustomTheme);
 
         $oView = oxNew('Theme_Main');
-        $oView->setConfig($oConfig);
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sTheme.');
     }
 
@@ -112,14 +110,12 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionSCustomTheme()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oConfig = oxNew('oxConfig');
-        $oConfig->sTheme = null;
+        // Production code uses Registry::getConfig()->sCustomTheme, so set it on the real config
+        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        unset($oConfig->sTheme);
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
-        $oView->setConfig($oConfig);
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sCustomTheme.');
     }
 
@@ -128,13 +124,12 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionSThemeSCustomTheme()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-        $oConfig = oxNew('oxConfig');
+        // Production code uses Registry::getConfig(), so set properties on the real config
+        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
         $oConfig->sTheme = 'azure';
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
-        $oView->setConfig($oConfig);
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sTheme and sCustomTheme.');
     }
 }

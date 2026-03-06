@@ -272,8 +272,6 @@ class UtilsobjectTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
     public function testGetClassName_classNotExist_originalClassReturn()
     {
-        $this->markTestSkipped('Bug: test is not working on a windows machine.');
-
         $sClassName = 'oxorder';
         $sClassNameExpect = 'oxorder';
 

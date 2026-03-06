@@ -61,7 +61,6 @@ class SeoEncoderVendorTest extends \OxidTestCase
      */
     public function testGetAltUriTag()
     {
-        $this->markTestSkipped("Bug: Failed asserting that null matches expected 'vendorUri'.");
         oxTestModules::addFunction('oxVendor', 'loadInLang', '{ return true; }');
 
         $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, ['getVendorUri']);

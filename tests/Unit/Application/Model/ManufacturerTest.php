@@ -346,13 +346,10 @@ class ManufacturerTest extends \OxidTestCase
      */
     public function testGetIconUrlAccordingToNewFilesStructure()
     {
-        $this->markTestSkipped('Bug: String does not match');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->at(0))->method('getConfigParam')->with('sManufacturerIconsize')->will($this->returnValue(false));
-        $oConfig->expects($this->at(1))->method('getConfigParam')->with('sIconsize')->will($this->returnValue('87*87'));
+        $this->getConfig()->setConfigParam('sManufacturerIconsize', false);
+        $this->getConfig()->setConfigParam('sIconsize', '87*87');
 
-        $oManufacturer = $this->getMock(\OxidEsales\Eshop\Application\Model\Manufacturer::class, ['getConfig'], [], '', false);
-        $oManufacturer->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConfig));
+        $oManufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
         $oManufacturer->oxmanufacturers__oxicon = new oxField('big_matsol_1_mico.png');
 
         $sUrl = $this->getConfig()->getOutUrl() . basename($this->getConfig()->getPicturePath(''));

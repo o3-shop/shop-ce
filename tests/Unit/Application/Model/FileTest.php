@@ -233,19 +233,15 @@ class FileTest extends \OxidTestCase
      */
     public function testProcessFileUploadOK()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $filePath = $this->createFile('out/downloads/testFile', 'test jpg file');
 
         $sFileHah = md5_file($filePath);
 
         $aFileInfo = ['tmp_name' => $filePath, 'name' => 'testFile'];
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile']);
-        $oConfig->expects($this->any())->method('getUploadedFile')->will($this->returnValue($aFileInfo));
+        $_FILES['aa'] = $aFileInfo;
 
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['getConfig', '_uploadFile', '_getHashedFileDir'], [], '', false);
-        $oFile->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['_uploadFile', '_getHashedFileDir'], [], '', false);
         $oFile->expects($this->any())->method('_uploadFile')->will($this->returnValue(true));
         $oFile->expects($this->any())->method('_getHashedFileDir')->will($this->returnValue('eb'));
 
@@ -259,7 +255,6 @@ class FileTest extends \OxidTestCase
      */
     public function testProcessFileUploadBad()
     {
-        $this->markTestSkipped('Bug: Wrong exception message.');
         $this->expectException('oxException');
         $this->expectExceptionMessage('EXCEPTION_COULDNOTWRITETOFILE');
 
@@ -267,13 +262,11 @@ class FileTest extends \OxidTestCase
 
         $aFileInfo = ['tmp_name' => $filePath, 'name' => 'testFile'];
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile']);
-        $oConfig->expects($this->any())->method('getUploadedFile')->will($this->returnValue($aFileInfo));
+        $_FILES['aa'] = $aFileInfo;
 
-        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['getConfig', '_uploadFile', '_getHashedFileDir'], [], '', false);
-        $oFile->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
-        $oFile->expects($this->any())->method('_uploadFile')->will($this->returnValue(false));
-        $oFile->expects($this->any())->method('_getHashedFileDir')->will($this->returnValue('eb'));
+        $oFile = $this->getMock(\OxidEsales\Eshop\Application\Model\File::class, ['uploadFile', 'getHashedFileDir'], [], '', false);
+        $oFile->expects($this->any())->method('uploadFile')->will($this->returnValue(false));
+        $oFile->expects($this->any())->method('getHashedFileDir')->will($this->returnValue('eb'));
 
         $oFile->processFile('aa');
     }

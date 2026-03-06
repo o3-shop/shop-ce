@@ -3269,11 +3269,21 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetArticleVat()
     {
-        $this->markTestSkipped('Bug: "19" does not match 99');
-        oxTestModules::addFunction('oxVatSelector', 'getArticleVat', '{return 99;}');
+        // Production Article.php uses Registry::get(VatSelector::class) where VatSelector::class
+        // resolves to the EshopCommunity namespace (same namespace as Article itself).
+        // We must use the same class name for Registry::set() to match the storage key.
+        $oVatSelector1 = $this->getMock(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, ['getArticleVat']);
+        $oVatSelector1->expects($this->any())->method('getArticleVat')->will($this->returnValue(99));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, $oVatSelector1);
+
         $oA = oxNew('oxArticle');
         $this->assertEquals(99, $oA->getArticleVat());
-        oxTestModules::addFunction('oxVatSelector', 'getArticleVat', '{return 98;}');
+
+        // Replace with new VatSelector returning 98
+        $oVatSelector2 = $this->getMock(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, ['getArticleVat']);
+        $oVatSelector2->expects($this->any())->method('getArticleVat')->will($this->returnValue(98));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\EshopCommunity\Application\Model\VatSelector::class, $oVatSelector2);
+
         // cached value, do not recalculate
         $this->assertEquals(99, $oA->getArticleVat());
         // check for new article
@@ -3302,14 +3312,13 @@ class ArticleTest extends \OxidTestCase
      */
     public function testApplyVats()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oPrice = oxNew('oxPrice');
         $oPrice->setPrice(125);
 
         oxTestModules::addFunction('oxVatSelector', 'getArticleVat', '{return 99;}');
 
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_applyVAT']);
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_applyVAT', 'getArticleVat']);
+        $oArticle->expects($this->once())->method('getArticleVat')->will($this->returnValue(99));
         $oArticle->expects($this->once())->method('_applyVAT')->will($this->returnValue(null))->with($oPrice, 99);
 
         $oArticle->applyVats($oPrice);
@@ -4243,7 +4252,6 @@ class ArticleTest extends \OxidTestCase
      */
     public function testCheckForStockWithBasketReservation()
     {
-        $this->markTestSkipped('Bug: 2.0 does not match 7');
         $oArticle = $this->_createArticle('_testArt');
         $this->getConfig()->setConfigParam('blAllowUnevenAmounts', false);
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
@@ -4255,8 +4263,8 @@ class ArticleTest extends \OxidTestCase
         $oBR->expects($this->once())->method('getReservedAmount')->with($this->equalTo('_testArt'))->will($this->returnValue(5));
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
-        $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getSession', '_assignStock']);
-        $oA->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
+        $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_assignStock']);
         $oA->expects($this->any())->method('_assignStock')->will($this->returnValue(null));
         $oA->load($oArticle->getId());
 
@@ -5737,19 +5745,30 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetIconUrlNewPath()
     {
-        $this->markTestSkipped('Bug: gives back nopic.jpg');
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_getIconName', '_isFieldEmpty', '_assignPictureValues']);
+        // Create dummy master image so the picture handler finds it on disk
+        $sMasterPath = $this->getConfig()->getMasterPicturePath('product/1/');
+        $sMasterFile = $sMasterPath . '30-360-back_p1_z_f_th_665.jpg';
+        if (!file_exists($sMasterFile)) {
+            @copy($this->getConfig()->getMasterPicturePath('nopic.jpg', false), $sMasterFile);
+        }
+
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getIconName', 'isFieldEmpty', 'assignPictureValues']);
 
         $oArticle->oxarticles__oxpic1 = new oxField('30-360-back_p1_z_f_th_665.jpg');
 
-        $oArticle->expects($this->any())->method('_isFieldEmpty')->will($this->returnValue(false));
-        $oArticle->expects($this->any())->method('_assignPictureValues')->will($this->returnValue(null));
-        $oArticle->expects($this->never())->method('_getIconName');
+        $oArticle->expects($this->any())->method('isFieldEmpty')->will($this->returnValue(false));
+        $oArticle->expects($this->any())->method('assignPictureValues')->will($this->returnValue(null));
+        $oArticle->expects($this->never())->method('getIconName');
+
+        $sSize = $this->getConfig()->getConfigParam('sIconsize');
+        $aSize = explode('*', $sSize);
 
         $sUrl = $this->getConfig()->getOutUrl() . basename($this->getConfig()->getPicturePath(''));
-        $sUrl .= '/generated/product/1/56_42_75/30-360-back_p1_z_f_th_665.jpg';
+        $sUrl .= "/generated/product/1/{$aSize[0]}_{$aSize[1]}_" . $this->getConfig()->getConfigParam('sDefaultImageQuality') . '/30-360-back_p1_z_f_th_665.jpg';
 
         $this->assertEquals($sUrl, $oArticle->getIconUrl(1));
+
+        @unlink($sMasterFile);
     }
 
     /**
@@ -5759,16 +5778,27 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetThumbnailUrlNewPath()
     {
-        $this->markTestSkipped('Bug: gives back nopic.jpg');
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_isFieldEmpty', '_assignPictureValues']);
+        // Create dummy master image so the picture handler finds it on disk
+        $sMasterPath = $this->getConfig()->getMasterPicturePath('product/thumb/');
+        $sMasterFile = $sMasterPath . 'detail1_z3_ico_th.jpg';
+        if (!file_exists($sMasterFile)) {
+            @copy($this->getConfig()->getMasterPicturePath('nopic.jpg', false), $sMasterFile);
+        }
+
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['isFieldEmpty', 'assignPictureValues']);
         $oArticle->oxarticles__oxthumb = new oxField('detail1_z3_ico_th.jpg');
-        $oArticle->expects($this->any())->method('_isFieldEmpty')->will($this->returnValue(false));
-        $oArticle->expects($this->any())->method('_assignPictureValues')->will($this->returnValue(null));
+        $oArticle->expects($this->any())->method('isFieldEmpty')->will($this->returnValue(false));
+        $oArticle->expects($this->any())->method('assignPictureValues')->will($this->returnValue(null));
+
+        $sSize = $this->getConfig()->getConfigParam('sThumbnailsize');
+        $aSize = explode('*', $sSize);
 
         $sUrl = $this->getConfig()->getOutUrl() . basename($this->getConfig()->getPicturePath(''));
-        $sUrl .= '/generated/product/thumb/100_100_75/detail1_z3_ico_th.jpg';
+        $sUrl .= "/generated/product/thumb/{$aSize[0]}_{$aSize[1]}_" . $this->getConfig()->getConfigParam('sDefaultImageQuality') . '/detail1_z3_ico_th.jpg';
 
         $this->assertEquals($sUrl, $oArticle->getThumbnailUrl());
+
+        @unlink($sMasterFile);
     }
 
     /**
@@ -5778,15 +5808,26 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetZoomPictureUrlNewPath()
     {
-        $this->markTestSkipped('Bug: gives back nopic.jpg');
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_isFieldEmpty']);
+        // Create dummy master image so the picture handler finds it on disk
+        $sMasterPath = $this->getConfig()->getMasterPicturePath('product/1/');
+        $sMasterFile = $sMasterPath . '30-360-back_p1_z_f_th_665.jpg';
+        if (!file_exists($sMasterFile)) {
+            @copy($this->getConfig()->getMasterPicturePath('nopic.jpg', false), $sMasterFile);
+        }
+
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['isFieldEmpty']);
         $oArticle->oxarticles__oxpic1 = new oxField('30-360-back_p1_z_f_th_665.jpg');
-        $oArticle->expects($this->any())->method('_isFieldEmpty')->will($this->returnValue(false));
+        $oArticle->expects($this->any())->method('isFieldEmpty')->will($this->returnValue(false));
+
+        $sSize = $this->getConfig()->getConfigParam('sZoomImageSize');
+        $aSize = explode('*', $sSize);
 
         $sUrl = $this->getConfig()->getOutUrl() . basename($this->getConfig()->getPicturePath(''));
-        $sUrl .= '/generated/product/1/450_450_75/30-360-back_p1_z_f_th_665.jpg';
+        $sUrl .= "/generated/product/1/{$aSize[0]}_{$aSize[1]}_" . $this->getConfig()->getConfigParam('sDefaultImageQuality') . '/30-360-back_p1_z_f_th_665.jpg';
 
         $this->assertEquals($sUrl, $oArticle->getZoomPictureUrl(1));
+
+        @unlink($sMasterFile);
     }
 
     /**

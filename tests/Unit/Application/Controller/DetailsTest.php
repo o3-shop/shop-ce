@@ -936,11 +936,9 @@ class DetailsTest extends \OxidTestCase
      */
     public function testSaveReviewIfOnlyRatingIsSet()
     {
-        $this->markTestSkipped('Bug: "test" is not true');
         $this->setRequestParameter('rvw_txt', null);
         $this->setRequestParameter('artrating', 3);
         $this->setRequestParameter('anid', 'test');
-        $this->setSessionParam('usr', 'oxdefaultadmin');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
@@ -952,9 +950,13 @@ class DetailsTest extends \OxidTestCase
         $oProduct->expects($this->any())->method('getId')->will($this->returnValue('test'));
         $oProduct->expects($this->any())->method('addToRatingAverage');
 
+        $oUser = oxNew('oxUser');
+        $oUser->load('oxdefaultadmin');
+
         /** @var Details|PHPUnit\Framework\MockObject\MockObject $oDetails */
-        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getProduct', 'canAcceptFormData']);
+        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getProduct', 'getUser', 'canAcceptFormData']);
         $oDetails->expects($this->any())->method('getProduct')->will($this->returnValue($oProduct));
+        $oDetails->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
         $oDetails->expects($this->any())->method('canAcceptFormData')->will($this->returnValue(true));
         $oDetails->saveReview();
 
@@ -1184,12 +1186,9 @@ class DetailsTest extends \OxidTestCase
 
     public function testIsReviewActive()
     {
-        $this->markTestSkipped('Bug: true is not "test_isactive"');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_perfLoadReviews'))->will($this->returnValue('test_isactive'));
+        $this->getConfig()->setConfigParam('bl_perfLoadReviews', 'test_isactive');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getConfig']);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class);
 
         $this->assertSame('test_isactive', $oView->isReviewActive());
     }

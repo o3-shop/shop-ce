@@ -567,13 +567,14 @@ class ViewConfigTest extends \OxidTestCase
      */
     public function testGetModulePathNoExceptionThrownWhenPathNotFoundAndDebugDisabled()
     {
-        $this->markTestSkipped('Bug: test is not working on a windows machine.');
+        // Force logger initialization before sShopDir is changed to vfs path,
+        // so the DI container caches the logger with the real log file path.
+        \OxidEsales\Eshop\Core\Registry::getLogger();
+
         $config = $this->fakeModuleStructure();
         $config->setConfigParam('iDebug', 0);
 
-        /** @var \OxidEsales\EshopCommunity\Core\ViewConfig|PHPUnit\Framework\MockObject\MockObject $viewConfig */
-        $viewConfig = $this->getMock(\OxidEsales\Eshop\Core\ViewConfig::class, ['getConfig']);
-        $viewConfig->expects($this->any())->method('getConfig')->will($this->returnValue($config));
+        $viewConfig = oxNew(\OxidEsales\Eshop\Core\ViewConfig::class);
 
         $this->assertEquals('', $viewConfig->getModulePath('test1', '/out/blocks/non_existing_template.tpl'));
 
@@ -2332,6 +2333,9 @@ class ViewConfigTest extends \OxidTestCase
                         ],
                     ],
                 ],
+            ],
+            'log' => [
+                'oxideshop.log' => '',
             ],
         ];
         $vfsStream = $this->getVfsStreamWrapper();

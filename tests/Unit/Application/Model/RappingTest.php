@@ -177,7 +177,6 @@ class RappingTest extends \OxidTestCase
      */
     public function testGetNoSslDynImageDir()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
         $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getPictureUrl']);
         $oConfig->expects($this->once())->method('getPictureUrl')
             ->with(
@@ -188,9 +187,9 @@ class RappingTest extends \OxidTestCase
                 $this->equalTo('123')
             )
             ->will($this->returnValue('testDynPath'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
-        $oWrapping = $this->getMock(\OxidEsales\Eshop\Application\Model\Wrapping::class, ['getConfig'], [], '', false);
-        $oWrapping->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oWrapping = oxNew(\OxidEsales\Eshop\Application\Model\Wrapping::class);
         $oWrapping->oxwrapping__oxshopid = new oxField('123');
 
         $this->assertEquals('testDynPath', $oWrapping->getNoSslDynImageDir());

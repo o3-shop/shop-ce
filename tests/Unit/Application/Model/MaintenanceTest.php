@@ -32,8 +32,6 @@ class MaintenanceTest extends \OxidTestCase
      */
     public function testExecute()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oList = $this->getMock(\OxidEsales\Eshop\Application\Model\ArticleList::class, ['updateUpcomingPrices']);
         $oList->expects($this->once())->method('updateUpcomingPrices')->with($this->equalTo(true));
 

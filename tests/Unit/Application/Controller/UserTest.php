@@ -116,7 +116,9 @@ class UserTest extends \OxidTestCase
      */
     public function testGetOrderRemarkNoRemark()
     {
-        $this->markTestSkipped('Bug: true is not false');
+        // Ensure no leftover request parameter from other tests
+        $this->setRequestParameter('order_remark', null);
+
         // get user returns false (not logged in)
         $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Controller\UserController::class, ['getUser']);
         $oUserView->expects($this->once())->method('getUser')->will($this->returnValue(false));
@@ -263,7 +265,6 @@ class UserTest extends \OxidTestCase
 
     public function testIsDownloadableProductWarning()
     {
-        $this->markTestSkipped('Bug: false is not true');
         $myConfig = $this->getConfig();
         $myConfig->setConfigParam('blEnableDownloads', true);
 
@@ -273,8 +274,10 @@ class UserTest extends \OxidTestCase
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oS->expects($this->any())->method('getBasket')->will($this->returnValue($oB));
 
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\UserController::class, ['getSession']);
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
+
+        $oO = oxNew(\OxidEsales\Eshop\Application\Controller\UserController::class);
 
         $this->assertTrue($oO->isDownloadableProductWarning());
     }

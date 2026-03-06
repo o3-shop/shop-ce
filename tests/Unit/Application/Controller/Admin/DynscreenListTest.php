@@ -33,11 +33,9 @@ class DynscreenListTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenList::class, ['_setupNavigation']);
-        $oView->expects($this->once())->method('_setupNavigation');
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenList::class, ['setupNavigation']);
+        $oView->expects($this->once())->method('setupNavigation');
         $this->assertEquals('dynscreen_list.tpl', $oView->render());
     }
 }

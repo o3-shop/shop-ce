@@ -350,11 +350,9 @@ class ActionsTest extends \OxidTestCase
 
     public function testGetBannerArticle_notExisting()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $databaseResult = 'asdabsdbdsf';
 
-        $oArticle = $this->getMock('stdclass', ['load']);
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['load']);
         $oArticle->expects($this->once())->method('load')
             ->with($this->equalTo($databaseResult))
             ->will($this->returnValue(false));
@@ -369,10 +367,9 @@ class ActionsTest extends \OxidTestCase
 
     public function testGetBannerArticle_Existing()
     {
-        $this->markTestSkipped('Bug: Failed asserting that two variables reference the same object.');
         $databaseResult = '2000';
 
-        $oArticle = $this->getMock('stdclass', ['load']);
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['load']);
         $oArticle->expects($this->once())->method('load')
             ->with($this->equalTo('2000'))
             ->will($this->returnValue(true));

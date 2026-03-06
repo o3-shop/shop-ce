@@ -1449,15 +1449,9 @@ class SessionTest extends \OxidTestCase
 
     public function testIsSessionStarted()
     {
-        $this->markTestSkipped('Broken');
-        $session = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['_allowSessionStart']);
-        $session->method('_allowSessionStart')->will($this->returnValue(true));
-
-        $this->assertFalse($session->isSessionStarted());
-
-        $session->start();
-
-        $this->assertTrue($session->isSessionStarted());
+        // isSessionStarted() relies on session_status() === PHP_SESSION_ACTIVE, which
+        // doesn't work reliably in PHPUnit CLI (headers already sent, session_start may fail).
+        $this->markTestSkipped('isSessionStarted() depends on session_status() which is unreliable in PHPUnit CLI environment.');
     }
 
     public function testIsActualSidInCookiePossitive()

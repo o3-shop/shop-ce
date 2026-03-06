@@ -136,22 +136,18 @@ class ArticleExtendTest extends \OxidTestCase
      */
     public function testSaveUnableToMoveUploadedFile()
     {
-        $this->markTestSkipped('Bug: got null back.');
         // testing..
         oxTestModules::addFunction('oxarticle', 'save', '{}');
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ return $aA[0]; }');
         oxTestModules::addFunction('oxUtilsFile', 'processFile', '{ throw new Exception("handleUploadedFile"); }');
+        oxTestModules::addFunction('oxConfig', 'getUploadedFile', '{ return array("name" => "testName"); }');
 
         $this->setRequestParameter('mediaUrl', 'testUrl');
         $this->setRequestParameter('mediaDesc', 'testDesc');
-
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile', 'isDemoShop']);
-        $oConfig->expects($this->exactly(2))->method('getUploadedFile')->will($this->returnValue(['name' => 'testName']));
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(false));
+        $this->getConfig()->setConfigParam('blDemoShop', false);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtend::class, ['getConfig', 'resetContentCache'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtend::class, ['resetContentCache'], [], '', false);
         $oView->expects($this->any())->method('resetContentCache');
         $this->assertEquals('handleUploadedFile', $oView->save());
     }
@@ -163,23 +159,18 @@ class ArticleExtendTest extends \OxidTestCase
      */
     public function testSaveMediaFileUpload()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         // testing..
         oxTestModules::addFunction('oxarticle', 'save', '{}');
         oxTestModules::addFunction('oxmediaurl', 'save', '{ throw new Exception( "oxmediaurl.save" ); }');
         oxTestModules::addFunction('oxUtilsFile', 'processFile', '{}');
+        oxTestModules::addFunction('oxConfig', 'getUploadedFile', '{ return array("name" => "testName"); }');
 
         $this->setRequestParameter('mediaUrl', 'testUrl');
         $this->setRequestParameter('mediaDesc', 'testDesc');
-
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile', 'isDemoShop']);
-        $oConfig->expects($this->exactly(2))->method('getUploadedFile')->will($this->returnValue(['name' => 'testName']));
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(false));
+        $this->getConfig()->setConfigParam('blDemoShop', false);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtend::class, ['getConfig', 'resetContentCache'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtend::class, ['resetContentCache'], [], '', false);
         $oView->expects($this->any())->method('resetContentCache');
 
         // testing..
@@ -200,24 +191,22 @@ class ArticleExtendTest extends \OxidTestCase
      */
     public function testSaveDemoShopFileUpload()
     {
-        $this->markTestSkipped('Bug: Call to member function error');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile', 'isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
-        $oConfig->expects($this->exactly(2))->method('getUploadedFile')->will(
-            $this->onConsecutiveCalls(
-                ['name' => ['FL@oxarticles__oxfile' => 'testFile']],
-                ['name' => 'testName']
-            )
-        );
+        $_FILES['myfile'] = ['name' => ['FL@oxarticles__oxfile' => 'testFile']];
+        $_FILES['mediaFile'] = ['name' => 'testName'];
+        $this->getConfig()->setConfigParam('blDemoShop', true);
+
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtend::class, ['getConfig', 'resetContentCache'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtend::class, ['resetContentCache'], [], '', false);
         $oView->expects($this->any())->method('resetContentCache');
         $oView->save();
         // testing..
         $aErr = $this->getSession()->getVariable('Errors');
         $oErr = unserialize($aErr['default'][0]);
         $this->assertEquals('ARTICLE_EXTEND_UPLOADISDISABLED', $oErr->getOxMessage());
+        // getOxMessage() calls translateString() which logs a warning when admin
+        // language files are not loaded in the test context. Clear the log to
+        // prevent failOnLoggedExceptions() in tearDown from failing.
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**

@@ -35,7 +35,9 @@ class VoucherSerieListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
+        // deleteEntry() inherited from AdminListController calls $this->init() at the end,
+        // which triggers the full admin controller init chain and hangs in a unit test context.
+        $this->markTestSkipped('Hangs: deleteEntry() calls init() which triggers full admin init chain.');
 
         oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
         oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
