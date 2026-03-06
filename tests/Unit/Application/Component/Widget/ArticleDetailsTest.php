@@ -464,26 +464,34 @@ class ArticleDetailsTest extends \OxidTestCase
      */
     public function testGetPictureGallery()
     {
-        $this->markTestSkipped('Fix: Create picture file (getShopBasePath()) and remove after, fix test naming. RT, use VFS?');
-
         $sArtID = '096a1b0849d5ffa4dd48cd388902420b';
 
+        // The picture URL resolution checks the master directory for the source image,
+        // then constructs the generated URL from it. We must place the fixture in the
+        // master directory so getPictureUrl() finds it (not the generated directory).
         $from = __DIR__ . '/../../../../Fixtures/front_z1(1).jpg';
-        $to = getShopBasePath() . '/out/pictures/generated/product/1/540_340_75/front_z1(1).jpg';
+        $to = getShopBasePath() . 'out/pictures/master/product/1/front_z1(1).jpg';
 
         copy($from, $to);
+        // Allow filesystem (especially Docker volume mounts) to sync
+        clearstatcache();
 
-        $oArticle = oxNew('oxArticle');
-        $oArticle->load($sArtID);
-        $sActPic = $this->getConfig()->getPictureUrl(null) . 'generated/product/1/540_340_75/' . basename($oArticle->oxarticles__oxpic1->value);
+        try {
+            $oArticle = oxNew('oxArticle');
+            $oArticle->load($sArtID);
+            $sActPic = $this->getConfig()->getPictureUrl(null) . 'generated/product/1/540_340_75/' . basename($oArticle->oxarticles__oxpic1->value);
 
-        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getPicturesProduct']);
-        $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
-        $aPicGallery = $oDetails->getPictureGallery();
+            $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getPicturesProduct']);
+            $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
+            $aPicGallery = $oDetails->getPictureGallery();
 
-        $this->assertEquals($sActPic, $aPicGallery['ActPic']);
-
-        unlink($to);
+            $this->assertEquals($sActPic, $aPicGallery['ActPic']);
+        } finally {
+            // Always clean up the fixture file
+            if (file_exists($to)) {
+                unlink($to);
+            }
+        }
     }
 
     /**
@@ -756,15 +764,14 @@ class ArticleDetailsTest extends \OxidTestCase
 
     public function testGetRatingValue_active()
     {
-        $this->markTestSkipped('Bug: Method does not get called.');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('blShowVariantReviews'))->will($this->returnValue(true));
+        // getRatingValue() uses Registry::getConfig()->getConfigParam(), not $this->getConfig(),
+        // so we set the param on the real config instead of mocking getConfig on the view.
+        $this->getConfig()->setConfigParam('blShowVariantReviews', true);
 
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getArticleRatingAverage']);
         $oProduct->expects($this->once())->method('getArticleRatingAverage')->will($this->returnValue(123.855));
 
-        $oView = $this->getMock($this->getProxyClassName('oxwArticleDetails'), ['getConfig', 'isReviewActive', 'getProduct']);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock($this->getProxyClassName('oxwArticleDetails'), ['isReviewActive', 'getProduct']);
         $oView->expects($this->once())->method('isReviewActive')->will($this->returnValue(true));
         $oView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
 
@@ -785,12 +792,11 @@ class ArticleDetailsTest extends \OxidTestCase
 
     public function testIsReviewActive()
     {
-        $this->markTestSkipped("Bug: Failed asserting that true is identical to 'test_isactive'.");
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_perfLoadReviews'))->will($this->returnValue('test_isactive'));
+        // isReviewActive() uses Registry::getConfig()->getConfigParam(), not $this->getConfig(),
+        // so we set the param on the real config.
+        $this->getConfig()->setConfigParam('bl_perfLoadReviews', 'test_isactive');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getConfig']);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class);
 
         $this->assertSame('test_isactive', $oView->isReviewActive());
     }
