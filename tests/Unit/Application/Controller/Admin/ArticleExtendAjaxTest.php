@@ -210,7 +210,12 @@ class ArticleExtendAjaxTest extends \OxidTestCase
     {
         $this->setRequestParameter('oxid', true);
         $oView = oxNew('article_extend_ajax');
-        $this->assertEquals([['_3' => '0', 'false' => '0']], $oView->UNITgetDataFields('select false'));
+        $result = $oView->UNITgetDataFields('select false');
+        // MariaDB returns 'FALSE' (uppercase), MySQL returns 'false' (lowercase) as column alias
+        $result = array_map(function ($row) {
+            return array_change_key_case($row, CASE_UPPER);
+        }, $result);
+        $this->assertEquals([['_3' => '0', 'FALSE' => '0']], $result);
     }
 
     /**

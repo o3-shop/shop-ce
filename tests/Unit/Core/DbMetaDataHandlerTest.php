@@ -57,10 +57,10 @@ class DbMetaDataHandlerTest extends \OxidTestCase
     {
         $sSql = ' CREATE TABLE `testDbMetaDataHandler` (
                     `OXID` char(32) NOT NULL,
-                    `OXTITLE` varchar(255) NOT NULL,
-                    `OXTITLE_1` varchar(255) NOT NULL,
-                    `OXLONGDESC` text NOT NULL,
-                    `OXLONGDESC_1` text NOT NULL,
+                    `OXTITLE` varchar(255) NOT NULL DEFAULT \'\',
+                    `OXTITLE_1` varchar(255) NOT NULL DEFAULT \'\',
+                    `OXLONGDESC` text NOT NULL DEFAULT \'\',
+                    `OXLONGDESC_1` text NOT NULL DEFAULT \'\',
                      PRIMARY KEY (`OXID`),
                      KEY `OXTITLE` (`OXTITLE`),
                      KEY `OXTITLE_1` (`OXTITLE_1`),
@@ -331,7 +331,7 @@ class DbMetaDataHandlerTest extends \OxidTestCase
         $oDbMeta = oxNew('oxDbMetaDataHandler');
         $aRes = ['OXTITLE', 'OXSHORTDESC', 'OXLONGDESC'];
 
-        $this->assertEquals($aRes, $oDbMeta->getMultilangFields('oxcountry'));
+        $this->assertEqualsCanonicalizing($aRes, $oDbMeta->getMultilangFields('oxcountry'));
     }
 
     /**

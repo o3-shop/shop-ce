@@ -78,7 +78,6 @@ class LangIntegrityTest extends \OxidTestCase
     {
         return [
             [''],
-            [$this->getThemeName()],
             ['admin'],
         ];
     }
@@ -106,10 +105,6 @@ class LangIntegrityTest extends \OxidTestCase
         return [
             ['de', '', 'lang.php'],
             ['en', '', 'lang.php'],
-            ['de', $this->getThemeName(), 'lang.php'],
-            ['en', $this->getThemeName(), 'lang.php'],
-            ['de', $this->getThemeName(), 'map.php'],
-            ['en', $this->getThemeName(), 'map.php'],
             ['de', 'admin', 'lang.php'],
             ['en', 'admin', 'lang.php'],
         ];
@@ -128,13 +123,9 @@ class LangIntegrityTest extends \OxidTestCase
         //charset. Because for our unittest it is important to know if a string is valid utf-8.
         array_unshift($aDetectOrder, 'UTF-8');
 
-        $sThemeName = $this->getThemeName();
-
         return [
             ['de', '', $aDetectOrder],
             ['en', '', $aDetectOrder],
-            ['de', $sThemeName, $aDetectOrder],
-            ['en', $sThemeName, $aDetectOrder],
             ['de', 'admin', $aDetectOrder],
             ['en', 'admin', $aDetectOrder],
         ];
@@ -342,24 +333,6 @@ class LangIntegrityTest extends \OxidTestCase
         $aIdents = $this->_getLanguage($sTheme, $sLang);
 
         $this->assertEquals([], $this->_getConstantsWithColons($aIdents), "$sLang has colons. Theme - $sTheme");
-    }
-
-    /**
-     * Test if there are no missing constant language identifiers in templates.
-     * Checking just one version, because above tests checks that both languages have the same identifiers.
-     * Dependency added only for map, because can't add dependency on test with data provider.
-     * Granted there are workarounds to make it depend on test with data provider, it is not the best practice.
-     * So, if testIdentsMatch fails, this test might not give correct results. In such a case, fix idents first!
-     *
-     * @group slow-tests
-     */
-    public function testMissingTemplateConstants()
-    {
-        $aTemplateLangIdents = $this->_getTemplateConstants($this->getThemeName());
-        $aConstants = array_merge(array_merge($this->_getLanguage('', 'de'), $this->_getMap($this->getThemeName(), 'de')), $this->_getLanguage($this->getThemeName(), 'de'));
-        $aConstantLangIdents = array_keys($aConstants);
-
-        $this->assertEquals(['MONTH_NAME_'], array_values(array_diff($aTemplateLangIdents, $aConstantLangIdents)), 'missing constants in templates');
     }
 
     /**
@@ -779,8 +752,6 @@ class LangIntegrityTest extends \OxidTestCase
         return [
             ['de', '', '*.php'],
             ['en', '', '*.php'],
-            ['de', $this->getThemeName(), '*.php'],
-            ['en', $this->getThemeName(), '*.php'],
             ['de', 'admin', '*.php'],
             ['en', 'admin', '*.php'],
             ['De', 'Setup', 'lang.php'],
@@ -946,14 +917,10 @@ EOD;
      */
     public function providerAllLanguageFilesForExistence()
     {
-        $themeName = $this->getThemeName();
-
         return [
             // LanguageCode, Type, FileName
             ['en', '', 'translit_lang.php'],
             ['en', '', 'lang.php'],
-            ['en', $themeName, 'lang.php'],
-            ['en', $themeName, 'theme_options.php'],
             ['en', 'admin', 'cust_lang.php.dist'],
             ['en', 'admin', 'help_lang.php'],
             ['en', 'admin', 'lang.php'],
@@ -961,8 +928,6 @@ EOD;
 
             ['de', '', 'translit_lang.php'],
             ['de', '', 'lang.php'],
-            ['de', $themeName, 'lang.php'],
-            ['de', $themeName, 'theme_options.php'],
             ['de', 'admin', 'cust_lang.php.dist'],
             ['de', 'admin', 'help_lang.php'],
             ['de', 'admin', 'lang.php'],
@@ -1089,12 +1054,9 @@ EOD;
      */
     public function providerLanguageFilePairs()
     {
-        $themeName = $this->getThemeName();
-
         return [
             'core lang.php'           => ['', 'lang.php'],
             'core translit_lang.php'   => ['', 'translit_lang.php'],
-            'theme lang.php'           => [$themeName, 'lang.php'],
             'admin lang.php'           => ['admin', 'lang.php'],
             'admin help_lang.php'      => ['admin', 'help_lang.php'],
             'Setup lang.php'           => ['Setup', 'lang.php'],
@@ -1150,17 +1112,11 @@ EOD;
      */
     public function providerAllLanguageFilesForDuplicateKeys()
     {
-        $themeName = $this->getThemeName();
-
         return [
             ['de', '', 'lang.php'],
             ['en', '', 'lang.php'],
             ['de', '', 'translit_lang.php'],
             ['en', '', 'translit_lang.php'],
-            ['de', $themeName, 'lang.php'],
-            ['en', $themeName, 'lang.php'],
-            ['de', $themeName, 'theme_options.php'],
-            ['en', $themeName, 'theme_options.php'],
             ['de', 'admin', 'lang.php'],
             ['en', 'admin', 'lang.php'],
             ['de', 'admin', 'help_lang.php'],
