@@ -209,7 +209,7 @@ class UtilsPicTest extends \OxidTestCase
      *
      * @return array
      */
-    public function testIsPicDeletableDataProvider()
+    public function isPicDeletableDataProvider()
     {
         return [
             ['testOK.jpg', 1, true],
@@ -224,7 +224,7 @@ class UtilsPicTest extends \OxidTestCase
      * @param int|null $response
      * @param bool $expectedResult
      *
-     * @dataProvider testIsPicDeletableDataProvider
+     * @dataProvider isPicDeletableDataProvider
      */
     public function testIsPicDeletable($filename, $response, $expectedResult)
     {

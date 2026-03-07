@@ -218,7 +218,7 @@ class ActionListTest extends \OxidTestCase
      *
      * @return array
      */
-    public function testAreAnyActivePromotionsDataProvider()
+    public function areAnyActivePromotionsDataProvider()
     {
         return [
             ['1', true],
@@ -230,7 +230,7 @@ class ActionListTest extends \OxidTestCase
      * oxActionList::areAnyActivePromotions() test case
      * test if return value is in the true case "true" and the other way around.
      *
-     * @dataProvider testAreAnyActivePromotionsDataProvider
+     * @dataProvider areAnyActivePromotionsDataProvider
      */
     public function testAreAnyPromotionsActive($response, $expected)
     {

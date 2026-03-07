@@ -6452,7 +6452,7 @@ class ArticleTest extends \OxidTestCase
      *
      * @return array
      */
-    public function testInPriceCategoryNoExceptionDataProvider()
+    public function inPriceCategoryNoExceptionDataProvider()
     {
         return [
             ['1', true],
@@ -6463,7 +6463,7 @@ class ArticleTest extends \OxidTestCase
     /**
      * Test in price category with no exceptions from db side.
      *
-     * @dataProvider testInPriceCategoryNoExceptionDataProvider
+     * @dataProvider inPriceCategoryNoExceptionDataProvider
      */
     public function testInPriceCategoryNoException($return, $expected)
     {
