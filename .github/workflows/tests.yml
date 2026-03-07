@@ -180,7 +180,6 @@ jobs:
             --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
             -c $CURRENT_DIR/tests/phpunit.xml \
             $CURRENT_DIR/tests/Unit \
-            --exclude-group quarantine \
             --colors=always \
             --coverage-clover="$CURRENT_DIR/coverage.xml" \
             --coverage-html="$CURRENT_DIR/coverage-html/" \
