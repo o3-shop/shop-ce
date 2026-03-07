@@ -27,6 +27,7 @@ NC='\033[0m' # No Color
 
 FAST_MODE=false
 COVERAGE_MODE=false
+QUARANTINE_MODE=false
 PASSTHROUGH_ARGS=()
 
 # Parse arguments
@@ -37,6 +38,10 @@ for arg in "$@"; do
             ;;
         --coverage)
             COVERAGE_MODE=true
+            ;;
+        --quarantine)
+            QUARANTINE_MODE=true
+            FAST_MODE=true
             ;;
         *)
             PASSTHROUGH_ARGS+=("$arg")
@@ -59,7 +64,9 @@ echo "----------------------------------------"
 
 # Display start message
 echo -e "${YELLOW}Starting tests...${NC}"
-if [ "$FAST_MODE" = true ]; then
+if [ "$QUARANTINE_MODE" = true ]; then
+    echo "Mode: quarantine (slow/special tests only)"
+elif [ "$FAST_MODE" = true ]; then
     echo "Mode: fast (phpunit direct, no shop install)"
 else
     echo "Mode: full (via runtests wrapper)"
@@ -93,6 +100,13 @@ else
     COVERAGE_FLAGS="--no-coverage"
 fi
 
+# Build group filter
+if [ "$QUARANTINE_MODE" = true ]; then
+    GROUP_FLAGS="--group quarantine"
+else
+    GROUP_FLAGS="--exclude-group quarantine"
+fi
+
 # Run the tests and store exit code
 if [ "$FAST_MODE" = true ]; then
     # Fast mode: call phpunit directly, skipping the runtests wrapper's
@@ -100,10 +114,11 @@ if [ "$FAST_MODE" = true ]; then
     php vendor/bin/phpunit \
         --bootstrap vendor/o3-shop/testing-library/bootstrap.php \
         --colors=always \
+        $GROUP_FLAGS \
         $COVERAGE_FLAGS \
         $TEST_TARGETS
 else
-    runtests $TEST_TARGETS --colors=always $COVERAGE_FLAGS
+    runtests $TEST_TARGETS --colors=always $GROUP_FLAGS $COVERAGE_FLAGS
 fi
 TEST_EXIT_CODE=$?
 

@@ -342,7 +342,6 @@ class LangIntegrityTest extends \OxidTestCase
      */
     public function testNotUsedTranslations()
     {
-        $this->markTestSkipped('this test is slow, only to be used locally when checking for translations that are not being used');
         $aUsedConstants = $this->_getTemplateConstants($this->getThemeName());
 
         $sFile = $this->getConfig()->getAppDir() . '/translations/de/lang.php';

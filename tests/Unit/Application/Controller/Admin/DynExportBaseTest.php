@@ -486,8 +486,6 @@ class DynExportBaseTest extends \OxidTestCase
      */
     public function testCreateHeapTable()
     {
-        $this->markTestSkipped('Production bug: DatabaseProvider::getDb()->execute() returns 0 (affected rows) for CREATE TABLE, which is falsy. createHeapTable() treats this as failure.');
-
         // defining parameters
         $sHeapTable = 'testdynexportbasetable';
         $sTableCharset = 'DEFAULT CHARACTER SET latin1 COLLATE latin1_general_ci';

@@ -351,6 +351,7 @@ class ArticleDetailsTest extends \OxidTestCase
      */
     public function testGetMediaFiles()
     {
+        oxDb::getDb()->execute("delete from oxmediaurls where oxid = '_test2'");
         $sQ = "insert into oxmediaurls (oxid, oxobjectid, oxurl, oxdesc) values ('_test2', '2000', 'http://www.youtube.com/watch?v=ZN239G6aJZo', 'test2')";
         oxDb::getDb()->execute($sQ);
 

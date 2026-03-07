@@ -698,7 +698,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $blDone = false;
         $oDB = DatabaseProvider::getDb();
         $sQ = "CREATE TABLE IF NOT EXISTS {$sHeapTable} ( `oxid` CHAR(32) NOT NULL default '' ) ENGINE=InnoDB {$sTableCharset}";
-        if ($oDB->execute($sQ)) {
+        if ($oDB->execute($sQ) !== false) {
             $blDone = true;
             $oDB->execute("TRUNCATE TABLE {$sHeapTable}");
         }
