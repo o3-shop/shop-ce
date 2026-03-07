@@ -46,20 +46,6 @@ class Argon2IPasswordHashServiceTest extends TestCase
         }
     }
 
-    public function testConstructorThrowsExceptionIfArgon2INotAvailable()
-    {
-        $this->skipTestIfArgon2IAvailable();
-        $this->expectException(\OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\UnavailablePasswordHashException::class);
-        $passwordPolicyMock = $this->getPasswordPolicyMock();
-
-        new Argon2IPasswordHashService(
-            $passwordPolicyMock,
-            1024,
-            2,
-            2
-        );
-    }
-
     public function testHashForGivenPasswordIsEncryptedWithProperAlgorithm()
     {
         $this->skipTestIfArgon2INotAvailable();
@@ -191,14 +177,5 @@ class Argon2IPasswordHashServiceTest extends TestCase
     }
 
     /**
-     * PHP > 7.2 is compiled by default with support for ARGON2I. Instead of checking for the constant PASSWORD_ARGON2I,
-     * we check for the PHP version in order to run this test and get an alarm if ARGON2I is not compiled into
-     * the PHP version on the server.
      */
-    private function skipTestIfArgon2IAvailable()
-    {
-        if (version_compare(PHP_VERSION, '7.2') >= 0) {
-            $this->markTestSkipped('This test can not be executed because the password hashing algorithm "PASSWORD_ARGON2I" is available.');
-        }
-    }
 }
