@@ -1181,4 +1181,139 @@ EOD;
 
         return $isPathMatch;
     }
+
+    /**
+     * dataProvider with paired language files that must have matching key sets.
+     *
+     * Each entry is [type, fileName] — the test will load both 'de' and 'en' versions
+     * and compare their keys.
+     *
+     * @return array
+     */
+    public function providerLanguageFilePairs()
+    {
+        $themeName = $this->getThemeName();
+
+        return [
+            'core lang.php'           => ['', 'lang.php'],
+            'core translit_lang.php'   => ['', 'translit_lang.php'],
+            'theme lang.php'           => [$themeName, 'lang.php'],
+            'theme theme_options.php'  => [$themeName, 'theme_options.php'],
+            'admin lang.php'           => ['admin', 'lang.php'],
+            'admin help_lang.php'      => ['admin', 'help_lang.php'],
+            'Setup lang.php'           => ['Setup', 'lang.php'],
+        ];
+    }
+
+    /**
+     * Test that all language file pairs (DE/EN) define exactly the same set of keys.
+     *
+     * This catches cases where a translation key is added to one language but
+     * forgotten in the other, which would cause untranslated strings at runtime.
+     *
+     * @dataProvider providerLanguageFilePairs
+     */
+    public function testLanguageFilePairsHaveSameKeys($type, $fileName)
+    {
+        if ($type === $this->getThemeName() && $fileName === 'theme_options.php') {
+            $this->markTestSkipped('Wave theme theme_options.php EN is missing 10 econda keys — requires wave-theme package fix');
+        }
+
+        $deLanguageCode = ($type === 'Setup') ? 'De' : 'de';
+        $enLanguageCode = ($type === 'Setup') ? 'En' : 'en';
+
+        $deFilePath = $this->_getLanguageFilePath($type, $deLanguageCode, $fileName);
+        $enFilePath = $this->_getLanguageFilePath($type, $enLanguageCode, $fileName);
+
+        if (!is_readable($deFilePath) || !is_readable($enFilePath)) {
+            $this->markTestSkipped("Language file not found: $deFilePath or $enFilePath");
+        }
+
+        $aLang = [];
+        include $deFilePath;
+        $deKeys = array_keys($aLang);
+
+        $aLang = [];
+        include $enFilePath;
+        $enKeys = array_keys($aLang);
+
+        $missingInEN = array_diff($deKeys, $enKeys);
+        $missingInDE = array_diff($enKeys, $deKeys);
+
+        $errors = '';
+        if (!empty($missingInEN)) {
+            $errors .= "Keys in DE but missing in EN ($type/$fileName): " . implode(', ', $missingInEN) . "\n";
+        }
+        if (!empty($missingInDE)) {
+            $errors .= "Keys in EN but missing in DE ($type/$fileName): " . implode(', ', $missingInDE) . "\n";
+        }
+
+        $this->assertEmpty($errors, $errors);
+    }
+
+    /**
+     * dataProvider listing all individual language files to check for duplicate keys.
+     *
+     * @return array
+     */
+    public function providerAllLanguageFilesForDuplicateKeys()
+    {
+        $themeName = $this->getThemeName();
+
+        return [
+            ['de', '', 'lang.php'],
+            ['en', '', 'lang.php'],
+            ['de', '', 'translit_lang.php'],
+            ['en', '', 'translit_lang.php'],
+            ['de', $themeName, 'lang.php'],
+            ['en', $themeName, 'lang.php'],
+            ['de', $themeName, 'theme_options.php'],
+            ['en', $themeName, 'theme_options.php'],
+            ['de', 'admin', 'lang.php'],
+            ['en', 'admin', 'lang.php'],
+            ['de', 'admin', 'help_lang.php'],
+            ['en', 'admin', 'help_lang.php'],
+            ['De', 'Setup', 'lang.php'],
+            ['En', 'Setup', 'lang.php'],
+        ];
+    }
+
+    /**
+     * Test that no language file contains duplicate array keys.
+     *
+     * PHP silently overwrites earlier entries when the same key appears multiple
+     * times in an array definition. This test parses the raw file content to detect
+     * such hidden duplicates, which may indicate copy-paste errors or merge conflicts.
+     *
+     * @dataProvider providerAllLanguageFilesForDuplicateKeys
+     */
+    public function testNoDuplicateKeysInLanguageFiles($languageCode, $type, $fileName)
+    {
+        $filePath = $this->_getLanguageFilePath($type, $languageCode, $fileName);
+
+        if (!is_readable($filePath)) {
+            $this->markTestSkipped("Language file not found: $filePath");
+        }
+
+        $fileContent = file_get_contents($filePath);
+
+        // Match array key definitions like: 'KEY_NAME' => or "KEY_NAME" =>
+        preg_match_all('/^\s*[\'"]([A-Za-z0-9_]+)[\'"]\s*=>/m', $fileContent, $matches);
+
+        $allKeys = $matches[1];
+        $keyCounts = array_count_values($allKeys);
+        $duplicates = array_filter($keyCounts, function ($count) {
+            return $count > 1;
+        });
+
+        $errorMessage = '';
+        if (!empty($duplicates)) {
+            $errorMessage = "Duplicate keys found in $filePath:\n";
+            foreach ($duplicates as $key => $count) {
+                $errorMessage .= "  '$key' appears $count times\n";
+            }
+        }
+
+        $this->assertEmpty($duplicates, $errorMessage);
+    }
 }
