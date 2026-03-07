@@ -19,9 +19,21 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
+namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+
+/**
+ * Override move_uploaded_file in the production namespace so that the unit test
+ * can exercise the file-upload branch without a real HTTP upload.
+ */
+function move_uploaded_file(string $from, string $to): bool
+{
+    return copy($from, $to);
+}
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxTestModules;
 
@@ -250,10 +262,43 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testGetUploadedCsvFilePath()
     {
-        $this->markTestSkipped(
-            'Cannot unit-test file upload path: production code uses Registry::getConfig() (not $this->getConfig()) '
-            . 'and move_uploaded_file() which requires a real HTTP upload. Needs integration test.'
-        );
+        // Clear any cached path and session var
+        $this->getSession()->setVariable('sCsvFilePath', null);
+
+        // Create a temporary file to simulate an upload
+        $sTmpFile = tempnam(sys_get_temp_dir(), 'csv_test_');
+        file_put_contents($sTmpFile, 'test;csv;data');
+
+        $sCompileDir = $this->getConfig()->getConfigParam('sCompileDir');
+
+        // Simulate $_FILES
+        $_FILES['csvfile'] = [
+            'name'     => 'test.csv',
+            'tmp_name' => $sTmpFile,
+            'error'    => UPLOAD_ERR_OK,
+            'size'     => filesize($sTmpFile),
+        ];
+
+        try {
+            $oView = $this->getProxyClass('GenImport_Main');
+            // Reset cached path
+            $oView->setNonPublicVar('_sCsvFilePath', null);
+
+            $sResult = $oView->UNITgetUploadedCsvFilePath();
+
+            $sExpected = $sCompileDir . basename($sTmpFile);
+            $this->assertEquals($sExpected, $sResult);
+            $this->assertTrue(file_exists($sExpected), 'File should have been copied to compile dir');
+            $this->assertEquals($sExpected, Registry::getSession()->getVariable('sCsvFilePath'));
+        } finally {
+            // Cleanup
+            @unlink($sTmpFile);
+            if (isset($sExpected)) {
+                @unlink($sExpected);
+            }
+            unset($_FILES['csvfile']);
+            $this->getSession()->setVariable('sCsvFilePath', null);
+        }
     }
 
     /**
