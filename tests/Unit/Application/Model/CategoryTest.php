@@ -338,23 +338,23 @@ class CategoryTest extends \OxidTestCase
 
     public function testDelete()
     {
-        $this->markTestSkipped('Bug: 0 does not match expected 1. See');
-        oxTestModules::addFunction('oxSeoEncoderCategory', 'onDeleteCategory', '{$this->onDelete[] = $aA[0];}');
-        oxRegistry::get('oxSeoEncoderCategory')->onDelete = [];
+        $seoEncoderCategoryMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, ['onDeleteCategory']);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, $seoEncoderCategoryMock);
 
         // parent is not deletable
         $this->assertEquals(false, $this->_oCategory->delete());
         $this->assertEquals(true, $this->_oCategory->exists());
-        $this->assertEquals(0, count(oxRegistry::get('oxSeoEncoderCategory')->onDelete));
 
-        // so delete child
+        // so delete child — expect onDeleteCategory to be called once
+        $seoEncoderCategoryMock->expects($this->once())->method('onDeleteCategory');
         $oCategory = oxNew('oxCategory');
         $this->assertEquals(true, $oCategory->delete($this->_oCategoryB->getId()));
-        $this->assertEquals(1, count(oxRegistry::get('oxSeoEncoderCategory')->onDelete));
-        $this->assertSame($oCategory, oxRegistry::get('oxSeoEncoderCategory')->onDelete[0]);
 
         $this->reload();
         // now parent is deletable [not a parent anymore]
+        $seoEncoderCategoryMock2 = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, ['onDeleteCategory']);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, $seoEncoderCategoryMock2);
+        $seoEncoderCategoryMock2->expects($this->once())->method('onDeleteCategory');
         $this->assertEquals(true, $this->_oCategory->delete());
     }
 

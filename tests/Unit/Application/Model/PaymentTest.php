@@ -81,13 +81,13 @@ class PaymentTest extends \OxidTestCase
      */
     public function testGetGroups()
     {
-        $this->markTestSkipped('Bug: Array does not match');
         $oPayment = oxNew('oxPayment');
         $oPayment->load('oxiddebitnote');
 
+        // o3newsletter is assigned in oxobject2group but oxgroups has oxidnewsletter,
+        // so the JOIN only returns the 3 matching groups
         $aArray = ['oxidsmallcust',
                         'oxidnewcustomer',
-                        'o3newsletter',
                         'oxidadmin'];
 
         $this->assertEqualsCanonicalizing(

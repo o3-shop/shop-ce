@@ -326,15 +326,13 @@ class BasketitemTest extends \OxidTestCase
      */
     public function testSetAmountIfBundleIsAdded()
     {
-        $this->markTestSkipped('Bug: 100.0 is not same as 99');
         $article = $this->createArticle();
 
         $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getArtStockInBasket']);
         $oBasket->expects($this->any())->method('getArtStockInBasket')->with($this->equalTo($article->getId()), $this->equalTo('testItemKey'))->will($this->returnValue(1));
-        $oSession = oxNew('oxSession');
-        $oSession->setBasket($oBasket);
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getSession']);
-        $oBasketItem->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
+        \OxidEsales\Eshop\Core\Registry::getSession()->setBasket($oBasket);
+
+        $oBasketItem = oxNew(\OxidEsales\Eshop\Application\Model\BasketItem::class);
 
         $oBasketItem->UNITsetArticle($article->getId());
         $oBasketItem->setAmount(10, true, 'testItemKey');

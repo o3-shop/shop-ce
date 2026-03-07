@@ -113,7 +113,6 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testSaveReserved()
     {
-        $this->markTestSkipped('Bug: Method not called.');
         $this->getConfig()->setConfigParam('blUseStock', 1);
         $this->getConfig()->setConfigParam('blAllowNegativeStock', 'xxx');
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', 1);
@@ -121,19 +120,22 @@ class OrderarticleTest extends \OxidTestCase
         $oBR = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketReservation::class, ['commitArticleReservation']);
         $oBR->expects($this->once())->method('commitArticleReservation')->with($this->equalTo('asd'), $this->equalTo(20));
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
-        $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
+        $oS->expects($this->any())->method('getBasketReservations')->will($this->returnValue($oBR));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'isNewOrderItem', 'setIsNewOrderItem', 'getSession']);
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'isNewOrderItem', 'setIsNewOrderItem']);
         $oOrderArticle->expects($this->never())->method('updateArticleStock');
         $oOrderArticle->expects($this->once())->method('isNewOrderItem')->will($this->returnValue(true));
         $oOrderArticle->expects($this->once())->method('setIsNewOrderItem')->with($this->equalTo(false));
-        $oOrderArticle->expects($this->once())->method('getSession')->will($this->returnValue($oS));
         $oOrderArticle->oxorderarticles__oxstorno = new oxField(0);
         $oOrderArticle->oxorderarticles__oxamount = new oxField(999);
         $oOrderArticle->oxorderarticles__oxartid = new oxField('asd');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(20);
         $oOrderArticle->oxorderarticles__oxorderid = new oxField($this->order->getId());
         $oOrderArticle->save();
+
+        // cleanup: disable reservation to prevent contaminating subsequent tests
+        $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', false);
     }
 
     public function testCancelOrderArticleAlreadyCanceled()
@@ -727,8 +729,12 @@ class OrderarticleTest extends \OxidTestCase
      */
     public function testGetWrapping()
     {
-        $this->markTestSkipped('Bug: Failed Asserting that false is true');
-        oxTestModules::addFunction('oxwrapping', 'load($id)', '{if ($id=="a") return true; }');
+        $oWrappingMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Wrapping::class, ['load']);
+        $oWrappingMock->expects($this->any())->method('load')->will($this->returnCallback(function ($id) {
+            return $id === 'a';
+        }));
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\Wrapping::class, $oWrappingMock);
+
         $o = oxNew('oxOrderArticle');
 
         $o->oxorderarticles__oxwrapid = new oxField('');
@@ -738,7 +744,7 @@ class OrderarticleTest extends \OxidTestCase
         $this->assertSame(null, $o->getWrapping());
 
         $o->oxorderarticles__oxwrapid = new oxField('a');
-        $this->assertTrue($o->getWrapping() instanceof wrapping);
+        $this->assertTrue($o->getWrapping() instanceof \OxidEsales\Eshop\Application\Model\Wrapping);
     }
 
     /**

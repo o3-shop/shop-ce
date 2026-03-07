@@ -49,9 +49,10 @@ class ManufacturerTest extends \OxidTestCase
 
     public function testGetBaseSeoLinkForPage()
     {
-        $this->markTestSkipped('Bug: get link instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderManufacturer', 'getManufacturerUrl', "{return 'sManufacturerUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderManufacturer', 'getManufacturerPageUrl', "{return 'sManufacturerPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, ['getManufacturerUrl', 'getManufacturerPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getManufacturerUrl')->will($this->returnValue('sManufacturerUrl'));
+        $seoEncoderMock->expects($this->any())->method('getManufacturerPageUrl')->will($this->returnValue('sManufacturerPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, $seoEncoderMock);
 
         $oManufacturer = oxNew('oxManufacturer');
         $this->assertEquals('sManufacturerPageUrl', $oManufacturer->getBaseSeoLink(0, 1));
@@ -59,9 +60,10 @@ class ManufacturerTest extends \OxidTestCase
 
     public function testGetBaseSeoLink()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderManufacturer', 'getManufacturerUrl', "{return 'sManufacturerUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderManufacturer', 'getManufacturerPageUrl', "{return 'sManufacturerPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, ['getManufacturerUrl', 'getManufacturerPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getManufacturerUrl')->will($this->returnValue('sManufacturerUrl'));
+        $seoEncoderMock->expects($this->any())->method('getManufacturerPageUrl')->will($this->returnValue('sManufacturerPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, $seoEncoderMock);
 
         $oManufacturer = oxNew('oxManufacturer');
         $this->assertEquals('sManufacturerUrl', $oManufacturer->getBaseSeoLink(0));
@@ -360,8 +362,6 @@ class ManufacturerTest extends \OxidTestCase
 
     public function testDelete()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $seoEncoderManufacturerMock = $this->createPartialMock(SeoEncoderManufacturer::class, ['onDeleteManufacturer']);
         Registry::set(SeoEncoderManufacturer::class, $seoEncoderManufacturerMock);
 
