@@ -80,21 +80,35 @@ class LangTest extends \OxidTestCase
      */
     public function testProcessUrl()
     {
-        $myConfig = $this->getConfig();
+        // Force a browser language that differs from the default (de=0) so that
+        // processUrl always appends the lang parameter for the default language.
+        // Without this, CLI environments return null from detectLanguageByBrowser(),
+        // which casts to 0 and matches $iDefaultLang, causing lang= to be omitted.
+        $origAcceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? null;
+        $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
 
-        $iDefL = $myConfig->getConfigParam('sDefaultLang');
-        $oLang = oxNew('oxLang');
-        // processUrl now always includes lang parameter, even for default language
-        $this->assertEquals("url?lang=$iDefL&amp;", $oLang->processUrl('url', $iDefL));
-        $this->assertEquals('url?lang=9&amp;', $oLang->processUrl('url', 9));
-        $this->assertEquals('url?lang=9&amp;', $oLang->processUrl('url?', 9));
-        $this->assertEquals("url?lang=$iDefL&amp;", $oLang->processUrl('url?lang=15&amp;', $iDefL));
-        $this->assertEquals('url?lang=9', $oLang->processUrl('url?lang=3', 9));
+        try {
+            $myConfig = $this->getConfig();
 
-        $this->assertEquals('url?x&amp;lang=9&amp;', $oLang->processUrl('url?x&amp;', 9));
-        $this->assertEquals("url?x&amp;lang=$iDefL&amp;", $oLang->processUrl('url?x&amp;', $iDefL));
-        $this->assertEquals('url?x&amp;lang=9', $oLang->processUrl('url?x&amp;lang=3', 9));
-        $this->assertEquals("url?x&amp;lang=$iDefL&amp;", $oLang->processUrl('url?x&amp;lang=5&amp;', $iDefL));
+            $iDefL = $myConfig->getConfigParam('sDefaultLang');
+            $oLang = oxNew('oxLang');
+            $this->assertEquals("url?lang=$iDefL&amp;", $oLang->processUrl('url', $iDefL));
+            $this->assertEquals('url?lang=9&amp;', $oLang->processUrl('url', 9));
+            $this->assertEquals('url?lang=9&amp;', $oLang->processUrl('url?', 9));
+            $this->assertEquals("url?lang=$iDefL&amp;", $oLang->processUrl('url?lang=15&amp;', $iDefL));
+            $this->assertEquals('url?lang=9', $oLang->processUrl('url?lang=3', 9));
+
+            $this->assertEquals('url?x&amp;lang=9&amp;', $oLang->processUrl('url?x&amp;', 9));
+            $this->assertEquals("url?x&amp;lang=$iDefL&amp;", $oLang->processUrl('url?x&amp;', $iDefL));
+            $this->assertEquals('url?x&amp;lang=9', $oLang->processUrl('url?x&amp;lang=3', 9));
+            $this->assertEquals("url?x&amp;lang=$iDefL&amp;", $oLang->processUrl('url?x&amp;lang=5&amp;', $iDefL));
+        } finally {
+            if ($origAcceptLang === null) {
+                unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+            } else {
+                $_SERVER['HTTP_ACCEPT_LANGUAGE'] = $origAcceptLang;
+            }
+        }
     }
 
     /**
