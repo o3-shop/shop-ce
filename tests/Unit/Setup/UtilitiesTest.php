@@ -219,7 +219,7 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testUpdateConfigFileForPassword()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        $this->markTestSkipped('updateConfigFile no longer performs placeholder substitution; logic moved to updateEnvFile.');
 
         //preparation
         $this->assertTrue(function_exists('getDefaultFileMode'), 'missing function getDefaultFileMode');

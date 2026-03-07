@@ -407,12 +407,21 @@ class ActionsTest extends \OxidTestCase
      */
     public function testGetBannerPictureUrl()
     {
-        $this->markTestSkipped('gives back nopic.jpg');
-        $oPromo = oxNew('oxActions');
-        $oPromo->oxactions__oxpic = new oxField('current_de.jpg');
         $oConfig = $this->getConfig();
+        $sPromoDir = $oConfig->getPictureDir(false) . 'promo/';
+        $sTmpFile = $sPromoDir . 'current_de.jpg';
 
-        $this->assertEquals($oConfig->getPictureUrl('promo/') . 'current_de.jpg', $oPromo->getBannerPictureUrl());
+        // Create temporary promo image so getPictureUrl does not fall back to nopic.jpg
+        @touch($sTmpFile);
+
+        try {
+            $oPromo = oxNew('oxActions');
+            $oPromo->oxactions__oxpic = new oxField('current_de.jpg');
+
+            $this->assertEquals($oConfig->getPictureUrl('promo/') . 'current_de.jpg', $oPromo->getBannerPictureUrl());
+        } finally {
+            @unlink($sTmpFile);
+        }
     }
 
     /**

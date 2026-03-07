@@ -423,19 +423,35 @@ class DetailsTest extends \OxidTestCase
      */
     public function testGetPictureGallery()
     {
-        $this->markTestSkipped('Create file and remove after test. RT');
-
         $sArtID = '096a1b0849d5ffa4dd48cd388902420b';
 
         $oArticle = oxNew('oxArticle');
         $oArticle->load($sArtID);
-        $sActPic = $this->getConfig()->getPictureUrl(null) . 'generated/product/1/250_200_75/' . basename($oArticle->oxarticles__oxpic1->value);
 
-        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getPicturesProduct']);
-        $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
-        $aPicGallery = $oDetails->getPictureGallery();
+        // Create temporary master image so getPictureUrl does not fall back to nopic.jpg
+        $oConfig = $this->getConfig();
+        $sMasterDir = $oConfig->getPictureDir(false) . 'master/product/1/';
+        $sTmpFile = $sMasterDir . basename($oArticle->oxarticles__oxpic1->value);
+        @touch($sTmpFile);
 
-        $this->assertEquals($sActPic, $aPicGallery['ActPic']);
+        try {
+            // Build expected URL using the actual detail image size from config
+            $aDetailSizes = $oConfig->getConfigParam('aDetailImageSizes');
+            $sSize = $aDetailSizes['oxpic1']; // e.g. "540*340"
+            list($w, $h) = explode('*', $sSize);
+            $sQuality = $oConfig->getConfigParam('sDefaultImageQuality');
+            $sSizeDir = $w . '_' . $h . '_' . $sQuality;
+
+            $sActPic = $oConfig->getPictureUrl(null) . 'generated/product/1/' . $sSizeDir . '/' . basename($oArticle->oxarticles__oxpic1->value);
+
+            $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getPicturesProduct']);
+            $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
+            $aPicGallery = $oDetails->getPictureGallery();
+
+            $this->assertEquals($sActPic, $aPicGallery['ActPic']);
+        } finally {
+            @unlink($sTmpFile);
+        }
     }
 
     /**

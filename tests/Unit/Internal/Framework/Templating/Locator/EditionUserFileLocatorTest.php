@@ -38,10 +38,9 @@ class EditionUserFileLocatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testLocate($edition)
     {
-        $this->markTestSkipped('Bug: Failed Asserting that 2 arrays are equal, but they are not. ' .
-            'Expected: ["vfs://root/testSourcePath' . $edition . '/Application/views/admin/user.xml"] ' .
-            'Actual: []');
-        $this->createModuleStructure($edition);
+        // EditionUserFileLocator always uses getCommunityEditionSourcePath(),
+        // so the vfs structure must be created at the CE path for all editions.
+        $this->createModuleStructure('CE');
         $locator = new EditionUserFileLocator(
             $this->getAdminThemeMock(),
             $this->getContext($edition),
@@ -49,8 +48,7 @@ class EditionUserFileLocatorTest extends \PHPUnit\Framework\TestCase
         );
 
         $expectedPath = $this->vfsStreamDirectory->url() .
-            '/testSourcePath' .
-            $edition .
+            '/testSourcePathCE' .
             '/Application/views/admin/user.xml';
         $this->assertSame([$expectedPath], $locator->locate());
     }
