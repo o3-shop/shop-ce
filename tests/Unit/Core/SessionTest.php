@@ -1447,13 +1447,6 @@ class SessionTest extends \OxidTestCase
         $this->assertTrue($oSubj->getNonPublicVar('_blForceNewSession'));
     }
 
-    public function testIsSessionStarted()
-    {
-        // isSessionStarted() relies on session_status() === PHP_SESSION_ACTIVE, which
-        // doesn't work reliably in PHPUnit CLI (headers already sent, session_start may fail).
-        $this->markTestSkipped('isSessionStarted() depends on session_status() which is unreliable in PHPUnit CLI environment.');
-    }
-
     public function testIsActualSidInCookiePossitive()
     {
         $sOriginalVal = $_COOKIE['sid'];
