@@ -147,20 +147,16 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testGetEnvVar()
     {
-        if (!function_exists('getenv')) {
-            $this->markTestSkipped('getenv() function is not available.');
-        }
-        if (getenv('CI') == true) {
-            $this->markTestSkipped('Skipping test in CI environment.');
-        }
+        // Set a known env var so the test works in any environment (including CI).
+        $sName = 'O3SHOP_TEST_ENV_VAR';
+        $sValue = 'test_value_' . uniqid();
+        putenv("{$sName}={$sValue}");
 
-        // ENV is not always filled in..
-        if (count($_ENV)) {
-            $sValue = current($_ENV);
-            $sName = key($_ENV);
-
+        try {
             $oUtils = new Utilities();
             $this->assertEquals($sValue, $oUtils->getEnvVar($sName));
+        } finally {
+            putenv($sName);
         }
     }
 
