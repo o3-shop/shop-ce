@@ -144,9 +144,10 @@ class CategoryTest extends \OxidTestCase
 
     public function testGetBaseSeoLinkForPage()
     {
-        $this->markTestSkipped('Bug: get link instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderCategory', 'getCategoryUrl', "{return 'sCategoryUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderCategory', 'getCategoryPageUrl', "{return 'sCategoryPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, ['getCategoryUrl', 'getCategoryPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getCategoryUrl')->will($this->returnValue('sCategoryUrl'));
+        $seoEncoderMock->expects($this->any())->method('getCategoryPageUrl')->will($this->returnValue('sCategoryPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, $seoEncoderMock);
 
         $oCategory = oxNew('oxCategory');
         $this->assertEquals('sCategoryPageUrl', $oCategory->getBaseSeoLink(0, 1));
@@ -154,9 +155,10 @@ class CategoryTest extends \OxidTestCase
 
     public function testGetBaseSeoLink()
     {
-        $this->markTestSkipped('Bug: get link instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderCategory', 'getCategoryUrl', "{return 'sCategoryUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderCategory', 'getCategoryPageUrl', "{return 'sCategoryPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, ['getCategoryUrl', 'getCategoryPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getCategoryUrl')->will($this->returnValue('sCategoryUrl'));
+        $seoEncoderMock->expects($this->any())->method('getCategoryPageUrl')->will($this->returnValue('sCategoryPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, $seoEncoderMock);
 
         $oCategory = oxNew('oxCategory');
         $this->assertEquals('sCategoryUrl', $oCategory->getBaseSeoLink(0));
@@ -896,12 +898,15 @@ class CategoryTest extends \OxidTestCase
      */
     public function testGetThumbUrl()
     {
-        $this->markTestSkipped('Bug: String does not match.');
         $oCategory = oxNew('oxCategory');
         $oCategory->setId('l_id');
 
         $sExistingPic = 'sportswear_1_tc.jpg';
         $sEmptyPic = '';
+
+        // Determine the expected thumbnail size string from config
+        $sCatThumbSize = $this->getConfig()->getConfigParam('sCatThumbnailsize');
+        $sSizeDir = str_replace('*', '_', $sCatThumbSize) . '_75';
 
         // no image
         $oCategory->oxcategories__oxthumb = new oxField($sEmptyPic);
@@ -909,11 +914,11 @@ class CategoryTest extends \OxidTestCase
 
         // old path
         $oCategory->oxcategories__oxthumb = new oxField($sExistingPic);
-        $this->assertEquals($oCategory->getPictureUrl() . 'generated/category/thumb/555_200_75/' . $sExistingPic, $oCategory->getThumbUrl());
+        $this->assertEquals($oCategory->getPictureUrl() . 'generated/category/thumb/' . $sSizeDir . '/' . $sExistingPic, $oCategory->getThumbUrl());
 
         // new path
         $sUrl = $this->getConfig()->getOutUrl() . basename($this->getConfig()->getPicturePath(''));
-        $sUrl .= '/generated/category/thumb/555_200_75/sportswear_1_tc.jpg';
+        $sUrl .= '/generated/category/thumb/' . $sSizeDir . '/sportswear_1_tc.jpg';
 
         $oCategory->oxcategories__oxthumb = new oxField('sportswear_1_tc.jpg');
         $this->assertEquals($sUrl, $oCategory->getThumbUrl());

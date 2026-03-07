@@ -163,7 +163,6 @@ class SuggestTest extends \OxidTestCase
 
     public function testSendPass()
     {
-        $this->markTestSkipped('Bug: strings does not match');
         $this->setRequestParameter(
             'editval',
             [

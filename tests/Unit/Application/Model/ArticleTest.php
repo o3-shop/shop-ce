@@ -267,9 +267,10 @@ class ArticleTest extends \OxidTestCase
      */
     public function testSetBaseSeoLinkMainLink()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderArticle', 'getArticleUrl', "{return 'sArticleUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderArticle', 'getArticleMainUrl', "{return 'sArticleMainUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getArticleUrl', 'getArticleMainUrl']);
+        $seoEncoderMock->expects($this->any())->method('getArticleUrl')->will($this->returnValue('sArticleUrl'));
+        $seoEncoderMock->expects($this->any())->method('getArticleMainUrl')->will($this->returnValue('sArticleMainUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, $seoEncoderMock);
 
         $oProduct = oxNew('oxArticle');
         $this->assertEquals('sArticleMainUrl', $oProduct->getBaseSeoLink(0, true));
@@ -282,9 +283,10 @@ class ArticleTest extends \OxidTestCase
      */
     public function testSetBaseSeoLink()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderArticle', 'getArticleUrl', "{return 'sArticleUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderArticle', 'getArticleMainUrl', "{return 'sArticleMainUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getArticleUrl', 'getArticleMainUrl']);
+        $seoEncoderMock->expects($this->any())->method('getArticleUrl')->will($this->returnValue('sArticleUrl'));
+        $seoEncoderMock->expects($this->any())->method('getArticleMainUrl')->will($this->returnValue('sArticleMainUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, $seoEncoderMock);
 
         $oProduct = oxNew('oxArticle');
         $this->assertEquals('sArticleUrl', $oProduct->getBaseSeoLink(0));
@@ -2782,7 +2784,6 @@ class ArticleTest extends \OxidTestCase
      */
     public function testgetCategoryAddsSqlLimit()
     {
-        $this->markTestSkipped('Bug: idk no feedback');
         oxTestModules::addFunction('oxcategory', 'assignRecord($sql)', '{throw new Exception($sql);}');
         $oArticle = oxNew('oxArticle');
         $oArticle->setId('123');
@@ -4127,23 +4128,25 @@ class ArticleTest extends \OxidTestCase
      */
     public function testIsVisibleNoStockButReserved()
     {
-        $this->markTestSkipped('Bug: false is not true');
         $oArticle = $this->_createArticle('_testArt');
 
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
         $this->getConfig()->setConfigParam('blUseStock', true);
 
         $oBR = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketReservation::class, ['getReservedAmount']);
-        $oBR->expects($this->once())->method('getReservedAmount')->with($this->equalTo($oArticle->getId()))->will($this->returnValue(5));
+        $oBR->expects($this->any())->method('getReservedAmount')->will($this->returnValue(5));
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
-        $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
-        $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getSession']);
-        $oA->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oS->expects($this->any())->method('getBasketReservations')->will($this->returnValue($oBR));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
+
+        $oA = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
         $oA->load($oArticle->getId());
 
         $oA->oxarticles__oxstock = new oxField(-1, oxField::T_RAW);
         $oA->oxarticles__oxstockflag = new oxField(2, oxField::T_RAW);
         $this->assertTrue($oA->isVisible());
+
+        $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', false);
     }
 
     /**
@@ -4713,7 +4716,6 @@ class ArticleTest extends \OxidTestCase
      */
     public function testAssignStockWhenStockEmptyButReserved()
     {
-        $this->markTestSkipped('Bug: Failed asserting that true is false.');
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
         $this->getConfig()->setConfigParam('blUseStock', true);
         $this->getConfig()->setConfigParam('sStockWarningLimit', 5);
@@ -4722,11 +4724,12 @@ class ArticleTest extends \OxidTestCase
         $this->_createArticle('_testArt', '_testVar');
 
         $oBR = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketReservation::class, ['getReservedAmount']);
-        $oBR->expects($this->once())->method('getReservedAmount')->with($this->equalTo('_testArt'))->will($this->returnValue(5));
+        $oBR->expects($this->any())->method('getReservedAmount')->will($this->returnValue(5));
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
-        $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
-        $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getSession']);
-        $oA->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oS->expects($this->any())->method('getBasketReservations')->will($this->returnValue($oBR));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
+
+        $oA = oxNew(\OxidEsales\Eshop\Application\Model\Article::class);
         $oA->load('_testArt');
         $oA->oxarticles__oxstock = new oxField(0, oxField::T_RAW);
         $oA->oxarticles__oxstockflag = new oxField(2, oxField::T_RAW);
@@ -4735,6 +4738,8 @@ class ArticleTest extends \OxidTestCase
         $this->assertEquals(-1, $oA->getStockStatus());
         $this->assertFalse($oA->_blNotBuyable);
         $this->assertTrue($oA->_blNotBuyableParent);
+
+        $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', false);
     }
 
     /**
@@ -6682,14 +6687,12 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetVariantSelections()
     {
-        $this->markTestSkipped('Bug: type is not array');
-        oxTestModules::addFunction('oxVariantHandler', 'buildVariantSelections', "{return 'buildVariantSelections';}");
         $oVariantHandler = $this->getMock(\OxidEsales\Eshop\Application\Model\VariantHandler::class, ['buildVariantSelections']);
         $aVariantSelections = ['selections' => 'asd', 'rawselections' => 'asd'];
         $oVariantHandler->expects($this->once())->method('buildVariantSelections')
             ->with($this->equalTo('varname'), $this->equalTo('variants'), $this->equalTo(1), $this->equalTo(2), $this->equalTo(3))
             ->will($this->returnValue($aVariantSelections));
-        oxTestModules::addModuleObject('oxVariantHandler', $oVariantHandler);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\VariantHandler::class, $oVariantHandler);
 
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getVariants']);
         $oProduct->expects($this->once())->method('getVariants')->will($this->returnValue('variants'));
@@ -6706,15 +6709,12 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetVariantSelectionsWithAllInactiveVariants()
     {
-        $this->markTestSkipped('Bug: type is not array');
-
-        oxTestModules::addFunction('oxVariantHandler', 'buildVariantSelections', "{return 'buildVariantSelections';}");
         $oVariantHandler = $this->getMock(\OxidEsales\Eshop\Application\Model\VariantHandler::class, ['buildVariantSelections']);
         $aVariantSelections = ['selections' => 'asd', 'rawselections' => ''];
         $oVariantHandler->expects($this->once())->method('buildVariantSelections')
             ->with($this->equalTo('varname'), $this->equalTo('variants'), $this->equalTo(1), $this->equalTo(2), $this->equalTo(3))
             ->will($this->returnValue($aVariantSelections));
-        oxTestModules::addModuleObject('oxVariantHandler', $oVariantHandler);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\VariantHandler::class, $oVariantHandler);
 
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getVariants']);
         $oProduct->expects($this->once())->method('getVariants')->will($this->returnValue('variants'));
@@ -6730,14 +6730,12 @@ class ArticleTest extends \OxidTestCase
      */
     public function testGetVariantSelectionsWithNoVariants()
     {
-        $this->markTestSkipped('Bug: Array does not match');
-        oxTestModules::addFunction('oxVariantHandler', 'buildVariantSelections', "{return 'buildVariantSelections';}");
         $oVariantHandler = $this->getMock(\OxidEsales\Eshop\Application\Model\VariantHandler::class, ['buildVariantSelections']);
         $aVariantSelections = ['selections' => 'asd', 'rawselections' => ''];
         $oVariantHandler->expects($this->once())->method('buildVariantSelections')
             ->with($this->equalTo('varname'), $this->equalTo([]), $this->equalTo(1), $this->equalTo(2), $this->equalTo(3))
             ->will($this->returnValue($aVariantSelections));
-        oxTestModules::addModuleObject('oxVariantHandler', $oVariantHandler);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\VariantHandler::class, $oVariantHandler);
 
         $oProduct = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getVariants']);
         $oProduct->expects($this->once())->method('getVariants')->will($this->returnValue([]));

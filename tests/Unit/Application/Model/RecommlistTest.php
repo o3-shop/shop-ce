@@ -69,9 +69,10 @@ class RecommlistTest extends \OxidTestCase
 
     public function testGetBaseSeoLinkForPage()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderRecomm', 'getRecommUrl', "{return 'sRecommUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderRecomm', 'getRecommPageUrl', "{return 'sRecommPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class, ['getRecommUrl', 'getRecommPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getRecommUrl')->will($this->returnValue('sRecommUrl'));
+        $seoEncoderMock->expects($this->any())->method('getRecommPageUrl')->will($this->returnValue('sRecommPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class, $seoEncoderMock);
 
         $oRecomm = oxNew('oxRecommList');
         $this->assertEquals('sRecommPageUrl', $oRecomm->getBaseSeoLink(0, 1));
@@ -79,9 +80,10 @@ class RecommlistTest extends \OxidTestCase
 
     public function testGetBaseSeoLink()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderRecomm', 'getRecommUrl', "{return 'sRecommUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderRecomm', 'getRecommPageUrl', "{return 'sRecommPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class, ['getRecommUrl', 'getRecommPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getRecommUrl')->will($this->returnValue('sRecommUrl'));
+        $seoEncoderMock->expects($this->any())->method('getRecommPageUrl')->will($this->returnValue('sRecommPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class, $seoEncoderMock);
 
         $oRecomm = oxNew('oxRecommList');
         $this->assertEquals('sRecommUrl', $oRecomm->getBaseSeoLink(0));
@@ -366,7 +368,6 @@ class RecommlistTest extends \OxidTestCase
 
     public function testGetReviews()
     {
-        $this->markTestSkipped('Bug: Get null as response');
         oxTestModules::addFunction('oxreview', 'loadList', '{$o=new oxlist();$o->args=$aA;return $o;}');
         $oRecomm = oxNew('oxRecommList');
         $oRecomm->setId('testid');

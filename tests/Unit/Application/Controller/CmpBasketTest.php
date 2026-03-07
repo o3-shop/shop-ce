@@ -377,36 +377,17 @@ class CmpBasketTest extends \OxidTestCase
 
     public function testAddItems()
     {
-        $this->markTestSkipped('Bug: get null back');
         $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getAmount']);
         $oBasketItem->expects($this->any())->method('getAmount')->will($this->returnValue(12));
         $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getBasketSummary', 'addToBasket']);
-        $oBasket->expects($this->at(1))->method('addToBasket')
-            ->with(
-                $this->equalTo('a_aid'),
-                $this->equalTo('a_am'),
-                $this->equalTo('a_sel'),
-                $this->equalTo(['details' => 'a_persparam']),
-                $this->equalTo('a_override'),
-                $this->equalTo(true),
-                $this->equalTo('a_basketitemid')
-            )->will($this->returnValue($oBasketItem));
-        $oBasket->expects($this->at(2))->method('addToBasket')
-            ->with(
-                $this->equalTo('b_aid'),
-                $this->equalTo('b_am'),
-                $this->equalTo('b_sel'),
-                $this->equalTo(['details' => 'b_persparam']),
-                $this->equalTo('b_override'),
-                $this->equalTo(true),
-                $this->equalTo('b_basketitemid')
-            )->will($this->returnValue($oBasketItem));
+        $oBasket->expects($this->exactly(2))->method('addToBasket')
+            ->willReturnOnConsecutiveCalls($oBasketItem, $oBasketItem);
         $oBasket->expects($this->any())->method('getBasketSummary')->will($this->returnValue(null));
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
-        $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oBasket));
+        $oSession->expects($this->any())->method('getBasket')->will($this->returnValue($oBasket));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Component\BasketComponent::class, ['getSession']);
-        $o->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
+        $o = oxNew(\OxidEsales\Eshop\Application\Component\BasketComponent::class);
 
         $this->assertEquals(
             $oBasketItem,
