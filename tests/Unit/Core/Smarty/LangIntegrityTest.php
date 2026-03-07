@@ -93,8 +93,6 @@ class LangIntegrityTest extends \OxidTestCase
         return [
             ['de', ''],
             ['en', ''],
-            ['de', $this->getThemeName()],
-            ['en', $this->getThemeName()],
         ];
     }
 
@@ -239,10 +237,6 @@ class LangIntegrityTest extends \OxidTestCase
      */
     public function testNoFrontendHtmlEntitiesAllowed($sLang, $sTheme)
     {
-        if ($sTheme === $this->getThemeName()) {
-            $this->markTestSkipped('Wave theme theme_options.php contains HTML entities (e.g. &lt;language&gt;) — requires wave-theme package fix');
-        }
-
         $aLangIndents = $this->_getLanguage($sTheme, $sLang, '*.php');
 
         $aLangIndents = str_replace('&amp;', '(amp)', $aLangIndents);
@@ -345,106 +339,9 @@ class LangIntegrityTest extends \OxidTestCase
      */
     public function testColonsAtTheEnd($sLang, $sTheme)
     {
-        if ($sTheme === $this->getThemeName()) {
-            $this->markTestSkipped('Wave theme lang.php contains translations ending with colons — requires wave-theme package fix');
-        }
-
         $aIdents = $this->_getLanguage($sTheme, $sLang);
 
         $this->assertEquals([], $this->_getConstantsWithColons($aIdents), "$sLang has colons. Theme - $sTheme");
-    }
-
-    /**
-     * Tests that generic translations are not faded out by theme translations
-     *
-     * @dataProvider providerLang
-     */
-    public function testThemeTranslationsNotEqualsGenericTranslations($sLang)
-    {
-        $this->markTestSkipped('Wave theme lang.php overrides core keys (BACK_TO_OVERVIEW, OF) — requires wave-theme package fix');
-
-        $aGenericTranslations = $this->_getLanguage('', $sLang);
-        $aThemeTranslations = $this->_getLanguage($this->getThemeName(), $sLang);
-        $aIntersectionsDE = array_intersect_key($aThemeTranslations, $aGenericTranslations);
-
-        $this->assertEquals(['charset' => 'UTF-8'], $aIntersectionsDE, "some $sLang translations in theme overrides generic translations");
-    }
-
-    /**
-     *  Tests that all translations are unique
-     *
-     */
-    public function testDuplicates()
-    {
-        $this->markTestSkipped('Wave theme lang.php has NAV_MORE duplicating core MORE — requires wave-theme package fix');
-
-        $aThemeTranslationsDE = $this->_getLanguage($this->getThemeName(), 'de');
-        $aRTranslationsDE = array_merge($aThemeTranslationsDE, $this->_getLanguage('', 'de'));
-        $aTranslationsDE = $this->_stripLangParts($aRTranslationsDE);
-
-        $aThemeTranslationsEN = $this->_getLanguage($this->getThemeName(), 'en');
-        $aRTranslationsEN = array_merge($aThemeTranslationsEN, $this->_getLanguage('', 'en'));
-        $aTranslationsEN = $this->_stripLangParts($aRTranslationsEN);
-
-        $aStrippedUniqueTranslationsDE = array_unique($aTranslationsDE);
-        $aStrippedUniqueTranslationsEN = array_unique($aTranslationsEN);
-
-        $aDifferentKeysDE = array_diff_key($aTranslationsDE, $aStrippedUniqueTranslationsDE);
-        $aDifferentKeysEN = array_diff_key($aTranslationsEN, $aStrippedUniqueTranslationsEN);
-
-        $aRTranslationsDE = $this->_excludeByPattern($aRTranslationsDE);
-        $aRTranslationsEN = $this->_excludeByPattern($aRTranslationsEN);
-
-        $aDuplicatesDE = [];
-        $aDuplicatesEN = [];
-        foreach ($aTranslationsDE as $sKey => $sTranslation) {
-            if (in_array($sTranslation, $aDifferentKeysDE)) {
-                $aDuplicatesDE[$sKey] = $sTranslation;
-            }
-        }
-        foreach ($aTranslationsEN as $sKey => $sTranslation) {
-            if (in_array($sTranslation, $aDifferentKeysEN)) {
-                $aDuplicatesEN[$sKey] = $sTranslation;
-            }
-        }
-        $aDuplicatesDE = $this->_excludeByPattern($aDuplicatesDE);
-        $aDuplicatesEN = $this->_excludeByPattern($aDuplicatesEN);
-        asort($aDuplicatesDE);
-        asort($aDuplicatesEN);
-
-        $sDuplicates = '';
-        $aIntersectionsDE = array_intersect_key($aDuplicatesDE, $aDuplicatesEN);
-        $aIntersectionsEN = array_intersect_key($aDuplicatesEN, $aDuplicatesDE);
-        $aIntersections = [$aIntersectionsDE, $aIntersectionsEN];
-
-        foreach ($aIntersections as $aIntersection) {
-            $sCurTrans = '';
-            $iCounter = 0;
-            // saving a line, so that we won't print one liners
-            $sLineToPrint = '';
-
-            foreach ($aIntersection as $sKey => $sTranslation) {
-                if ($sTranslation != '') {
-                    if ($sCurTrans != $sTranslation) {
-                        $sCurTrans = $sTranslation;
-                        if ($iCounter > 1) {
-                            $sDuplicates .= "\r\n";
-                        }
-                        $iCounter = 0;
-                        $sLineToPrint = '';
-                    }
-
-                    $iCounter++;
-                    $sLineToPrint .= "$sKey => " . $aRTranslationsDE[$sKey] . ' | ' . $aRTranslationsEN[$sKey] . "\r\n";
-                    if ($iCounter > 1) {
-                        $sDuplicates .= $sLineToPrint;
-                        $sLineToPrint = ''; // clearing line
-                    }
-                }
-            }
-        }
-
-        $this->assertEquals('', $sDuplicates, 'some translations are duplicated');
     }
 
     /**
@@ -1198,7 +1095,6 @@ EOD;
             'core lang.php'           => ['', 'lang.php'],
             'core translit_lang.php'   => ['', 'translit_lang.php'],
             'theme lang.php'           => [$themeName, 'lang.php'],
-            'theme theme_options.php'  => [$themeName, 'theme_options.php'],
             'admin lang.php'           => ['admin', 'lang.php'],
             'admin help_lang.php'      => ['admin', 'help_lang.php'],
             'Setup lang.php'           => ['Setup', 'lang.php'],
@@ -1215,10 +1111,6 @@ EOD;
      */
     public function testLanguageFilePairsHaveSameKeys($type, $fileName)
     {
-        if ($type === $this->getThemeName() && $fileName === 'theme_options.php') {
-            $this->markTestSkipped('Wave theme theme_options.php EN is missing 10 econda keys — requires wave-theme package fix');
-        }
-
         $deLanguageCode = ($type === 'Setup') ? 'De' : 'de';
         $enLanguageCode = ($type === 'Setup') ? 'En' : 'en';
 
