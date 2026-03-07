@@ -34,10 +34,10 @@ use stdClass;
  */
 class _DynExportBase extends DynExportBase
 {
-    public function initArticle($heapTable, $count, & $continue)
+    public function initArticle($heapTable, $count, &$continue)
     {
         try {
-            return $this->_initArticle($heapTable, $count, $continue);
+            return parent::initArticle($heapTable, $count, $continue);
         } catch (Exception $exception) {
             throw $exception;
         }
@@ -730,7 +730,6 @@ class DynExportBaseTest extends \OxidTestCase
      */
     public function testInitArticle()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
 
         $blContinue = true;
         $this->setRequestParameter('sExportMinPrice', '1');

@@ -1305,12 +1305,11 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetResourceUrlNonAdminExpectsDefault()
     {
-        // modForTestGetBaseTplDirExpectsDefault::_setDefaults() hardcodes sTheme=azure,
-        // but azure doesn't exist. The non-admin getDir() path resolution uses
-        // getEditionTemplate() and physical is_readable() checks that fail because
-        // the test helper skips full DB config loading and returns shopId='xxx'.
-        // The admin variant works because admin theme resolution is simpler.
-        $this->markTestSkipped('Test helper modForTestGetBaseTplDirExpectsDefault breaks non-admin theme directory resolution.');
+        oxRegistry::getLang()->setBaseLanguage(999);
+        $oConfig = oxNew('oxConfig');
+        $oConfig->init();
+        $sDir = $oConfig->getConfigParam('sShopURL') . $this->_getOutPath($oConfig, null, false) . 'src/';
+        $this->assertEquals($sDir, $oConfig->getResourceUrl('', false));
     }
 
     /**
