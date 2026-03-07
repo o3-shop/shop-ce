@@ -730,7 +730,6 @@ class DynExportBaseTest extends \OxidTestCase
      */
     public function testInitArticle()
     {
-
         $blContinue = true;
         $this->setRequestParameter('sExportMinPrice', '1');
         $sProdId = '8a142c4113f3b7aa3.13470399';

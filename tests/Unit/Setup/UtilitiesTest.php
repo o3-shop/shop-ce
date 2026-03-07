@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Setup;
 
-use Exception;
 use OxidEsales\EshopCommunity\Setup\Utilities;
 
 require_once getShopBasePath() . '/Setup/functions.php';
