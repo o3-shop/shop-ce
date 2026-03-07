@@ -37,7 +37,7 @@ class AdminListHelper extends \oxAdminList
      *
      * @return boolean
      */
-    protected function _authorize()
+    protected function authorize()
     {
         return true;
     }
@@ -148,10 +148,6 @@ class AdminListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
-        // deleteEntry() calls $this->init() at the end, which triggers the full admin
-        // controller init chain and hangs in a unit test context (no admin session/auth).
-        // Needs architectural rework to mock out init() or refactor deleteEntry().
-        $this->markTestSkipped('Hangs: deleteEntry() calls init() which triggers full admin init chain.');
         $oLink = oxNew('oxLinks');
         $oLink->setId('_testId');
         $oLink->save();

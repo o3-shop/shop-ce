@@ -1305,7 +1305,12 @@ class ConfigTest extends OxidTestCase
      */
     public function testGetResourceUrlNonAdminExpectsDefault()
     {
-        $this->markTestSkipped('Bug: _setDefaults() hardcodes sTheme=azure but azure theme directory does not exist, so getUrl() returns empty string.');
+        // modForTestGetBaseTplDirExpectsDefault::_setDefaults() hardcodes sTheme=azure,
+        // but azure doesn't exist. The non-admin getDir() path resolution uses
+        // getEditionTemplate() and physical is_readable() checks that fail because
+        // the test helper skips full DB config loading and returns shopId='xxx'.
+        // The admin variant works because admin theme resolution is simpler.
+        $this->markTestSkipped('Test helper modForTestGetBaseTplDirExpectsDefault breaks non-admin theme directory resolution.');
     }
 
     /**

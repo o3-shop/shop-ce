@@ -39,15 +39,17 @@ class Argon2IPasswordHashServiceTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->markTestSkipped('Argon2I not available currently on PHP 7.2.');
+        parent::setUp();
+
+        if (!defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('PASSWORD_ARGON2I is not available in this PHP build.');
+        }
     }
 
-    /**
-     * @expectedException \OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\UnavailablePasswordHashException
-     */
     public function testConstructorThrowsExceptionIfArgon2INotAvailable()
     {
         $this->skipTestIfArgon2IAvailable();
+        $this->expectException(\OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\UnavailablePasswordHashException::class);
         $passwordPolicyMock = $this->getPasswordPolicyMock();
 
         new Argon2IPasswordHashService(
@@ -92,12 +94,18 @@ class Argon2IPasswordHashServiceTest extends TestCase
 
     /**
      * Invalid values as a memory cost value of 2^32 + 1 can cause the method hash to fail.
+     * PHP 8+ throws \ValueError; PHP 7.x emits a warning (converted by PHPUnit's error handler).
      */
     public function testHashThrowsExceptionOnInvalidSettings()
     {
         $this->skipTestIfArgon2INotAvailable();
 
-        $this->expectException(\PHPUnit\Framework\Error\Warning::class);
+        if (PHP_MAJOR_VERSION >= 8) {
+            $this->expectException(\ValueError::class);
+        } else {
+            $this->expectWarning();
+        }
+
         $passwordPolicyMock = $this->getPasswordPolicyMock();
 
         $passwordHashService = new Argon2IPasswordHashService(

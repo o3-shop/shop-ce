@@ -67,18 +67,22 @@ class PriceAlarmListTest extends \OxidTestCase
      */
     public function testBuildWhere()
     {
-        $this->markTestSkipped(
-            'buildWhere() triggers getItemList() which executes SQL referencing oxarticles view columns, '
-            . 'but the JOIN from _buildSelectString is not included. Pre-existing design issue.'
-        );
-
         $this->setRequestParameter('where', ['oxpricealarm' => ['oxprice' => 15], 'oxarticles' => ['oxprice' => 15]]);
 
         $sViewName = getViewName('oxpricealarm');
         $sArtViewName = getViewName('oxarticles');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmList::class, ['authorize']);
+        // Mock getItemList to avoid SQL execution (the query references oxarticles
+        // columns without a JOIN, which is a pre-existing production design issue).
+        $oListItem = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
+
+        $oView = $this->getMock(
+            \OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmList::class,
+            ['authorize', 'getItemList', 'getItemListBaseObject']
+        );
         $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
+        $oView->expects($this->any())->method('getItemList')->will($this->returnValue(oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class)));
+        $oView->expects($this->any())->method('getItemListBaseObject')->will($this->returnValue($oListItem));
         $oView->init();
 
         $queryWhereParts = $oView->buildWhere();

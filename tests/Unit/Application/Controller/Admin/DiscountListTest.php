@@ -21,8 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use oxTestModules;
-
 /**
  * Tests for Discount_List class
  */
@@ -35,16 +33,8 @@ class DiscountListTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
-        oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
-        oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
-
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
-
-        $oView = $this->getMock($this->getProxyClassName('Discount_List'), ['getSession']);
-        $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
+        $oView = $this->getMock($this->getProxyClassName('Discount_List'), ['authorize']);
+        $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
 
         $oView->init();
 

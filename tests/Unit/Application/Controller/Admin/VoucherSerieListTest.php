@@ -35,20 +35,11 @@ class VoucherSerieListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
-        // deleteEntry() inherited from AdminListController calls $this->init() at the end,
-        // which triggers the full admin controller init chain and hangs in a unit test context.
-        $this->markTestSkipped('Hangs: deleteEntry() calls init() which triggers full admin init chain.');
-
-        oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
-        oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
         oxTestModules::addFunction('oxvoucherserie', 'load', '{ return true; }');
         oxTestModules::addFunction('oxvoucherserie', 'deleteVoucherList', '{ return true; }');
 
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
-
-        $oView = $this->getMock($this->getProxyClassName('VoucherSerie_List'), ['getSession']);
-        $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
+        $oView = $this->getMock($this->getProxyClassName('VoucherSerie_List'), ['authorize']);
+        $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
 
         $oView->deleteEntry();
     }
