@@ -26,7 +26,7 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Http;
  *
  * @package OxidEsales\EshopCommunity\Tests\Integration\Http
  */
-class HtAccessTest extends \OxidEsales\TestingLibrary\UnitTestCase
+class HtaccessTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
     /**
      * Assure, that we get a HTTP code 301 for redirected file extensions.

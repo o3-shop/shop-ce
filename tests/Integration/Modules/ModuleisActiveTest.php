@@ -21,7 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
-class ModuleIsActiveTest extends BaseModuleTestCase
+class ModuleisActiveTest extends BaseModuleTestCase
 {
     /**
      * @return array
