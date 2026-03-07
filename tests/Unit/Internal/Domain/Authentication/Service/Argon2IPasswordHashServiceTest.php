@@ -89,7 +89,10 @@ class Argon2IPasswordHashServiceTest extends TestCase
         if (PHP_MAJOR_VERSION >= 8) {
             $this->expectException(\ValueError::class);
         } else {
-            $this->expectWarning();
+            // PHP 7.4: password_hash() emits a warning for invalid settings and
+            // returns false/null, but the method's `: string` return type then
+            // triggers a TypeError which supersedes the warning.
+            $this->expectException(\TypeError::class);
         }
 
         $passwordPolicyMock = $this->getPasswordPolicyMock();
