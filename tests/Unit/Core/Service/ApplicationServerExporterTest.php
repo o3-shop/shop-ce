@@ -35,7 +35,7 @@ class ApplicationServerExporterTest extends \OxidEsales\TestingLibrary\UnitTestC
      */
     public function testExport($activeServers, $count, $expectedServerCollection)
     {
-        $this->markTestSkipped('Review with D.S. Only EE?');
+        $this->markTestSkipped('ApplicationServerExporter class only exists in EE edition.');
         $service = $this->getApplicationServerServiceMock($activeServers);
         $exporter = oxNew(\OxidEsales\Eshop\Core\Service\ApplicationServerExporter::class, $service);
 

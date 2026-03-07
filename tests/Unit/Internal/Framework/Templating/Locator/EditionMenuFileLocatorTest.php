@@ -38,9 +38,6 @@ class EditionMenuFileLocatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testLocate($edition)
     {
-        $this->markTestSkipped('Bug: Failed Asserting that 2 arrays are equal, but they are not. ' .
-            'Expected: ["vfs://root/testSourcePath' . $edition . '/Application/views/admin/menu.xml"] ' .
-            'Actual: []');
         $this->createModuleStructure($edition);
         $locator = new EditionMenuFileLocator(
             $this->getAdminThemeMock(),
@@ -84,7 +81,7 @@ class EditionMenuFileLocatorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new BasicContextStub();
         $context->setEdition($edition);
-        $context->setSourcePath($this->vfsStreamDirectory->url() . '/testSourcePathCE');
+        $context->setSourcePath($this->vfsStreamDirectory->url() . '/testSourcePath' . $edition);
 
         return $context;
     }
