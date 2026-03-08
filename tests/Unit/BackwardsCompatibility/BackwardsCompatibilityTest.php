@@ -101,8 +101,19 @@ class BackwardsCompatibilityTest extends TestCase
 
         $this->assertEmpty(
             $missing,
-            "The following unified namespace classes were removed from UnifiedNameSpaceClassMap:\n  - " .
-            implode("\n  - ", $missing)
+            "\n\n" .
+            "SAFE HARBOUR VIOLATION: Unified namespace entries removed\n" .
+            "=========================================================\n\n" .
+            "O3-Shop guarantees backwards compatibility with the predecessor's v6 API.\n" .
+            "The following unified namespace classes were removed from UnifiedNameSpaceClassMap.php,\n" .
+            "which means modules and extensions relying on these classes will break.\n\n" .
+            "Removed classes (" . count($missing) . "):\n  - " .
+            implode("\n  - ", $missing) . "\n\n" .
+            "What to do:\n" .
+            "  - If this removal was unintentional, restore the entries in\n" .
+            "    source/Core/Autoload/UnifiedNameSpaceClassMap.php\n" .
+            "  - If this removal was intentional and reviewed, regenerate the snapshot:\n" .
+            "    php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php\n"
         );
     }
 
@@ -128,8 +139,20 @@ class BackwardsCompatibilityTest extends TestCase
 
         $this->assertEmpty(
             $unloadable,
-            "The following edition classes cannot be loaded:\n  - " .
-            implode("\n  - ", $unloadable)
+            "\n\n" .
+            "SAFE HARBOUR VIOLATION: Edition classes not loadable\n" .
+            "====================================================\n\n" .
+            "O3-Shop guarantees that every unified namespace class resolves to a valid edition class.\n" .
+            "The following edition classes are referenced in UnifiedNameSpaceClassMap.php but cannot\n" .
+            "be autoloaded. This means modules extending these classes will get fatal errors.\n\n" .
+            "Broken mappings (" . count($unloadable) . "):\n  - " .
+            implode("\n  - ", $unloadable) . "\n\n" .
+            "What to do:\n" .
+            "  - Check if the edition class was renamed or moved — update the mapping accordingly.\n" .
+            "  - Check if the file exists under source/ and follows PSR-4 conventions.\n" .
+            "  - If the class was intentionally removed, remove the mapping from\n" .
+            "    UnifiedNameSpaceClassMap.php and regenerate the snapshot:\n" .
+            "    php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php\n"
         );
     }
 
@@ -162,8 +185,19 @@ class BackwardsCompatibilityTest extends TestCase
 
         $this->assertEmpty(
             $missing,
-            "The following methods from the BC snapshot no longer exist:\n  - " .
-            implode("\n  - ", $missing)
+            "\n\n" .
+            "SAFE HARBOUR VIOLATION: Public/protected methods removed\n" .
+            "========================================================\n\n" .
+            "O3-Shop guarantees that every public/protected method from the predecessor's v6 API\n" .
+            "remains available. Modules and shop extensions may call or override these methods.\n" .
+            "Removing them will cause fatal errors or broken functionality for existing installations.\n\n" .
+            "Missing methods (" . count($missing) . "):\n  - " .
+            implode("\n  - ", $missing) . "\n\n" .
+            "What to do:\n" .
+            "  - If this removal was unintentional, restore the method(s).\n" .
+            "  - If the method was moved to a parent class, ensure it is still accessible.\n" .
+            "  - If this removal was intentional and reviewed, regenerate the snapshot:\n" .
+            "    php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php\n"
         );
     }
 
@@ -196,8 +230,18 @@ class BackwardsCompatibilityTest extends TestCase
 
         $this->assertEmpty(
             $violations,
-            "The following classes were made final, breaking the BC contract:\n  - " .
-            implode("\n  - ", $violations)
+            "\n\n" .
+            "SAFE HARBOUR VIOLATION: Classes made final\n" .
+            "===========================================\n\n" .
+            "O3-Shop guarantees that all classes remain extensible (not final).\n" .
+            "Marking a class as final prevents modules from extending it via the chain,\n" .
+            "which is the core mechanism for shop customisation.\n\n" .
+            "Classes made final (" . count($violations) . "):\n  - " .
+            implode("\n  - ", $violations) . "\n\n" .
+            "What to do:\n" .
+            "  - Remove the 'final' keyword from the class declaration.\n" .
+            "  - If this was intentional and reviewed, regenerate the snapshot:\n" .
+            "    php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php\n"
         );
     }
 
@@ -237,8 +281,18 @@ class BackwardsCompatibilityTest extends TestCase
 
         $this->assertEmpty(
             $violations,
-            "The following methods were made final, breaking the BC contract:\n  - " .
-            implode("\n  - ", $violations)
+            "\n\n" .
+            "SAFE HARBOUR VIOLATION: Methods made final\n" .
+            "===========================================\n\n" .
+            "O3-Shop guarantees that all public/protected methods remain overridable (not final).\n" .
+            "Marking a method as final prevents modules from overriding it, breaking existing\n" .
+            "customisations that rely on method overrides.\n\n" .
+            "Methods made final (" . count($violations) . "):\n  - " .
+            implode("\n  - ", $violations) . "\n\n" .
+            "What to do:\n" .
+            "  - Remove the 'final' keyword from the method declaration.\n" .
+            "  - If this was intentional and reviewed, regenerate the snapshot:\n" .
+            "    php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php\n"
         );
     }
 
@@ -280,8 +334,18 @@ class BackwardsCompatibilityTest extends TestCase
 
         $this->assertEmpty(
             $violations,
-            "The following methods had their visibility reduced, breaking the BC contract:\n  - " .
-            implode("\n  - ", $violations)
+            "\n\n" .
+            "SAFE HARBOUR VIOLATION: Method visibility reduced\n" .
+            "==================================================\n\n" .
+            "O3-Shop guarantees that method visibility is never reduced.\n" .
+            "A public method must stay public, a protected method must not become private.\n" .
+            "Reducing visibility breaks modules that call or override these methods.\n\n" .
+            "Visibility changes (" . count($violations) . "):\n  - " .
+            implode("\n  - ", $violations) . "\n\n" .
+            "What to do:\n" .
+            "  - Restore the original visibility of the method(s).\n" .
+            "  - If this was intentional and reviewed, regenerate the snapshot:\n" .
+            "    php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php\n"
         );
     }
 }
