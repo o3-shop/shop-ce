@@ -38,7 +38,7 @@ $rootDir = dirname(__DIR__, 3);
 require_once $rootDir . '/vendor/autoload.php';
 
 $classMapFile = $rootDir . '/source/Core/Autoload/UnifiedNameSpaceClassMap.php';
-$outputDir    = __DIR__;
+$outputDir = __DIR__;
 
 if (!file_exists($classMapFile)) {
     fwrite(STDERR, "ERROR: UnifiedNameSpaceClassMap.php not found at {$classMapFile}\n");
@@ -79,7 +79,7 @@ ksort($namespaceSnapshot);
 // ── 3. Build the method signature snapshot ───────────────────────────────────
 
 $methodSnapshot = [];
-$errors         = [];
+$errors = [];
 
 foreach ($classMap as $unifiedClass => $meta) {
     $editionClass = $meta['editionClassName'];
@@ -125,7 +125,7 @@ ksort($methodSnapshot);
 
 // ── 4. Write snapshot files ──────────────────────────────────────────────────
 
-$nsFile  = $outputDir . '/unified-namespace-snapshot.json';
+$nsFile = $outputDir . '/unified-namespace-snapshot.json';
 $apiFile = $outputDir . '/api-signature-snapshot.json';
 
 file_put_contents($nsFile, json_encode($namespaceSnapshot, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
@@ -133,7 +133,7 @@ file_put_contents($apiFile, json_encode($methodSnapshot, JSON_PRETTY_PRINT | JSO
 
 // ── 5. Report ────────────────────────────────────────────────────────────────
 
-$classCount  = count($methodSnapshot);
+$classCount = count($methodSnapshot);
 $methodCount = 0;
 foreach ($methodSnapshot as $entry) {
     $methodCount += count($entry['methods']);

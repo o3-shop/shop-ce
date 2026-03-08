@@ -22,7 +22,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\BackwardsCompatibility;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use ReflectionMethod;
 
 /**
  * Backwards Compatibility Contract Test
@@ -55,24 +54,24 @@ class BackwardsCompatibilityTest extends TestCase
     {
         self::$snapshotDir = __DIR__;
 
-        $nsFile  = self::$snapshotDir . '/unified-namespace-snapshot.json';
+        $nsFile = self::$snapshotDir . '/unified-namespace-snapshot.json';
         $apiFile = self::$snapshotDir . '/api-signature-snapshot.json';
 
         if (!file_exists($nsFile)) {
             self::fail(
                 "Unified namespace snapshot not found at {$nsFile}.\n" .
-                "Run: php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php"
+                'Run: php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php'
             );
         }
         if (!file_exists($apiFile)) {
             self::fail(
                 "API signature snapshot not found at {$apiFile}.\n" .
-                "Run: php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php"
+                'Run: php tests/Unit/BackwardsCompatibility/generate-bc-snapshot.php'
             );
         }
 
         self::$namespaceSnapshot = json_decode(file_get_contents($nsFile), true);
-        self::$apiSnapshot       = json_decode(file_get_contents($apiFile), true);
+        self::$apiSnapshot = json_decode(file_get_contents($apiFile), true);
 
         // Load the current class map for comparison
         $classMapFile = dirname(__DIR__, 3) . '/source/Core/Autoload/UnifiedNameSpaceClassMap.php';
@@ -107,7 +106,7 @@ class BackwardsCompatibilityTest extends TestCase
             "O3-Shop guarantees backwards compatibility with the predecessor's v6 API.\n" .
             "The following unified namespace classes were removed from UnifiedNameSpaceClassMap.php,\n" .
             "which means modules and extensions relying on these classes will break.\n\n" .
-            "Removed classes (" . count($missing) . "):\n  - " .
+            'Removed classes (' . count($missing) . "):\n  - " .
             implode("\n  - ", $missing) . "\n\n" .
             "What to do:\n" .
             "  - If this removal was unintentional, restore the entries in\n" .
@@ -145,7 +144,7 @@ class BackwardsCompatibilityTest extends TestCase
             "O3-Shop guarantees that every unified namespace class resolves to a valid edition class.\n" .
             "The following edition classes are referenced in UnifiedNameSpaceClassMap.php but cannot\n" .
             "be autoloaded. This means modules extending these classes will get fatal errors.\n\n" .
-            "Broken mappings (" . count($unloadable) . "):\n  - " .
+            'Broken mappings (' . count($unloadable) . "):\n  - " .
             implode("\n  - ", $unloadable) . "\n\n" .
             "What to do:\n" .
             "  - Check if the edition class was renamed or moved — update the mapping accordingly.\n" .
@@ -191,7 +190,7 @@ class BackwardsCompatibilityTest extends TestCase
             "O3-Shop guarantees that every public/protected method from the predecessor's v6 API\n" .
             "remains available. Modules and shop extensions may call or override these methods.\n" .
             "Removing them will cause fatal errors or broken functionality for existing installations.\n\n" .
-            "Missing methods (" . count($missing) . "):\n  - " .
+            'Missing methods (' . count($missing) . "):\n  - " .
             implode("\n  - ", $missing) . "\n\n" .
             "What to do:\n" .
             "  - If this removal was unintentional, restore the method(s).\n" .
@@ -236,7 +235,7 @@ class BackwardsCompatibilityTest extends TestCase
             "O3-Shop guarantees that all classes remain extensible (not final).\n" .
             "Marking a class as final prevents modules from extending it via the chain,\n" .
             "which is the core mechanism for shop customisation.\n\n" .
-            "Classes made final (" . count($violations) . "):\n  - " .
+            'Classes made final (' . count($violations) . "):\n  - " .
             implode("\n  - ", $violations) . "\n\n" .
             "What to do:\n" .
             "  - Remove the 'final' keyword from the class declaration.\n" .
@@ -287,7 +286,7 @@ class BackwardsCompatibilityTest extends TestCase
             "O3-Shop guarantees that all public/protected methods remain overridable (not final).\n" .
             "Marking a method as final prevents modules from overriding it, breaking existing\n" .
             "customisations that rely on method overrides.\n\n" .
-            "Methods made final (" . count($violations) . "):\n  - " .
+            'Methods made final (' . count($violations) . "):\n  - " .
             implode("\n  - ", $violations) . "\n\n" .
             "What to do:\n" .
             "  - Remove the 'final' keyword from the method declaration.\n" .
@@ -340,7 +339,7 @@ class BackwardsCompatibilityTest extends TestCase
             "O3-Shop guarantees that method visibility is never reduced.\n" .
             "A public method must stay public, a protected method must not become private.\n" .
             "Reducing visibility breaks modules that call or override these methods.\n\n" .
-            "Visibility changes (" . count($violations) . "):\n  - " .
+            'Visibility changes (' . count($violations) . "):\n  - " .
             implode("\n  - ", $violations) . "\n\n" .
             "What to do:\n" .
             "  - Restore the original visibility of the method(s).\n" .
