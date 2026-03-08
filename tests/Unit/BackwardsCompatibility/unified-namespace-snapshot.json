@@ -1577,12 +1577,6 @@
         "isInterface": false,
         "isDeprecated": false
     },
-    "OxidEsales\\Eshop\\Application\\Controller\\MoreDetailsController": {
-        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\MoreDetailsController",
-        "isAbstract": false,
-        "isInterface": false,
-        "isDeprecated": false
-    },
     "OxidEsales\\Eshop\\Application\\Controller\\NewsController": {
         "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\NewsController",
         "isAbstract": false,
@@ -2416,12 +2410,6 @@
         "isAbstract": false,
         "isInterface": false,
         "isDeprecated": false
-    },
-    "OxidEsales\\Eshop\\Core\\CreditCardValidator": {
-        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\CreditCardValidator",
-        "isAbstract": false,
-        "isInterface": false,
-        "isDeprecated": true
     },
     "OxidEsales\\Eshop\\Core\\Curl": {
         "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Curl",
