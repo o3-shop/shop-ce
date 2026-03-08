@@ -1,0 +1,3350 @@
+{
+    "OxidEsales\\Eshop\\Application\\Component\\BasketComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\BasketComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\CategoriesComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\CategoriesComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\CurrencyComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\CurrencyComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\LanguageComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\LanguageComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Locator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\NewsComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\NewsComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\ShopComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\ShopComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\UserComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\UserComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\UtilsComponent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\UtilsComponent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\Actions": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\Actions",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\ArticleBox": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\ArticleBox",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\ArticleDetails": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\ArticleDetails",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\BetaNote": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\BetaNote",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\CategoryTree": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\CategoryTree",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\CookieNote": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\CookieNote",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\CurrencyList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\CurrencyList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\Information": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\Information",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\LanguageList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\LanguageList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\ManufacturerList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\ManufacturerList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\MiniBasket": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\MiniBasket",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\Rating": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\Rating",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\Recommendation": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\Recommendation",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\Review": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\Review",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\ServiceList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\ServiceList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\ServiceMenu": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\ServiceMenu",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\VendorList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\VendorList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Component\\Widget\\WidgetController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Component\\Widget\\WidgetController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountDownloadsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountDownloadsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountNewsletterController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountNewsletterController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountNoticeListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountNoticeListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountOrderController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountOrderController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountPasswordController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountPasswordController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountRecommlistController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountRecommlistController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountReviewController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountReviewController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountUserController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountUserController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\AccountWishlistController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountWishlistController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsArticleAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsArticleAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsGroupsAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsGroupsAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsOrderAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsOrderAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminContent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminContent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminLinks": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminLinks",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminNews": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminNews",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminNewsletter": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminNewsletter",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminOrder": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminOrder",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminPayment": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminPayment",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminPriceAlarm": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminPriceAlarm",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminStart": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminStart",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminUser": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminUser",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminWrapping": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminWrapping",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminlinksList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminlinksList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminlinksMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminlinksMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleAccessoriesAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAccessoriesAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleAttribute": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttribute",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleAttributeAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleBundleAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleBundleAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleCrossselling": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrossselling",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleCrosssellingAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleExtend": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtend",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleExtendAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleFiles": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleFiles",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleOverview": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleOverview",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticlePictures": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticlePictures",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleReview": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleReview",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleSelectionAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSelectionAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleSeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleStock": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleStock",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleUserdef": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleUserdef",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleVariant": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleVariant",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeCategory": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategory",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeCategoryAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AttributeOrderAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeOrderAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryOrder": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrder",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryOrderAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryPictures": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryPictures",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategorySeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategorySeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryText": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryText",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CategoryUpdate": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryUpdate",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ContentList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ContentList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ContentMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ContentMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ContentSeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ContentSeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CountryController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CountryController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CountryList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CountryList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\CountryMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CountryMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryArticles": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticles",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryArticlesAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticlesAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryCategoriesAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryCategoriesAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryGroupsAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryGroupsAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetCountryAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetCountryAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetGroupsAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetGroupsAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetPayment": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetPayment",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetPaymentAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetPaymentAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetRdfa": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetRdfa",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetUsers": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetUsers",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliverySetUsersAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetUsersAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryUsers": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryUsers",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DeliveryUsersAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryUsersAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiagnosticsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiagnosticsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiagnosticsList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiagnosticsList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiagnosticsMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiagnosticsMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountArticles": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticles",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountArticlesAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticlesAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountCategoriesAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountCategoriesAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountGroupsAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountGroupsAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountItemAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountItemAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountUsers": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountUsers",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DiscountUsersAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountUsersAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DynEconda": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynEconda",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DynamicExportBaseController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DynamicInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicInterface",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DynamicScreenController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicScreenController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DynamicScreenList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicScreenList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\DynamicScreenLocal": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicScreenLocal",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\GenericExport": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\GenericExport",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\GenericExportDo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\GenericExportDo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\GenericExportMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\GenericExportMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\GenericImport": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\GenericImport",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\GenericImportMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\GenericImportMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\LanguageController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\LanguageController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\LanguageList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\LanguageList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\LanguageMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\LanguageMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ListComponentAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ListReview": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListReview",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ListUser": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListUser",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\LoginController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\LoginController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ManufacturerController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ManufacturerList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ManufacturerMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ManufacturerMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ManufacturerSeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerSeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ModuleConfiguration": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleConfiguration",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ModuleController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ModuleList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ModuleMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ModuleSortList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleSortList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NavigationController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NavigationTree": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsText": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsText",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterPlain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterPlain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterPreview": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterPreview",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterSelection": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSelection",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterSelectionAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSelectionAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NewsletterSend": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSend",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ObjectSeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ObjectSeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderAddress": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderAddress",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderArticle": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderArticle",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderDownloads": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderDownloads",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderOverview": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderOverview",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderRemark": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderRemark",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentCountry": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentCountry",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentCountryAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentCountryAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentRdfa": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentRdfa",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PriceAlarmList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmMail": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PriceAlarmMail",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PriceAlarmMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmSend": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PriceAlarmSend",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListOrderAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListOrderAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopConfiguration": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopConfiguration",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopDefaultCategoryAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopDefaultCategoryAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopPerformance": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopPerformance",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopRdfa": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopRdfa",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopSeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopSeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopSystem": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopSystem",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SystemInfoController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SystemInfoController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SystemRequirements": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SystemRequirements",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SystemRequirementsList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SystemRequirementsList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SystemRequirementsMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SystemRequirementsMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ThemeConfiguration": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ThemeConfiguration",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ThemeController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ThemeController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ThemeList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ThemeList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ThemeMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ThemeMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ToolsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ToolsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ToolsList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ToolsList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ToolsMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ToolsMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserAddress": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserAddress",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserArticle": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserArticle",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserExtend": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserExtend",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserGroupController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserGroupController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserGroupList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserGroupList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserGroupMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserGroupMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserGroupMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserGroupMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserOverview": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserOverview",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserPayment": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserPayment",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserRemark": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserRemark",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorMainAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorMainAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorSeo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorSeo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieExport": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieExport",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieGenerate": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieGenerate",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieGroups": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieGroups",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieGroupsAjax": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieGroupsAjax",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\WrappingList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\WrappingList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\Admin\\WrappingMain": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\WrappingMain",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ArticleDetailsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ArticleDetailsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ArticleListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ArticleListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\BasketController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\BasketController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ClearCookiesController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ClearCookiesController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\CompareController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\CompareController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ContactController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ContactController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ContentController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ContentController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\CreditsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\CreditsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\DownloadController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\DownloadController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ExceptionErrorController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ExceptionErrorController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ForgotPasswordController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ForgotPasswordController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\FrontendController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\FrontendController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\InviteController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\InviteController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\LinksController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\LinksController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ManufacturerListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ManufacturerListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\MoreDetailsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\MoreDetailsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\NewsController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\NewsController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\NewsletterController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\NewsletterController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\OrderController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\OrderController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\OxidStartController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\OxidStartController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\PaymentController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\PaymentController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\PriceAlarmController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\PriceAlarmController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\RecommListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\RecommListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\RecommendationAddController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\RecommendationAddController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\RegisterController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\RegisterController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ReviewController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ReviewController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\RssController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\RssController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\SearchController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\SearchController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\StartController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\StartController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\SuggestController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\SuggestController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\TemplateController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\TemplateController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\TextEditorHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\TextEditorHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\ThankYouController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\ThankYouController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\UserController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\UserController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\VendorListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\VendorListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\WishListController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\WishListController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Controller\\WrappingController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Controller\\WrappingController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ActionList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ActionList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Actions": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Actions",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Address": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Address",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\AmountPriceList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\AmountPriceList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Article": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ArticleList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ArticleList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Attribute": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Attribute",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\AttributeList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\AttributeList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Basket": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Basket",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\BasketContentMarkGenerator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\BasketContentMarkGenerator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\BasketItem": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\BasketItem",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\BasketReservation": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\BasketReservation",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Category": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Category",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\CategoryList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\CategoryList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\CompanyVatIn": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\CompanyVatIn",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Content": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Content",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ContentList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ContentList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Contract\\ArticleInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Contract\\ArticleInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Contract\\CacheConnectorInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Contract\\CacheConnectorInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Country": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Country",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\CountryList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\CountryList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Delivery": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Delivery",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\DeliveryList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\DeliveryList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\DeliverySet": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\DeliverySet",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\DeliverySetList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\DeliverySetList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Diagnostics": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Diagnostics",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\DiagnosticsOutput": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\DiagnosticsOutput",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Discount": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Discount",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\DiscountList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\DiscountList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\File": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\File",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\FileChecker": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\FileChecker",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\FileCheckerResult": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\FileCheckerResult",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\FileCollector": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\FileCollector",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Groups": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Groups",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Links": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Links",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ListObject": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ListObject",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Maintenance": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Maintenance",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Manufacturer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Manufacturer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ManufacturerList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ManufacturerList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\MdVariant": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\MdVariant",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\MediaUrl": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\MediaUrl",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\News": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\News",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\NewsList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\NewsList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\NewsSubscribed": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\NewsSubscribed",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Newsletter": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Newsletter",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Object2Category": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Object2Category",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Object2Group": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Object2Group",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Order": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Order",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\OrderArticle": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\OrderArticle",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\OrderArticleList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\OrderArticleList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\OrderFile": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\OrderFile",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\OrderFileList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\OrderFileList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Payment": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Payment",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\PaymentGateway": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\PaymentGateway",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\PaymentList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\PaymentList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\PriceAlarm": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\PriceAlarm",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Rating": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Rating",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\RecommendationList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\RecommendationList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Remark": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Remark",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\RequiredAddressFields": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\RequiredAddressFields",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\RequiredFieldValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\RequiredFieldValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\RequiredFieldsValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\RequiredFieldsValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Review": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Review",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\RssFeed": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\RssFeed",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Search": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Search",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SelectList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SelectList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Selection": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Selection",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SeoEncoderArticle": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderArticle",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SeoEncoderCategory": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderCategory",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SeoEncoderContent": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderContent",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SeoEncoderManufacturer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderManufacturer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SeoEncoderRecomm": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderRecomm",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SeoEncoderVendor": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderVendor",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Shop": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Shop",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ShopList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ShopList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\ShopViewValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\ShopViewValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SimpleVariant": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SimpleVariant",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SimpleVariantList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SimpleVariantList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\SmartyRenderer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\SmartyRenderer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\State": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\State",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\User": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\User",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\UserAddressList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\UserAddressList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\UserBasket": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\UserBasket",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\UserBasketItem": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\UserBasketItem",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\UserList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\UserList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\UserPayment": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\UserPayment",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\User\\UserShippingAddressUpdatableFields": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\User\\UserShippingAddressUpdatableFields",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\User\\UserUpdatableFields": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\User\\UserUpdatableFields",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\VariantHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\VariantHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\VariantSelectList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\VariantSelectList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\VatSelector": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\VatSelector",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Vendor": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Vendor",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\VendorList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\VendorList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Voucher": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Voucher",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\VoucherList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\VoucherList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\VoucherSerie": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\VoucherSerie",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Application\\Model\\Wrapping": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Application\\Model\\Wrapping",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\AdminLogSqlDecorator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\AdminLogSqlDecorator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Autoload\\BackwardsCompatibilityAutoload": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Autoload\\BackwardsCompatibilityAutoload",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\BackwardsCompatibleClassNameProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\BackwardsCompatibleClassNameProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Base": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Base",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\CompanyVatInChecker": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\CompanyVatInChecker",
+        "isAbstract": true,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\CompanyVatInCountryChecker": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\CompanyVatInCountryChecker",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\CompanyVatInValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\CompanyVatInValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Config": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Config",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ConfigFile": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ConfigFile",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\AbstractUpdatableFields": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\AbstractUpdatableFields",
+        "isAbstract": true,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\ClassNameResolverInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\ClassNameResolverInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\ClassProviderStorageInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\ClassProviderStorageInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\ControllerMapProviderInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\ControllerMapProviderInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\IConfigurable": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\IConfigurable",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\ICountryAware": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\ICountryAware",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\IDisplayError": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\IDisplayError",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\IModuleValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\IModuleValidator",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\ISelectList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\ISelectList",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Contract\\IUrl": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Contract\\IUrl",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Controller\\BaseController": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Controller\\BaseController",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Counter": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Counter",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\CreditCardValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\CreditCardValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Curl": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Curl",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Dao\\ApplicationServerDao": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Dao\\ApplicationServerDao",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Dao\\ApplicationServerDaoInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Dao\\ApplicationServerDaoInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Dao\\BaseDaoInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Dao\\BaseDaoInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\DataObject\\ApplicationServer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\DataObject\\ApplicationServer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\DatabaseProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\DatabaseProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Database\\Adapter\\DatabaseInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Database\\Adapter\\DatabaseInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Database\\Adapter\\Doctrine\\Database": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Database\\Adapter\\Doctrine\\Database",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Database\\Adapter\\Doctrine\\ResultSet": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Database\\Adapter\\Doctrine\\ResultSet",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Database\\Adapter\\ResultSetInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Database\\Adapter\\ResultSetInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\DbMetaDataHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\DbMetaDataHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\DebugInfo": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\DebugInfo",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Decryptor": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Decryptor",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\DisplayError": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\DisplayError",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\DynamicImageGenerator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\DynamicImageGenerator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Edition\\EditionPathProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Edition\\EditionPathProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Edition\\EditionRootPathProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Edition\\EditionRootPathProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Edition\\EditionSelector": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Edition\\EditionSelector",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Email": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Email",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Encryptor": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Encryptor",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ArticleException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ArticleException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ArticleInputException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ArticleInputException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ConnectionException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ConnectionException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\CookieException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\CookieException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\DatabaseConnectionException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\DatabaseConnectionException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\DatabaseErrorException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\DatabaseErrorException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\DatabaseException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\DatabaseException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\DatabaseNotConfiguredException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\DatabaseNotConfiguredException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ExceptionHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ExceptionHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ExceptionToDisplay": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ExceptionToDisplay",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\FileException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\FileException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\InputException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\InputException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\LanguageException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\LanguageException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ModuleValidationException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ModuleValidationException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\NoArticleException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\NoArticleException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\NoResultException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\NoResultException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ObjectException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ObjectException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\OutOfStockException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\OutOfStockException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\RoutingException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\RoutingException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\ShopException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\ShopException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\StandardException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\StandardException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\SystemComponentException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\SystemComponentException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\UserException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\UserException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Exception\\VoucherException": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Exception\\VoucherException",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Field": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Field",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\FileCache": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\FileCache",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\FileSystem\\FileSystem": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\FileSystem\\FileSystem",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Form\\FormFields": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Form\\FormFields",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Form\\FormFieldsCleaner": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Form\\FormFieldsCleaner",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Form\\FormFieldsTrimmer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Form\\FormFieldsTrimmer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Form\\FormFieldsTrimmerInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Form\\FormFieldsTrimmerInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Form\\UpdatableFieldsConstructor": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Form\\UpdatableFieldsConstructor",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\GenericImport": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\GenericImport",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Accessories2Article": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Accessories2Article",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Article": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Article",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Article2Action": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Article2Action",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Article2Category": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Article2Category",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\ArticleExtends": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\ArticleExtends",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Category": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Category",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Country": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Country",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\CrossSelling": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\CrossSelling",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\ImportObject": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\ImportObject",
+        "isAbstract": true,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Order": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Order",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\OrderArticle": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\OrderArticle",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\ScalePrice": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\ScalePrice",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\User": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\User",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\GenericImport\\ImportObject\\Vendor": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\GenericImport\\ImportObject\\Vendor",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Hasher": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Hasher",
+        "isAbstract": true,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Header": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Header",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\InputValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\InputValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Language": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Language",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\MailValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\MailValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Model\\BaseModel": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Model\\BaseModel",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Model\\FieldNameHelper": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Model\\FieldNameHelper",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Model\\ListModel": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Model\\ListModel",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Model\\MultiLanguageModel": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Model\\MultiLanguageModel",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\Module": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\Module",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleCache": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleCache",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleChainsGenerator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleChainsGenerator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleExtensionsCleaner": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleExtensionsCleaner",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleInstaller": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleInstaller",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleMetadataValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleMetadataValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleSmartyPluginDirectories": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleSmartyPluginDirectories",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleSmartyPluginDirectoryRepository": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleSmartyPluginDirectoryRepository",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleSmartyPluginDirectoryValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleSmartyPluginDirectoryValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleTemplateBlockContentReader": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleTemplateBlockContentReader",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleTemplateBlockPathFormatter": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleTemplateBlockPathFormatter",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleTemplateBlockRepository": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleTemplateBlockRepository",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleTemplatePathCalculator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleTemplatePathCalculator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleTranslationPathFinder": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleTranslationPathFinder",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleValidatorFactory": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleValidatorFactory",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\Module\\ModuleVariablesLocator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Module\\ModuleVariablesLocator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\NamespaceInformationProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\NamespaceInformationProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\NoJsValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\NoJsValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\OnlineVatIdCheck": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\OnlineVatIdCheck",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\OpenSSLFunctionalityChecker": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\OpenSSLFunctionalityChecker",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Output": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Output",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Oxid": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Oxid",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\PasswordHasher": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\PasswordHasher",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\PasswordSaltGenerator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\PasswordSaltGenerator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\PictureHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\PictureHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Price": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Price",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\PriceList": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\PriceList",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Registry": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Registry",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Request": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Request",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Routing\\ControllerClassNameResolver": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Routing\\ControllerClassNameResolver",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Routing\\ModuleControllerMapProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Routing\\ModuleControllerMapProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Routing\\Module\\ClassProviderStorage": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Routing\\Module\\ClassProviderStorage",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Routing\\ShopControllerMapProvider": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Routing\\ShopControllerMapProvider",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SeoDecoder": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SeoDecoder",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SeoEncoder": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SeoEncoder",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SepaBICValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SepaBICValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SepaIBANValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SepaIBANValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SepaValidator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SepaValidator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Service\\ApplicationServerService": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Service\\ApplicationServerService",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Service\\ApplicationServerServiceInterface": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Service\\ApplicationServerServiceInterface",
+        "isAbstract": false,
+        "isInterface": true,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Session": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Session",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SettingsHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SettingsHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Sha512Hasher": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Sha512Hasher",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": true
+    },
+    "OxidEsales\\Eshop\\Core\\ShopControl": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ShopControl",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ShopIdCalculator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ShopIdCalculator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ShopVersion": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ShopVersion",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SimpleXml": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SimpleXml",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Smarty\\Plugin\\Emos": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Smarty\\Plugin\\Emos",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Smarty\\Plugin\\EmosAdapter": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Smarty\\Plugin\\EmosAdapter",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Smarty\\Plugin\\EmosItem": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Smarty\\Plugin\\EmosItem",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Str": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Str",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\StrMb": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\StrMb",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\StrRegular": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\StrRegular",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SubShopSpecificFileCache": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SubShopSpecificFileCache",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SystemEventHandler": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SystemEventHandler",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\SystemRequirements": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\SystemRequirements",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\TableViewNameGenerator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\TableViewNameGenerator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Theme": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Theme",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UniversallyUniqueIdGenerator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UniversallyUniqueIdGenerator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UserCounter": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UserCounter",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\Utils": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\Utils",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsCount": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsCount",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsDate": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsDate",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsFile": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsFile",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsObject": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsObject",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsPic": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsPic",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsServer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsServer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsString": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsString",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsUrl": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsUrl",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsView": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsView",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\UtilsXml": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\UtilsXml",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ViewConfig": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ViewConfig",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ViewHelper\\JavaScriptRegistrator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ViewHelper\\JavaScriptRegistrator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ViewHelper\\JavaScriptRenderer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ViewHelper\\JavaScriptRenderer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ViewHelper\\StyleRegistrator": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ViewHelper\\StyleRegistrator",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\ViewHelper\\StyleRenderer": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\ViewHelper\\StyleRenderer",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    },
+    "OxidEsales\\Eshop\\Core\\WidgetControl": {
+        "editionClassName": "OxidEsales\\EshopCommunity\\Core\\WidgetControl",
+        "isAbstract": false,
+        "isInterface": false,
+        "isDeprecated": false
+    }
+}
