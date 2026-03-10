@@ -239,7 +239,7 @@ $configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.p
  * This directory is required for caching, Smarty compilation, and other temporary files.
  */
 $tmpDir = $configFile->getVar('sCompileDir');
-if ($tmpDir && !is_dir($tmpDir)) {
+if ($tmpDir && strpos($tmpDir, '<') === false && !is_dir($tmpDir)) {
     if (!mkdir($tmpDir, 0755, true)) {
         trigger_error("Error: Could not create tmp directory '$tmpDir'. Please check permissions.", E_USER_WARNING);
     }
