@@ -20,7 +20,7 @@ declare(strict_types=1);
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Smarty\Extension;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Smarty\Extension;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Extension\CacheResourcePlugin;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyContextInterface;

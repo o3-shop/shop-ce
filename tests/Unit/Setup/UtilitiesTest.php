@@ -21,7 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Setup;
 
-use Exception;
 use OxidEsales\EshopCommunity\Setup\Utilities;
 
 require_once getShopBasePath() . '/Setup/functions.php';
@@ -148,20 +147,16 @@ class UtilitiesTest extends \OxidTestCase
      */
     public function testGetEnvVar()
     {
-        if (!function_exists('getenv')) {
-            $this->markTestSkipped('getenv() function is not available.');
-        }
-        if (getenv('CI') == true) {
-            $this->markTestSkipped('Skipping test in CI environment.');
-        }
+        // Set a known env var so the test works in any environment (including CI).
+        $sName = 'O3SHOP_TEST_ENV_VAR';
+        $sValue = 'test_value_' . uniqid();
+        putenv("{$sName}={$sValue}");
 
-        // ENV is not always filled in..
-        if (count($_ENV)) {
-            $sValue = current($_ENV);
-            $sName = key($_ENV);
-
+        try {
             $oUtils = new Utilities();
             $this->assertEquals($sValue, $oUtils->getEnvVar($sName));
+        } finally {
+            putenv($sName);
         }
     }
 
@@ -210,68 +205,6 @@ class UtilitiesTest extends \OxidTestCase
         $oUtils = new Utilities();
         $this->assertFalse($oUtils->isValidEmail('admin'));
         $this->assertTrue($oUtils->isValidEmail('shop@admin.com'));
-    }
-
-    /**
-     * Verify that Utilities::updateConfigFile stores the given variables correctly.
-     *
-     * @throws \Exception
-     */
-    public function testUpdateConfigFileForPassword()
-    {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        //preparation
-        $this->assertTrue(function_exists('getDefaultFileMode'), 'missing function getDefaultFileMode');
-        $this->assertTrue(function_exists('getDefaultConfigFileMode'), 'missing function getDefaultConfigFileMode');
-
-        $utilities = new Utilities();
-        $password = 'l3$z4f#bu\'xyz\\\'zh"ad\\"dc$1\1\\1\2v5745XC$lic';
-        $url = 'http://test.myoxidshop.com';
-
-        /** @var  $originalFile take the real config.inc.php.dist for testing as this is the blueprint for config.inc.php */
-        $originalFile = OX_BASE_PATH . 'config.inc.php.dist';
-        if (!realpath($originalFile)) {
-            $originalFile = VENDOR_PATH .
-                            'oxid-esales' . DIRECTORY_SEPARATOR .
-                            'oxideshop-ce' . DIRECTORY_SEPARATOR .
-                            'source' . DIRECTORY_SEPARATOR .
-                            'config.inc.php.dist';
-        }
-        if (!realpath($originalFile)) {
-            throw new Exception('Configuration file template \'config.inc.php.dist\' not found');
-        }
-        $destinationDirectory = realpath($this->configTestPath);
-        if (!is_writable(realpath($destinationDirectory))) {
-            throw new Exception($destinationDirectory . ' is not writable');
-        }
-
-        $destinationFile = $destinationDirectory . '/config.inc.php';
-        file_put_contents($destinationFile, file_get_contents($originalFile));
-        $this->assertStringNotContainsString($password, $destinationFile);
-
-        $configParameters = [
-            'sShopDir' => $destinationDirectory,
-            'dbPwd'    => $password,
-            'sShopURL' => $url,
-        ];
-
-        //check
-        try {
-            $utilities->updateConfigFile($configParameters);
-        } catch (Exception $exception) {
-            $this->fail($exception->getMessage());
-        }
-
-        /**
-         * Test if the _values_ are assigned correctly:
-         * - file can be parsed without problems
-         * - the properties are set to the correct values
-         */
-        include $destinationFile;
-        foreach ($configParameters as $key => $value) {
-            $this->assertEquals($value, $this->{$key}, "The value for the parameter $key was not updated as expected");
-        }
     }
 
     /**

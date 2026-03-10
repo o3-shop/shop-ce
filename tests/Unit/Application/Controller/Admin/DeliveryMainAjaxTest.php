@@ -143,10 +143,8 @@ class DeliveryMainAjaxTest extends \OxidTestCase
      */
     public function testRemoveCountryFromDel()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDeliveryCountry1', '_testDeliveryCountry2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testDeliveryCountry1', '_testDeliveryCountry2']));
 
         $sSql = "select count(oxid) from oxobject2delivery where oxid in ('_testDeliveryCountry1', '_testDeliveryCountry2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -179,16 +177,14 @@ class DeliveryMainAjaxTest extends \OxidTestCase
      */
     public function testAddCountryToDel()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sSynchoxid = '_testActionAddCountry';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addCountryToDel();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -211,8 +207,8 @@ class DeliveryMainAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addCountryToDel();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

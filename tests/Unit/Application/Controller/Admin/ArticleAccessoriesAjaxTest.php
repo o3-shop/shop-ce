@@ -134,8 +134,8 @@ class ArticleAccessoriesAjaxTest extends \OxidTestCase
      */
     public function testRemoveArticleAcc()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle1', '_testArticle2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle1', '_testArticle2']));
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxaccessoire2article where OXARTICLENID='_testArticleAccessories'"));
 
         $oView->removearticleacc();
@@ -166,10 +166,10 @@ class ArticleAccessoriesAjaxTest extends \OxidTestCase
      */
     public function testAddArticleAcc()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class, ['_getActionIds']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class, ['getActionIds']);
         $this->setRequestParameter('synchoxid', '_testArticle1');
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxaccessoire2article where oxarticlenid='_testArticle1'"));
         $oView->addarticleacc();
@@ -183,7 +183,7 @@ class ArticleAccessoriesAjaxTest extends \OxidTestCase
      */
     public function testAddArticleAccAll()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class, ['_getActionIds']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleAccessoriesAjax::class, ['getActionIds']);
         $sSynchoxid = '_testArticle1';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
         $this->setRequestParameter('all', true);
@@ -191,7 +191,7 @@ class ArticleAccessoriesAjaxTest extends \OxidTestCase
         //count how much articles gets filtered
         $iCount = oxDb::getDb()->getOne('select count(oxid) from ' . $this->getArticleViewTable() . ' where 1  and ' . $this->getArticleViewTable() . ".oxparentid = ''  and " . $this->getArticleViewTable() . ".oxid not in (  select oxaccessoire2article.oxobjectid from oxaccessoire2article  where oxaccessoire2article.oxarticlenid = '$sSynchoxid'  )  and " . $this->getArticleViewTable() . ".oxid != '$sSynchoxid'");
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $this->assertGreaterThan(0, $iCount);
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxaccessoire2article where oxarticlenid='_testArticle1'"));

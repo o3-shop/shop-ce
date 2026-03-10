@@ -134,6 +134,9 @@ class TranslateLogicTest extends UnitTestCase
         $oShop->save();
 
         $this->assertEquals($translation, $this->multiLangFilterLogic->multiLang($ident));
+
+        // Clear expected log warnings from translating missing translation keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**
@@ -163,5 +166,8 @@ class TranslateLogicTest extends UnitTestCase
         $this->setAdminMode(true);
 
         $this->assertEquals($translation, $this->multiLangFilterLogic->multiLang($ident));
+
+        // Clear expected log warnings from translating missing translation keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 }

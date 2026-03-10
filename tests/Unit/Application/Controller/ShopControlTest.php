@@ -317,7 +317,6 @@ class ShopControlTest extends \OxidTestCase
      */
     public function testRenderTemplateNotFound()
     {
-        $this->markTestSkipped('Bug: test is not working on a windows machine.');
         ContainerFactory::resetContainer();
         $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['render']);
         $oView->expects($this->once())->method('render')->will($this->returnValue('wrongTpl'));
@@ -395,7 +394,6 @@ class ShopControlTest extends \OxidTestCase
 
     public function testProcessJson()
     {
-        $this->markTestSkipped('not working');
         ContainerFactory::resetContainer();
         $this->getConfig()->setConfigParam('sTheme', 'wave');
 
@@ -423,9 +421,12 @@ class ShopControlTest extends \OxidTestCase
         $oOut->expects($this->once())
             ->method('sendHeaders')
             ->willReturn(null);
-        $oOut->expects($this->once())
+        $oOut->expects($this->exactly(2))
             ->method('output')
-            ->with($this->equalTo($controllerClassName), $this->anything());
+            ->withConsecutive(
+                [$this->equalTo('errors'), $this->equalTo([])],
+                [$this->equalTo($controllerClassName), $this->anything()]
+            );
         $oOut->expects($this->once())
             ->method('flushOutput')
             ->willReturn(null);
@@ -466,7 +467,7 @@ class ShopControlTest extends \OxidTestCase
         $oConfig->expects($this->any())->method('getConfigParam')->will($this->returnValueMap($map));
         $oConfig->expects($this->any())->method('getTemplatePath')->will($this->returnValue($sTplPath));
 
-        $aTasks = ['isAdmin', '_log', '_startMonitor', 'getConfig', '_stopMonitor', '_getOutputManager', '_getErrors', '_executeMaintenanceTasks'];
+        $aTasks = ['isAdmin', '_log', '_startMonitor', 'getConfig', '_stopMonitor', '_getOutputManager', '_getErrors', '_getFormattedErrors', '_executeMaintenanceTasks'];
 
         $oOut = $this->getMock(\OxidEsales\Eshop\Core\Output::class, ['output', 'flushOutput', 'sendHeaders', 'setOutputFormat']);
         $oOut->expects($this->once())
@@ -499,18 +500,12 @@ class ShopControlTest extends \OxidTestCase
         $oControl->expects($this->any())->method('isAdmin')->will($this->returnValue(false));
         $oControl->expects($this->any())->method('_getOutputManager')->will($this->returnValue($oOut));
         $oControl->expects($this->atLeastOnce())->method('_executeMaintenanceTasks');
-        $aErrors = [];
-        $oDE = oxNew('oxDisplayError');
-        $oDE->setMessage('test1');
-        $aErrors['other'][] = serialize($oDE);
-        $oDE->setMessage('test2');
-        $aErrors['default'][] = serialize($oDE);
-        $oDE->setMessage('test3');
-        $aErrors['other'][] = serialize($oDE);
-        $oDE->setMessage('test4');
-        $aErrors['default'][] = serialize($oDE);
 
-        $oControl->expects($this->any())->method('_getErrors')->will($this->returnValue($aErrors));
+        $aFormattedErrors = [
+            'other'   => ['test1', 'test3'],
+            'default' => ['test2', 'test4'],
+        ];
+        $oControl->expects($this->any())->method('_getFormattedErrors')->will($this->returnValue($aFormattedErrors));
 
         $oControl->UNITprocess($controllerClassName, null);
     }

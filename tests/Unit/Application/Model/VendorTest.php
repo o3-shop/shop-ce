@@ -103,9 +103,10 @@ class VendorTest extends \OxidTestCase
 
     public function testGetBaseSeoLinkForPage()
     {
-        $this->markTestSkipped('Bug: Got url instead of sVendorPageUrl');
-        oxTestModules::addFunction('oxSeoEncoderVendor', 'getVendorUrl', "{return 'sVendorUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderVendor', 'getVendorPageUrl', "{return 'sVendorPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, ['getVendorUrl', 'getVendorPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getVendorUrl')->will($this->returnValue('sVendorUrl'));
+        $seoEncoderMock->expects($this->any())->method('getVendorPageUrl')->will($this->returnValue('sVendorPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, $seoEncoderMock);
 
         /** @var Vendor $vendor */
         $vendor = oxNew('oxvendor');
@@ -114,9 +115,10 @@ class VendorTest extends \OxidTestCase
 
     public function testGetBaseSeoLink()
     {
-        $this->markTestSkipped('Bug: Got url instead of sVendorUrl');
-        oxTestModules::addFunction('oxSeoEncoderVendor', 'getVendorUrl', "{return 'sVendorUrl';}");
-        oxTestModules::addFunction('oxSeoEncoderVendor', 'getVendorPageUrl', "{return 'sVendorPageUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, ['getVendorUrl', 'getVendorPageUrl']);
+        $seoEncoderMock->expects($this->any())->method('getVendorUrl')->will($this->returnValue('sVendorUrl'));
+        $seoEncoderMock->expects($this->any())->method('getVendorPageUrl')->will($this->returnValue('sVendorPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, $seoEncoderMock);
 
         /** @var Vendor $vendor */
         $vendor = oxNew('oxvendor');
@@ -407,21 +409,19 @@ class VendorTest extends \OxidTestCase
 
     public function testDelete()
     {
-        $this->markTestSkipped('Bug: Got not deleted?');
-        oxTestModules::addFunction('oxSeoEncoderVendor', 'onDeleteVendor', '{$this->onDelete[] = $aA[0];}');
-        oxRegistry::get('oxSeoEncoderVendor')->onDelete = [];
+        $seoEncoderVendorMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, ['onDeleteVendor']);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderVendor::class, $seoEncoderVendorMock);
 
         /** @var Vendor $vendor */
         $vendor = oxNew('oxvendor');
         $this->assertEquals(false, $vendor->delete());
-        $this->assertEquals(0, count(oxRegistry::get('oxSeoEncoderVendor')->onDelete));
         $this->assertEquals(false, $vendor->exists());
 
-        $vendor->save();
-        $this->assertEquals(true, $vendor->delete());
-        $this->assertEquals(false, $vendor->exists());
-        $this->assertEquals(1, count(oxRegistry::get('oxSeoEncoderVendor')->onDelete));
-        $this->assertSame($vendor, oxRegistry::get('oxSeoEncoderVendor')->onDelete[0]);
+        $vendor1 = oxNew('oxvendor');
+        $seoEncoderVendorMock->expects($this->once())->method('onDeleteVendor')->with($vendor1);
+        $vendor1->save();
+        $this->assertEquals(true, $vendor1->delete());
+        $this->assertEquals(false, $vendor1->exists());
     }
 
     public function testGetStdLinkWithParams()

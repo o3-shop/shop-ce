@@ -108,7 +108,6 @@ class ForgotpwdTest extends \OxidTestCase
      */
     public function testUpdatePasswordProblemsWithPass()
     {
-        $this->markTestSkipped('Bug: false is not true');
         // overriding utility function
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ throw new Exception( $aA[0] ); }');
 
@@ -217,8 +216,6 @@ class ForgotpwdTest extends \OxidTestCase
      */
     public function testUpdatePassword_passwordSpecChars()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oRealInputValidator = \OxidEsales\Eshop\Core\Registry::getInputValidator();
 
         $sPass = '&quot;&#34;"o?p[]XfdKvA=#3K8tQ%';

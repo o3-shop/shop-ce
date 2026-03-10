@@ -128,7 +128,7 @@ class DeliveryMainTest extends \OxidTestCase
 
         $oType = new stdClass();
         $oType->sType = 't';      // test
-        $oType->sDesc = $oLang->translateString('test', $iLang);
+        $oType->sDesc = 'test';
         $aDelTypes['t'] = $oType;
 
         $this->assertIsArray($aDelTypes);

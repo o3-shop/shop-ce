@@ -75,11 +75,9 @@ class DynscreenTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenController::class, ['_setupNavigation']);
-        $oView->expects($this->once())->method('_setupNavigation');
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenController::class, ['setupNavigation']);
+        $oView->expects($this->once())->method('setupNavigation');
         $this->assertEquals('dynscreen.tpl', $oView->render());
     }
 }

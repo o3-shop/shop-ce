@@ -219,10 +219,8 @@ class DeliveryArticlesAjaxTest extends \OxidTestCase
      */
     public function testRemoveArtFromDel()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDelivery1', '_testDelivery2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testDelivery1', '_testDelivery2']));
 
         $sSql = "select count(oxid) from oxobject2delivery where oxid in ('_testDelivery1', '_testDelivery2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -255,16 +253,14 @@ class DeliveryArticlesAjaxTest extends \OxidTestCase
      */
     public function testAddArtToDel()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sSynchoxid = '_testActionAddArt';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addArtToDel();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -287,8 +283,8 @@ class DeliveryArticlesAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliveryArticlesAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addArtToDel();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

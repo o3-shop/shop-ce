@@ -158,10 +158,8 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
      */
     public function testRemoveCountryFromSet()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDeliverysetCountry1', '_testDeliverysetCountry2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testDeliverysetCountry1', '_testDeliverysetCountry2']));
 
         $sSql = "select count(oxid) from oxobject2delivery where oxid in ('_testDeliverysetCountry1', '_testDeliverysetCountry2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -194,16 +192,14 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
      */
     public function testAddCountryToset()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sSynchoxid = '_testActionAddCountry';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
 
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addCountryToSet();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -226,8 +222,8 @@ class DeliverysetCountryAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetCountryAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addCountryToSet();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

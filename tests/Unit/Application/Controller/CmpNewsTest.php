@@ -48,20 +48,15 @@ class CmpNewsTest extends \OxidTestCase
      */
     public function testRenderPerfLoadNewsOnlyStart()
     {
-        $this->markTestSkipped('Bug: Method not called.');
+        $this->getConfig()->setConfigParam('bl_perfLoadNews', true);
+        $this->getConfig()->setConfigParam('blDisableNavBars', false);
+        $this->getConfig()->setConfigParam('bl_perfLoadNewsOnlyStart', true);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getIsOrderStep', 'getClassName']);
-        $oView->expects($this->never())->method('getIsOrderStep');
-        $oView->expects($this->once())->method('getClassName')->will($this->returnValue('test'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getClassKey']);
+        $oView->expects($this->once())->method('getClassKey')->will($this->returnValue('test'));
+        $this->getConfig()->setActiveView($oView);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam', 'getActiveView']);
-        $oConfig->expects($this->at(0))->method('getActiveView')->will($this->returnValue($oView));
-        $oConfig->expects($this->at(1))->method('getConfigParam')->with($this->equalTo('bl_perfLoadNews'))->will($this->returnValue(true));
-        $oConfig->expects($this->at(2))->method('getConfigParam')->with($this->equalTo('blDisableNavBars'))->will($this->returnValue(false));
-        $oConfig->expects($this->at(3))->method('getConfigParam')->with($this->equalTo('bl_perfLoadNewsOnlyStart'))->will($this->returnValue(true));
-
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\NewsComponent::class, ['getConfig'], [], '', false);
-        $oCmp->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oCmp = oxNew(\OxidEsales\Eshop\Application\Component\NewsComponent::class);
         $this->assertNull($oCmp->render());
     }
 

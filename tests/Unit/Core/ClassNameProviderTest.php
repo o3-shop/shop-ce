@@ -29,6 +29,8 @@ class ClassNameProviderTest extends UnitTestCase
     public function providerReturnsClassNameFromClassAlias()
     {
         return [
+            'known alias resolves to class' => ['oxarticle', 'OxidEsales\\Eshop\\Application\\Model\\Article'],
+            'unknown alias returns itself'  => ['nonExistentAlias', 'nonExistentAlias'],
         ];
     }
 
@@ -41,6 +43,8 @@ class ClassNameProviderTest extends UnitTestCase
     public function testReturnsClassNameFromClassAlias($classAlias, $className)
     {
         $map = [
+            'oxarticle' => 'OxidEsales\\Eshop\\Application\\Model\\Article',
+            'oxorder'   => 'OxidEsales\\Eshop\\Application\\Model\\Order',
         ];
 
         $utilsObject = new BackwardsCompatibleClassNameProvider($map);
@@ -51,18 +55,23 @@ class ClassNameProviderTest extends UnitTestCase
     public function providerReturnsClassNameAliasFromClassName()
     {
         return [
+            'known class resolves to alias'          => ['OxidEsales\\Eshop\\Application\\Model\\Article', 'oxarticle'],
+            'leading backslash is stripped'           => ['\\OxidEsales\\Eshop\\Application\\Model\\Article', 'oxarticle'],
+            'unknown class returns null'              => ['NonExistent\\Class\\Name', null],
         ];
     }
 
     /**
      * @param string $className
-     * @param string $classAliasName
+     * @param string|null $classAliasName
      *
      * @dataProvider providerReturnsClassNameAliasFromClassName
      */
     public function testReturnsClassNameAliasFromClassName($className, $classAliasName)
     {
         $map = [
+            'oxarticle' => 'OxidEsales\\Eshop\\Application\\Model\\Article',
+            'oxorder'   => 'OxidEsales\\Eshop\\Application\\Model\\Order',
         ];
 
         $utilsObject = new BackwardsCompatibleClassNameProvider($map);

@@ -48,6 +48,9 @@ class OutofstockexceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
         $this->testObject->setDestination(null);
         $this->assertEquals($this->message . ': ' . $this->amount, $this->testObject->getMessage());
+
+        // Clear expected log warning from translateString called with test message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testSetGetRemainingAmount()

@@ -415,24 +415,16 @@ class AlistTest extends \OxidTestCase
      */
     public function testGetTitleSuffix()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oCat = oxNew('oxcategory');
-        $oCat->oxcategories__oxshowsuffix = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
-        $oCat->oxcategories__oxshowsuffix->expects($this->once())->method('__get')->will($this->returnValue(true));
+        $oCat->oxcategories__oxshowsuffix = new \OxidEsales\Eshop\Core\Field(true);
 
-        $oShop = oxNew('oxshop');
-        $oShop->oxshops__oxtitlesuffix = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
-        $oShop->oxshops__oxtitlesuffix->expects($this->once())->method('__get')->will($this->returnValue('testsuffix'));
+        $oShop = $this->getConfig()->getActiveShop();
+        $oShop->oxshops__oxtitlesuffix = new \OxidEsales\Eshop\Core\Field('testsuffix');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveShop']);
-        $oConfig->expects($this->once())->method('getActiveShop')->will($this->returnValue($oShop));
-
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getConfig']);
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->once())->method('getActiveCategory')->will($this->returnValue($oCat));
-        $oListView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
 
-        $this->assertEquals('online kaufen', $oListView->getTitleSuffix());
+        $this->assertEquals('testsuffix', $oListView->getTitleSuffix());
     }
 
     /**
@@ -1120,13 +1112,9 @@ class AlistTest extends \OxidTestCase
      */
     public function testCanSelectDisplayType()
     {
-        $this->markTestSkipped('Bug: Method not called.');
+        $this->getConfig()->setConfigParam('blShowListDisplayType', true);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->will($this->returnValue(true));
-
-        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getConfig']);
-        $oSubj->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oSubj = oxNew(\OxidEsales\Eshop\Application\Controller\ArticleListController::class);
 
         $this->assertEquals(true, $oSubj->canSelectDisplayType());
     }

@@ -28,13 +28,23 @@ use stdClass;
 
 class UtilsViewTest extends \OxidTestCase
 {
-    public function setup(): void
+    /**
+     * Activate the Wave theme once per test class instead of per test.
+     * Theme::activate() costs ~170ms and doesn't need to be repeated
+     * for every test since no test deactivates the theme.
+     */
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
 
         $theme = oxNew(Theme::class);
         $theme->load('wave');
         $theme->activate();
+    }
+
+    public function setup(): void
+    {
+        parent::setUp();
     }
 
     public function testGetTemplateDirsContainsAWave()
@@ -236,6 +246,9 @@ class UtilsViewTest extends \OxidTestCase
         $oEx = unserialize($aErrors['myDest'][0]);
         $this->assertEquals('testMessage', $oEx->getOxMessage());
         $this->assertNull(oxRegistry::getSession()->getVariable('ErrorController'));
+
+        // Clear expected log warning from translating test message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testAddErrorToDisplayCustomDestinationFromPost()
@@ -255,6 +268,9 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertEquals('testMessage', $oEx->getOxMessage());
         $aErrorController = oxRegistry::getSession()->getVariable('ErrorController');
         $this->assertEquals('oxwminibasket', $aErrorController['myDest']);
+
+        // Clear expected log warning from translating test message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testAddErrorToDisplayDefaultDestination()
@@ -272,6 +288,9 @@ class UtilsViewTest extends \OxidTestCase
         $this->assertEquals('testMessage', $oEx->getOxMessage());
         $aErrorController = oxRegistry::getSession()->getVariable('ErrorController');
         $this->assertEquals('start', $aErrorController['default']);
+
+        // Clear expected log warning from translating test message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testAddErrorToDisplayUsingExeptionObject()
@@ -290,6 +309,9 @@ class UtilsViewTest extends \OxidTestCase
         $aErrors = oxRegistry::getSession()->getVariable('Errors');
         $oEx = unserialize($aErrors['default'][0]);
         $this->assertEquals('testMessage', $oEx->getOxMessage());
+
+        // Clear expected log warning from translating test message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testAddErrorToDisplayIfNotSet()

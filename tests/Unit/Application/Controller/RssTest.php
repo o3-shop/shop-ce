@@ -90,12 +90,8 @@ class RssTest extends \OxidTestCase
 
     public function testTopShopDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssTopShop'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssTopShop', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -106,10 +102,7 @@ class RssTest extends \OxidTestCase
 
     public function testTopShopEnabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssTopShop'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssTopShop', true);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->never())->method('handlePageNotFoundError');
@@ -118,21 +111,16 @@ class RssTest extends \OxidTestCase
         $oRssFeed = $this->getMock(\OxidEsales\Eshop\Application\Model\RssFeed::class, ['loadTopInShop']);
         $oRssFeed->expects($this->once())->method('loadTopInShop');
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $oRss->topshop();
     }
 
     public function testNewArtsDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssNewest'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssNewest', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -143,10 +131,7 @@ class RssTest extends \OxidTestCase
 
     public function testNewArtsEnabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssNewest'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssNewest', true);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->never())->method('handlePageNotFoundError');
@@ -155,21 +140,16 @@ class RssTest extends \OxidTestCase
         $oRssFeed = $this->getMock(\OxidEsales\Eshop\Application\Model\RssFeed::class, ['loadNewestArticles']);
         $oRssFeed->expects($this->once())->method('loadNewestArticles');
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $oRss->newarts();
     }
 
     public function testSearchArtsDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssSearch'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssSearch', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -180,10 +160,7 @@ class RssTest extends \OxidTestCase
 
     public function testSearchArtsEnabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssSearch'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssSearch', true);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->never())->method('handlePageNotFoundError');
@@ -202,21 +179,16 @@ class RssTest extends \OxidTestCase
             $this->equalTo('x&amp;searchmanufacturer')
         );
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $oRss->searcharts();
     }
 
     public function testBargainDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssBargain'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssBargain', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -227,9 +199,7 @@ class RssTest extends \OxidTestCase
 
     public function testBargainEnabled()
     {
-        $this->markTestSkipped('Bug: Should not be called.');
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssBargain'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssBargain', true);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->never())->method('handlePageNotFoundError');
@@ -238,21 +208,16 @@ class RssTest extends \OxidTestCase
         $oRssFeed = $this->getMock(\OxidEsales\Eshop\Application\Model\RssFeed::class, ['loadBargain']);
         $oRssFeed->expects($this->once())->method('loadBargain');
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $oRss->bargain();
     }
 
     public function testCatArtsDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssCategories'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssCategories', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -263,10 +228,7 @@ class RssTest extends \OxidTestCase
 
     public function testCatArtsEnabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssCategories'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssCategories', true);
 
         $oObj = $this->getMock(\OxidEsales\Eshop\Application\Model\Category::class, ['load']);
         $oObj->expects($this->once())->method('load')->with($this->equalTo('x&amp;objid'))->will($this->returnValue(true));
@@ -278,9 +240,8 @@ class RssTest extends \OxidTestCase
         $oRssFeed = $this->getMock(\OxidEsales\Eshop\Application\Model\RssFeed::class, ['loadCategoryArticles']);
         $oRssFeed->expects($this->once())->method('loadCategoryArticles')->with($this->equalTo($oObj));
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $this->setRequestParameter('cat', 'x&objid');
         oxTestModules::addModuleObject('oxCategory', $oObj);
@@ -290,12 +251,8 @@ class RssTest extends \OxidTestCase
 
     public function testRecommListsDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssRecommLists'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssRecommLists', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -306,9 +263,8 @@ class RssTest extends \OxidTestCase
 
     public function testRecommListsEnabled()
     {
-        $this->markTestSkipped('Bug: should not be called.');
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssRecommLists'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssRecommLists', true);
+        $this->getConfig()->setConfigParam('bl_showListmania', true);
 
         $oObj = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['load']);
         $oObj->expects($this->once())->method('load')->with($this->equalTo('x&amp;objid'))->will($this->returnValue(true));
@@ -320,9 +276,8 @@ class RssTest extends \OxidTestCase
         $oRssFeed = $this->getMock(\OxidEsales\Eshop\Application\Model\RssFeed::class, ['loadRecommLists']);
         $oRssFeed->expects($this->once())->method('loadRecommLists')->with($this->equalTo($oObj));
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $this->setRequestParameter('anid', 'x&objid');
         oxTestModules::addModuleObject('oxarticle', $oObj);
@@ -332,12 +287,8 @@ class RssTest extends \OxidTestCase
 
     public function testRecommListArtsDisabled()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssRecommListArts'))->will($this->returnValue(false));
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
+        $this->getConfig()->setConfigParam('bl_rssRecommListArts', false);
+        $oRss = oxNew(\OxidEsales\Eshop\Application\Controller\RssController::class);
 
         $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['handlePageNotFoundError']);
         $oUtils->expects($this->once())->method('handlePageNotFoundError')->with($this->equalTo(''));
@@ -348,9 +299,7 @@ class RssTest extends \OxidTestCase
 
     public function testRecommListArtsEnabled()
     {
-        $this->markTestSkipped('Bug: should not be called, but is called.');
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssRecommListArts'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssRecommListArts', true);
 
         $oObj = $this->getMock(\OxidEsales\Eshop\Application\Model\RecommendationList::class, ['load']);
         $oObj->expects($this->once())->method('load')->with($this->equalTo('x&amp;objid'))->will($this->returnValue(true));
@@ -362,9 +311,8 @@ class RssTest extends \OxidTestCase
         $oRssFeed = $this->getMock(\OxidEsales\Eshop\Application\Model\RssFeed::class, ['loadRecommListArticles']);
         $oRssFeed->expects($this->once())->method('loadRecommListArticles')->with($this->equalTo($oObj));
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->once())->method('_getRssFeed')->will($this->returnValue($oRssFeed));
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->once())->method('getRssFeed')->will($this->returnValue($oRssFeed));
 
         $this->setRequestParameter('recommid', 'x&objid');
         oxTestModules::addModuleObject('oxrecommlist', $oObj);
@@ -374,10 +322,7 @@ class RssTest extends \OxidTestCase
 
     public function testRecommListArtsEnabledNoList()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock('oxCofig', ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssRecommListArts'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssRecommListArts', true);
 
         $oObj = $this->getMock(\OxidEsales\Eshop\Application\Model\RecommendationList::class, ['load']);
         $oObj->expects($this->once())->method('load')->with($this->equalTo('x&amp;objid'))->will($this->returnValue(false));
@@ -386,9 +331,8 @@ class RssTest extends \OxidTestCase
         $oUtils->expects($this->once())->method('handlePageNotFoundError');
         oxTestModules::addModuleObject('oxutils', $oUtils);
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->never())->method('_getRssFeed');
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->never())->method('getRssFeed');
 
         $this->setRequestParameter('recommid', 'x&objid');
         oxTestModules::addModuleObject('oxrecommlist', $oObj);
@@ -398,10 +342,8 @@ class RssTest extends \OxidTestCase
 
     public function testRecommListsEnabledNoList()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oCfg->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_rssRecommLists'))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('bl_rssRecommLists', true);
+        $this->getConfig()->setConfigParam('bl_showListmania', true);
 
         $oObj = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['load']);
         $oObj->expects($this->once())->method('load')->with($this->equalTo('x&amp;objid'))->will($this->returnValue(false));
@@ -410,9 +352,8 @@ class RssTest extends \OxidTestCase
         $oUtils->expects($this->once())->method('handlePageNotFoundError');
         oxTestModules::addModuleObject('oxutils', $oUtils);
 
-        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getConfig', '_getRssFeed']);
-        $oRss->expects($this->once())->method('getConfig')->will($this->returnValue($oCfg));
-        $oRss->expects($this->never())->method('_getRssFeed');
+        $oRss = $this->getMock(\OxidEsales\Eshop\Application\Controller\RssController::class, ['getRssFeed']);
+        $oRss->expects($this->never())->method('getRssFeed');
 
         $this->setRequestParameter('anid', 'x&objid');
         oxTestModules::addModuleObject('oxarticle', $oObj);

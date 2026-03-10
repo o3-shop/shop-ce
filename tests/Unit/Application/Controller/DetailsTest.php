@@ -423,19 +423,35 @@ class DetailsTest extends \OxidTestCase
      */
     public function testGetPictureGallery()
     {
-        $this->markTestSkipped('Create file and remove after test. RT');
-
         $sArtID = '096a1b0849d5ffa4dd48cd388902420b';
 
         $oArticle = oxNew('oxArticle');
         $oArticle->load($sArtID);
-        $sActPic = $this->getConfig()->getPictureUrl(null) . 'generated/product/1/250_200_75/' . basename($oArticle->oxarticles__oxpic1->value);
 
-        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getPicturesProduct']);
-        $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
-        $aPicGallery = $oDetails->getPictureGallery();
+        // Create temporary master image so getPictureUrl does not fall back to nopic.jpg
+        $oConfig = $this->getConfig();
+        $sMasterDir = $oConfig->getPictureDir(false) . 'master/product/1/';
+        $sTmpFile = $sMasterDir . basename($oArticle->oxarticles__oxpic1->value);
+        @touch($sTmpFile);
 
-        $this->assertEquals($sActPic, $aPicGallery['ActPic']);
+        try {
+            // Build expected URL using the actual detail image size from config
+            $aDetailSizes = $oConfig->getConfigParam('aDetailImageSizes');
+            $sSize = $aDetailSizes['oxpic1']; // e.g. "540*340"
+            list($w, $h) = explode('*', $sSize);
+            $sQuality = $oConfig->getConfigParam('sDefaultImageQuality');
+            $sSizeDir = $w . '_' . $h . '_' . $sQuality;
+
+            $sActPic = $oConfig->getPictureUrl(null) . 'generated/product/1/' . $sSizeDir . '/' . basename($oArticle->oxarticles__oxpic1->value);
+
+            $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getPicturesProduct']);
+            $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));
+            $aPicGallery = $oDetails->getPictureGallery();
+
+            $this->assertEquals($sActPic, $aPicGallery['ActPic']);
+        } finally {
+            @unlink($sTmpFile);
+        }
     }
 
     /**
@@ -936,11 +952,9 @@ class DetailsTest extends \OxidTestCase
      */
     public function testSaveReviewIfOnlyRatingIsSet()
     {
-        $this->markTestSkipped('Bug: "test" is not true');
         $this->setRequestParameter('rvw_txt', null);
         $this->setRequestParameter('artrating', 3);
         $this->setRequestParameter('anid', 'test');
-        $this->setSessionParam('usr', 'oxdefaultadmin');
 
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
@@ -952,9 +966,13 @@ class DetailsTest extends \OxidTestCase
         $oProduct->expects($this->any())->method('getId')->will($this->returnValue('test'));
         $oProduct->expects($this->any())->method('addToRatingAverage');
 
+        $oUser = oxNew('oxUser');
+        $oUser->load('oxdefaultadmin');
+
         /** @var Details|PHPUnit\Framework\MockObject\MockObject $oDetails */
-        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getProduct', 'canAcceptFormData']);
+        $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getProduct', 'getUser', 'canAcceptFormData']);
         $oDetails->expects($this->any())->method('getProduct')->will($this->returnValue($oProduct));
+        $oDetails->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
         $oDetails->expects($this->any())->method('canAcceptFormData')->will($this->returnValue(true));
         $oDetails->saveReview();
 
@@ -1184,12 +1202,9 @@ class DetailsTest extends \OxidTestCase
 
     public function testIsReviewActive()
     {
-        $this->markTestSkipped('Bug: true is not "test_isactive"');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('bl_perfLoadReviews'))->will($this->returnValue('test_isactive'));
+        $this->getConfig()->setConfigParam('bl_perfLoadReviews', 'test_isactive');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getConfig']);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class);
 
         $this->assertSame('test_isactive', $oView->isReviewActive());
     }

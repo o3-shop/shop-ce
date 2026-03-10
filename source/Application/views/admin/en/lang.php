@@ -1762,7 +1762,7 @@ $aLang = [
     'weight'                                      => 'Weight',
     'price'                                       => 'Price',
     'user'                                        => 'Customer',
-    'mallAdmin'                                   => 'Mall Admin',
+    'mallAdmin'                                   => 'Admin',
     'usrRegistered'                               => 'The user will be registered after entering his password.',
     // HTML editor',
     'editor_language'                             => 'en-us',

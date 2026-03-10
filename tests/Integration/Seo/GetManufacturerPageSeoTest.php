@@ -32,7 +32,7 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  *
  * @package OxidEsales\EshopCommunity\Tests\Integration\Seo
  */
-class GetManufacturerSeoTest extends UnitTestCase
+class GetManufacturerPageSeoTest extends UnitTestCase
 {
     /**
      * Sets up test

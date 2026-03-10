@@ -35,38 +35,30 @@ class LanguageListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
-        $this->markTestSkipped('Bug: Method not called.');
+        // deleteEntry() uses Registry::getConfig(), not $this->getConfig(),
+        // so we set the params on the real config.
+        $oConfig = $this->getConfig();
+        $oConfig->setConfigParam('blAllowSharedEdit', true);
+        $oConfig->setConfigParam('aLanguageParams', [1 => ['baseId' => 1]]);
+        $oConfig->setConfigParam('aLanguages', [1 => 1]);
+        $oConfig->setConfigParam('aLanguageURLs', [1 => 1]);
+        $oConfig->setConfigParam('aLanguageSSLURLs', [1 => 1]);
+        $oConfig->setConfigParam('sDefaultLang', 1);
 
-        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
         $this->setRequestParameter('oxid', 1);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam', 'saveShopConfVar']);
-
-        $map = [
-            ['blAllowSharedEdit',  null, '1'],
-            ['aLanguageParams', null, [1 => ['baseId' => 1]]],
-            ['aLanguages', null, [1 => 1]],
-            ['aLanguageURLs', null, [1 => 1]],
-            ['aLanguageSSLURLs', null, [1 => 1]],
-            ['sDefaultLang', null, 1],
-        ];
-        $oConfig->expects($this->any())->method('getConfigParam')->will($this->returnValueMap($map));
-
-        $map = [
-            ['aarr', 'aLanguageParams', [], null],
-            ['aarr', 'aLanguages', [], null],
-            ['arr', 'aLanguageURLs', [], null],
-            ['arr', 'aLanguageSSLURLs', [], null],
-            ['str', 'sDefaultLang', 0, null],
-        ];
-        $oConfig->expects($this->exactly(5))->method('saveShopConfVar')->will($this->returnValueMap($map));
-
-        $aTasks = ['getConfig'];
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageList::class, $aTasks, [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
-
+        // Use getMock with constructor suppression to avoid AdminController::init()
+        // which tries to access DB views for languages that may not exist in test DB.
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageList::class, null, [], '', false);
         $oView->deleteEntry();
+
+        // Verify languages were removed
+        $this->assertEmpty($oConfig->getConfigParam('aLanguageParams'));
+        $this->assertEmpty($oConfig->getConfigParam('aLanguages'));
+        $this->assertEmpty($oConfig->getConfigParam('aLanguageURLs'));
+        $this->assertEmpty($oConfig->getConfigParam('aLanguageSSLURLs'));
+        // Since deleted language was default (baseId=1 == sDefaultLang=1), default should be reset to 0
+        $this->assertEquals(0, $oConfig->getConfigParam('sDefaultLang'));
     }
 
     /**

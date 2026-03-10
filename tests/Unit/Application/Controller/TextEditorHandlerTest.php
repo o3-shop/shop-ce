@@ -31,8 +31,9 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testRenderTextEditorNoRichTextEditor()
     {
-        $this->markTestSkipped('Bug: strings does not match');
-        $expEditorHtml = "<textarea id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
+        // Production code: "<textarea ${disabledTextEditor} id=..." — when not disabled, $disabledTextEditor is empty,
+        // resulting in a double space between 'textarea' and 'id'
+        $expEditorHtml = "<textarea  id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
 
         $textEditorHandler = $this->getMock(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class, ['renderRichTextEditor']);
         $textEditorHandler->expects($this->any())->method('renderRichTextEditor')->will($this->returnValue(''));
@@ -66,7 +67,6 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testRenderPlainTextEditor($width, $height, $expectedEditorHtml)
     {
-        $this->markTestSkipped('Bug: strings does not match');
         $textEditorHandler = oxNew(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class);
         $editorHtml = $textEditorHandler->renderPlainTextEditor($width, $height, 'sEditObjectValue', 'sField');
         $this->assertEquals($expectedEditorHtml, $editorHtml);
@@ -80,10 +80,10 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function renderPlainTextEditorDataProvider()
     {
         return [
-            [100, 100, "<textarea id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>"],
-            ['100%', '100%', "<textarea id='editor_sField' name='sField' style='width:100%; height:100%;'>sEditObjectValue</textarea>"],
-            [100, '100%', "<textarea id='editor_sField' name='sField' style='width:100px; height:100%;'>sEditObjectValue</textarea>"],
-            ['100%', 100, "<textarea id='editor_sField' name='sField' style='width:100%; height:100px;'>sEditObjectValue</textarea>"],
+            [100, 100, "<textarea  id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>"],
+            ['100%', '100%', "<textarea  id='editor_sField' name='sField' style='width:100%; height:100%;'>sEditObjectValue</textarea>"],
+            [100, '100%', "<textarea  id='editor_sField' name='sField' style='width:100px; height:100%;'>sEditObjectValue</textarea>"],
+            ['100%', 100, "<textarea  id='editor_sField' name='sField' style='width:100%; height:100px;'>sEditObjectValue</textarea>"],
         ];
     }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\CE\Internal\Application;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\CE\Internal\Container;
 
 /**
  * This file is part of O3-Shop.

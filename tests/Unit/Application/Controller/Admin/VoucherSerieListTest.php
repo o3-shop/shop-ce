@@ -35,18 +35,11 @@ class VoucherSerieListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
-        oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
-        oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
         oxTestModules::addFunction('oxvoucherserie', 'load', '{ return true; }');
         oxTestModules::addFunction('oxvoucherserie', 'deleteVoucherList', '{ return true; }');
 
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
-
-        $oView = $this->getMock($this->getProxyClassName('VoucherSerie_List'), ['getSession']);
-        $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
+        $oView = $this->getMock($this->getProxyClassName('VoucherSerie_List'), ['authorize']);
+        $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
 
         $oView->deleteEntry();
     }

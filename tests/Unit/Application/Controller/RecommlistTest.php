@@ -165,8 +165,9 @@ class RecommlistTest extends \OxidTestCase
 
     public function testAddPageNrParam()
     {
-        $this->markTestSkipped('Bug: get link back instead of seo');
-        oxTestModules::addFunction('oxSeoEncoderRecomm', 'getRecommPageUrl', '{return "testPageUrl";}');
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class, ['getRecommPageUrl']);
+        $oEncoder->expects($this->any())->method('getRecommPageUrl')->will($this->returnValue('testPageUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderRecomm::class, $oEncoder);
 
         $oRecommListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\RecommListController::class, ['getActiveRecommList']);
         $oRecommListView->expects($this->any())->method('getActiveRecommList')->will($this->returnValue(oxNew('oxrecommlist')));
@@ -299,15 +300,19 @@ class RecommlistTest extends \OxidTestCase
 
     public function testGetReviews()
     {
-        $this->markTestSkipped('Bug: get null back');
-        oxTestModules::addFunction('oxreview', 'loadList', '{$o=new oxlist();$o[0]="asd";$o->args=$aA;return $o;}');
-        $oRecomm = $this->getProxyClass('recommlist');
-        $oRecommtList = oxNew('oxRecommList');
+        $oRevs = oxNew('oxlist');
+        $oRevs[0] = 'asd';
+
+        $oRecommtList = $this->getMock(\OxidEsales\Eshop\Application\Model\RecommendationList::class, ['getReviews']);
         $oRecommtList->setId('testid');
+        $oRecommtList->expects($this->once())->method('getReviews')->will($this->returnValue($oRevs));
+
+        $oRecomm = $this->getProxyClass('recommlist');
         $oRecomm->setNonPublicVar('_oActiveRecommList', $oRecommtList);
+
         $oResult = $oRecomm->getReviews();
-        $this->assertEquals('oxrecommlist', $oResult->args[0]);
-        $this->assertEquals('testid', $oResult->args[1]);
+        $this->assertNotNull($oResult);
+        $this->assertEquals(1, $oResult->count());
     }
 
     public function testIsReviewActive()

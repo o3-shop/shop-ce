@@ -342,7 +342,7 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
                 /** @var \OxidEsales\Eshop\Application\Model\CompanyVatIn $oVatIn */
                 $oVatIn = oxNew('oxCompanyVatIn', $invAddress['oxuser__oxustid']);
 
-                if (!$vatInValidator->validate($oVatIn)) {
+                if (!$vatInValidator->validate($oVatIn) && $vatInValidator->getError()) {
                     /** @var \OxidEsales\Eshop\Core\Exception\InputException $exception */
                     $exception = oxNew(\OxidEsales\Eshop\Core\Exception\InputException::class);
                     $exception->setMessage(\OxidEsales\Eshop\Core\Registry::getLang()->translateString('VAT_MESSAGE_' . $vatInValidator->getError()));

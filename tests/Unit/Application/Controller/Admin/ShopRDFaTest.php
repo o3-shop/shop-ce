@@ -121,6 +121,8 @@ class ShopRDFaTest extends \OxidTestCase
         $oView->submitUrl();
         $aErr = oxRegistry::getSession()->getVariable('Errors');
         $oErr = unserialize($aErr['default'][0]);
-        $this->assertEquals('To many times submited', $oErr->getOxMessage());
+        $oRef = new \ReflectionProperty($oErr, '_sMessage');
+        $oRef->setAccessible(true);
+        $this->assertEquals('To many times submited', $oRef->getValue($oErr));
     }
 }

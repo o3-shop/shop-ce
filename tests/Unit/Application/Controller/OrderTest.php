@@ -145,6 +145,7 @@ class OrderTest extends \OxidTestCase
 
         $oUser = oxNew('oxUser');
         $oUser->setId('_testUserId');
+        $oUser->oxuser__oxusername = new \OxidEsales\Eshop\Core\Field('_testuser@order.test', \OxidEsales\Eshop\Core\Field::T_RAW);
         $oUser->save();
 
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\UtilsHelper::class, 'oxUtils');
@@ -265,7 +266,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testRenderWhenNoActiveUserExistWithBasket()
     {
-        $this->markTestSkipped('Bug: strings does not match');
         $sRedirUrl = $this->getConfig()->getShopHomeURL() . 'cl=basket';
         $this->expectException('oxException');
         $this->expectExceptionMessage($sRedirUrl);
@@ -276,11 +276,12 @@ class OrderTest extends \OxidTestCase
         $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getProductsCount']);
         $oB->expects($this->once())->method('getProductsCount')->will($this->returnValue(1));
 
+        // Production uses Registry::getSession(), not $this->getSession()
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations', 'getBasket']);
         $oS->expects($this->any())->method('getBasket')->will($this->returnValue($oB));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession', 'getUser']);
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getUser']);
         $oO->expects($this->any())->method('getUser')->will($this->returnValue(null));
         $oO->render();
     }
@@ -434,7 +435,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecuteWithoutAGB()
     {
-        $this->markTestSkipped('Bug: get null back');
         $oConfig = $this->getConfig();
 
         $oConfig->setConfigParam('blConfirmAGB', 1);
@@ -446,10 +446,11 @@ class OrderTest extends \OxidTestCase
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getEncodedDeliveryAddress']);
         $oUser->expects($this->any())->method('getEncodedDeliveryAddress')->will($this->returnValue('encodedAddress'));
 
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oS->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession']);
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession()->checkSessionChallenge()
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+
+        $oO = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
         $oO->setUser($oUser);
 
         $this->assertNull($oO->execute());
@@ -464,7 +465,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecuteWithoutCustInfo()
     {
-        $this->markTestSkipped('Bug: get null back');
         $oConfig = $this->getConfig();
 
         $oConfig->setConfigParam('blConfirmAGB', 1);
@@ -473,21 +473,20 @@ class OrderTest extends \OxidTestCase
         $oConfig->setConfigParam('blConfirmCustInfo', 1);
         // test new tpl, when option (ord_custinfo) was removed
         $this->setRequestParameter('ord_custinfo', null);
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oS->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession']);
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+
+        // Production uses Registry::getSession()->checkSessionChallenge()
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+
+        $oOrder = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
 
         $this->assertEquals('user', $oOrder->execute());
         // test former tpl. If ord_custinfo is not confirmed
         $this->setRequestParameter('ord_custinfo', 0);
 
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oS->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession']);
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oOrder2 = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
 
-        $this->assertSame('user', $oOrder->execute());
+        $this->assertSame('user', $oOrder2->execute());
     }
 
     /**
@@ -497,7 +496,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecute()
     {
-        $this->markTestSkipped('Bug: get null back');
         $this->setupConfigForOrderExecute();
 
         //setting active user
@@ -515,14 +513,14 @@ class OrderTest extends \OxidTestCase
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['onOrderExecute']);
         $oUser->expects($this->once())->method('onOrderExecute')->will($this->returnValue(null));
 
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oSession->setBasket($oBasket);
+        // Set up session challenge so Registry::getSession()->checkSessionChallenge() returns true
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+        oxRegistry::getSession()->setBasket($oBasket);
 
         //on order success must return next step vale
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep', 'getSession', 'getUser']);
+        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep', 'getUser']);
         $oOrder->expects($this->any())->method('_getNextStep')->will($this->returnValue('nextStepValue'));
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
         $oOrder->expects($this->any())->method('getUser')->will($this->returnValue($oUser));
 
         $this->assertEquals('nextStepValue', $oOrder->execute());
@@ -535,7 +533,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecuteWithWrongStockThrowsException()
     {
-        $this->markTestSkipped('Bug: exception is not thrown');
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{throw $aA[0];}');
 
         $this->setupConfigForOrderExecute();
@@ -548,13 +545,19 @@ class OrderTest extends \OxidTestCase
         $basketItem->expects($this->any())->method('getArticle')->will($this->returnValue($product));
         $basketItem->expects($this->any())->method('getAmount')->will($this->returnValue(999));
 
-        //setting basket info
         $basket = $this->getBasketMock($basketItem);
 
-        $session = $this->getSessionMock($basket);
-        $session->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
+        // Use real session with token challenge instead of mocked getSession
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+        oxRegistry::getSession()->setBasket($basket);
 
-        $order = $this->getOrderMock($session);
+        $user = oxNew('oxUser');
+        $user->load('_testUserId');
+
+        $order = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep', 'getUser', 'getPayment']);
+        $order->expects($this->any())->method('getUser')->will($this->returnValue($user));
+        $order->expects($this->any())->method('getPayment')->will($this->returnValue(true));
 
         $this->expectException('oxOutOfStockException');
         $this->assertNull($order->execute());
@@ -567,7 +570,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecuteWithWrongStockCallsMethodsInRightOrder()
     {
-        $this->markTestSkipped('Bug: Exception is not thrown');
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{throw $aA[0];}');
 
         $this->setupConfigForOrderExecute();
@@ -585,10 +587,17 @@ class OrderTest extends \OxidTestCase
 
         $basket = $this->getBasketMock($basketItem);
 
-        $session = $this->getSessionMock($basket);
-        $session->method('checkSessionChallenge')->will($this->returnValue(true));
+        // Set up session challenge so Registry::getSession()->checkSessionChallenge() returns true
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+        oxRegistry::getSession()->setBasket($basket);
 
-        $order = $this->getOrderMock($session);
+        $user = oxNew('oxUser');
+        $user->load('_testUserId');
+
+        $order = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep', 'getUser', 'getPayment']);
+        $order->expects($this->any())->method('getUser')->will($this->returnValue($user));
+        $order->expects($this->any())->method('getPayment')->will($this->returnValue(true));
         $order->expects($this->never())->method('_getNextStep');
 
         $this->expectException('oxOutOfStockException');
@@ -603,7 +612,6 @@ class OrderTest extends \OxidTestCase
      */
     public function testExecuteOnSuccessMarksUser()
     {
-        $this->markTestSkipped('Bug: get null back');
         $this->setupConfigForOrderExecute();
 
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\OrderHelper::class, 'oxorder');
@@ -618,17 +626,16 @@ class OrderTest extends \OxidTestCase
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['onOrderExecute']);
         $oUser->expects($this->once())->method('onOrderExecute')->with($this->equalTo($oBasket), $this->equalTo(1))->will($this->returnValue(null));
         $this->assertTrue($oUser->load('_testUserId'));
-        //on order success must return next step vale
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oS->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
 
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep', 'getSession']);
+        // Set up session challenge so Registry::getSession()->checkSessionChallenge() returns true
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+        oxRegistry::getSession()->setBasket($oBasket);
+
+        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['_getNextStep']);
         $oOrder->expects($this->any())->method('_getNextStep')->will($this->returnValue('nextStepValue'));
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oS));
 
         $oOrder->setUser($oUser);
-
-        $oS->setBasket($oBasket);
 
         $this->assertEquals('nextStepValue', $oOrder->execute());
     }
@@ -862,14 +869,14 @@ class OrderTest extends \OxidTestCase
      */
     public function testIsConfirmAGBError()
     {
-        $this->markTestSkipped('Bug: get null back');
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getEncodedDeliveryAddress']);
         $oUser->expects($this->any())->method('getEncodedDeliveryAddress')->will($this->returnValue('encodedAddress'));
 
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oS->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession']);
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession()->checkSessionChallenge()
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+        $this->setRequestParameter('stoken', 'testtoken');
+
+        $oOrder = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
         $oOrder->setUser($oUser);
 
         $oConfig = $this->getConfig();
@@ -890,19 +897,20 @@ class OrderTest extends \OxidTestCase
      */
     public function testIsConfirmAGBErrorWhenBasketHasIntangibleProducts()
     {
-        $this->markTestSkipped('Bug: get null back');
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getEncodedDeliveryAddress']);
         $oUser->expects($this->any())->method('getEncodedDeliveryAddress')->will($this->returnValue('encodedAddress'));
 
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['hasArticlesWithIntangibleAgreement']);
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['hasArticlesWithIntangibleAgreement', 'hasArticlesWithDownloadableAgreement']);
         $oBasket->expects($this->any())->method('hasArticlesWithIntangibleAgreement')->will($this->returnValue(true));
+        $oBasket->expects($this->any())->method('hasArticlesWithDownloadableAgreement')->will($this->returnValue(false));
 
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession', 'getBasket']);
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
-        $oOrder->expects($this->any())->method('getBasket')->will($this->returnValue($oBasket));
+        // Production uses Registry::getSession()
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge', 'getBasket']);
+        $oSession->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
+        $oSession->expects($this->any())->method('getBasket')->will($this->returnValue($oBasket));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oOrder = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
         $oOrder->setUser($oUser);
 
         $oConfig = $this->getConfig();
@@ -922,19 +930,20 @@ class OrderTest extends \OxidTestCase
      */
     public function testIsConfirmAGBErrorWhenBasketHasDownloadableProducts()
     {
-        $this->markTestSkipped('Bug: get null back');
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getEncodedDeliveryAddress']);
         $oUser->expects($this->any())->method('getEncodedDeliveryAddress')->will($this->returnValue('encodedAddress'));
 
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['hasArticlesWithDownloadableAgreement']);
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['hasArticlesWithDownloadableAgreement', 'hasArticlesWithIntangibleAgreement']);
         $oBasket->expects($this->any())->method('hasArticlesWithDownloadableAgreement')->will($this->returnValue(true));
+        $oBasket->expects($this->any())->method('hasArticlesWithIntangibleAgreement')->will($this->returnValue(false));
 
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession', 'getBasket']);
-        $oOrder->expects($this->any())->method('getSession')->will($this->returnValue($oSession));
-        $oOrder->expects($this->any())->method('getBasket')->will($this->returnValue($oBasket));
+        // Production uses Registry::getSession()
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge', 'getBasket']);
+        $oSession->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
+        $oSession->expects($this->any())->method('getBasket')->will($this->returnValue($oBasket));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
+        $oOrder = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
         $oOrder->setUser($oUser);
 
         $oConfig = $this->getConfig();
@@ -961,16 +970,14 @@ class OrderTest extends \OxidTestCase
 
     public function testExecuteChecksSessionChallenge()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getEncodedDeliveryAddress']);
         $oUser->expects($this->any())->method('getEncodedDeliveryAddress')->will($this->returnValue('encodedAddress'));
 
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
-        $oS->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(false));
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getConfig', 'getSession']);
-        $oO->expects($this->never())->method('getConfig')->will($this->returnValue(false));
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Ensure session challenge fails: do not set stoken request parameter
+        // so Registry::getSession()->checkSessionChallenge() returns false
+        $this->getSession()->setVariable('sess_stoken', 'testtoken');
+
+        $oO = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
         $oO->setUser($oUser);
 
         $this->assertSame(null, $oO->execute());
@@ -1014,18 +1021,17 @@ class OrderTest extends \OxidTestCase
 
     public function testRenderDoesCleanReservationsIfOn()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
 
         $oR = $this->getMock('stdclass', ['renewExpiration']);
         $oR->expects($this->once())->method('renewExpiration')->will($this->returnValue(null));
 
+        // Production uses Registry::getSession(), not $this->getSession()
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oR));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\OrderController::class, ['getSession']);
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oO = oxNew(\OxidEsales\Eshop\Application\Controller\OrderController::class);
 
         try {
             $oO->render();

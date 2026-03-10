@@ -289,15 +289,13 @@ class CategoryMainTest extends \OxidTestCase
      */
     public function testDeletePicture_demoShopMode()
     {
-        $this->markTestSkipped('Bug: Error: Call to a member function getOxMessage() on bool.');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
         oxRegistry::getSession()->deleteVariable('Errors');
 
         /** @var \OxidEsales\Eshop\Application\Controller\Admin\CategoryMain $oView */
         $oView = $this->getProxyClass('Category_Main');
-        $oView->setConfig($oConfig);
         $oView->deletePicture();
 
         $aEx = oxRegistry::getSession()->getVariable('Errors');

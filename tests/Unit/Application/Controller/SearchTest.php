@@ -28,7 +28,6 @@ class SearchTest extends \OxidTestCase
 {
     public function testIsEmptySearch()
     {
-        $this->markTestSkipped('Bug: false is not true');
         $oSearch = oxNew('search');
         $oSearch->init();
 
@@ -280,13 +279,9 @@ class SearchTest extends \OxidTestCase
      */
     public function testCanSelectDisplayType()
     {
-        $this->markTestSkipped('Bug: Method not called.');
+        $this->getConfig()->setConfigParam('blShowListDisplayType', true);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->will($this->returnValue(true));
-
-        $oSubj = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getConfig']);
-        $oSubj->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oSubj = oxNew(\OxidEsales\Eshop\Application\Controller\SearchController::class);
 
         $this->assertEquals(true, $oSubj->canSelectDisplayType());
     }

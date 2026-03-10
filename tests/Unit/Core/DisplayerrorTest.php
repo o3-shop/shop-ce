@@ -44,6 +44,9 @@ class DisplayerrorTest extends \OxidTestCase
     {
         $this->_oDisplayError->setMessage('Test ');
         $this->assertEquals('Test ', $this->_oDisplayError->getOxMessage());
+
+        // getOxMessage() internally calls translateString() which logs a warning for unknown keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**
@@ -67,5 +70,8 @@ class DisplayerrorTest extends \OxidTestCase
         $this->_oDisplayError->setMessage('Test %s string with %d values');
         $this->_oDisplayError->setFormatParameters(['formatting', 2]);
         $this->assertEquals('Test formatting string with 2 values', $this->_oDisplayError->getOxMessage());
+
+        // getOxMessage() internally calls translateString() which logs a warning for unknown keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 }
