@@ -510,14 +510,6 @@ class Config extends \OxidEsales\Eshop\Core\Base
         $fileUtils = Registry::getUtilsFile();
         $this->sShopDir = $fileUtils->normalizeDir($this->sShopDir);
         $this->sLogDir = $fileUtils->normalizeDir($this->sLogDir);
-
-        if (
-            empty($this->sCompileDir) ||
-            strpos($this->sCompileDir, '<') !== false ||
-            strpos($this->sCompileDir, '>') !== false
-        ) {
-            $this->sCompileDir = $this->sShopDir . 'tmp';
-        }
         $this->sCompileDir = $fileUtils->normalizeDir($this->sCompileDir);
         $this->sShopURL = $fileUtils->normalizeDir($this->sShopURL);
         $this->sSSLShopURL = $fileUtils->normalizeDir($this->sSSLShopURL);
