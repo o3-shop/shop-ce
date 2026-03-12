@@ -1808,7 +1808,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getCategory()
     {
-        $oCategory = oxNew(Category::class);
+        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
         $oCategory->setLanguage($this->getLanguage());
 
         // variant handling
@@ -1818,8 +1818,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
 
         if ($sOXID) {
+            if (!is_array(static::$_aCategoryCache)) {
+                static::$_aCategoryCache = [];
+            }
+
             // if the oxcategory instance of this article is not cached
-            if (!isset($this->_aCategoryCache[$sOXID])) {
+            if (!array_key_exists($sOXID, static::$_aCategoryCache)) {
                 startProfile('getCategory');
                 $oStr = Str::getStr();
                 $sWhere = $oCategory->getSqlActiveSnippet();
@@ -1840,11 +1844,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                     }
                 }
                 // add the category instance to cache
-                $this->_aCategoryCache[$sOXID] = $oCategory;
+                static::$_aCategoryCache[$sOXID] = $oCategory;
                 stopPRofile('getCategory');
             } else {
                 // if the oxcategory instance is cached
-                $oCategory = $this->_aCategoryCache[$sOXID];
+                $oCategory = static::$_aCategoryCache[$sOXID];
             }
         }
 

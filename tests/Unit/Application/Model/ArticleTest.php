@@ -2827,26 +2827,25 @@ class ArticleTest extends \OxidTestCase
 
     /**
      * Tests if the "oxarticle::getCategory()" uses a cached value
+     * This test verifies that the static cache works correctly across instances
      *
      * @return null
      */
     public function testGetCategoryCached()
     {
-        // test variables
-        $sCacheIndex = 'test';
-        $sCacheResult = 'already cached';
-        $aCache = [$sCacheIndex => $sCacheResult];
+        // First article - loads category and populates cache
+        $oArticle1 = oxNew('oxArticle');
+        $oArticle1->load('1126');
+        $oCategory1 = $oArticle1->getCategory();
+        $this->assertNotNull($oCategory1);
 
-        // setting the "cached" variables
-        $oArticle = $this->getProxyClass('oxarticle');
-        $oArticle->setNonPublicVar('_aCategoryCache', $aCache);
+        // Second article with same ID - should get the same cached object
+        $oArticle2 = oxNew('oxArticle');
+        $oArticle2->load('1126');
+        $oCategory2 = $oArticle2->getCategory();
 
-        // setting the used article ID
-        $oArticle->setId($sCacheIndex);
-
-        // asserts are equals if the articles ID is in the caches index
-        // and returns the cached result
-        $this->assertEquals($sCacheResult, $oArticle->getCategory());
+        // With static cache, both should reference the same object instance
+        $this->assertSame($oCategory1, $oCategory2, 'Static cache should return the same object instance');
     }
 
     /**
