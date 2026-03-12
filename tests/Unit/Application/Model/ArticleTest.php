@@ -83,6 +83,12 @@ class ArticleTest extends \OxidTestCase
     {
         $this->getConfig()->setGlobalParameter('listtype', null);
 
+        // Clear static category cache to prevent cache pollution between tests
+        $reflection = new \ReflectionClass(\OxidEsales\Eshop\Application\Model\Article::class);
+        $property = $reflection->getProperty('_aCategoryCache');
+        $property->setAccessible(true);
+        $property->setValue(null, null);
+
         oxRemClassModule('oxCacheHelper');
         $this->cleanUpTable('oxobject2attribute');
 
