@@ -349,10 +349,14 @@ class SystemRequirements
                 try {
                     $fileSystem->createDirIfNotExists($sPathToCheck, $shopParentPath, 0700);
                 } catch (\InvalidArgumentException | \RuntimeException $e) {
-                    // Creation failed silently; the check loop below will set $iModStat accordingly
+                    \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
+                        sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage())
+                    );
                 }
             } catch (\RuntimeException $e) {
-                // Creation failed silently; the check loop below will set $iModStat accordingly
+                \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
+                    sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage())
+                );
             }
         }
 
