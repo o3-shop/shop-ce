@@ -245,11 +245,11 @@ class File extends BaseModel
     protected function _getHashedFileDir($sFileHash) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sDir = substr($sFileHash, 0, 2);
-        $sAbsDir = $this->_getBaseDownloadDirPath() . DIRECTORY_SEPARATOR . $sDir;
+        $sBaseDir = $this->_getBaseDownloadDirPath();
+        $sAbsDir = $sBaseDir . DIRECTORY_SEPARATOR . $sDir;
 
-        if (!is_dir($sAbsDir)) {
-            mkdir($sAbsDir, 0755);
-        }
+        oxNew(\OxidEsales\EshopCommunity\Core\FileSystem\FileSystem::class)
+            ->createDirIfNotExists($sAbsDir, $sBaseDir);
 
         return $sDir;
     }

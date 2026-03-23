@@ -2184,14 +2184,18 @@ class Config extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
-     * Returns log files storage path
+     * Returns log files storage path, creating the directory if it does not exist.
      *
      * @return string
      */
     public function getLogsDir()
     {
         if ($this->sLogDir === null) {
-            return $this->sLogDir = $this->getConfigParam('sShopDir') . 'log/';
+            $shopDir = $this->getConfigParam('sShopDir');
+            $logDir = $shopDir . 'log/';
+            oxNew(\OxidEsales\EshopCommunity\Core\FileSystem\FileSystem::class)
+                ->createDirIfNotExists($logDir, $shopDir);
+            return $this->sLogDir = $logDir;
         }
 
         return $this->getConfigParam('sShopDir') . $this->sLogDir;

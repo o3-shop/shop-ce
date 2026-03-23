@@ -239,9 +239,24 @@ $configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.p
  * This directory is required for caching, Smarty compilation, and other temporary files.
  */
 $tmpDir = $configFile->getVar('sCompileDir');
-if ($tmpDir && !is_dir($tmpDir)) {
-    if (!mkdir($tmpDir, 0755, true)) {
-        trigger_error("Error: Could not create tmp directory '$tmpDir'. Please check permissions.", E_USER_WARNING);
+if ($tmpDir) {
+    try {
+        // oxNew is not yet available here; instantiate directly via the composer autoloader.
+        // Use INSTALLATION_ROOT_PATH as the security boundary. If sCompileDir is configured
+        // outside the project root, fall back to the parent of the compile dir.
+        (new \OxidEsales\EshopCommunity\Core\FileSystem\FileSystem())
+            ->createDirIfNotExists($tmpDir, INSTALLATION_ROOT_PATH);
+    } catch (\InvalidArgumentException $e) {
+        // sCompileDir is outside the project root; try with its parent directory as boundary
+        $tmpDirParent = dirname(rtrim($tmpDir, DIRECTORY_SEPARATOR));
+        try {
+            (new \OxidEsales\EshopCommunity\Core\FileSystem\FileSystem())
+                ->createDirIfNotExists($tmpDir, $tmpDirParent);
+        } catch (\InvalidArgumentException | \RuntimeException $e) {
+            trigger_error("Error: Could not create tmp directory '$tmpDir'. Please check permissions.", E_USER_WARNING);
+        }
+    } catch (\RuntimeException $e) {
+        trigger_error("Error: Could not create tmp directory '$tmpDir'. " . $e->getMessage(), E_USER_WARNING);
     }
 }
 

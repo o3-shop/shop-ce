@@ -359,7 +359,8 @@ class UtilsView extends \OxidEsales\Eshop\Core\Base
         $compileDir = $config->getConfigParam('sCompileDir');
         $smartyDir = $compileDir . '/smarty/';
         if (!is_dir($smartyDir)) {
-            @mkdir($smartyDir);
+            // Race-condition safe: another process may create the dir between check and mkdir
+            @mkdir($smartyDir, 0755, true);
         }
 
         if (!is_writable($smartyDir)) {
