@@ -572,14 +572,28 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Checks whether object is in list or not
+     * Checks whether the article is in the current user's wish list or notice list.
      * It's needed for oxArticle so that it can pass this to widgets
      *
      * @return bool
      */
     public function isInList()
     {
-        return $this->_isInList();
+        $oUser = $this->getUser();
+        if (!$oUser) {
+            return false;
+        }
+
+        $articleId = $this->getId();
+        foreach (['noticelist', 'wishlist'] as $listType) {
+            foreach ($oUser->getBasket($listType)->getItems() as $oItem) {
+                if ($oItem->oxuserbasketitems__oxartid->value === $articleId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
