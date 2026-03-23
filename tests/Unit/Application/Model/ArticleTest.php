@@ -7246,4 +7246,71 @@ class ArticleTest extends \OxidTestCase
 
         return $oProduct;
     }
+
+    public function testIsInList_noUser_returnsFalse(): void
+    {
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getUser']);
+        $oArticle->expects($this->once())->method('getUser')->willReturn(false);
+
+        $this->assertFalse($oArticle->isInList());
+    }
+
+    public function testIsInList_articleNotInAnyList_returnsFalse(): void
+    {
+        $oNoticeBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['getItems']);
+        $oNoticeBasket->expects($this->once())->method('getItems')->willReturn([]);
+
+        $oWishBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['getItems']);
+        $oWishBasket->expects($this->once())->method('getItems')->willReturn([]);
+
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getBasket']);
+        $oUser->expects($this->exactly(2))->method('getBasket')
+            ->willReturnMap([['noticelist', $oNoticeBasket], ['wishlist', $oWishBasket]]);
+
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getUser', 'getId']);
+        $oArticle->expects($this->once())->method('getUser')->willReturn($oUser);
+        $oArticle->expects($this->once())->method('getId')->willReturn('_testArticleId');
+
+        $this->assertFalse($oArticle->isInList());
+    }
+
+    public function testIsInList_articleInNoticeList_returnsTrue(): void
+    {
+        $oItem = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oItem->oxuserbasketitems__oxartid = new oxField('_testArticleId');
+
+        $oNoticeBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['getItems']);
+        $oNoticeBasket->expects($this->once())->method('getItems')->willReturn([$oItem]);
+
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getBasket']);
+        $oUser->expects($this->once())->method('getBasket')->with('noticelist')->willReturn($oNoticeBasket);
+
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getUser', 'getId']);
+        $oArticle->expects($this->once())->method('getUser')->willReturn($oUser);
+        $oArticle->expects($this->once())->method('getId')->willReturn('_testArticleId');
+
+        $this->assertTrue($oArticle->isInList());
+    }
+
+    public function testIsInList_articleInWishList_returnsTrue(): void
+    {
+        $oItem = oxNew(\OxidEsales\Eshop\Core\Model\BaseModel::class);
+        $oItem->oxuserbasketitems__oxartid = new oxField('_testArticleId');
+
+        $oNoticeBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['getItems']);
+        $oNoticeBasket->expects($this->once())->method('getItems')->willReturn([]);
+
+        $oWishBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['getItems']);
+        $oWishBasket->expects($this->once())->method('getItems')->willReturn([$oItem]);
+
+        $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getBasket']);
+        $oUser->expects($this->exactly(2))->method('getBasket')
+            ->willReturnMap([['noticelist', $oNoticeBasket], ['wishlist', $oWishBasket]]);
+
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getUser', 'getId']);
+        $oArticle->expects($this->once())->method('getUser')->willReturn($oUser);
+        $oArticle->expects($this->once())->method('getId')->willReturn('_testArticleId');
+
+        $this->assertTrue($oArticle->isInList());
+    }
 }
