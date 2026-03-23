@@ -191,6 +191,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     protected $_blIsOnComparisonList = false;
 
     /**
+     * Cached result of whether this article is in the user's wish list or notice list.
+     * null = not yet determined, true/false = explicitly set via setIsInList().
+     *
+     * @var bool|null
+     */
+    protected $_blIsInUserList = null;
+
+    /**
      * user object
      *
      * @var User
@@ -579,8 +587,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function isInList()
     {
+        if ($this->_blIsInUserList !== null) {
+            Registry::getLogger()->debug('isInList [cache] id=' . $this->getId() . ' result=' . ($this->_blIsInUserList ? 'true' : 'false'));
+            return $this->_blIsInUserList;
+        }
+
         $oUser = $this->getUser();
         if (!$oUser) {
+            Registry::getLogger()->debug('isInList [db] id=' . $this->getId() . ' no user → false');
             return false;
         }
 
@@ -588,12 +602,26 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         foreach (['noticelist', 'wishlist'] as $listType) {
             foreach ($oUser->getBasket($listType)->getItems() as $oItem) {
                 if ($oItem->oxuserbasketitems__oxartid->value === $articleId) {
+                    Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' found in ' . $listType . ' → true');
                     return true;
                 }
             }
         }
 
+        Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' not found → false');
         return false;
+    }
+
+    /**
+     * Sets whether this article is in the user's wish list or notice list.
+     * Used by UtilsComponent after adding/removing to push the state onto
+     * the view's article objects without a DB re-query.
+     *
+     * @param bool $blInList
+     */
+    public function setIsInList(bool $blInList)
+    {
+        $this->_blIsInUserList = $blInList;
     }
 
     /**
