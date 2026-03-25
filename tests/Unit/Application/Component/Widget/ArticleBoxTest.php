@@ -21,12 +21,15 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Component\Widget\ArticleBox;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Category;
+use OxidTestCase;
 
 /**
  * Tests for oxwArticleBox class
  */
-class ArticleBoxTest extends \OxidTestCase
+class ArticleBoxTest extends OxidTestCase
 {
     /**
      * Template view parameters data provider
@@ -63,7 +66,7 @@ class ArticleBoxTest extends \OxidTestCase
 
         $aViewParams = [
             'sWidgetType' => $sWidgetType,
-            'sListType'   => $sListType,
+            'sListType' => $sListType,
         ];
         $oArticleBox->setViewParameters($aViewParams);
 
@@ -97,7 +100,7 @@ class ArticleBoxTest extends \OxidTestCase
         $sId = '1126';
         $iLinkType = 4;
         $aViewParams = [
-            'anid'      => $sId,
+            'anid' => $sId,
             'iLinkType' => $iLinkType,
         ];
         $oArticleBox->setViewParameters($aViewParams);
@@ -107,34 +110,48 @@ class ArticleBoxTest extends \OxidTestCase
     }
 
     /**
-     * Checking if additional parameters are being recieved and added properly
+     * Checking if additional parameters are being received and added properly
      */
     public function testGetProductWithSearch()
     {
-        $this->markTestSkipped('Bug: URL doesnt match. sLinkUrl is not there.');
-        $oArticleBox = oxNew('oxwArticleBox');
         $this->setLanguage(1);
 
         $sId = '1126';
         $iLinkType = 4;
+
+        // First, get the base product link without search parameters
+        $oArticle = oxNew(Article::class);
+        $oArticle->load($sId);
+        $sLinkUrl = $oArticle->getMainLink();
+
+        // Set up the Search controller as the top active view before ArticleBox
+        // creates any product, because getProduct() reads the top active view
+        // from Registry::getConfig()->getTopActiveView() (not $this->getConfig()).
+        // We must ensure the Search controller is the first (top) view in the chain.
+        $oSearch = oxNew('Search');
+        $oConfig = $this->getConfig();
+
+        // Drop any lazily-created default views so the Search controller becomes the top view
+        while ($oConfig->hasActiveViewsChain() || count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+            if (count($oConfig->getActiveViewsList()) === 0) {
+                break;
+            }
+        }
+        $oConfig->setActiveView($oSearch);
+
+        $this->setRequestParameter('searchparam', '1126');
+
+        $sLinkUrl .= '?listtype=search&amp;searchparam=1126';
+
+        // Now create the ArticleBox and fetch the product — search params should be appended
+        $oArticleBox = oxNew('oxwArticleBox');
         $aViewParams = [
-            'anid'      => $sId,
+            'anid' => $sId,
             'iLinkType' => $iLinkType,
         ];
         $oArticleBox->setViewParameters($aViewParams);
-        $sLinkUrl = $oArticleBox->getProduct()->getMainLink();
 
-        $oArticleBox->setParent('search');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getTopActiveView']);
-        $oSearch = oxNew('Search');
-        $oConfig->expects($this->any())->method('getTopActiveView')->will($this->returnValue($oSearch));
-
-        $oArticleBox->setConfig($oConfig);
-        $sLinkUrl .= '?listtype=search&amp;searchparam=1126';
-
-        $this->setRequestParameter('searchparam', '1126');
-        // removing cached object
-        $oArticleBox->setProduct(null);
         $this->assertEquals($sLinkUrl, $oArticleBox->getProduct()->getMainLink(), 'Correct product link with additional search parameters should be loaded');
     }
 
@@ -166,7 +183,7 @@ class ArticleBoxTest extends \OxidTestCase
 
         $aRSS = [
             'title' => 'O3-Shop 5/Bargain',
-            'link'  => 'http://trunk:8080/en/rss/O3-Shop/Bargain/',
+            'link' => 'http://trunk:8080/en/rss/O3-Shop/Bargain/',
         ];
         $aViewParams = [
             'rsslinks' => $aRSS,
@@ -239,18 +256,21 @@ class ArticleBoxTest extends \OxidTestCase
      */
     public function testGetActiveCategory_ParentControllerActiveCategoryIsSet_ReturnCategory()
     {
-        $this->markTestSkipped('Bug: Failed asserting that false is true.');
         $oCategory = oxNew('oxCategory');
         $oCategory->load('943a9ba3050e78b443c16e043ae60ef3');
 
         $oList = oxNew('aList');
         $oList->setActiveCategory($oCategory);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getTopActiveView']);
-        $oConfig->expects($this->any())->method('getTopActiveView')->will($this->returnValue($oList));
+        // getActiveCategory() uses Registry::getConfig()->getTopActiveView(), not $this->getConfig(),
+        // so we must set the view on the real Registry config.
+        $oConfig = $this->getConfig();
+        while (count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+        }
+        $oConfig->setActiveView($oList);
 
-        $oArticleBox = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleBox::class, ['getConfig']);
-        $oArticleBox->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oArticleBox = oxNew(ArticleBox::class);
 
         $this->assertTrue($oArticleBox->getActiveCategory() instanceof Category);
         $this->assertEquals('943a9ba3050e78b443c16e043ae60ef3', $oArticleBox->getActiveCategory()->getId());
@@ -263,17 +283,20 @@ class ArticleBoxTest extends \OxidTestCase
      */
     public function testGetActiveCategory_ParentControllerActiveCategoryIsNotSet_ReturnNull()
     {
-        $this->markTestSkipped('Bug: Failed asserting that false is true.');
         $oCategory = oxNew('oxCategory');
 
         $oList = oxNew('aList');
         $oList->setActiveCategory($oCategory);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getTopActiveView']);
-        $oConfig->expects($this->any())->method('getTopActiveView')->will($this->returnValue($oList));
+        // getActiveCategory() uses Registry::getConfig()->getTopActiveView(), not $this->getConfig(),
+        // so we must set the view on the real Registry config.
+        $oConfig = $this->getConfig();
+        while (count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+        }
+        $oConfig->setActiveView($oList);
 
-        $oArticleBox = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleBox::class, ['getConfig']);
-        $oArticleBox->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oArticleBox = oxNew(ArticleBox::class);
 
         $this->assertTrue($oArticleBox->getActiveCategory() instanceof Category);
         $this->assertEquals(null, $oArticleBox->getActiveCategory()->getId());

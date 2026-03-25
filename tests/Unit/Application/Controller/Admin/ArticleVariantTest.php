@@ -148,8 +148,6 @@ class ArticleVariantTest extends \OxidTestCase
      */
     public function testDeleteVariant()
     {
-        $this->markTestSkipped('Bug: Undefined method OxidEsales\Eshop\Core\Request::getRequestRawParameter().');
-
         oxTestModules::addFunction('oxarticle', 'delete', '{ throw new Exception( "delete" ); }');
         $this->setRequestParameter('oxid', 'testid');
 

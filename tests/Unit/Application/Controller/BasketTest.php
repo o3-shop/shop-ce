@@ -100,14 +100,14 @@ class BasketTest extends \OxidTestCase
 
     public function testGetBasketArticles()
     {
-        $this->markTestSkipped('Bug: array is not string');
         $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getBasketArticles']);
         $oB->expects($this->once())->method('getBasketArticles')->will($this->returnValue('bitems'));
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oB));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getSession']);
-        $o->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertEquals('bitems', $o->getBasketArticles());
     }
 
@@ -131,11 +131,8 @@ class BasketTest extends \OxidTestCase
 
     public function testShowBackToShop()
     {
-        $this->markTestSkipped('Bug: false is not same as true');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(2))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(3));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(2))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 3);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
 
         $this->assertEquals(false, $o->showBackToShop());
         $this->getSession()->setVariable('_backtoshop', 1);
@@ -144,80 +141,60 @@ class BasketTest extends \OxidTestCase
 
     public function testAddVoucher()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['addVoucher']);
         $oB->expects($this->once())->method('addVoucher')->with($this->equalTo('vouchnr'));
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
+        // Production uses Registry::getSession() for both checkSessionChallenge and getBasket
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oB));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getSession']);
-        $o->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
-
-        $session = $this->getMockBuilder(Session::class)->setMethods(['checkSessionChallenge'])->getMock();
-        $session->method('checkSessionChallenge')->willReturn(true);
-        Registry::set(Session::class, $session);
+        $oSession->method('checkSessionChallenge')->willReturn(true);
+        Registry::set(Session::class, $oSession);
 
         $this->setRequestParameter('voucherNr', 'vouchnr');
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertEquals(null, $o->addVoucher());
     }
 
     public function testRemoveVoucher()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['removeVoucher']);
         $oB->expects($this->once())->method('removeVoucher')->with($this->equalTo('vouchnr'));
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
+        // Production uses Registry::getSession() for both checkSessionChallenge and getBasket
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oB));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getSession']);
-        $o->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
-
-        $session = $this->getMockBuilder(Session::class)->setMethods(['checkSessionChallenge'])->getMock();
-        $session->method('checkSessionChallenge')->willReturn(true);
-        Registry::set(Session::class, $session);
+        $oSession->method('checkSessionChallenge')->willReturn(true);
+        Registry::set(Session::class, $oSession);
 
         $this->setRequestParameter('voucherId', 'vouchnr');
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertEquals(null, $o->removeVoucher());
     }
 
     public function testBackToShop()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getSession()->setVariable('_backtoshop', 'asd');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(1))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(2));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 2);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertSame(null, $o->backToShop());
     }
 
     public function testBackToShopShowPage()
     {
-        $this->markTestSkipped('Bug: Get null back');
-
         $this->getSession()->setVariable('_backtoshop', 'asd');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(1))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(3));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 3);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertSame('asd', $o->backToShop());
 
-        $this->assertSame(null, oxRegistry::getSession()->getVariable('_backtoshop'));
+        $this->assertSame(null, \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('_backtoshop'));
     }
 
     public function testBackToShopShowPageNoPage()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->getSession()->setVariable('_backtoshop', '');
-        $oConf = $this->getMock('stdclass', ['getConfigParam']);
-        $oConf->expects($this->exactly(1))->method('getConfigParam')->with($this->equalTo('iNewBasketItemMessage'))->will($this->returnValue(3));
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getConfig']);
-        $o->expects($this->exactly(1))->method('getConfig')->will($this->returnValue($oConf));
+        $this->getConfig()->setConfigParam('iNewBasketItemMessage', 3);
+        $o = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $this->assertSame(null, $o->backToShop());
 
-        $this->assertSame('', oxRegistry::getSession()->getVariable('_backtoshop'));
+        $this->assertSame('', \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('_backtoshop'));
     }
 
     /**
@@ -252,8 +229,6 @@ class BasketTest extends \OxidTestCase
 
     public function testRenderDoesCleanReservationsIfOn()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->setConfigParam('blPsBasketReservationEnabled', true);
 
         $oR = $this->getMock('stdclass', ['renewExpiration']);
@@ -262,9 +237,10 @@ class BasketTest extends \OxidTestCase
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oR));
 
-        $oB = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getSession']);
-        $oB->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
+        $oB = oxNew(\OxidEsales\Eshop\Application\Controller\BasketController::class);
         $oB->render();
     }
 
@@ -313,8 +289,6 @@ class BasketTest extends \OxidTestCase
      */
     public function testChangeWrapping()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->setRequestParameter('wrapping', [1 => 2]);
         $this->setRequestParameter('giftmessage', 'testCardMessage');
         $this->setRequestParameter('chosencard', 'testCardId');
@@ -335,19 +309,17 @@ class BasketTest extends \OxidTestCase
         $oBasket->expects($this->atLeastOnce())->method('setCardId')->with($this->equalTo('testCardId'));
         $oBasket->expects($this->atLeastOnce())->method('onUpdate');
 
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
+        // Production uses Registry::getSession() for both checkSessionChallenge and getBasket
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket', 'checkSessionChallenge']);
         $oSession->expects($this->atLeastOnce())->method('getBasket')->will($this->returnValue($oBasket));
-
-        $session = $this->getMockBuilder(Session::class)->setMethods(['checkSessionChallenge'])->getMock();
-        $session->method('checkSessionChallenge')->willReturn(true);
-        Registry::set(Session::class, $session);
+        $oSession->method('checkSessionChallenge')->willReturn(true);
+        Registry::set(Session::class, $oSession);
 
         $oViewConfig = $this->getMock(\OxidEsales\Eshop\Core\ViewConfig::class, ['getShowGiftWrapping']);
         $oViewConfig->expects($this->atLeastOnce())->method('getShowGiftWrapping')->will($this->returnValue(true));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getViewConfig', 'getSession'], [], '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\BasketController::class, ['getViewConfig']);
         $oView->expects($this->atLeastOnce())->method('getViewConfig')->will($this->returnValue($oViewConfig));
-        $oView->expects($this->atLeastOnce())->method('getSession')->will($this->returnValue($oSession));
         $oView->changeWrapping();
     }
 

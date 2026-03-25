@@ -26,6 +26,7 @@ use OxidEsales\Eshop\Application\Model\Address;
 use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\BasketItem;
 use OxidEsales\Eshop\Application\Model\Discount;
+use OxidEsales\Eshop\Application\Model\DiscountList;
 use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Application\Model\Voucher;
 use OxidEsales\Eshop\Application\Model\Wrapping;

@@ -1,6 +1,6 @@
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: o3shop-db
     restart: always
     environment:
@@ -9,7 +9,7 @@ services:
       MYSQL_USER: ${O3SHOP_CONF_DBUSER}
       MYSQL_PASSWORD: ${O3SHOP_CONF_DBPWD}
     volumes:
-      - ./database/data:/var/lib/mysql
+      - db_data:/var/lib/mysql
       - ./database/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
@@ -65,5 +65,6 @@ services:
       MYSQL_USER: ${O3SHOP_CONF_DBUSER}
       MYSQL_PASSWORD: ${O3SHOP_CONF_DBPWD}
 
-
+volumes:
+  db_data:
 

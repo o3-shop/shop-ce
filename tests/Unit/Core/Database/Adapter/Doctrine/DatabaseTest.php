@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Database;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Database\Adapter\Doctrine;
 
 use OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database;
 use OxidEsales\TestingLibrary\UnitTestCase;

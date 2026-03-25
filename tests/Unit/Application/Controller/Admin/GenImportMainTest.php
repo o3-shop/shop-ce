@@ -19,9 +19,21 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
+namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
+
+/**
+ * Override move_uploaded_file in the production namespace so that the unit test
+ * can exercise the file-upload branch without a real HTTP upload.
+ */
+function move_uploaded_file(string $from, string $to): bool
+{
+    return copy($from, $to);
+}
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use Exception;
+use OxidEsales\Eshop\Core\Registry;
 use oxRegistry;
 use oxTestModules;
 
@@ -79,8 +91,6 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testDeleteCsvFile()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         // creating file for test
         $sFilePath = $this->getConfig()->getConfigParam('sCompileDir') . md5(time());
         $rFile = fopen($sFilePath, 'w');
@@ -89,8 +99,8 @@ class GenImportMainTest extends \OxidTestCase
         $this->assertTrue(file_exists($sFilePath));
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['_getUploadedCsvFilePath']);
-        $oView->expects($this->once())->method('_getUploadedCsvFilePath')->will($this->returnValue($sFilePath));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['getUploadedCsvFilePath']);
+        $oView->expects($this->once())->method('getUploadedCsvFilePath')->will($this->returnValue($sFilePath));
         $oView->UNITdeleteCsvFile();
 
         $this->assertFalse(file_exists($sFilePath));
@@ -103,13 +113,11 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testGetCsvFieldsNamesContainsNoHeader()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $this->setRequestParameter('blContainsHeader', false);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['_getUploadedCsvFilePath', '_getCsvFirstRow']);
-        $oView->expects($this->once())->method('_getUploadedCsvFilePath')->will($this->returnValue(false));
-        $oView->expects($this->once())->method('_getCsvFirstRow')->will($this->returnValue([1, 2, 3]));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['getUploadedCsvFilePath', 'getCsvFirstRow']);
+        $oView->expects($this->once())->method('getUploadedCsvFilePath')->will($this->returnValue(false));
+        $oView->expects($this->once())->method('getCsvFirstRow')->will($this->returnValue([1, 2, 3]));
         $this->assertEquals([2 => 'Column 1', 3 => 'Column 2', 4 => 'Column 3'], $oView->UNITgetCsvFieldsNames());
     }
 
@@ -120,13 +128,11 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testGetCsvFieldsNamesContainsHeader()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $this->setRequestParameter('blContainsHeader', true);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['_getUploadedCsvFilePath', '_getCsvFirstRow']);
-        $oView->expects($this->once())->method('_getUploadedCsvFilePath')->will($this->returnValue(false));
-        $oView->expects($this->once())->method('_getCsvFirstRow')->will($this->returnValue([1, 2, 3]));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['getUploadedCsvFilePath', 'getCsvFirstRow']);
+        $oView->expects($this->once())->method('getUploadedCsvFilePath')->will($this->returnValue(false));
+        $oView->expects($this->once())->method('getCsvFirstRow')->will($this->returnValue([1, 2, 3]));
         $this->assertEquals([1, 2, 3], $oView->UNITgetCsvFieldsNames());
     }
 
@@ -137,7 +143,6 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testGetCsvFirstRow()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
         // creating file for test
         $sFilePath = $this->getConfig()->getConfigParam('sCompileDir') . md5(time());
         $rFile = fopen($sFilePath, 'w');
@@ -145,10 +150,10 @@ class GenImportMainTest extends \OxidTestCase
         fclose($rFile);
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['_getCsvFieldsTerminator', '_getCsvFieldsEncolser', '_getUploadedCsvFilePath']);
-        $oView->expects($this->once())->method('_getCsvFieldsTerminator')->will($this->returnValue(';'));
-        $oView->expects($this->once())->method('_getCsvFieldsEncolser')->will($this->returnValue('"'));
-        $oView->expects($this->once())->method('_getUploadedCsvFilePath')->will($this->returnValue($sFilePath));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['getCsvFieldsTerminator', 'getCsvFieldsEncloser', 'getUploadedCsvFilePath']);
+        $oView->expects($this->once())->method('getCsvFieldsTerminator')->will($this->returnValue(';'));
+        $oView->expects($this->once())->method('getCsvFieldsEncloser')->will($this->returnValue('"'));
+        $oView->expects($this->once())->method('getUploadedCsvFilePath')->will($this->returnValue($sFilePath));
         $this->assertEquals(['test1', 'test2', 'test3'], $oView->UNITgetCsvFirstRow());
     }
 
@@ -178,15 +183,13 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testCheckErrorsStep2()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{}');
 
         // defining parameters
         $iNavStep = 2;
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['_getUploadedCsvFilePath']);
-        $oView->expects($this->once())->method('_getUploadedCsvFilePath')->will($this->returnValue(false));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['getUploadedCsvFilePath']);
+        $oView->expects($this->once())->method('getUploadedCsvFilePath')->will($this->returnValue(false));
         $this->assertEquals(1, $oView->UNITcheckErrors($iNavStep));
     }
 
@@ -259,21 +262,43 @@ class GenImportMainTest extends \OxidTestCase
      */
     public function testGetUploadedCsvFilePath()
     {
-        $this->markTestSkipped('Bug: Get null back');
-
+        // Clear any cached path and session var
         $this->getSession()->setVariable('sCsvFilePath', null);
-        $sFileName = md5(time());
 
-        // testing..
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile', 'getConfigParam']);
-        $oConfig->expects($this->once())->method('getUploadedFile')->will($this->returnValue(['name' => $sFileName, 'tmp_name' => rtrim(sys_get_temp_dir(), '/') . '/' . $sFileName]));
-        $oConfig->expects($this->once())->method('getConfigParam')->will($this->returnValue($this->getConfig()->getConfigParam('sCompileDir')));
+        // Create a temporary file to simulate an upload
+        $sTmpFile = tempnam(sys_get_temp_dir(), 'csv_test_');
+        file_put_contents($sTmpFile, 'test;csv;data');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\GenericImportMain::class, ['getConfig'], [], '', false);
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $sCompileDir = $this->getConfig()->getConfigParam('sCompileDir');
 
-        $this->assertEquals($this->getConfig()->getConfigParam('sCompileDir') . $sFileName, $oView->UNITgetUploadedCsvFilePath());
-        $this->assertEquals($this->getConfig()->getConfigParam('sCompileDir') . $sFileName, oxRegistry::getSession()->getVariable('sCsvFilePath'));
+        // Simulate $_FILES
+        $_FILES['csvfile'] = [
+            'name'     => 'test.csv',
+            'tmp_name' => $sTmpFile,
+            'error'    => UPLOAD_ERR_OK,
+            'size'     => filesize($sTmpFile),
+        ];
+
+        try {
+            $oView = $this->getProxyClass('GenImport_Main');
+            // Reset cached path
+            $oView->setNonPublicVar('_sCsvFilePath', null);
+
+            $sResult = $oView->UNITgetUploadedCsvFilePath();
+
+            $sExpected = $sCompileDir . basename($sTmpFile);
+            $this->assertEquals($sExpected, $sResult);
+            $this->assertTrue(file_exists($sExpected), 'File should have been copied to compile dir');
+            $this->assertEquals($sExpected, Registry::getSession()->getVariable('sCsvFilePath'));
+        } finally {
+            // Cleanup
+            @unlink($sTmpFile);
+            if (isset($sExpected)) {
+                @unlink($sExpected);
+            }
+            unset($_FILES['csvfile']);
+            $this->getSession()->setVariable('sCsvFilePath', null);
+        }
     }
 
     /**

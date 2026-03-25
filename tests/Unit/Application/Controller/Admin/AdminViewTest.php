@@ -58,24 +58,23 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetServiceProtocol()
     {
-        $this->markTestSkipped('Bug: got http when https is expected. ');
+        // getServiceProtocol() uses Registry::getConfig()->isSsl(), not $this->getConfig().
+
         // SSL on
         $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl']);
         $oConfig->expects($this->once())->method('isSsl')->will($this->returnValue(true));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['getConfig'], [], '', false);
-        $oAdminView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-
+        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, null, [], '', false);
         $this->assertEquals('https', $oAdminView->UNITgetServiceProtocol());
 
         // SSL off
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl']);
-        $oConfig->expects($this->once())->method('isSsl')->will($this->returnValue(false));
+        $oConfig2 = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl']);
+        $oConfig2->expects($this->once())->method('isSsl')->will($this->returnValue(false));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig2);
 
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['getConfig'], [], '', false);
-        $oAdminView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-
-        $this->assertEquals('http', $oAdminView->UNITgetServiceProtocol());
+        $oAdminView2 = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, null, [], '', false);
+        $this->assertEquals('http', $oAdminView2->UNITgetServiceProtocol());
     }
 
     /**
@@ -85,26 +84,26 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetServiceUrl()
     {
-        $this->markTestSkipped('Bug: does not use testprotocol, but http. ');
+        // getServiceUrl() calls getServiceProtocol() (without underscore) and ShopVersion::getVersion().
+        // Mock getServiceProtocol on the view, and use the real ShopVersion.
         $sPref = $this->getConfig()->getEdition();
+        $sVersion = \OxidEsales\Eshop\Core\ShopVersion::getVersion();
 
-        // no lang abbr
         $this->getProxyClass(AdminController::class);
-        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['_getServiceProtocol', '_getCountryByCode', '_getShopVersionNr'], [], '', false);
-        $oAdminView->expects($this->any())->method('_getServiceProtocol')->will($this->returnValue('testprotocol'));
-        $oAdminView->expects($this->any())->method('_getShopVersionNr')->will($this->returnValue('testshopversion'));
+        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['getServiceProtocol'], [], '', false);
+        $oAdminView->expects($this->any())->method('getServiceProtocol')->will($this->returnValue('testprotocol'));
 
         $this->getSession()->setVariable('tpllanguage', 'de');
 
-        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/testshopversion/international/de/";
+        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/$sVersion/international/de/";
         $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl());
 
         $oAdminView->setNonPublicVar('_sServiceUrl', null);
-        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/testshopversion/international/en/";
+        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/$sVersion/international/en/";
         $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl('fr'));
 
         $oAdminView->setNonPublicVar('_sServiceUrl', null);
-        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/testshopversion/international/en/";
+        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/$sVersion/international/en/";
         $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl('en'));
     }
 
@@ -127,9 +126,10 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testInit()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['_authorize']);
-        $oAdminView->expects($this->once())->method('_authorize')->will($this->returnValue(true));
+        // init() calls authorize() (without underscore). If it returns false,
+        // it calls redirect() + exit() which kills the process.
+        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['authorize']);
+        $oAdminView->expects($this->once())->method('authorize')->will($this->returnValue(true));
         $oAdminView->init();
 
         $this->assertEquals(oxRegistry::getSession()->getVariable('malladmin'), $oAdminView->getViewDataElement('malladmin'));
@@ -336,20 +336,20 @@ class AdminViewTest extends \OxidTestCase
 
     public function testAuthorizeChecksSessionChallenge()
     {
-        $this->markTestSkipped('Bug: Failed asserting that false matches expected true.');
         oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
         oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array("asd");}');
 
+        // Production code uses Registry::getSession(), not $this->getSession()
         $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oAView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['getSession']);
-        $oAView->expects($this->once())->method('getSession')->will($this->returnValue($oSess));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSess);
+        $oAView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class);
         $this->assertEquals(true, $oAView->UNITauthorize());
 
         $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(false));
-        $oAView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['getSession']);
-        $oAView->expects($this->once())->method('getSession')->will($this->returnValue($oSess));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSess);
+        $oAView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class);
         $this->assertEquals(false, $oAView->UNITauthorize());
     }
 

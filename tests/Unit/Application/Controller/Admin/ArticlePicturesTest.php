@@ -161,13 +161,11 @@ class ArticlePicturesTest extends \OxidTestCase
      */
     public function testDeletePicture_generatedPicsCounterReset()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $this->setRequestParameter('oxid', '_testArtId');
         $this->setRequestParameter('masterPicIndex', '2');
 
-        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['_resetMasterPicture']);
-        $oArtPic->expects($this->once())->method('_resetMasterPicture');
+        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['resetMasterPicture']);
+        $oArtPic->expects($this->once())->method('resetMasterPicture');
 
         $this->_oArticle->save();
 
@@ -245,8 +243,6 @@ class ArticlePicturesTest extends \OxidTestCase
      */
     public function testResetMasterPicture_makesCleanupOnFields()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['isDerived']);
         $oArticle->expects($this->atLeastOnce())->method('isDerived')->will($this->returnValue(null));
 
@@ -258,12 +254,12 @@ class ArticlePicturesTest extends \OxidTestCase
 
         oxTestModules::addModuleObject('oxPictureHandler', $oPicHandler);
 
-        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['_cleanupCustomFields']);
-        $oArtPic->expects($this->never())->method('_cleanupCustomFields');
+        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['cleanupCustomFields']);
+        $oArtPic->expects($this->never())->method('cleanupCustomFields');
         $oArtPic->UNITresetMasterPicture($oArticle, 2);
 
-        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['_cleanupCustomFields']);
-        $oArtPic->expects($this->once())->method('_cleanupCustomFields');
+        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['cleanupCustomFields']);
+        $oArtPic->expects($this->once())->method('cleanupCustomFields');
         $oArtPic->UNITresetMasterPicture($oArticle, 1);
     }
 
@@ -316,15 +312,12 @@ class ArticlePicturesTest extends \OxidTestCase
      */
     public function testSave_demoShopMode()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
         oxRegistry::getSession()->deleteVariable('Errors');
 
         $oArtPic = $this->getProxyClass('Article_Pictures');
-        $oArtPic->setConfig($oConfig);
         $oArtPic->save();
 
         $aEx = oxRegistry::getSession()->getVariable('Errors');
@@ -340,15 +333,12 @@ class ArticlePicturesTest extends \OxidTestCase
      */
     public function testDeletePicture_demoShopMode()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
         oxRegistry::getSession()->deleteVariable('Errors');
 
         $oArtPic = $this->getProxyClass('Article_Pictures');
-        $oArtPic->setConfig($oConfig);
         $oArtPic->deletePicture();
 
         $aEx = oxRegistry::getSession()->getVariable('Errors');

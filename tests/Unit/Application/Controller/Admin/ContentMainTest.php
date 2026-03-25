@@ -71,14 +71,12 @@ class ContentMainTest extends \OxidTestCase
      */
     public function testSave()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         oxTestModules::addFunction('oxcontent', 'save', '{ throw new Exception( "save" );}');
 
         // testing..
         try {
-            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentMain::class, ['_checkIdent']);
-            $oView->expects($this->once())->method('_checkIdent')->will($this->returnValue(false));
+            $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentMain::class, ['checkIdent']);
+            $oView->expects($this->once())->method('checkIdent')->will($this->returnValue(false));
             $oView->save();
         } catch (Exception $oExcp) {
             $this->assertEquals('save', $oExcp->getMessage(), 'Error in Content_Main::Save()');

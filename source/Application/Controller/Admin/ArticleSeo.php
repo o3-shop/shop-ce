@@ -212,7 +212,7 @@ class ArticleSeo extends ObjectSeo
                 $oCat = oxNew(Category::class);
                 if ($oCat->loadInLang($iLang, current($oRs->fields))) {
                     if ($sMainCatId == $oCat->getId()) {
-                        $sSuffix = Registry::getLang()->translateString('(main category)', $this->getEditLang());
+                        $sSuffix = Registry::getLang()->translateString('GENERAL_SEO_MAINCAT', $this->getEditLang());
                         $sTitleField = 'oxcategories__oxtitle';
                         $sTitle = $oCat->$sTitleField->getRawValue() . ' ' . $sSuffix;
                         $oCat->$sTitleField = new Field($sTitle, Field::T_RAW);

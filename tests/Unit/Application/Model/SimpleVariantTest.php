@@ -174,8 +174,9 @@ class SimpleVariantTest extends \OxidTestCase
 
     public function testGetBaseSeoLink()
     {
-        $this->markTestSkipped('Bug: got url instead of seo link');
-        oxTestModules::addFunction('oxSeoEncoderArticle', 'getArticleUrl', "{return 'sArticleUrl';}");
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getArticleUrl']);
+        $seoEncoderMock->expects($this->any())->method('getArticleUrl')->will($this->returnValue('sArticleUrl'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, $seoEncoderMock);
 
         $oVariant = oxNew('oxSimpleVariant');
         $this->assertEquals('sArticleUrl', $oVariant->getBaseSeoLink(0));

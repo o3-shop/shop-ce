@@ -141,8 +141,6 @@ class ManufacturerSeoTest extends \OxidTestCase
      */
     public function testGetEntryUri()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $oManufacturer = oxNew('oxManufacturer');
         $oManufacturer->setId('_test1');
         $oManufacturer->oxmanufacturers__oxshowsuffix = new oxField(0);
@@ -151,9 +149,9 @@ class ManufacturerSeoTest extends \OxidTestCase
         $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, ['getManufacturerUri']);
         $oEncoder->expects($this->once())->method('getManufacturerUri')->will($this->returnValue('ManufacturerUri'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, ['getEditObjectId', '_getEncoder']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerSeo::class, ['getEditObjectId', 'getEncoder']);
         $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('_test1'));
-        $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
+        $oView->expects($this->once())->method('getEncoder')->will($this->returnValue($oEncoder));
         $this->assertEquals('ManufacturerUri', $oView->getEntryUri());
     }
 

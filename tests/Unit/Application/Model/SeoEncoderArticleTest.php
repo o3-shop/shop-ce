@@ -533,7 +533,6 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
     public function testGetArticleMainUriHasCategory()
     {
-        $this->markTestSkipped('Bug: Assertion doesnt match nearly.');
         $sMainCatId = oxDb::getDb()->getOne('select oxcatnid from ' . getViewName('oxobject2category') . " where oxobjectid = '1126' order by oxtime");
 
         $oCategory = oxNew('oxCategory');
@@ -545,15 +544,15 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
         $oEncoder = $this->getMock(
             'oxseoencoderarticle',
-            ['_loadFromDb', '_getProductForLang', '_createArticleCategoryUri',
-                                         '_processSeoUrl', '_prepareArticleTitle', '_saveToDb']
+            ['_loadFromDb', 'getProductForLang', 'createArticleCategoryUri',
+                                         '_processSeoUrl', 'prepareArticleTitle', '_saveToDb']
         );
 
         $oEncoder->expects($this->once())->method('_loadFromDb')->with($this->equalTo('oxarticle'), $this->equalTo('1126'), $this->equalTo(0), $this->equalTo(null), $this->equalTo($sMainCatId), $this->equalTo(true))->will($this->returnValue(false));
-        $oEncoder->expects($this->once())->method('_createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
-        $oEncoder->expects($this->never())->method('_getProductForLang');
+        $oEncoder->expects($this->once())->method('createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
+        $oEncoder->expects($this->never())->method('getProductForLang');
         $oEncoder->expects($this->never())->method('_processSeoUrl');
-        $oEncoder->expects($this->never())->method('_prepareArticleTitle');
+        $oEncoder->expects($this->never())->method('prepareArticleTitle');
         $oEncoder->expects($this->never())->method('_saveToDb');
 
         $this->assertEquals('testSeoUri', $oEncoder->getArticleMainUri($oArticle, 0));
@@ -561,7 +560,6 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
     public function testGetArticleMainUriVariantHasCategory()
     {
-        $this->markTestSkipped('Bug: Assertion doesnt match nearly.');
         $sMainCatId = oxDb::getDb()->getOne('select oxcatnid from ' . getViewName('oxobject2category') . " where oxobjectid = '1126' order by oxtime");
 
         $oCategory = oxNew('oxCategory');
@@ -574,15 +572,15 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
         $oEncoder = $this->getMock(
             'oxseoencoderarticle',
-            ['_loadFromDb', '_getProductForLang', '_createArticleCategoryUri',
-                                         '_processSeoUrl', '_prepareArticleTitle', '_saveToDb']
+            ['_loadFromDb', 'getProductForLang', 'createArticleCategoryUri',
+                                         '_processSeoUrl', 'prepareArticleTitle', '_saveToDb']
         );
 
         $oEncoder->expects($this->once())->method('_loadFromDb')->with($this->equalTo('oxarticle'), $this->equalTo('testVarId'), $this->equalTo(0), $this->equalTo(null), $this->equalTo($sMainCatId), $this->equalTo(true))->will($this->returnValue(false));
-        $oEncoder->expects($this->once())->method('_createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
-        $oEncoder->expects($this->never())->method('_getProductForLang');
+        $oEncoder->expects($this->once())->method('createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
+        $oEncoder->expects($this->never())->method('getProductForLang');
         $oEncoder->expects($this->never())->method('_processSeoUrl');
-        $oEncoder->expects($this->never())->method('_prepareArticleTitle');
+        $oEncoder->expects($this->never())->method('prepareArticleTitle');
         $oEncoder->expects($this->never())->method('_saveToDb');
 
         $this->assertEquals('testSeoUri', $oEncoder->getArticleMainUri($oArticle, 0));
@@ -715,10 +713,6 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
     public function testGetArticleVendorUriArticleArticleIsAssignedToVendorWithLangParam()
     {
-        $this->markTestSkipped("Bug: 
-        -'Nach-Lieferant/Haller-Stahlwaren/Wanduhr-SPIDER-oxid-test-article-var-select.html'
-        +'Nach-Lieferant/Haller-Stahlwaren/Wanduhr-SPIDER.html'
-        ");
         $sVendorId = oxDb::getDb()->getOne('select oxid from oxvendor');
         $oVendor = oxNew('oxVendor');
         $oVendor->load($sVendorId);
@@ -741,18 +735,13 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxvendorid = new oxField($sVendorId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getVendor']);
-        $oEncoder->expects($this->once())->method('_getVendor')->will($this->returnValue($oVendor));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getVendor']);
+        $oEncoder->expects($this->once())->method('getVendor')->will($this->returnValue($oVendor));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleVendorUri($oArticle, 0));
     }
 
     public function testGetArticleManufacturerUriArticleArticleIsAssignedToManufacturerWithLangParam()
     {
-        $this->markTestSkipped("Bug: 
-        -'Nach-Hersteller/Stewart-Brown/Wanduhr-SPIDER-oxid-test-article-var-select.html'
-        +'Nach-Hersteller/Stewart-Brown/Wanduhr-SPIDER.html'
-        ");
-
         $sManufacturerId = oxDb::getDb()->getOne('select oxid from oxmanufacturers');
         $oManufacturer = oxNew('oxManufacturer');
         $oManufacturer->load($sManufacturerId);
@@ -775,17 +764,13 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxmanufacturerid = new oxField($sManufacturerId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getManufacturer']);
-        $oEncoder->expects($this->once())->method('_getManufacturer')->will($this->returnValue($oManufacturer));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getManufacturer']);
+        $oEncoder->expects($this->once())->method('getManufacturer')->will($this->returnValue($oManufacturer));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleManufacturerUri($oArticle, 0));
     }
 
     public function testGetArticleVendorUriArticleArticleIsAssignedToVendorEngWithLangParam()
     {
-        $this->markTestSkipped("Bug:
-        -'en/By-distributor/Haller-Stahlwaren/Wall-Clock-SPIDER-oxid-test-article-var-select.html'
-        +'en/By-distributor/Haller-Stahlwaren/Wall-Clock-SPIDER.html'
-        ");
         $sVendorId = oxDb::getDb()->getOne('select oxid from oxvendor');
         $oVendor = oxNew('oxVendor');
         $oVendor->loadInLang(1, $sVendorId);
@@ -808,17 +793,13 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxvendorid = new oxField($sVendorId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getVendor']);
-        $oEncoder->expects($this->once())->method('_getVendor')->will($this->returnValue($oVendor));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getVendor']);
+        $oEncoder->expects($this->once())->method('getVendor')->will($this->returnValue($oVendor));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleVendorUri($oArticle, 1));
     }
 
     public function testGetArticleManufacturerUriArticleArticleIsAssignedToManufacturerEngWithLangParam()
     {
-        $this->markTestSkipped("Bug: 
-        -'en/By-manufacturer/Stewart-Brown/Wall-Clock-SPIDER-oxid-test-article-var-select.html'
-        +'en/By-manufacturer/Stewart-Brown/Wall-Clock-SPIDER.html'
-        ");
         $sManufacturerId = oxDb::getDb()->getOne('select oxid from oxmanufacturers');
         $oManufacturer = oxNew('oxManufacturer');
         $oManufacturer->loadInLang(1, $sManufacturerId);
@@ -841,8 +822,8 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxmanufacturerid = new oxField($sManufacturerId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getManufacturer']);
-        $oEncoder->expects($this->once())->method('_getManufacturer')->will($this->returnValue($oManufacturer));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getManufacturer']);
+        $oEncoder->expects($this->once())->method('getManufacturer')->will($this->returnValue($oManufacturer));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleManufacturerUri($oArticle, 1));
     }
 
@@ -1225,8 +1206,13 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
     public function testCreateArticleCategoryUri()
     {
-        $this->markTestSkipped('Bug: seo is completely broken. got: caturlcatId1articleTitle');
-        oxTestModules::addFunction('oxSeoEncoderCategory', 'getCategoryUri($c, $l = NULL, $blRegenerate = false)', '{return "caturl".$c->getId().$l;}');
+        $oSeoEncoderCategory = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, ['getCategoryUri']);
+        $oSeoEncoderCategory->expects($this->any())->method('getCategoryUri')->will($this->returnCallback(function ($c, $l = null) {
+            return 'caturl' . $c->getId() . $l;
+        }));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, $oSeoEncoderCategory);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\EshopCommunity\Application\Model\SeoEncoderCategory::class, $oSeoEncoderCategory);
+
         $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getLanguage', 'getId', 'getBaseStdLink']);
         $oA->expects($this->never())->method('getLanguage');
         $oA->expects($this->any())->method('getId')->will($this->returnValue('articleId'));

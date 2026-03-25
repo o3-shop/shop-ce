@@ -614,7 +614,6 @@ class LocatorTest extends \OxidTestCase
     // set locator data for my account recommlists
     public function testSetRecommListLocatorDataNoSearchParam()
     {
-        $this->markTestSkipped('Bug: strings does not match');
         oxTestModules::addFunction('oxarticlelist', 'loadRecommArticleIds', '{parent::loadRecommArticleIds($aA[0], " order by oxobject2list.oxobjectid asc" );}');
         $myConfig = $this->getConfig();
 

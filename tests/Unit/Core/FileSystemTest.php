@@ -21,11 +21,49 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
+use InvalidArgumentException;
 use OxidEsales\EshopCommunity\Core\FileSystem\FileSystem;
 use OxidEsales\TestingLibrary\UnitTestCase;
+use RuntimeException;
 
 class FileSystemTest extends UnitTestCase
 {
+    /** @var string[] Temp directories created during tests, to be cleaned up */
+    private $tempDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach (array_reverse($this->tempDirs) as $dir) {
+            if (is_dir($dir)) {
+                $this->removeDir($dir);
+            }
+        }
+        $this->tempDirs = [];
+        parent::tearDown();
+    }
+
+    private function removeDir(string $dir): void
+    {
+        foreach (scandir($dir) as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $dir . DIRECTORY_SEPARATOR . $entry;
+            is_dir($path) ? $this->removeDir($path) : unlink($path);
+        }
+        rmdir($dir);
+    }
+
+    /**
+     * Creates a unique temporary directory and registers it for cleanup.
+     */
+    private function makeTempDir(string $suffix = ''): string
+    {
+        $base = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oxid_fs_test_' . uniqid('', true) . $suffix;
+        mkdir($base, 0755, true);
+        $this->tempDirs[] = $base;
+        return $base;
+    }
     public function testCombinePathsReturnEmptyPathWhenCalledWithoutParameters()
     {
         $fileSystem = oxNew(FileSystem::class);
@@ -68,6 +106,106 @@ class FileSystemTest extends UnitTestCase
         $expectedPath = 'path1/path2/path3';
         $this->assertSame($expectedPath, $actualConnectedPath);
     }
+
+    // -------------------------------------------------------------------------
+    // createDirIfNotExists tests
+    // -------------------------------------------------------------------------
+
+    public function testCreateDirIfNotExistsReturnsTrueWhenDirectoryAlreadyExists(): void
+    {
+        $base = $this->makeTempDir();
+        $target = $base . DIRECTORY_SEPARATOR . 'existing';
+        mkdir($target, 0755, true);
+
+        $fileSystem = oxNew(FileSystem::class);
+        $this->assertTrue($fileSystem->createDirIfNotExists($target, $base));
+    }
+
+    public function testCreateDirIfNotExistsCreatesNewDirectory(): void
+    {
+        $base = $this->makeTempDir();
+        $target = $base . DIRECTORY_SEPARATOR . 'newdir';
+
+        $fileSystem = oxNew(FileSystem::class);
+        $this->assertTrue($fileSystem->createDirIfNotExists($target, $base));
+        $this->assertDirectoryExists($target);
+    }
+
+    public function testCreateDirIfNotExistsCreatesNestedDirectories(): void
+    {
+        $base = $this->makeTempDir();
+        $target = $base . DIRECTORY_SEPARATOR . 'a' . DIRECTORY_SEPARATOR . 'b' . DIRECTORY_SEPARATOR . 'c';
+
+        $fileSystem = oxNew(FileSystem::class);
+        $this->assertTrue($fileSystem->createDirIfNotExists($target, $base));
+        $this->assertDirectoryExists($target);
+    }
+
+    public function testCreateDirIfNotExistsRespectsCustomMode(): void
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped('File permission modes are not applicable on Windows.');
+        }
+        $base = $this->makeTempDir();
+        $target = $base . DIRECTORY_SEPARATOR . 'modedir';
+
+        $fileSystem = oxNew(FileSystem::class);
+        $fileSystem->createDirIfNotExists($target, $base, 0700);
+
+        $this->assertDirectoryExists($target);
+        $this->assertSame('0700', substr(sprintf('%o', fileperms($target)), -4));
+    }
+
+    public function testCreateDirIfNotExistsThrowsOnEmptyPath(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $base = $this->makeTempDir();
+        $fileSystem = oxNew(FileSystem::class);
+        $fileSystem->createDirIfNotExists('', $base);
+    }
+
+    public function testCreateDirIfNotExistsThrowsWhenBaseDirDoesNotExist(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $fileSystem = oxNew(FileSystem::class);
+        $fileSystem->createDirIfNotExists('/some/path/newdir', '/this/does/not/exist');
+    }
+
+    public function testCreateDirIfNotExistsThrowsWhenPathIsOutsideBaseDir(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $base = $this->makeTempDir();
+        $fileSystem = oxNew(FileSystem::class);
+        // Use a path clearly outside the base dir
+        $fileSystem->createDirIfNotExists($base . '/../outside', $base);
+    }
+
+    public function testCreateDirIfNotExistsThrowsWhenPathIsExistingFile(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        $base = $this->makeTempDir();
+        $file = $base . DIRECTORY_SEPARATOR . 'iam_a_file';
+        file_put_contents($file, '');
+
+        $fileSystem = oxNew(FileSystem::class);
+        $fileSystem->createDirIfNotExists($file, $base);
+    }
+
+    public function testCreateDirIfNotExistsNormalizesTrailingSlash(): void
+    {
+        $base = $this->makeTempDir();
+        $target = $base . DIRECTORY_SEPARATOR . 'trailingslash' . DIRECTORY_SEPARATOR;
+
+        $fileSystem = oxNew(FileSystem::class);
+        $this->assertTrue($fileSystem->createDirIfNotExists($target, $base));
+        $this->assertDirectoryExists(rtrim($target, DIRECTORY_SEPARATOR));
+    }
+
+    // -------------------------------------------------------------------------
 
     /**
      * Test for isReadable method

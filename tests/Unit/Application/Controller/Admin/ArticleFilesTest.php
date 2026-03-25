@@ -38,6 +38,9 @@ class ArticleFilesTest extends \OxidTestCase
      */
     protected function tearDown(): void
     {
+        // Clean up any $_FILES set by tests
+        unset($_FILES['newArticleFile']);
+
         $oDb = oxDb::getDb();
         $oDb->execute("delete from oxfiles where oxid='_testFileId'");
         $oDb->execute("delete from oxorderfiles where oxid='_testOrderFile'");
@@ -179,7 +182,7 @@ class ArticleFilesTest extends \OxidTestCase
      */
     public function testDeletefileDemoShop()
     {
-        $this->markTestSkipped('Bug: Call to member function error');
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
         oxTestModules::addFunction('oxfile', '_deleteFile', '{ return true; }');
         $oDb = oxDb::getDb();
@@ -187,16 +190,15 @@ class ArticleFilesTest extends \OxidTestCase
         $this->setRequestParameter('oxid', 2000);
         $this->setRequestParameter('fileid', '_testFileId');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
-
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleFiles::class, ['getConfig'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew('Article_Files');
         $oView->deletefile();
 
         $aErr = oxRegistry::getSession()->getVariable('Errors');
+        $this->assertNotEmpty($aErr, 'Expected error to be set in session');
         $oErr = unserialize($aErr['default'][0]);
-        $this->assertEquals('ARTICLE_EXTEND_UPLOADISDISABLED', $oErr->getOxMessage());
+        // getOxMessage() translates the ident via Registry::getLang()
+        $sExpected = oxRegistry::getLang()->translateString('ARTICLE_EXTEND_UPLOADISDISABLED');
+        $this->assertEquals($sExpected, $oErr->getOxMessage());
     }
 
     /**
@@ -254,19 +256,17 @@ class ArticleFilesTest extends \OxidTestCase
      */
     public function testUpload()
     {
-        $this->markTestSkipped('Bug: Got null back');
+        $this->getConfig()->setConfigParam('blDemoShop', false);
         oxTestModules::addFunction('oxfile', 'processFile', '{ return true; }');
         oxTestModules::addFunction('oxfile', 'isUnderDownloadFolder', '{ return true; }');
         $oDb = oxDb::getDb();
         $this->setRequestParameter('oxid', '2000');
         $this->setRequestParameter('newfile', ['oxfiles__oxid' => '_testFileId', 'oxfiles__oxpurchasedonly' => 1]);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile', 'isDemoShop']);
-        $oConfig->expects($this->once())->method('getUploadedFile')->will($this->returnValue(['name' => 'testName']));
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(false));
+        // Simulate file upload via $_FILES since production uses Registry::getConfig()->getUploadedFile()
+        $_FILES['newArticleFile'] = ['name' => 'testName', 'tmp_name' => '', 'error' => 0, 'size' => 100];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleFiles::class, ['getConfig'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew('Article_Files');
         $oView->upload();
 
         $oFile = oxNew('oxFile');
@@ -283,17 +283,17 @@ class ArticleFilesTest extends \OxidTestCase
      */
     public function testUploadDemoShop()
     {
-        $this->markTestSkipped('Bug: False string returned');
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isDemoShop']);
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('blDemoShop', true);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleFiles::class, ['getConfig'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = oxNew('Article_Files');
         $oView->upload();
 
         $aErr = oxRegistry::getSession()->getVariable('Errors');
+        $this->assertNotEmpty($aErr, 'Expected error to be set in session');
         $oErr = unserialize($aErr['default'][0]);
-        $this->assertEquals('ARTICLE_EXTEND_UPLOADISDISABLED', $oErr->getOxMessage());
+        // getOxMessage() translates the ident via Registry::getLang()
+        $sExpected = oxRegistry::getLang()->translateString('ARTICLE_EXTEND_UPLOADISDISABLED');
+        $this->assertEquals($sExpected, $oErr->getOxMessage());
     }
 
     /**
@@ -320,18 +320,18 @@ class ArticleFilesTest extends \OxidTestCase
      */
     public function testUploadNotProcessedFile()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $oDb = oxDb::getDb();
+        $this->getConfig()->setConfigParam('blDemoShop', false);
         $this->setRequestParameter('oxid', '2000');
         $this->setRequestParameter('newfile', ['oxfiles__oxid' => '_testFileId', 'oxfiles__oxpurchasedonly' => 1]);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getUploadedFile', 'isDemoShop']);
-        $oConfig->expects($this->once())->method('getUploadedFile')->will($this->returnValue(['name' => 'testName']));
-        $oConfig->expects($this->once())->method('isDemoShop')->will($this->returnValue(false));
+        // Simulate file upload via $_FILES since production uses Registry::getConfig()->getUploadedFile()
+        $_FILES['newArticleFile'] = ['name' => 'testName', 'tmp_name' => '', 'error' => 0, 'size' => 100];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleFiles::class, ['getConfig'], [], '', false);
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        // Mock processFile to throw an Exception (simulating file processing failure)
+        oxTestModules::addFunction('oxfile', 'processFile', '{ throw new \Exception("EXCEPTION_NOFILE"); }');
+        oxTestModules::addFunction('oxfile', 'isUnderDownloadFolder', '{ return true; }');
+
+        $oView = oxNew('Article_Files');
         $oView->upload();
 
         $this->setAdminMode(true);

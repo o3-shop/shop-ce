@@ -197,11 +197,16 @@ class UtilsPicTest extends \OxidTestCase
     // deleting existing
     public function testDeletePictureExisting()
     {
-        if (getenv('CI') == true) {
-            $this->markTestSkipped('Skipping test in CI environment.');
+        $sDir = $this->getConfig()->getPictureDir(false) . 'master/product/thumb/';
+        if (!is_dir($sDir)) {
+            mkdir($sDir, 0755, true);
         }
+        // Create a temporary file so the test works in any environment (including CI).
+        $sTmpFile = 'test_delete_' . uniqid() . '.jpg';
+        file_put_contents($sDir . $sTmpFile, 'test');
+
         $oUtilsPic = oxNew('oxutilspic');
-        $this->assertTrue($oUtilsPic->UNITdeletePicture('CCdetail1_z3_ico_th.jpg', $this->getConfig()->getPictureDir(false) . 'master/product/thumb/'));
+        $this->assertTrue($oUtilsPic->UNITdeletePicture($sTmpFile, $sDir));
     }
 
     /**
@@ -209,7 +214,7 @@ class UtilsPicTest extends \OxidTestCase
      *
      * @return array
      */
-    public function testIsPicDeletableDataProvider()
+    public function isPicDeletableDataProvider()
     {
         return [
             ['testOK.jpg', 1, true],
@@ -224,7 +229,7 @@ class UtilsPicTest extends \OxidTestCase
      * @param int|null $response
      * @param bool $expectedResult
      *
-     * @dataProvider testIsPicDeletableDataProvider
+     * @dataProvider isPicDeletableDataProvider
      */
     public function testIsPicDeletable($filename, $response, $expectedResult)
     {

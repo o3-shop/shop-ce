@@ -92,16 +92,16 @@ class AttributeOrderAjaxTest extends \OxidTestCase
      */
     public function testSetSorting()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         $this->getConfig()->setConfigParam('iDebug', 1);
 
         $sViewTable = $this->getVieTableName();
 
-        $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '$sOxid' ", 'records' => [], 'totalRecords' => 0];
+        // No oxid request parameter set, so oxobjectid is empty
+        $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '' ", 'records' => [], 'totalRecords' => 0];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, ['_output']);
-        $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
+        // Production calls outputResponse() (without underscore), not _output()
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, ['outputResponse']);
+        $oView->expects($this->once())->method('outputResponse')->with($this->equalTo($aData));
         $oView->setsorting();
     }
 
@@ -121,11 +121,10 @@ class AttributeOrderAjaxTest extends \OxidTestCase
 
         $aData = ['startIndex' => 0, 'sort' => '_0', 'dir' => 'asc', 'countsql' => "select count( * )  from $sViewTable left join oxcategory2attribute on oxcategory2attribute.oxattrid = $sViewTable.oxid where oxobjectid = '$sOxid' ", 'records' => [], 'totalRecords' => 0];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, ['_output']);
-        $oView->expects($this->any())->method('_output')->with($this->equalTo(json_encode($aData)));
-        ob_start();
+        // Production calls outputResponse() (without underscore), not _output()
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeOrderAjax::class, ['outputResponse']);
+        $oView->expects($this->any())->method('outputResponse')->with($this->equalTo($aData));
         $oView->setsorting();
-        $output = ob_get_clean();
         $this->assertEquals(1, oxDb::getDb()->getOne("select sum(oxsort) from oxcategory2attribute where oxobjectid='_testObject'"));
     }
 

@@ -184,6 +184,41 @@ class UtilsComponent extends BaseController
 
             // recalculate basket count
             $oBasket->getItemCount(true);
+
+            Registry::getLogger()->debug('toList: listType=' . $sListType . ' productId=' . $sProductId . ' amount=' . $dAmount);
+
+            // push the updated in-list state onto any article objects already loaded in the view,
+            // so the heart icon reflects the change without a DB re-query (mirrors toCompareList())
+            $blInList = ($dAmount != 0);
+            if (!$blInList) {
+                // article was removed from this list — check if it is still in the other list
+                $otherList = ($sListType === 'noticelist') ? 'wishlist' : 'noticelist';
+                foreach ($oUser->getBasket($otherList)->getItems() as $oItem) {
+                    if ($oItem->oxuserbasketitems__oxartid->value === $sProductId) {
+                        $blInList = true;
+                        break;
+                    }
+                }
+            }
+            Registry::getLogger()->debug('toList: blInList=' . ($blInList ? 'true' : 'false'));
+
+            $oParentView = $this->getParent();
+            if ($oParentView) {
+                if (($oProduct = $oParentView->getViewProduct()) && $oProduct->getId() === $sProductId) {
+                    Registry::getLogger()->debug('toList: setIsInList on viewProduct id=' . $oProduct->getId());
+                    $oProduct->setIsInList($blInList);
+                }
+                $aViewProds = $oParentView->getViewProductList();
+                Registry::getLogger()->debug('toList: viewProductList count=' . (is_array($aViewProds) ? count($aViewProds) : 0));
+                if (is_array($aViewProds)) {
+                    foreach ($aViewProds as $oProduct) {
+                        if ($oProduct->getId() === $sProductId) {
+                            Registry::getLogger()->debug('toList: setIsInList on listProduct id=' . $oProduct->getId());
+                            $oProduct->setIsInList($blInList);
+                        }
+                    }
+                }
+            }
         }
     }
 

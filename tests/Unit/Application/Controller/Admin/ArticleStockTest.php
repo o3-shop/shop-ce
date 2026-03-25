@@ -246,8 +246,6 @@ class ArticleStockTest extends \OxidTestCase
      */
     public function testAddPriceShopMall()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         //set default params for first save
         $this->setRequestParameter(
             'editval',
@@ -260,16 +258,12 @@ class ArticleStockTest extends \OxidTestCase
         //expected shop id
         $sShopId = $this->getTestConfig()->getShopEdition() == 'EE' ? '2' : '1';
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopId']);
-        $oConfig->expects($this->any())->method('getShopId')->will($this->returnValue($sShopId));
-
         $oBase = $this->getMock(\OxidEsales\Eshop\Core\Model\BaseModel::class, ['isDerived']);
         $oBase->expects($this->any())->method('isDerived')->will($this->returnValue(false));
 
         oxTestModules::addModuleObject('oxbase', $oBase);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, ['getConfig', 'resetContentCache', 'getEditObjectId', 'oxNew'], [], '', false);
-        $oView->expects($this->atLeastOnce())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleStock::class, ['resetContentCache', 'getEditObjectId'], [], '', false);
         $oView->expects($this->atLeastOnce())->method('resetContentCache');
         $oView->expects($this->atLeastOnce())->method('getEditObjectId')->will($this->returnValue('_testArtId'));
 

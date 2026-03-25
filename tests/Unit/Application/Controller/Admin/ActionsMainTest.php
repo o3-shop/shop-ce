@@ -99,7 +99,6 @@ class ActionsMainTest extends \OxidTestCase
      */
     public function testRenderForArticlePromotions()
     {
-        $this->markTestSkipped('Bug: Method does not get called.');
         $sPromotion = oxDb::getDb()->getOne("select oxid from oxactions WHERE oxid = 'd51545e80843be666a9326783a73e91d'");
         $this->setRequestParameter('oxid', $sPromotion);
         $this->setRequestParameter('oxpromotionaoc', 'article');
@@ -112,10 +111,10 @@ class ActionsMainTest extends \OxidTestCase
         $oPromotion->expects($this->once())->method('getBannerArticle')->will($this->returnValue($oArticle));
         $oPromotion->load($sPromotion);
 
-        // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', '_createCategoryTree']);
+        // testing.. Production calls createCategoryTree (without underscore)
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', 'createCategoryTree']);
         $oView->expects($this->once())->method('getViewDataElement')->will($this->returnValue($oPromotion));
-        $oView->expects($this->once())->method('_createCategoryTree');
+        $oView->expects($this->once())->method('createCategoryTree');
         $sTplName = $oView->render();
 
         $this->assertEquals('popups/actions_article.tpl', $sTplName);
@@ -163,7 +162,6 @@ class ActionsMainTest extends \OxidTestCase
      */
     public function testRenderForPromotionsEditor()
     {
-        $this->markTestSkipped('Bug: Got HTML editor, but expected seo.');
         $sPromotion = oxDb::getDb()->getOne('select oxid from oxactions where oxtype=2');
         $this->setRequestParameter('oxid', $sPromotion);
         $this->setRequestParameter('oxpromotionaoc', null);
@@ -171,10 +169,10 @@ class ActionsMainTest extends \OxidTestCase
         $oPromotion = oxNew('oxActions');
         $oPromotion->load($sPromotion);
 
-        // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', '_generateTextEditor']);
+        // testing.. Production calls generateTextEditor (without underscore)
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', 'generateTextEditor']);
         $oView->expects($this->once())->method('getViewDataElement')->will($this->returnValue($oPromotion));
-        $oView->expects($this->once())->method('_generateTextEditor')->will($this->returnValue('sHtmlEditor'));
+        $oView->expects($this->once())->method('generateTextEditor')->will($this->returnValue('sHtmlEditor'));
         $sTplName = $oView->render();
 
         $this->assertEquals('actions_main.tpl', $sTplName);
@@ -226,17 +224,16 @@ class ActionsMainTest extends \OxidTestCase
      */
     public function testPromotionsRender()
     {
-        $this->markTestSkipped('Bug: Method does not get called.');
         $this->setRequestParameter('oxid', -1);
         $this->setRequestParameter('saved_oxid', -1);
 
         $oPromotion = oxNew('oxActions');
         $oPromotion->oxactions__oxtype = new oxField(2);
 
-        // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', '_generateTextEditor']);
+        // testing.. Production calls generateTextEditor (without underscore)
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', 'generateTextEditor']);
         $oView->expects($this->once())->method('getViewDataElement')->with($this->equalTo('edit'))->will($this->returnValue($oPromotion));
-        $oView->expects($this->once())->method('_generateTextEditor')->with($this->equalTo('100%'), $this->equalTo(300), $this->equalTo($oPromotion), $this->equalTo('oxactions__oxlongdesc'), $this->equalTo('details.tpl.css'));
+        $oView->expects($this->once())->method('generateTextEditor')->with($this->equalTo('100%'), $this->equalTo(300), $this->equalTo($oPromotion), $this->equalTo('oxactions__oxlongdesc'), $this->equalTo('details.tpl.css'));
 
         $sTplName = $oView->render();
 

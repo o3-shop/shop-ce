@@ -94,16 +94,14 @@ class CmpUtilsTest extends \OxidTestCase
      */
     public function testToNoticeList()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxcmp_utils|PHPUnit\Framework\MockObject\MockObject $oCmp */
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['_toList']);
-        $oCmp->expects($this->once())->method('_toList')->with($this->equalTo('noticelist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['toList']);
+        $oCmp->expects($this->once())->method('toList')->with($this->equalTo('noticelist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
         $oCmp->toNoticeList('1126', 999, 'sel');
     }
 
@@ -114,8 +112,6 @@ class CmpUtilsTest extends \OxidTestCase
      */
     public function testToWishList()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         /** @var oxSession|PHPUnit\Framework\MockObject\MockObject $oSession */
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSession->expects($this->exactly(2))->method('checkSessionChallenge')->will($this->returnValue(true));
@@ -124,15 +120,15 @@ class CmpUtilsTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('bl_showWishlist', false);
 
         /** @var oxcmp_utils|PHPUnit\Framework\MockObject\MockObject $oCmp */
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['_toList']);
-        $oCmp->expects($this->never())->method('_toList');
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['toList']);
+        $oCmp->expects($this->never())->method('toList');
         $oCmp->toWishList('1126', 999, 'sel');
 
         $this->getConfig()->setConfigParam('bl_showWishlist', true);
 
         /** @var oxcmp_utils|PHPUnit\Framework\MockObject\MockObject $oCmp */
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['_toList']);
-        $oCmp->expects($this->once())->method('_toList')->with($this->equalTo('wishlist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['toList']);
+        $oCmp->expects($this->once())->method('toList')->with($this->equalTo('wishlist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
         $oCmp->toWishList('1126', 999, 'sel');
     }
 

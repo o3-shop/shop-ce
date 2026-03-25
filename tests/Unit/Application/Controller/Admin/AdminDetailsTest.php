@@ -48,12 +48,14 @@ class AdminDetailsTest extends \OxidTestCase
      */
     public function testGetPlainEditor()
     {
-        $this->markTestSkipped('Bug: sEditObjectValue is missing.');
         $oObject = new stdClass();
-        $sEditorHtml = "<textarea id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
+        // Note: the double space before id is intentional — TextEditorHandler leaves an empty
+        // $disabledTextEditor placeholder: "<textarea ${disabledTextEditor} id=..."
+        $sEditorHtml = "<textarea  id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
 
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['_getEditValue']);
-        $oAdminDetails->expects($this->once())->method('_getEditValue')->with($this->equalTo($oObject), $this->equalTo('sField'))->will($this->returnValue('sEditObjectValue'));
+        // Production calls getEditValue() (without underscore)
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['getEditValue']);
+        $oAdminDetails->expects($this->once())->method('getEditValue')->with($this->equalTo($oObject), $this->equalTo('sField'))->will($this->returnValue('sEditObjectValue'));
         $this->assertEquals($sEditorHtml, $oAdminDetails->UNITgetPlainEditor(100, 100, $oObject, 'sField'));
     }
 

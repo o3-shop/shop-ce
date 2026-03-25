@@ -68,9 +68,9 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
      */
     public function testRemovePromotionGroup()
     {
-        $this->markTestSkipped('Bug: Failed asserting that true is false.');
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testId1', '_testId2']));
+        // Production calls getActionIds() (without underscore)
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testId1', '_testId2']));
 
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testGroupDelete'"));
         $oView->removePromotionGroup();
@@ -101,11 +101,11 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
      */
     public function testAddPromotionGroup()
     {
-        $this->markTestSkipped('Bug: Got "2" but expected 0.');
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['_getActionIds']);
+        // Production calls getActionIds() (without underscore)
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['getActionIds']);
         $this->setRequestParameter('synchoxid', '_testActionAdd');
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testActionAdd'"));
         $oView->addPromotionGroup();
@@ -119,11 +119,11 @@ class ActionsGroupsAjaxTest extends \OxidTestCase
      */
     public function testAddPromotionGroupAll()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['_getActionIds']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsGroupsAjax::class, ['getActionIds']);
         $this->setRequestParameter('synchoxid', '_testActionAdd');
         $this->setRequestParameter('all', true);
 
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2action where oxactionid='_testActionAdd'"));
         $oView->addPromotionGroup();

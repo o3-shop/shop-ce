@@ -61,7 +61,6 @@ class SeoEncoderContentTest extends \OxidTestCase
      */
     public function testGetAltUriTag()
     {
-        $this->markTestSkipped("Bug: Failed asserting that null matches expected 'contentUri'.");
         oxTestModules::addFunction('oxcontent', 'loadInLang', '{ return true; }');
 
         $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class, ['getContentUri']);
@@ -207,7 +206,6 @@ class SeoEncoderContentTest extends \OxidTestCase
 
     public function testGetContentUriNotExistingSeqCheckChangeLang()
     {
-        $this->markTestSkipped('Bug: Expectation failed for method name is "_prepareTitle" when invoked 1 time(s)');
         $oContent = $this->getMock(\OxidEsales\Eshop\Application\Model\Content::class, ['getLanguage', 'getId', 'getBaseStdLink', 'loadInLang']);
         $oContent->oxcontents__oxcatid = new oxField('xxx', oxField::T_RAW);
         $oContent->oxcontents__oxtitle = new oxField('content title', oxField::T_RAW);

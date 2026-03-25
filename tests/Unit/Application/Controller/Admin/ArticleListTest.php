@@ -231,8 +231,6 @@ class ArticleListTest extends \OxidTestCase
      */
     public function testDeleteEntry()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array(1);}');
         oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
         oxTestModules::addFunction('oxarticle', 'load', '{ return true; }');
@@ -243,8 +241,8 @@ class ArticleListTest extends \OxidTestCase
         $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, ['_authorize', 'getSession']);
-        $oView->expects($this->any())->method('_authorize')->will($this->returnValue(true));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleList::class, ['authorize', 'getSession']);
+        $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
         $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
         $oView->deleteEntry();
     }

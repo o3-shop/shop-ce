@@ -160,17 +160,15 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testGetDomXml()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
-        $aTestMethods = ['_getInitialDom', '_checkGroups', '_checkRights', '_checkDemoShopDenials', '_cleanEmptyParents', 'removeInvisibleMenuNodes'];
+        $aTestMethods = ['getInitialDom', 'checkGroups', 'checkRights', 'checkDemoShopDenials', 'cleanEmptyParents', 'removeInvisibleMenuNodes'];
 
         $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, $aTestMethods);
-        $oNavTree->expects($this->once())->method('_getInitialDom')->will($this->returnValue(new stdClass()));
-        $oNavTree->expects($this->once())->method('_checkGroups');
-        $oNavTree->expects($this->once())->method('_checkRights');
-        $oNavTree->expects($this->once())->method('_checkDemoShopDenials');
+        $oNavTree->expects($this->once())->method('getInitialDom')->will($this->returnValue(new stdClass()));
+        $oNavTree->expects($this->once())->method('checkGroups');
+        $oNavTree->expects($this->once())->method('checkRights');
+        $oNavTree->expects($this->once())->method('checkDemoShopDenials');
         $oNavTree->expects($this->once())->method('removeInvisibleMenuNodes');
-        $oNavTree->expects($this->exactly(2))->method('_cleanEmptyParents');
+        $oNavTree->expects($this->exactly(2))->method('cleanEmptyParents');
 
         $oNavTree->getDomXml();
     }
@@ -479,7 +477,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testCheckGroups()
     {
-        $this->markTestSkipped('Bug: Error: Call to member function inGroup() on bool');
         $sXml = '<?xml version="1.0" encoding="UTF-8"?>
                    <MAINMENU>
                      <SUBMENU cl="testClass1" group="testGroup1">
@@ -496,9 +493,8 @@ class NavigationTreeTest extends \OxidTestCase
         $oDom->formatOutput = true;
         $oDom->loadXML($sXml);
 
-        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_hasGroup']);
-        $oNavTree->expects($this->at(0))->method('_hasGroup')->will($this->returnValue(false));
-        $oNavTree->expects($this->at(1))->method('_hasGroup')->will($this->returnValue(true));
+        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['hasGroup']);
+        $oNavTree->expects($this->exactly(2))->method('hasGroup')->willReturnOnConsecutiveCalls(false, true);
         $oNavTree->UNITcheckGroups($oDom);
         $this->assertEquals(str_replace(["\t", ' ', "\n", "\r"], '', $sResXml), str_replace(["\t", ' ', "\n", "\r"], '', $oDom->saveXML()));
     }
@@ -511,8 +507,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testRemoveInvisibleMenuNodes()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
                    <MAINMENU>
                      <SUBMENU cl="MenuEntry-Visible" visible="1">
@@ -530,8 +524,8 @@ class NavigationTreeTest extends \OxidTestCase
         $dom->formatOutput = true;
         $dom->loadXML($xml);
 
-        $navTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_getInitialDom']);
-        $navTree->expects($this->any())->method('_getInitialDom')->will($this->returnValue($dom));
+        $navTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getInitialDom']);
+        $navTree->expects($this->any())->method('getInitialDom')->will($this->returnValue($dom));
         $resultDom = $navTree->getDomXml();
 
         $expectedMenuClasses = ['MenuEntry-Visible', 'MenuEntry-DefaultVisibility'];
@@ -549,8 +543,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testRemoveInvisibleMainMenuNodes()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
                     <OXMENU id="NAVIGATION_ESHOPADMIN">
                        <MAINMENU id="MainMenu-Visible">
@@ -572,8 +564,8 @@ class NavigationTreeTest extends \OxidTestCase
         $dom->formatOutput = true;
         $dom->loadXML($xml);
 
-        $navTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_getInitialDom']);
-        $navTree->expects($this->any())->method('_getInitialDom')->will($this->returnValue($dom));
+        $navTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getInitialDom']);
+        $navTree->expects($this->any())->method('getInitialDom')->will($this->returnValue($dom));
         $resultDom = $navTree->getDomXml();
 
         $expectedMenuItems = ['MainMenu-Visible'];
@@ -627,8 +619,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testCheckRights()
     {
-        $this->markTestSkipped('Bug: Get null back');
-
         $sXml = '<?xml version="1.0" encoding="UTF-8"?>
                    <MAINMENU>
                      <SUBMENU cl="testClass1" rights="testGroup1">
@@ -645,9 +635,8 @@ class NavigationTreeTest extends \OxidTestCase
         $oDom->formatOutput = true;
         $oDom->loadXML($sXml);
 
-        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_hasRights']);
-        $oNavTree->expects($this->at(0))->method('_hasRights')->will($this->returnValue(false));
-        $oNavTree->expects($this->at(1))->method('_hasRights')->will($this->returnValue(true));
+        $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['hasRights']);
+        $oNavTree->expects($this->exactly(2))->method('hasRights')->willReturnOnConsecutiveCalls(false, true);
         $oNavTree->UNITcheckRights($oDom);
         $this->assertEquals(str_replace(["\t", ' ', "\n", "\r"], '', $sResXml), str_replace(["\t", ' ', "\n", "\r"], '', $oDom->saveXML()));
     }
@@ -735,8 +724,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testcheckDemoShopDenialsDefaultNormal()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oNavTree = oxNew('oxNavigationTree');
         $oDom = $this->_getDomXml();
 
@@ -748,12 +735,11 @@ class NavigationTreeTest extends \OxidTestCase
         // not changed
         $this->_checkDemoShopDenialsInMenuXml($oDom, 3);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('blDemoShop'))->will($this->returnValue(false));
-        $oNavTree->setConfig($oConfig);
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', false);
         $oNavTree->UNITcheckDemoShopDenials($oDom);
 
-        // not changed
+        // not changed (not a demo shop, so nothing is removed)
         $this->_checkDemoShopDenialsInMenuXml($oDom, 3);
     }
 
@@ -764,8 +750,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testcheckDemoShopDenialsDefaultDemo()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $oNavTree = oxNew('oxNavigationTree');
         $oDom = $this->_getDomXml();
 
@@ -776,9 +760,8 @@ class NavigationTreeTest extends \OxidTestCase
         // not changed
         $this->_checkDemoShopDenialsInMenuXml($oDom, 3, '1');
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('blDemoShop'))->will($this->returnValue(true));
-        $oNavTree->setConfig($oConfig);
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', true);
         $oNavTree->UNITcheckDemoShopDenials($oDom);
 
         // removed
@@ -792,8 +775,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testcheckDemoShopDenialsInverseNormal()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oNavTree = oxNew('oxNavigationTree');
         $oDom = $this->_getDomXml();
 
@@ -801,15 +782,17 @@ class NavigationTreeTest extends \OxidTestCase
         foreach ($oXPath->query('//*[@disableForDemoShop]') as $oNode) {
             $oNode->setAttribute('disableForDemoShop', '0');
         }
-        // not changed
+        // disableForDemoShop='0' means "don't disable" => nodes have the attribute but with value '0'
+        // _checkDemoShopDenialsInMenuXml checks for nodes with disableForDemoShop attribute
+        // After setting all to '0', the XPath for disableForDemoShop still finds them
+        // but their value is falsy so they won't be removed
         $this->_checkDemoShopDenialsInMenuXml($oDom, 0);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('blDemoShop'))->will($this->returnValue(false));
-        $oNavTree->setConfig($oConfig);
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', false);
         $oNavTree->UNITcheckDemoShopDenials($oDom);
 
-        // removed
+        // not a demo shop, so nothing is removed regardless
         $this->_checkDemoShopDenialsInMenuXml($oDom, 0);
     }
 
@@ -820,8 +803,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testcheckDemoShopDenialsInverseDemo()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oNavTree = oxNew('oxNavigationTree');
         $oDom = $this->_getDomXml();
 
@@ -829,15 +810,14 @@ class NavigationTreeTest extends \OxidTestCase
         foreach ($oXPath->query('//*[@disableForDemoShop]') as $oNode) {
             $oNode->setAttribute('disableForDemoShop', '0');
         }
-        // not changed
+        // disableForDemoShop='0' => falsy => nodes won't be removed even in demo shop
         $this->_checkDemoShopDenialsInMenuXml($oDom, 0);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getConfigParam']);
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo('blDemoShop'))->will($this->returnValue(true));
-        $oNavTree->setConfig($oConfig);
+        // Production code uses Registry::getConfig()->isDemoShop()
+        $this->getConfig()->setConfigParam('blDemoShop', true);
         $oNavTree->UNITcheckDemoShopDenials($oDom);
 
-        // not changed
+        // disableForDemoShop='0' is falsy, so nodes are NOT removed even in demo shop
         $this->_checkDemoShopDenialsInMenuXml($oDom, 0);
     }
 
@@ -983,8 +963,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testSessionizeLocalUrls()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $oDom = new DOMDocument();
         $oEl1 = $oDom->createElement('OX');
         $oDom->appendChild($oEl1);
@@ -1000,14 +978,14 @@ class NavigationTreeTest extends \OxidTestCase
         $oEl32->setAttribute('url', 'index.php?loaa');
 
         $oCDom = clone $oDom;
-        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_getAdminUrl']);
-        $o->expects($this->once())->method('_getAdminUrl')->will($this->returnValue('http://url/lala?stoken=TOKEN111454&'));
+        $o = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getAdminUrl']);
+        $o->expects($this->once())->method('getAdminUrl')->will($this->returnValue('http://url/lala?stoken=TOKEN111454&'));
         $o->UNITsessionizeLocalUrls($oCDom);
 
         $oXPath = new DomXPath($oDom);
         $oNodeList = $oXPath->query('//*[@url="index.php?loaa"]');
         $this->assertEquals(1, $oNodeList->length);
-        $oNodeList->item(0)->setAttribute('url', 'http://localhost:8090/lala?stoken=TOKEN111454&loaa');
+        $oNodeList->item(0)->setAttribute('url', 'http://url/lala?stoken=TOKEN111454&loaa');
         $this->assertEquals($oDom, $oCDom);
     }
 
@@ -1018,8 +996,6 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testMergeNodes()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oNode1 = $this->getMock('stdClass', ['getAttribute']);
         $oNode1->expects($this->once())->method('getAttribute')->will($this->returnValue('testAttribute1'));
         $oNode1->nodeType = XML_ELEMENT_NODE;
@@ -1046,17 +1022,16 @@ class NavigationTreeTest extends \OxidTestCase
         $oCurNode2->length = 1;
 
         $oXPathTo = $this->getMock('stdClass', ['query']);
-        $oXPathTo->expects($this->at(0))->method('query')->will($this->returnValue($oCurNode1));
-        $oXPathTo->expects($this->at(1))->method('query')->will($this->returnValue($oCurNode2));
+        $oXPathTo->expects($this->exactly(2))->method('query')->willReturnOnConsecutiveCalls($oCurNode1, $oCurNode2);
 
         $oDomDocTo = $this->getMock('stdClass', ['importNode']);
-        $oDomDocTo->expects($this->at(0))->method('importNode');
+        $oDomDocTo->expects($this->once())->method('importNode');
 
         $oDomElemFrom = new stdClass();
         $oDomElemFrom->childNodes = [$oNode1, $oNode2];
 
-        $oTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_copyAttributes']);
-        $oTree->expects($this->once())->method('_copyAttributes');
+        $oTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['copyAttributes']);
+        $oTree->expects($this->once())->method('copyAttributes');
         $oTree->UNITmergeNodes($oDomElemTo, $oDomElemFrom, $oXPathTo, $oDomDocTo, $sQueryStart);
     }
 

@@ -20,7 +20,7 @@ declare(strict_types=1);
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Password\Service;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Domain\Authentication\Service;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\PasswordPolicyException;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordVerificationServiceInterface;

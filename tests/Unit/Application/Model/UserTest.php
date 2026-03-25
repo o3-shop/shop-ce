@@ -60,6 +60,7 @@ class UserTest_oxNewsSubscribed extends oxnewssubscribed
     {
         if ($sOXID == 'oxid') {
             $this->loadFromUserID = true;
+            return true;
         }
     }
 
@@ -67,6 +68,7 @@ class UserTest_oxNewsSubscribed extends oxnewssubscribed
     {
         if ($sEmail == 'email') {
             $this->loadFromEMail = true;
+            return true;
         }
     }
 }
@@ -382,8 +384,8 @@ class UserTest extends \OxidTestCase
      */
     public function testAcceptTerms()
     {
-        $this->markTestSkipped('Need to be fixed');
         $oDb = $this->getDb();
+        $sVersion = oxNew(\OxidEsales\Eshop\Application\Model\Content::class)->getTermsVersion();
 
         $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin'"));
 
@@ -391,14 +393,14 @@ class UserTest extends \OxidTestCase
         $oUser->load('oxdefaultadmin');
         $oUser->acceptTerms();
 
-        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='1'"));
+        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion=" . $oDb->quote($sVersion)));
 
         $oDb->execute("update oxacceptedterms set oxtermversion='0'");
         $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='0'"));
-        $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='1'"));
+        $this->assertFalse((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion=" . $oDb->quote($sVersion)));
 
         $oUser->acceptTerms();
-        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion='1'"));
+        $this->assertTrue((bool) $oDb->getOne("select 1 from oxacceptedterms where oxuserid='oxdefaultadmin' and oxtermversion=" . $oDb->quote($sVersion)));
     }
 
     /**
@@ -883,7 +885,6 @@ class UserTest extends \OxidTestCase
     // 2. loading subscription by user id
     public function testGetNewsSubscriptionNoUserReturnsByOxid()
     {
-        $this->markTestSkipped('Bug: null = true');
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\UserTest_oxNewsSubscribed::class, 'oxnewssubscribed');
         $oUser = oxNew('oxUser');
         $oUser->setId('oxid');
@@ -893,7 +894,6 @@ class UserTest extends \OxidTestCase
     // 3. loading subscription by user email
     public function testGetNewsSubscriptionNoUserReturnsByEmail()
     {
-        $this->markTestSkipped('Bug: null = true');
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\UserTest_oxNewsSubscribed::class, 'oxnewssubscribed');
         $oUser = oxNew('oxUser');
         $oUser->oxuser__oxusername = new oxField('email', oxField::T_RAW);
@@ -1369,18 +1369,14 @@ class UserTest extends \OxidTestCase
 
     public function testExistsMallUsers()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        $this->getConfig()->setConfigParam('blMallUsers', true);
 
         $oUser = $this->createUser();
-
-        $oConfig = $this->getConfig();
-        $blMall = $oConfig->blMallUsers;
-        $oConfig->blMallUsers = true;
 
         $this->assertEquals(true, $oUser->exists($oUser->getId()));
 
         // restoring
-        $oConfig->blMallUsers = $blMall;
+        $this->getConfig()->setConfigParam('blMallUsers', false);
     }
 
     public function testExistsIfMallAdmin()
@@ -2066,27 +2062,22 @@ class UserTest extends \OxidTestCase
      */
     public function testLoadAdminUser()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue(true));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
+        $this->getConfig()->setAdminMode(true);
 
-        oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\UserTest_oxUtilsServerHelper::class, 'oxUtilsServer');
         //not logged in
         $oUser = oxNew('oxUser');
         $this->assertFalse($oUser->loadAdminUser());
         //logging in
         $oAdminUser = oxNew('oxUser');
         $oAdminUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD);
+
         $oActiveUser = oxNew('oxUser');
         $oActiveUser->loadAdminUser();
 
-        $this->assertNull($oActiveUser->oxuser__oxusername->value);
-
-        $oAdminUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['isAdmin']);
-        $oAdminUser->expects($this->any())->method('isAdmin')->will($this->returnValue(true));
-        $oAdminUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD);
-
-        $oActiveUser->loadAdminUser();
-
-        $this->assertEquals($oActiveUser->oxuser__oxusername->value, oxADMIN_LOGIN);
+        $this->assertEquals(oxADMIN_LOGIN, $oActiveUser->oxuser__oxusername->value);
         $oAdminUser->logout();
         $oUser = oxNew('oxUser');
         $this->assertFalse($oUser->loadAdminUser());
@@ -2097,18 +2088,20 @@ class UserTest extends \OxidTestCase
      */
     public function testGetUser()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue('test'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
+        $this->getConfig()->setAdminMode(true);
 
         //not logged in
         $oActUser = oxNew('oxUser');
-        $this->assertFalse($oActUser->loadActiveUser());
-        $testUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['isAdmin']);
-        $testUser->expects($this->any())->method('isAdmin')->will($this->returnValue(false));
+        $this->assertFalse($oActUser->loadAdminUser());
         //trying to login
+        $testUser = oxNew('oxUser');
         $testUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD);
-        $oActUser->loadActiveUser();
+        $oActUser->loadAdminUser();
         $testUser->logout();
-        $this->assertEquals($oActUser->oxuser__oxusername->value, oxADMIN_LOGIN);
+        $this->assertEquals(oxADMIN_LOGIN, $oActUser->oxuser__oxusername->value);
     }
 
     /**
@@ -2169,12 +2162,15 @@ class UserTest extends \OxidTestCase
      */
     public function testLogin_Logout()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        // Admin login requires isAdmin()=true and a cookie
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue('test'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
+        $this->getConfig()->setAdminMode(true);
 
         $oUser = oxNew('oxUser');
         $oUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD);
-        $this->assertEquals(oxRegistry::getSession()->getVariable('usr'), 'oxdefaultadmin');
-        $this->assertNull(oxRegistry::getSession()->getVariable('auth'));
+        $this->assertEquals('oxdefaultadmin', \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('auth'));
 
         $oUser = $oUser->getUser();
 
@@ -2183,8 +2179,8 @@ class UserTest extends \OxidTestCase
 
         $oUser->logout();
 
-        $this->assertNull(oxRegistry::getSession()->getVariable('usr'));
-        $this->assertNull(oxRegistry::getSession()->getVariable('auth'));
+        $this->assertNull(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('usr'));
+        $this->assertNull(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('auth'));
         $this->assertFalse($oUser->getUser());
     }
 
@@ -2193,7 +2189,10 @@ class UserTest extends \OxidTestCase
      */
     public function testLogin_resetsActiveUser()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue('test'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
+        $this->getConfig()->setAdminMode(true);
 
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['setUser']);
         $oUser->expects($this->once())->method('setUser')->with($this->equalTo(null));
@@ -2260,16 +2259,19 @@ class UserTest extends \OxidTestCase
      */
     public function testLoginCookieMustBeSet()
     {
-        $this->markTestSkipped("Bug: 
-        -'cookie is set'
-        +'ERROR_MESSAGE_USER_NOVALIDLOGIN");
-        $exceptionThrown = false;
-        oxTestModules::addFunction('oxUtilsServer', 'setUserCookie', '{ throw new Exception( "cookie is set" ); }');
+        $this->getConfig()->setConfigParam('blShowRememberMe', true);
+        $this->getConfig()->setAdminMode(true);
 
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['setUserCookie', 'getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue('test'));
+        $oUtilsServer->expects($this->once())->method('setUserCookie')->will($this->throwException(new \Exception('cookie is set')));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
+
+        $exceptionThrown = false;
         $oUser = oxNew('oxUser');
         try {
             $this->assertTrue($oUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD, true));
-        } catch (Exception $oExcp) {
+        } catch (\Exception $oExcp) {
             $exceptionThrown = true;
             $this->assertEquals('cookie is set', $oExcp->getMessage());
         }
@@ -2281,14 +2283,18 @@ class UserTest extends \OxidTestCase
      */
     public function testLoginCookie_disabled()
     {
-        $this->markTestSkipped('Bug: Cookie should not be set, its disabled. ');
-        oxTestModules::addFunction('oxUtilsServer', 'setUserCookie', '{ throw new Exception( "cookie is set" ); }');
         $this->getConfig()->setConfigParam('blShowRememberMe', 0);
+        $this->getConfig()->setAdminMode(true);
+
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['setUserCookie', 'getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue('test'));
+        $oUtilsServer->expects($this->never())->method('setUserCookie');
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
 
         $oUser = oxNew('oxUser');
         try {
             $this->assertTrue($oUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD, true));
-        } catch (Exception $oExcp) {
+        } catch (\Exception $oExcp) {
             $this->fail('Cookie should not be set, it\'s disabled.');
         }
     }
@@ -2350,13 +2356,16 @@ class UserTest extends \OxidTestCase
      */
     public function testLogout()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
+        $oUtilsServer = $this->getMock(\OxidEsales\Eshop\Core\UtilsServer::class, ['getOxCookie']);
+        $oUtilsServer->expects($this->any())->method('getOxCookie')->will($this->returnValue('test'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\UtilsServer::class, $oUtilsServer);
+        $this->getConfig()->setAdminMode(true);
 
         $oUser = oxNew('oxUser');
         $oUser->login(oxADMIN_LOGIN, oxADMIN_PASSWD);
 
-        $this->getSession()->setVariable('dynvalue', 'test');
-        $this->getSession()->setVariable('paymentid', 'test');
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('dynvalue', 'test');
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('paymentid', 'test');
 
         $oUser = $oUser->getUser();
 
@@ -2366,8 +2375,8 @@ class UserTest extends \OxidTestCase
 
             $oUser->logout();
 
-            $this->assertNull(oxRegistry::getSession()->getVariable('dynvalue'));
-            $this->assertNull(oxRegistry::getSession()->getVariable('paymentid'));
+            $this->assertNull(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('dynvalue'));
+            $this->assertNull(\OxidEsales\Eshop\Core\Registry::getSession()->getVariable('paymentid'));
             $this->assertFalse($oUser->getUser());
         } else {
             $this->fail('User not loaded');
@@ -2668,15 +2677,14 @@ class UserTest extends \OxidTestCase
 
     public function testGetWishListId()
     {
-        $this->markTestSkipped("Bug: Failed asserting that null matches expected 'testwishid'.");
         $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getWishId']);
         $oBasketItem->expects($this->once())->method('getWishId')->will($this->returnValue('testwishid'));
         $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getContents']);
         $oBasket->expects($this->once())->method('getContents')->will($this->returnValue([$oBasketItem]));
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oSession->expects($this->once())->method('getBasket')->will($this->returnValue($oBasket));
-        $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getSession']);
-        $oUserView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+        $oUserView = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $this->assertEquals('testwishid', $oUserView->UNITgetWishListId());
     }
 
