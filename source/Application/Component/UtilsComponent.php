@@ -58,44 +58,63 @@ class UtilsComponent extends BaseController
         $blOverride = false,
         $blBundle = false
     ) {
-        // only if enabled and not search engine...
-        if ($this->getViewConfig()->getShowCompareList() && !Registry::getUtils()->isSearchEngine()) {
-            // #657 special treatment if we want to put on comparelist
-            $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
-            $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
-            $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
-            if (($blAddCompare || $blRemoveCompare) && $sProductId) {
-                // toggle state in session array
-                $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
-                if ($blAddCompare && !isset($aItems[$sProductId])) {
-                    $aItems[$sProductId] = true;
-                }
+        // Guard against bots or contexts where the parent view / view-config is unavailable.
+        $oViewConfig = null;
+        if (method_exists($this, 'getViewConfig')) {
+            $oViewConfig = $this->getViewConfig();
+        }
 
-                if ($blRemoveCompare) {
-                    unset($aItems[$sProductId]);
-                }
+        if ($oViewConfig === null
+            || !method_exists($oViewConfig, 'getShowCompareList')
+            || !$oViewConfig->getShowCompareList()
+        ) {
+            return;
+        }
 
-                Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
-                $oParentView = $this->getParent();
+        if (Registry::getUtils()->isSearchEngine()) {
+            return;
+        }
 
-                // #843C there was problem then field "blIsOnComparisonList" was not set to article object
-                if (($oProduct = $oParentView->getViewProduct())) {
-                    if (isset($aItems[$oProduct->getId()])) {
-                        $oProduct->setOnComparisonList(true);
-                    } else {
-                        $oProduct->setOnComparisonList(false);
-                    }
-                }
+        // #657 special treatment if we want to put on comparelist
+        $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
+        $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
+        $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
 
-                $aViewProds = $oParentView->getViewProductList();
-                if (is_array($aViewProds) && count($aViewProds)) {
-                    foreach ($aViewProds as $oProduct) {
-                        if (isset($aItems[$oProduct->getId()])) {
-                            $oProduct->setOnComparisonList(true);
-                        } else {
-                            $oProduct->setOnComparisonList(false);
-                        }
-                    }
+        if ((!$blAddCompare && !$blRemoveCompare) || !$sProductId) {
+            return;
+        }
+
+        // toggle state in session array
+        $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
+        if (!is_array($aItems)) {
+            $aItems = [];
+        }
+
+        if ($blAddCompare && !isset($aItems[$sProductId])) {
+            $aItems[$sProductId] = true;
+        }
+
+        if ($blRemoveCompare) {
+            unset($aItems[$sProductId]);
+        }
+
+        Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
+
+        $oParentView = $this->getParent();
+        if ($oParentView === null) {
+            return;
+        }
+
+        // #843C there was problem then field "blIsOnComparisonList" was not set to article object
+        if (method_exists($oParentView, 'getViewProduct') && ($oProduct = $oParentView->getViewProduct())) {
+            $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+        }
+
+        if (method_exists($oParentView, 'getViewProductList')) {
+            $aViewProds = $oParentView->getViewProductList();
+            if (is_array($aViewProds)) {
+                foreach ($aViewProds as $oProduct) {
+                    $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
                 }
             }
         }
