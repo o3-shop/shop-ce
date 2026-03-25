@@ -502,16 +502,10 @@ class Controller extends Core
         $aDB = $session->getSessionParam('aDB');
 
         try {
-            $this->getUtilitiesInstance()->executeExternalRegenerateViewsCommand(); // move to last step possible?
-        } catch (CommandExecutionFailedException $exception) {
-            $this->handleCommandExecutionFailedException($exception);
-
-            throw new SetupControllerExitException();
+            $this->getUtilitiesInstance()->executeExternalRegenerateViewsCommand();
         } catch (Exception $exception) {
-            $view = $this->getView();
-            $view->setMessage($exception->getMessage());
-
-            throw new SetupControllerExitException();
+            // View regeneration failure is non-critical: the admin can regenerate
+            // views manually via Service → Tools. Do not block setup completion.
         }
 
         $this->setViewOptions(
