@@ -167,6 +167,11 @@ jobs:
             sleep 1
           done
 
+      - name: 🩹 Patch Testing Library (MariaDB --skip-ssl fix)
+        run: |
+          sed -i "s/--skip-ssl //g" \
+            vendor/o3-shop/testing-library/library/Services/Library/DatabaseHandler.php
+
       - name: 🗄️ Create Test Database
         run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
 
