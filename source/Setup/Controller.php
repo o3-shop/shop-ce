@@ -503,9 +503,15 @@ class Controller extends Core
 
         try {
             $this->getUtilitiesInstance()->executeExternalRegenerateViewsCommand();
+        } catch (CommandExecutionFailedException $exception) {
+            $this->handleCommandExecutionFailedException($exception);
+
+            throw new SetupControllerExitException();
         } catch (Exception $exception) {
-            // View regeneration failure is non-critical: the admin can regenerate
-            // views manually via Service → Tools. Do not block setup completion.
+            $view = $this->getView();
+            $view->setMessage($exception->getMessage());
+
+            throw new SetupControllerExitException();
         }
 
         $this->setViewOptions(
@@ -621,6 +627,12 @@ class Controller extends Core
         $baseSqlDir = $this->getUtilitiesInstance()->getSqlDirectory(EditionSelector::COMMUNITY);
 
         try {
+            // initial_data.sql must run before migrations in both paths so that
+            // oxconfig is populated when the migration wrapper invokes
+            // oe-eshop-db_views_generate (which needs Config::initVars to read
+            // shop config from the database).
+            $database->queryFile("$baseSqlDir/initial_data.sql");
+
             // If demo data files are provided.
             if ($demoDataRequired && $this->getUtilitiesInstance()->isDemodataPrepared()) {
                 $this->getUtilitiesInstance()->executeExternalDatabaseMigrationCommand();
@@ -630,8 +642,6 @@ class Controller extends Core
                 // Copy demo data files.
                 $this->getUtilitiesInstance()->executeExternalDemodataAssetsInstallCommand();
             } else {
-                $database->queryFile("$baseSqlDir/initial_data.sql");
-
                 $this->getUtilitiesInstance()->executeExternalDatabaseMigrationCommand();
             }
         } catch (Exception $exception) {
