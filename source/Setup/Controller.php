@@ -627,10 +627,8 @@ class Controller extends Core
         $baseSqlDir = $this->getUtilitiesInstance()->getSqlDirectory(EditionSelector::COMMUNITY);
 
         try {
-            // initial_data.sql must run before migrations in both paths so that
-            // oxconfig is populated when the migration wrapper invokes
-            // oe-eshop-db_views_generate (which needs Config::initVars to read
-            // shop config from the database).
+            // initial_data.sql must run before migrations so that oxconfig is
+            // populated before view generation in finish() needs it.
             $database->queryFile("$baseSqlDir/initial_data.sql");
 
             // If demo data files are provided.
