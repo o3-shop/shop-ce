@@ -20,7 +20,7 @@ declare(strict_types=1);
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Setting;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\ShopModuleSetting;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoderInterface;

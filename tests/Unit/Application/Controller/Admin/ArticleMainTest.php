@@ -71,26 +71,24 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testCopyArticleAdditionalTest()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         oxTestModules::addFunction('oxarticle', 'load', '{ return true; }');
         oxTestModules::addFunction('oxarticle', 'save', '{ return true; }');
         $this->getConfig()->setConfigParam('blDisableDublArtOnCopy', true);
 
-        $aTasks = ['_copyCategories', '_copyAttributes', '_copySelectlists',
-                        '_copyCrossseling', '_copyAccessoires', '_copyStaffelpreis',
-                        '_copyArtExtends'];
+        $aTasks = ['copyCategories', 'copyAttributes', 'copySelectlists',
+                        'copyCrossseling', 'copyAccessoires', 'copyStaffelpreis',
+                        'copyArtExtends'];
 
         $aTasks[] = 'resetContentCache';
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, $aTasks);
-        $oView->expects($this->once())->method('_copyCategories');
-        $oView->expects($this->once())->method('_copyAttributes');
-        $oView->expects($this->once())->method('_copySelectlists');
-        $oView->expects($this->once())->method('_copyCrossseling');
-        $oView->expects($this->once())->method('_copyAccessoires');
-        $oView->expects($this->once())->method('_copyStaffelpreis');
-        $oView->expects($this->once())->method('_copyArtExtends');
+        $oView->expects($this->once())->method('copyCategories');
+        $oView->expects($this->once())->method('copyAttributes');
+        $oView->expects($this->once())->method('copySelectlists');
+        $oView->expects($this->once())->method('copyCrossseling');
+        $oView->expects($this->once())->method('copyAccessoires');
+        $oView->expects($this->once())->method('copyStaffelpreis');
+        $oView->expects($this->once())->method('copyArtExtends');
 
         $oView->expects($this->once())->method('resetContentCache');
 
@@ -541,7 +539,6 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testFormJumpListParent()
     {
-        $this->markTestSkipped('Bug: Array does not match ');
         $oVar1 = oxNew('oxArticle');
         $oVar1->oxarticles__oxid = new oxField('testId1');
 
@@ -570,8 +567,8 @@ class ArticleMainTest extends \OxidTestCase
                        ['testId1', ' -- testTitle'],
                        ['testId2', ' -- testTitle']];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['_getTitle']);
-        $oView->expects($this->atLeastOnce())->method('_getTitle')->will($this->returnValue('testTitle'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['getTitle']);
+        $oView->expects($this->atLeastOnce())->method('getTitle')->will($this->returnValue('testTitle'));
         $oView->UNITformJumpList($oArticle, $oParentArticle);
         $this->assertEquals($aData, $oView->getViewDataElement('thisvariantlist'));
     }
@@ -583,7 +580,6 @@ class ArticleMainTest extends \OxidTestCase
      */
     public function testFormJumpList()
     {
-        $this->markTestSkipped('Bug: Array does not match ');
         $oVar1 = oxNew('oxArticle');
         $oVar1->oxarticles__oxid = new oxField('testId1');
 
@@ -602,8 +598,8 @@ class ArticleMainTest extends \OxidTestCase
                        ['testId1', ' - testTitle'],
                        ['testId2', ' - testTitle']];
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['_getTitle']);
-        $oView->expects($this->atLeastOnce())->method('_getTitle')->will($this->returnValue('testTitle'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, ['getTitle']);
+        $oView->expects($this->atLeastOnce())->method('getTitle')->will($this->returnValue('testTitle'));
         $oView->UNITformJumpList($oArticle, null);
         $this->assertEquals($aData, $oView->getViewDataElement('thisvariantlist'));
     }

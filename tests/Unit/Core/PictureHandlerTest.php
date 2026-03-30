@@ -684,14 +684,25 @@ class PictureHandlerTest extends \OxidTestCase
      */
     public function testGetProductPicUrl()
     {
-        $this->markTestSkipped('Review with D.S. Picture thing.');
-
         $oConfig = $this->getConfig();
         $sSize = $oConfig->getConfigParam('aDetailImageSizes');
-        $sPath = $oConfig->getPictureUrl('') . 'generated/product/1/250_200_75/30-360-back_p1_z_f_th_665.jpg';
 
-        $oPicHandler = oxNew('oxPictureHandler');
-        $this->assertEquals($sPath, $oPicHandler->getProductPicUrl('product/1/', '30-360-back_p1_z_f_th_665.jpg', $sSize, 'oxpic1'));
+        // Create temporary master image so getPicUrl finds it
+        $sMasterDir = $oConfig->getPictureDir(false) . 'master/product/1/';
+        $sTmpFile = $sMasterDir . '30-360-back_p1_z_f_th_665.jpg';
+        @touch($sTmpFile);
+
+        try {
+            // Build expected size dir dynamically from config
+            list($w, $h) = explode('*', $sSize['oxpic1']);
+            $sSizeDir = $w . '_' . $h . '_' . $oConfig->getConfigParam('sDefaultImageQuality');
+            $sPath = $oConfig->getPictureUrl('') . 'generated/product/1/' . $sSizeDir . '/30-360-back_p1_z_f_th_665.jpg';
+
+            $oPicHandler = oxNew('oxPictureHandler');
+            $this->assertEquals($sPath, $oPicHandler->getProductPicUrl('product/1/', '30-360-back_p1_z_f_th_665.jpg', $sSize, 'oxpic1'));
+        } finally {
+            @unlink($sTmpFile);
+        }
     }
 
     /**
@@ -701,11 +712,13 @@ class PictureHandlerTest extends \OxidTestCase
      */
     public function testGetProductPicUrlNopic()
     {
-        $this->markTestSkipped('Review with D.S. Picture thing.');
-
         $oConfig = $this->getConfig();
         $sSize = $oConfig->getConfigParam('aDetailImageSizes');
-        $sPath = $oConfig->getPictureUrl('') . 'generated/product/1/250_200_75/nopic.jpg';
+
+        // Build expected size dir dynamically from config
+        list($w, $h) = explode('*', $sSize['oxpic1']);
+        $sSizeDir = $w . '_' . $h . '_' . $oConfig->getConfigParam('sDefaultImageQuality');
+        $sPath = $oConfig->getPictureUrl('') . 'generated/product/1/' . $sSizeDir . '/nopic.jpg';
 
         $oPicHandler = oxNew('oxPictureHandler');
         $this->assertEquals($sPath, $oPicHandler->getProductPicUrl('product/1/', false, $sSize, 'oxpic1'));

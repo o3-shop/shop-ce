@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Module;
 
 use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -53,7 +53,6 @@ class ModuleChainsGeneratorTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testOnModuleExtensionCreationError()
     {
-        $this->markTestSkipped('Bug: test is not working on a windows machine.');
         $moduleChainsGeneratorMock = $this->generateModuleChainsGeneratorWithNonExistingFileConfiguration();
 
         $actualClassName = $moduleChainsGeneratorMock->createClassChain('content');

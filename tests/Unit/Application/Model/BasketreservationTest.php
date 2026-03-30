@@ -75,7 +75,6 @@ class BasketreservationTest extends \OxidTestCase
      */
     public function testLoadReservationsLoad()
     {
-        $this->markTestSkipped('Bug?: Failed asserting that two variables reference the same object.');
         $oUO = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['assignRecord', 'buildSelectString', 'setIsNewBasket']);
         $oUO->expects($this->once())->method('buildSelectString')
             ->with($this->equalTo(['oxuserbaskets.oxuserid' => 'p:basketId', 'oxuserbaskets.oxtitle' => 'reservations']))
@@ -85,7 +84,7 @@ class BasketreservationTest extends \OxidTestCase
             ->will($this->returnValue(true));
         $oUO->expects($this->never())->method('setIsNewBasket');
 
-        oxTestModules::addModuleObject('oxuserbasket', $oUO);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\UserBasket::class, $oUO);
 
         $oR = oxNew('oxBasketReservation');
         $this->assertSame($oUO, $oR->UNITloadReservations('p:basketId'));
@@ -99,7 +98,6 @@ class BasketreservationTest extends \OxidTestCase
      */
     public function testLoadReservationsCreate()
     {
-        $this->markTestSkipped('BUG?: Failed asserting that two variables reference the same object.');
         $oUO = $this->getMock(\OxidEsales\Eshop\Application\Model\UserBasket::class, ['assignRecord', 'buildSelectString', 'setIsNewBasket']);
         $oUO->expects($this->once())->method('buildSelectString')
             ->with($this->equalTo(['oxuserbaskets.oxuserid' => 'p:basketId', 'oxuserbaskets.oxtitle' => 'reservations']))
@@ -109,7 +107,7 @@ class BasketreservationTest extends \OxidTestCase
             ->will($this->returnValue(false));
         $oUO->expects($this->once())->method('setIsNewBasket')->will($this->returnValue(null));
 
-        oxTestModules::addModuleObject('oxuserbasket', $oUO);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\UserBasket::class, $oUO);
 
         $oR = oxNew('oxBasketReservation');
         $this->assertSame($oUO, $oR->UNITloadReservations('p:basketId'));
@@ -301,8 +299,6 @@ class BasketreservationTest extends \OxidTestCase
      */
     public function testReserveArticles()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oUB = $this->getMock('stdclass', ['addItemToBasket']);
         $oUB->expects($this->exactly(1))->method('addItemToBasket')->with($this->equalTo('2000'), $this->equalTo(8))->will($this->returnValue(null));
 
@@ -311,7 +307,7 @@ class BasketreservationTest extends \OxidTestCase
 
         $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['reduceStock']);
         $oA->expects($this->exactly(1))->method('reduceStock')->with($this->equalTo(8), $this->equalTo(false))->will($this->returnValue(5));
-        oxTestModules::addModuleObject('oxarticle', $oA);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\Article::class, $oA);
 
         $oR->UNITreserveArticles(['1126' => 0, '2000' => -8]);
     }
@@ -342,8 +338,6 @@ class BasketreservationTest extends \OxidTestCase
      */
     public function testCommitArticleReservation()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oUB = $this->getMock('stdclass', ['addItemToBasket']);
         $oUB->expects($this->exactly(1))->method('addItemToBasket')->with($this->equalTo('2000'), $this->equalTo(-4))->will($this->returnValue(null));
 
@@ -353,7 +347,7 @@ class BasketreservationTest extends \OxidTestCase
 
         $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['updateSoldAmount']);
         $oA->expects($this->exactly(1))->method('updateSoldAmount')->with($this->equalTo(4))->will($this->returnValue(null));
-        oxTestModules::addModuleObject('oxarticle', $oA);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\Article::class, $oA);
 
         $oR->commitArticleReservation(2000, 5);
     }
@@ -367,8 +361,6 @@ class BasketreservationTest extends \OxidTestCase
      */
     public function testDiscardArticleReservation()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         $oUB = $this->getMock('stdclass', ['addItemToBasket']);
         $oUB->expects($this->exactly(1))->method('addItemToBasket')->with($this->equalTo('2000'), $this->equalTo(0), $this->equalTo(null), $this->equalTo(true))->will($this->returnValue(null));
 
@@ -378,7 +370,7 @@ class BasketreservationTest extends \OxidTestCase
 
         $oA = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['reduceStock']);
         $oA->expects($this->exactly(1))->method('reduceStock')->with($this->equalTo(-4))->will($this->returnValue(null));
-        oxTestModules::addModuleObject('oxarticle', $oA);
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\Article::class, $oA);
 
         $oR->discardArticleReservation(2000);
     }

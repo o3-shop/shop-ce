@@ -146,8 +146,6 @@ class CategorySeoTest extends \OxidTestCase
      */
     public function testGetEntryUri()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sQ1 = 'Insert into oxcategories (`OXID`,`OXROOTID`,`OXSHOPID`,`OXLEFT`,`OXRIGHT`,`OXTITLE`,`OXLONGDESC`,`OXLONGDESC_1`,`OXLONGDESC_2`,`OXLONGDESC_3`, `OXACTIVE`, `OXPRICEFROM`, `OXPRICETO`, oxshowsuffix) ' .
                "values ('_test1','test',1,'1','4','test','','','','','1','10','50', '1')";
         $this->addToDatabase($sQ1, 'oxcategories');
@@ -156,9 +154,9 @@ class CategorySeoTest extends \OxidTestCase
         $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderCategory::class, ['getCategoryUri']);
         $oEncoder->expects($this->once())->method('getCategoryUri')->will($this->returnValue('CategoryUri'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategorySeo::class, ['getEditObjectId', '_getEncoder']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategorySeo::class, ['getEditObjectId', 'getEncoder']);
         $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('_test1'));
-        $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
+        $oView->expects($this->once())->method('getEncoder')->will($this->returnValue($oEncoder));
         $this->assertEquals('CategoryUri', $oView->getEntryUri());
     }
 

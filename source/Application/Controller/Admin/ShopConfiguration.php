@@ -465,7 +465,7 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->multilineToArray($multiline);
+        return $this->multilineToArray($multiline);
     }
 
     /**
@@ -500,7 +500,7 @@ class ShopConfiguration extends AdminDetailsController
      */
     protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->aarrayToMultiline($input);
+        return $this->aarrayToMultiline($input);
     }
 
     /**

@@ -339,10 +339,24 @@ class SystemRequirements
         ];
 
         // Try to create the folders, in case they do not yet exist. In case it fails, the error handling later will handle it
+        $fileSystem = oxNew(\OxidEsales\EshopCommunity\Core\FileSystem\FileSystem::class);
+        $shopParentPath = dirname(rtrim(realpath($sPath) ?: $sPath, DIRECTORY_SEPARATOR));
         foreach ($aPathsToCheck as $sPathToCheck) {
-            if (!file_exists($sPathToCheck)) {
-                /** @noinspection MkdirRaceConditionInspection */
-                mkdir($sPathToCheck, 0700, true);
+            try {
+                $fileSystem->createDirIfNotExists($sPathToCheck, $sPath, 0700);
+            } catch (\InvalidArgumentException $e) {
+                // Path may be outside $sPath (e.g. ../var/ or a configured compile dir outside source/)
+                try {
+                    $fileSystem->createDirIfNotExists($sPathToCheck, $shopParentPath, 0700);
+                } catch (\InvalidArgumentException | \RuntimeException $e) {
+                    \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
+                        sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage())
+                    );
+                }
+            } catch (\RuntimeException $e) {
+                \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
+                    sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage())
+                );
             }
         }
 

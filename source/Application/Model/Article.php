@@ -31,8 +31,10 @@ use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
 use OxidEsales\Eshop\Application\Model\Manufacturer;
 use OxidEsales\Eshop\Application\Model\Rating;
 use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\SeoEncoderArticle;
 use OxidEsales\Eshop\Application\Model\SimpleVariantList;
 use OxidEsales\Eshop\Application\Model\VariantHandler;
+use OxidEsales\Eshop\Application\Model\VatSelector;
 use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
@@ -187,6 +189,14 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      * @var bool
      */
     protected $_blIsOnComparisonList = false;
+
+    /**
+     * Cached result of whether this article is in the user's wish list or notice list.
+     * null = not yet determined, true/false = explicitly set via setIsInList().
+     *
+     * @var bool|null
+     */
+    protected $_blIsInUserList = null;
 
     /**
      * user object
@@ -570,14 +580,48 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
-     * Checks whether object is in list or not
+     * Checks whether the article is in the current user's wish list or notice list.
      * It's needed for oxArticle so that it can pass this to widgets
      *
      * @return bool
      */
     public function isInList()
     {
-        return $this->_isInList();
+        if ($this->_blIsInUserList !== null) {
+            Registry::getLogger()->debug('isInList [cache] id=' . $this->getId() . ' result=' . ($this->_blIsInUserList ? 'true' : 'false'));
+            return $this->_blIsInUserList;
+        }
+
+        $oUser = $this->getUser();
+        if (!$oUser) {
+            Registry::getLogger()->debug('isInList [db] id=' . $this->getId() . ' no user → false');
+            return false;
+        }
+
+        $articleId = $this->getId();
+        foreach (['noticelist', 'wishlist'] as $listType) {
+            foreach ($oUser->getBasket($listType)->getItems() as $oItem) {
+                if ($oItem->oxuserbasketitems__oxartid->value === $articleId) {
+                    Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' found in ' . $listType . ' → true');
+                    return true;
+                }
+            }
+        }
+
+        Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' not found → false');
+        return false;
+    }
+
+    /**
+     * Sets whether this article is in the user's wish list or notice list.
+     * Used by UtilsComponent after adding/removing to push the state onto
+     * the view's article objects without a DB re-query.
+     *
+     * @param bool $blInList
+     */
+    public function setIsInList(bool $blInList)
+    {
+        $this->_blIsInUserList = $blInList;
     }
 
     /**
@@ -1806,7 +1850,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getCategory()
     {
-        $oCategory = oxNew(Category::class);
+        $oCategory = oxNew(\OxidEsales\Eshop\Application\Model\Category::class);
         $oCategory->setLanguage($this->getLanguage());
 
         // variant handling
@@ -1816,8 +1860,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
 
         if ($sOXID) {
+            if (!is_array(static::$_aCategoryCache)) {
+                static::$_aCategoryCache = [];
+            }
+
             // if the oxcategory instance of this article is not cached
-            if (!isset($this->_aCategoryCache[$sOXID])) {
+            if (!array_key_exists($sOXID, static::$_aCategoryCache)) {
                 startProfile('getCategory');
                 $oStr = Str::getStr();
                 $sWhere = $oCategory->getSqlActiveSnippet();
@@ -1838,11 +1886,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
                     }
                 }
                 // add the category instance to cache
-                $this->_aCategoryCache[$sOXID] = $oCategory;
+                static::$_aCategoryCache[$sOXID] = $oCategory;
                 stopPRofile('getCategory');
             } else {
                 // if the oxcategory instance is cached
-                $oCategory = $this->_aCategoryCache[$sOXID];
+                $oCategory = static::$_aCategoryCache[$sOXID];
             }
         }
 

@@ -286,7 +286,7 @@ class ArticleVariant extends AdminDetailsController
 
         $this->resetContentCache();
 
-        $variantOxid = Registry::getRequest()->getRequestRawParameter('voxid');
+        $variantOxid = Registry::getRequest()->getRequestEscapedParameter('voxid');
         $variant = oxNew(Article::class);
         $variant->delete($variantOxid);
     }

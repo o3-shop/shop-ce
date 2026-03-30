@@ -626,12 +626,13 @@ class VoucherTest extends \OxidTestCase
      */
     public function testIsAvailablePriceWhenPriceIsBelowMinVal()
     {
-        $this->markTestSkipped('Bug: Get null as response');
-        $sOXID = $this->_aVoucherOxid[$this->_aSerieOxid[0]][$this->getRandLTAmnt()];
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActShopCurrencyObject'], [], '', false);
         $myCurr = new stdclass();
         $myCurr->rate = 1000;
-        $oConfig->expects($this->once())->method('getActShopCurrencyObject')->will($this->returnValue($myCurr));
+
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActShopCurrencyObject']);
+        $oConfig->expects($this->any())->method('getActShopCurrencyObject')->will($this->returnValue($myCurr));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
+
         $oSerie = oxNew('oxvoucherserie');
         $oSerie->load($this->_aSerieOxid[0]);
         $oSerie->oxvoucherseries__oxminimumvalue = new oxField(0.01, oxField::T_RAW);
@@ -640,17 +641,11 @@ class VoucherTest extends \OxidTestCase
 
         $oNewVoucher = oxNew('oxvoucher');
         $oNewVoucher->oxvouchers__oxvoucherserieid = new oxField($this->_aSerieOxid[0], oxField::T_RAW);
-        $iErrorMsgId = null;
         $dPrice = 9;
 
-        try {
-            $oNewVoucher->setConfig($oConfig);
-            $aErrors = $oNewVoucher->UNITisAvailablePrice($dPrice);
-        } catch (\OxidEsales\EshopCommunity\Core\Exception\VoucherException $oEx) {
-            $sErrorMsg = $oEx->getMessage();
-        }
-
-        $this->assertEquals('ERROR_MESSAGE_VOUCHER_INCORRECTPRICE', $sErrorMsg);
+        $this->expectException(\OxidEsales\EshopCommunity\Core\Exception\VoucherException::class);
+        $this->expectExceptionMessage('ERROR_MESSAGE_VOUCHER_INCORRECTPRICE');
+        $oNewVoucher->UNITisAvailablePrice($dPrice);
     }
 
     /**

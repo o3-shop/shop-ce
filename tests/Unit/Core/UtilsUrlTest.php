@@ -33,14 +33,11 @@ class UtilsUrlTest extends \OxidTestCase
      */
     public function testPrepareCanonicalUrl()
     {
-        $this->markTestIncomplete(
-            'sDefaultLang is a string like "de", 
-            if the abbreviation of the base language differs from sDefaultLang, a lang parameter "lang=X" is added to the URL'
-        );
-
         oxTestModules::addFunction('oxUtils', 'seoIsActive', '{return false;}');
-        $this->getConfig()->setConfigParam('sDefaultLang', 9);
-        $iLang = oxRegistry::getLang()->getBaseLanguage();
+        // Set sDefaultLang to a language abbreviation that differs from the current
+        // base language abbreviation ("de"), so the lang= parameter is appended.
+        $this->getConfig()->setConfigParam('sDefaultLang', 'en');
+        $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage();
 
         $sExpUrl = 'shop.com/index.php?param1=value1&amp;bonusid=111';
         $sExpUrl .= "&amp;lang={$iLang}";
@@ -380,7 +377,7 @@ class UtilsUrlTest extends \OxidTestCase
         $this->assertEquals($sUrl, $oUtils->processSeoUrl($sUrl));
     }
 
-    public function testGetCurrentUrl_dataProvider()
+    public function getCurrentUrlDataProvider()
     {
         $aData = [
             ['', '', 'www.testshop.com', '', 'http://www.testshop.com'],
@@ -398,7 +395,7 @@ class UtilsUrlTest extends \OxidTestCase
     /**
      * oxUtilsUrl::getCurrentUrl() test case
      *
-     * @dataProvider testGetCurrentUrl_dataProvider
+     * @dataProvider getCurrentUrlDataProvider
      *
      * @return null
      */

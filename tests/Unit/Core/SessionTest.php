@@ -288,6 +288,9 @@ class SessionTest extends \OxidTestCase
         $this->assertNotNull($oExcp);
         $this->assertTrue($oExcp instanceof \OxidEsales\EshopCommunity\Core\Exception\ExceptionToDisplay);
         $this->assertEquals('Different browser (oldone, none), creating new SID...<br>', $oExcp->getOxMessage());
+
+        // Clear expected log warning from translation of debug session message
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     public function testIsSidNeededPassingCustomUrl()
@@ -1442,19 +1445,6 @@ class SessionTest extends \OxidTestCase
 
         $oSubj->setForceNewSession();
         $this->assertTrue($oSubj->getNonPublicVar('_blForceNewSession'));
-    }
-
-    public function testIsSessionStarted()
-    {
-        $this->markTestSkipped('Broken');
-        $session = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['_allowSessionStart']);
-        $session->method('_allowSessionStart')->will($this->returnValue(true));
-
-        $this->assertFalse($session->isSessionStarted());
-
-        $session->start();
-
-        $this->assertTrue($session->isSessionStarted());
     }
 
     public function testIsActualSidInCookiePossitive()

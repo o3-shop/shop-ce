@@ -760,7 +760,6 @@ class DeliverysetListTest extends \OxidTestCase
      */
     public function testGetDeliverySetData_usesBasketPriceWithoutPayment()
     {
-        $this->markTestSkipped('Bug: get null back');
         $iActShop = $this->getConfig()->getBaseShopId();
 
         // Deliverycost 1
@@ -809,7 +808,8 @@ class DeliverysetListTest extends \OxidTestCase
         $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getPriceForPayment']);
         $oBasket->expects($this->once())->method('getPriceForPayment')->will($this->returnValue(100));
 
-        oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Model\modOxDeliverySetList_paymentList::class, 'oxPaymentList');
+        $oPayList = new modOxDeliverySetList_paymentList();
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\PaymentList::class, $oPayList);
 
         $oDeliverySetList = oxNew('oxDeliverySetList');
 

@@ -349,19 +349,23 @@ class AccountControllerTest extends UnitTestCase
      */
     public function testGetTitle()
     {
-        $this->markTestSkipped('Bug: null does not match with string.');
         $oUser = oxNew('oxUser');
         $oUser->oxuser__oxusername = new Field('Jon');
 
-        $oActiveView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getClassName']);
+        // getTitle() uses Registry::getConfig()->getActiveView(), not $this->getConfig(),
+        // so we set the active view on the real config.
+        $oActiveView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getClassName', 'getClassKey']);
         $oActiveView->expects($this->any())->method('getClassName')->will($this->returnValue('account'));
+        $oActiveView->expects($this->any())->method('getClassKey')->will($this->returnValue('account'));
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveView'], [], '', false);
-        $oConfig->expects($this->any())->method('getActiveView')->will($this->returnValue($oActiveView));
+        $oConfig = Registry::getConfig();
+        while (count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+        }
+        $oConfig->setActiveView($oActiveView);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getUser', 'getConfig']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\AccountController::class, ['getUser']);
         $oView->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
-        $oView->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
 
         $this->assertEquals(Registry::getLang()->translateString('PAGE_TITLE_ACCOUNT', Registry::getLang()->getBaseLanguage(), false) . ' - "Jon"', $oView->getTitle());
     }

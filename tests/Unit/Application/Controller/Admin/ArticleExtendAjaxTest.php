@@ -208,10 +208,14 @@ class ArticleExtendAjaxTest extends \OxidTestCase
      */
     public function testGetDataFieldsOxidFalse()
     {
-        $this->markTestSkipped('Bug: Array does not match');
         $this->setRequestParameter('oxid', true);
         $oView = oxNew('article_extend_ajax');
-        $this->assertEquals([['FALSE' => 0, '_3' => 0]], $oView->UNITgetDataFields('select false'));
+        $result = $oView->UNITgetDataFields('select false');
+        // MariaDB returns 'FALSE' (uppercase), MySQL returns 'false' (lowercase) as column alias
+        $result = array_map(function ($row) {
+            return array_change_key_case($row, CASE_UPPER);
+        }, $result);
+        $this->assertEquals([['_3' => '0', 'FALSE' => '0']], $result);
     }
 
     /**
@@ -221,11 +225,10 @@ class ArticleExtendAjaxTest extends \OxidTestCase
      */
     public function testRemoveCat()
     {
-        $this->markTestSkipped('Bug: "2" does not match 0');
         $sOxid = '_testObjectRemove';
         $this->setRequestParameter('oxid', $sOxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testCategory1', '_testCategory2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testCategory1', '_testCategory2']));
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxobject2category where oxobjectid='$sOxid'"));
 
         $oView->removeCat();
@@ -257,11 +260,10 @@ class ArticleExtendAjaxTest extends \OxidTestCase
      */
     public function testAddCat()
     {
-        $this->markTestSkipped('Bug: "0" does not match 2');
         $sSynchoxid = '_testObjectAdd';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testCategoryAdd1', '_testCategoryAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleExtendAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testCategoryAdd1', '_testCategoryAdd2']));
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxobject2category where oxobjectid='$sSynchoxid'"));
 
         $oView->addCat();

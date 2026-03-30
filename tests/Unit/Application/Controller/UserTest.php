@@ -116,7 +116,9 @@ class UserTest extends \OxidTestCase
      */
     public function testGetOrderRemarkNoRemark()
     {
-        $this->markTestSkipped('Bug: true is not false');
+        // Ensure no leftover request parameter from other tests
+        $this->setRequestParameter('order_remark', null);
+
         // get user returns false (not logged in)
         $oUserView = $this->getMock(\OxidEsales\Eshop\Application\Controller\UserController::class, ['getUser']);
         $oUserView->expects($this->once())->method('getUser')->will($this->returnValue(false));
@@ -206,18 +208,17 @@ class UserTest extends \OxidTestCase
 
     public function testRenderDoesCleanReservationsIfOn()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
 
         $oR = $this->getMock('stdclass', ['renewExpiration']);
         $oR->expects($this->once())->method('renewExpiration')->will($this->throwException(new Exception('call is ok')));
 
+        // Production uses Registry::getSession(), not $this->getSession()
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oR));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
-        $oU = $this->getMock(\OxidEsales\Eshop\Application\Controller\UserController::class, ['getSession']);
-        $oU->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oU = oxNew(\OxidEsales\Eshop\Application\Controller\UserController::class);
 
         try {
             $oU->render();
@@ -231,8 +232,6 @@ class UserTest extends \OxidTestCase
 
     public function testRenderReturnsToBasketIfReservationOnAndBasketEmpty()
     {
-        $this->markTestSkipped('Bug: Method not called.');
-
         oxTestModules::addFunction('oxutils', 'redirect($url, $blAddRedirectParam = true, $iHeaderCode = 301)', '{throw new Exception($url);}');
 
         $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', true);
@@ -244,12 +243,13 @@ class UserTest extends \OxidTestCase
         $oB = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['getProductsCount']);
         $oB->expects($this->once())->method('getProductsCount')->will($this->returnValue(0));
 
+        // Production uses Registry::getSession(), not $this->getSession()
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations', 'getBasket']);
         $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oR));
         $oS->expects($this->any())->method('getBasket')->will($this->returnValue($oB));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\UserController::class, ['getSession']);
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        $oO = oxNew(\OxidEsales\Eshop\Application\Controller\UserController::class);
 
         try {
             $oO->render();
@@ -263,7 +263,6 @@ class UserTest extends \OxidTestCase
 
     public function testIsDownloadableProductWarning()
     {
-        $this->markTestSkipped('Bug: false is not true');
         $myConfig = $this->getConfig();
         $myConfig->setConfigParam('blEnableDownloads', true);
 
@@ -273,8 +272,10 @@ class UserTest extends \OxidTestCase
         $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasket']);
         $oS->expects($this->any())->method('getBasket')->will($this->returnValue($oB));
 
-        $oO = $this->getMock(\OxidEsales\Eshop\Application\Controller\UserController::class, ['getSession']);
-        $oO->expects($this->any())->method('getSession')->will($this->returnValue($oS));
+        // Production uses Registry::getSession(), not $this->getSession()
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
+
+        $oO = oxNew(\OxidEsales\Eshop\Application\Controller\UserController::class);
 
         $this->assertTrue($oO->isDownloadableProductWarning());
     }

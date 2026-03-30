@@ -160,12 +160,10 @@ class CategoryMainAjaxTest extends \OxidTestCase
      */
     public function testRemoveArticle()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sOxid = '_testCategory';
         $this->setRequestParameter('oxid', $sOxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testObjectRemove1']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testObjectRemove1']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2category where oxcatnid='$sOxid'"));
 
         $oView->removeArticle();
@@ -197,12 +195,10 @@ class CategoryMainAjaxTest extends \OxidTestCase
      */
     public function testAddArticle()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $sSynchoxid = '_testCategory';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticleAdd1', '_testArticleAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\CategoryMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticleAdd1', '_testArticleAdd2']));
         $this->assertEquals(3, oxDb::getDb()->getOne("select count(oxid) from oxobject2category where oxcatnid='$sSynchoxid'"));
 
         $oView->addArticle();

@@ -231,7 +231,7 @@ class SeoAdminTest extends AdminTestCase
         $this->clickAndWaitFrame('link=[DE 4] Test product 0 šÄßüл', 'edit');
         $this->openTab('SEO');
         //seo checking when category is selected
-        $this->assertEquals('Test category 0 [DE] šÄßüл (main category)', $this->getSelectedLabel('aSeoData[oxparams]'));
+        $this->assertEquals('Test category 0 [DE] šÄßüл (Hauptkategorie)', $this->getSelectedLabel('aSeoData[oxparams]'));
         $this->assertEquals('off', $this->getValue('aSeoData[oxfixed]'));
         $this->assertEquals('Deutsch', $this->getSelectedLabel('test_editlanguage'));
         $this->assertEquals('off', $this->getValue('aSeoData[oxfixed]'));
@@ -263,7 +263,7 @@ class SeoAdminTest extends AdminTestCase
         $this->assertEquals('keywords EN', $this->getValue('aSeoData[oxkeywords]'));
         $this->assertEquals('description EN', $this->getValue('aSeoData[oxdescription]'));
         $this->selectAndWait('test_editlanguage', 'label=Deutsch');
-        $this->assertEquals('Test category 0 [DE] šÄßüл (main category)', $this->getSelectedLabel('aSeoData[oxparams]'));
+        $this->assertEquals('Test category 0 [DE] šÄßüл (Hauptkategorie)', $this->getSelectedLabel('aSeoData[oxparams]'));
         $this->assertEquals('on', $this->getValue('aSeoData[oxfixed]'));
         $this->assertEquals('Test-category-0-DE/DE-4-Test-product-0-de.html', $this->getValue('aSeoData[oxseourl]'));
         $this->assertEquals('keywords DE', $this->getValue('aSeoData[oxkeywords]'));

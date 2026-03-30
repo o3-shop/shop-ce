@@ -49,6 +49,7 @@ class GenericImportTest extends OxidTestCase
     {
         oxRemClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Core\GenericImportTest_oxUtilsServer::class);
         $this->cleanUpTable('oxuser');
+        $this->cleanUpTable('oxnewssubscribed');
         parent::tearDown();
     }
 
@@ -175,7 +176,8 @@ class GenericImportTest extends OxidTestCase
      */
     public function testDoImport()
     {
-        $this->markTestSkipped('Review with D.S. Created vfs file seems to be empty.');
+        // Ensure CSV separator matches the file format (semicolon)
+        $this->getConfig()->setConfigParam('sCSVSign', ';');
 
         /** @var GenericImport|MockObject $oImport */
         $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['init', 'checkAccess']);
@@ -226,7 +228,8 @@ class GenericImportTest extends OxidTestCase
      */
     public function testDoImportWithCsvWithoutHeaderLine()
     {
-        $this->markTestSkipped('Review with D.S. Created vfs file seems to be empty.');
+        // Ensure CSV separator matches the file format (semicolon)
+        $this->getConfig()->setConfigParam('sCSVSign', ';');
 
         /** @var GenericImport|MockObject $oImport */
         $oImport = $this->getMock('OxidEsales\EshopCommunity\Core\GenericImport\GenericImport', ['init', 'checkAccess']);

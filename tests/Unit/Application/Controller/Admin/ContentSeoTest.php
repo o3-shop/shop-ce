@@ -72,8 +72,6 @@ class ContentSeoTest extends \OxidTestCase
      */
     public function testGetEntryUri()
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $oContent = oxNew('oxContent');
         $oContent->setId('_test1');
         $oContent->save();
@@ -81,9 +79,9 @@ class ContentSeoTest extends \OxidTestCase
         $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class, ['getContentUri']);
         $oEncoder->expects($this->once())->method('getContentUri')->will($this->returnValue('ContentUri'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentSeo::class, ['getEditObjectId', '_getEncoder']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentSeo::class, ['getEditObjectId', 'getEncoder']);
         $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('_test1'));
-        $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
+        $oView->expects($this->once())->method('getEncoder')->will($this->returnValue($oEncoder));
         $this->assertEquals('ContentUri', $oView->getEntryUri());
     }
 

@@ -142,8 +142,6 @@ final class TemplatesModuleSettingHandlerTest extends TestCase
 
     public function testHandleOnModuleDeactivationWillSaveCleanedConfig(): void
     {
-        $this->markTestSkipped('Bug: test is not working as expected.');
-
         $shopId = 1;
         $moduleId = 'some-module-id';
         $initialConfig = [

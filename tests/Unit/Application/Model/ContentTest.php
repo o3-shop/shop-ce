@@ -209,7 +209,6 @@ class ContentTest extends \OxidTestCase
 
     public function testGetLinkSeo()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
         oxTestModules::addFunction('oxutils', 'seoIsActive', '{return true;}');
         oxTestModules::addFunction('oxseoencodercontent', 'getContentUrl', '{$o = $aA[0]; return "seolink".$o->oxcontents__oxtitle->value;}');
 
@@ -271,22 +270,20 @@ class ContentTest extends \OxidTestCase
 
     public function testGetLinkSeoWithLangParam()
     {
-        $this->markTestSkipped('Bug: get url instead of seo');
         oxTestModules::addFunction('oxutils', 'seoIsActive', '{return true;}');
-        oxTestModules::addFunction('oxseoencodercontent', 'getContentUrl', '{$o = $aA[0]; return "seolink".$o->oxcontents__oxtitle->value.$aA[1];}');
 
-        try {
-            $o = oxNew('oxContent');
-            $o->setId('testts');
-            $o->oxcontents__oxcatid = new oxField();
-            $o->oxcontents__oxtitle = new oxField('aaFaa');
+        $seoEncoderMock = $this->createPartialMock(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class, ['getContentUrl']);
+        $seoEncoderMock->expects($this->any())->method('getContentUrl')->will($this->returnCallback(function ($oContent, $iLang = null) {
+            return 'seolink' . $oContent->oxcontents__oxtitle->value . $iLang;
+        }));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class, $seoEncoderMock);
 
-            $this->assertEquals('seolinkaaFaa1', $o->getLink(1));
-        } catch (Ecxeption $e) {
-        }
-        if ($e) {
-            throw $e;
-        }
+        $o = oxNew('oxContent');
+        $o->setId('testts');
+        $o->oxcontents__oxcatid = new oxField();
+        $o->oxcontents__oxtitle = new oxField('aaFaa');
+
+        $this->assertEquals('seolinkaaFaa1', $o->getLink(1));
     }
 
     public function testExpandedStatusGetter()
@@ -315,7 +312,6 @@ class ContentTest extends \OxidTestCase
 
     public function testDelete()
     {
-        $this->markTestSkipped('Bug: 0 does not match expected value 1.');
         oxTestModules::addFunction('oxSeoEncoderContent', 'onDeleteContent', '{$this->onDelete[] = $aA[0];}');
         oxRegistry::get('oxSeoEncoderContent')->onDelete = [];
 

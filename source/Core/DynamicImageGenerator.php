@@ -395,15 +395,11 @@ namespace OxidEsales\EshopCommunity\Core {
 
             $done = false;
             if ($picFolderPath && is_dir($picFolderPath)) {
-                // if its in main path..
-                if (strcmp($picFolderPath, substr($dir, 0, strlen($picFolderPath))) == 0) {
-                    // folder does not exist yet?
-                    if (!($done = file_exists($dir))) {
-                        clearstatcache();
-                        // in case creation did not succeed, maybe another process allready created folder?
-                        $mode = 0755;
-                        $done = mkdir($dir, $mode, true) || file_exists($dir);
-                    }
+                try {
+                    $done = oxNew(\OxidEsales\EshopCommunity\Core\FileSystem\FileSystem::class)
+                        ->createDirIfNotExists($dir, $picFolderPath);
+                } catch (\InvalidArgumentException | \RuntimeException $e) {
+                    $done = false;
                 }
             }
 

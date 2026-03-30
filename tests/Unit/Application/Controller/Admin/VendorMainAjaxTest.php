@@ -227,8 +227,8 @@ class VendorMainAjaxTest extends \OxidTestCase
     {
         $this->setRequestParameter('oxid', '_testVendorId');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle1']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle1']));
 
         $oDb = oxDb::getDb();
         $this->assertEquals(2, $oDb->getOne("select count(oxid) from oxarticles where oxvendorid='_testVendorId' "));
@@ -266,8 +266,8 @@ class VendorMainAjaxTest extends \OxidTestCase
     {
         $this->setRequestParameter('oxid', '_testVendorId');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['_getActionIds', 'resetCounter']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle1']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['getActionIds', 'resetCounter']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle1']));
         $oView->expects($this->any())->method('resetCounter')->with($this->equalTo('vendorArticle'), $this->equalTo('_testVendorId'));
 
         $oView->removeVendor();
@@ -282,8 +282,8 @@ class VendorMainAjaxTest extends \OxidTestCase
     {
         $this->setRequestParameter('synchoxid', '_testVendorId');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['_getActionIds']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle3']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['getActionIds']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle3']));
 
         $oDb = oxDb::getDb();
         $this->assertEquals('', $oDb->getOne("select oxvendorid from oxarticles where oxid='_testArticle3' "));
@@ -322,8 +322,8 @@ class VendorMainAjaxTest extends \OxidTestCase
     {
         $this->setRequestParameter('synchoxid', '_testVendorId');
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['_getActionIds', 'resetCounter']);
-        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testArticle3']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMainAjax::class, ['getActionIds', 'resetCounter']);
+        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testArticle3']));
         $oView->expects($this->any())->method('resetCounter')->with($this->equalTo('vendorArticle'), $this->equalTo('_testVendorId'));
 
         $oView->addVendor();
