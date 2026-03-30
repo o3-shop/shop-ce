@@ -239,7 +239,7 @@ $configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.p
  * This directory is required for caching, Smarty compilation, and other temporary files.
  */
 $tmpDir = $configFile->getVar('sCompileDir');
-if ($tmpDir) {
+if ($tmpDir && strpos($tmpDir, '<') === false && !is_dir($tmpDir)) {
     try {
         // oxNew is not yet available here; instantiate directly via the composer autoloader.
         // Use INSTALLATION_ROOT_PATH as the security boundary. If sCompileDir is configured
