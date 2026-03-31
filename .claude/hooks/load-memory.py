@@ -34,11 +34,16 @@ def main():
 
     for m in re.finditer(r"^\- \[!\] \[.*?\]\((.*?)\)", index, re.MULTILINE):
         full_path = os.path.join(mem_dir, m.group(1))
+        if not os.path.abspath(full_path).startswith(os.path.abspath(mem_dir) + os.sep):
+            continue
         if os.path.isfile(full_path):
-            with open(full_path) as f:
-                parts.append("### " + os.path.basename(full_path) + "\n" + f.read())
+            try:
+                with open(full_path) as f:
+                    parts.append("### " + os.path.basename(full_path) + "\n" + f.read())
+            except OSError as e:
+                print(f"load-memory: could not read {full_path}: {e}", file=sys.stderr)
 
-    content = "\n".join(parts)
+    content = "\n\n".join(parts)
     print(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "SessionStart",
