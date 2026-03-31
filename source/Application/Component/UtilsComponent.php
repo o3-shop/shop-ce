@@ -124,7 +124,6 @@ class UtilsComponent extends BaseController
         }
     }
 
-
     /**
      * If session user is set loads user notice-list (\OxidEsales\Eshop\Application\Model\User::GetBasket())
      * and adds article to it.
