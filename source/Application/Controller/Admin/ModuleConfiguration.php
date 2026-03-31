@@ -44,7 +44,7 @@ class ModuleConfiguration extends ShopConfiguration
     /** @var string Template name. */
     protected $_sModule = 'shop_config.tpl';
 
-    protected $_sModuleId = null;
+    protected string $_sModuleId = '';
 
     /**
      * Add additional config type for modules.
