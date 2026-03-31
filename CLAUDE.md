@@ -2,30 +2,32 @@
 
 PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
-## Claude Code Plugin Setup (first time only)
+## Claude Code Workflow
 
-The project plugins are declared in `.claude/settings.json` and should activate automatically. If skills like `/finish`, `superpowers:brainstorming`, or `feature-dev` are not available, install the marketplace manually:
+The following dev workflow skills are **bundled in this repo** at `.claude/skills/` — no plugin installation required:
+
+| Skill | When to use |
+|---|---|
+| `brainstorming` | Before building anything new — explores intent and design |
+| `writing-plans` | Turns a spec into a step-by-step implementation plan |
+| `test-driven-development` | TDD for every feature or bugfix |
+| `systematic-debugging` | Any bug, test failure, or unexpected behaviour |
+| `verification-before-completion` | Before claiming work is done |
+| `finishing-a-development-branch` | Wrapping up a branch (merge/PR/discard) |
+| `subagent-driven-development` | Execute plans with parallel subagents + review checkpoints |
+| `/finish` | Quality gate: cs-fixer + full tests + coverage + memory update |
+
+**Recommended additional plugins** (install once, auto-activate for this repo via `.claude/settings.json`):
 
 ```bash
-# Install the claude-plugins-official marketplace
 claude plugins add marketplace claude-plugins-official
 ```
 
-Then restart Claude Code. The following plugins activate for this project:
-
-| Plugin | What it gives you |
+| Plugin | What it adds |
 |---|---|
-| `superpowers` | Full dev workflow — brainstorming, TDD, planning, debugging, code review |
-| `feature-dev` | Guided feature development with architecture focus |
+| `superpowers` | Extended skill set (receiving code review, git worktrees, parallel agents) |
+| `feature-dev` | Guided feature development with codebase understanding |
 | `php-lsp` | PHP language server (inline errors, go-to-definition) |
-| `claude-code-setup` | Automation recommendations for this repo |
-
-**Key skills you'll use:**
-- `superpowers:brainstorming` — before building anything new
-- `superpowers:writing-plans` — turn specs into implementation plans
-- `superpowers:test-driven-development` — TDD for every feature/fix
-- `superpowers:systematic-debugging` — for any bug or test failure
-- `/finish` — quality gate before marking work done (project skill, always available)
 
 ## Quick Start
 
