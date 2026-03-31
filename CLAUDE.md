@@ -53,7 +53,7 @@ bin/oe-console                   # Symfony Console CLI entry point
 
 - **Style:** PSR-12, enforced by PHP-CS-Fixer (`.php-cs-fixer.dist.php`). Run `./docker.sh cs-fixer` before committing.
 - **Database:** Doctrine DBAL ≤2.12. Use QueryBuilder — never raw PDO or string-concatenated SQL.
-- **Templates:** Smarty ~2.6. Template files live in `source/Application/views/`.
+- **Templates:** Smarty ~2.6. Template files live in `source/Application/views/{admin,wave}/`.
 - **Dependency injection:** Symfony container. Services registered via YAML configs in `source/Internal/`.
 - **Branches:** Feature branches off `b-1.5`. Naming: `NNN-short-description` (issue number prefix).
 - **Main branch:** `b-1.5`

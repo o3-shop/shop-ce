@@ -22,7 +22,7 @@ type: reference
 
 ## Templates
 - Smarty ~2.6
-- Template files: `source/Application/views/{frontend,admin}/`
+- Template files: `source/Application/views/{admin,wave}/`
 - Cache: `source/tmp/smarty/` — clear when templates misbehave
 
 ## Branches

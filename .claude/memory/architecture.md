@@ -21,7 +21,7 @@ type: reference
 - Add commands by registering them in the DI container with the `console.command` tag
 
 ## Email
-- PHPMailer via `\OxidEsales\EshopCommunity\Core\Mailer`
+- PHPMailer via `\OxidEsales\EshopCommunity\Core\Mailer` (may live in vendor — verify with `find vendor -name "Mailer.php"` before editing)
 - Test emails caught by Mailpit at http://localhost:8025
 
 ## Logging

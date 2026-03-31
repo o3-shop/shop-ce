@@ -15,6 +15,8 @@ Run this skill before declaring any task complete.
 ./docker.sh test-all-coverage
 ```
 
+> Note: this command can take 5–15 minutes on first run or after container rebuild.
+
 This runs (in order):
 1. `./docker.sh cs-fixer` — fix all code style violations
 2. Full unit test suite with coverage report
