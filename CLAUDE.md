@@ -2,6 +2,31 @@
 
 PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
+## Claude Code Plugin Setup (first time only)
+
+The project plugins are declared in `.claude/settings.json` and should activate automatically. If skills like `/finish`, `superpowers:brainstorming`, or `feature-dev` are not available, install the marketplace manually:
+
+```bash
+# Install the claude-plugins-official marketplace
+claude plugins add marketplace claude-plugins-official
+```
+
+Then restart Claude Code. The following plugins activate for this project:
+
+| Plugin | What it gives you |
+|---|---|
+| `superpowers` | Full dev workflow — brainstorming, TDD, planning, debugging, code review |
+| `feature-dev` | Guided feature development with architecture focus |
+| `php-lsp` | PHP language server (inline errors, go-to-definition) |
+| `claude-code-setup` | Automation recommendations for this repo |
+
+**Key skills you'll use:**
+- `superpowers:brainstorming` — before building anything new
+- `superpowers:writing-plans` — turn specs into implementation plans
+- `superpowers:test-driven-development` — TDD for every feature/fix
+- `superpowers:systematic-debugging` — for any bug or test failure
+- `/finish` — quality gate before marking work done (project skill, always available)
+
 ## Quick Start
 
 ```bash
