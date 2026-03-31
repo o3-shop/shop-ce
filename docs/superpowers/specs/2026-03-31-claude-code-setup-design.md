@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-31
 **Status:** Approved
-**Branch:** 89-improve-utilscomponent-tocomparelist
+**Branch:** b-1.5-setup-claude
 
 ## Overview
 
@@ -116,14 +116,14 @@ Auto-runs php-cs-fixer inside Docker after any PHP file is edited by Claude.
       "matcher": "Edit|Write",
       "hooks": [{
         "type": "command",
-        "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))\"); if [[ \"$FILE\" == *.php ]] && docker ps --format '{{.Names}}' | grep -q '^o3shop-app$'; then REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null); REL=${FILE#\"$REPO_ROOT/\"}; docker exec -i o3shop-app php-cs-fixer fix --config=.php-cs-fixer.dist.php \"$REL\" 2>/dev/null || true; fi"
+        "command": "FILE=$(echo \"$CLAUDE_TOOL_INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('file_path',''))\"); if [[ \"$FILE\" == *.php ]] && docker ps --format '{{.Names}}' | grep -q '^o3shop-app$'; then ./docker.sh cs-fixer 2>/dev/null || true; fi"
       }]
     }]
   }
 }
 ```
 
-Uses `git rev-parse --show-toplevel` to derive the relative path dynamically — works regardless of where the repo is cloned. Only fires when the `o3shop-app` container is running — silently skips otherwise.
+Delegates entirely to `./docker.sh cs-fixer` — consistent with the standalone command, no duplicated logic. Runs on the whole codebase (not just the edited file), but `php-cs-fixer`'s cache makes subsequent runs fast. Only fires when the `o3shop-app` container is running — silently skips otherwise.
 
 ---
 
