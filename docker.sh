@@ -216,6 +216,9 @@ case "$1" in
     quarantine)
         run_quarantine_tests || exit 127
         ;;
+    cs-fixer)
+        run_php_cs_fixer || exit 127
+        ;;
     *)
         echo "Usage: $0 <command> [options]"
         echo ""
@@ -226,6 +229,7 @@ case "$1" in
         echo ""
         echo "  test         Run unit tests (pass extra args to phpunit)"
         echo "  test-all     Run php-cs-fixer, then full test suite"
+        echo "  cs-fixer     Run php-cs-fixer on the entire codebase"
         echo "  quarantine   Run slow/special @group quarantine tests only"
         echo ""
         echo "Options for 'test':"
