@@ -180,6 +180,15 @@ run_full_test_with_cs_fixer() {
   run_tests
 }
 
+run_full_test_with_coverage() {
+  run_php_cs_fixer
+  echo ""
+  echo "---------------------------"
+  echo "Now running tests with coverage:"
+  echo "---------------------------"
+  run_tests --coverage
+}
+
 MY_DIR=$(getMyPath)
 
 if [ ! -f "$MY_DIR/.env" ]; then
@@ -213,6 +222,9 @@ case "$1" in
     test-all)
         run_full_test_with_cs_fixer || exit 127
         ;;
+    test-all-coverage)
+        run_full_test_with_coverage || exit 127
+        ;;
     quarantine)
         run_quarantine_tests || exit 127
         ;;
@@ -229,6 +241,7 @@ case "$1" in
         echo ""
         echo "  test         Run unit tests (pass extra args to phpunit)"
         echo "  test-all     Run php-cs-fixer, then full test suite"
+        echo "  test-all-coverage  Run php-cs-fixer, then full test suite with coverage report"
         echo "  cs-fixer     Run php-cs-fixer on the entire codebase"
         echo "  quarantine   Run slow/special @group quarantine tests only"
         echo ""
