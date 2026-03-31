@@ -94,6 +94,8 @@ This repo has a shared memory system at `.claude/memory/`. All agents working he
 2. If you learned something non-obvious during your work, find the relevant memory file and append it
 3. If nothing fits, create a new memory file and add it to `MEMORY.md`
 
+**Mid-task capture:** If you encounter something surprising, non-obvious, or that contradicts your assumptions during a task — write it to `.claude/memory/` immediately. Don't wait for `/finish`.
+
 Memory files use frontmatter:
 ```markdown
 ---
