@@ -99,8 +99,14 @@ class CmpUtilsTest extends \OxidTestCase
         $this->setRequestParameter('addcompare', true);
         $this->setRequestParameter('aid', '1126');
 
+        $oViewConfig = $this->getMock(\OxidEsales\Eshop\Core\ViewConfig::class, ['getShowCompareList']);
+        $oViewConfig->method('getShowCompareList')->will($this->returnValue(true));
+
+        $oParentView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getViewConfig']);
+        $oParentView->method('getViewConfig')->will($this->returnValue($oViewConfig));
+
         $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['getParent']);
-        $oCmp->expects($this->never())->method('getParent');
+        $oCmp->expects($this->once())->method('getParent')->will($this->returnValue($oParentView));
         $oCmp->toCompareList('1126'); // must not throw
     }
 
@@ -121,7 +127,7 @@ class CmpUtilsTest extends \OxidTestCase
         $oCmp->toCompareList('1126'); // must not throw
 
         $aItems = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('aFiltcompproducts');
-        $this->assertArrayHasKey('1126', $aItems);
+        $this->assertNull($aItems);
     }
 
     /**

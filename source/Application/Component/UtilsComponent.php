@@ -58,15 +58,17 @@ class UtilsComponent extends BaseController
         $blOverride = false,
         $blBundle = false
     ) {
-        // Guard against bots or contexts where the parent view / view-config is unavailable.
-        $oViewConfig = null;
-        if (method_exists($this, 'getViewConfig')) {
-            $oViewConfig = $this->getViewConfig();
+        $view = $this->getParent();
+
+        if ($view === null) {
+            return;
         }
 
-        if ($oViewConfig === null
-            || !method_exists($oViewConfig, 'getShowCompareList')
-            || !$oViewConfig->getShowCompareList()
+        $viewConfig = method_exists($view, 'getViewConfig') ? $view->getViewConfig() : null;
+
+        if ($viewConfig === null
+            || !method_exists($viewConfig, 'getShowCompareList')
+            || !$viewConfig->getShowCompareList()
         ) {
             return;
         }
@@ -75,17 +77,18 @@ class UtilsComponent extends BaseController
             return;
         }
 
-        // #657 special treatment if we want to put on comparelist
-        $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
-        $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
-        $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
+        $config = Registry::getConfig();
+        $blAddCompare = $config->getRequestParameter('addcompare');
+        $blRemoveCompare = $config->getRequestParameter('removecompare');
+        $sProductId = $sProductId ?: $config->getRequestParameter('aid');
 
         if ((!$blAddCompare && !$blRemoveCompare) || !$sProductId) {
             return;
         }
 
-        // toggle state in session array
-        $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
+        $session = Registry::getSession();
+        $aItems = $session->getVariable('aFiltcompproducts');
+
         if (!is_array($aItems)) {
             $aItems = [];
         }
@@ -98,27 +101,29 @@ class UtilsComponent extends BaseController
             unset($aItems[$sProductId]);
         }
 
-        Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
+        $session->setVariable('aFiltcompproducts', $aItems);
 
-        $oParentView = $this->getParent();
-        if ($oParentView === null) {
-            return;
+        // Update in-memory product flags so templates show the correct
+        // comparison-list state without requiring a page reload.
+        if (method_exists($view, 'getViewProduct')) {
+            $oProduct = $view->getViewProduct();
+            if ($oProduct !== null && method_exists($oProduct, 'getId')) {
+                $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+            }
         }
 
-        // #843C there was problem then field "blIsOnComparisonList" was not set to article object
-        if (method_exists($oParentView, 'getViewProduct') && ($oProduct = $oParentView->getViewProduct())) {
-            $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
-        }
-
-        if (method_exists($oParentView, 'getViewProductList')) {
-            $aViewProds = $oParentView->getViewProductList();
+        if (method_exists($view, 'getViewProductList')) {
+            $aViewProds = $view->getViewProductList();
             if (is_array($aViewProds)) {
                 foreach ($aViewProds as $oProduct) {
-                    $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+                    if (method_exists($oProduct, 'getId')) {
+                        $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+                    }
                 }
             }
         }
     }
+
 
     /**
      * If session user is set loads user notice-list (\OxidEsales\Eshop\Application\Model\User::GetBasket())
