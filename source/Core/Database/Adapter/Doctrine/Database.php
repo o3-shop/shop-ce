@@ -23,12 +23,13 @@ namespace OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ConnectionException;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
-use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception as ConnectionException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\TransactionIsolationLevel;
+use PDOException;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -70,10 +71,10 @@ class Database implements DatabaseInterface
      * @var array Map strings used in the shop to Doctrine constants
      */
     protected $transactionIsolationLevelMap = [
-        'READ UNCOMMITTED' => Connection::TRANSACTION_READ_UNCOMMITTED,
-        'READ COMMITTED'   => Connection::TRANSACTION_READ_COMMITTED,
-        'REPEATABLE READ'  => Connection::TRANSACTION_REPEATABLE_READ,
-        'SERIALIZABLE'     => Connection::TRANSACTION_SERIALIZABLE,
+        'READ UNCOMMITTED' => TransactionIsolationLevel::READ_UNCOMMITTED,
+        'READ COMMITTED'   => TransactionIsolationLevel::READ_COMMITTED,
+        'REPEATABLE READ'  => TransactionIsolationLevel::REPEATABLE_READ,
+        'SERIALIZABLE'     => TransactionIsolationLevel::SERIALIZABLE,
     ];
 
     /**
