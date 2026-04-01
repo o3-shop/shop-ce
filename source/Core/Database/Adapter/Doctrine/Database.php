@@ -292,16 +292,6 @@ class Database implements DatabaseInterface
     public function setFetchMode($fetchMode)
     {
         $this->fetchMode = $this->fetchModeMap[$fetchMode];
-
-        try {
-            $this->getConnection()->setFetchMode($this->fetchMode);
-        } catch (DBALException $exception) {
-            $exception = $this->convertException($exception);
-            $this->handleException($exception);
-        } catch (PDOException $exception) {
-            $exception = $this->convertException($exception);
-            $this->handleException($exception);
-        }
     }
 
     /**
