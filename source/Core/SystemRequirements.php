@@ -339,7 +339,9 @@ class SystemRequirements
         ];
 
         // Try to create the folders, in case they do not yet exist. In case it fails, the error handling later will handle it
-        $fileSystem = oxNew(\OxidEsales\EshopCommunity\Core\FileSystem\FileSystem::class);
+        // Direct instantiation (not oxNew) is intentional: this method runs during setup where the Registry/UtilsObject
+        // chain is not yet fully initialised, mirroring the same pattern used in bootstrap.php.
+        $fileSystem = new \OxidEsales\EshopCommunity\Core\FileSystem\FileSystem();
         $shopParentPath = dirname(rtrim(realpath($sPath) ?: $sPath, DIRECTORY_SEPARATOR));
         foreach ($aPathsToCheck as $sPathToCheck) {
             try {
@@ -349,13 +351,15 @@ class SystemRequirements
                 try {
                     $fileSystem->createDirIfNotExists($sPathToCheck, $shopParentPath, 0700);
                 } catch (\InvalidArgumentException | \RuntimeException $e) {
-                    \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
-                        sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage())
+                    trigger_error(
+                        sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage()),
+                        E_USER_WARNING
                     );
                 }
             } catch (\RuntimeException $e) {
-                \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
-                    sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage())
+                trigger_error(
+                    sprintf('Could not create required directory "%s": %s', $sPathToCheck, $e->getMessage()),
+                    E_USER_WARNING
                 );
             }
         }
