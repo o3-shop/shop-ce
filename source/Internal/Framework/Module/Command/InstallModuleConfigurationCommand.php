@@ -112,6 +112,7 @@ class InstallModuleConfigurationCommand extends Command
             $output->writeln('<info>' . self::MESSAGE_INSTALLATION_WAS_SUCCESSFUL . '</info>');
         } catch (ModuleTargetPathIsMissingException $exception) {
             $output->writeln('<error>' . self::MESSAGE_TARGET_PATH_IS_REQUIRED . '</error>');
+            return self::FAILURE;
         } catch (\Throwable $throwable) {
             $output->writeln('<error>' . self::MESSAGE_INSTALLATION_FAILED . '</error>');
 

@@ -100,6 +100,7 @@ class ModuleDeactivateCommand extends Command
             $this->deactivateModule($output, $moduleId);
         } else {
             $output->writeLn('<error>' . sprintf(static::MESSAGE_MODULE_NOT_FOUND, $moduleId) . '</error>');
+            return self::FAILURE;
         }
 
         return self::SUCCESS;
