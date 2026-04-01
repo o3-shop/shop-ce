@@ -848,7 +848,26 @@ class Database implements DatabaseInterface
             $parameter = [];
         }
 
-        return $parameter;
+        return $this->normalizeNamedParameters($parameter);
+    }
+
+    /**
+     * DBAL 3 no longer accepts colon-prefixed keys in named parameter arrays (e.g. ':name' => $v).
+     * Strip the leading colon so that legacy callers passing [':oxid' => $id] still work.
+     *
+     * @param array $parameters
+     * @return array
+     */
+    private function normalizeNamedParameters(array $parameters): array
+    {
+        $normalized = [];
+        foreach ($parameters as $key => $value) {
+            if (is_string($key) && strncmp($key, ':', 1) === 0) {
+                $key = substr($key, 1);
+            }
+            $normalized[$key] = $value;
+        }
+        return $normalized;
     }
 
     /**

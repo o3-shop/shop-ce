@@ -25,7 +25,7 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Storage;
 
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\LockFactory;
 
 class YamlFileStorageFactory implements FileStorageFactoryInterface
 {
@@ -35,7 +35,7 @@ class YamlFileStorageFactory implements FileStorageFactoryInterface
     private $fileLocator;
 
     /**
-     * @var Factory
+     * @var LockFactory
      */
     private $lockFactory;
 
@@ -47,10 +47,10 @@ class YamlFileStorageFactory implements FileStorageFactoryInterface
     /**
      * YamlFileStorageFactory constructor.
      * @param FileLocatorInterface $fileLocator
-     * @param Factory $lockFactory
+     * @param LockFactory $lockFactory
      * @param Filesystem $filesystemService
      */
-    public function __construct(FileLocatorInterface $fileLocator, Factory $lockFactory, Filesystem $filesystemService)
+    public function __construct(FileLocatorInterface $fileLocator, LockFactory $lockFactory, Filesystem $filesystemService)
     {
         $this->fileLocator = $fileLocator;
         $this->lockFactory = $lockFactory;
