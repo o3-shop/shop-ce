@@ -1,4 +1,4 @@
-name: Oxid Migrations PE
-migrations_namespace: OxidEsales\EshopProfessional\Migrations
-table_name: oxmigrations_pe
-migrations_directory: data
+migrations_paths:
+  'OxidEsales\EshopProfessional\Migrations': 'data'
+table_storage:
+  table_name: oxmigrations_pe

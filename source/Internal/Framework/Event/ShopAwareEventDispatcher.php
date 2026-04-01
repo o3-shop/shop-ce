@@ -23,20 +23,20 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ShopAwareEventDispatcher extends EventDispatcher
 {
     /**
-     * @param \callable[] $listeners
+     * @param iterable    $listeners
      * @param string      $eventName
-     * @param Event       $event
+     * @param object      $event
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function callListeners(iterable $listeners, string $eventName, object $event)
     {
         foreach ($listeners as $listener) {
-            if ($event->isPropagationStopped()) {
+            if ($event instanceof Event && $event->isPropagationStopped()) {
                 break;
             }
             if (
