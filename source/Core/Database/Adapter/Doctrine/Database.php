@@ -323,7 +323,7 @@ class Database implements DatabaseInterface
 
         if ($this->doesStatementProduceOutput($query)) {
             try {
-                return $this->getConnection()->fetchColumn($query, $parameters);
+                return $this->getConnection()->fetchOne($query, $parameters);
             } catch (DBALException $exception) {
                 $exception = $this->convertException($exception);
                 $this->handleException($exception);
@@ -755,7 +755,7 @@ class Database implements DatabaseInterface
         $result = [];
 
         try {
-            $rows = $this->getConnection()->fetchAll($query, $parameters);
+            $rows = $this->getConnection()->fetchAllAssociative($query, $parameters);
             foreach ($rows as $row) {
                 // cause there is no doctrine equivalent, we take this little detour and restructure the result
                 $columnNames = array_keys($row);
@@ -806,7 +806,7 @@ class Database implements DatabaseInterface
         $affectedRows = 0;
 
         try {
-            $affectedRows = $this->getConnection()->executeUpdate($query, $parameters, $types);
+            $affectedRows = $this->getConnection()->executeStatement($query, $parameters, $types);
         } catch (DBALException $exception) {
             $exception = $this->convertException($exception);
             $this->handleException($exception);
@@ -1047,7 +1047,7 @@ class Database implements DatabaseInterface
         }
 
         if ($this->doesStatementProduceOutput($query)) {
-            $result = $statement->fetchAll();
+            $result = $statement->fetchAllAssociative();
         } else {
             \OxidEsales\Eshop\Core\Registry::getLogger()->warning('Given statement does not produce output and was not executed', [debug_backtrace()]);
         }
@@ -1107,7 +1107,7 @@ class Database implements DatabaseInterface
               TABLE_NAME = '$table'";
 
         try {
-            $columns = $connection->executeQuery($query)->fetchAll();
+            $columns = $connection->executeQuery($query)->fetchAllAssociative();
         } catch (DBALException $exception) {
             $exception = $this->convertException($exception);
             $this->handleException($exception);
