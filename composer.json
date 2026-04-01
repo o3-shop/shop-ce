@@ -108,7 +108,8 @@
             }
         },
         "branch-alias": {
-            "dev-b-1.5": "1.5-dev"
+            "dev-b-1.5": "1.5-dev",
+            "dev-req/update-dependencies": "1.5-dev"
         }
     },
     "config": {

@@ -105,6 +105,12 @@ The container currently runs Composer 2.2.26 (LTS branch). We'll bump to the lat
 
 A `composer-runtime-api` constraint will be added to `composer.json` to formally document the minimum Composer version requirement.
 
+### Known Blocker: Branch Alias Missing
+
+Composer 2.9.5 is stricter about root package version resolution. Packages that require `o3-shop/shop-ce ^1.2.0` fail to install on non-aliased branches because the branch name (e.g. `dev-req/update-dependencies`) doesn't satisfy `^1.2.0`.
+
+**Fix:** Add a branch alias for `dev-req/update-dependencies` → `1.5-dev` in `composer.json`. This is already applied on this branch.
+
 ---
 
 ## Out of Scope
