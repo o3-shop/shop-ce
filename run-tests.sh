@@ -59,6 +59,11 @@ fi
 # Display start message
 echo -e "${YELLOW}Changing to testing config${NC}"
 sed -i 's/^O3SHOP_CONF_DBNAME="o3shop"$/O3SHOP_CONF_DBNAME="o3shop-test"/' .env
+# Silence debug/info logs during tests: the testing framework fails if the log
+# file contains any entries, and many production code paths emit DEBUG messages.
+# Save original log level line so we can restore it exactly.
+ORIG_LOG_LEVEL_LINE=$(grep '^O3SHOP_CONF_LOG_LEVEL=' .env || true)
+sed -i 's/^O3SHOP_CONF_LOG_LEVEL=.*/O3SHOP_CONF_LOG_LEVEL="error"/' .env
 echo -e "${GREEN}Changed to testing config${NC}"
 echo "----------------------------------------"
 
@@ -161,6 +166,10 @@ echo "Test run completed at: $(date)"
 echo "----------------------------------------"
 echo -e "${YELLOW}Changing to normal config${NC}"
 sed -i 's/^O3SHOP_CONF_DBNAME="o3shop-test"$/O3SHOP_CONF_DBNAME="o3shop"/' .env
+# Restore original log level
+if [ -n "$ORIG_LOG_LEVEL_LINE" ]; then
+    sed -i "s|^O3SHOP_CONF_LOG_LEVEL=.*|${ORIG_LOG_LEVEL_LINE}|" .env
+fi
 echo -e "${GREEN}Changed to normal config${NC}"
 echo "----------------------------------------"
 
