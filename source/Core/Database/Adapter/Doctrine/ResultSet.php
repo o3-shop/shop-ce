@@ -106,9 +106,9 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
     public function fetchAll()
     {
         $this->close();
-        $this->getStatement()->execute();
+        $result = $this->getStatement()->execute();
 
-        return $this->getStatement()->fetchAll();
+        return $result->fetchAllAssociative();
     }
 
     /**
