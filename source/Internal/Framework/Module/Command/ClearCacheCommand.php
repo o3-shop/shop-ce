@@ -19,14 +19,12 @@ class ClearCacheCommand extends Command
     {
         $output->writeln('Clearing cache...');
 
-        $DIR = __DIR__;
-        $tmp = $DIR . '/../../../../tmp';
-        $smarty = $DIR . '/../../../../tmp/smarty';
+        $compileDir = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar('sCompileDir');
+        $this->deleteContents($compileDir);
 
-        $this->deleteContents($tmp);
-        $this->deleteContents($smarty);
-        // Your cache-clearing logic here
         $output->writeln('Cache cleared successfully.');
+
+        return Command::SUCCESS;
     }
 
     protected function deleteContents($path)
