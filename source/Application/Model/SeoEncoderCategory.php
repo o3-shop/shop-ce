@@ -343,7 +343,7 @@ class SeoEncoderCategory extends SeoEncoder
         $result = DatabaseProvider::getDb()->select($sql, [':oxobjectid' => $category->getId()]);
 
         $urlIdents = [];
-        foreach ($result->fetchAll() as $row) {
+        foreach ($result->fetchAllAssociative() as $row) {
             $urlIdents[] = $row[0];
         }
 

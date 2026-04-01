@@ -248,7 +248,7 @@ class UtilsCount extends \OxidEsales\Eshop\Core\Base
 
         $resultSet = $database->select($query, $parameters);
 
-        $rows = $resultSet->fetchAll();
+        $rows = $resultSet->fetchAllAssociative();
 
         if (!$rows) {
             return [];

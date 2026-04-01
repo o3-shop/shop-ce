@@ -65,7 +65,7 @@ class ProductRatingDao implements ProductRatingDaoInterface
             ->where('OXID = :OXID')
             ->setParameters($this->productRatingMapper->getData($productRating));
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     /**
@@ -92,7 +92,7 @@ class ProductRatingDao implements ProductRatingDaoInterface
 
         return $this->productRatingMapper->map(
             new ProductRating(),
-            $queryBuilder->execute()->fetch()
+            $queryBuilder->executeQuery()->fetchAssociative()
         );
     }
 

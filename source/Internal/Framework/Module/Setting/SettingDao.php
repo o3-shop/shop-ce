@@ -208,7 +208,7 @@ class SettingDao implements SettingDaoInterface
                 ),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     /**
@@ -237,7 +237,7 @@ class SettingDao implements SettingDaoInterface
                 'constraints'   => implode('|', $shopModuleSetting->getConstraints()),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     /**
@@ -263,7 +263,7 @@ class SettingDao implements SettingDaoInterface
                 'name'      => $name,
             ]);
 
-        $result = $queryBuilder->execute()->fetch();
+        $result = $queryBuilder->executeQuery()->fetchAssociative();
 
         if (false === $result) {
             throw new EntryDoesNotExistDaoException(
@@ -292,7 +292,7 @@ class SettingDao implements SettingDaoInterface
                 'name'      => $name,
             ]);
 
-        $result = $queryBuilder->execute()->fetch();
+        $result = $queryBuilder->executeQuery()->fetchAssociative();
 
         return $result ?: [];
     }
@@ -316,7 +316,7 @@ class SettingDao implements SettingDaoInterface
                 'moduleId'  => $this->getPrefixedModuleId($moduleId),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     /**
@@ -335,7 +335,7 @@ class SettingDao implements SettingDaoInterface
                 'name'      => $shopModuleSetting->getName(),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     /**

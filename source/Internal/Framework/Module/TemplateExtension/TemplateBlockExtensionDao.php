@@ -83,7 +83,7 @@ class TemplateBlockExtensionDao implements TemplateBlockExtensionDaoInterface
                 'priority'      => $templateBlockExtension->getPosition(),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     public function exists(TemplateBlockExtension $templateBlockExtension)
@@ -111,7 +111,7 @@ class TemplateBlockExtensionDao implements TemplateBlockExtensionDaoInterface
                 'templatePath'  => $templateBlockExtension->getExtendedBlockTemplatePath(),
             ]);
 
-        return (bool) $queryBuilder->execute()->fetchOne();
+        return (bool) $queryBuilder->executeQuery()->fetchOne();
     }
 
     /**
@@ -133,7 +133,7 @@ class TemplateBlockExtensionDao implements TemplateBlockExtensionDaoInterface
                 'name'      => $name,
             ]);
 
-        $blocksData = $queryBuilder->execute()->fetchAll();
+        $blocksData = $queryBuilder->executeQuery()->fetchAllAssociative();
 
         return $this->mapDataToObjects($blocksData);
     }
@@ -154,7 +154,7 @@ class TemplateBlockExtensionDao implements TemplateBlockExtensionDaoInterface
                 'moduleId'  => $moduleId,
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 
     /**
