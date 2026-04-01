@@ -25,7 +25,6 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Database;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use PDO;
 
 class QueryBuilderFactory implements QueryBuilderFactoryInterface
 {
@@ -49,8 +48,6 @@ class QueryBuilderFactory implements QueryBuilderFactoryInterface
      */
     public function create(): QueryBuilder
     {
-        $this->connection->setFetchMode(PDO::FETCH_ASSOC);
-
         return $this->connection->createQueryBuilder();
     }
 }

@@ -108,7 +108,7 @@ class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterfac
                 ),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
 
         $this->eventDispatcher->dispatch(
             new ShopConfigurationChangedEvent(
@@ -139,7 +139,7 @@ class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterfac
                 'name'      => $name,
             ]);
 
-        $result = $queryBuilder->execute()->fetch();
+        $result = $queryBuilder->executeQuery()->fetchAssociative();
 
         if (false === $result) {
             throw new EntryDoesNotExistDaoException(
@@ -173,6 +173,6 @@ class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterfac
                 'name'      => $setting->getName(),
             ]);
 
-        $queryBuilder->execute();
+        $queryBuilder->executeStatement();
     }
 }
