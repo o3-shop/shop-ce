@@ -64,7 +64,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 
-COPY --from=composer:2.2 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 # Install PHP CS Fixer globally
 RUN composer global require friendsofphp/php-cs-fixer \
