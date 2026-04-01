@@ -143,11 +143,6 @@ setup_db() {
   bin/o3-setup
 }
 
-clear_cache() {
-    log "${YELLOW}Clearing cache...${NC}"
-    /var/www/html/bin/oe-console oe:cache:clear || handle_error "Failed to clear cache"
-    log "${GREEN}Cache cleared successfully${NC}"
-}
 
 
 # Main execution
@@ -161,7 +156,6 @@ main() {
     install_demodata || exit 127
     setup_db || exit 127
     install_theme || exit 127
-    clear_cache || exit 127
     start_apache || exit 127
 }
 
