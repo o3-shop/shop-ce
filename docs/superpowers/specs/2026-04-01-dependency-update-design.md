@@ -41,6 +41,7 @@
 | `phpmailer/phpmailer` | `^v6.5.0` | unchanged (`^6.5`) | n/a — 7.x needs PHP 8.0+ |
 | `incenteev/composer-parameter-handler` | `~v2.0` | `^2.3` | Low |
 | `squizlabs/php_codesniffer` | `^3.5.4` | unchanged (`^3.x`) | n/a — 4.x needs PHP 8.1 |
+| **Composer tool** | `2.2.26` | latest `2.x` | Low — update binary in container/CI |
 
 ---
 
@@ -95,6 +96,14 @@ DBAL 3 is a major rewrite. Breaking changes:
 3. Fix compilation errors (type errors, missing methods) systematically by package
 4. Run existing test suite to catch regressions
 5. Verify module extension points still function
+
+---
+
+## Composer Tool Upgrade
+
+The container currently runs Composer 2.2.26 (LTS branch). We'll bump to the latest Composer 2.x (`composer self-update --2`). This also means updating any Dockerfile or CI configuration that pins the Composer version.
+
+A `composer-runtime-api` constraint will be added to `composer.json` to formally document the minimum Composer version requirement.
 
 ---
 
