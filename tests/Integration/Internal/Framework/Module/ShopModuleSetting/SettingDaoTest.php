@@ -288,7 +288,7 @@ class SettingDaoTest extends TestCase
                 'moduleId'  => 'module:' . $moduleId,
             ]);
 
-        return $queryBuilder->execute()->rowCount();
+        return count($queryBuilder->executeQuery()->fetchAllAssociative());
     }
 
     private function getOxDisplayConfigTableRowCount(string $settingName, string $moduleId): int
@@ -304,7 +304,7 @@ class SettingDaoTest extends TestCase
                 'moduleId'  => 'module:' . $moduleId,
             ]);
 
-        return $queryBuilder->execute()->rowCount();
+        return count($queryBuilder->executeQuery()->fetchAllAssociative());
     }
 
     private function saveDataToOxConfigTable(Setting $shopModuleSetting, string $moduleId, int $shopId)

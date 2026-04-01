@@ -126,7 +126,7 @@ class ModuleMigrationsTest extends TestCase
             ->select('*')
             ->from('test_module_with_migrations');
 
-        $this->assertEquals(1, $queryBuilder->execute()->rowCount());
+        $this->assertEquals(1, count($queryBuilder->executeQuery()->fetchAllAssociative()));
     }
 
     private function getMigrations(): Migrations

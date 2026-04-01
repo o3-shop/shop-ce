@@ -218,6 +218,6 @@ class ShopConfigurationSettingDaoTest extends TestCase
                 'name'      => $settingName,
             ]);
 
-        return $queryBuilder->execute()->rowCount();
+        return count($queryBuilder->executeQuery()->fetchAllAssociative());
     }
 }
