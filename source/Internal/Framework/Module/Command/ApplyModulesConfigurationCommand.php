@@ -66,13 +66,15 @@ class ApplyModulesConfigurationCommand extends Command
         $this->setDescription('Applies configuration for installed modules.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->hasOption('shop-id') && $input->getOption('shop-id')) {
             $this->applyModulesConfigurationForOneShop($output, (int) $input->getOption('shop-id'));
         } else {
             $this->applyModulesConfigurationForAllShops($output);
         }
+
+        return self::SUCCESS;
     }
 
     private function applyModulesConfigurationForOneShop(OutputInterface $output, int $shopId): void

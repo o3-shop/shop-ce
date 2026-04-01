@@ -74,7 +74,7 @@ class UninstallModuleConfigurationCommand extends Command
      *
      * @throws \Throwable
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $moduleId = $input->getArgument('module-id');
@@ -85,5 +85,7 @@ class UninstallModuleConfigurationCommand extends Command
 
             throw $throwable;
         }
+
+        return self::SUCCESS;
     }
 }

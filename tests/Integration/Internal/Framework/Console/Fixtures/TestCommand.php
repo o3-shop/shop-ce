@@ -33,8 +33,10 @@ class TestCommand extends Command
         $this->setName('oe:tests:test-command');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Command have been executed!');
+
+        return self::SUCCESS;
     }
 }

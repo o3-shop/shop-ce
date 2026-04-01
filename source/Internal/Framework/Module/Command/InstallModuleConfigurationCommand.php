@@ -99,7 +99,7 @@ class InstallModuleConfigurationCommand extends Command
      *
      * @throws \Throwable
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $moduleSourcePath = $this->getModuleSourcePath($input);
@@ -117,6 +117,8 @@ class InstallModuleConfigurationCommand extends Command
 
             throw $throwable;
         }
+
+        return self::SUCCESS;
     }
 
     /**

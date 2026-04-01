@@ -15,7 +15,7 @@ class ClearCacheCommand extends Command
         $this->setDescription('Clears the application cache');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Clearing cache...');
 
@@ -27,6 +27,8 @@ class ClearCacheCommand extends Command
         $this->deleteContents($smarty);
         // Your cache-clearing logic here
         $output->writeln('Cache cleared successfully.');
+
+        return self::SUCCESS;
     }
 
     protected function deleteContents($path)

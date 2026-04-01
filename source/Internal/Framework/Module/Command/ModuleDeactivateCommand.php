@@ -92,7 +92,7 @@ class ModuleDeactivateCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $moduleId = $input->getArgument('module-id');
 
@@ -101,6 +101,8 @@ class ModuleDeactivateCommand extends Command
         } else {
             $output->writeLn('<error>' . sprintf(static::MESSAGE_MODULE_NOT_FOUND, $moduleId) . '</error>');
         }
+
+        return self::SUCCESS;
     }
 
     /**
