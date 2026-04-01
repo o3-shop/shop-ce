@@ -21,11 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine;
 
-use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Result;
 use OxidEsales\Eshop\Core\Database\Adapter\ResultSetInterface;
+use PDO;
 
 /**
- * The doctrine statement wrapper, to support the old adodblite interface.
+ * The doctrine result wrapper, to support the old adodblite interface.
  *
  * @package OxidEsales\EshopCommunity\Core\Database\Adapter
  *
@@ -44,24 +45,28 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
     public $EOF;
 
     /**
-     * @var Statement The doctrine adapted statement.
+     * @var array All rows buffered from the Result on construction.
      */
-    protected $statement;
+    private $bufferedRows = [];
 
     /**
-     * @var int The current cursor position.
+     * @var int Current position in the buffered rows array.
      */
     private $currentRow = 0;
 
     /**
      * DoctrineResultSet constructor.
      *
-     * @param Statement $statement The statement we want to wrap in this class.
+     * @param Result $result    The DBAL Result to wrap.
+     * @param int    $fetchMode PDO fetch mode constant (PDO::FETCH_NUM, PDO::FETCH_ASSOC, PDO::FETCH_BOTH).
+     *                         Defaults to PDO::FETCH_NUM to match the Database adapter default.
      */
-    public function __construct(Statement $statement)
+    public function __construct(Result $result, int $fetchMode = PDO::FETCH_NUM)
     {
+        $this->bufferedRows = $this->fetchAllWithMode($result, $fetchMode);
+        $result->free();
+
         $this->fields = [];
-        $this->setStatement($statement);
         $this->EOF = false;
         $this->currentRow = 0;
 
@@ -77,21 +82,24 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function close()
     {
-        $this->getStatement()->closeCursor();
+        $this->bufferedRows = [];
+        $this->currentRow = 0;
         $this->fields = [];
+        $this->EOF = true;
     }
 
     /**
-     * Fetches the next row from a result set and fills the fields array.
+     * Fetches the next row from the buffered rows and fills the fields array.
      *
-     * @return mixed The return value of this function on success depends on the fetch type.
-     *               In all cases, FALSE is returned on failure.
+     * @return mixed The next row as an array, or false if no more rows.
      */
     public function fetchRow()
     {
-        $this->fields = $this->getStatement()->fetch();
-
-        if (false === $this->fields) {
+        if ($this->currentRow < count($this->bufferedRows)) {
+            $this->fields = $this->bufferedRows[$this->currentRow];
+            $this->currentRow++;
+        } else {
+            $this->fields = false;
             $this->EOF = true;
         }
 
@@ -99,16 +107,13 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * Returns an array containing all of the result set rows
+     * Returns an array containing all of the result set rows.
      *
      * @return array
      */
     public function fetchAll()
     {
-        $this->close();
-        $result = $this->getStatement()->execute();
-
-        return $result->fetchAllAssociative();
+        return $this->bufferedRows;
     }
 
     /**
@@ -118,20 +123,17 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
      */
     public function fieldCount()
     {
-        return $this->getStatement()->columnCount();
+        return !empty($this->bufferedRows) ? count(reset($this->bufferedRows)) : 0;
     }
 
     /**
-     * Returns an external iterator.
+     * Returns an external iterator over all buffered rows.
      *
-     * @return Statement The Statment class implements Traversable
+     * @return \Traversable
      */
     public function getIterator(): \Traversable
     {
-        $this->close();
-        $this->getStatement()->execute();
-
-        return $this->getStatement();
+        return new \ArrayIterator($this->bufferedRows);
     }
 
     /**
@@ -145,42 +147,49 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
-     * Getter for the adapted statement.
-     *
-     * @return Statement The adapted statement.
-     */
-    protected function getStatement()
-    {
-        return $this->statement;
-    }
-
-    /**
-     * Setter for the adapted statement.
-     *
-     * @param Statement $statement The adapted statement.
-     */
-    protected function setStatement(Statement $statement)
-    {
-        $this->statement = $statement;
-    }
-
-    /**
      * Set the state of this wrapper to 'empty'.
      */
     protected function setToEmptyState()
     {
-        /** The following properties change the value for an  empty result set */
         $this->EOF = true;
     }
 
     /**
-     * Count elements of an object
-     * This method is executed when using the count() function on an object implementing Countable.
+     * Count elements of an object.
      *
-     *  @return int The number of rows retrieved by the current statement.
+     * @return int The number of rows in the result set.
      */
     public function count(): int
     {
-        return $this->getStatement()->rowCount();
+        return count($this->bufferedRows);
+    }
+
+    /**
+     * Buffer all rows from the Result using the requested PDO fetch mode.
+     *
+     * DBAL 3 removed the unified fetchAll()-with-mode API.  We emulate the
+     * legacy PDO fetch-mode behaviour so that callers relying on numeric or
+     * BOTH-keyed rows (the historical default) continue to work.
+     *
+     * @param Result $result
+     * @param int    $fetchMode
+     * @return array
+     */
+    private function fetchAllWithMode(Result $result, int $fetchMode): array
+    {
+        switch ($fetchMode) {
+            case PDO::FETCH_ASSOC:
+                return $result->fetchAllAssociative();
+            case PDO::FETCH_BOTH:
+                return array_map(
+                    static function (array $row): array {
+                        return array_merge(array_values($row), $row);
+                    },
+                    $result->fetchAllAssociative()
+                );
+            case PDO::FETCH_NUM:
+            default:
+                return $result->fetchAllNumeric();
+        }
     }
 }

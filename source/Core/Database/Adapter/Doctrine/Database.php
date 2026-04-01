@@ -615,7 +615,7 @@ class Database implements DatabaseInterface
                 $parameters
             );
 
-            $result = new \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\ResultSet($statement);
+            $result = new \OxidEsales\Eshop\Core\Database\Adapter\Doctrine\ResultSet($statement, $this->fetchMode);
         } catch (DBALException $exception) {
             $exception = $this->convertException($exception);
             $this->handleException($exception);
@@ -871,6 +871,34 @@ class Database implements DatabaseInterface
     }
 
     /**
+     * Fetch all rows from a DBAL Result object respecting the current fetchMode.
+     *
+     * DBAL 3 removed the unified fetchAll()-with-mode API. We emulate the legacy
+     * PDO fetch-mode behaviour here so callers that rely on numeric or BOTH-keyed
+     * rows (the historical default) continue to work without modification.
+     *
+     * @param \Doctrine\DBAL\Result $result
+     * @return array
+     */
+    private function fetchAllWithCurrentMode(\Doctrine\DBAL\Result $result): array
+    {
+        switch ($this->fetchMode) {
+            case PDO::FETCH_ASSOC:
+                return $result->fetchAllAssociative();
+            case PDO::FETCH_BOTH:
+                return array_map(
+                    static function (array $row): array {
+                        return array_merge(array_values($row), $row);
+                    },
+                    $result->fetchAllAssociative()
+                );
+            case PDO::FETCH_NUM:
+            default:
+                return $result->fetchAllNumeric();
+        }
+    }
+
+    /**
      * Return true, if the given SQL statement is a statement that may produce any output.
      *
      * There are two kinds of SQL statements.
@@ -1057,7 +1085,7 @@ class Database implements DatabaseInterface
         }
 
         if ($this->doesStatementProduceOutput($query)) {
-            $result = $statement->fetchAllAssociative();
+            $result = $this->fetchAllWithCurrentMode($statement);
         } else {
             \OxidEsales\Eshop\Core\Registry::getLogger()->warning('Given statement does not produce output and was not executed', [debug_backtrace()]);
         }

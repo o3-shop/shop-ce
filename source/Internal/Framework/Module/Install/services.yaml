@@ -9,6 +9,9 @@ services:
       $context: '@OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface'
     public: true
 
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\BootstrapModuleInstaller:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\BootstrapModuleInstaller
+
   OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstallerInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstaller
     public: true
