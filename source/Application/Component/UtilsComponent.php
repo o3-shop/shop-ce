@@ -58,43 +58,66 @@ class UtilsComponent extends BaseController
         $blOverride = false,
         $blBundle = false
     ) {
-        // only if enabled and not search engine...
-        if ($this->getViewConfig()->getShowCompareList() && !Registry::getUtils()->isSearchEngine()) {
-            // #657 special treatment if we want to put on comparelist
-            $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
-            $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
-            $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
-            if (($blAddCompare || $blRemoveCompare) && $sProductId) {
-                // toggle state in session array
-                $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
-                if ($blAddCompare && !isset($aItems[$sProductId])) {
-                    $aItems[$sProductId] = true;
-                }
+        $view = $this->getParent();
 
-                if ($blRemoveCompare) {
-                    unset($aItems[$sProductId]);
-                }
+        if ($view === null) {
+            return;
+        }
 
-                Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
-                $oParentView = $this->getParent();
+        $viewConfig = method_exists($view, 'getViewConfig') ? $view->getViewConfig() : null;
 
-                // #843C there was problem then field "blIsOnComparisonList" was not set to article object
-                if (($oProduct = $oParentView->getViewProduct())) {
-                    if (isset($aItems[$oProduct->getId()])) {
-                        $oProduct->setOnComparisonList(true);
-                    } else {
-                        $oProduct->setOnComparisonList(false);
-                    }
-                }
+        if ($viewConfig === null
+            || !method_exists($viewConfig, 'getShowCompareList')
+            || !$viewConfig->getShowCompareList()
+        ) {
+            return;
+        }
 
-                $aViewProds = $oParentView->getViewProductList();
-                if (is_array($aViewProds) && count($aViewProds)) {
-                    foreach ($aViewProds as $oProduct) {
-                        if (isset($aItems[$oProduct->getId()])) {
-                            $oProduct->setOnComparisonList(true);
-                        } else {
-                            $oProduct->setOnComparisonList(false);
-                        }
+        if (Registry::getUtils()->isSearchEngine()) {
+            return;
+        }
+
+        $config = Registry::getConfig();
+        $blAddCompare = $config->getRequestParameter('addcompare');
+        $blRemoveCompare = $config->getRequestParameter('removecompare');
+        $sProductId = $sProductId ?: $config->getRequestParameter('aid');
+
+        if ((!$blAddCompare && !$blRemoveCompare) || !$sProductId) {
+            return;
+        }
+
+        $session = Registry::getSession();
+        $aItems = $session->getVariable('aFiltcompproducts');
+
+        if (!is_array($aItems)) {
+            $aItems = [];
+        }
+
+        if ($blAddCompare && !isset($aItems[$sProductId])) {
+            $aItems[$sProductId] = true;
+        }
+
+        if ($blRemoveCompare) {
+            unset($aItems[$sProductId]);
+        }
+
+        $session->setVariable('aFiltcompproducts', $aItems);
+
+        // Update in-memory product flags so templates show the correct
+        // comparison-list state without requiring a page reload.
+        if (method_exists($view, 'getViewProduct')) {
+            $oProduct = $view->getViewProduct();
+            if ($oProduct !== null && method_exists($oProduct, 'getId')) {
+                $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+            }
+        }
+
+        if (method_exists($view, 'getViewProductList')) {
+            $aViewProds = $view->getViewProductList();
+            if (is_array($aViewProds)) {
+                foreach ($aViewProds as $oProduct) {
+                    if (method_exists($oProduct, 'getId')) {
+                        $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
                     }
                 }
             }
