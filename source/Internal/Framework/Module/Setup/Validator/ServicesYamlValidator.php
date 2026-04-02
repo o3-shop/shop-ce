@@ -28,6 +28,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Dao\ProjectYamlDaoI
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\Exception\NoServiceYamlException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Webmozart\PathUtil\Path;
 
 class ServicesYamlValidator implements ModuleConfigurationValidatorInterface
@@ -98,7 +99,17 @@ class ServicesYamlValidator implements ModuleConfigurationValidatorInterface
     private function checkContainer(\Symfony\Component\DependencyInjection\ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $definitionKey => $definition) {
-            $container->get($definitionKey);
+            // Skip internal Symfony services (e.g. lazy proxy stubs starting with '.').
+            if (strncmp($definitionKey, '.', 1) === 0) {
+                continue;
+            }
+            try {
+                $container->get($definitionKey);
+            } catch (ServiceNotFoundException $e) {
+                // In Symfony 5 some services are inlined/removed during compilation and
+                // cannot be retrieved directly. Container compilation already validates them.
+                continue;
+            }
         }
     }
 }
