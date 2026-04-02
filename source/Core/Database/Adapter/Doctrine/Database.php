@@ -25,7 +25,7 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Exception as DBALException;
-use Doctrine\DBAL\Exception as ConnectionException;
+use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\TransactionIsolationLevel;
