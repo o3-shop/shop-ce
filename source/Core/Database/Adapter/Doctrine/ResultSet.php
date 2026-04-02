@@ -147,6 +147,23 @@ class ResultSet implements \IteratorAggregate, ResultSetInterface
     }
 
     /**
+     * @deprecated since v6.5.0 (2019-09-24); No longer functional after DBAL 3 migration (rows are buffered).
+     * @return null
+     */
+    public function getStatement()
+    {
+        return null;
+    }
+
+    /**
+     * @deprecated since v6.5.0 (2019-09-24); No longer functional after DBAL 3 migration (rows are buffered).
+     * @param mixed $statement
+     */
+    public function setStatement($statement)
+    {
+    }
+
+    /**
      * Set the state of this wrapper to 'empty'.
      */
     protected function setToEmptyState()
