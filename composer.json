@@ -40,7 +40,7 @@
         "symfony/finder": "^3.4",
         "symfony/filesystem": "^4.4.17",
         "vlucas/phpdotenv": "^5.5",
-        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.2-RC3",
+        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.2",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
         "o3-shop/shop-composer-plugin": "^v1.1.0",
