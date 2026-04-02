@@ -976,13 +976,26 @@ class Database implements DatabaseInterface
                  * compatibility as it uses SQLSTATE error code (string), but the shop used to the (My)SQL errors (integer)
                  * See http://php.net/manual/de/class.pdoexception.php For details and discussion.
                  * Fortunately we can access PDOException and recover the original SQL error code and message.
+                 *
+                 * In DBAL 3 the chain is: DBALException -> Doctrine\DBAL\Driver\PDO\Exception -> PDOException.
+                 * The intermediate driver exception is NOT a \PDOException, so we must handle both depths.
                  */
-                /** @var $pdoException PDOException */
-                $pdoException = $exception->getPrevious();
+                $prevException = $exception->getPrevious();
 
-                if ($pdoException instanceof PDOException) {
-                    $code = $this->convertErrorCode($pdoException->errorInfo[1]);
-                    $message = $pdoException->errorInfo[2];
+                if ($prevException instanceof PDOException) {
+                    // DBAL 2 path: DBALException wraps PDOException directly
+                    $code = $this->convertErrorCode($prevException->errorInfo[1]);
+                    $message = $prevException->errorInfo[2];
+                } elseif ($prevException instanceof \Doctrine\DBAL\Driver\Exception) {
+                    // DBAL 3 path: DBALException wraps a driver exception which already has the integer code
+                    $code = $this->convertErrorCode($prevException->getCode());
+                    $message = $prevException->getMessage();
+                    // The driver exception may still wrap a PHP PDOException with errorInfo
+                    $pdoException = $prevException->getPrevious();
+                    if ($pdoException instanceof PDOException && isset($pdoException->errorInfo[1])) {
+                        $code = $this->convertErrorCode($pdoException->errorInfo[1]);
+                        $message = $pdoException->errorInfo[2];
+                    }
                 }
 
                 break;
