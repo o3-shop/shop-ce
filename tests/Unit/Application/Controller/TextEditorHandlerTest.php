@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
 /**
@@ -29,9 +31,11 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testRenderTextEditorNoRichTextEditor()
     {
-        $expEditorHtml = "<textarea id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
+        // Production code: "<textarea ${disabledTextEditor} id=..." — when not disabled, $disabledTextEditor is empty,
+        // resulting in a double space between 'textarea' and 'id'
+        $expEditorHtml = "<textarea  id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
 
-        $textEditorHandler = $this->getMock(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class, array('renderRichTextEditor'));
+        $textEditorHandler = $this->getMock(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class, ['renderRichTextEditor']);
         $textEditorHandler->expects($this->any())->method('renderRichTextEditor')->will($this->returnValue(''));
 
         $editorHtml = $textEditorHandler->renderTextEditor(100, 100, 'sEditObjectValue', 'sField');
@@ -43,9 +47,9 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testRenderTextEditorIfRichTextEditorIsSet()
     {
-        $expEditorHtml = "Rich Text Editor Output";
+        $expEditorHtml = 'Rich Text Editor Output';
 
-        $textEditorHandler = $this->getMock(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class, array('renderRichTextEditor'));
+        $textEditorHandler = $this->getMock(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class, ['renderRichTextEditor']);
         $textEditorHandler->expects($this->any())->method('renderRichTextEditor')->will($this->returnValue($expEditorHtml));
 
         $editorHtml = $textEditorHandler->renderTextEditor(100, 100, 'sEditObjectValue', 'sField');
@@ -75,12 +79,12 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function renderPlainTextEditorDataProvider()
     {
-        return array(
-            array(100, 100, "<textarea id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>"),
-            array('100%', '100%', "<textarea id='editor_sField' name='sField' style='width:100%; height:100%;'>sEditObjectValue</textarea>"),
-            array(100, '100%', "<textarea id='editor_sField' name='sField' style='width:100px; height:100%;'>sEditObjectValue</textarea>"),
-            array('100%', 100, "<textarea id='editor_sField' name='sField' style='width:100%; height:100px;'>sEditObjectValue</textarea>"),
-        );
+        return [
+            [100, 100, "<textarea  id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>"],
+            ['100%', '100%', "<textarea  id='editor_sField' name='sField' style='width:100%; height:100%;'>sEditObjectValue</textarea>"],
+            [100, '100%', "<textarea  id='editor_sField' name='sField' style='width:100px; height:100%;'>sEditObjectValue</textarea>"],
+            ['100%', 100, "<textarea  id='editor_sField' name='sField' style='width:100%; height:100px;'>sEditObjectValue</textarea>"],
+        ];
     }
 
     /**
@@ -88,7 +92,7 @@ class TextEditorHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
      */
     public function testSetGetStyleSheet()
     {
-        $expCssFile = "style.css";
+        $expCssFile = 'style.css';
 
         $textEditorHandler = oxNew(\OxidEsales\EshopCommunity\Application\Controller\TextEditorHandler::class);
         $textEditorHandler->setStyleSheet($expCssFile);

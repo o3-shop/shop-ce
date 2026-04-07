@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\UserBasketItem;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -181,12 +183,12 @@ class UserBasket extends BaseModel
         }
         $sSelect .= "where oxuserbasketitems.oxbasketid = :oxbasketid and $sViewName.oxid is not null ";
 
-        $sSelect .= " order by oxartnum, oxsellist, oxpersparam ";
+        $sSelect .= ' order by oxartnum, oxsellist, oxpersparam ';
 
         $oItems = oxNew(ListModel::class);
         $oItems->init('oxuserbasketitem');
         $oItems->selectstring($sSelect, [
-            ':oxbasketid' => $this->getId()
+            ':oxbasketid' => $this->getId(),
         ]);
 
         foreach ($oItems as $oItem) {
@@ -230,7 +232,6 @@ class UserBasket extends BaseModel
 
         return $oNewItem;
     }
-
 
     /**
      * Searches for item in basket items array and returns it. If not item was
@@ -356,9 +357,9 @@ class UserBasket extends BaseModel
         if ($sOXID && ($blDelete = parent::delete($sOXID))) {
             // cleaning up related data
             $oDb = DatabaseProvider::getDb();
-            $sQ = "delete from oxuserbasketitems where oxbasketid = :oxbasketid";
+            $sQ = 'delete from oxuserbasketitems where oxbasketid = :oxbasketid';
             $oDb->execute($sQ, [
-                ':oxbasketid' => $sOXID
+                ':oxbasketid' => $sOXID,
             ]);
             $this->_aBasketItems = null;
         }

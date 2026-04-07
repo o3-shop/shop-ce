@@ -1,4 +1,5 @@
 <?php
+
 /*
 /**
  * Price enter mode: netto
@@ -26,64 +27,64 @@
  * Short description:
  * Uset 7 different discount
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'                     => 10005,
             'oxprice'                  => 1001,
             'oxvat'                    => 19,
             'amount'                   => 1,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'                     => 1004,
             'oxprice'                  => 0.5,
             'oxvat'                    => 19,
             'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
 
-    'discounts' => array(
-        0 => array(
+    'discounts' => [
+        0 => [
             'oxid'         => 'shopdiscount5for10005',
             'oxaddsum'     => 5.5,
             'oxaddsumtype' => '%',
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 10005 ),
+            'oxarticles' => [ 10005 ],
             'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'         => 'shopdiscount5for1004',
             'oxaddsum'     => 5,
             'oxaddsumtype' => '%',
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 1004 ),
+            'oxarticles' => [ 1004 ],
             'oxsort' => 20,
-        ),
-        2 => array(
+        ],
+        2 => [
             'oxid'         => 'basketdiscount5for10005',
             'oxaddsum'     => 5,
             'oxaddsumtype' => 'abs',
             'oxamount' => 1,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 10005 ),
+            'oxarticles' => [ 10005 ],
             'oxsort' => 30,
-        ),
-        3 => array(
+        ],
+        3 => [
             'oxid'         => 'basketdiscount5for1004',
             'oxaddsum'     => 6,
             'oxaddsumtype' => '%',
             'oxamount' => 1,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 1004 ),
+            'oxarticles' => [ 1004 ],
             'oxsort' => 40,
-        ),
-        4 => array(
+        ],
+        4 => [
             'oxid'         => 'absolutebasketdiscount',
             'oxaddsum'     => 5,
             'oxaddsumtype' => 'abs',
@@ -91,8 +92,8 @@ $aData = array(
             'oxamountto' => 99999,
             'oxactive' => 1,
             'oxsort' => 50,
-        ),
-        5 => array(
+        ],
+        5 => [
             // -10% discount for product 10005
             'oxid'         => 'procdiscountfor10005',
             'oxaddsum'     => 5,
@@ -100,10 +101,10 @@ $aData = array(
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 10005 ),
+            'oxarticles' => [ 10005 ],
             'oxsort' => 60,
-        ),
-        6 => array(
+        ],
+        6 => [
             // 5.5% discount for product 1004
             'oxid'         => 'procdiscountfor1004',
             'oxaddsum'     => -10,
@@ -111,103 +112,102 @@ $aData = array(
             'oxamount' => 0,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array(  1004 ),
+            'oxarticles' => [  1004 ],
             'oxsort' => 70,
-        ),
-
-    ),
-    'costs' => array(
-        'wrapping' => array(
-            0 => array(
+        ],
+    ],
+    'costs' => [
+        'wrapping' => [
+            0 => [
                 'oxtype' => 'WRAP',
                 'oxname' => 'testWrap102',
                 'oxprice' => 9,
                 'oxactive' => 1,
-                'oxarticles' => array( 10005 )
-            ),
-            1 => array(
+                'oxarticles' => [ 10005 ],
+            ],
+            1 => [
                 'oxtype' => 'WRAP',
                 'oxname' => 'testWrap1002',
                 'oxprice' => 6,
                 'oxactive' => 1,
-                'oxarticles' => array( 1004 )
-            ),
-        ),
-        'delivery' => array(
-            0 => array(
+                'oxarticles' => [ 1004 ],
+            ],
+        ],
+        'delivery' => [
+            0 => [
                 'oxtitle' => '6_abs_del',
                 'oxactive' => 1,
                 'oxaddsum' => 6,
                 'oxaddsumtype' => 'abs',
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
-                'oxparamend' => 99999
-            ),
-        ),
-        'payment' => array(
-            0 => array(
+                'oxparamend' => 99999,
+            ],
+        ],
+        'payment' => [
+            0 => [
                 'oxtitle' => '1 abs payment',
                 'oxaddsum' => 1,
                 'oxaddsumtype' => 'abs',
                 'oxfromamount' => 0,
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
-            ),
-        ),
-        'voucherserie' => array(
-            0 => array(
+            ],
+        ],
+        'voucherserie' => [
+            0 => [
                 'oxdiscount' => 6.00,
                 'oxdiscounttype' => 'absolute',
                 'oxallowsameseries' => 1,
                 'oxallowotherseries' => 1,
                 'oxallowuseanother' => 1,
-                'voucher_count' => 1
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-             10005 => array( '1.115,67', '1.115,67' ),
-             1004 => array( '0,59', '0,59' ),
-        ),
-        'totals' => array(
+                'voucher_count' => 1,
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+             10005 => [ '1.115,67', '1.115,67' ],
+             1004 => [ '0,59', '0,59' ],
+        ],
+        'totals' => [
             'totalBrutto' => '1.116,26',
             'totalNetto'  => '928,79',
-            'vats' => array(
-                19 => '176,47'
-            ),
-            'discounts' => array(
+            'vats' => [
+                19 => '176,47',
+            ],
+            'discounts' => [
                 'absolutebasketdiscount' => '5,00',
-            ),
-            'wrapping' => array(
+            ],
+            'wrapping' => [
                 'brutto' => '15,00',
                 'netto' => '12,60',
                 'vat' => '2,40',
-            ),
-            'delivery' => array(
+            ],
+            'delivery' => [
                 'brutto' => '6,00',
                 'netto' => '5,04',
-                'vat' => '0,96'
-            ),
-            'payment' => array(
+                'vat' => '0,96',
+            ],
+            'payment' => [
                 'brutto' => '1,00',
                 'netto' => '0,84',
-                'vat' => '0,16'
-            ),
-            'voucher' => array(
+                'vat' => '0,16',
+            ],
+            'voucher' => [
                 'brutto' => '6,00',
-            ),
-            'grandTotal'  => '1.127,26'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+            ],
+            'grandTotal'  => '1.127,26',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => true,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => true,
                 'blShowVATForPayCharge' => true,
                 'blShowVATForDelivery' => true,
-        ),
+        ],
         'activeCurrencyRate' => 1.00,
-    ),
-);
+    ],
+];

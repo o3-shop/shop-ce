@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Domain\Review\Service;
 
-use OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\RatingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\ProductRatingDaoInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Review\Dao\RatingDaoInterface;
 
 class ProductRatingService implements ProductRatingServiceInterface
 {

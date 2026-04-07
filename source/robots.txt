@@ -37,8 +37,6 @@ Disallow: /passwort-vergessen/
 Disallow: /en/forgot-password/
 Disallow: /index.php?cl=forgotpwd
 #
-Disallow: /index.php?cl=moredetails
-#
 Disallow: /index.php?cl=review
 #
 Disallow: /index.php?cl=search
@@ -66,9 +64,6 @@ Disallow: /*&cl=register
 #
 Disallow: /*?cl=forgotpwd
 Disallow: /*&cl=forgotpwd
-#
-Disallow: /*?cl=moredetails
-Disallow: /*&cl=moredetails
 #
 Disallow: /*?cl=review
 Disallow: /*&cl=review

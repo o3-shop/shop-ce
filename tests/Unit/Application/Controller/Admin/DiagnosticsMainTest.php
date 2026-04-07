@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class DiagnosticsMainTest extends \OxidTestCase
 {
-
     /**
      * sysreq_main::Render() test case
      *

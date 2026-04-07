@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\User;
 
 use oxField;
@@ -68,12 +70,12 @@ class LoginTest extends UserTestCase
 
     public function providerNotSuccessfulLogin()
     {
-        return array(
+        return [
             // Not successful login with old password
-            array($this->_sDefaultUserName, $this->_sOldEncodedPassword, $this->_sOldSalt),
+            [$this->_sDefaultUserName, $this->_sOldEncodedPassword, $this->_sOldSalt],
             // Not successful login with new password
-            array($this->_sDefaultUserName, $this->_sNewEncodedPassword, $this->_sNewSalt),
-        );
+            [$this->_sDefaultUserName, $this->_sNewEncodedPassword, $this->_sNewSalt],
+        ];
     }
 
     /**

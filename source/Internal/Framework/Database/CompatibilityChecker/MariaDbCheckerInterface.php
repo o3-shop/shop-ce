@@ -22,4 +22,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Database\CompatibilityChecker;
 
-interface MariaDbCheckerInterface {}
+interface MariaDbCheckerInterface
+{
+}

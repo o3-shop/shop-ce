@@ -45,6 +45,6 @@ class MariaDbChecker implements MariaDbCheckerInterface, DatabaseCheckerInterfac
     {
         return
             version_compare($this->version, '10.0', '>=') &&
-            version_compare($this->version, '10.11', '<');
+            version_compare($this->version, '12.0', '<');
     }
 }

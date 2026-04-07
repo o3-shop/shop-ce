@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto
  * Price view mode: brutto
@@ -13,44 +14,44 @@
  * Gift cart: -
  * Short description: Vat and rounding issue test case: basket discount without articles ( Discount (from 1 unit to 99999) )
  */
-$aData = array(
-     'articles' => array(
-         0 => array(
+$aData = [
+     'articles' => [
+         0 => [
              'oxid'    => 'rounding_issue_test_article',
              'oxprice' => 298.55,
              'oxvat'   => 19,
              'amount'  => 200,
-         ),
-     ),
-    'discounts' => array(
-        0 => array(
+         ],
+     ],
+    'discounts' => [
+        0 => [
             'oxid'         => 'discount_2_55_forBasket',
             'oxaddsum'     => 2.55,
             'oxaddsumtype' => '%',
             'oxamount' => 1,
             'oxamountto' => 99999,
             'oxactive' => 1,
-            'oxarticles' => array( 'rounding_issue_test_article' ),
+            'oxarticles' => [ 'rounding_issue_test_article' ],
             'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-            'rounding_issue_test_article' => array( '290,94', '58.188,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+            'rounding_issue_test_article' => [ '290,94', '58.188,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '58.188,00',
             'totalNetto'  => '48.897,48',
-            'vats' => array(
-                    '19' => '9.290,52'
-            ),
-            'grandTotal'  => '58.188,00'
-        ),
-    ),
-    'options' => array(
-            'config' => array(
+            'vats' => [
+                    '19' => '9.290,52',
+            ],
+            'grandTotal'  => '58.188,00',
+        ],
+    ],
+    'options' => [
+            'config' => [
                 'blEnterNetPrice' => false,
-                'blShowNetPrice' => false
-            ),
-    )
-);
+                'blShowNetPrice' => false,
+            ],
+    ],
+];

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -21,8 +23,8 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Configuration\DataObject;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ClassExtensionsChain;
-use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
@@ -42,7 +44,7 @@ class ClassExtensionsChainTest extends TestCase
                 new ClassExtension(
                     'anotherExtendedClass',
                     'someExtension'
-                )
+                ),
             ]
         );
 
@@ -80,7 +82,7 @@ class ClassExtensionsChainTest extends TestCase
                 new ClassExtension(
                     'extendedClass',
                     'firstExtension'
-                )
+                ),
             ]
         );
 
@@ -99,7 +101,7 @@ class ClassExtensionsChainTest extends TestCase
                 ],
                 'anotherExtendedClass' => [
                     'someExtension',
-                ]
+                ],
             ],
             $chain->getChain()
         );
@@ -118,8 +120,8 @@ class ClassExtensionsChainTest extends TestCase
                     'extension3',
                 ],
                 'extendedClass3' => [
-                    'extension4'
-                ]
+                    'extension4',
+                ],
             ]
         );
         $chain->removeExtension(
@@ -141,8 +143,8 @@ class ClassExtensionsChainTest extends TestCase
                     'extension2',
                 ],
                 'extendedClass3' => [
-                    'extension4'
-                ]
+                    'extension4',
+                ],
             ],
             $chain->getChain()
         );
@@ -162,7 +164,7 @@ class ClassExtensionsChainTest extends TestCase
                 'extendedClass1' => [
                     'extension1',
                     'extension2',
-                ]
+                ],
             ]
         );
         $this->expectException(
@@ -178,13 +180,13 @@ class ClassExtensionsChainTest extends TestCase
                 new ClassExtension(
                     'notExistingExtended',
                     'notExistingExtension'
-                )
+                ),
             ],
             [
                 new ClassExtension(
                     'extendedClass1',
                     'notExistingExtension'
-                )
+                ),
             ],
         ];
     }

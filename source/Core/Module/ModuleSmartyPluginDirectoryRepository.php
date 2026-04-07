@@ -22,9 +22,9 @@
 namespace OxidEsales\EshopCommunity\Core\Module;
 
 use OxidEsales\Eshop\Core\Config;
-use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectories  as EshopModuleSmartyPluginDirectories;
-use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator         as EshopModuleVariablesLocator;
-use OxidEsales\Eshop\Core\Module\Module                         as EshopModule;
+use OxidEsales\Eshop\Core\Module\Module as EshopModule;
+use OxidEsales\Eshop\Core\Module\ModuleSmartyPluginDirectories as EshopModuleSmartyPluginDirectories;
+use OxidEsales\Eshop\Core\Module\ModuleVariablesLocator as EshopModuleVariablesLocator;
 
 /**
  * Class ModuleSmartyPluginDirectoryRepository
@@ -39,7 +39,7 @@ class ModuleSmartyPluginDirectoryRepository
     /**
      * @var string The key under which the value will be stored.
      */
-    const STORAGE_KEY = 'moduleSmartyPluginDirectories';
+    public const STORAGE_KEY = 'moduleSmartyPluginDirectories';
 
     /** @var Config  */
     private $config;

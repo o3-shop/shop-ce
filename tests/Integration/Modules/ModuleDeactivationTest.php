@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao\ProjectConfigurationDaoInterface;
@@ -29,7 +31,7 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     public function providerModuleDeactivation()
     {
-        return array(
+        return [
             $this->caseSevenModulesPreparedDeactivatedWithEverything(),
             $this->caseTwoModulesPreparedDeactivatedWithEverything(),
             $this->caseFourModulesPreparedDeactivatedWithExtendedClasses(),
@@ -37,7 +39,7 @@ class ModuleDeactivationTest extends BaseModuleTestCase
             $this->caseTwoModulesPreparedDeactivatedWithFiles(),
             $this->caseTwoModulesPreparedDeactivatedWithTemplates(),
             $this->caseTwoModulesPreparedDeactivatedWithSettings(),
-        );
+        ];
     }
 
     /**
@@ -73,7 +75,7 @@ class ModuleDeactivationTest extends BaseModuleTestCase
     public function testModuleDeactivationInSubShop($aInstallModules, $sModuleId, $aResultToAssert)
     {
         if ($this->getTestConfig()->getShopEdition() != 'EE') {
-            $this->markTestSkipped("This test case is only actual when SubShops are available.");
+            $this->markTestSkipped('This test case is only actual when SubShops are available.');
         }
 
         $this->prepareProjectConfigurationWitSubshops();
@@ -102,59 +104,58 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseSevenModulesPreparedDeactivatedWithEverything()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
+            [
                 'extending_1_class', 'with_2_templates', 'with_2_files', 'with_2_settings',
-                'extending_3_blocks', 'with_everything', 'with_events'
-            ),
+                'extending_3_blocks', 'with_everything', 'with_events',
+            ],
 
             // module that will be deactivated
             'with_everything',
 
             // environment asserts
-            array(
-                'blocks'          => array(
-                    array('template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_top', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'),
-                    array('template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_bottom', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'),
-                    array('template' => 'page/checkout/payment.tpl', 'block' => 'select_payment', 'file' => '/views/blocks/page/checkout/mypaymentselector.tpl'),
-                ),
-                'extend'          => array(
+            [
+                'blocks'          => [
+                    ['template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_top', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'],
+                    ['template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_bottom', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'],
+                    ['template' => 'page/checkout/payment.tpl', 'block' => 'select_payment', 'file' => '/views/blocks/page/checkout/mypaymentselector.tpl'],
+                ],
+                'extend'          => [
                     \OxidEsales\Eshop\Application\Model\Order::class   => 'oeTest/extending_1_class/myorder',
-                ),
-                'files'           => array(
-                    'with_2_files' => array(
+                ],
+                'files'           => [
+                    'with_2_files' => [
                         'myexception'  => 'with_2_files/core/exception/myexception.php',
                         'myconnection' => 'with_2_files/core/exception/myconnection.php',
-                    ),
-                    'with_events'  => array(
+                    ],
+                    'with_events'  => [
                         'myevents' => 'with_events/files/myevents.php',
-                    ),
-                ),
-                'settings'        => array(
-                    array('group' => 'my_checkconfirm', 'name' => 'blCheckConfirm', 'type' => 'bool', 'value' => 'true'),
-                    array('group' => 'my_displayname', 'name' => 'sDisplayName', 'type' => 'str', 'value' => 'Some name'),
-                ),
-                'disabledModules' => array(
-                    'with_everything'
-                ),
-                'templates'       => array(
-                    'with_2_templates' => array(
+                    ],
+                ],
+                'settings'        => [
+                    ['group' => 'my_checkconfirm', 'name' => 'blCheckConfirm', 'type' => 'bool', 'value' => 'true'],
+                    ['group' => 'my_displayname', 'name' => 'sDisplayName', 'type' => 'str', 'value' => 'Some name'],
+                ],
+                'disabledModules' => [
+                    'with_everything',
+                ],
+                'templates'       => [
+                    'with_2_templates' => [
                         'order_special.tpl'    => 'with_2_templates/views/admin/tpl/order_special.tpl',
                         'user_connections.tpl' => 'with_2_templates/views/tpl/user_connections.tpl',
-                    ),
-                ),
-                'versions'        => array(
+                    ],
+                ],
+                'versions'        => [
                     'extending_1_class'  => '1.0',
                     'with_2_templates'   => '1.0',
                     'with_2_settings'    => '1.0',
                     'with_2_files'       => '1.0',
                     'extending_3_blocks' => '1.0',
                     'with_events'        => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -164,31 +165,30 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseTwoModulesPreparedDeactivatedWithEverything()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
-                'with_everything', 'no_extending'
-            ),
+            [
+                'with_everything', 'no_extending',
+            ],
 
             // module that will be deactivated
             'with_everything',
 
             // environment asserts
-            array(
-                'blocks'          => array(),
-                'extend'          => array(),
-                'files'           => array(),
-                'settings'        => array(),
-                'disabledModules' => array(
-                    'with_everything'
-                ),
-                'templates'       => array(),
-                'versions'        => array(
+            [
+                'blocks'          => [],
+                'extend'          => [],
+                'files'           => [],
+                'settings'        => [],
+                'disabledModules' => [
+                    'with_everything',
+                ],
+                'templates'       => [],
+                'versions'        => [
                     'no_extending' => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -198,40 +198,39 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseFourModulesPreparedDeactivatedWithExtendedClasses()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
+            [
                 'extending_1_class_3_extensions', 'extending_1_class',
-                'extending_3_classes_with_1_extension', 'extending_3_classes'
-            ),
+                'extending_3_classes_with_1_extension', 'extending_3_classes',
+            ],
 
             // module that will be deactivated
             'extending_1_class_3_extensions',
 
             // environment asserts
-            array(
-                'blocks'          => array(),
-                'extend'          => array(
+            [
+                'blocks'          => [],
+                'extend'          => [
                     \OxidEsales\Eshop\Application\Model\Order::class =>
                                    'oeTest/extending_1_class/myorder&' .
                                    'extending_3_classes_with_1_extension/mybaseclass&extending_3_classes/myorder',
                     \OxidEsales\Eshop\Application\Model\Article::class => 'extending_3_classes_with_1_extension/mybaseclass&extending_3_classes/myarticle',
                     \OxidEsales\Eshop\Application\Model\User::class    => 'extending_3_classes_with_1_extension/mybaseclass&extending_3_classes/myuser',
-                ),
-                'files'           => array(),
-                'settings'        => array(),
-                'disabledModules' => array(
-                    'extending_1_class_3_extensions'
-                ),
-                'templates'       => array(),
-                'versions'        => array(
+                ],
+                'files'           => [],
+                'settings'        => [],
+                'disabledModules' => [
+                    'extending_1_class_3_extensions',
+                ],
+                'templates'       => [],
+                'versions'        => [
                     'extending_3_classes_with_1_extension' => '1.0',
                     'extending_1_class'                    => '1.0',
                     'extending_3_classes'                  => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -241,64 +240,63 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseEightModulesPreparedDeactivatedWithoutExtending()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
+            [
                 'extending_1_class', 'with_2_templates', 'with_2_files', 'with_2_settings',
-                'extending_3_blocks', 'with_everything', 'with_events', 'no_extending'
-            ),
+                'extending_3_blocks', 'with_everything', 'with_events', 'no_extending',
+            ],
 
             // module that will be deactivated
             'no_extending',
 
             // environment asserts
-            array(
-                'blocks'          => array(
-                    array('template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_top', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'),
-                    array('template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_bottom', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'),
-                    array('template' => 'page/checkout/payment.tpl', 'block' => 'select_payment', 'file' => '/views/blocks/page/checkout/mypaymentselector.tpl'),
-                    array('template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_top', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'),
-                    array('template' => 'page/checkout/payment.tpl', 'block' => 'select_payment', 'file' => '/views/blocks/page/checkout/mypaymentselector.tpl'),
-                ),
-                'extend'          => array(
+            [
+                'blocks'          => [
+                    ['template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_top', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'],
+                    ['template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_bottom', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'],
+                    ['template' => 'page/checkout/payment.tpl', 'block' => 'select_payment', 'file' => '/views/blocks/page/checkout/mypaymentselector.tpl'],
+                    ['template' => 'page/checkout/basket.tpl', 'block' => 'basket_btn_next_top', 'file' => '/views/blocks/page/checkout/myexpresscheckout.tpl'],
+                    ['template' => 'page/checkout/payment.tpl', 'block' => 'select_payment', 'file' => '/views/blocks/page/checkout/mypaymentselector.tpl'],
+                ],
+                'extend'          => [
                     \OxidEsales\Eshop\Application\Model\Order::class   => 'oeTest/extending_1_class/myorder&with_everything/myorder1',
                     \OxidEsales\Eshop\Application\Model\Article::class => 'with_everything/myarticle',
                     \OxidEsales\Eshop\Application\Model\User::class    => 'with_everything/myuser',
-                ),
-                'files'           => array(
-                    'with_2_files'    => array(
+                ],
+                'files'           => [
+                    'with_2_files'    => [
                         'myexception'  => 'with_2_files/core/exception/myexception.php',
                         'myconnection' => 'with_2_files/core/exception/myconnection.php',
-                    ),
-                    'with_everything' => array(
+                    ],
+                    'with_everything' => [
                         'myexception'  => 'with_everything/core/exception/myexception.php',
                         'myconnection' => 'with_everything/core/exception/myconnection.php',
-                    ),
-                    'with_events'     => array(
+                    ],
+                    'with_events'     => [
                         'myevents' => 'with_events/files/myevents.php',
-                    ),
-                ),
-                'settings'        => array(
-                    array('group' => 'my_checkconfirm', 'name' => 'blCheckConfirm', 'type' => 'bool', 'value' => 'true'),
-                    array('group' => 'my_displayname', 'name' => 'sDisplayName', 'type' => 'str', 'value' => 'Some name'),
-                    array('group' => 'my_checkconfirm', 'name' => 'blCheckConfirm', 'type' => 'bool', 'value' => 'true'),
-                    array('group' => 'my_displayname', 'name' => 'sDisplayName', 'type' => 'str', 'value' => 'Some name'),
-                ),
-                'disabledModules' => array(
-                    'no_extending'
-                ),
-                'templates'       => array(
-                    'with_2_templates' => array(
+                    ],
+                ],
+                'settings'        => [
+                    ['group' => 'my_checkconfirm', 'name' => 'blCheckConfirm', 'type' => 'bool', 'value' => 'true'],
+                    ['group' => 'my_displayname', 'name' => 'sDisplayName', 'type' => 'str', 'value' => 'Some name'],
+                    ['group' => 'my_checkconfirm', 'name' => 'blCheckConfirm', 'type' => 'bool', 'value' => 'true'],
+                    ['group' => 'my_displayname', 'name' => 'sDisplayName', 'type' => 'str', 'value' => 'Some name'],
+                ],
+                'disabledModules' => [
+                    'no_extending',
+                ],
+                'templates'       => [
+                    'with_2_templates' => [
                         'order_special.tpl'    => 'with_2_templates/views/admin/tpl/order_special.tpl',
                         'user_connections.tpl' => 'with_2_templates/views/tpl/user_connections.tpl',
-                    ),
-                    'with_everything'  => array(
+                    ],
+                    'with_everything'  => [
                         'order_special.tpl'    => 'with_everything/views/admin/tpl/order_special.tpl',
                         'user_connections.tpl' => 'with_everything/views/tpl/user_connections.tpl',
-                    ),
-                ),
-                'versions'        => array(
+                    ],
+                ],
+                'versions'        => [
                     'extending_1_class'  => '1.0',
                     'with_2_templates'   => '1.0',
                     'with_2_settings'    => '1.0',
@@ -306,9 +304,9 @@ class ModuleDeactivationTest extends BaseModuleTestCase
                     'extending_3_blocks' => '1.0',
                     'with_events'        => '1.0',
                     'with_everything'    => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -318,31 +316,30 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseTwoModulesPreparedDeactivatedWithFiles()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
-                'with_2_files', 'no_extending'
-            ),
+            [
+                'with_2_files', 'no_extending',
+            ],
 
             // module that will be deactivated
             'with_2_files',
 
             // environment asserts
-            array(
-                'blocks'          => array(),
-                'extend'          => array(),
-                'files'           => array(),
-                'settings'        => array(),
-                'disabledModules' => array(
-                    'with_2_files'
-                ),
-                'templates'       => array(),
-                'versions'        => array(
+            [
+                'blocks'          => [],
+                'extend'          => [],
+                'files'           => [],
+                'settings'        => [],
+                'disabledModules' => [
+                    'with_2_files',
+                ],
+                'templates'       => [],
+                'versions'        => [
                     'no_extending' => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -352,31 +349,30 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseTwoModulesPreparedDeactivatedWithTemplates()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
-                'with_2_templates', 'no_extending'
-            ),
+            [
+                'with_2_templates', 'no_extending',
+            ],
 
             // module that will be deactivated
             'with_2_templates',
 
             // environment asserts
-            array(
-                'blocks'          => array(),
-                'extend'          => array(),
-                'files'           => array(),
-                'settings'        => array(),
-                'disabledModules' => array(
-                    'with_2_templates'
-                ),
-                'templates'       => array(),
-                'versions'        => array(
+            [
+                'blocks'          => [],
+                'extend'          => [],
+                'files'           => [],
+                'settings'        => [],
+                'disabledModules' => [
+                    'with_2_templates',
+                ],
+                'templates'       => [],
+                'versions'        => [
                     'no_extending' => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -386,31 +382,30 @@ class ModuleDeactivationTest extends BaseModuleTestCase
      */
     private function caseTwoModulesPreparedDeactivatedWithSettings()
     {
-        return array(
-
+        return [
             // modules to be activated during test preparation
-            array(
-                'with_2_settings', 'no_extending'
-            ),
+            [
+                'with_2_settings', 'no_extending',
+            ],
 
             // module that will be deactivated
             'with_2_settings',
 
             // environment asserts
-            array(
-                'blocks'          => array(),
-                'extend'          => array(),
-                'files'           => array(),
-                'settings'        => array(),
-                'disabledModules' => array(
-                    'with_2_settings'
-                ),
-                'templates'       => array(),
-                'versions'        => array(
+            [
+                'blocks'          => [],
+                'extend'          => [],
+                'files'           => [],
+                'settings'        => [],
+                'disabledModules' => [
+                    'with_2_settings',
+                ],
+                'templates'       => [],
+                'versions'        => [
                     'no_extending' => '1.0',
-                ),
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     private function prepareProjectConfigurationWitSubshops()
@@ -419,7 +414,6 @@ class ModuleDeactivationTest extends BaseModuleTestCase
         $projectConfiguration = $projectConfigurationDao->getConfiguration();
 
         $projectConfiguration->addShopConfiguration(2, new ShopConfiguration());
-
 
         $projectConfigurationDao->save($projectConfiguration);
     }

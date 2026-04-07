@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Smarty\Extension;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Smarty\Extension;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Extension\CacheResourcePlugin;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyContextInterface;
@@ -82,7 +84,7 @@ class CacheResourcePluginTest extends \PHPUnit\Framework\TestCase
     {
         $smarty = $this->getMockBuilder(\Smarty::class)->getMock();
         $resource = $this->getSmartyExtensionObject();
-        $this->assertTrue($resource::getSecure("templateName", $smarty));
+        $this->assertTrue($resource::getSecure('templateName', $smarty));
     }
 
     public function testGetTrusted()

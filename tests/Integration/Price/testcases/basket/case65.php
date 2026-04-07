@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  brutto
@@ -18,17 +19,17 @@
  *
  * Case: cheking if corectrly currency rate applyed to discount
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 111,
                 'oxprice'                  => 100.00,
                 'oxvat'                    => 19,
                 'amount'                   => 1,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'abs_discount_for_111',
                 'oxaddsum'     => 15.00,
                 'oxaddsumtype' => 'abs',
@@ -37,28 +38,28 @@ $aData = array(
                 'oxprice' => 85,
                 'oxpriceto' => 110,
                 'oxactive' => 1,
-                'oxarticles' => array( 111 ),
+                'oxarticles' => [ 111 ],
                 'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 111 => array( '68,00', '68,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 111 => [ '68,00', '68,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '68,00',
                 'totalNetto'  => '57,14',
-                'vats' => array(
+                'vats' => [
                     19 => '10,86',
-                ),
-                'grandTotal'  => '68,00'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '68,00',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 0.8,
-    ),
-);
+    ],
+];

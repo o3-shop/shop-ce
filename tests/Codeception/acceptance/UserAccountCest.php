@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
 use Codeception\Util\Fixtures;
-use OxidEsales\Codeception\Step\Start;
 use OxidEsales\Codeception\Module\Translation\Translator;
+use OxidEsales\Codeception\Step\Start;
 
 final class UserAccountCest
 {
@@ -277,7 +277,7 @@ final class UserAccountCest
         $I->wantToTest('modify user shipping address in my account');
 
         $I->retry(2, 3000);
-        
+
         $userData = $this->getExistingUserData();
 
         $userAddressPage = $start->loginOnStartPage($userData['userLoginName'], $userData['userPassword'])
@@ -315,7 +315,7 @@ final class UserAccountCest
         $I->wantToTest('user shipping address create and delete');
 
         $I->retry(3, 2000);
-        
+
         $userData = $this->getExistingUserData();
 
         $userAddressPage = $start->loginOnStartPage($userData['userLoginName'], $userData['userPassword'])
@@ -339,7 +339,6 @@ final class UserAccountCest
             ->deleteShippingAddress(1)
             ->seeNumberOfShippingAddresses(0);
     }
-
 
     private function getExistingUserData()
     {

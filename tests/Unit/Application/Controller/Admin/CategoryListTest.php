@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\CategoryList;
-use \oxTestModules;
 
 /**
  * Tests for Category_List class
  */
 class CategoryListTest extends \OxidTestCase
 {
-
     /**
      * Category_List::Init() test case
      *
@@ -35,19 +35,11 @@ class CategoryListTest extends \OxidTestCase
      */
     public function testInit()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-
-        oxTestModules::addFunction("oxUtilsServer", "getOxCookie", "{return array(1);}");
-        oxTestModules::addFunction("oxUtils", "checkAccessRights", "{return true;}");
-
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
-        $oSess->expects($this->any())->method('checkSessionChallenge')->will($this->returnValue(true));
-
-        $oView = $this->getMock($this->getProxyClassName('Category_List'), array('getSession'));
-        $oView->expects($this->any())->method('getSession')->will($this->returnValue($oSess));
+        $oView = $this->getMock($this->getProxyClassName('Category_List'), ['authorize']);
+        $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
 
         $oView->init();
-        $this->assertEquals(array("oxcategories" => array("oxrootid" => "desc", "oxleft" => "asc")), $oView->getListSorting());
+        $this->assertEquals(['oxcategories' => ['oxrootid' => 'desc', 'oxleft' => 'asc']], $oView->getListSorting());
     }
 
     /**
@@ -63,7 +55,7 @@ class CategoryListTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["cattree"] instanceof CategoryList);
+        $this->assertTrue($aViewData['cattree'] instanceof CategoryList);
 
         $this->assertEquals('category_list.tpl', $sTplName);
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +22,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Templating\Resolver;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\Resolver\TemplateNameResolver;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Resolver\LegacyTemplateNameResolver;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Resolver\TemplateNameResolver;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateEngineInterface;
 
 class LegacyTemplateNameResolverTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,24 +47,24 @@ class LegacyTemplateNameResolverTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'template.tpl',
-                'template.tpl'
+                'template.tpl',
             ],
             [
                 'some/path/template.tpl',
-                'some/path/template.tpl'
+                'some/path/template.tpl',
             ],
             [
                 'some/path/template_name.tpl',
-                'some/path/template_name.tpl'
+                'some/path/template_name.tpl',
             ],
             [
                 'some/path/template.name.tpl',
-                'some/path/template.name.tpl'
+                'some/path/template.name.tpl',
             ],
             [
                 '',
-                ''
-            ]
+                '',
+            ],
         ];
     }
 
@@ -85,20 +87,20 @@ class LegacyTemplateNameResolverTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'template.html.twig',
-                'template.tpl'
+                'template.tpl',
             ],
             [
                 'some/path/template_name.html.twig',
-                'some/path/template_name.tpl'
+                'some/path/template_name.tpl',
             ],
             [
                 'some/path/template.name.html.twig',
-                'some/path/template.name.tpl'
+                'some/path/template.name.tpl',
             ],
             [
                 '',
-                ''
-            ]
+                '',
+            ],
         ];
     }
 

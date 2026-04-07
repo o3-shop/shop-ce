@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 use oxDb;
@@ -47,49 +49,49 @@ class ModuleTemplateBlocksTest extends UnitTestCase
     {
         $blocksForDefaultTheme = [
             'blockname1' => [
-                'block template content'
+                'block template content',
             ],
             'blockname2' => [
-                'block template content 2'
+                'block template content 2',
             ],
             'blockname3' => [
-                'block template content 3'
+                'block template content 3',
             ],
         ];
 
         $blocksForTheme_1 = [
             'blockname1' => [
-                'block template content 1 theme 1'
+                'block template content 1 theme 1',
             ],
             'blockname2' => [
-                'block template content 2 theme 1'
+                'block template content 2 theme 1',
             ],
             'blockname3' => [
-                'block template content 3'
+                'block template content 3',
             ],
         ];
 
         $blocksForTheme_2 = [
             'blockname1' => [
-                'block template content 1 theme 2'
+                'block template content 1 theme 2',
             ],
             'blockname2' => [
-                'block template content 2'
+                'block template content 2',
             ],
             'blockname3' => [
-                'block template content 3'
+                'block template content 3',
             ],
         ];
 
         $blocksForTheme_1_2 = [
             'blockname1' => [
-                'block template content 1 theme 2'
+                'block template content 1 theme 2',
             ],
             'blockname2' => [
-                'block template content 2 theme 1'
+                'block template content 2 theme 1',
             ],
             'blockname3' => [
-                'block template content 3'
+                'block template content 3',
             ],
         ];
 
@@ -169,40 +171,40 @@ class ModuleTemplateBlocksTest extends UnitTestCase
      */
     private function insertTemplateBlocks()
     {
-        $oxid = "__test_1";
-        $themeId = "";
-        $blockName = "blockname1";
-        $moduleBlockFileName = "blocks/blocktemplate.tpl";
+        $oxid = '__test_1';
+        $themeId = '';
+        $blockName = 'blockname1';
+        $moduleBlockFileName = 'blocks/blocktemplate.tpl';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_2";
-        $themeId = "";
-        $blockName = "blockname2";
-        $moduleBlockFileName = "blocks/blocktemplate2.tpl";
+        $oxid = '__test_2';
+        $themeId = '';
+        $blockName = 'blockname2';
+        $moduleBlockFileName = 'blocks/blocktemplate2.tpl';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_3";
-        $themeId = "";
-        $blockName = "blockname3";
-        $moduleBlockFileName = "blocks/blocktemplate3.tpl";
+        $oxid = '__test_3';
+        $themeId = '';
+        $blockName = 'blockname3';
+        $moduleBlockFileName = 'blocks/blocktemplate3.tpl';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_1_theme_1";
-        $themeId = "theme_1";
-        $blockName = "blockname1";
-        $moduleBlockFileName = "blocks/blocktemplate1_theme1.tpl";
+        $oxid = '__test_1_theme_1';
+        $themeId = 'theme_1';
+        $blockName = 'blockname1';
+        $moduleBlockFileName = 'blocks/blocktemplate1_theme1.tpl';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_2_theme_1";
-        $themeId = "theme_1";
-        $blockName = "blockname2";
-        $moduleBlockFileName = "blocks/blocktemplate2_theme1.tpl";
+        $oxid = '__test_2_theme_1';
+        $themeId = 'theme_1';
+        $blockName = 'blockname2';
+        $moduleBlockFileName = 'blocks/blocktemplate2_theme1.tpl';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
 
-        $oxid = "__test_1_theme_2";
-        $themeId = "theme_2";
-        $blockName = "blockname1";
-        $moduleBlockFileName = "blocks/blocktemplate1_theme2.tpl";
+        $oxid = '__test_1_theme_2';
+        $themeId = 'theme_2';
+        $blockName = 'blockname1';
+        $moduleBlockFileName = 'blocks/blocktemplate1_theme2.tpl';
         $this->insertBlock($oxid, $themeId, $blockName, $moduleBlockFileName);
     }
 

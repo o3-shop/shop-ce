@@ -21,11 +21,12 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Payment;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseException;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 
 /**
  * User payment manager.
@@ -138,7 +139,6 @@ class UserPayment extends BaseModel
         return $this->assignRecord($sSelect);
     }
 
-
     /**
      * Inserts payment information to DB. Returns insert status.
      *
@@ -154,7 +154,7 @@ class UserPayment extends BaseModel
             // Function is called from inside a transaction in Category::save (see ESDEV-3804 and ESDEV-3822).
             // No need to explicitly force master here.
             $database = DatabaseProvider::getDb();
-            $sEncodedValue = $database->getOne("select " . $database->quote($sValue));
+            $sEncodedValue = $database->getOne('select ' . $database->quote($sValue));
             $this->oxuserpayments__oxvalue->setValue($sEncodedValue);
         }
 
@@ -178,14 +178,13 @@ class UserPayment extends BaseModel
      */
     protected function _update() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-
         //encode sensitive data
         if ($sValue = $this->oxuserpayments__oxvalue->value) {
             // Function is called from inside a transaction in Category::save (see ESDEV-3804 and ESDEV-3822).
             // No need to explicitly force master here.
             $database = DatabaseProvider::getDb();
 
-            $sEncodedValue = $database->getOne("select " . $database->quote($sValue));
+            $sEncodedValue = $database->getOne('select ' . $database->quote($sValue));
             $this->oxuserpayments__oxvalue->setValue($sEncodedValue);
         }
 
@@ -217,7 +216,7 @@ class UserPayment extends BaseModel
                     oxuserid = :oxuserid order by oxorderdate desc';
             $params = [
                 ':oxpaymenttype' => $sPaymentType,
-                ':oxuserid' => $oUser->getId()
+                ':oxuserid' => $oUser->getId(),
             ];
 
             if (($sOxId = $oDb->getOne($sQ, $params))) {

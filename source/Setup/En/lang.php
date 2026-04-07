@@ -20,11 +20,10 @@
  */
 
 $aLang = [
-
 'charset'                                       => 'UTF-8',
 'HEADER_META_MAIN_TITLE'                        => 'O3-Shop installation wizard',
 'HEADER_TEXT_SETUP_NOT_RUNS_AUTOMATICLY'        => 'If setup does not continue in a few seconds, please click ',
-'FOOTER_OXID_ESALES'                            => '&copy; O3-Shop 2022 - '.@date("Y").', &copy; OXID eSales AG 2003 - 2022',
+'FOOTER_OXID_ESALES'                            => '&copy; O3-Shop 2022 - ' . @date('Y') . ', &copy; OXID eSales AG 2003 - 2022',
 
 'TAB_0_TITLE'                                   => 'System Requirements',
 'TAB_1_TITLE'                                   => 'Welcome',

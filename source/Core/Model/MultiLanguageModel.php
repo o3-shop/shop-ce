@@ -59,7 +59,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
         //lets try to differentiate cache keys for oxI18n and oxBase
         //in order not to load cached structure for the instances of oxbase classe called on same table
         if ($this->_sCacheKey) {
-            $this->_sCacheKey .= "_i18n";
+            $this->_sCacheKey .= '_i18n';
         }
     }
 
@@ -101,7 +101,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
             $this->_blEmployMultilanguage = $employMultilanguage;
             if (!$employMultilanguage) {
                 //#63T
-                $this->modifyCacheKey("_nonml");
+                $this->modifyCacheKey('_nonml');
             }
             // reset
             $this->_sViewTable = false;
@@ -173,7 +173,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     public function modifyCacheKey($cacheKey, $override = false)
     {
         if ($override) {
-            $this->_sCacheKey = $cacheKey . "|i18n";
+            $this->_sCacheKey = $cacheKey . '|i18n';
         } else {
             $this->_sCacheKey .= $cacheKey;
         }
@@ -222,9 +222,9 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
 
         // select from non-multilanguage core view (all ml tables joined to one)
         $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb(\OxidEsales\Eshop\Core\DatabaseProvider::FETCH_MODE_ASSOC);
-        $query = "select * from " . getViewName($this->_sCoreTable, -1, -1) . " where oxid = :oxid";
+        $query = 'select * from ' . getViewName($this->_sCoreTable, -1, -1) . ' where oxid = :oxid';
         $rs = $db->getAll($query, [
-            ':oxid' => $this->getId()
+            ':oxid' => $this->getId(),
         ]);
 
         $notInLang = $languages;
@@ -258,7 +258,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     protected function _getFieldStatus($fieldName) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $allField = $this->_getAllFields(true);
-        if (isset($allField[strtolower($fieldName) . "_1"])) {
+        if (isset($allField[strtolower($fieldName) . '_1'])) {
             return 1;
         }
 
@@ -339,7 +339,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         $lang = $this->getLanguage();
         if ($lang && $this->_blEmployMultilanguage && $this->isMultilingualField($field)) {
-            $field .= "_" . $lang;
+            $field .= '_' . $lang;
         }
 
         return $field;
@@ -358,7 +358,6 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
     {
         parent::_setUpdateSeoOnFieldChange($this->getUpdateSqlFieldName($field));
     }
-
 
     /**
      * return update fields SQL part
@@ -419,7 +418,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
 
             if (!$useSkipSaveFields || ($useSkipSaveFields && !in_array($keyLowercase, $this->_aSkipSaveFields))) {
                 $key = $this->getUpdateSqlFieldName($key);
-                $sql .= (($sep) ? ',' : '') . $key . " = " . $this->_getUpdateFieldValue($key, $field);
+                $sql .= (($sep) ? ',' : '') . $key . ' = ' . $this->_getUpdateFieldValue($key, $field);
                 $sep = true;
             }
         }
@@ -481,7 +480,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
             }
             foreach ($updateTables as $langTable) {
                 $insertSql = "insert into $langTable set " . $this->_getUpdateFieldsForTable($langTable, $this->getUseSkipSaveFields()) .
-                             " on duplicate key update " . $this->_getUpdateFieldsForTable($langTable);
+                             ' on duplicate key update ' . $this->_getUpdateFieldsForTable($langTable);
 
                 $this->executeDatabaseQuery($insertSql);
             }
@@ -635,7 +634,7 @@ class MultiLanguageModel extends \OxidEsales\Eshop\Core\Model\BaseModel
             //delete the record
             foreach ($this->_getLanguageSetTables() as $setTbl) {
                 $db->execute("delete from {$setTbl} where oxid = :oxid", [
-                    ':oxid' => $oxid
+                    ':oxid' => $oxid,
                 ]);
             }
         }

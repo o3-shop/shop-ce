@@ -29,13 +29,13 @@ use OxidEsales\Eshop\Core\Registry;
 use stdClass;
 
 if (!defined('ERR_SUCCESS')) {
-    DEFINE("ERR_SUCCESS", 1);
+    DEFINE('ERR_SUCCESS', 1);
 }
 if (!defined('ERR_REQUIREDMISSING')) {
-    DEFINE("ERR_REQUIREDMISSING", -1);
+    DEFINE('ERR_REQUIREDMISSING', -1);
 }
 if (!defined('ERR_POSOUTOFBOUNDS')) {
-    DEFINE("ERR_POSOUTOFBOUNDS", -2);
+    DEFINE('ERR_POSOUTOFBOUNDS', -2);
 }
 
 /**
@@ -60,16 +60,16 @@ class SelectListMain extends AdminDetailsController
     {
         parent::render();
 
-        $sOxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $sOxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         //create empty edit object
-        $this->_aViewData["edit"] = oxNew(SelectList::class);
+        $this->_aViewData['edit'] = oxNew(SelectList::class);
 
-        if (isset($sOxId) && $sOxId != "-1") {
+        if (isset($sOxId) && $sOxId != '-1') {
             // generating category tree for select list
             // A. hack - passing language by post as lists uses only language passed by POST/GET/SESSION
-            $_POST["language"] = $this->_iEditLang;
-            $this->_createCategoryTree("artcattree", $sOxId);
+            $_POST['language'] = $this->_iEditLang;
+            $this->_createCategoryTree('artcattree', $sOxId);
 
             // load object
             $oAttr = oxNew(SelectList::class);
@@ -89,7 +89,7 @@ class SelectListMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oAttr->loadInLang(key($oOtherLang), $sOxId);
             }
-            $this->_aViewData["edit"] = $oAttr;
+            $this->_aViewData['edit'] = $oAttr;
 
             // Disable editing for derived items.
             if ($oAttr->isDerived()) {
@@ -99,33 +99,33 @@ class SelectListMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
-            $iErr = Registry::getSession()->getVariable("iErrorCode");
+            $iErr = Registry::getSession()->getVariable('iErrorCode');
 
             if (!$iErr) {
                 $iErr = ERR_SUCCESS;
             }
 
-            $this->_aViewData["iErrorCode"] = $iErr;
-            Registry::getSession()->setVariable("iErrorCode", ERR_SUCCESS);
+            $this->_aViewData['iErrorCode'] = $iErr;
+            Registry::getSession()->setVariable('iErrorCode', ERR_SUCCESS);
         }
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oSelectlistMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\SelectListMainAjax::class);
             $this->_aViewData['oxajax'] = $oSelectlistMainAjax->getColumns();
 
-            return "popups/selectlist_main.tpl";
+            return 'popups/selectlist_main.tpl';
         }
 
-        return "selectlist_main.tpl";
+        return 'selectlist_main.tpl';
     }
 
     /**
@@ -143,7 +143,7 @@ class SelectListMain extends AdminDetailsController
 
         $oAttr = oxNew(SelectList::class);
 
-        if ($sOxId != "-1") {
+        if ($sOxId != '-1') {
             $oAttr->loadInLang($this->_iEditLang, $sOxId);
         } else {
             $aParams['oxselectlist__oxid'] = null;
@@ -163,16 +163,16 @@ class SelectListMain extends AdminDetailsController
             $this->aFieldArray = Registry::getUtils()->assignValuesFromText($oAttr->oxselectlist__oxvaldesc->getRawValue());
         }
         // build value
-        $oAttr->oxselectlist__oxvaldesc = new Field("", Field::T_RAW);
+        $oAttr->oxselectlist__oxvaldesc = new Field('', Field::T_RAW);
         foreach ($this->aFieldArray as $oField) {
             $oAttr->oxselectlist__oxvaldesc->setValue($oAttr->oxselectlist__oxvaldesc->getRawValue() . $oField->name, Field::T_RAW);
             if (isset($oField->price) && $oField->price) {
-                $oAttr->oxselectlist__oxvaldesc->setValue($oAttr->oxselectlist__oxvaldesc->getRawValue() . "!P!" . trim(str_replace(",", ".", $oField->price)), Field::T_RAW);
+                $oAttr->oxselectlist__oxvaldesc->setValue($oAttr->oxselectlist__oxvaldesc->getRawValue() . '!P!' . trim(str_replace(',', '.', $oField->price)), Field::T_RAW);
                 if ($oField->priceUnit == '%') {
                     $oAttr->oxselectlist__oxvaldesc->setValue($oAttr->oxselectlist__oxvaldesc->getRawValue() . '%', Field::T_RAW);
                 }
             }
-            $oAttr->oxselectlist__oxvaldesc->setValue($oAttr->oxselectlist__oxvaldesc->getRawValue() . "__@@", Field::T_RAW);
+            $oAttr->oxselectlist__oxvaldesc->setValue($oAttr->oxselectlist__oxvaldesc->getRawValue() . '__@@', Field::T_RAW);
         }
 
         $oAttr->setLanguage($this->_iEditLang);
@@ -195,7 +195,7 @@ class SelectListMain extends AdminDetailsController
 
         $oObj = oxNew(SelectList::class);
 
-        if ($sOxId != "-1") {
+        if ($sOxId != '-1') {
             $oObj->loadInLang($this->_iEditLang, $sOxId);
         } else {
             $aParams['oxselectlist__oxid'] = null;
@@ -270,7 +270,7 @@ class SelectListMain extends AdminDetailsController
 
             $sAddField = Registry::getRequest()->getRequestEscapedParameter('sAddField');
             if (empty($sAddField)) {
-                Registry::getSession()->setVariable("iErrorCode", ERR_REQUIREDMISSING);
+                Registry::getSession()->setVariable('iErrorCode', ERR_REQUIREDMISSING);
 
                 return;
             }
@@ -303,7 +303,7 @@ class SelectListMain extends AdminDetailsController
     {
         $sAddField = Registry::getRequest()->getRequestEscapedParameter('sAddField');
         if (empty($sAddField)) {
-            Registry::getSession()->setVariable("iErrorCode", ERR_REQUIREDMISSING);
+            Registry::getSession()->setVariable('iErrorCode', ERR_REQUIREDMISSING);
 
             return;
         }
@@ -351,7 +351,7 @@ class SelectListMain extends AdminDetailsController
 
         $iFieldCount = count($this->aFieldArray);
         if ($iPos < 0 || $iPos >= $iFieldCount) {
-            Registry::getSession()->setVariable("iErrorCode", ERR_POSOUTOFBOUNDS);
+            Registry::getSession()->setVariable('iErrorCode', ERR_POSOUTOFBOUNDS);
 
             return true;
         }

@@ -64,7 +64,7 @@ class ShopConfigurationClassesWithoutNamespaceHandler implements ModuleConfigura
             $shopSettingValue = array_merge(
                 $shopConfigurationSetting->getValue(),
                 [
-                    $configuration->getId() => $classes
+                    $configuration->getId() => $classes,
                 ]
             );
 

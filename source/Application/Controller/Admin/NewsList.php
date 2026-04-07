@@ -58,7 +58,7 @@ class NewsList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxdate";
+    protected $_sDefSortField = 'oxdate';
 
     /**
      * Returns sorting fields array
@@ -69,7 +69,7 @@ class NewsList extends AdminListController
     public function getListSorting()
     {
         $aSorting = parent::getListSorting();
-        if (isset($aSorting["oxnews"][$this->_sDefSortField])) {
+        if (isset($aSorting['oxnews'][$this->_sDefSortField])) {
             $this->_blDesc = true;
         }
 

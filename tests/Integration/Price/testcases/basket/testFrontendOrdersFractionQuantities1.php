@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -21,11 +22,9 @@
  * Test checking when active fraction quantity ('blAllowUnevenAmounts' => true,),
  * Test is moved from selenium test "testFrontendOrdersFractionQuantities"
  */
-$aData = array(
-
-    'articles' => array(
-
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 1000,
                 'oxprice'                  => 50,
                 'oxvat'                    => 5,
@@ -33,12 +32,11 @@ $aData = array(
                 'oxunitquantity'           => 10,
                 'oxweight'                 => 10,
                 'amount'                   => 3.4,
-
-        ),
-    ),
+        ],
+    ],
         // Discounts
-    'discounts' => array(
-        0 => array(
+    'discounts' => [
+        0 => [
             // Discount 10%
             'oxid'         => 'test',
             'oxshopid' => 1,
@@ -50,26 +48,26 @@ $aData = array(
             'oxpriceto'=> 999999,
             'oxactive' => 1,
             'oxsort' => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 1000 => array( '45,00', '153,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 1000 => [ '45,00', '153,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '153,00',
                 'totalNetto'  => '145,71',
-                'vats' => array(
+                'vats' => [
                         5 => '7,29',
-                ),
-                'grandTotal'  => '153,00'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '153,00',
+        ],
+    ],
+    'options' => [
+        'config' => [
             'blAllowUnevenAmounts' => true,
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
-         ),
-    ),
-);
+         ],
+    ],
+];

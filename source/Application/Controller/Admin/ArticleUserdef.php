@@ -42,10 +42,10 @@ class ArticleUserdef extends AdminDetailsController
         parent::render();
 
         $oArticle = oxNew(Article::class);
-        $this->_aViewData["edit"] = $oArticle;
+        $this->_aViewData['edit'] = $oArticle;
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             if ($oArticle->isDerived()) {
                 $this->_aViewData['readonly'] = true;
             }
@@ -54,6 +54,6 @@ class ArticleUserdef extends AdminDetailsController
             $oArticle->load($soxId);
         }
 
-        return "article_userdef.tpl";
+        return 'article_userdef.tpl';
     }
 }

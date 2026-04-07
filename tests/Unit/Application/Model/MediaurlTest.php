@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
+use oxDb;
+use oxField;
 
 class MediaurlTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -67,19 +68,19 @@ class MediaurlTest extends \OxidTestCase
 
     public function testGetHtml()
     {
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopUrl', 'getSslShopUrl']);
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(0));
         $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://localhost:8090/'));
-        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://locahost:8090/'));
+        $oCfg->expects($this->any())->method('getSslShopUrl')->will($this->returnValue('https://locahost:8090/'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oCfg);
 
-        $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
-        $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
+        $oMediaUrl = oxNew(\OxidEsales\Eshop\Application\Model\MediaUrl::class);
 
         // uploaded file
         $oMediaUrl->oxmediaurls__oxurl = new oxField('test.jpg', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxdesc = new oxField('test1', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxisuploaded = new oxField(1, oxField::T_RAW);
-        $sExpt = '<a href="http://shop/out/media/test.jpg" target="_blank">test1</a>';
+        $sExpt = '<a href="http://localhost:8090/out/media/test.jpg" target="_blank">test1</a>';
         $this->assertEquals($sExpt, $oMediaUrl->getHtml());
 
         // youtube link
@@ -93,18 +94,18 @@ class MediaurlTest extends \OxidTestCase
         $oMediaUrl->oxmediaurls__oxurl = new oxField('http://www.site.com/watch?v=ZN239G6aJZo', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxdesc = new oxField('test4', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxisuploaded = new oxField(0, oxField::T_RAW);
-        $sExpt = "<a href=\"http://www.site.com/watch?v=ZN239G6aJZo\" target=\"_blank\">test4</a>";
+        $sExpt = '<a href="http://www.site.com/watch?v=ZN239G6aJZo" target="_blank">test4</a>';
         $this->assertEquals($sExpt, $oMediaUrl->getHtml());
 
         // -- SSL ----------
 
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopUrl', 'getSslShopUrl']);
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(1));
-        $oCfg->expects($this->never())->method('getShopUrl')->will($this->returnValue('http://shop/'));
+        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://shop/'));
         $oCfg->expects($this->any())->method('getSslShopUrl')->will($this->returnValue('https://shop/'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oCfg);
 
-        $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
-        $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
+        $oMediaUrl = oxNew(\OxidEsales\Eshop\Application\Model\MediaUrl::class);
 
         // uploaded file
         $oMediaUrl->oxmediaurls__oxurl = new oxField('test.jpg', oxField::T_RAW);
@@ -124,25 +125,25 @@ class MediaurlTest extends \OxidTestCase
         $oMediaUrl->oxmediaurls__oxurl = new oxField('http://www.site.com/watch?v=ZN239G6aJZo', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxdesc = new oxField('test4', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxisuploaded = new oxField(0, oxField::T_RAW);
-        $sExpt = "<a href=\"http://www.site.com/watch?v=ZN239G6aJZo\" target=\"_blank\">test4</a>";
+        $sExpt = '<a href="http://www.site.com/watch?v=ZN239G6aJZo" target="_blank">test4</a>';
         $this->assertEquals($sExpt, $oMediaUrl->getHtml());
     }
 
     public function testGetHtmlLink($blNewPage = false)
     {
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopUrl', 'getSslShopUrl']);
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(0));
         $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://localhost:8090/'));
-        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://localhost:8090/'));
+        $oCfg->expects($this->any())->method('getSslShopUrl')->will($this->returnValue('https://localhost:8090/'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oCfg);
 
-        $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
-        $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
+        $oMediaUrl = oxNew(\OxidEsales\Eshop\Application\Model\MediaUrl::class);
 
         // uploaded file
         $oMediaUrl->oxmediaurls__oxurl = new oxField('test.jpg', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxdesc = new oxField('test1', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxisuploaded = new oxField(1, oxField::T_RAW);
-        $sExpt = '<a href="http://shop/out/media/test.jpg" target="_blank">test1</a>';
+        $sExpt = '<a href="http://localhost:8090/out/media/test.jpg" target="_blank">test1</a>';
         $this->assertEquals($sExpt, $oMediaUrl->getHtmlLink());
 
         // youtube link
@@ -156,18 +157,18 @@ class MediaurlTest extends \OxidTestCase
         $oMediaUrl->oxmediaurls__oxurl = new oxField('http://www.site.com/watch?v=ZN239G6aJZo', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxdesc = new oxField('test4', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxisuploaded = new oxField(0, oxField::T_RAW);
-        $sExpt = "<a href=\"http://www.site.com/watch?v=ZN239G6aJZo\" target=\"_blank\">test4</a>";
+        $sExpt = '<a href="http://www.site.com/watch?v=ZN239G6aJZo" target="_blank">test4</a>';
         $this->assertEquals($sExpt, $oMediaUrl->getHtmlLink());
 
         // -- SSL -------------------
 
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopUrl', 'getSslShopUrl']);
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(1));
-        $oCfg->expects($this->never())->method('getShopUrl')->will($this->returnValue('http://shop/'));
+        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://shop/'));
         $oCfg->expects($this->any())->method('getSslShopUrl')->will($this->returnValue('https://shop/'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oCfg);
 
-        $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
-        $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
+        $oMediaUrl = oxNew(\OxidEsales\Eshop\Application\Model\MediaUrl::class);
 
         // uploaded file
         $oMediaUrl->oxmediaurls__oxurl = new oxField('test.jpg', oxField::T_RAW);
@@ -187,7 +188,7 @@ class MediaurlTest extends \OxidTestCase
         $oMediaUrl->oxmediaurls__oxurl = new oxField('http://www.site.com/watch?v=ZN239G6aJZo', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxdesc = new oxField('test4', oxField::T_RAW);
         $oMediaUrl->oxmediaurls__oxisuploaded = new oxField(0, oxField::T_RAW);
-        $sExpt = "<a href=\"http://www.site.com/watch?v=ZN239G6aJZo\" target=\"_blank\">test4</a>";
+        $sExpt = '<a href="http://www.site.com/watch?v=ZN239G6aJZo" target="_blank">test4</a>';
         $this->assertEquals($sExpt, $oMediaUrl->getHtmlLink());
     }
 
@@ -195,13 +196,13 @@ class MediaurlTest extends \OxidTestCase
     {
         $sFilePath = $this->getConfig()->getConfigParam('sShopDir') . '/out/media/test.jpg';
         file_put_contents($sFilePath, 'test jpg file');
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopUrl', 'getSslShopUrl']);
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(0));
         $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://localhost:8090/'));
-        $oCfg->expects($this->never())->method('getSslShopUrl')->will($this->returnValue('https://localhost:8090/'));
+        $oCfg->expects($this->any())->method('getSslShopUrl')->will($this->returnValue('https://localhost:8090/'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oCfg);
 
-        $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
-        $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
+        $oMediaUrl = oxNew(\OxidEsales\Eshop\Application\Model\MediaUrl::class);
 
         // uploaded file
         $oMediaUrl->oxmediaurls__oxurl = new oxField('test.jpg', oxField::T_RAW);
@@ -226,13 +227,13 @@ class MediaurlTest extends \OxidTestCase
 
         // -- SSL -------------------
 
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('isSsl', 'getShopUrl', 'getSslShopUrl'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl', 'getShopUrl', 'getSslShopUrl']);
         $oCfg->expects($this->any())->method('isSsl')->will($this->returnValue(1));
-        $oCfg->expects($this->never())->method('getShopUrl')->will($this->returnValue('http://shop/'));
+        $oCfg->expects($this->any())->method('getShopUrl')->will($this->returnValue('http://shop/'));
         $oCfg->expects($this->any())->method('getSslShopUrl')->will($this->returnValue('https://shop/'));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oCfg);
 
-        $oMediaUrl = $this->getMock(\OxidEsales\Eshop\Application\Model\MediaUrl::class, array('getConfig'), array(), '', false);
-        $oMediaUrl->expects($this->any())->method('getConfig')->will($this->returnValue($oCfg));
+        $oMediaUrl = oxNew(\OxidEsales\Eshop\Application\Model\MediaUrl::class);
 
         // uploaded file
         $oMediaUrl->oxmediaurls__oxurl = new oxField('test.jpg', oxField::T_RAW);

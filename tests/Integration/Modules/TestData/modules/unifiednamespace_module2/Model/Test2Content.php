@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -30,6 +31,6 @@ class Test2Content
      */
     public function getTitle()
     {
-        return " Module2";
+        return ' Module2';
     }
 }

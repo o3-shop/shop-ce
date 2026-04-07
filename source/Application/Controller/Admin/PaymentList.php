@@ -49,5 +49,5 @@ class PaymentList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxdesc";
+    protected $_sDefSortField = 'oxdesc';
 }

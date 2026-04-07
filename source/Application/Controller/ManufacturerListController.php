@@ -417,7 +417,7 @@ class ManufacturerListController extends ArticleListController
         $sAddParams = parent::getAddUrlParams();
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
         if ($oManufacturer = $this->getActManufacturer()) {
-            $sAddParams .= "&amp;mnid=" . $oManufacturer->getId();
+            $sAddParams .= '&amp;mnid=' . $oManufacturer->getId();
         }
 
         return $sAddParams;

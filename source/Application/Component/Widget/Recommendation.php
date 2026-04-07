@@ -57,7 +57,7 @@ class Recommendation extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      */
     public function getSimilarRecommLists()
     {
-        $aArticleIds = $this->getViewParameter("aArticleIds");
+        $aArticleIds = $this->getViewParameter('aArticleIds');
 
         $oRecommList = oxNew(RecommendationList::class);
 

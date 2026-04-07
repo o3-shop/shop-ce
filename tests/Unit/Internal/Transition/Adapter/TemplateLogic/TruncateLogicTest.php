@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +29,6 @@ use PHPUnit\Framework\TestCase;
  */
 class TruncateLogicTest extends TestCase
 {
-
     /** @var TruncateLogic */
     private $truncateLogic;
 
@@ -60,16 +60,16 @@ class TruncateLogicTest extends TestCase
     {
         return [
             [
-                "Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.",
-                "Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse..."
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse...',
             ],
             [
-                "Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse dapibus pulvinar sem vitae.",
-                "Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse..."
+                'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
+                'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse...',
             ],
             [
-                "&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse dapibus pulvinar sem vitae.",
-                "&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at...."
+                '&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
+                '&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit lacinia at....',
             ],
         ];
     }
@@ -97,19 +97,19 @@ class TruncateLogicTest extends TestCase
     {
         return [
             [
-                "Duis iaculis pellentesque felis, et pulvinar elit.",
-                "Duis iaculis...",
-                ['length' => 20]
+                'Duis iaculis pellentesque felis, et pulvinar elit.',
+                'Duis iaculis...',
+                ['length' => 20],
             ],
             [
-                "Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit.",
-                "Duis iaculis...",
-                ['length' => 20]
+                'Duis iaculis &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit.',
+                'Duis iaculis...',
+                ['length' => 20],
             ],
             [
-                "&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit.",
-                "&#039;Duis&#039; &#039;iaculis&#039;...",
-                ['length' => 20]
+                '&#039;Duis&#039; &#039;iaculis&#039; &#039;pellentesque&#039; felis, et &quot;pulvinar&quot; elit.',
+                '&#039;Duis&#039; &#039;iaculis&#039;...',
+                ['length' => 20],
             ],
         ];
     }
@@ -137,9 +137,9 @@ class TruncateLogicTest extends TestCase
     {
         return [
             [
-                "Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.",
-                "Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse (...)",
-                ['suffix' => ' (...)']
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse (...)',
+                ['suffix' => ' (...)'],
             ],
         ];
     }
@@ -167,9 +167,9 @@ class TruncateLogicTest extends TestCase
     {
         return [
             [
-                "Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.",
-                "Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dap...",
-                ['breakWords' => true]
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dapibus pulvinar sem vitae.',
+                'Duis iaculis pellentesque felis, et pulvinar elit lacinia at. Suspendisse dap...',
+                ['breakWords' => true],
             ],
         ];
     }

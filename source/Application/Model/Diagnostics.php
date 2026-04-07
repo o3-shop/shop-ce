@@ -38,14 +38,14 @@ class Diagnostics
      *
      * @var string
      */
-    protected $_sEdition = "";
+    protected $_sEdition = '';
 
     /**
      * Version of THIS O3-Shop
      *
      * @var string
      */
-    protected $_sVersion = "";
+    protected $_sVersion = '';
 
     /**
      * Revision of THIS O3-Shop
@@ -54,14 +54,14 @@ class Diagnostics
      *
      * @var string
      */
-    protected $_sRevision = "";
+    protected $_sRevision = '';
 
     /**
      * Revision of THIS O3-Shop
      *
      * @var string
      */
-    protected $_sShopLink = "";
+    protected $_sShopLink = '';
 
     /**
      * Array of all files and folders in shop root folder which are to be checked
@@ -142,7 +142,6 @@ class Diagnostics
         return $this->_aFileCheckerExtensionList;
     }
 
-
     /**
      * Version setter
      *
@@ -212,7 +211,6 @@ class Diagnostics
     {
         return $this->_sRevision;
     }
-
 
     /**
      * ShopLink setter
@@ -288,7 +286,6 @@ class Diagnostics
         return $aRes;
     }
 
-
     /**
      * Picks some pre-selected PHP configuration settings and returns them.
      *
@@ -317,7 +314,6 @@ class Diagnostics
         return $aPhpIniConf;
     }
 
-
     /**
      * Returns the installed PHP decoder (like Zend Optimizer, Guard Loader)
      *
@@ -337,7 +333,6 @@ class Diagnostics
 
         return $sReturn;
     }
-
 
     /**
      * General server information

@@ -64,7 +64,7 @@ final class ControllersModuleSettingHandlerTest extends TestCase
                 'newmodule' => [
                     'firstcontrollernewmodule'  => '\NewModule\FirstClass',
                     'secondcontrollernewmodule' => '\NewModule\SecondClass',
-                ]
+                ],
             ],
             $shopConfigurationSettingDaoMock->get(ShopConfigurationSetting::MODULE_CONTROLLERS, 1)->getValue()
         );
@@ -169,7 +169,7 @@ final class ControllersModuleSettingHandlerTest extends TestCase
             ->setShopId(1)
             ->setType(ShopSettingType::ARRAY)
             ->setValue([
-                'existingmodule' => ['firstcontrollerexistingmodule' => '\OldModule\FirstControllerClass']
+                'existingmodule' => ['firstcontrollerexistingmodule' => '\OldModule\FirstControllerClass'],
             ]);
 
         $shopConfigurationSettingDaoMock->method('get')->willReturn($moduleControllers);

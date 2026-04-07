@@ -63,7 +63,7 @@ final class ClassExtensionsModuleSettingHandlerTest extends TestCase
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->setId('newModuleId');
 
-        $classExtensions =      [
+        $classExtensions = [
             'originalClass'         => 'moduleExtensionClass',
             'anotherOriginalClass'  => 'anotherModuleExtensionClass',
         ];

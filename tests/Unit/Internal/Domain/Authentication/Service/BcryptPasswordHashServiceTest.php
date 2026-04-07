@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -21,11 +23,9 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Authentication\Service;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\PasswordHashException;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicy;
+use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\BcryptPasswordHashService;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Service\PasswordHashServiceInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\OptionsProvider\BcryptPasswordHashOptionsProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -124,7 +124,7 @@ class BcryptPasswordHashServiceTest extends TestCase
             [-5],
             [0],
             [3], // Cost must not be smaller than 4
-            [32] // Cost must not be bigger than 31
+            [32], // Cost must not be bigger than 31
         ];
     }
 
@@ -148,7 +148,7 @@ class BcryptPasswordHashServiceTest extends TestCase
     /**
      * @return PasswordPolicyInterface
      */
-    private function getPasswordPolicyMock() : PasswordPolicyInterface
+    private function getPasswordPolicyMock(): PasswordPolicyInterface
     {
         return $this
             ->getMockBuilder(PasswordPolicyInterface::class)

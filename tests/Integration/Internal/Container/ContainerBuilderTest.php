@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -45,8 +47,10 @@ class ContainerBuilderTest extends TestCase
         $context->setGeneratedServicesFilePath(__DIR__ . '/Fixtures/Project/generated_services.yaml');
         $container = $this->makeContainer($context);
 
-        $this->assertSame('Service overwriting for Project!',
-            $container->get('oxid_esales.tests.internal.dummy_executor')->execute());
+        $this->assertSame(
+            'Service overwriting for Project!',
+            $container->get('oxid_esales.tests.internal.dummy_executor')->execute()
+        );
     }
 
     /**
@@ -68,7 +72,7 @@ class ContainerBuilderTest extends TestCase
     {
         $context = new ContextStub();
         $context->setCommunityEditionSourcePath(__DIR__ . '/Fixtures/CE');
-        $context->setGeneratedServicesFilePath("nonexiting.yaml");
+        $context->setGeneratedServicesFilePath('nonexiting.yaml');
         $context->setConfigurableServicesFilePath('nonexisting.yaml');
         return $context;
     }

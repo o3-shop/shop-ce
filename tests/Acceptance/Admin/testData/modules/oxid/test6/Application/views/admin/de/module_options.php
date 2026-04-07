@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -18,13 +19,12 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$sLangName  = "Deutsch";
-$iLangNr    = 0;
+$sLangName = 'Deutsch';
+$iLangNr = 0;
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
 // -------------------------------
-$aLang = array(
-
+$aLang = [
 'charset'                                         => 'UTF-8',
 'tbclmodule_testtab'                               => 'Test tab DE',
-);
+];

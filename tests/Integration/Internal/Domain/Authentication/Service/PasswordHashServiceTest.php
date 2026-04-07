@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Password\Service;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Domain\Authentication\Service;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Exception\PasswordPolicyException;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface;
@@ -99,7 +101,6 @@ class PasswordHashServiceTest extends TestCase
 
         return $passwordHashService;
     }
-
 
     /**
      * @return PasswordPolicyInterface|\PHPUnit\Framework\MockObject\MockObject

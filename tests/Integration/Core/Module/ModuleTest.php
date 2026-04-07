@@ -140,7 +140,7 @@ class ModuleTest extends TestCase
 
     public function testModuleGetTemplates()
     {
-        $moduleId = "with_extending_blocks";
+        $moduleId = 'with_extending_blocks';
 
         $this->installModule($moduleId);
         $this->activateModule($moduleId);
@@ -151,7 +151,7 @@ class ModuleTest extends TestCase
         $expected = [
             'page/checkout/basket.tpl',
             'page/checkout/payment.tpl',
-            'page/checkout/basket.tpl'
+            'page/checkout/basket.tpl',
         ];
 
         $actual = $module->getTemplates();
@@ -161,7 +161,7 @@ class ModuleTest extends TestCase
 
     public function testGetModuleDataWillReturnMetadataArray(): void
     {
-        $moduleId = "with_everything";
+        $moduleId = 'with_everything';
 
         $this->installModule($moduleId);
         $this->activateModule($moduleId);
@@ -192,7 +192,6 @@ class ModuleTest extends TestCase
 
         $module = oxNew(Module::class);
 
-
         $this->assertSame(
             [
                 'with_class_extensions' => $this->getModuleConfiguration('with_class_extensions')->getPath(),
@@ -222,7 +221,7 @@ class ModuleTest extends TestCase
 
         $this->assertEquals(
             'with_class_extensions',
-            oxNew(Module::class)->getModuleIdByClassName("with_class_extensions/ModuleArticle")
+            oxNew(Module::class)->getModuleIdByClassName('with_class_extensions/ModuleArticle')
         );
     }
 

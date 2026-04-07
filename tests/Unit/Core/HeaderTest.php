@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class HeaderTest extends \OxidTestCase
 {
-
     /**
      * oxHeader::getHeader() test case.
      * test if default value is empty
@@ -34,7 +35,7 @@ class HeaderTest extends \OxidTestCase
     public function testGetHeader_default()
     {
         $oHeader = oxNew('oxHeader');
-        $this->assertEquals(array(), $oHeader->getHeader(), 'Default header should be empty as nothing is set.');
+        $this->assertEquals([], $oHeader->getHeader(), 'Default header should be empty as nothing is set.');
     }
 
     /**
@@ -46,8 +47,8 @@ class HeaderTest extends \OxidTestCase
     public function testSetGetHeader()
     {
         $oHeader = oxNew('oxHeader');
-        $oHeader->setHeader("Some header");
-        $this->assertEquals(array("Some header" . "\r\n"), $oHeader->getHeader(), 'Set header check.');
+        $oHeader->setHeader('Some header');
+        $this->assertEquals(['Some header' . "\r\n"], $oHeader->getHeader(), 'Set header check.');
     }
 
     /**
@@ -60,7 +61,7 @@ class HeaderTest extends \OxidTestCase
     {
         $oHeader = oxNew('oxHeader');
         $oHeader->setNonCacheable();
-        $this->assertEquals(array("Cache-Control: no-cache;" . "\r\n"), $oHeader->getHeader(), 'Cache header was NOT formated correctly.');
+        $this->assertEquals(['Cache-Control: no-cache;' . "\r\n"], $oHeader->getHeader(), 'Cache header was NOT formated correctly.');
     }
 
     /**
@@ -68,12 +69,12 @@ class HeaderTest extends \OxidTestCase
      */
     public function providerSetGetHeader_withNewLine_newLineRemoved()
     {
-        return array(
-            array("\r"),
-            array("\n"),
-            array("\r\n"),
-            array("\n\r"),
-        );
+        return [
+            ["\r"],
+            ["\n"],
+            ["\r\n"],
+            ["\n\r"],
+        ];
     }
 
     /**
@@ -89,7 +90,7 @@ class HeaderTest extends \OxidTestCase
     public function testSetGetHeader_withNewLine_newLineRemoved($sNewLine)
     {
         $oHeader = oxNew('oxHeader');
-        $oHeader->setHeader("Some header" . $sNewLine . "2");
-        $this->assertEquals(array("Some header2" . "\r\n"), $oHeader->getHeader(), 'Set header check.');
+        $oHeader->setHeader('Some header' . $sNewLine . '2');
+        $this->assertEquals(['Some header2' . "\r\n"], $oHeader->getHeader(), 'Set header check.');
     }
 }

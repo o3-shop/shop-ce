@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,17 +18,17 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxDb;
 use OxidEsales\EshopCommunity\Application\Model\SeoEncoderContent;
-use \oxDb;
 
 /**
  * Tests for Content_Seo class
  */
 class ContentSeoTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -72,16 +73,16 @@ class ContentSeoTest extends \OxidTestCase
     public function testGetEntryUri()
     {
         $oContent = oxNew('oxContent');
-        $oContent->setId("_test1");
+        $oContent->setId('_test1');
         $oContent->save();
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class, array("getContentUri"));
-        $oEncoder->expects($this->once())->method('getContentUri')->will($this->returnValue("ContentUri"));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderContent::class, ['getContentUri']);
+        $oEncoder->expects($this->once())->method('getContentUri')->will($this->returnValue('ContentUri'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentSeo::class, array("getEditObjectId", "_getEncoder"));
-        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue("_test1"));
-        $oView->expects($this->once())->method('_getEncoder')->will($this->returnValue($oEncoder));
-        $this->assertEquals("ContentUri", $oView->getEntryUri());
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentSeo::class, ['getEditObjectId', 'getEncoder']);
+        $oView->expects($this->once())->method('getEditObjectId')->will($this->returnValue('_test1'));
+        $oView->expects($this->once())->method('getEncoder')->will($this->returnValue($oEncoder));
+        $this->assertEquals('ContentUri', $oView->getEntryUri());
     }
 
     /**
@@ -92,13 +93,13 @@ class ContentSeoTest extends \OxidTestCase
     public function testGetStdUrl()
     {
         $oContent = oxNew('oxContent');
-        $oContent->setId("_test1");
+        $oContent->setId('_test1');
         $oContent->save();
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentSeo::class, array("getEditLang"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ContentSeo::class, ['getEditLang']);
         $oView->expects($this->once())->method('getEditLang')->will($this->returnValue(0));
 
-        $this->assertEquals($oContent->getBaseStdLink(0, true, false), $oView->UNITgetStdUrl("_test1"));
+        $this->assertEquals($oContent->getBaseStdLink(0, true, false), $oView->UNITgetStdUrl('_test1'));
     }
 
     /**

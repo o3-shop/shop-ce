@@ -68,10 +68,10 @@ class ListReview extends ArticleList
     {
         AdminListController::render();
 
-        $this->_aViewData["menustructure"] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
-        $this->_aViewData["articleListTable"] = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
+        $this->_aViewData['menustructure'] = $this->getNavigation()->getDomXml()->documentElement->childNodes;
+        $this->_aViewData['articleListTable'] = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
 
-        return "list_review.tpl";
+        return 'list_review.tpl';
     }
 
     /**
@@ -105,10 +105,9 @@ class ListReview extends ArticleList
         $sQ .= "left join $sArtTable as oxparentarticles on oxparentarticles.oxid = {$sArtTable}.oxparentid ";
         $sQ .= "where 1 and oxreviews.oxlang = '{$this->_iEditLang}' ";
 
-
         //removing parent id checking from sql
         $sStr = "/\s+and\s+" . $sArtTable . "\.oxparentid\s*=\s*''/";
-        $sQ = Str::getStr()->preg_replace($sStr, " ", $sQ);
+        $sQ = Str::getStr()->preg_replace($sStr, ' ', $sQ);
 
         return " $sQ and {$sArtTable}.oxid is not null ";
     }

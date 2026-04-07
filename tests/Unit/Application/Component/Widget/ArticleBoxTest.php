@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,27 +18,31 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
+use OxidEsales\Eshop\Application\Component\Widget\ArticleBox;
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Category;
+use OxidTestCase;
 
 /**
  * Tests for oxwArticleBox class
  */
-class ArticleBoxTest extends \OxidTestCase
+class ArticleBoxTest extends OxidTestCase
 {
     /**
      * Template view parameters data provider
      */
     public function _dpTemplateViewParams()
     {
-        return array(
-            array("product", "listitem_grid", "widget/product/listitem_grid.tpl"),
-            array("product", "listitem_infogrid", "widget/product/listitem_infogrid.tpl"),
-            array("product", "listitem_line", "widget/product/listitem_line.tpl"),
-            array("product", "boxproduct", "widget/product/boxproduct.tpl"),
-            array("product", "bargainitem", "widget/product/bargainitem.tpl"),
-        );
+        return [
+            ['product', 'listitem_grid', 'widget/product/listitem_grid.tpl'],
+            ['product', 'listitem_infogrid', 'widget/product/listitem_infogrid.tpl'],
+            ['product', 'listitem_line', 'widget/product/listitem_line.tpl'],
+            ['product', 'boxproduct', 'widget/product/boxproduct.tpl'],
+            ['product', 'bargainitem', 'widget/product/bargainitem.tpl'],
+        ];
     }
 
     /**
@@ -47,7 +52,7 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $this->assertEquals("widget/product/boxproduct.tpl", $oArticleBox->render(), "Default template should be loaded");
+        $this->assertEquals('widget/product/boxproduct.tpl', $oArticleBox->render(), 'Default template should be loaded');
     }
 
     /**
@@ -59,13 +64,13 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $aViewParams = array(
-            "sWidgetType" => $sWidgetType,
-            "sListType"   => $sListType,
-        );
+        $aViewParams = [
+            'sWidgetType' => $sWidgetType,
+            'sListType' => $sListType,
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
-        $this->assertEquals($sExpected, $oArticleBox->render(), "Correct template should be loaded");
+        $this->assertEquals($sExpected, $oArticleBox->render(), 'Correct template should be loaded');
     }
 
     /**
@@ -75,14 +80,14 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $sForcedTemplate = "page/compare/inc/compareitem.tpl";
+        $sForcedTemplate = 'page/compare/inc/compareitem.tpl';
 
-        $aViewParams = array(
-            "oxwtemplate" => $sForcedTemplate,
-        );
+        $aViewParams = [
+            'oxwtemplate' => $sForcedTemplate,
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
-        $this->assertEquals($sForcedTemplate, $oArticleBox->render(), "Correct template should be loaded");
+        $this->assertEquals($sForcedTemplate, $oArticleBox->render(), 'Correct template should be loaded');
     }
 
     /**
@@ -92,48 +97,62 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $sId = "1126";
+        $sId = '1126';
         $iLinkType = 4;
-        $aViewParams = array(
-            "anid"      => $sId,
-            "iLinkType" => $iLinkType,
-        );
+        $aViewParams = [
+            'anid' => $sId,
+            'iLinkType' => $iLinkType,
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
-        $this->assertEquals($sId, $oArticleBox->getProduct()->getId(), "Correct product should be loaded");
-        $this->assertEquals($iLinkType, $oArticleBox->getProduct()->getLinkType(), "Correct link type should be set");
+        $this->assertEquals($sId, $oArticleBox->getProduct()->getId(), 'Correct product should be loaded');
+        $this->assertEquals($iLinkType, $oArticleBox->getProduct()->getLinkType(), 'Correct link type should be set');
     }
 
     /**
-     * Checking if additional parameters are being recieved and added properly
+     * Checking if additional parameters are being received and added properly
      */
     public function testGetProductWithSearch()
     {
-        $oArticleBox = oxNew('oxwArticleBox');
         $this->setLanguage(1);
 
-        $sId = "1126";
+        $sId = '1126';
         $iLinkType = 4;
-        $aViewParams = array(
-            "anid"      => $sId,
-            "iLinkType" => $iLinkType,
-        );
-        $oArticleBox->setViewParameters($aViewParams);
-        $sLinkUrl = $oArticleBox->getProduct()->getMainLink();
 
-        $oArticleBox->setParent("search");
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getTopActiveView'));
+        // First, get the base product link without search parameters
+        $oArticle = oxNew(Article::class);
+        $oArticle->load($sId);
+        $sLinkUrl = $oArticle->getMainLink();
+
+        // Set up the Search controller as the top active view before ArticleBox
+        // creates any product, because getProduct() reads the top active view
+        // from Registry::getConfig()->getTopActiveView() (not $this->getConfig()).
+        // We must ensure the Search controller is the first (top) view in the chain.
         $oSearch = oxNew('Search');
-        $oConfig->expects($this->any())->method('getTopActiveView')->will($this->returnValue($oSearch));
+        $oConfig = $this->getConfig();
 
-        $oArticleBox->setConfig($oConfig);
-        $sLinkUrl .= "?listtype=search&amp;searchparam=1126";
+        // Drop any lazily-created default views so the Search controller becomes the top view
+        while ($oConfig->hasActiveViewsChain() || count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+            if (count($oConfig->getActiveViewsList()) === 0) {
+                break;
+            }
+        }
+        $oConfig->setActiveView($oSearch);
 
+        $this->setRequestParameter('searchparam', '1126');
 
-        $this->setRequestParameter("searchparam", "1126");
-        // removing cached object
-        $oArticleBox->setProduct(null);
-        $this->assertEquals($sLinkUrl, $oArticleBox->getProduct()->getMainLink(), "Correct product link with additional search parameters should be loaded");
+        $sLinkUrl .= '?listtype=search&amp;searchparam=1126';
+
+        // Now create the ArticleBox and fetch the product — search params should be appended
+        $oArticleBox = oxNew('oxwArticleBox');
+        $aViewParams = [
+            'anid' => $sId,
+            'iLinkType' => $iLinkType,
+        ];
+        $oArticleBox->setViewParameters($aViewParams);
+
+        $this->assertEquals($sLinkUrl, $oArticleBox->getProduct()->getMainLink(), 'Correct product link with additional search parameters should be loaded');
     }
 
     /**
@@ -142,17 +161,17 @@ class ArticleBoxTest extends \OxidTestCase
     public function testGetLink()
     {
         $oView = oxNew('aList');
-        $oView->setClassName("alist");
+        $oView->setClassName('alist');
 
         $this->getConfig()->setActiveView($oView);
 
         $oArticleBox = oxNew('oxwArticleBox');
-        $aViewParams = array(
-            "_parent" => $oView->getClassName()
-        );
+        $aViewParams = [
+            '_parent' => $oView->getClassName(),
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
-        $this->assertNotEquals(false, strpos($oArticleBox->getLink(), "cl=alist"));
+        $this->assertNotEquals(false, strpos($oArticleBox->getLink(), 'cl=alist'));
     }
 
     /**
@@ -162,13 +181,13 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $aRSS = array(
+        $aRSS = [
             'title' => 'O3-Shop 5/Bargain',
-            'link'  => 'http://trunk:8080/en/rss/O3-Shop/Bargain/',
-        );
-        $aViewParams = array(
-            "rsslinks" => $aRSS,
-        );
+            'link' => 'http://trunk:8080/en/rss/O3-Shop/Bargain/',
+        ];
+        $aViewParams = [
+            'rsslinks' => $aRSS,
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
         $this->assertEquals($aRSS, $oArticleBox->getRSSLinks(), "Should get RSS links' array");
@@ -181,19 +200,19 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $aViewParams = array(
-            "rsslinks" => array(),
-        );
+        $aViewParams = [
+            'rsslinks' => [],
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
-        $this->assertEquals(array(), $oArticleBox->getRSSLinks(), "Should get array");
+        $this->assertEquals([], $oArticleBox->getRSSLinks(), 'Should get array');
 
-        $aViewParams = array(
-            "rsslinks" => "rsslink",
-        );
+        $aViewParams = [
+            'rsslinks' => 'rsslink',
+        ];
         $oArticleBox->setViewParameters($aViewParams);
 
-        $this->assertEquals(null, $oArticleBox->getRSSLinks(), "Should get null");
+        $this->assertEquals(null, $oArticleBox->getRSSLinks(), 'Should get null');
     }
 
     /**
@@ -203,17 +222,17 @@ class ArticleBoxTest extends \OxidTestCase
      */
     public function _dpViewParameters()
     {
-        return array(
-            array("recommid", "Z8oRXLEnInxn", "getRecommId", "Recommendation list id"),
-            array("iIteration", "7", "getIteration", "Iteration number"),
-            array("iIndex", "3", "getIndex", "Test id"),
-            array("owishid", "7g7eZ6hxUsad", "getWishId", "Wishlist id"),
-            array("showMainLink", false, "getShowMainLink", "Condition if main link is showed"),
-            array("blDisableToCart", true, "getDisableToCart", "Condition if to cart button is showed"),
-            array("toBasketFunction", "tobasket", "getToBasketFunction", "toBasket function"),
-            array("removeFunction", "remove", "getRemoveFunction", "Remove function"),
-            array("altproduct", false, "getAltProduct", "Condition if alternate product exists"),
-        );
+        return [
+            ['recommid', 'Z8oRXLEnInxn', 'getRecommId', 'Recommendation list id'],
+            ['iIteration', '7', 'getIteration', 'Iteration number'],
+            ['iIndex', '3', 'getIndex', 'Test id'],
+            ['owishid', '7g7eZ6hxUsad', 'getWishId', 'Wishlist id'],
+            ['showMainLink', false, 'getShowMainLink', 'Condition if main link is showed'],
+            ['blDisableToCart', true, 'getDisableToCart', 'Condition if to cart button is showed'],
+            ['toBasketFunction', 'tobasket', 'getToBasketFunction', 'toBasket function'],
+            ['removeFunction', 'remove', 'getRemoveFunction', 'Remove function'],
+            ['altproduct', false, 'getAltProduct', 'Condition if alternate product exists'],
+        ];
     }
 
     /**
@@ -225,7 +244,7 @@ class ArticleBoxTest extends \OxidTestCase
     {
         $oArticleBox = oxNew('oxwArticleBox');
 
-        $aViewParams = array($sKey => $mxValue);
+        $aViewParams = [$sKey => $mxValue];
         $oArticleBox->setViewParameters($aViewParams);
 
         $this->assertEquals($mxValue, $oArticleBox->$sFunction(), $sMessage);
@@ -243,11 +262,15 @@ class ArticleBoxTest extends \OxidTestCase
         $oList = oxNew('aList');
         $oList->setActiveCategory($oCategory);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getTopActiveView'));
-        $oConfig->expects($this->any())->method('getTopActiveView')->will($this->returnValue($oList));
+        // getActiveCategory() uses Registry::getConfig()->getTopActiveView(), not $this->getConfig(),
+        // so we must set the view on the real Registry config.
+        $oConfig = $this->getConfig();
+        while (count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+        }
+        $oConfig->setActiveView($oList);
 
-        $oArticleBox = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleBox::class, array('getConfig'));
-        $oArticleBox->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oArticleBox = oxNew(ArticleBox::class);
 
         $this->assertTrue($oArticleBox->getActiveCategory() instanceof Category);
         $this->assertEquals('943a9ba3050e78b443c16e043ae60ef3', $oArticleBox->getActiveCategory()->getId());
@@ -265,11 +288,15 @@ class ArticleBoxTest extends \OxidTestCase
         $oList = oxNew('aList');
         $oList->setActiveCategory($oCategory);
 
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getTopActiveView'));
-        $oConfig->expects($this->any())->method('getTopActiveView')->will($this->returnValue($oList));
+        // getActiveCategory() uses Registry::getConfig()->getTopActiveView(), not $this->getConfig(),
+        // so we must set the view on the real Registry config.
+        $oConfig = $this->getConfig();
+        while (count($oConfig->getActiveViewsList()) > 0) {
+            $oConfig->dropLastActiveView();
+        }
+        $oConfig->setActiveView($oList);
 
-        $oArticleBox = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleBox::class, array('getConfig'));
-        $oArticleBox->expects($this->any())->method('getConfig')->will($this->returnValue($oConfig));
+        $oArticleBox = oxNew(ArticleBox::class);
 
         $this->assertTrue($oArticleBox->getActiveCategory() instanceof Category);
         $this->assertEquals(null, $oArticleBox->getActiveCategory()->getId());

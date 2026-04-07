@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require "_header.php"; ?>
+require '_header.php'; ?>
 <strong><?php $this->getText('STEP_1_DESC'); ?></strong><br>
 <br>
 <form action="index.php" method="post">
@@ -32,16 +32,16 @@ require "_header.php"; ?>
                     <td>
                         <select name="country_lang" style="font-size: 11px;">
                             <?php
-                                $aCountries   = $this->getViewParam("aCountries");
-                                $sLanguage   = $this->getViewParam("sLanguage");
-                                $sCountryLang = $this->getViewParam("sCountryLang");
+                                $aCountries = $this->getViewParam('aCountries');
+$sLanguage = $this->getViewParam('sLanguage');
+$sCountryLang = $this->getViewParam('sCountryLang');
 
-                            if (isset($aCountries[$sLanguage])) {
-                                foreach ($aCountries[$sLanguage] as $sKey => $sValue) {
-                                    $sSelected = ($sCountryLang !== null && $sCountryLang == $sKey) ? 'selected' : ''; ?><option value="<?php echo $sKey; ?>" <?php echo $sSelected; ?>><?php echo $sValue; ?></option><?php
-                                }
-                            }
-                            ?>
+if (isset($aCountries[$sLanguage])) {
+    foreach ($aCountries[$sLanguage] as $sKey => $sValue) {
+        $sSelected = ($sCountryLang !== null && $sCountryLang == $sKey) ? 'selected' : ''; ?><option value="<?php echo $sKey; ?>" <?php echo $sSelected; ?>><?php echo $sValue; ?></option><?php
+    }
+}
+?>
                         </select>
                     </td>
                     <td style="padding: 0px 5px;">
@@ -62,15 +62,15 @@ require "_header.php"; ?>
                     <td>
                         <select name="sShopLang" style="font-size: 11px;">
                             <?php
-                            $aLanguages = $this->getViewParam("aLanguages");
-                            foreach ($aLanguages as $sLangId => $sLangTitle) {
-                                ?>
-                                <option value="<?php echo $sLangId; ?>" <?php if ($this->getViewParam("sShopLang") == $sLangId) {
+$aLanguages = $this->getViewParam('aLanguages');
+foreach ($aLanguages as $sLangId => $sLangTitle) {
+    ?>
+                                <option value="<?php echo $sLangId; ?>" <?php if ($this->getViewParam('sShopLang') == $sLangId) {
                                     echo 'selected';
-                                               } ?>><?php echo $sLangTitle; ?></option>
+                                } ?>><?php echo $sLangTitle; ?></option>
                                 <?php
-                            }
-                            ?>
+}
+?>
                         </select>
                     </td>
                     <td style="padding: 0px 5px;">
@@ -94,4 +94,4 @@ require "_header.php"; ?>
     <input type="hidden" name="sid" value="<?php $this->getSid(); ?>">
     <input type="submit" id="step1Submit" class="edittext" value="<?php $this->getText('BUTTON_BEGIN_INSTALL'); ?>">
 </form>
-<?php require "_footer.php";
+<?php require '_footer.php';

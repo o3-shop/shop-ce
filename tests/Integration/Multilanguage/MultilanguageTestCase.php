@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Multilanguage;
 
 use oxRegistry;
@@ -63,8 +65,8 @@ abstract class MultilanguageTestCase extends \OxidTestCase
     protected function prepare($count = 9)
     {
         $languageId = 0;
-        for ($i=0;$i<$count;$i++) {
-            $languageName = chr(97+$i) . chr(97+$i);
+        for ($i = 0;$i < $count;$i++) {
+            $languageName = chr(97 + $i) . chr(97 + $i);
             $languageId = $this->insertLanguage($languageName);
         }
         //we need a fresh instance of language object in registry,
@@ -88,15 +90,15 @@ abstract class MultilanguageTestCase extends \OxidTestCase
     {
         $languages = $this->getLanguageMain()->_getLanguages();
         $baseId = $this->getLanguageMain()->_getAvailableLangBaseId();
-        $sort = $baseId*100;
+        $sort = $baseId * 100;
 
-        $languages['params'][$languageId] = array('baseId' => $baseId,
+        $languages['params'][$languageId] = ['baseId' => $baseId,
                                                   'active' => 1,
-                                                  'sort'   => $sort);
+                                                  'sort'   => $sort];
 
         $languages['lang'][$languageId] = $languageId;
-        $languages['urls'][$baseId]     = '';
-        $languages['sslUrls'][$baseId]  = '';
+        $languages['urls'][$baseId] = '';
+        $languages['sslUrls'][$baseId] = '';
         $this->getLanguageMain()->setLanguageData($languages);
 
         $this->storeLanguageConfiguration($languages);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\Category;
@@ -26,7 +28,6 @@ use OxidEsales\EshopCommunity\Application\Model\Category;
  */
 class CategoryPicturesTest extends \OxidTestCase
 {
-
     /**
      * Category_Pictures::Render() test case
      *
@@ -40,7 +41,7 @@ class CategoryPicturesTest extends \OxidTestCase
 
         // testing view data
         $aViewData = $oView->getViewData();
-        $this->assertTrue($aViewData["edit"] instanceof Category);
+        $this->assertTrue($aViewData['edit'] instanceof Category);
 
         $this->assertEquals('category_pictures.tpl', $sTplName);
     }

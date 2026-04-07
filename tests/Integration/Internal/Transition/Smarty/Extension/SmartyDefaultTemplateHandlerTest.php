@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -26,7 +28,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoade
 class SmartyDefaultTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 {
     private $resourceName = 'smartyTemplate.tpl';
-    private $resourceContent = "The new contents of the file";
+    private $resourceContent = 'The new contents of the file';
     private $resourceTimeStamp = 1;
 
     /**
@@ -67,7 +69,7 @@ class SmartyDefaultTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         return [
             ['content', $this->resourceName],
             ['file', $this->resourceName],
-            ['file', $this->getTemplateDirectory()]
+            ['file', $this->getTemplateDirectory()],
         ];
     }
 
@@ -82,7 +84,7 @@ class SmartyDefaultTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $smarty->right_delimiter = '}]';
 
         $template = $this->getTemplateDirectory() . $resourceName;
-        $returnContent = '[{assign var=\'title\' value=$title|default:\'Hello OXID!\'}]'."\n".'[{$title}]';
+        $returnContent = '[{assign var=\'title\' value=$title|default:\'Hello OXID!\'}]' . "\n" . '[{$title}]';
 
         $handler = $this->getSmartyDefaultTemplateHandler($template);
         $return = $handler->handleTemplate(

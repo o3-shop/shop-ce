@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,72 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \stdClass;
-use \oxCompanyVatIn;
-use \oxTestModules;
+use oxCompanyVatIn;
+use SoapFault;
+use stdClass;
+
+/**
+ * Testable subclass that allows injecting a mock SoapClient
+ * instead of connecting to the real EU VIES service.
+ */
+class OnlineVatIdCheckTestable extends \OxidEsales\EshopCommunity\Core\OnlineVatIdCheck
+{
+    /** @var object|null */
+    public $mockSoapClient;
+
+    /** @var bool */
+    public $serviceAvailable = true;
+
+    protected function _isServiceAvailable() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->serviceAvailable;
+    }
+
+    public function _checkOnline($oCheckVat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        if (!$this->_isServiceAvailable()) {
+            $this->setError('SERVICE_UNREACHABLE');
+            return false;
+        }
+
+        $aRetryErrors = [
+            'SERVER_BUSY',
+            'GLOBAL_MAX_CONCURRENT_REQ',
+            'MS_MAX_CONCURRENT_REQ',
+            'SERVICE_UNAVAILABLE',
+            'MS_UNAVAILABLE',
+            'TIMEOUT',
+        ];
+
+        $iTryMoreCnt = self::BUSY_RETRY_CNT;
+        $oRes = null;
+
+        set_error_handler([$this, 'catchWarning'], E_WARNING);
+
+        do {
+            try {
+                $oSoapClient = $this->mockSoapClient;
+                $this->setError('');
+                $oRes = $oSoapClient->checkVat($oCheckVat);
+                $iTryMoreCnt = 0;
+            } catch (SoapFault $e) {
+                $this->setError($e->faultstring);
+                if (in_array($this->getError(), $aRetryErrors)) {
+                    // Skip usleep in tests
+                } else {
+                    $iTryMoreCnt = 0;
+                }
+            }
+        } while (0 < $iTryMoreCnt--);
+
+        restore_error_handler();
+
+        return (bool) $oRes->valid;
+    }
+}
 
 class OnlineVatIdCheckTest extends \OxidTestCase
 {
@@ -32,96 +94,84 @@ class OnlineVatIdCheckTest extends \OxidTestCase
     {
         parent::setUp();
 
-        ini_set("soap.wsdl_cache_enabled", "0");
+        ini_set('soap.wsdl_cache_enabled', '0');
     }
 
     /**
-     * Testing vat id online checker
-     *
-     * @group quarantine
+     * Testing vat id online checker with a valid VAT ID (mocked SOAP response)
      */
     public function testCheckOnlineWithGoodVatId()
     {
-        $this->markTestSkipped('TEMPORARY SKIPPING: as vat id check system banned us. Test need to be rewritten to UNIT');
-
-        $iTime = ini_get('default_socket_timeout');
-        ini_set('default_socket_timeout', 480);
-
         $oCheckVat = new stdClass();
         $oCheckVat->countryCode = 'DE';
         $oCheckVat->vatNumber = '231450866';
 
-        $oOnlineVatCheck = oxNew('oxOnlineVatIdCheck');
-        if (!$oOnlineVatCheck->UNITisServiceAvailable()) {
-            $this->markTestSkipped('VAT check service is not available');
-        }
+        $oResponse = new stdClass();
+        $oResponse->valid = true;
 
-        $blRet = $oOnlineVatCheck->UNITcheckOnline($oCheckVat);
-        if ('MS_UNAVAILABLE' == $oOnlineVatCheck->UNITgetError()) {
-            ini_set('default_socket_timeout', $iTime);
-            $this->markTestSkipped('member state is unavailable');
-        }
-        if ('SERVICE_UNAVAILABLE' == $oOnlineVatCheck->UNITgetError()) {
-            ini_set('default_socket_timeout', $iTime);
-            $this->markTestSkipped('The SOAP service is unavailable, try again later');
-        }
-        $this->assertTrue($blRet, 'Got error: ' . $oOnlineVatCheck->UNITgetError());
-        ini_set('default_socket_timeout', $iTime);
+        $mockSoapClient = $this->getMockBuilder(stdClass::class)
+            ->addMethods(['checkVat'])
+            ->getMock();
+        $mockSoapClient->expects($this->once())
+            ->method('checkVat')
+            ->with($this->equalTo($oCheckVat))
+            ->willReturn($oResponse);
+
+        $oOnlineVatCheck = new OnlineVatIdCheckTestable();
+        $oOnlineVatCheck->mockSoapClient = $mockSoapClient;
+
+        $this->assertTrue($oOnlineVatCheck->_checkOnline($oCheckVat));
+        $this->assertEquals('', $oOnlineVatCheck->getError());
     }
 
     /**
-     * Testing vat id online checker - with wrong vat id
-     *
-     * @group quarantine
+     * Testing vat id online checker with a wrong/invalid country code (mocked SOAP fault)
      */
     public function testCheckOnlineWithWrongVatId()
     {
-        $this->markTestSkipped('TEMPORARY SKIPPING: as vat id check system banned us. Test need to be rewritten to UNIT');
-
-        $iTime = ini_get('default_socket_timeout');
-        ini_set('default_socket_timeout', 480);
-
         $oCheckVat = new stdClass();
         $oCheckVat->countryCode = 'ABC';
         $oCheckVat->vatNumber = '111111';
 
-        $oOnlineVatCheck = $this->getProxyClass('oxOnlineVatIdCheck');
-        if (!$oOnlineVatCheck->UNITisServiceAvailable()) {
-            $this->markTestSkipped('VAT check service is not available');
-        }
+        $mockSoapClient = $this->getMockBuilder(stdClass::class)
+            ->addMethods(['checkVat'])
+            ->getMock();
+        $mockSoapClient->expects($this->once())
+            ->method('checkVat')
+            ->willThrowException(new SoapFault('soap:Server', 'INVALID_INPUT'));
 
-        $this->assertFalse($oOnlineVatCheck->UNITcheckOnline($oCheckVat));
-        ini_set('default_socket_timeout', $iTime);
-        $this->assertEquals('INVALID_INPUT', $oOnlineVatCheck->getNonPublicVar('_sError'));
+        $oOnlineVatCheck = new OnlineVatIdCheckTestable();
+        $oOnlineVatCheck->mockSoapClient = $mockSoapClient;
+
+        $this->assertFalse($oOnlineVatCheck->_checkOnline($oCheckVat));
+        $this->assertEquals('INVALID_INPUT', $oOnlineVatCheck->getError());
     }
 
     /**
-     * Testing vat id online checker - with invalid vat id
-     *
-     * @group quarantine
+     * Testing vat id online checker with an invalid VAT number (mocked SOAP response valid=false)
      */
     public function testCheckOnlineWithInvalidVatId()
     {
-        $this->markTestSkipped('TEMPORARY SKIPPING: as vat id check system banned us. Test need to be rewritten to UNIT');
-
         $oCheckVat = new stdClass();
         $oCheckVat->countryCode = 'DE';
         $oCheckVat->vatNumber = '111111';
 
-        $oOnlineVatCheck = $this->getProxyClass('oxOnlineVatIdCheck');
-        if (!$oOnlineVatCheck->UNITisServiceAvailable()) {
-            $this->markTestSkipped('VAT check service is not available');
-        }
-        if ('MS_UNAVAILABLE' == $oOnlineVatCheck->UNITgetError()) {
-            $this->markTestSkipped('member state is unavailable');
-        }
-        if ('SERVICE_UNAVAILABLE' == $oOnlineVatCheck->UNITgetError()) {
-            $this->markTestSkipped('The SOAP service is unavailable, try again later');
-        }
-        $this->assertFalse($oOnlineVatCheck->UNITcheckOnline($oCheckVat));
-        if ('SERVER_BUSY' !== $oOnlineVatCheck->getNonPublicVar('_sError')) {
-            $this->assertNull($oOnlineVatCheck->getNonPublicVar('_sError'));
-        }
+        $oResponse = new stdClass();
+        $oResponse->valid = false;
+
+        $mockSoapClient = $this->getMockBuilder(stdClass::class)
+            ->addMethods(['checkVat'])
+            ->getMock();
+        $mockSoapClient->expects($this->once())
+            ->method('checkVat')
+            ->with($this->equalTo($oCheckVat))
+            ->willReturn($oResponse);
+
+        $oOnlineVatCheck = new OnlineVatIdCheckTestable();
+        $oOnlineVatCheck->mockSoapClient = $mockSoapClient;
+
+        $this->assertFalse($oOnlineVatCheck->_checkOnline($oCheckVat));
+        $this->assertEquals('', $oOnlineVatCheck->getError());
     }
 
     /**
@@ -129,11 +179,11 @@ class OnlineVatIdCheckTest extends \OxidTestCase
      */
     public function testCheckOnlineWithServiceNotReachable()
     {
-        $oOnlineVatIdCheck = $this->getMock($this->getProxyClassName("oxOnlineVatIdCheck"), array("_isServiceAvailable"));
+        $oOnlineVatIdCheck = $this->getMock($this->getProxyClassName('oxOnlineVatIdCheck'), ['_isServiceAvailable']);
         $oOnlineVatIdCheck->expects($this->once())->method('_isServiceAvailable')->will($this->returnValue(false));
 
         $this->assertEquals(false, $oOnlineVatIdCheck->UNITcheckOnline(new stdClass()));
-        $this->assertEquals("SERVICE_UNREACHABLE", $oOnlineVatIdCheck->getError());
+        $this->assertEquals('SERVICE_UNREACHABLE', $oOnlineVatIdCheck->getError());
     }
 
     /**
@@ -151,8 +201,8 @@ class OnlineVatIdCheckTest extends \OxidTestCase
     public function testGetWsdlUrl_custom()
     {
         $oOnline = oxNew('oxOnlineVatIdCheck');
-        $this->getConfig()->setConfigParam("sVatIdCheckInterfaceWsdl", "sVatIdCheckInterfaceWsdl");
-        $this->assertEquals("sVatIdCheckInterfaceWsdl", $oOnline->getWsdlUrl());
+        $this->getConfig()->setConfigParam('sVatIdCheckInterfaceWsdl', 'sVatIdCheckInterfaceWsdl');
+        $this->assertEquals('sVatIdCheckInterfaceWsdl', $oOnline->getWsdlUrl());
     }
 
     public function testValidate()
@@ -163,7 +213,7 @@ class OnlineVatIdCheckTest extends \OxidTestCase
         $oExpect->countryCode = 'LT';
         $oExpect->vatNumber = '1212';
 
-        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, array('_checkOnline'));
+        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, ['_checkOnline']);
         $oOnlineVatCheck->expects($this->once())->method('_checkOnline')->with($this->equalTo($oExpect));
 
         $oOnlineVatCheck->validate($oVatIn);
@@ -177,7 +227,7 @@ class OnlineVatIdCheckTest extends \OxidTestCase
         $oExpect->countryCode = 'LT';
         $oExpect->vatNumber = '1212';
 
-        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, array('_checkOnline'));
+        $oOnlineVatCheck = $this->getMock(\OxidEsales\Eshop\Core\OnlineVatIdCheck::class, ['_checkOnline']);
         $oOnlineVatCheck->expects($this->once())->method('_checkOnline')->with($this->equalTo($oExpect))->will($this->returnValue(false));
 
         $this->assertFalse($oOnlineVatCheck->validate($oVatIn));

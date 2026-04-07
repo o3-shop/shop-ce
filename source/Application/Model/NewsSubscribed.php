@@ -24,10 +24,10 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 use Exception;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
+use OxidEsales\Eshop\Core\Exception\DatabaseException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 
 /**
  * Newsletter Subscriptions manager
@@ -114,11 +114,11 @@ class NewsSubscribed extends BaseModel
     {
         $database = DatabaseProvider::getDb();
         $params = [
-            ':oxemail' => (string) $email
+            ':oxemail' => (string) $email,
         ];
 
-        $userOxid = $database->getOne("select oxid from oxnewssubscribed 
-            where oxemail = :oxemail ", $params);
+        $userOxid = $database->getOne('select oxid from oxnewssubscribed 
+            where oxemail = :oxemail ', $params);
 
         return $userOxid;
     }
@@ -136,11 +136,11 @@ class NewsSubscribed extends BaseModel
         $oDb = DatabaseProvider::getDb();
         $params = [
             ':oxuserid' => $sOxUserId,
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ];
 
-        $sOxId = $oDb->getOne("select oxid from oxnewssubscribed 
-            where oxuserid = :oxuserid and oxshopid = :oxshopid", $params);
+        $sOxId = $oDb->getOne('select oxid from oxnewssubscribed 
+            where oxuserid = :oxuserid and oxshopid = :oxshopid', $params);
 
         return $this->load($sOxId);
     }

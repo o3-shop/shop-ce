@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,14 +21,14 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Database\Adapter\Doctrine;
 
-use OxidEsales\Eshop\Core\DatabaseProvider;
-use PDO;
 use Doctrine\DBAL\DBALException;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseErrorException;
-use OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\ResultSet;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database;
+use OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\ResultSet;
+use OxidEsales\EshopCommunity\Core\Exception\DatabaseErrorException;
 use OxidEsales\EshopCommunity\Tests\Integration\Core\Database\Adapter\DatabaseInterfaceImplementationTest;
+use PDO;
 
 /**
  * Tests for our database object.
@@ -39,12 +40,12 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     /**
      * @var string The database exception class to be thrown
      */
-    const DATABASE_EXCEPTION_CLASS = DatabaseErrorException::class;
+    public const DATABASE_EXCEPTION_CLASS = DatabaseErrorException::class;
 
     /**
      * @var string The result set class class
      */
-    const RESULT_SET_CLASS = ResultSet::class;
+    public const RESULT_SET_CLASS = ResultSet::class;
 
     /**
      * @var DatabaseInterface|Database The database to test.
@@ -99,7 +100,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
         $this->expectException($expectedExceptionClass);
 
         $this->database->getAll(
-            "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'",
+            'SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "'",
             $invalidParameter
         );
     }
@@ -146,38 +147,38 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
      */
     public function dataProviderTestSelectLimitForInvalidOffsetAndLimit()
     {
-        return array(
-            array(
+        return [
+            [
                 'If parameter rowCount is integer 2 and offset is string " UNION SELECT oxusername FROM oxuser" , a warning will be triggered and the first 2 rows will be returned',
                 2, // row count
-                " UNION SELECT oxusername FROM oxuser", // offset
+                ' UNION SELECT oxusername FROM oxuser', // offset
                 [
-                    [self::FIXTURE_OXID_1], [self::FIXTURE_OXID_2]  // expected result
-                ]
-            ),
-            array(
+                    [self::FIXTURE_OXID_1], [self::FIXTURE_OXID_2],  // expected result
+                ],
+            ],
+            [
                 'If parameter rowCount is integer 2 and offset is string "1  UNION SELECT oxusername FROM oxuser -- " , a warning will be triggered and last 2 rows will be returned',
                 2, // row count
-                "1  UNION SELECT oxusername FROM oxuser", // offset
+                '1  UNION SELECT oxusername FROM oxuser', // offset
                 [
-                    [self::FIXTURE_OXID_2], [self::FIXTURE_OXID_3]  // expected result
-                ]
-            ),
-            array(
+                    [self::FIXTURE_OXID_2], [self::FIXTURE_OXID_3],  // expected result
+                ],
+            ],
+            [
                 'If parameter rowCount is string " UNION SELECT oxusername FROM oxuser  --" and offset is 0, a warning will be triggered and the first 2 rows will be returned',
-                " UNION SELECT oxusername FROM oxuser  --", // row count
+                ' UNION SELECT oxusername FROM oxuser  --', // row count
                 0, // offset
-                []  // expected result
-            ),
-            array(
+                [],  // expected result
+            ],
+            [
                 'If parameter rowCount is string "1 UNION SELECT oxusername FROM oxuser  --" and offset is 0, a warning will be triggered and the first 2 rows will be returned',
-                "1  UNION SELECT oxusername FROM oxuser --", // row count
+                '1  UNION SELECT oxusername FROM oxuser --', // row count
                 0, // offset
                 [
-                    [self::FIXTURE_OXID_1]  // expected result
-                ]
-            ),
-        );
+                    [self::FIXTURE_OXID_1],  // expected result
+                ],
+            ],
+        ];
     }
 
     /**
@@ -205,7 +206,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     {
         $this->expectException(self::DATABASE_EXCEPTION_CLASS);
 
-        $connectionMock =  $this->getMockBuilder('\OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database')
+        $connectionMock = $this->getMockBuilder('\OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database')
             ->setMethods(['beginTransaction'])
             ->getMock();
         $connectionMock->expects($this->once())
@@ -230,7 +231,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     {
         $this->expectException(self::DATABASE_EXCEPTION_CLASS);
 
-        $connectionMock =  $this->getMockBuilder('\OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database')
+        $connectionMock = $this->getMockBuilder('\OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database')
             ->setMethods(['commit'])
             ->getMock();
         $connectionMock->expects($this->once())
@@ -255,7 +256,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     {
         $this->expectException(self::DATABASE_EXCEPTION_CLASS);
 
-        $connectionMock =  $this->getMockBuilder('\OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database')
+        $connectionMock = $this->getMockBuilder('\OxidEsales\EshopCommunity\Core\Database\Adapter\Doctrine\Database')
             ->setMethods(['rollBack'])
             ->getMock();
         $connectionMock->expects($this->once())
@@ -300,7 +301,6 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
         $this->assertSame($expectedCode, $actualCode);
     }
 
-
     /**
      * Assert a given error level and a given error message
      *
@@ -312,15 +312,15 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     protected function assertError($errorLevel, $errorMessage)
     {
         foreach ($this->errors as $error) {
-            if ($error["errorMessage"] === $errorMessage
-                && $error["errorLevel"] === $errorLevel
+            if ($error['errorMessage'] === $errorMessage
+                && $error['errorLevel'] === $errorLevel
             ) {
                 return true;
             }
         }
 
         $this->fail(
-            "No error with level " . $errorLevel . " and message '" . $errorMessage . "' was triggered"
+            'No error with level ' . $errorLevel . " and message '" . $errorMessage . "' was triggered"
         );
     }
 
@@ -330,10 +330,10 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
         $quotedIdentifier = $this->database->quoteIdentifier('OXID');
 
         $expectedResult = [
-            [self::FIXTURE_OXID_1]
+            [self::FIXTURE_OXID_1],
         ];
         $resultSet = $this->database
-            ->select("SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "' ORDER BY " . $quotedIdentifier);
+            ->select('SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = '" . self::FIXTURE_OXID_1 . "' ORDER BY " . $quotedIdentifier);
         $actualResult = $resultSet->fetchAll();
 
         $this->assertSame($expectedResult, $actualResult);
@@ -361,12 +361,12 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
             [
                 // A arbitrary string will be converted in a column name
                 'SELECT * from oxuser',
-                'Unknown column \'SELECT * from oxuser\' in \'order clause\''
+                'Unknown column \'SELECT * from oxuser\' in \'order clause\'',
             ],
             [
                 // A arbitrary string, which contains a backtick, will be converted in a column name
                 'columnName ` columnName',
-                'Unknown column \'columnName  columnName\' in \'order clause\''
+                'Unknown column \'columnName  columnName\' in \'order clause\'',
             ],
         ];
     }
@@ -389,7 +389,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
 
         $this->expectException($expectedException);
 
-        $query = "SELECT OXID FROM " . self::TABLE_NAME . " WHERE OXID = {$actualQuotedValue}";
+        $query = 'SELECT OXID FROM ' . self::TABLE_NAME . " WHERE OXID = {$actualQuotedValue}";
         $resultSet = $this->database->select($query);
         $resultSet->fetchAll();
     }
@@ -398,7 +398,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     {
         $tableName = self::TABLE_NAME;
         $id = self::FIXTURE_OXID_1;
-        $this->database->execute("ALTER TABLE `oxdoctrinetest`ADD UNIQUE `oxid` (`oxid`);");
+        $this->database->execute('ALTER TABLE `oxdoctrinetest`ADD UNIQUE `oxid` (`oxid`);');
         $this->database->execute("INSERT INTO $tableName (OXID) VALUES ('$id');");
 
         try {
@@ -414,11 +414,10 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
     public function dataProviderTestQuoteWithInvalidValues()
     {
         return [
-            [array('key' => 'value'), false, self::DATABASE_EXCEPTION_CLASS, 'An array will be converted into boolean "false" and an exception is thrown, when the statement is executed '],
+            [['key' => 'value'], false, self::DATABASE_EXCEPTION_CLASS, 'An array will be converted into boolean "false" and an exception is thrown, when the statement is executed '],
             [new \stdClass(), false, self::DATABASE_EXCEPTION_CLASS, 'An object will be converted into boolean "false" and an exception is thrown, when the statement is executed'],
         ];
     }
-
 
     /**
      * Test, that affected rows is set to the expected values by consecutive calls to execute()
@@ -429,14 +428,13 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
 
         /** One row will be updated by the query */
         $expectedAffectedRows = 1;
-        $actualAffectedRows = $this->database->execute('UPDATE ' . self::TABLE_NAME . ' SET oxuserid = "somevalue" WHERE OXID = ?', array(self::FIXTURE_OXID_1));
+        $actualAffectedRows = $this->database->execute('UPDATE ' . self::TABLE_NAME . ' SET oxuserid = "somevalue" WHERE OXID = ?', [self::FIXTURE_OXID_1]);
 
         $this->assertEquals($expectedAffectedRows, $actualAffectedRows, '1 row was updated by the query');
 
-
         /** Two rows will be updated by the query */
         $expectedAffectedRows = 2;
-        $actualAffectedRows = $this->database->execute('UPDATE ' . self::TABLE_NAME . ' SET oxuserid = "someothervalue" WHERE OXID IN (?, ?)', array(self::FIXTURE_OXID_1, self::FIXTURE_OXID_2));
+        $actualAffectedRows = $this->database->execute('UPDATE ' . self::TABLE_NAME . ' SET oxuserid = "someothervalue" WHERE OXID IN (?, ?)', [self::FIXTURE_OXID_1, self::FIXTURE_OXID_2]);
 
         $this->assertEquals($expectedAffectedRows, $actualAffectedRows, '2 rows was updated by the query');
     }
@@ -450,12 +448,12 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
 
         $exampleOxId = self::FIXTURE_OXID_1;
 
-        $affectedRows = $this->database->execute("INSERT INTO " . self::TABLE_NAME . " (OXID) VALUES ('$exampleOxId');");
+        $affectedRows = $this->database->execute('INSERT INTO ' . self::TABLE_NAME . " (OXID) VALUES ('$exampleOxId');");
 
         $this->assertSame(1, $affectedRows);
         $this->assertTestTableHasOnly($exampleOxId);
 
-        $affectedRows = $this->database->execute("DELETE FROM " . self::TABLE_NAME . " WHERE OXID = '$exampleOxId';");
+        $affectedRows = $this->database->execute('DELETE FROM ' . self::TABLE_NAME . " WHERE OXID = '$exampleOxId';");
 
         $this->assertSame(1, $affectedRows);
         $this->assertTestTableIsEmpty();
@@ -510,9 +508,9 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
      */
     public function testSetConnectionParametersAllParametersSet()
     {
-        $this->setProtectedClassProperty($this->database, 'connectionParameters', array());
-        $connectionParametersFromConfigInc = array(
-            'default' => array(
+        $this->setProtectedClassProperty($this->database, 'connectionParameters', []);
+        $connectionParametersFromConfigInc = [
+            'default' => [
                 'databaseHost'          => 'myDatabaseHost',
                 'databaseName'          => 'myDatabaseName',
                 'databaseUser'          => 'myDatabaseUser',
@@ -521,10 +519,10 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
                 'databaseDriverOptions' => [
                     'testkey' => 'testvalue',
                 ],
-            )
-        );
+            ],
+        ];
         $this->database->setConnectionParameters($connectionParametersFromConfigInc);
-        $expectedConnectionParameters = array(
+        $expectedConnectionParameters = [
             'driver'   => 'pdo_mysql',
             'host'     => 'myDatabaseHost',
             'dbname'   => 'myDatabaseName',
@@ -535,11 +533,11 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET @@SESSION.sql_mode=''",
                 'testkey'                    => 'testvalue',
             ],
-        );
+        ];
         $this->assertEquals(
             $expectedConnectionParameters,
             $this->getProtectedClassProperty($this->database, 'connectionParameters'),
-            "Not all input parameters are set to the correct place in the output array."
+            'Not all input parameters are set to the correct place in the output array.'
         );
     }
 
@@ -548,14 +546,14 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
      */
     public function testSetConnectionParametersNoParametersSet()
     {
-        $this->setProtectedClassProperty($this->database, 'connectionParameters', array());
-        $connectionParametersFromConfigInc = array();
+        $this->setProtectedClassProperty($this->database, 'connectionParameters', []);
+        $connectionParametersFromConfigInc = [];
         $this->database->setConnectionParameters($connectionParametersFromConfigInc);
-        $expectedConnectionParameters = array();
+        $expectedConnectionParameters = [];
         $this->assertEquals(
             $expectedConnectionParameters,
             $this->getProtectedClassProperty($this->database, 'connectionParameters'),
-            "There can be no parameters in the array with no input parameters."
+            'There can be no parameters in the array with no input parameters.'
         );
     }
 
@@ -572,7 +570,7 @@ class DatabaseTest extends DatabaseInterfaceImplementationTest
         $this->assertSame(
             $expectedSqlMode,
             $actualSqlMode,
-            "The sql_mode variable on the database is not the expected one."
+            'The sql_mode variable on the database is not the expected one.'
         );
     }
 

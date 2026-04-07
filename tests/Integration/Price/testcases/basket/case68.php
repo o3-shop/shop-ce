@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: bruto
  * Price view mode:  brutto
@@ -18,17 +19,17 @@
  *
  * Case: 0004680: Discount recalculation fails on basket refresh
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => '_testProduct',
                 'oxprice'                  => 10.00,
                 'oxvat'                    => 19,
                 'amount'                   => 31,
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+        ],
+    ],
+    'discounts' => [
+        0 => [
                 'oxid'         => 'basket_0',
                 'oxaddsum'     => 6.00,
                 'oxaddsumtype' => '%',
@@ -37,10 +38,10 @@ $aData = array(
                 'oxprice' => 100,
                 'oxpriceto' => 199,
                 'oxactive' => 1,
-                'oxarticles' => array( '_testProduct' ),
+                'oxarticles' => [ '_testProduct' ],
                 'oxsort' => 10,
-        ),
-        1 => array(
+        ],
+        1 => [
                 'oxid'         => 'basket_1',
                 'oxaddsum'     => 9.00,
                 'oxaddsumtype' => '%',
@@ -49,10 +50,10 @@ $aData = array(
                 'oxprice' => 200,
                 'oxpriceto' => 299,
                 'oxactive' => 1,
-                'oxarticles' => array( '_testProduct' ),
+                'oxarticles' => [ '_testProduct' ],
                 'oxsort' => 20,
-        ),
-        2 => array(
+        ],
+        2 => [
                 'oxid'         => 'basket_2',
                 'oxaddsum'     => 12.00,
                 'oxaddsumtype' => '%',
@@ -61,30 +62,29 @@ $aData = array(
                 'oxprice' => 300,
                 'oxpriceto' => 99999,
                 'oxactive' => 1,
-                'oxarticles' => array( '_testProduct' ),
+                'oxarticles' => [ '_testProduct' ],
                 'oxsort' => 30,
-        ),
+        ],
+    ],
 
-    ),
-
-    'expected' => array(
-        'articles' => array(
-                 '_testProduct' => array( '8,80', '272,80' ),
-        ),
-        'totals' => array(
+    'expected' => [
+        'articles' => [
+                 '_testProduct' => [ '8,80', '272,80' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '272,80',
                 'totalNetto'  => '229,24',
-                'vats' => array(
-                    19 => '43,56'
-                ),
-                'grandTotal'  => '272,80'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                'vats' => [
+                    19 => '43,56',
+                ],
+                'grandTotal'  => '272,80',
+        ],
+    ],
+    'options' => [
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

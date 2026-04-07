@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,20 +22,19 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\Validator;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\SmartyPluginDirectoriesValidator;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\DirectoryNotExistentException;
 use OxidEsales\EshopCommunity\Internal\Framework\FileSystem\DirectoryNotReadableException;
-use PHPUnit\Framework\TestCase;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\SmartyPluginDirectory;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Path\ModulePathResolverInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ModuleSettingNotValidException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Validator\SmartyPluginDirectoriesValidator;
+use PHPUnit\Framework\TestCase;
 
 class SmartyPluginDirectoriesModuleSettingValidatorTest extends TestCase
 {
-
     /** @var vfsStreamDirectory */
     private $vfsStreamDirectory = null;
 
@@ -58,7 +59,7 @@ class SmartyPluginDirectoriesModuleSettingValidatorTest extends TestCase
 
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->addSmartyPluginDirectory(new SmartyPluginDirectory('smarty'));
-        $moduleConfiguration->setId("smartyTestModule");
+        $moduleConfiguration->setId('smartyTestModule');
 
         $validator->validate($moduleConfiguration, 1);
     }
@@ -75,7 +76,7 @@ class SmartyPluginDirectoriesModuleSettingValidatorTest extends TestCase
 
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->addSmartyPluginDirectory(new SmartyPluginDirectory('notExistingDirectory'));
-        $moduleConfiguration->setId("smartyTestModule");
+        $moduleConfiguration->setId('smartyTestModule');
 
         $this->expectException(DirectoryNotExistentException::class);
         $validator->validate($moduleConfiguration, 1);
@@ -95,7 +96,7 @@ class SmartyPluginDirectoriesModuleSettingValidatorTest extends TestCase
 
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->addSmartyPluginDirectory(new SmartyPluginDirectory('smarty'));
-        $moduleConfiguration->setId("smartyTestModule");
+        $moduleConfiguration->setId('smartyTestModule');
 
         $this->expectException(DirectoryNotReadableException::class);
         $validator->validate($moduleConfiguration, 1);
@@ -107,7 +108,7 @@ class SmartyPluginDirectoriesModuleSettingValidatorTest extends TestCase
 
         $moduleConfiguration = new ModuleConfiguration();
         $moduleConfiguration->addSmartyPluginDirectory(new SmartyPluginDirectory(''));
-        $moduleConfiguration->setId("smartyTestModule");
+        $moduleConfiguration->setId('smartyTestModule');
 
         $this->expectException(ModuleSettingNotValidException::class);
         $validator->validate($moduleConfiguration, 1);
@@ -119,10 +120,10 @@ class SmartyPluginDirectoriesModuleSettingValidatorTest extends TestCase
             'modules' => [
                 'smartyTestModule' => [
                     'smarty' => [
-                        'smartyPlugin.php' => '*this is test smarty plugin*'
-                    ]
-                ]
-            ]
+                        'smartyPlugin.php' => '*this is test smarty plugin*',
+                    ],
+                ],
+            ],
         ];
 
         if (!$this->vfsStreamDirectory) {

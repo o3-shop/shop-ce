@@ -43,8 +43,8 @@ class ManufacturerMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oManufacturer = oxNew(Manufacturer::class);
             $oManufacturer->loadInLang($this->_iEditLang, $soxId);
@@ -53,10 +53,10 @@ class ManufacturerMain extends AdminDetailsController
             if (!isset($oOtherLang[$this->_iEditLang])) {
                 $oManufacturer->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oManufacturer;
+            $this->_aViewData['edit'] = $oManufacturer;
 
             // category tree
-            $this->createCategoryTree("artcattree");
+            $this->createCategoryTree('artcattree');
 
             //Disable editing for derived articles
             if ($oManufacturer->isDerived()) {
@@ -66,14 +66,14 @@ class ManufacturerMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
@@ -81,10 +81,10 @@ class ManufacturerMain extends AdminDetailsController
             $oManufacturerMainAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\ManufacturerMainAjax::class);
             $this->_aViewData['oxajax'] = $oManufacturerMainAjax->getColumns();
 
-            return "popups/manufacturer_main.tpl";
+            return 'popups/manufacturer_main.tpl';
         }
 
-        return "manufacturer_main.tpl";
+        return 'manufacturer_main.tpl';
     }
 
     /**
@@ -105,7 +105,7 @@ class ManufacturerMain extends AdminDetailsController
 
         $oManufacturer = oxNew(Manufacturer::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oManufacturer->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxmanufacturers__oxid'] = null;
@@ -143,7 +143,7 @@ class ManufacturerMain extends AdminDetailsController
 
         $oManufacturer = oxNew(Manufacturer::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oManufacturer->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxmanufacturers__oxid'] = null;

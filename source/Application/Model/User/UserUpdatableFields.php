@@ -75,7 +75,7 @@ class UserUpdatableFields extends AbstractUpdatableFields
             'OXURL',
             'OXUPDATEKEY',
             'OXUPDATEEXP',
-            'OXTIMESTAMP'
+            'OXTIMESTAMP',
         ];
     }
 }

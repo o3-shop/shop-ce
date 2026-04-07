@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class ObjectexceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
@@ -26,9 +28,9 @@ class ObjectexceptionTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $testObject = oxNew(\OxidEsales\Eshop\Core\Exception\ObjectException::class);
         $this->assertEquals(\OxidEsales\Eshop\Core\Exception\ObjectException::class, get_class($testObject));
         $object = new \stdClass();
-        $object->sAtrib = "Atribute";
+        $object->sAtrib = 'Atribute';
         $testObject->setObject($object);
-        $this->assertEquals("Atribute", $testObject->getObject()->sAtrib);
+        $this->assertEquals('Atribute', $testObject->getObject()->sAtrib);
     }
 
     // We check on class name (exception class) and message only - rest is not checked yet

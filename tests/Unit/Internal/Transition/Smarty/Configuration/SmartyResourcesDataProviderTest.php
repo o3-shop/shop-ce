@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +20,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Smarty\Configuration;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Transition\Smarty\Configuration;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyResourcesDataProvider;
 
@@ -32,8 +34,8 @@ class SmartyResourcesDataProviderTest extends \PHPUnit\Framework\TestCase
             'ox_get_template',
             'ox_get_timestamp',
             'ox_get_secure',
-            'ox_get_trusted'
-        ]
+            'ox_get_trusted',
+        ],
         ];
 
         $this->assertEquals($settings, $datProvider->getResources());

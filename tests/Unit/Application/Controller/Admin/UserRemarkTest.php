@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,21 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\User;
 use OxidEsales\EshopCommunity\Core\Model\ListModel;
-
-use \oxField;
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Testing User_Remark class
  */
 class UserRemarkTest extends \OxidTestCase
 {
-
     /**
      * user_remark::render() test case
      *
@@ -40,11 +39,11 @@ class UserRemarkTest extends \OxidTestCase
     public function testRender()
     {
         oxTestModules::addFunction('oxRemark', 'load($sId)', '{$this->oxremark__oxtext = new oxField("text-$sId");$this->oxremark__oxheader = new oxField("header-$sId");}');
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("rem_oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('rem_oxid', 'testId');
 
         $oView = oxNew('user_remark');
-        $this->assertEquals("user_remark.tpl", $oView->render());
+        $this->assertEquals('user_remark.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['edit']));
         $this->assertTrue($aViewData['edit'] instanceof user);
@@ -71,12 +70,12 @@ class UserRemarkTest extends \OxidTestCase
             $oView = oxNew('user_remark');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in user_remark::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in user_remark::save()');
 
             return;
         }
 
-        $this->fail("Error in user_remark::save()");
+        $this->fail('Error in user_remark::save()');
     }
 
     /**
@@ -92,11 +91,11 @@ class UserRemarkTest extends \OxidTestCase
             $oView = oxNew('user_remark');
             $oView->delete();
         } catch (Exception $oExcp) {
-            $this->assertEquals("delete", $oExcp->getMessage(), "Error in user_remark::delete()");
+            $this->assertEquals('delete', $oExcp->getMessage(), 'Error in user_remark::delete()');
 
             return;
         }
 
-        $this->fail("Error in user_remark::delete()");
+        $this->fail('Error in user_remark::delete()');
     }
 }

@@ -8,12 +8,9 @@ function getMyPath() {
     source="$(readlink "$source")"
     [[ $source != /* ]] && source="$dir/$source"
   done
-
   cd -P "$(dirname "$source")" && pwd
 }
 
-
-# Determine which Docker Compose command to use
 check_docker_compose() {
     if command -v docker &> /dev/null && docker compose version &> /dev/null; then
         DOCKER_COMPOSE="docker compose"
@@ -26,53 +23,46 @@ check_docker_compose() {
     echo "Using command: $DOCKER_COMPOSE"
 }
 
-# Function to start Docker containers
 start_containers() {
-    # Change to the docker directory
     MY_DIR=$(getMyPath)
     cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
-
     check_docker_compose
-
-    # Pull latest images before starting containers
     echo "Pulling latest Docker images..."
     $DOCKER_COMPOSE pull
-
-    # Start the containers in detached mode
     echo "Starting Docker containers..."
     $DOCKER_COMPOSE up -d
-
-    # Check if containers started successfully
     if [ $? -eq 0 ]; then
         echo "Docker containers started successfully"
         $DOCKER_COMPOSE ps
-
         echo "
-| Credentials    |
-| -------------- | ---------------------------- |
++----------------+------------------------------+
+| Credentials    |                              |
++----------------+------------------------------+
 | Shop URL       | http://localhost:8080        |
-| Admin URL      | http://localhoat:8080/admin/ |
+| Admin URL      | http://localhost:8080/admin/ |
 | Admin Login    | admin@example.com            |
-| Admin Password | admin123                     |"
+| Admin Password | admin123                     |
++----------------+------------------------------+
+| Mailpit URL    | http://localhost:8025        |
++----------------+------------------------------+
+| Adminer URL    | http://localhost:8081        |
+| DB Root User   | root                         |
+| DB Root PW     | supersecret                  |
++----------------+------------------------------+
+"
+      return 0
     else
         echo "Error: Failed to start Docker containers"
         exit 1
     fi
 }
 
-# Function to stop Docker containers
 stop_containers() {
-    # Change to the docker directory
     MY_DIR=$(getMyPath)
     cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
-
     check_docker_compose
-
-    # Stop the containers
     echo "Stopping Docker containers..."
     $DOCKER_COMPOSE down
-
-    # Check if containers stopped successfully
     if [ $? -eq 0 ]; then
         echo "Docker containers stopped successfully"
     else
@@ -83,43 +73,114 @@ stop_containers() {
 
 rebuild_containers() {
       MY_DIR=$(getMyPath)
-
-            rm -f $MY_DIR/runned.txt
-
-            rm -f $MY_DIR/source/tmp/*.txt
-
-            rm -f $MY_DIR/source/tmp/*.php
-
-            rm -f $MY_DIR/source/tmp/smarty/*.php
-
-
+      rm -f $MY_DIR/runned.txt
+      rm -f $MY_DIR/source/tmp/*.txt
+      rm -f $MY_DIR/source/tmp/*.php
+      rm -f $MY_DIR/source/tmp/smarty/*.php
       cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
-
       check_docker_compose
-
-
-      # Pull latest images before starting containers
       echo "Pulling latest Docker images..."
       $DOCKER_COMPOSE pull
-
       $DOCKER_COMPOSE build --no-cache
-
-      # Start the containers in detached mode
       echo "Starting Docker containers..."
       $DOCKER_COMPOSE up -d
-
-      # Check if containers started successfully
       if [ $? -eq 0 ]; then
           echo "Docker containers started successfully"
           $DOCKER_COMPOSE ps
+          echo "
+| Credentials    |
+| -------------- | ---------------------------- |
+| Shop URL       | http://localhost:8080        |
+| Admin URL      | http://localhost:8080/admin/ |
+| Admin Login    | admin@example.com            |
+| Admin Password | admin123                     |
+| -------------- | ---------------------------- |
+| Adminer URL    | http://localhost:8081        |
+| DB Root User   | root                         |
+| DB Root PW     | supersecret                  |
+          "
+          return 0;
       else
           echo "Error: Failed to start Docker containers"
           exit 1
       fi
 }
 
-MY_DIR=$(getMyPath)
+run_tests() {
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
 
+  MY_DIR=$(getMyPath)
+  containers=(o3shop-app o3shop-db o3shop-mailpit)
+  target_container="o3shop-app"
+
+  for c in "${containers[@]}"; do
+      if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
+          echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
+          exit 1
+      fi
+  done
+
+  echo -e "${GREEN}✓ All containers are running – executing tests${NC}"
+  docker exec -i "$target_container" ./run-tests.sh "$@"
+}
+
+run_php_cs_fixer() {
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NC='\033[0m'
+
+    containers=(o3shop-app)
+    target_container="o3shop-app"
+
+    for c in "${containers[@]}"; do
+        if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
+            echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
+            exit 1
+        fi
+    done
+
+  # You may need to adjust path/to/php-cs-fixer and working directory if necessary
+  if docker exec -i "$target_container" php-cs-fixer --version &> /dev/null; then
+      echo -e "${GREEN}✓ Running php-cs-fixer...${NC}"
+      docker exec -i "$target_container" php-cs-fixer fix || true
+  else
+      echo -e "${RED}php-cs-fixer not found in $target_container. Please install it!${NC}"
+      exit 1
+  fi
+}
+
+run_quarantine_tests() {
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NC='\033[0m'
+
+  MY_DIR=$(getMyPath)
+  containers=(o3shop-app o3shop-db o3shop-mailpit)
+  target_container="o3shop-app"
+
+  for c in "${containers[@]}"; do
+      if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
+          echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
+          exit 1
+      fi
+  done
+
+  echo -e "${GREEN}✓ Running quarantine tests (slow / special tests)${NC}"
+  docker exec -i "$target_container" ./run-tests.sh --quarantine
+}
+
+run_full_test_with_cs_fixer() {
+  run_php_cs_fixer
+  echo ""
+  echo "---------------------------"
+  echo "Now running tests:"
+  echo "---------------------------"
+  run_tests
+}
+
+MY_DIR=$(getMyPath)
 
 if [ ! -f "$MY_DIR/.env" ]; then
     cp .env.example .env || handle_error "Failed to copy .env.example to .env"
@@ -130,16 +191,12 @@ fi
 
 if [ ! -f "$MY_DIR/docker/.env" ]; then
     DOCKER_VARS=("O3SHOP_CONF_DBUSER" "O3SHOP_CONF_DBPWD" "O3SHOP_CONF_DBROOT" "O3SHOP_CONF_DBNAME")
-
-    # Extract and write only those variables
     for var in "${DOCKER_VARS[@]}"; do
         grep "^$var=" "$MY_DIR/.env.example" >> "$MY_DIR/docker/.env"
     done
 fi
 
-# Main script execution
 case "$1" in
-
     start)
         start_containers || exit 127
         ;;
@@ -149,11 +206,37 @@ case "$1" in
     rebuild)
         rebuild_containers || exit 127
         ;;
+    test)
+        shift
+        run_tests "$@" || exit 127
+        ;;
+    test-all)
+        run_full_test_with_cs_fixer || exit 127
+        ;;
+    quarantine)
+        run_quarantine_tests || exit 127
+        ;;
     *)
-        echo "Usage: $0 {start|stop}"
-        echo "  start - Start Docker containers"
-        echo "  stop  - Stop Docker containers"
-        echo "  rebuild  - Rebuild Docker containers"
+        echo "Usage: $0 <command> [options]"
+        echo ""
+        echo "Commands:"
+        echo "  start        Start Docker containers"
+        echo "  stop         Stop Docker containers"
+        echo "  rebuild      Rebuild Docker containers from scratch"
+        echo ""
+        echo "  test         Run unit tests (pass extra args to phpunit)"
+        echo "  test-all     Run php-cs-fixer, then full test suite"
+        echo "  quarantine   Run slow/special @group quarantine tests only"
+        echo ""
+        echo "Options for 'test':"
+        echo "  --fast       Skip shop install, call phpunit directly"
+        echo "  --coverage   Generate coverage reports (clover, html, junit)"
+        echo ""
+        echo "Examples:"
+        echo "  $0 start"
+        echo "  $0 test --fast tests/Unit/Core/ConfigTest.php"
+        echo "  $0 test-all"
+        echo "  $0 quarantine"
         exit
         ;;
 esac

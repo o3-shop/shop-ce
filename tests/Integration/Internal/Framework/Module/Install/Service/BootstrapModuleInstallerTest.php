@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 class BootstrapModuleInstallerTest extends TestCase
 {
     use ContainerTrait;
-    
+
     private $moduleId = 'myTestModule';
 
     public function testUninstall(): void

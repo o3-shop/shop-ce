@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,15 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Setup;
 
+use oxDatabaseHelper;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Setup\Utilities;
 use OxidEsales\Facts\Facts;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use oxDatabaseHelper;
 
 require_once TEST_LIBRARY_HELPERS_PATH . 'oxDatabaseHelper.php';
 
@@ -85,7 +87,7 @@ class UtilitiesTest extends \OxidEsales\TestingLibrary\UnitTestCase
 
             $database = DatabaseProvider::getDb();
 
-            $sql = "SELECT `OXTITLE` FROM `oxdelivery` WHERE oxid = ?";
+            $sql = 'SELECT `OXTITLE` FROM `oxdelivery` WHERE oxid = ?';
             $oxtitle = $database->getOne($sql, ['1b842e734b62a4775.45738618']);
 
             $this->assertEquals('Versandkosten für Standard: Versandkostenfrei ab 80,-', $oxtitle);
@@ -152,7 +154,7 @@ class UtilitiesTest extends \OxidEsales\TestingLibrary\UnitTestCase
             ->will($this->returnValue([
                 'ce' => $ceMigrationPath,
                 'pe' => $peMigrationPath,
-                'ee' => $eeMigrationPath
+                'ee' => $eeMigrationPath,
             ]));
 
         return $factsMock;

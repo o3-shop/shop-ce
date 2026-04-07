@@ -65,7 +65,6 @@ class ContactFormFactory implements FormFactoryInterface
         $this->requiredFieldsValidator = $requiredFieldsValidator;
     }
 
-
     /**
      * @return FormInterface
      */

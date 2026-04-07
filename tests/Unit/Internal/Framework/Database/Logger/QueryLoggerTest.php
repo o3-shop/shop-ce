@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,11 +22,10 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Database\Logger;
 
-use OxidEsales\EshopCommunity\Tests\Unit\Internal\ContextStub;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLogger;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryFilter;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\Logger\QueryLogger;
+use OxidEsales\EshopCommunity\Tests\Unit\Internal\ContextStub;
 use Psr\Log\LoggerInterface;
-use OxidEsales\Eshop\Core\Registry;
 
 class QueryLoggerTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,12 +34,12 @@ class QueryLoggerTest extends \PHPUnit\Framework\TestCase
         $data = [
              [
                  'query_pass' => true,
-                 'expected'   => 'once'
+                 'expected'   => 'once',
              ],
              [
                  'query_pass' => false,
-                 'expected'   => 'never'
-             ]
+                 'expected'   => 'never',
+             ],
         ];
 
         return $data;
@@ -106,7 +107,7 @@ class QueryLoggerTest extends \PHPUnit\Framework\TestCase
                     'notice',
                     'info',
                     'debug',
-                    'log'
+                    'log',
                 ]
             )
             ->getMock();

@@ -43,7 +43,7 @@ class UserGroupList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxtitle";
+    protected $_sDefSortField = 'oxtitle';
 
     /**
      * Executes parent method parent::render() and returns name of template
@@ -56,6 +56,6 @@ class UserGroupList extends AdminListController
     {
         parent::render();
 
-        return "usergroup_list.tpl";
+        return 'usergroup_list.tpl';
     }
 }

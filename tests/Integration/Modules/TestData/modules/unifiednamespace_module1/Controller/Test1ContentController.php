@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -33,7 +34,7 @@ class Test1ContentController extends Test1ContentController_parent
         $contentTitle = parent::getTitle();
 
         $content = oxNew('Test1Content');
-        $contentTitle = $contentTitle . " - Module_1_Controller " . $content->getTitle();
+        $contentTitle = $contentTitle . ' - Module_1_Controller ' . $content->getTitle();
 
         return $contentTitle;
     }

@@ -38,28 +38,28 @@ class ContentList extends ListModel
      *
      * @var int
      */
-    const TYPE_INFORMATION_CONTENTS = 0;
+    public const TYPE_INFORMATION_CONTENTS = 0;
 
     /**
      * Main menu list type
      *
      * @var int
      */
-    const TYPE_MAIN_MENU_LIST = 1;
+    public const TYPE_MAIN_MENU_LIST = 1;
 
     /**
      * Main menu list type
      *
      * @var int
      */
-    const TYPE_CATEGORY_MENU = 2;
+    public const TYPE_CATEGORY_MENU = 2;
 
     /**
      * Service list.
      *
      * @var int
      */
-    const TYPE_SERVICE_LIST = 3;
+    public const TYPE_SERVICE_LIST = 3;
 
     /**
      * List of services.
@@ -194,15 +194,15 @@ class ContentList extends ListModel
     {
         $sSQLAdd = '';
         $oDb = DatabaseProvider::getDb();
-        $sSQLType = " AND `oxtype` = " . $oDb->quote($iType);
+        $sSQLType = ' AND `oxtype` = ' . $oDb->quote($iType);
 
         if ($iType == self::TYPE_CATEGORY_MENU) {
             $sSQLAdd = " AND `oxcatid` IS NOT NULL AND `oxsnippet` = '0'";
         }
 
         if ($iType == self::TYPE_SERVICE_LIST) {
-            $sIdents = implode(", ", DatabaseProvider::getDb()->quoteArray($this->getServiceKeys()));
-            $sSQLAdd = " AND OXLOADID IN (" . $sIdents . ")";
+            $sIdents = implode(', ', DatabaseProvider::getDb()->quoteArray($this->getServiceKeys()));
+            $sSQLAdd = ' AND OXLOADID IN (' . $sIdents . ')';
             $sSQLType = '';
         }
         $sViewName = $this->getBaseObject()->getViewName();

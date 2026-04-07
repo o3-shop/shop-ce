@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \stdClass;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxField;
+use oxRegistry;
+use stdClass;
 
 /**
  * Testing oxuserpayment class
@@ -87,7 +89,7 @@ class UserpaymentTest extends \OxidTestCase
      */
     public function testGetDynValuesForTestCase()
     {
-        $aDynValues = array();
+        $aDynValues = [];
 
         $oVal = new stdClass();
         $oVal->name = 'lsbankname';
@@ -124,7 +126,6 @@ class UserpaymentTest extends \OxidTestCase
         $oUserPayment->getNonPublicVar('_aDynValues', 'aDynValues');
     }
 
-
     /**
      * Checking if payment encryption key is good
      */
@@ -148,18 +149,7 @@ class UserpaymentTest extends \OxidTestCase
         $this->assertEquals(oxRegistry::getUtils()->strRot13('fq45QS09_fqyx09239QQ'), $oUpay->getPaymentKey('_sPaymentKey'));
     }
 
-    /**
-     * Testing if constructor sets _blStoreCreditCardInfo from oxConfig param
-     */
-    public function testConstructor()
-    {
-        $this->getConfig()->setConfigParam('blStoreCreditCardInfo', true);
-
-        $oUpay = oxNew('oxuserpayment');
-        $oUpay->__construct();
-
-        $this->assertTrue($oUpay->getStoreCreditCardInfo());
-    }
+    // testConstructor removed: tested setStoreCreditCardInfo/getStoreCreditCardInfo which were removed from production code
 
     /**
      * Checking if payment encryption key is good
@@ -192,84 +182,31 @@ class UserpaymentTest extends \OxidTestCase
     }
 
     /**
-     * Testing if insert encodes oxvalue field
+     * Testing if insert stores oxvalue field (encoding via MySQL ENCODE() was removed)
      */
-    public function testInsertEncodesOxValue()
+    public function testInsertStoresOxValue()
     {
         $oUpay = oxNew('oxuserpayment');
         $oUpay->setId('_testOxId2');
         $oUpay->oxuserpayments__oxvalue = new oxField('123456789', oxField::T_RAW);
         $oUpay->save();
 
-        $this->assertEquals("\xbc\x69\x65\xb9\x3a\x13\x29\xa1\xeb", oxDb::getDb()->getOne("SELECT oxvalue FROM oxuserpayments WHERE oxid='_testOxId2'"));
+        $this->assertEquals('123456789', oxDb::getDb()->getOne("SELECT oxvalue FROM oxuserpayments WHERE oxid='_testOxId2'"));
     }
 
-    /**
-     * Testing if insert is not exectuted when _blStoreCreditCardInfo is false
-     * and payment type is credit card
-     */
-    public function testInsertWhenStoreCreditCardInfoIsOffAndPaymentTypeIsCreditCard()
-    {
-        $oUpay = oxNew('oxuserpayment');
-        $oUpay->setStoreCreditCardInfo(false);
-        $oUpay->setId('_testOxId2');
-        $oUpay->oxuserpayments__oxpaymentsid = new oxField('oxidcreditcard', oxField::T_RAW);
-        $oUpay->save();
-
-        $this->assertFalse(oxDb::getDb()->getOne("SELECT oxid FROM oxuserpayments WHERE oxid='_testOxId2'"));
-    }
+    // testInsertWhenStoreCreditCardInfo* tests removed: tested setStoreCreditCardInfo() which was removed from production code
 
     /**
-     * Testing if insert is exectuted when _blStoreCreditCardInfo is true
-     * and payment type is credit card
+     * Testing if update stores oxvalue field (encoding via MySQL ENCODE() was removed)
      */
-    public function testInsertWhenStoreCreditCardInfoIsOnAndPaymentTypeIsCreditCard()
-    {
-        $oUpay = oxNew('oxuserpayment');
-        $oUpay->setStoreCreditCardInfo(true);
-        $oUpay->setId('_testOxId2');
-        $oUpay->oxuserpayments__oxpaymentsid = new oxField('oxidcreditcard', oxField::T_RAW);
-        $oUpay->save();
-
-        $this->assertEquals('_testOxId2', oxDb::getDb()->getOne("SELECT oxid FROM oxuserpayments WHERE oxid='_testOxId2'"));
-    }
-
-    /**
-     * Testing if insert is exectuted when _blStoreCreditCardInfo is false
-     * and payment type is not credit card
-     */
-    public function testInsertWhenStoreCreditCardInfoIsOnAndPaymentTypeIsNotCreditCard()
-    {
-        $oUpay = oxNew('oxuserpayment');
-        $oUpay->setStoreCreditCardInfo(true);
-        $oUpay->setId('_testOxId2');
-        $oUpay->oxuserpayments__oxpaymentsid = new oxField('oxidinvoice', oxField::T_RAW);
-        $oUpay->save();
-
-        $this->assertEquals('_testOxId2', oxDb::getDb()->getOne("SELECT oxid FROM oxuserpayments WHERE oxid='_testOxId2'"));
-    }
-
-    /**
-     * Testing if update encodes oxvalue field
-     */
-    public function testUpdateEncodesOxValue()
+    public function testUpdateStoresOxValue()
     {
         $this->_oUpay->oxuserpayments__oxvalue = new oxField('123456789', oxField::T_RAW);
         $this->_oUpay->save();
-        $this->assertEquals("BC6965B93A1329A1EB", oxDb::getDb()->getOne("SELECT hex(oxvalue) FROM oxuserpayments WHERE oxid='_testOxId'"));
+        $this->assertEquals('123456789', oxDb::getDb()->getOne("SELECT oxvalue FROM oxuserpayments WHERE oxid='_testOxId'"));
     }
 
-    /**
-     * Testing setter/getter for _blStoreCreditCardInfo
-     */
-    public function testSetGetStoreCreditCardInfo()
-    {
-        $this->_oUpay->setStoreCreditCardInfo(true);
-        $this->assertTrue($this->_oUpay->getStoreCreditCardInfo());
-
-        $this->_oUpay->setStoreCreditCardInfo(false);
-        $this->assertFalse($this->_oUpay->getStoreCreditCardInfo());
-    }
+    // testSetGetStoreCreditCardInfo removed: tested setStoreCreditCardInfo/getStoreCreditCardInfo which were removed from production code
 
     /**
      * Inserting test orders
@@ -285,10 +222,10 @@ class UserpaymentTest extends \OxidTestCase
 
         $sShopId = $this->getConfig()->GetBaseShopId();
         foreach ($aUserPaymentId as $iCnt => $sUserPaymentId) {
-            $sOrderId = "_test" . (time() + $iCnt);
+            $sOrderId = '_test' . (time() + $iCnt);
             $sOrderDate = "2011-03-1{$iCnt} 10:55:13";
 
-            $oDb->execute($sQ, array($sOrderId, $sShopId, $sUserId, $sOrderDate, $iCnt + 1, $sUserPaymentId));
+            $oDb->execute($sQ, [$sOrderId, $sShopId, $sUserId, $sOrderDate, $iCnt + 1, $sUserPaymentId]);
         }
     }
 
@@ -298,7 +235,7 @@ class UserpaymentTest extends \OxidTestCase
     public function testGetPaymentByPaymentType()
     {
         // inserting few test orders
-        $this->_insertTestOrders(array('_testOxId5', '_testOxId4', '_testOxId3', '_testOxId2', '_testOxId'), '_testUserId');
+        $this->_insertTestOrders(['_testOxId5', '_testOxId4', '_testOxId3', '_testOxId2', '_testOxId'], '_testUserId');
 
         $oUser = oxNew('oxUser');
         $oUser->setId('_testUserId');
@@ -360,16 +297,5 @@ class UserpaymentTest extends \OxidTestCase
         $this->assertEquals($aDynVal, $oUserPayment->getDynValues());
     }
 
-    /**
-     * Testing dyn values getter
-     */
-    public function testGetDynValuesNotAllowed()
-    {
-        $sDyn = 'kktype__visa@@kknumber__12345@@kkmonth__11@@kkyear__2008@@kkname__testName@@kkpruef__56789@@';
-        $oUserPayment = oxNew('oxUserPayment');
-        $oUserPayment->setStoreCreditCardInfo(false);
-        $oUserPayment->oxuserpayments__oxvalue = new oxField($sDyn, oxField::T_RAW);
-        $oUserPayment->oxuserpayments__oxpaymentsid = new oxField('oxidcreditcard', oxField::T_RAW);
-        $this->assertNull($oUserPayment->getDynValues());
-    }
+    // testGetDynValuesNotAllowed removed: tested setStoreCreditCardInfo() which was removed from production code
 }

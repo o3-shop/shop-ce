@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 class SelectionTest extends \OxidTestCase
@@ -28,11 +30,11 @@ class SelectionTest extends \OxidTestCase
      */
     public function testConstructorAndSetters()
     {
-        $oSelection = oxNew('oxSelection', "test", "test", true, true);
+        $oSelection = oxNew('oxSelection', 'test', 'test', true, true);
 
-        $this->assertEquals("test", $oSelection->getValue());
-        $this->assertEquals("test", $oSelection->getName());
-        $this->assertEquals("#", $oSelection->getLink());
+        $this->assertEquals('test', $oSelection->getValue());
+        $this->assertEquals('test', $oSelection->getName());
+        $this->assertEquals('#', $oSelection->getLink());
         $this->assertTrue($oSelection->isActive());
         $this->assertTrue($oSelection->isDisabled());
 

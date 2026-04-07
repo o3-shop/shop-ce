@@ -1,6 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\CE\Internal\Application;
+declare(strict_types=1);
+
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\CE\Internal\Container;
 
 /**
  * This file is part of O3-Shop.
@@ -23,7 +25,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixture
 
 class DummyGraphQLTypeFactory
 {
-
     /**
      * @var DummyGraphQLType
      */

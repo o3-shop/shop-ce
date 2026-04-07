@@ -99,7 +99,7 @@ class ConnectionException extends \OxidEsales\Eshop\Core\Exception\StandardExcep
      */
     public function getString()
     {
-        return __CLASS__ . '-' . parent::getString() . " Connection Adress --> " . $this->_sAddress . "\n" . "Connection Error --> " . $this->_sConnectionError;
+        return __CLASS__ . '-' . parent::getString() . ' Connection Adress --> ' . $this->_sAddress . "\n" . 'Connection Error --> ' . $this->_sConnectionError;
     }
 
     /**

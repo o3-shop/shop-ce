@@ -38,7 +38,7 @@ class AdminRightsMainAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table,  visible, multilanguage, ident
             ['oxusername', 'oxuser', 1, 0, 0],
             ['oxlname', 'oxuser', 0, 0, 0],
@@ -98,16 +98,16 @@ class AdminRightsMainAjax extends ListComponentAjax
             $sQAdd = " from $sUserTable where 1 ";
         } else {
             $sQAdd = " from $sUserTable, o3object2role where $sUserTable.oxid=o3object2role.objectid and ";
-            $sQAdd .= " o3object2role.roleid = " . $oDb->quote($sRoleId);
+            $sQAdd .= ' o3object2role.roleid = ' . $oDb->quote($sRoleId);
         }
 
         if ($sSynchRoleId && $sSynchRoleId != $sRoleId) {
             $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from $sUserTable, o3object2role where $sUserTable.oxid=o3object2role.objectid and ";
-            $sQAdd .= " o3object2role.roleid = " . $oDb->quote($sSynchRoleId);
+            $sQAdd .= ' o3object2role.roleid = ' . $oDb->quote($sSynchRoleId);
             if (!$myConfig->getConfigParam('blMallUsers')) {
                 $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
             }
-            $sQAdd .= " ) ";
+            $sQAdd .= ' ) ';
         }
 
         if (!$myConfig->getConfigParam('blMallUsers')) {
@@ -125,10 +125,10 @@ class AdminRightsMainAjax extends ListComponentAjax
         $aRemoveRoles = $this->getActionIds('o3object2role.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete o3object2role.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete o3object2role.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveRoles && is_array($aRemoveRoles)) {
-            $sQ = "delete from o3object2role where o3object2role.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveRoles)) . ") ";
+            $sQ = 'delete from o3object2role where o3object2role.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveRoles)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -145,12 +145,12 @@ class AdminRightsMainAjax extends ListComponentAjax
             $sUserTable = (oxNew(User::class))->getViewName();
             $aAddUsers = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aAddUsers)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddUsers)) {
             foreach ($aAddUsers as $sAdduser) {
                 $newAssignments = oxNew(Object2Role::class);
                 $newAssignments->assign([
                     'objectid'  => $sAdduser,
-                    'roleid'    => $soxId
+                    'roleid'    => $soxId,
                 ]);
                 $newAssignments->save();
             }

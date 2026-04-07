@@ -48,7 +48,7 @@ class DynEconda extends ShopConfiguration
         parent::render();
         $this->_aViewData['oxid'] = Registry::getConfig()->getShopId();
 
-        return "dyn_econda.tpl";
+        return 'dyn_econda.tpl';
     }
 
     /**

@@ -52,7 +52,7 @@ class UserAddress extends AdminDetailsController
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oUser = oxNew(User::class);
             $oUser->load($soxId);
@@ -60,13 +60,13 @@ class UserAddress extends AdminDetailsController
             // load address
             $sAddressIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
             $sAddressId = isset($this->sSavedOxid) ? $this->sSavedOxid : $sAddressIdParameter;
-            if ($sAddressId != "-1" && isset($sAddressId)) {
+            if ($sAddressId != '-1' && isset($sAddressId)) {
                 $oAddress = oxNew(Address::class);
                 $oAddress->load($sAddressId);
-                $this->_aViewData["edit"] = $oAddress;
+                $this->_aViewData['edit'] = $oAddress;
             }
 
-            $this->_aViewData["oxaddressid"] = $sAddressId;
+            $this->_aViewData['oxaddressid'] = $sAddressId;
 
             // generate selected
             $oAddressList = $oUser->getUserAddresses();
@@ -77,19 +77,19 @@ class UserAddress extends AdminDetailsController
                 }
             }
 
-            $this->_aViewData["edituser"] = $oUser;
+            $this->_aViewData['edituser'] = $oUser;
         }
 
         $oCountryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
         $oCountryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
 
-        $this->_aViewData["countrylist"] = $oCountryList;
+        $this->_aViewData['countrylist'] = $oCountryList;
 
         if (!$this->_allowAdminEdit($soxId)) {
             $this->_aViewData['readonly'] = true;
         }
 
-        return "user_address.tpl";
+        return 'user_address.tpl';
     }
 
     /**
@@ -102,7 +102,7 @@ class UserAddress extends AdminDetailsController
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
             $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
             $oAddress = oxNew(Address::class);
-            if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] == "-1") {
+            if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] == '-1') {
                 $aParams['oxaddress__oxid'] = null;
             } else {
                 $oAddress->load($aParams['oxaddress__oxid']);
@@ -123,7 +123,7 @@ class UserAddress extends AdminDetailsController
         $this->_blDelete = false;
         if ($this->_allowAdminEdit($this->getEditObjectId())) {
             $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
-            if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] != "-1") {
+            if (isset($aParams['oxaddress__oxid']) && $aParams['oxaddress__oxid'] != '-1') {
                 $oAddress = oxNew(Address::class);
                 $this->_blDelete = $oAddress->delete($aParams['oxaddress__oxid']);
             }

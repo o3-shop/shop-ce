@@ -51,14 +51,14 @@ class SystemInfoController extends AdminController
 
         $oAuthUser = oxNew(User::class);
         $oAuthUser->loadAdminUser();
-        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == "malladmin";
+        $blisMallAdmin = $oAuthUser->oxuser__oxrights->value == 'malladmin';
 
         if ($blisMallAdmin && !$myConfig->isDemoShop()) {
             $aClassVars = get_object_vars($myConfig);
             $aSystemInfo = [];
             $aSystemInfo['pkg.info'] = $myConfig->getPackageInfo();
             foreach ($aClassVars as $name => $value) {
-                if (gettype($value) == "object") {
+                if (gettype($value) == 'object') {
                     continue;
                 }
 
@@ -67,28 +67,28 @@ class SystemInfoController extends AdminController
                 }
 
                 $value = var_export($value, true);
-                $value = str_replace("\n", "<br>", $value);
+                $value = str_replace("\n", '<br>', $value);
                 $aSystemInfo[$name] = $value;
                 //echo( "$name = $value <br>");
             }
             $context = [
-                "oViewConf" => $this->_aViewData["oViewConf"],
-                "oView" => $this->_aViewData["oView"],
-                "shop" => $this->_aViewData["shop"],
-                "isdemo" => $myConfig->isDemoShop(),
-                "aSystemInfo" => $aSystemInfo
+                'oViewConf' => $this->_aViewData['oViewConf'],
+                'oView' => $this->_aViewData['oView'],
+                'shop' => $this->_aViewData['shop'],
+                'isdemo' => $myConfig->isDemoShop(),
+                'aSystemInfo' => $aSystemInfo,
             ];
 
             ob_start();
-            echo $this->getRenderer()->renderTemplate("systeminfo.tpl", $context);
-            echo("<br><br>");
+            echo $this->getRenderer()->renderTemplate('systeminfo.tpl', $context);
+            echo('<br><br>');
 
             phpinfo();
             $sMessage = ob_get_clean();
 
             Registry::getUtils()->showMessageAndExit($sMessage);
         } else {
-            return Registry::getUtils()->showMessageAndExit("Access denied !");
+            return Registry::getUtils()->showMessageAndExit('Access denied !');
         }
     }
 
@@ -117,7 +117,7 @@ class SystemInfoController extends AdminController
             'dbUser',
             'dbPwd',
             'aSerials',
-            'sSerialNr'
+            'sSerialNr',
         ]);
     }
 }

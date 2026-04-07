@@ -44,7 +44,7 @@ class SystemRequirementsMain extends AdminDetailsController
         $this->_aViewData['aInfo'] = $oSysReq->getSystemInfo();
         $this->_aViewData['aCollations'] = $oSysReq->checkCollation();
 
-        return "sysreq_main.tpl";
+        return 'sysreq_main.tpl';
     }
 
     /**

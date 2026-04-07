@@ -188,7 +188,7 @@ class RecommListController extends ArticleListController
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
 
         if ($oRecommList = $this->getActiveRecommList()) {
-            $sAddParams .= "&amp;recommid=" . $oRecommList->getId();
+            $sAddParams .= '&amp;recommid=' . $oRecommList->getId();
         }
 
         return $sAddParams;
@@ -202,8 +202,8 @@ class RecommListController extends ArticleListController
     public function getAddSeoUrlParams()
     {
         $sAddParams = parent::getAddSeoUrlParams();
-        if ($sParam = Registry::getRequest()->getRequestEscapedParameter('searchrecomm', true)) {
-            $sAddParams .= "&amp;searchrecomm=" . rawurlencode($sParam);
+        if ($sParam = Registry::getRequest()->getRequestParameter('searchrecomm')) {
+            $sAddParams .= '&amp;searchrecomm=' . rawurlencode($sParam);
         }
 
         return $sAddParams;
@@ -243,7 +243,7 @@ class RecommListController extends ArticleListController
                 }
             }
 
-            if (($sReviewText = trim((string) Registry::getRequest()->getRequestEscapedParameter('rvw_txt', true)))) {
+            if (($sReviewText = trim((string) Registry::getRequest()->getRequestParameter('rvw_txt')))) {
                 $oReview = oxNew(Review::class);
                 $oReview->oxreviews__oxobjectid = new Field($oRecommList->getId());
                 $oReview->oxreviews__oxtype = new Field('oxrecommlist');
@@ -377,13 +377,13 @@ class RecommListController extends ArticleListController
     public function getRatingValue()
     {
         if ($this->_dRatingValue === null) {
-            $this->_dRatingValue = (double) 0;
+            $this->_dRatingValue = (float) 0;
             if ($this->isReviewActive() && ($oActiveRecommList = $this->getActiveRecommList())) {
                 $this->_dRatingValue = round($oActiveRecommList->oxrecommlists__oxrating->value, 1);
             }
         }
 
-        return (double) $this->_dRatingValue;
+        return (float) $this->_dRatingValue;
     }
 
     /**
@@ -434,7 +434,7 @@ class RecommListController extends ArticleListController
     {
         if ($this->_sSearch === null) {
             $this->_sSearch = false;
-            if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('searchrecomm', false)) {
+            if ($sSearch = Registry::getRequest()->getRequestEscapedParameter('searchrecomm')) {
                 $this->_sSearch = $sSearch;
             }
         }
@@ -457,7 +457,7 @@ class RecommListController extends ArticleListController
 
         if ($sSearchParam = $this->getRecommSearch()) {
             $shopHomeURL = Registry::getConfig()->getShopHomeUrl();
-            $sUrl = $shopHomeURL . "cl=recommlist&amp;searchrecomm=" . rawurlencode($sSearchParam);
+            $sUrl = $shopHomeURL . 'cl=recommlist&amp;searchrecomm=' . rawurlencode($sSearchParam);
             $sTitle = $oLang->translateString('RECOMMLIST_SEARCH') . ' "' . $sSearchParam . '"';
 
             $aPath[1] = oxNew(Category::class);
@@ -531,11 +531,11 @@ class RecommListController extends ArticleListController
         $sAddParams = FrontendController::getAdditionalParams();
 
         if ($oRecomm = $this->getActiveRecommList()) {
-            $sAddParams .= "&amp;recommid=" . $oRecomm->getId();
+            $sAddParams .= '&amp;recommid=' . $oRecomm->getId();
         }
 
         if ($sSearch = $this->getRecommSearch()) {
-            $sAddParams .= "&amp;searchrecomm=" . rawurlencode($sSearch);
+            $sAddParams .= '&amp;searchrecomm=' . rawurlencode($sSearch);
         }
 
         return $sAddParams;

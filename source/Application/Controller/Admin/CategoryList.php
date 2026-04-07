@@ -61,8 +61,8 @@ class CategoryList extends AdminListController
         if ($this->_aCurrSorting === null && !$sSortParameter && ($oBaseObject = $this->getItemListBaseObject())) {
             $sCatView = $oBaseObject->getCoreTableName();
 
-            $this->_aCurrSorting[$sCatView]["oxrootid"] = "desc";
-            $this->_aCurrSorting[$sCatView]["oxleft"] = "asc";
+            $this->_aCurrSorting[$sCatView]['oxrootid'] = 'desc';
+            $this->_aCurrSorting[$sCatView]['oxleft'] = 'asc';
 
             return $this->_aCurrSorting;
         } else {
@@ -93,12 +93,12 @@ class CategoryList extends AdminListController
         $aNewList = [];
         $oRoot = new stdClass();
         $oRoot->oxcategories__oxid = new Field(null, Field::T_RAW);
-        $oRoot->oxcategories__oxtitle = new Field($oLang->translateString("viewAll", $iLang), Field::T_RAW);
+        $oRoot->oxcategories__oxtitle = new Field($oLang->translateString('viewAll', $iLang), Field::T_RAW);
         $aNewList[] = $oRoot;
 
         $oRoot = new stdClass();
-        $oRoot->oxcategories__oxid = new Field("oxrootid", Field::T_RAW);
-        $oRoot->oxcategories__oxtitle = new Field("-- " . $oLang->translateString("mainCategory", $iLang) . " --", Field::T_RAW);
+        $oRoot->oxcategories__oxid = new Field('oxrootid', Field::T_RAW);
+        $oRoot->oxcategories__oxtitle = new Field('-- ' . $oLang->translateString('mainCategory', $iLang) . ' --', Field::T_RAW);
         $aNewList[] = $oRoot;
 
         foreach ($oCatTree as $oCategory) {
@@ -107,17 +107,17 @@ class CategoryList extends AdminListController
 
         $oCatTree->assign($aNewList);
         $aFilter = $this->getListFilter();
-        if (is_array($aFilter) && isset($aFilter["oxcategories"]["oxparentid"])) {
+        if (is_array($aFilter) && isset($aFilter['oxcategories']['oxparentid'])) {
             foreach ($oCatTree as $oCategory) {
-                if ($oCategory->oxcategories__oxid->value == $aFilter["oxcategories"]["oxparentid"]) {
+                if ($oCategory->oxcategories__oxid->value == $aFilter['oxcategories']['oxparentid']) {
                     $oCategory->selected = 1;
                     break;
                 }
             }
         }
 
-        $this->_aViewData["cattree"] = $oCatTree;
+        $this->_aViewData['cattree'] = $oCatTree;
 
-        return "category_list.tpl";
+        return 'category_list.tpl';
     }
 }

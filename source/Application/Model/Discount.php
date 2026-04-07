@@ -102,7 +102,7 @@ class Discount extends MultiLanguageModel
 
         $oDb = DatabaseProvider::getDb();
         $oDb->execute('delete from oxobject2discount where oxobject2discount.oxdiscountid = :oxdiscountid', [
-            ':oxdiscountid' => $sOXID
+            ':oxdiscountid' => $sOXID,
         ]);
 
         return parent::delete($sOXID);
@@ -163,13 +163,13 @@ class Discount extends MultiLanguageModel
         if (is_null($this->_blIsForArticleOrForCategory)) {
             $oDb = DatabaseProvider::getDb();
 
-            $sQuery = "select 1
+            $sQuery = 'select 1
                         from oxobject2discount
-                        where oxdiscountid = :oxdiscountid and (oxtype = :oxtypearticles or oxtype = :oxtypecategories)";
+                        where oxdiscountid = :oxdiscountid and (oxtype = :oxtypearticles or oxtype = :oxtypecategories)';
             $params = [
                 ':oxdiscountid' => $this->oxdiscount__oxid->value,
                 ':oxtypearticles' => 'oxarticles',
-                ':oxtypecategories' => 'oxcategories'
+                ':oxtypecategories' => 'oxcategories',
             ];
 
             $this->_blIsForArticleOrForCategory = $oDb->getOne($sQuery, $params) ? false : true;
@@ -239,12 +239,12 @@ class Discount extends MultiLanguageModel
         $oDb = DatabaseProvider::getDb();
 
         // check if this article is assigned
-        $sQ = "select 1 from oxobject2discount 
-            where oxdiscountid = :oxdiscountid and oxtype = :oxtype ";
+        $sQ = 'select 1 from oxobject2discount 
+            where oxdiscountid = :oxdiscountid and oxtype = :oxtype ';
         $sQ .= $this->_getProductCheckQuery($oArticle);
         $params = [
             ':oxdiscountid' => $this->oxdiscount__oxid->value,
-            ':oxtype' => 'oxarticles'
+            ':oxtype' => 'oxarticles',
         ];
 
         if (!($blOk = (bool)$oDb->getOne($sQ, $params))) {
@@ -336,7 +336,7 @@ class Discount extends MultiLanguageModel
         // amounts check
         if ($this->oxdiscount__oxamount->value && ($oSummary->iArticleCount < $this->oxdiscount__oxamount->value || $oSummary->iArticleCount > $this->oxdiscount__oxamountto->value)) {
             return false;
-        // price check
+            // price check
         } elseif ($this->oxdiscount__oxprice->value) {
             $dRate = $oBasket->getBasketCurrency()->rate;
             if ($oSummary->dArticleDiscountablePrice < $this->oxdiscount__oxprice->value * $dRate || $oSummary->dArticleDiscountablePrice > $this->oxdiscount__oxpriceto->value * $dRate) {
@@ -349,7 +349,7 @@ class Discount extends MultiLanguageModel
         $sQ = 'select 1 from oxobject2discount 
             where oxdiscountid = :oxdiscountid and oxtype in ("oxarticles", "oxcategories" ) ';
         $params = [
-            ':oxdiscountid' => $this->oxdiscount__oxid->value
+            ':oxdiscountid' => $this->oxdiscount__oxid->value,
         ];
 
         return !((bool)$oDb->getOne($sQ, $params));
@@ -370,10 +370,10 @@ class Discount extends MultiLanguageModel
         }
 
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select 1 from oxobject2discount where oxdiscountid = :oxdiscountid";
+        $sQ = 'select 1 from oxobject2discount where oxdiscountid = :oxdiscountid';
         $sQ .= $this->_getProductCheckQuery($oArticle);
         $params = [
-            ':oxdiscountid' => $this->getId()
+            ':oxdiscountid' => $this->getId(),
         ];
 
         if (!($blOk = (bool)$oDb->getOne($sQ, $params))) {
@@ -509,11 +509,11 @@ class Discount extends MultiLanguageModel
         $db = DatabaseProvider::getDb();
         $params = [
             ':oxdiscountid' => $this->getId(),
-            ':oxtype' => 'oxarticles'
+            ':oxtype' => 'oxarticles',
         ];
 
-        return $db->getCol("select `oxobjectid` from oxobject2discount 
-            where oxdiscountid = :oxdiscountid and oxtype = :oxtype", $params);
+        return $db->getCol('select `oxobjectid` from oxobject2discount 
+            where oxdiscountid = :oxdiscountid and oxtype = :oxtype', $params);
     }
 
     /**
@@ -528,11 +528,11 @@ class Discount extends MultiLanguageModel
         $db = DatabaseProvider::getDb();
         $params = [
             ':oxdiscountid' => $this->getId(),
-            ':oxtype' => 'oxcategories'
+            ':oxtype' => 'oxcategories',
         ];
 
-        return $db->getCol("select `oxobjectid` from oxobject2discount 
-            where oxdiscountid = :oxdiscountid and oxtype = :oxtype", $params);
+        return $db->getCol('select `oxobjectid` from oxobject2discount 
+            where oxdiscountid = :oxdiscountid and oxtype = :oxtype', $params);
     }
 
     /**
@@ -545,9 +545,9 @@ class Discount extends MultiLanguageModel
      */
     public function getNextOxsort($shopId)
     {
-        $query = "SELECT MAX(`oxsort`)+10 FROM `oxdiscount` WHERE `oxshopid` = :oxshopid";
+        $query = 'SELECT MAX(`oxsort`)+10 FROM `oxdiscount` WHERE `oxshopid` = :oxshopid';
         $nextSort = DatabaseProvider::getDb()->getOne($query, [
-            ':oxshopid' => $shopId
+            ':oxshopid' => $shopId,
         ]);
 
         return (int) $nextSort;
@@ -571,7 +571,7 @@ class Discount extends MultiLanguageModel
             return false;
         }
 
-        $sCatIds = "(" . implode(",", DatabaseProvider::getDb()->quoteArray($aCatIds)) . ")";
+        $sCatIds = '(' . implode(',', DatabaseProvider::getDb()->quoteArray($aCatIds)) . ')';
 
         $oDb = DatabaseProvider::getDb();
         // getOne appends limit 1, so this one should be fast enough
@@ -582,7 +582,7 @@ class Discount extends MultiLanguageModel
 
         return $oDb->getOne($sQ, [
             ':oxdiscountid' => $this->oxdiscount__oxid->value,
-            ':oxtype' => 'oxcategories'
+            ':oxtype' => 'oxcategories',
         ]);
     }
 
@@ -601,9 +601,9 @@ class Discount extends MultiLanguageModel
         $oDb = DatabaseProvider::getDb();
         // check if this article is assigned
         if (($sParentId = $oProduct->getParentId())) {
-            $sArticleId = " and ( oxobjectid = " . $oDb->quote($oProduct->getProductId()) . " or oxobjectid = " . $oDb->quote($sParentId) . " )";
+            $sArticleId = ' and ( oxobjectid = ' . $oDb->quote($oProduct->getProductId()) . ' or oxobjectid = ' . $oDb->quote($sParentId) . ' )';
         } else {
-            $sArticleId = " and oxobjectid = " . $oDb->quote($oProduct->getProductId());
+            $sArticleId = ' and oxobjectid = ' . $oDb->quote($oProduct->getProductId());
         }
 
         return $sArticleId;
@@ -622,14 +622,14 @@ class Discount extends MultiLanguageModel
     {
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select 1
+        $sQ = 'select 1
                 from oxobject2discount
                 where oxdiscountid = :oxdiscountid 
-                    and oxtype = :oxtype ";
+                    and oxtype = :oxtype ';
         $sQ .= $this->_getProductCheckQuery($oArticle);
         $params = [
             ':oxdiscountid' => $this->oxdiscount__oxid->value,
-            ':oxtype' => 'oxarticles'
+            ':oxtype' => 'oxarticles',
         ];
 
         return $oDb->getOne($sQ, $params) ? true : false;
@@ -652,13 +652,13 @@ class Discount extends MultiLanguageModel
 
         $oDb = DatabaseProvider::getDb();
 
-        $sCategoryIds = "(" . implode(",", DatabaseProvider::getDb()->quoteArray($aCategoryIds)) . ")";
+        $sCategoryIds = '(' . implode(',', DatabaseProvider::getDb()->quoteArray($aCategoryIds)) . ')';
         $sQ = "select 1
                 from oxobject2discount
                 where oxdiscountid = :oxdiscountid and oxobjectid in {$sCategoryIds} and oxtype = :oxtype";
         $params = [
             ':oxdiscountid' => $this->oxdiscount__oxid->value,
-            ':oxtype' => 'oxcategories'
+            ':oxtype' => 'oxcategories',
         ];
 
         return $oDb->getOne($sQ, $params) ? true : false;

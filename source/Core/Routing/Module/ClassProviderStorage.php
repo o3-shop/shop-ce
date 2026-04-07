@@ -35,7 +35,7 @@ class ClassProviderStorage implements ClassProviderStorageInterface
     /**
      * @var string The key under which the value will be stored.
      */
-    const STORAGE_KEY = 'aModuleControllers';
+    public const STORAGE_KEY = 'aModuleControllers';
 
     /**
      * Get the stored controller value from the oxconfig.

@@ -45,23 +45,23 @@ class NewsletterMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         $oNewsletter = oxNew(Newsletter::class);
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oNewsletter->load($soxId);
-            $this->_aViewData["edit"] = $oNewsletter;
+            $this->_aViewData['edit'] = $oNewsletter;
         }
 
         // generate editor
-        $this->_aViewData["editor"] = $this->generateTextEditor(
-            "100%",
+        $this->_aViewData['editor'] = $this->generateTextEditor(
+            '100%',
             255,
             $oNewsletter,
-            "oxnewsletter__oxtemplate"
+            'oxnewsletter__oxtemplate'
         );
 
-        return "newsletter_main.tpl";
+        return 'newsletter_main.tpl';
     }
 
     /**
@@ -74,11 +74,11 @@ class NewsletterMain extends AdminDetailsController
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         // shopid
-        $sShopID = Registry::getSession()->getVariable("actshop");
+        $sShopID = Registry::getSession()->getVariable('actshop');
         $aParams['oxnewsletter__oxshopid'] = $sShopID;
 
         $oNewsletter = oxNew(Newsletter::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oNewsletter->load($soxId);
         } else {
             $aParams['oxnewsletter__oxid'] = null;

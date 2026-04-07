@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -54,8 +55,8 @@ class ToolsListTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function testPerformsql()
     {
         // testing..
-        $this->getSession()->setVariable('auth', "oxdefaultadmin");
-        $this->setRequestParameter("updatesql", 'select * from oxvoucher');
+        $this->getSession()->setVariable('auth', 'oxdefaultadmin');
+        $this->setRequestParameter('updatesql', 'select * from oxvoucher');
 
         $oView = oxNew('Tools_List');
         $oView->performsql();

@@ -21,7 +21,23 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use function bin2hex;
+
 use Exception;
+use OxidEsales\Eshop\Application\Model\Address;
+use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Application\Model\Groups;
+use OxidEsales\Eshop\Application\Model\NewsSubscribed;
+use OxidEsales\Eshop\Application\Model\Object2Group;
+use OxidEsales\Eshop\Application\Model\PriceAlarm;
+use OxidEsales\Eshop\Application\Model\Rating;
+use OxidEsales\Eshop\Application\Model\RecommendationList;
+use OxidEsales\Eshop\Application\Model\Remark;
+use OxidEsales\Eshop\Application\Model\Review;
+use OxidEsales\Eshop\Application\Model\State;
+use OxidEsales\Eshop\Application\Model\User as EshopUser;
+use OxidEsales\Eshop\Application\Model\UserAddressList;
+use OxidEsales\Eshop\Application\Model\UserBasket;
 use OxidEsales\Eshop\Core\Database\Adapter\DatabaseInterface;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Email;
@@ -29,6 +45,7 @@ use OxidEsales\Eshop\Core\Exception\ConnectionException;
 use OxidEsales\Eshop\Core\Exception\CookieException;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
+use OxidEsales\Eshop\Core\Exception\DatabaseException;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Field;
@@ -43,11 +60,9 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Sha512Hasher;
 use OxidEsales\Eshop\Core\TableViewNameGenerator;
 use OxidEsales\Eshop\Core\UtilsObject;
-use OxidEsales\EshopCommunity\Core\Exception\DatabaseException;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use Psr\Log\LoggerInterface;
 
-use function bin2hex;
 use function random_bytes;
 use function strlen;
 use function substr;
@@ -60,7 +75,7 @@ use function substr;
  */
 class User extends BaseModel
 {
-    const USER_COOKIE_SALT = 'user_cookie_salt';
+    public const USER_COOKIE_SALT = 'user_cookie_salt';
 
     /**
      * Shop control variable
@@ -266,10 +281,10 @@ class User extends BaseModel
                 return $this->_iCntNoticeListArticles = $this->getNoticeListArtCnt();
             case 'iCntWishListArticles':
                 return $this->_iCntWishListArticles = $this->getWishListArtCnt();
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+                // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             case 'iCntRecommLists':
                 return $this->_iCntRecommLists = $this->getRecommListsCount();
-            // END deprecated
+                // END deprecated
             case 'oAddresses':
                 return $this->getUserAddresses();
             case 'oPayments':
@@ -330,7 +345,7 @@ class User extends BaseModel
             $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry', $iLang);
 
             $countryTitle = $oDb->getOne("select oxtitle from {$sViewName} where oxid = :oxid", [
-                ':oxid' => $sId
+                ':oxid' => $sId,
             ]);
 
             $oCountry = new Field($countryTitle, Field::T_RAW);
@@ -355,10 +370,10 @@ class User extends BaseModel
     public function getUserCountryId($sCountry = null)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select oxid from " . Registry::get(TableViewNameGenerator::class)->getViewName("oxcountry") . " 
+        $sQ = 'select oxid from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry') . " 
             where oxactive = '1' and oxisoalpha2 = :oxisoalpha2";
         $sCountryId = $oDb->getOne($sQ, [
-            ':oxisoalpha2' => $sCountry
+            ':oxisoalpha2' => $sCountry,
         ]);
 
         return $sCountryId;
@@ -381,12 +396,12 @@ class User extends BaseModel
             $sOXID = $this->getId();
         }
 
-        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups");
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
         $this->_oGroups = oxNew('oxList', 'oxgroups');
         $sSelect = "select {$sViewName}.* from {$sViewName} left join oxobject2group on oxobject2group.oxgroupsid = {$sViewName}.oxid
                      where oxobject2group.oxobjectid = :oxobjectid";
         $this->_oGroups->selectString($sSelect, [
-            ':oxobjectid' => $sOXID
+            ':oxobjectid' => $sOXID,
         ]);
 
         return $this->_oGroups;
@@ -442,9 +457,9 @@ class User extends BaseModel
             return $this->_sSelAddressId;
         }
 
-        $sAddressId = Registry::getRequest()->getRequestEscapedParameter("oxaddressid");
+        $sAddressId = Registry::getRequest()->getRequestEscapedParameter('oxaddressid');
         if (!$sAddressId && !Registry::getRequest()->getRequestEscapedParameter('reloadaddress')) {
-            $sAddressId = Registry::getSession()->getVariable("deladrid");
+            $sAddressId = Registry::getSession()->getVariable('deladrid');
         }
 
         return $sAddressId;
@@ -536,7 +551,7 @@ class User extends BaseModel
             $this->_oPayments = oxNew(ListModel::class);
             $this->_oPayments->init('oxUserPayment');
             $this->_oPayments->selectString($sSelect, [
-                ':oxuserid' => $sOXID
+                ':oxuserid' => $sOXID,
             ]);
         }
 
@@ -778,7 +793,7 @@ class User extends BaseModel
             $sQ .= ' order by oxorderdate desc ';
             $oOrders->selectString($sQ, [
                 ':oxuserid' => $this->getId(),
-                ':oxorderdate' => $this->oxuser__oxregister->value
+                ':oxorderdate' => $this->oxuser__oxregister->value,
             ]);
         }
 
@@ -803,7 +818,7 @@ class User extends BaseModel
             $iCnt = (int) $oDb->getOne($sQ, [
                 ':oxuserid' => $this->getId(),
                 ':oxorderdate' => $this->oxuser__oxregister->value,
-                ':oxshopid' => Registry::getConfig()->getShopId()
+                ':oxshopid' => Registry::getConfig()->getShopId(),
             ]);
         }
 
@@ -873,7 +888,7 @@ class User extends BaseModel
         } elseif ($this->getId()) {
             $sDeliveryCountry = $this->oxuser__oxcountryid->value;
         } else {
-            $oUser = oxNew(User::class);
+            $oUser = oxNew(EshopUser::class);
             if ($oUser->loadActiveUser()) {
                 $sDeliveryCountry = $oUser->oxuser__oxcountryid->value;
             }
@@ -896,15 +911,15 @@ class User extends BaseModel
         $sShopID = Registry::getConfig()->getShopId();
 
         // check if user exists AND there is no password - in this case we update otherwise we try to insert
-        $sSelect = "select oxid from oxuser 
+        $sSelect = 'select oxid from oxuser 
             where oxusername = :oxusername 
-            and oxpassword = :oxpassword ";
+            and oxpassword = :oxpassword ';
         $params = [
             ':oxusername' => (string) $this->oxuser__oxusername->value,
-            ':oxpassword' => ''
+            ':oxpassword' => '',
         ];
         if (!$this->_blMallUsers) {
-            $sSelect .= " and oxshopid = :oxshopid ";
+            $sSelect .= ' and oxshopid = :oxshopid ';
             $params[':oxshopid'] = $sShopID;
         }
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -919,7 +934,7 @@ class User extends BaseModel
                 where oxusername = :oxusername
                 and oxusername != '' ";
             $params = [
-                ':oxusername' => (string) $this->oxuser__oxusername->value
+                ':oxusername' => (string) $this->oxuser__oxusername->value,
             ];
 
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
@@ -940,13 +955,13 @@ class User extends BaseModel
         } else {
             // @TODO the following statements make no sense and should be removed: oxuser__oxid is freshly created and the conditions will never match
             // dropping/cleaning old delivery address/payment info
-            $oDb->execute("delete from oxaddress where oxaddress.oxuserid = :oxuserid", [
-                ':oxuserid' => $this->oxuser__oxid->value
+            $oDb->execute('delete from oxaddress where oxaddress.oxuserid = :oxuserid', [
+                ':oxuserid' => $this->oxuser__oxid->value,
             ]);
 
-            $query = "update oxuserpayments
+            $query = 'update oxuserpayments
                       set oxuserpayments.oxuserid = :newUserId
-                      where oxuserpayments.oxuserid = :oldUserId";
+                      where oxuserpayments.oxuserid = :oldUserId';
             $oDb->execute($query, [
                 ':newUserId' => $this->oxuser__oxusername->value,
                 ':oldUserId' => $this->oxuser__oxid->value,
@@ -1000,7 +1015,7 @@ class User extends BaseModel
                 and oxobject2group.oxgroupsid = :oxgroupsid ';
             $oGroups->selectString($sSelect, [
                 ':oxobjectid' => $this->getId(),
-                ':oxgroupsid' => $sGroupID
+                ':oxgroupsid' => $sGroupID,
             ]);
             foreach ($oGroups as $oRemoveGroup) {
                 if ($oRemoveGroup->delete()) {
@@ -1082,7 +1097,6 @@ class User extends BaseModel
      */
     public function convertBirthday($aData)
     {
-
         // preparing data to process
         $iYear = isset($aData['year']) ? ((int) $aData['year']) : false;
         $iMonth = isset($aData['month']) ? ((int) $aData['month']) : false;
@@ -1090,7 +1104,7 @@ class User extends BaseModel
 
         // leaving empty if not set
         if (!$iYear && !$iMonth && !$iDay) {
-            return "";
+            return '';
         }
 
         // year
@@ -1125,7 +1139,7 @@ class User extends BaseModel
         }
 
         // whole date
-        return sprintf("%04d-%02d-%02d", $iYear, $iMonth, $iDay);
+        return sprintf('%04d-%02d-%02d', $iYear, $iMonth, $iDay);
     }
 
     /**
@@ -1401,7 +1415,6 @@ class User extends BaseModel
         $shopOrRightsCondition = $this->formQueryPartForAdminView($shopId, $isAdmin);
         $passwordCondition = $this->formQueryPartForSha512Password($password, $database, $userNameCondition, $shopOrRightsCondition);
         $userActiveCondition = $this->formQueryPartForActiveUser();
-
 
         $query = "SELECT `oxid`
                     FROM oxuser 
@@ -1716,7 +1729,7 @@ class User extends BaseModel
             where oxuser.oxactive = :oxactive and oxuser.oxusername = :oxusername $sShopSelect";
         $sLDAPKey = $oDb->getOne($ldapSql, [
             ':oxactive' => 1,
-            ':oxusername' => (string) $sUser
+            ':oxusername' => (string) $sUser,
         ]);
         if (isset($sLDAPKey) && $sLDAPKey) {
             $sUser = $sLDAPKey;
@@ -1733,7 +1746,7 @@ class User extends BaseModel
             $sSelect = "select oxid from oxuser 
                 where oxuser.oxusername = :oxusername $sShopSelect";
             $sOXID = $oDb->getOne($sSelect, [
-                ':oxusername' => (string) $aData['OXUSERNAME']
+                ':oxusername' => (string) $aData['OXUSERNAME'],
             ]);
 
             if (!isset($sOXID) || !$sOXID) {
@@ -1743,15 +1756,15 @@ class User extends BaseModel
 
                 // map all user data fields
                 foreach ($aData as $fieldName => $value) {
-                    $sField = "oxuser__" . strtolower($fieldName);
+                    $sField = 'oxuser__' . strtolower($fieldName);
                     $this->$sField = new Field($aData[$fieldName]);
                 }
 
                 $this->oxuser__oxactive = new Field(1);
                 $this->oxuser__oxshopid = new Field($sShopID);
                 $this->oxuser__oxldapkey = new Field($sUser);
-                $this->oxuser__oxrights = new Field("user");
-                $this->setPassword("ldap user");
+                $this->oxuser__oxrights = new Field('user');
+                $this->setPassword('ldap user');
 
                 $this->save();
             } else {
@@ -1791,7 +1804,7 @@ class User extends BaseModel
         if ($sAuthUserID) {
             $authRightsSql = 'select oxrights from ' . $this->getViewName() . ' where oxid = :oxid';
             $sAuthRights = $oDb->getOne($authRightsSql, [
-                ':oxid' => $sAuthUserID
+                ':oxid' => $sAuthUserID,
             ]);
         }
 
@@ -1801,7 +1814,7 @@ class User extends BaseModel
         // selecting current users rights ...
         $currentRightsSql = 'select oxrights from ' . $this->getViewName() . ' where oxid = :oxid';
         $params = [
-            ':oxid' => $this->getId()
+            ':oxid' => $this->getId(),
         ];
         if ($sCurrRights = $oDb->getOne($currentRightsSql, $params)) {
             $aRights[] = $sCurrRights;
@@ -1829,7 +1842,6 @@ class User extends BaseModel
      */
     protected function _insert() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-
         // set oxcreate date
         $this->oxuser__oxcreate = new Field(date('Y-m-d H:i:s'), Field::T_RAW);
 
@@ -1889,10 +1901,10 @@ class User extends BaseModel
 
         $sQ = 'select oxshopid, oxrights, oxpassword from oxuser where oxusername = :oxusername';
         $params = [
-            ':oxusername' => (string) $sEmail
+            ':oxusername' => (string) $sEmail,
         ];
         if (($sOxid = $this->getId())) {
-            $sQ .= " and oxid <> :notoxid";
+            $sQ .= ' and oxid <> :notoxid';
             $params[':notoxid'] = $sOxid;
         }
         $oRs = $masterDb->select($sQ, $params);
@@ -1947,7 +1959,6 @@ class User extends BaseModel
         $iNrofCatArticles = Registry::getConfig()->getConfigParam('iNrofCatArticles');
         $iNrofCatArticles = $iNrofCatArticles ? $iNrofCatArticles : 10;
 
-
         $oRecommList = oxNew(ListModel::class);
         $oRecommList->init('oxrecommlist');
         $oRecommList->setSqlLimit($iNrofCatArticles * $iActPage, $iNrofCatArticles);
@@ -1957,7 +1968,7 @@ class User extends BaseModel
                 and oxshopid = :oxshopid';
         $oRecommList->selectString($sSelect, [
             ':oxuserid' => $sOXID,
-            ':oxshopid' => $iShopId
+            ':oxshopid' => $iShopId,
         ]);
 
         return $oRecommList;
@@ -1987,7 +1998,7 @@ class User extends BaseModel
                 where oxuserid = :oxuserid and oxshopid = :oxshopid';
             $this->_iCntRecommLists = $oDb->getOne($sSelect, [
                 ':oxuserid' => $sOx,
-                ':oxshopid' => $iShopId
+                ':oxshopid' => $iShopId,
             ]);
         }
 
@@ -2053,9 +2064,9 @@ class User extends BaseModel
     public function loadUserByUpdateId($sUid)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select oxid from " . $this->getViewName() . " 
+        $sQ = 'select oxid from ' . $this->getViewName() . ' 
             where oxupdateexp >= :time 
-                and MD5( CONCAT( oxid, oxshopid, oxupdatekey ) ) = :hash";
+                and MD5( CONCAT( oxid, oxshopid, oxupdatekey ) ) = :hash';
         if ($sUserId = $oDb->getOne($sQ, [':time' => time(), ':hash' => $sUid])) {
             return $this->load($sUserId);
         }
@@ -2098,9 +2109,9 @@ class User extends BaseModel
     public function isExpiredUpdateId($sKey)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select 1 from " . $this->getViewName() . " 
+        $sQ = 'select 1 from ' . $this->getViewName() . ' 
             where oxupdateexp >= :time 
-            and MD5( CONCAT( oxid, oxshopid, oxupdatekey ) ) = :hash";
+            and MD5( CONCAT( oxid, oxshopid, oxupdatekey ) ) = :hash';
 
         return !((bool) $oDb->getOne($sQ, [':time' => time(), ':hash' => $sKey]));
     }
@@ -2210,7 +2221,7 @@ class User extends BaseModel
         $hashSql = 'select md5(concat("oxid", oxpassword, oxusername )) from oxuser 
             where oxid = :oxid';
         $sReviewUserHash = $oDb->getOne($hashSql, [
-            ':oxid' => $sUserId
+            ':oxid' => $sUserId,
         ]);
 
         return $sReviewUserHash;
@@ -2229,7 +2240,7 @@ class User extends BaseModel
         $oDb = DatabaseProvider::getDb();
         $userIdSql = 'select oxid from oxuser where md5(concat("oxid", oxpassword, oxusername )) = :hash';
         $sUserId = $oDb->getOne($userIdSql, [
-            ':hash' => $sReviewUserHash
+            ':hash' => $sReviewUserHash,
         ]);
 
         return $sUserId;
@@ -2273,10 +2284,10 @@ class User extends BaseModel
     public function isTermsAccepted()
     {
         $oDb = DatabaseProvider::getDb();
-        $termsSql = "select 1 from oxacceptedterms where oxuserid = :oxuserid and oxshopid = :oxshopid";
+        $termsSql = 'select 1 from oxacceptedterms where oxuserid = :oxuserid and oxshopid = :oxshopid';
         return (bool) $oDb->getOne($termsSql, [
             ':oxuserid' => $this->getId(),
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ]);
     }
 
@@ -2311,16 +2322,16 @@ class User extends BaseModel
         // check if this invitation is still not accepted
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = DatabaseProvider::getMaster();
-        $pendingSql = "select count(oxuserid) from oxinvitations 
+        $pendingSql = 'select count(oxuserid) from oxinvitations 
             where oxuserid = :oxuserid
                 and md5(oxemail) = :oxemailhash
                 and oxpending = :oxpending 
-                and oxaccepted = :oxaccepted";
+                and oxaccepted = :oxaccepted';
         $iPending = $masterDb->getOne($pendingSql, [
             ':oxuserid' => $sUserId,
             ':oxemailhash' => $sRecEmail,
             ':oxpending' => 1,
-            ':oxaccepted' => 0
+            ':oxaccepted' => 0,
         ]);
         if ($iPoints && $iPending) {
             $this->oxuser__oxpoints = new Field($iPoints, Field::T_RAW);
@@ -2333,7 +2344,7 @@ class User extends BaseModel
                                 md5(oxemail) = :oxemail";
                 $masterDb->execute($query, [
                     ':oxuserid' => $sUserId,
-                    ':oxemail' => $sRecEmail
+                    ':oxemail' => $sRecEmail,
                 ]);
                 $oInvUser = oxNew(User::class);
                 if ($oInvUser->load($sUserId)) {
@@ -2380,13 +2391,13 @@ class User extends BaseModel
 
         if ($sUserId && is_array($aRecEmail) && count($aRecEmail) > 0) {
             // inserting statistics about invitation
-            $sDate = Registry::getUtilsDate()->formatDBDate(date("Y-m-d"), true);
+            $sDate = Registry::getUtilsDate()->formatDBDate(date('Y-m-d'), true);
             foreach ($aRecEmail as $sRecEmail) {
                 $sSql = "INSERT INTO oxinvitations SET oxuserid = :oxuserid, oxemail = :oxemail, oxdate = :oxdate, oxpending = '1', oxaccepted = '0', oxtype = '1'";
                 $oDb->execute($sSql, [
                     ':oxuserid' => $sUserId,
                     ':oxemail' => $sRecEmail,
-                    ':oxdate' => $sDate
+                    ':oxdate' => $sDate,
                 ]);
             }
         }
@@ -2407,7 +2418,7 @@ class User extends BaseModel
                 'SELECT `OXID` FROM `oxuser` WHERE `OXUSERNAME` = :oxusername AND `OXSHOPID` = :oxshopid',
                 [
                     ':oxusername' => (string) $userName,
-                    ':oxshopid' => Registry::getConfig()->getShopId()
+                    ':oxshopid' => Registry::getConfig()->getShopId(),
                 ]
             );
 
@@ -2534,7 +2545,7 @@ class User extends BaseModel
      */
     protected function _getDemoShopLoginQuery($sUser, $sPassword) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        if ($sPassword == "admin" && $sUser == "admin") {
+        if ($sPassword == 'admin' && $sUser == 'admin') {
             $sSelect = "SELECT `oxid` FROM `oxuser` WHERE `oxrights` = 'malladmin' ";
         } else {
             /** @var UserException $oEx */
@@ -2612,7 +2623,7 @@ class User extends BaseModel
     private function deleteUserFromGroups(DatabaseInterface $database)
     {
         $database->execute('delete from oxobject2group where oxobject2group.oxobjectid = :oxobjectid', [
-            ':oxobjectid' => $this->getId()
+            ':oxobjectid' => $this->getId(),
         ]);
     }
 
@@ -2625,7 +2636,7 @@ class User extends BaseModel
     private function deleteDeliveries(DatabaseInterface $database)
     {
         $database->execute('delete from oxobject2delivery where oxobjectid = :oxobjectid', [
-            ':oxobjectid' => $this->getId()
+            ':oxobjectid' => $this->getId(),
         ]);
     }
 
@@ -2638,7 +2649,7 @@ class User extends BaseModel
     private function deleteDiscounts(DatabaseInterface $database)
     {
         $database->execute('delete from oxobject2discount where oxobjectid = :oxobjectid', [
-            ':oxobjectid' => $this->getId()
+            ':oxobjectid' => $this->getId(),
         ]);
     }
 
@@ -2651,7 +2662,7 @@ class User extends BaseModel
     private function deleteAcceptedTerms(DatabaseInterface $database)
     {
         $database->execute('delete from oxacceptedterms where oxuserid = :oxuserid', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
     }
 
@@ -2664,7 +2675,7 @@ class User extends BaseModel
     private function deleteAddresses(DatabaseInterface $database)
     {
         $ids = $database->getCol('SELECT oxid FROM oxaddress WHERE oxuserid = :oxuserid', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], Address::class);
     }
@@ -2678,7 +2689,7 @@ class User extends BaseModel
     private function deleteBaskets(DatabaseInterface $database)
     {
         $ids = $database->getCol('SELECT oxid FROM oxuserbaskets WHERE oxuserid = :oxuserid', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], UserBasket::class);
     }
@@ -2694,7 +2705,7 @@ class User extends BaseModel
         $sql = 'SELECT oxid FROM oxremark WHERE oxparentid = :oxparentid and oxtype != :notoxtype';
         $ids = $database->getCol($sql, [
             ':oxparentid' => $this->getId(),
-            ':notoxtype' => 'o'
+            ':notoxtype' => 'o',
         ]);
         array_walk($ids, [$this, 'deleteItemById'], Remark::class);
     }
@@ -2708,7 +2719,7 @@ class User extends BaseModel
     private function deleteRecommendationLists(DatabaseInterface $database)
     {
         $ids = $database->getCol('SELECT oxid FROM oxrecommlists WHERE oxuserid = :oxuserid ', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], RecommendationList::class);
     }
@@ -2722,11 +2733,10 @@ class User extends BaseModel
     private function deleteNewsletterSubscriptions(DatabaseInterface $database)
     {
         $ids = $database->getCol('SELECT oxid FROM oxnewssubscribed WHERE oxuserid = :oxuserid ', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], NewsSubscribed::class);
     }
-
 
     /**
      * Deletes User reviews.
@@ -2737,7 +2747,7 @@ class User extends BaseModel
     private function deleteReviews(DatabaseInterface $database)
     {
         $ids = $database->getCol('select oxid from oxreviews where oxuserid = :oxuserid', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], Review::class);
     }
@@ -2751,7 +2761,7 @@ class User extends BaseModel
     private function deleteRatings(DatabaseInterface $database)
     {
         $ids = $database->getCol('SELECT oxid FROM oxratings WHERE oxuserid = :oxuserid', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], Rating::class);
     }
@@ -2765,7 +2775,7 @@ class User extends BaseModel
     private function deletePriceAlarms(DatabaseInterface $database)
     {
         $ids = $database->getCol('SELECT oxid FROM oxpricealarm WHERE oxuserid = :oxuserid', [
-            ':oxuserid' => $this->getId()
+            ':oxuserid' => $this->getId(),
         ]);
         array_walk($ids, [$this, 'deleteItemById'], PriceAlarm::class);
     }

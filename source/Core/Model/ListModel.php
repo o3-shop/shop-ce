@@ -439,7 +439,6 @@ class ListModel extends \OxidEsales\Eshop\Core\Base implements \ArrayAccess, \It
         }
     }
 
-
     /**
      * Sets SQL Limit
      *

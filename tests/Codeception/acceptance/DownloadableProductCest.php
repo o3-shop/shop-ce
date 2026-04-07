@@ -38,16 +38,16 @@ final class DownloadableProductCest
     /** @param AcceptanceTester $I */
     public function _before(AcceptanceTester $I)
     {
-        $I->updateConfigInDatabase('iMaxDownloadsCount', "2", 'str');
-        $I->updateConfigInDatabase('iLinkExpirationTime', "240", 'str');
+        $I->updateConfigInDatabase('iMaxDownloadsCount', '2', 'str');
+        $I->updateConfigInDatabase('iLinkExpirationTime', '240', 'str');
         $I->updateInDatabase('oxarticles', ['oxisdownloadable' => 1], ['oxartnum' => '1002-1']);
     }
 
     /** @param AcceptanceTester $I */
     public function _after(AcceptanceTester $I)
     {
-        $I->updateConfigInDatabase('iMaxDownloadsCount', "0", 'str');
-        $I->updateConfigInDatabase('iLinkExpirationTime', "168", 'str');
+        $I->updateConfigInDatabase('iMaxDownloadsCount', '0', 'str');
+        $I->updateConfigInDatabase('iLinkExpirationTime', '168', 'str');
         $I->updateInDatabase('oxarticles', ['oxisdownloadable' => 0], ['oxartnum' => '1002-1']);
         $I->deleteFromDatabase('oxorder', ['OXID' => $this->orderId]);
         $I->deleteFromDatabase('oxorderarticles', ['OXORDERID' => $this->orderId]);
@@ -68,7 +68,7 @@ final class DownloadableProductCest
         $I->haveInDatabase(
             'oxorderfiles',
             [
-                'OXID' => "testdownloadProductCest",
+                'OXID' => 'testdownloadProductCest',
                 'OXORDERID' => $this->orderId,
                 'OXFILENAME' => 'testFile3',
                 'OXFILEID' => '1000l',
@@ -80,7 +80,7 @@ final class DownloadableProductCest
                 'OXLINKEXPIRATIONTIME' => 240,
                 'OXRESETCOUNT' => 0,
                 'OXVALIDUNTIL' => (new DateTime())->modify('+1 week')->format('Y-m-d 00:00:00'),
-                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00')
+                'OXTIMESTAMP' => (new DateTime())->format('Y-m-d 00:00:00'),
             ]
         );
 
@@ -143,6 +143,6 @@ final class DownloadableProductCest
         $accountPage = $startPage->openAccountPage();
         $accountPage->openMyDownloadsPage();
         $I->dontSee(Translator::translate('DOWNLOADS_PAYMENT_PENDING'));
-        $I->click(".downloadList a");
+        $I->click('.downloadList a');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \stdClass;
-use \oxDb;
+use oxDb;
+use oxField;
+use stdClass;
 
 /**
  * Testing oxattribute class.
  */
 class AttributeTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -38,21 +39,21 @@ class AttributeTest extends \OxidTestCase
     {
         parent::setUp();
         $this->_oAttr = oxNew('oxAttribute');
-        $this->_oAttr->oxattribute__oxtitle = new oxField("test", oxField::T_RAW);
+        $this->_oAttr->oxattribute__oxtitle = new oxField('test', oxField::T_RAW);
         $this->_oAttr->save();
 
         // article attribute
         $oNewGroup = oxNew('oxbase');
         $oNewGroup->Init('oxobject2attribute');
-        $oNewGroup->oxobject2attribute__oxobjectid = new oxField("test_oxid", oxField::T_RAW);
+        $oNewGroup->oxobject2attribute__oxobjectid = new oxField('test_oxid', oxField::T_RAW);
         $oNewGroup->oxobject2attribute__oxattrid = new oxField($this->_oAttr->getId(), oxField::T_RAW);
-        $oNewGroup->oxobject2attribute__oxvalue = new oxField("testvalue", oxField::T_RAW);
+        $oNewGroup->oxobject2attribute__oxvalue = new oxField('testvalue', oxField::T_RAW);
         $oNewGroup->Save();
 
         // category attribute
         $oNewGroup = oxNew('oxbase');
         $oNewGroup->Init('oxcategory2attribute');
-        $oNewGroup->oxcategory2attribute__oxobjectid = new oxField("test_oxid", oxField::T_RAW);
+        $oNewGroup->oxcategory2attribute__oxobjectid = new oxField('test_oxid', oxField::T_RAW);
         $oNewGroup->oxcategory2attribute__oxattrid = new oxField($this->_oAttr->getId(), oxField::T_RAW);
         $oNewGroup->Save();
     }
@@ -92,7 +93,7 @@ class AttributeTest extends \OxidTestCase
         $sCheckOxid2 = oxDb::getDb()->GetOne("select oxid from oxcategory2attribute where oxattrid = '{$this->sOxid}'");
         $oAttr = oxNew('oxAttribute');
         if ($sCheckOxid1 || $sCheckOxid2 || $oAttr->Load($this->_oAttr->getId())) {
-            $this->fail("fail deleting");
+            $this->fail('fail deleting');
         }
     }
 
@@ -104,11 +105,11 @@ class AttributeTest extends \OxidTestCase
     public function testAssignVarToAttribute()
     {
         $myDB = oxDb::getDB();
-        $oAttr = oxNew("oxAttribute");
+        $oAttr = oxNew('oxAttribute');
         $sVarId = '_testVar';
         $sVarId2 = '_testVar2';
-        $aSellTitle = array(0 => '_testAttr',
-                            1 => '_tetsAttr_1');
+        $aSellTitle = [0 => '_testAttr',
+                            1 => '_tetsAttr_1'];
         $oValue = new stdClass();
         $oValue->name = 'red';
         $oValue2 = new stdClass();
@@ -117,10 +118,10 @@ class AttributeTest extends \OxidTestCase
         $oValue3->name = 'blue';
         $oValue4 = new stdClass();
         $oValue4->name = 'blau';
-        $aSellValue = array($sVarId  => array(0 => $oValue,
-                                              1 => $oValue2),
-                            $sVarId2 => array(0 => $oValue3,
-                                              1 => $oValue4));
+        $aSellValue = [$sVarId  => [0 => $oValue,
+                                              1 => $oValue2],
+                            $sVarId2 => [0 => $oValue3,
+                                              1 => $oValue4]];
         $oAttr->assignVarToAttribute($aSellValue, $aSellTitle);
         $this->assertEquals(2, $myDB->getOne("select count(*) from oxobject2attribute where oxobjectid like '_testVar%'"));
         $oRez = $myDB->select("select oxvalue, oxvalue_1, oxobjectid  from oxobject2attribute where oxobjectid = '_testVar'");
@@ -140,7 +141,7 @@ class AttributeTest extends \OxidTestCase
      */
     public function testGetAttrId()
     {
-        $oAttr = $this->getProxyClass("oxAttribute");
+        $oAttr = $this->getProxyClass('oxAttribute');
         $this->assertTrue((bool) $oAttr->UNITgetAttrId('Design'));
         $this->assertFalse((bool) $oAttr->UNITgetAttrId('aaaaa'));
     }
@@ -152,9 +153,9 @@ class AttributeTest extends \OxidTestCase
      */
     public function testCreateAttribute()
     {
-        $oAttr = $this->getProxyClass("oxAttribute");
-        $aSellTitle = array(0 => '_testAttr',
-                            1 => '_testAttr_1');
+        $oAttr = $this->getProxyClass('oxAttribute');
+        $aSellTitle = [0 => '_testAttr',
+                            1 => '_testAttr_1'];
         $sId = $oAttr->UNITcreateAttribute($aSellTitle);
         $this->assertEquals('_testAttr', oxDb::getDB()->getOne("select oxtitle from oxattribute where oxid = '$sId'"));
         $this->assertEquals('_testAttr_1', oxDb::getDB()->getOne("select oxtitle_1 from oxattribute where oxid = '$sId'"));
@@ -167,11 +168,10 @@ class AttributeTest extends \OxidTestCase
      */
     public function testGetAttributeAssigns()
     {
-        $oAttr = $this->getProxyClass("oxAttribute");
+        $oAttr = $this->getProxyClass('oxAttribute');
         $aId = $oAttr->getAttributeAssigns('test_oxid');
         $this->assertEquals(1, count($aId));
     }
-
 
     /**
      * Test set attribute title.
@@ -208,6 +208,6 @@ class AttributeTest extends \OxidTestCase
         $oAttr->addValue('val1');
         $oAttr->addValue('val2');
 
-        $this->assertEquals(array('val1', 'val2'), $oAttr->getValues());
+        $this->assertEquals(['val1', 'val2'], $oAttr->getValues());
     }
 }

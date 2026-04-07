@@ -42,7 +42,7 @@ use stdClass;
  */
 class CategoryMain extends AdminDetailsController
 {
-    const NEW_CATEGORY_ID = "-1";
+    public const NEW_CATEGORY_ID = '-1';
 
     /**
      * Loads article category data,
@@ -59,12 +59,12 @@ class CategoryMain extends AdminDetailsController
         $oCategory = $this->createCategory();
         $categoryId = $this->getEditObjectId();
 
-        $this->_aViewData["edit"] = $oCategory;
-        $this->_aViewData["oxid"] = $categoryId;
+        $this->_aViewData['edit'] = $oCategory;
+        $this->_aViewData['oxid'] = $categoryId;
 
         if (isset($categoryId) && $categoryId != self::NEW_CATEGORY_ID) {
             // generating category tree for select list
-            $this->createCategoryTree("artcattree", $categoryId);
+            $this->createCategoryTree('artcattree', $categoryId);
 
             // load object
             $oCategory->loadInLang($this->_iEditLang, $categoryId);
@@ -83,38 +83,38 @@ class CategoryMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             if ($oCategory->oxcategories__oxparentid->value == 'oxrootid') {
                 $oCategory->oxcategories__oxparentid->setValue('');
             }
 
-            $this->getCategoryTree("cattree", $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
+            $this->getCategoryTree('cattree', $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
 
-            $this->_aViewData["defsort"] = $oCategory->oxcategories__oxdefsort->value;
+            $this->_aViewData['defsort'] = $oCategory->oxcategories__oxdefsort->value;
         } else {
-            $this->createCategoryTree("cattree", "", true, $myConfig->getShopId());
+            $this->createCategoryTree('cattree', '', true, $myConfig->getShopId());
         }
 
-        $this->_aViewData["sortableFields"] = $this->getSortableFields();
+        $this->_aViewData['sortableFields'] = $this->getSortableFields();
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             /** @var CategoryMainAjax $oCategoryMainAjax */
             $oCategoryMainAjax = oxNew(CategoryMainAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryMainAjax->getColumns();
 
-            return "popups/category_main.tpl";
+            return 'popups/category_main.tpl';
         }
 
-        return "category_main.tpl";
+        return 'category_main.tpl';
     }
 
     /**
@@ -124,17 +124,17 @@ class CategoryMain extends AdminDetailsController
      */
     public function getSortableFields()
     {
-        $aSkipFields = ["OXID", "OXSHOPID", "OXMAPID", "OXPARENTID", "OXACTIVE", "OXACTIVEFROM"
-        , "OXACTIVETO", "OXSHORTDESC"
-        , "OXUNITNAME", "OXUNITQUANTITY", "OXEXTURL", "OXURLDESC", "OXURLIMG", "OXVAT"
-        , "OXTHUMB", "OXPIC1", "OXPIC2", "OXPIC3", "OXPIC4", "OXPIC5"
-        , "OXPIC6", "OXPIC7", "OXPIC8", "OXPIC9", "OXPIC10", "OXPIC11", "OXPIC12", "OXSTOCKFLAG"
-        , "OXSTOCKTEXT", "OXNOSTOCKTEXT", "OXDELIVERY", "OXFILE", "OXSEARCHKEYS", "OXTEMPLATE"
-        , "OXQUESTIONEMAIL", "OXISSEARCH", "OXISCONFIGURABLE", "OXBUNDLEID", "OXFOLDER", "OXSUBCLASS"
-        , "OXREMINDACTIVE", "OXREMINDAMOUNT", "OXVENDORID", "OXMANUFACTURERID", "OXSKIPDISCOUNTS"
-        , "OXBLFIXEDPRICE", "OXICON", "OXVARSELECT", "OXAMITEMID", "OXAMTASKID", "OXPIXIEXPORT", "OXPIXIEXPORTED", "OXSORT"
-        , "OXUPDATEPRICE", "OXUPDATEPRICEA", "OXUPDATEPRICEB", "OXUPDATEPRICEC", "OXUPDATEPRICETIME", "OXISDOWNLOADABLE"
-        , "OXVARMAXPRICE", "OXSHOWCUSTOMAGREEMENT"
+        $aSkipFields = ['OXID', 'OXSHOPID', 'OXMAPID', 'OXPARENTID', 'OXACTIVE', 'OXACTIVEFROM'
+        , 'OXACTIVETO', 'OXSHORTDESC'
+        , 'OXUNITNAME', 'OXUNITQUANTITY', 'OXEXTURL', 'OXURLDESC', 'OXURLIMG', 'OXVAT'
+        , 'OXTHUMB', 'OXPIC1', 'OXPIC2', 'OXPIC3', 'OXPIC4', 'OXPIC5'
+        , 'OXPIC6', 'OXPIC7', 'OXPIC8', 'OXPIC9', 'OXPIC10', 'OXPIC11', 'OXPIC12', 'OXSTOCKFLAG'
+        , 'OXSTOCKTEXT', 'OXNOSTOCKTEXT', 'OXDELIVERY', 'OXFILE', 'OXSEARCHKEYS', 'OXTEMPLATE'
+        , 'OXQUESTIONEMAIL', 'OXISSEARCH', 'OXISCONFIGURABLE', 'OXBUNDLEID', 'OXFOLDER', 'OXSUBCLASS'
+        , 'OXREMINDACTIVE', 'OXREMINDAMOUNT', 'OXVENDORID', 'OXMANUFACTURERID', 'OXSKIPDISCOUNTS'
+        , 'OXBLFIXEDPRICE', 'OXICON', 'OXVARSELECT', 'OXAMITEMID', 'OXAMTASKID', 'OXPIXIEXPORT', 'OXPIXIEXPORTED', 'OXSORT'
+        , 'OXUPDATEPRICE', 'OXUPDATEPRICEA', 'OXUPDATEPRICEB', 'OXUPDATEPRICEC', 'OXUPDATEPRICETIME', 'OXISDOWNLOADABLE'
+        , 'OXVARMAXPRICE', 'OXSHOWCUSTOMAGREEMENT',
         ];
         /** @var DbMetaDataHandler $oDbHandler */
         $oDbHandler = oxNew(DbMetaDataHandler::class);
@@ -164,7 +164,7 @@ class CategoryMain extends AdminDetailsController
         $oCategory = $this->createCategory();
 
         if ($soxId != self::NEW_CATEGORY_ID) {
-            $this->resetCounter("catArticle", $soxId);
+            $this->resetCounter('catArticle', $soxId);
             $this->resetCategoryPictures($oCategory, $aParams, $soxId);
         }
 
@@ -358,8 +358,8 @@ class CategoryMain extends AdminDetailsController
             $aReqParams['oxcategories__oxid'] = null;
         }
 
-        if (isset($aReqParams["oxcategories__oxlongdesc"])) {
-            $aReqParams["oxcategories__oxlongdesc"] = $this->processLongDesc($aReqParams["oxcategories__oxlongdesc"]);
+        if (isset($aReqParams['oxcategories__oxlongdesc'])) {
+            $aReqParams['oxcategories__oxlongdesc'] = $this->processLongDesc($aReqParams['oxcategories__oxlongdesc']);
         }
 
         if (empty($aReqParams['oxcategories__oxpricefrom'])) {

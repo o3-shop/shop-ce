@@ -166,7 +166,7 @@ class ManufacturerMainAjax extends ListComponentAjax
             $query = $this->formManufacturerRemovalQuery($articleIds);
             DatabaseProvider::getDb()->execute($query);
 
-            $this->resetCounter("manufacturerArticle", $manufacturerId);
+            $this->resetCounter('manufacturerArticle', $manufacturerId);
         }
     }
 
@@ -180,10 +180,10 @@ class ManufacturerMainAjax extends ListComponentAjax
      */
     protected function formManufacturerRemovalQuery($articlesToRemove)
     {
-        return "
+        return '
           UPDATE oxarticles
           SET oxmanufacturerid = null
-          WHERE oxid IN ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ") ";
+          WHERE oxid IN ( ' . implode(', ', DatabaseProvider::getDb()->quoteArray($articlesToRemove)) . ') ';
     }
 
     /**
@@ -201,12 +201,12 @@ class ManufacturerMainAjax extends ListComponentAjax
             $articleIds = $this->getAll($this->addFilter("select $articleViewName.oxid " . $this->getQuery()));
         }
 
-        if ($manufacturerId && $manufacturerId != "-1" && is_array($articleIds)) {
+        if ($manufacturerId && $manufacturerId != '-1' && is_array($articleIds)) {
             $database = DatabaseProvider::getDb();
 
             $query = $this->formArticleToManufacturerAdditionQuery($manufacturerId, $articleIds);
             $database->execute($query);
-            $this->resetCounter("manufacturerArticle", $manufacturerId);
+            $this->resetCounter('manufacturerArticle', $manufacturerId);
         }
     }
 
@@ -223,9 +223,9 @@ class ManufacturerMainAjax extends ListComponentAjax
     {
         $database = DatabaseProvider::getDb();
 
-        return "
+        return '
             UPDATE oxarticles
-            SET oxmanufacturerid = " . $database->quote($manufacturerId) . "
-            WHERE oxid IN ( " . implode(", ", $database->quoteArray($articlesToAdd)) . " )";
+            SET oxmanufacturerid = ' . $database->quote($manufacturerId) . '
+            WHERE oxid IN ( ' . implode(', ', $database->quoteArray($articlesToAdd)) . ' )';
     }
 }

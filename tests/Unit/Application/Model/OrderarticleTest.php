@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,24 +18,23 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
+use oxDb;
+use oxField;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Application\Model\OrderArticle;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Wrapping;
-
-use \oxField;
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Class Unit_Models_oxorderarticleTest
  */
 class OrderarticleTest extends \OxidTestCase
 {
-
     /** @var OrderArticle orderArticle */
     private $_oOrderArticle;
 
@@ -83,10 +83,10 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testDelete()
     {
-        $this->getConfig()->setConfigParam("blUseStock", 1);
-        $this->getConfig()->setConfigParam("blAllowNegativeStock", 'xxx');
+        $this->getConfig()->setConfigParam('blUseStock', 1);
+        $this->getConfig()->setConfigParam('blAllowNegativeStock', 'xxx');
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock']);
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(999), 'xxx');
         $oOrderArticle->oxorderarticles__oxstorno = new oxField(0);
         $oOrderArticle->oxorderarticles__oxamount = new oxField(999);
@@ -95,11 +95,11 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testSave()
     {
-        $this->getConfig()->setConfigParam("blUseStock", 1);
-        $this->getConfig()->setConfigParam("blAllowNegativeStock", 'xxx');
-        $this->getConfig()->setConfigParam("blPsBasketReservationEnabled", 0);
+        $this->getConfig()->setConfigParam('blUseStock', 1);
+        $this->getConfig()->setConfigParam('blAllowNegativeStock', 'xxx');
+        $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', 0);
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "isNewOrderItem", "setIsNewOrderItem", '_setOrderFiles'));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'isNewOrderItem', 'setIsNewOrderItem', '_setOrderFiles']);
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(-999), 'xxx');
         $oOrderArticle->expects($this->once())->method('isNewOrderItem')->will($this->returnValue(true));
         $oOrderArticle->expects($this->once())->method('_setOrderFiles');
@@ -113,31 +113,34 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testSaveReserved()
     {
-        $this->getConfig()->setConfigParam("blUseStock", 1);
-        $this->getConfig()->setConfigParam("blAllowNegativeStock", 'xxx');
-        $this->getConfig()->setConfigParam("blPsBasketReservationEnabled", 1);
+        $this->getConfig()->setConfigParam('blUseStock', 1);
+        $this->getConfig()->setConfigParam('blAllowNegativeStock', 'xxx');
+        $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', 1);
 
-        $oBR = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketReservation::class, array('commitArticleReservation'));
+        $oBR = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketReservation::class, ['commitArticleReservation']);
         $oBR->expects($this->once())->method('commitArticleReservation')->with($this->equalTo('asd'), $this->equalTo(20));
-        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('getBasketReservations'));
-        $oS->expects($this->once())->method('getBasketReservations')->will($this->returnValue($oBR));
+        $oS = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['getBasketReservations']);
+        $oS->expects($this->any())->method('getBasketReservations')->will($this->returnValue($oBR));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oS);
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "isNewOrderItem", "setIsNewOrderItem", 'getSession'));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'isNewOrderItem', 'setIsNewOrderItem']);
         $oOrderArticle->expects($this->never())->method('updateArticleStock');
         $oOrderArticle->expects($this->once())->method('isNewOrderItem')->will($this->returnValue(true));
         $oOrderArticle->expects($this->once())->method('setIsNewOrderItem')->with($this->equalTo(false));
-        $oOrderArticle->expects($this->once())->method('getSession')->will($this->returnValue($oS));
         $oOrderArticle->oxorderarticles__oxstorno = new oxField(0);
         $oOrderArticle->oxorderarticles__oxamount = new oxField(999);
         $oOrderArticle->oxorderarticles__oxartid = new oxField('asd');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(20);
         $oOrderArticle->oxorderarticles__oxorderid = new oxField($this->order->getId());
         $oOrderArticle->save();
+
+        // cleanup: disable reservation to prevent contaminating subsequent tests
+        $this->getConfig()->setConfigParam('blPsBasketReservationEnabled', false);
     }
 
     public function testCancelOrderArticleAlreadyCanceled()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("save"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['save']);
         $oOrderArticle->expects($this->never())->method('save');
         $oOrderArticle->oxorderarticles__oxstorno = new oxField(1);
 
@@ -146,10 +149,10 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testCancelOrderArticle()
     {
-        $this->getConfig()->setConfigParam("blUseStock", 1);
-        $this->getConfig()->setConfigParam("blAllowNegativeStock", 1);
+        $this->getConfig()->setConfigParam('blUseStock', 1);
+        $this->getConfig()->setConfigParam('blAllowNegativeStock', 1);
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("save", "updateArticleStock"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['save', 'updateArticleStock']);
         $oOrderArticle->expects($this->once())->method('save')->will($this->returnValue(true));
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(999), $this->equalTo(1));
         $oOrderArticle->oxorderarticles__oxstorno = new oxField(0);
@@ -170,25 +173,25 @@ class OrderarticleTest extends \OxidTestCase
         $this->assertFalse($oOrderArticle->getParentId());
 
         $oOrderArticle = oxNew('oxOrderArticle');
-        $oOrderArticle->oxorderarticles__oxartparentid = new oxField("sParentId");
-        $this->assertEquals("sParentId", $oOrderArticle->getParentId());
+        $oOrderArticle->oxorderarticles__oxartparentid = new oxField('sParentId');
+        $this->assertEquals('sParentId', $oOrderArticle->getParentId());
     }
 
     public function testGetCategoryIds()
     {
         $oArticle = oxNew('oxArticle');
-        $oArticle->load("1126");
+        $oArticle->load('1126');
 
         $oOrderArticle = oxNew('oxOrderArticle');
-        $oOrderArticle->oxorderarticles__oxartid = new oxField("1126");
+        $oOrderArticle->oxorderarticles__oxartid = new oxField('1126');
 
         $this->assertEquals($oArticle->getCategoryIds(false, true), $oOrderArticle->getCategoryIds(false, true));
     }
 
     public function testGetBasePrice()
     {
-        $oPrice = "oBasePrice";
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("getPrice"));
+        $oPrice = 'oBasePrice';
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['getPrice']);
         $oOrderArticle->expects($this->once())->method('getPrice')->will($this->returnValue($oPrice));
         $this->assertEquals($oPrice, $oOrderArticle->getBasePrice());
     }
@@ -202,9 +205,9 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testLoadInLang()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array('load'));
-        $oOrderArticle->expects($this->once())->method('load')->with($this->equalTo("sOrderArticleId"));
-        $oOrderArticle->loadInLang(0, "sOrderArticleId");
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['load']);
+        $oOrderArticle->expects($this->once())->method('load')->with($this->equalTo('sOrderArticleId'));
+        $oOrderArticle->loadInLang(0, 'sOrderArticleId');
     }
 
     public function testCheckForStock()
@@ -217,20 +220,20 @@ class OrderarticleTest extends \OxidTestCase
     {
         $oOrderArticle = oxNew('oxOrderArticle');
 
-        $oArticle = $oOrderArticle->UNITgetOrderArticle("1126");
+        $oArticle = $oOrderArticle->UNITgetOrderArticle('1126');
         $this->assertTrue($oArticle instanceof article);
         $this->assertTrue($oArticle->getLoadParentData());
     }
 
     public function testGetSelectLists()
     {
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array("getSelectLists"));
-        $oArticle->expects($this->once())->method('getSelectLists')->will($this->returnValue("aSelectLists"));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getSelectLists']);
+        $oArticle->expects($this->once())->method('getSelectLists')->will($this->returnValue('aSelectLists'));
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("_getOrderArticle"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['_getOrderArticle']);
         $oOrderArticle->expects($this->once())->method('_getOrderArticle')->will($this->returnValue($oArticle));
 
-        $this->assertEquals("aSelectLists", $oOrderArticle->getSelectLists());
+        $this->assertEquals('aSelectLists', $oOrderArticle->getSelectLists());
     }
 
     public function testSetIsNewOrderItemAndIsNewOrderItem()
@@ -244,7 +247,7 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testGetBasketPrice()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("getPrice", "_getOrderArticle"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['getPrice', '_getOrderArticle']);
         $oOrderArticle->expects($this->once())->method('getPrice')->will($this->returnValue('oPrice'));
         $oOrderArticle->expects($this->once())->method('_getOrderArticle')->will($this->returnValue(false));
 
@@ -253,16 +256,15 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testGetBasketPriceFromArticle()
     {
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("getBasketPrice"));
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['getBasketPrice']);
         $oArticle->expects($this->once())->method('getBasketPrice')->will($this->returnValue('oPrice'));
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("getPrice", "_getOrderArticle"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['getPrice', '_getOrderArticle']);
         $oOrderArticle->expects($this->never())->method('getPrice')->will($this->returnValue('oPrice'));
         $oOrderArticle->expects($this->once())->method('_getOrderArticle')->will($this->returnValue($oArticle));
 
         $this->assertEquals('oPrice', $oOrderArticle->getBasketPrice(null, null, null));
     }
-
 
     public function testSkipDiscounts()
     {
@@ -273,7 +275,7 @@ class OrderarticleTest extends \OxidTestCase
     public function testGetCategoryIdsNoArticleSet()
     {
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(), $oOrderArticle->getCategoryIds(false, null));
+        $this->assertEquals([], $oOrderArticle->getCategoryIds(false, null));
     }
 
     public function getLanguage()
@@ -298,7 +300,7 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testSetNewAmountNoArticleToLoad()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock']);
         $oOrderArticle->expects($this->never())->method('updateArticleStock');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(1);
 
@@ -309,7 +311,7 @@ class OrderarticleTest extends \OxidTestCase
 
     public function testSetNewAmount()
     {
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "save"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'save']);
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(-989), false);
         $oOrderArticle->expects($this->once())->method('save');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(10);
@@ -330,7 +332,7 @@ class OrderarticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxstockflag = new oxField(3);
         $oArticle->save();
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "save"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'save']);
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(-10), false);
         $oOrderArticle->expects($this->once())->method('save');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(10);
@@ -351,7 +353,7 @@ class OrderarticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxstockflag = new oxField(3);
         $oArticle->save();
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "save"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'save']);
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(5), false);
         $oOrderArticle->expects($this->once())->method('save');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(10);
@@ -372,7 +374,7 @@ class OrderarticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxstockflag = new oxField(3);
         $oArticle->save();
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "save"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'save']);
         $oOrderArticle->expects($this->once())->method('updateArticleStock')->with($this->equalTo(10), false);
         $oOrderArticle->expects($this->once())->method('save');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(10);
@@ -393,7 +395,7 @@ class OrderarticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxstockflag = new oxField(3);
         $oArticle->save();
 
-        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, array("updateArticleStock", "save"));
+        $oOrderArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\OrderArticle::class, ['updateArticleStock', 'save']);
         $oOrderArticle->expects($this->never())->method('updateArticleStock');
         $oOrderArticle->expects($this->never())->method('save');
         $oOrderArticle->oxorderarticles__oxamount = new oxField(10);
@@ -427,24 +429,24 @@ class OrderarticleTest extends \OxidTestCase
         $oDB->Execute($sQ2);
 
         // test getting correct list and correct handling of letters case
-        $sFields = "Color : BluE, size: small ";
+        $sFields = 'Color : BluE, size: small ';
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(0 => 1, 1 => 2), $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
+        $this->assertEquals([0 => 1, 1 => 2], $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
 
         // just one list must be returned
-        $sFields = "Size : middle ";
+        $sFields = 'Size : middle ';
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(1 => 1), $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
+        $this->assertEquals([1 => 1], $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
 
         // only existing list returned
-        $sFields = "Color : red, Material : wood ";
+        $sFields = 'Color : red, Material : wood ';
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(0 => 0), $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
+        $this->assertEquals([0 => 0], $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
 
         // articles with selectlists and variants should work
-        $sFields = "Color : red || variantvalue1 | variantvalue2";
+        $sFields = 'Color : red || variantvalue1 | variantvalue2';
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(0 => 0), $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
+        $this->assertEquals([0 => 0], $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
     }
 
     public function testMakeSelListArrayPriceON()
@@ -453,7 +455,7 @@ class OrderarticleTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('bl_perfLoadSelectLists', true);
         $this->getConfig()->setConfigParam('bl_perfUseSelectlistPrice', true);
-        $this->getConfig()->setConfigParam('aCurrencies', array(0 => 'EUR@ 1.00@ ,@ .@ EUR@ 2'));
+        $this->getConfig()->setConfigParam('aCurrencies', [0 => 'EUR@ 1.00@ ,@ .@ EUR@ 2']);
         $this->getConfig()->setActShopCurrency(0);
 
         $oSelList = oxNew('oxselectlist');
@@ -473,14 +475,14 @@ class OrderarticleTest extends \OxidTestCase
         $oDB->Execute($sQ2);
 
         // just one list must be returned
-        $sFields = "Size : middle +10,00 EUR";
+        $sFields = 'Size : middle +10,00 EUR';
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(1 => 1), $oOrderArticle->getOrderArticleSelectList('1127', $sFields), 'Size : middle +10,00 EUR');
+        $this->assertEquals([1 => 1], $oOrderArticle->getOrderArticleSelectList('1127', $sFields), 'Size : middle +10,00 EUR');
 
         // just one list must be returned
-        $sFields = "Size : small +12,03 EUR";
+        $sFields = 'Size : small +12,03 EUR';
         $oOrderArticle = oxNew('oxOrderArticle');
-        $this->assertEquals(array(1 => 2), $oOrderArticle->getOrderArticleSelectList('1127', $sFields), 'Size : small +12,03 EUR');
+        $this->assertEquals([1 => 2], $oOrderArticle->getOrderArticleSelectList('1127', $sFields), 'Size : small +12,03 EUR');
     }
 
     public function testMakeSelListArrayWithIncorrectFieldInOrderArticle()
@@ -504,16 +506,16 @@ class OrderarticleTest extends \OxidTestCase
         $oDB->Execute($sQ2);
 
         $oOrderArticle = oxNew('oxOrderArticle');
-        $sFields = "_______:::_______";
-        $this->assertEquals(array(), $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
+        $sFields = '_______:::_______';
+        $this->assertEquals([], $oOrderArticle->getOrderArticleSelectList('1126', $sFields));
     }
 
     public function testMakeSelListArrayWithNoAssignedSelLists()
     {
         $oOrderArticle = oxNew('oxOrderArticle');
-        $sFields = "Color : blue, Size : small ";
+        $sFields = 'Color : blue, Size : small ';
 
-        $this->assertEquals(array(), $oOrderArticle->getOrderArticleSelectList('1127', $sFields));
+        $this->assertEquals([], $oOrderArticle->getOrderArticleSelectList('1127', $sFields));
     }
 
     /*
@@ -524,7 +526,7 @@ class OrderarticleTest extends \OxidTestCase
         $oOrderArticle = oxNew('oxorderarticle');
         $this->assertTrue($oOrderArticle->load('_testOrderArticleId'));
 
-        $this->assertEquals("_testArticleId", $oOrderArticle->oxorderarticles__oxartid->value);
+        $this->assertEquals('_testArticleId', $oOrderArticle->oxorderarticles__oxartid->value);
     }
 
     /*
@@ -544,7 +546,7 @@ class OrderarticleTest extends \OxidTestCase
 
         foreach ($oArticle as $name => $value) {
             $sFieldName = preg_replace('/oxarticles__/', 'oxorderarticles__', $name);
-            if (isset($oArticle->$name->value) && !in_array($name, array("oxarticles__oxtimestamp"))) {
+            if (isset($oArticle->$name->value) && !in_array($name, ['oxarticles__oxtimestamp'])) {
                 $this->assertEquals($oArticle->$name->value, $oOrderArticle->$sFieldName->value, 'oxArticle object was not coppied correctly');
             }
         }
@@ -568,8 +570,8 @@ class OrderarticleTest extends \OxidTestCase
         $oDB->execute("update oxarticles set oxtimestamp = '2005-03-24 14:33:53' where oxid = '_testArticleId'");
         $this->_oOrderArticle->updateArticleStock(-3, false);
 
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId');
 
         $this->assertEquals(7, $oArticle->oxarticles__oxstock->value);
         $this->assertNotEquals('2005-03-24 14:33:53', $oDB->getOne("select oxtimestamp from oxarticles where oxid = '_testArticleId'"));
@@ -580,11 +582,11 @@ class OrderarticleTest extends \OxidTestCase
      */
     public function testUpdateArticleStockWithStockDisabled()
     {
-        $this->getConfig()->setConfigParam("blUseStock", 0);
+        $this->getConfig()->setConfigParam('blUseStock', 0);
         $this->_oOrderArticle->updateArticleStock(-3, false);
 
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId');
 
         $this->assertEquals(10, $oArticle->oxarticles__oxstock->value);
         $this->assertEquals(3, $oArticle->oxarticles__oxsoldamount->value);
@@ -597,8 +599,8 @@ class OrderarticleTest extends \OxidTestCase
     {
         $this->_oOrderArticle->updateArticleStock(-15, false);
 
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId');
 
         $this->assertEquals(0, $oArticle->oxarticles__oxstock->value);
     }
@@ -610,8 +612,8 @@ class OrderarticleTest extends \OxidTestCase
     {
         $this->_oOrderArticle->updateArticleStock(-15, true);
 
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId');
 
         $this->assertEquals(-5, $oArticle->oxarticles__oxstock->value);
     }
@@ -623,8 +625,8 @@ class OrderarticleTest extends \OxidTestCase
     {
         $this->_oOrderArticle->updateArticleStock(-3, false);
 
-        $oArticle = oxNew("oxArticle");
-        $oArticle->load("_testArticleId");
+        $oArticle = oxNew('oxArticle');
+        $oArticle->load('_testArticleId');
 
         $this->assertEquals(3, $oArticle->oxarticles__oxsoldamount->value);
     }
@@ -663,7 +665,7 @@ class OrderarticleTest extends \OxidTestCase
         $this->assertNull($oOrderArticle->getPersParams());
         $this->assertNull($oOrderArticle->getNonPublicVar('_aPersParam'));
 
-        $aParams = array("xxx", "yyy", "zzz");
+        $aParams = ['xxx', 'yyy', 'zzz'];
         $oOrderArticle->setPersParams($aParams);
         $this->assertEquals($aParams, $oOrderArticle->getPersParams());
         $this->assertEquals($aParams, $oOrderArticle->getNonPublicVar('_aPersParam'));
@@ -674,7 +676,7 @@ class OrderarticleTest extends \OxidTestCase
      */
     public function testSetPersParams()
     {
-        $aParams = array('xxx', 'yyy', 'zzz');
+        $aParams = ['xxx', 'yyy', 'zzz'];
 
         $oOrderArticle = oxNew('oxorderarticle');
         $oOrderArticle->setPersParams($aParams);
@@ -687,7 +689,7 @@ class OrderarticleTest extends \OxidTestCase
      */
     public function testSerializingValues()
     {
-        $aTestArr = array("te\"st", "test2");
+        $aTestArr = ['te"st', 'test2'];
         $sParams = serialize($aTestArr);
 
         $this->_oOrderArticle->oxorderarticles__oxpersparam = new oxField($sParams, oxField::T_RAW);
@@ -727,7 +729,12 @@ class OrderarticleTest extends \OxidTestCase
      */
     public function testGetWrapping()
     {
-        oxTestModules::addFunction('oxwrapping', 'load($id)', '{if ($id=="a") return true; }');
+        $oWrappingMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Wrapping::class, ['load']);
+        $oWrappingMock->expects($this->any())->method('load')->will($this->returnCallback(function ($id) {
+            return $id === 'a';
+        }));
+        oxTestModules::addModuleObject(\OxidEsales\Eshop\Application\Model\Wrapping::class, $oWrappingMock);
+
         $o = oxNew('oxOrderArticle');
 
         $o->oxorderarticles__oxwrapid = new oxField('');
@@ -737,7 +744,7 @@ class OrderarticleTest extends \OxidTestCase
         $this->assertSame(null, $o->getWrapping());
 
         $o->oxorderarticles__oxwrapid = new oxField('a');
-        $this->assertTrue($o->getWrapping() instanceof wrapping);
+        $this->assertTrue($o->getWrapping() instanceof \OxidEsales\Eshop\Application\Model\Wrapping);
     }
 
     /**
@@ -771,7 +778,7 @@ class OrderarticleTest extends \OxidTestCase
         $this->assertNull($oOrderArticle->getOrder());
 
         // checking if method returns the result from cache
-        $oOrderArticle->setNonPublicVar('_aOrderCache', array('test' => 'result'));
+        $oOrderArticle->setNonPublicVar('_aOrderCache', ['test' => 'result']);
         $this->assertEquals('result', $oOrderArticle->getOrder());
     }
 

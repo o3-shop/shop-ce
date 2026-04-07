@@ -63,7 +63,7 @@ class BackwardsCompatibilityAutoload
     {
         $classMap = static::getBackwardsCompatibilityClassMap();
         $bcAlias = strtolower($bcAlias);
-        $result = isset($classMap[$bcAlias]) ? $classMap[$bcAlias] : "";
+        $result = isset($classMap[$bcAlias]) ? $classMap[$bcAlias] : '';
 
         return $result;
     }

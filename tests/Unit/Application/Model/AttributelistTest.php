@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxDb;
+use oxDb;
 use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
-use \oxRegistry;
+use oxRegistry;
 
 /**
  * testing oxattributelist class.
  */
 class AttributelistTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -54,7 +55,7 @@ class AttributelistTest extends \OxidTestCase
     public function testLoadAttributesByIds()
     {
         $oAttrList = oxNew('oxAttributelist');
-        $aAttributes = $oAttrList->loadAttributesByIds(array('1672'));
+        $aAttributes = $oAttrList->loadAttributesByIds(['1672']);
 
         $sSelect = "select oxattrid, oxvalue from oxobject2attribute where oxobjectid = '1672'";
         $rs = oxDb::getDB()->select($sSelect);
@@ -73,7 +74,7 @@ class AttributelistTest extends \OxidTestCase
     {
         oxRegistry::getLang()->setBaseLanguage(1);
         $oAttrList = oxNew('oxAttributelist');
-        $aAttributes = $oAttrList->loadAttributesByIds(array('1672'));
+        $aAttributes = $oAttrList->loadAttributesByIds(['1672']);
 
         $sSelect = "select oxattrid, oxvalue_1 from oxobject2attribute where oxobjectid = '1672'";
         $rs = oxDb::getDB()->select($sSelect);
@@ -125,7 +126,6 @@ class AttributelistTest extends \OxidTestCase
         $this->assertEquals(9, $oAttrList->count());
     }
 
-
     /**
      * Test load displayable in basket/order attributes.
      *
@@ -158,7 +158,6 @@ class AttributelistTest extends \OxidTestCase
         $this->assertEquals(0, count($oAttrList));
     }
 
-
     /**
      * Test load attributes in other language.
      *
@@ -186,7 +185,7 @@ class AttributelistTest extends \OxidTestCase
 
         $myDB = oxDb::getDB();
 
-        $sSql = "insert into oxattribute (oxid, oxshopid, oxtitle, oxpos ) values ('test3', ".ShopIdCalculator::BASE_SHOP_ID.", 'test3', '3'), ('test1', ".ShopIdCalculator::BASE_SHOP_ID.", 'test1', '1'), ('test2', ".ShopIdCalculator::BASE_SHOP_ID.", 'test2', '2')";
+        $sSql = "insert into oxattribute (oxid, oxshopid, oxtitle, oxpos ) values ('test3', " . ShopIdCalculator::BASE_SHOP_ID . ", 'test3', '3'), ('test1', " . ShopIdCalculator::BASE_SHOP_ID . ", 'test1', '1'), ('test2', " . ShopIdCalculator::BASE_SHOP_ID . ", 'test2', '2')";
         $myDB->execute($sSql);
 
         $sArtId = 'testArt';
@@ -224,7 +223,7 @@ class AttributelistTest extends \OxidTestCase
         $myDB = oxDb::getDb();
         $myDB->Execute('insert into oxcategory2attribute (oxid, oxobjectid, oxattrid, oxsort) values ("test3","' . $sCategoryId . '","' . $sAttributeId . '", "333")');
 
-        $oAttrList = oxNew("oxattributelist");
+        $oAttrList = oxNew('oxattributelist');
         $oAttrList->getCategoryAttributes($sCategoryId, 1);
         $oAttribute = $oAttrList->offsetGet($sAttributeId);
 

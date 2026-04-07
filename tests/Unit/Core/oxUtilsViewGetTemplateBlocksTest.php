@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use oxDb;
 use oxException;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use oxUtilsView;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class oxUtilsViewGetTemplateBlocksTest extends UnitTestCase
 {
@@ -221,42 +222,42 @@ class oxUtilsViewGetTemplateBlocksTest extends UnitTestCase
      */
     public function testGetTemplateBlocksLogsExceptions()
     {
-        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getShopId', 'init'));
+        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getShopId', 'init']);
         $config->expects($this->atLeastOnce())->method('getShopId')->will($this->returnValue('15'));
-        $aInfo = array('module1' => 'module1', 'module2' => 'module2');
+        $aInfo = ['module1' => 'module1', 'module2' => 'module2'];
 
         /** @var oxException|PHPUnit\Framework\MockObject\MockObject $exception */
-        $exception = $this->getMock(\OxidEsales\Eshop\Core\Exception\StandardException::class, array('debugOut'));
+        $exception = $this->getMock(\OxidEsales\Eshop\Core\Exception\StandardException::class, ['debugOut']);
         $exception->expects($this->once())->method('debugOut');
 
         /** @var oxUtilsView|PHPUnit\Framework\MockObject\MockObject $utilsView */
-        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, array('getConfig', '_getActiveModuleInfo', '_getTemplateBlock'));
+        $utilsView = $this->getMock(\OxidEsales\Eshop\Core\UtilsView::class, ['getConfig', '_getActiveModuleInfo', '_getTemplateBlock']);
         $utilsView->expects($this->any())->method('getConfig')->will($this->returnValue($config));
         $utilsView->expects($this->any())->method('_getActiveModuleInfo')->will($this->returnValue($aInfo));
 
         $utilsView->expects($this->any())->method('_getTemplateBlock')->will($this->returnCallback(
             function ($param1, $param2) use ($exception) {
-                if ($param1 == "module2") {
-                    if ($param2 == "contentfile3") {
+                if ($param1 == 'module2') {
+                    if ($param2 == 'contentfile3') {
                         throw $exception;
                     } else {
-                        return "content2";
+                        return 'content2';
                     }
                 }
 
-                return "content1";
+                return 'content1';
             }
         ));
 
         $this->assertEquals(
-            array(
-                'blockname1' => array(
+            [
+                'blockname1' => [
                     'content1',
-                ),
-                'blockname2' => array(
+                ],
+                'blockname2' => [
                     'content2',
-                ),
-            ),
+                ],
+            ],
             $utilsView->getTemplateBlocks('filename.tpl')
         );
     }

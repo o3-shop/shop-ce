@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -52,7 +52,7 @@ class OrderFileList extends ListModel
         $oOrderFile->addFieldName('oxorderfiles__oxordernr');
         $oOrderFile->addFieldName('oxorderfiles__oxorderdate');
 
-        $sSql = "SELECT " . $sFields . " ,
+        $sSql = 'SELECT ' . $sFields . " ,
                       `oxorderarticles`.`oxtitle` AS `oxorderfiles__oxarticletitle`,
                       `oxorderarticles`.`oxartnum` AS `oxorderfiles__oxarticleartnum`,
                       `oxfiles`.`oxpurchasedonly` AS `oxorderfiles__oxpurchasedonly`,
@@ -71,7 +71,7 @@ class OrderFileList extends ListModel
 
         $this->selectString($sSql, [
             ':oxuserid' => $sUserId,
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ]);
     }
 
@@ -88,7 +88,7 @@ class OrderFileList extends ListModel
         $oOrderFile->addFieldName('oxorderfiles__oxarticletitle');
         $oOrderFile->addFieldName('oxorderfiles__oxarticleartnum');
 
-        $sSql = "SELECT " . $sFields . " ,
+        $sSql = 'SELECT ' . $sFields . ' ,
                       `oxorderarticles`.`oxtitle` AS `oxorderfiles__oxarticletitle`,
                       `oxorderarticles`.`oxartnum` AS `oxorderfiles__oxarticleartnum`,
                       `oxfiles`.`oxpurchasedonly` AS `oxorderfiles__oxpurchasedonly`
@@ -96,11 +96,11 @@ class OrderFileList extends ListModel
                         LEFT JOIN `oxorderarticles` ON `oxorderarticles`.`oxid` = `oxorderfiles`.`oxorderarticleid`
                         LEFT JOIN `oxfiles` ON `oxfiles`.`oxid` = `oxorderfiles`.`oxfileid`
                     WHERE `oxorderfiles`.`oxorderid` = :oxorderid AND `oxorderfiles`.`oxshopid` = :oxshopid
-                        AND `oxorderarticles`.`oxstorno` = 0";
+                        AND `oxorderarticles`.`oxstorno` = 0';
 
         $this->selectString($sSql, [
             ':oxorderid' => $sOrderId,
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ]);
     }
 }

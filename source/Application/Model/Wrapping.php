@@ -141,7 +141,7 @@ class Wrapping extends MultiLanguageModel
               and $sWrappingViewName.oxtype = :oxtype";
         $oEntries->selectString($sSelect, [
             ':oxactive' => '1',
-            ':oxtype' => $sWrapType
+            ':oxtype' => $sWrapType,
         ]);
 
         return $oEntries;
@@ -165,7 +165,7 @@ class Wrapping extends MultiLanguageModel
 
         return (int) $oDb->getOne($sQ, [
             ':oxactive' => '1',
-            ':oxtype' => $sWrapType
+            ':oxtype' => $sWrapType,
         ]);
     }
 
@@ -234,7 +234,7 @@ class Wrapping extends MultiLanguageModel
     public function getPictureUrl()
     {
         if ($this->oxwrapping__oxpic->value) {
-            return Registry::getConfig()->getPictureUrl("master/wrapping/" . $this->oxwrapping__oxpic->value, false, Registry::getConfig()->isSsl(), null, $this->oxwrapping__oxshopid->value);
+            return Registry::getConfig()->getPictureUrl('master/wrapping/' . $this->oxwrapping__oxpic->value, false, Registry::getConfig()->isSsl(), null, $this->oxwrapping__oxshopid->value);
         }
     }
 }

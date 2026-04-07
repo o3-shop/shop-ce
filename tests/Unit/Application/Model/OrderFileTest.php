@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,15 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxField;
 
 class OrderFileTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      */
@@ -74,9 +74,9 @@ class OrderFileTest extends \OxidTestCase
     {
         $oOrderFileNew = oxNew('oxOrderFile');
         $oOrderFileNew->setOrderId('_orderId');
-        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField("2");
+        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField('2');
         $oOrderFileNew->oxorderfiles__oxmaxdownloadcount = new oxField('10');
-        $oOrderFileNew->oxorderfiles__oxvaliduntil = new oxField("2050-10-20 12:12:00");
+        $oOrderFileNew->oxorderfiles__oxvaliduntil = new oxField('2050-10-20 12:12:00');
 
         $this->assertTrue($oOrderFileNew->isValid());
     }
@@ -88,9 +88,9 @@ class OrderFileTest extends \OxidTestCase
     {
         $oOrderFileNew = oxNew('oxOrderFile');
         $oOrderFileNew->setOrderId('_orderId');
-        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField("10");
+        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField('10');
         $oOrderFileNew->oxorderfiles__oxmaxdownloadcount = new oxField('10');
-        $oOrderFileNew->oxorderfiles__oxvaliduntil = new oxField("2050-10-20 12:12:00");
+        $oOrderFileNew->oxorderfiles__oxvaliduntil = new oxField('2050-10-20 12:12:00');
 
         $this->assertFalse($oOrderFileNew->isValid());
     }
@@ -108,10 +108,10 @@ class OrderFileTest extends \OxidTestCase
         $oOrderFileNew->oxorderfiles__oxmaxdownloadcount = new oxField('10');
         $oOrderFileNew->oxorderfiles__oxlinkexpirationtime = new oxField('24');
         $oOrderFileNew->oxorderfiles__oxdownloadexpirationtime = new oxField('12');
-        $oOrderFileNew->oxorderfiles__oxvaliduntil = new oxField("2011-10-20 12:12:00");
-        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField("2");
-        $oOrderFileNew->oxorderfiles__oxfirstdownload = new oxField("2011-10-10");
-        $oOrderFileNew->oxorderfiles__oxlastdownload = new oxField("2011-10-20");
+        $oOrderFileNew->oxorderfiles__oxvaliduntil = new oxField('2011-10-20 12:12:00');
+        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField('2');
+        $oOrderFileNew->oxorderfiles__oxfirstdownload = new oxField('2011-10-10');
+        $oOrderFileNew->oxorderfiles__oxlastdownload = new oxField('2011-10-20');
         $oOrderFileNew->save();
 
         $id = $oOrderFileNew->getId();
@@ -128,7 +128,7 @@ class OrderFileTest extends \OxidTestCase
         $this->assertEquals('24', $oOrderFile->oxorderfiles__oxlinkexpirationtime->value);
         $this->assertEquals('2011-10-10 00:00:00', $oOrderFile->oxorderfiles__oxfirstdownload->value);
         $this->assertEquals('2011-10-20 00:00:00', $oOrderFile->oxorderfiles__oxlastdownload->value);
-        $this->assertEquals("2011-10-20 12:12:00", $oOrderFile->oxorderfiles__oxvaliduntil->value);
+        $this->assertEquals('2011-10-20 12:12:00', $oOrderFile->oxorderfiles__oxvaliduntil->value);
 
         $iTime = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
         $sDate = date('Y-m-d H:i:s', $iTime + 24 * 3600);
@@ -244,9 +244,9 @@ class OrderFileTest extends \OxidTestCase
         $oOrderFileNew->setOrderArticleId('orderArticleId');
         $oOrderFileNew->setShopId('1');
         $oOrderFileNew->setFile('fileName', 'fileId', '10', '24', '12');
-        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField("2");
-        $oOrderFileNew->oxorderfiles__oxfirstdownload = new oxField("2011-10-10");
-        $oOrderFileNew->oxorderfiles__oxlastdownload = new oxField("2011-10-20");
+        $oOrderFileNew->oxorderfiles__oxdownloadcount = new oxField('2');
+        $oOrderFileNew->oxorderfiles__oxfirstdownload = new oxField('2011-10-10');
+        $oOrderFileNew->oxorderfiles__oxlastdownload = new oxField('2011-10-20');
         $oOrderFileNew->save();
 
         $sLastDate = date('Y-m-d H:i:s');

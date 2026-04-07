@@ -41,7 +41,7 @@ class CategoryOrderAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -92,15 +92,15 @@ class CategoryOrderAjax extends ListComponentAjax
         if ($sSynchOxid = Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
             $sQAdd = " from $sArtTable left join $sO2CView on $sArtTable.oxid=$sO2CView.oxobjectid where $sO2CView.oxcatnid = " . $oDb->quote($sSynchOxid);
             if ($aSkipArt = Registry::getSession()->getVariable('neworder_sess')) {
-                $sQAdd .= " and $sArtTable.oxid not in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aSkipArt)) . " ) ";
+                $sQAdd .= " and $sArtTable.oxid not in ( " . implode(', ', DatabaseProvider::getDb()->quoteArray($aSkipArt)) . ' ) ';
             }
         } else {
             // which fields to load ?
             $sQAdd = " from $sArtTable where ";
             if ($aSkipArt = Registry::getSession()->getVariable('neworder_sess')) {
-                $sQAdd .= " $sArtTable.oxid in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aSkipArt)) . " ) ";
+                $sQAdd .= " $sArtTable.oxid in ( " . implode(', ', DatabaseProvider::getDb()->quoteArray($aSkipArt)) . ' ) ';
             } else {
-                $sQAdd .= " 1 = 0 ";
+                $sQAdd .= ' 1 = 0 ';
             }
         }
 
@@ -135,10 +135,10 @@ class CategoryOrderAjax extends ListComponentAjax
             $sArtTable = $this->getViewName('oxarticles');
             $sSep = '';
             foreach ($aSkipArt as $sId) {
-                $sOrderBy = " $sArtTable.oxid=" . DatabaseProvider::getDb()->quote($sId) . " " . $sSep . $sOrderBy;
-                $sSep = ", ";
+                $sOrderBy = " $sArtTable.oxid=" . DatabaseProvider::getDb()->quote($sId) . ' ' . $sSep . $sOrderBy;
+                $sSep = ', ';
             }
-            $sOrder = "order by " . $sOrderBy;
+            $sOrder = 'order by ' . $sOrderBy;
         }
 
         return $sOrder;
@@ -169,13 +169,13 @@ class CategoryOrderAjax extends ListComponentAjax
             $sSelect .= "where $sO2CView.oxcatnid = :oxcatnid";
             if (count($aSkipArt)) {
                 $sSelect .= " and $sArticleTable.oxparentid = '' and $sArticleTable.oxid ";
-                $sSelect .= "not in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aSkipArt)) . " ) ";
+                $sSelect .= 'not in ( ' . implode(', ', DatabaseProvider::getDb()->quoteArray($aSkipArt)) . ' ) ';
             }
 
             // simply echoing "1" if some items found, and 0 if nothing was found
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
             echo (int) DatabaseProvider::getMaster()->getOne($sSelect, [
-                ':oxcatnid' => $soxId
+                ':oxcatnid' => $soxId,
             ]);
         }
     }
@@ -208,12 +208,12 @@ class CategoryOrderAjax extends ListComponentAjax
             // checking if all articles were moved from one
             $sSelect = "select 1 from $sArticleTable left join $sO2CView on $sArticleTable.oxid=$sO2CView.oxobjectid ";
             $sSelect .= "where $sO2CView.oxcatnid = :oxcatnid and $sArticleTable.oxparentid = '' and $sArticleTable.oxid ";
-            $sSelect .= "not in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aOrdArt)) . " ) ";
+            $sSelect .= 'not in ( ' . implode(', ', DatabaseProvider::getDb()->quoteArray($aOrdArt)) . ' ) ';
 
             // simply echoing "1" if some items found, and 0 if nothing was found
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
             echo (int) DatabaseProvider::getMaster()->getOne($sSelect, [
-                ':oxcatnid' => $soxId
+                ':oxcatnid' => $soxId,
             ]);
         }
     }
@@ -236,14 +236,14 @@ class CategoryOrderAjax extends ListComponentAjax
 
             $this->resetContentCache();
 
-            $aNewOrder = Registry::getSession()->getVariable("neworder_sess");
+            $aNewOrder = Registry::getSession()->getVariable('neworder_sess');
             if (is_array($aNewOrder) && count($aNewOrder)) {
                 $sO2CView = $this->getViewName('oxobject2category');
-                $sSelect = "select * from $sO2CView where $sO2CView.oxcatnid = :oxcatnid and $sO2CView.oxobjectid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aNewOrder)) . " )";
+                $sSelect = "select * from $sO2CView where $sO2CView.oxcatnid = :oxcatnid and $sO2CView.oxobjectid in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aNewOrder)) . ' )';
                 $oList = oxNew(ListModel::class);
                 $oList->init($this->getObject2CategoryClass(), 'oxobject2category');
                 $oList->selectString($sSelect, [
-                    ':oxcatnid' => $oCategory->getId()
+                    ':oxcatnid' => $oCategory->getId(),
                 ]);
 
                 // setting new position

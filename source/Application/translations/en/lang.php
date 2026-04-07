@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$sLangName  = "English";
+$sLangName = 'English';
 
 // -------------------------------
 // RESOURCE IDENTIFIER = STRING
@@ -77,6 +77,10 @@ $aLang = [
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'CARD_TO'                                                     => 'Card to',
 /** end deprecated */
+'CARD_MASTERCARD'                                             => 'MasterCard',
+'CARD_VISA'                                                   => 'Visa',
+'CARD_SECURITY_CODE'                                          => 'Security code',
+'CARD_SECURITY_CODE_DESCRIPTION'                              => 'Last 3 digits on the back of your credit card.',
 'CART'                                                        => 'Cart',
 'CATEGORIES'                                                  => 'Categories',
 'CATEGORY'                                                    => 'Category',
@@ -109,6 +113,7 @@ $aLang = [
 'COUPON'                                                      => 'Coupon',
 'COUPON_NOT_ACCEPTED'                                         => 'Your coupon "%s" couldn\'t be accepted.',
 'CREATE_PASSWORD'                                             => 'Create password',
+'CREDITCARD'                                                  => 'Credit card',
 'CURRENT_PRODUCT'                                             => 'Current product',
 'CUSTOMERS_ALSO_BOUGHT'                                       => 'Customers who bought this product also bought',
 'DATE'                                                        => 'Date',
@@ -136,6 +141,8 @@ $aLang = [
 'EDIT'                                                        => 'Edit',
 'EMAIL'                                                       => 'E-mail',
 'EMAIL_ADDRESS'                                               => 'E-mail address',
+'EMAIL_INVITE_HTML_INVITETOSHOP2'                             => 'has invited you to visit',
+'EMAIL_INVITE_HTML_INVITETOSHOP3'                             => '.',
 'ENABLE'                                                      => 'Enable',
 'ENTER_COUPON_NUMBER'                                         => 'Enter coupon number',
 'ENTER_EMAIL_OR_NAME'                                         => 'Enter e-mail address or last name',
@@ -451,6 +458,8 @@ $aLang = [
 'RECIPIENT_EMAIL'                                             => 'Recipient\'s e-mail',
 'RECIPIENT_NAME'                                              => 'Recipient\'s name',
 'RECOMMEND'                                                   => 'Recommend',
+'RECOMMLIST'                                                  => 'Recommendation List',
+'RECOMMLIST_SEARCH'                                           => 'Search',
 /** @deprecated since v6.5.4 (2020-04-06); Suggest feature will be removed completely */
 'RECOMMENDED_PRODUCTS'                                        => 'My product recommendation',
 /** end deprecated */
@@ -710,6 +719,8 @@ $aLang = [
 'BASKET_TOTAL_PLUS_PROPORTIONAL_VAT'                          => 'plus tax (calculated proportionally)',
 'PROPORTIONALLY_CALCULATED'                                   => 'Calculated proportionally',
 'PRICE_FROM'                                                  => 'from',
+'PAGE_CHECKOUT_ORDER_COUPONNOTACCEPTED1'                      => 'Coupon',
+'PAGE_CHECKOUT_ORDER_COUPONNOTACCEPTED2'                      => 'couldn\'t be accepted.',
 'PAGE_DETAILS_THANKYOUMESSAGE1'                               => 'Thank you.',
 'PAGE_DETAILS_THANKYOUMESSAGE2'                               => ' appreciates your comments.',
 'PAGE_DETAILS_THANKYOUMESSAGE3'                               => 'We will inform you as soon as the price falls below',
@@ -745,13 +756,11 @@ $aLang = [
 
 'WISHLIST_PRODUCTS'                                           => 'These products are on the wish list of %s. If you want to please him/her, purchase one or more of these products.',
 
-
 'BETA_NOTE'                                                   => 'Welcome to ',
 'BETA_NOTE_RELEASE_BETA'                                      => 'Beta',
 'BETA_NOTE_RELEASE_RC'                                        => 'Release candidate',
 'BETA_NOTE_MIDDLE'                                            => ' of O3-Shop ',
 'BETA_NOTE_FAQ'                                               => '. Please refer to our %s if you have any questions.',
-
 
 'NO_LISTMANIA_LIST'                                           => 'There is no listmania lists at the moment. To create a new list, please ',
 'DETAILS_VPE_MESSAGE'                                         => 'This product can only be ordered in packaging units of %s',
@@ -763,6 +772,10 @@ $aLang = [
 'SERVICES'                                                    => 'Service',
 'FORM_FIELDSET_USER_SHIPPING_ADDITIONALINFO2_TOOLTIP'         => '', // this is specifically for DHL
 'FORM_FIELDSET_USER_BILLING_ADDITIONALINFO_TOOLTIP'           => '', // this is specifically for DHL
+'FORM_REGISTER_IAGREETOTERMS1'                                => 'I agree to the',
+'FORM_REGISTER_IAGREETOTERMS3'                                => 'and accept',
+'FORM_REGISTER_IAGREETORIGHTOFWITHDRAWAL1'                    => 'and have been informed about my',
+'FORM_REGISTER_IAGREETORIGHTOFWITHDRAWAL3'                    => '.',
 'FORM_SUGGEST_MESSAGE1'                                       => 'Hello, I was looking at',
 'FORM_SUGGEST_MESSAGE2'                                       => 'today and found something that might be interesting for you. Just click on the link below and you will be directed to the shop.',
 'SHOP_SUGGEST_MESSAGE'                                        => 'Hello, I was looking at %s today and found something that might be interesting for you. Just click on the link below and you will be directed to the shop.',
@@ -774,7 +787,6 @@ $aLang = [
 'THANK_YOU_FOR_ORDER'                                         => 'Thank you for ordering at',
 'PRICE_ALERT_THANK_YOU_MESSAGE'                               => 'Many thanks for the transmission of your wished price of %s %s. You will receive an e-mail as soon as this is reached.',
 'THANK_YOU_MESSAGE'                                           => 'Thank you for your message to %s.',
-
 
 'ALL_BRANDS'                                                  => 'All brands',
 'BY_BRAND'                                                    => 'By brand',

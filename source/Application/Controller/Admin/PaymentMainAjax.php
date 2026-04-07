@@ -72,7 +72,7 @@ class PaymentMainAjax extends ListComponentAjax
             $sQAdd = " from {$sGroupTable} ";
         } else {
             $sQAdd = " from {$sGroupTable}, oxobject2group where ";
-            $sQAdd .= " oxobject2group.oxobjectid = " . $oDb->quote($sGroupId) .
+            $sQAdd .= ' oxobject2group.oxobjectid = ' . $oDb->quote($sGroupId) .
                       " and oxobject2group.oxgroupsid = {$sGroupTable}.oxid ";
         }
 
@@ -86,7 +86,7 @@ class PaymentMainAjax extends ListComponentAjax
                 $sQAdd .= 'and ';
             }
             $sQAdd .= " {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid from {$sGroupTable}, oxobject2group " .
-                      "where  oxobject2group.oxobjectid = " . $oDb->quote($sSynchGroupId) .
+                      'where  oxobject2group.oxobjectid = ' . $oDb->quote($sSynchGroupId) .
                       " and oxobject2group.oxgroupsid = $sGroupTable.oxid ) ";
         }
 
@@ -100,11 +100,11 @@ class PaymentMainAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
+            $sQ = $this->_addFilter('delete oxobject2group.* ' . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . $sRemoveGroups . ") ";
+            $sRemoveGroups = implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . $sRemoveGroups . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -121,7 +121,7 @@ class PaymentMainAjax extends ListComponentAjax
             $sGroupTable = $this->_getViewName('oxgroups');
             $aAddGroups = $this->_getAll($this->_addFilter("select $sGroupTable.oxid " . $this->_getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aAddGroups)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddGroups)) {
             foreach ($aAddGroups as $sAddgroup) {
                 $oNewGroup = oxNew(Object2Group::class);
                 $oNewGroup->oxobject2group__oxobjectid = new Field($soxId);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto
  * Price view mode: brutto
@@ -21,22 +22,22 @@
  * Calculate scale price.
  * Brutto-Brutto mode.
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'       => 'testarticle',
             'oxprice'    => 12.00,
             'amount'     => 2,
-            'scaleprices' => array(
+            'scaleprices' => [
                     'oxaddabs'     => 11.95,
                     'oxamount'     => 2,
                     'oxamountto'   => 2,
-                    'oxartid'      => 'testarticle'
-            ),
-        ),
-    ),
-    'discounts' => array(
-        0 => array(
+                    'oxartid'      => 'testarticle',
+            ],
+        ],
+    ],
+    'discounts' => [
+        0 => [
             'oxid'         => '_testDiscount',
             'oxactive'     => 1,
             'oxtitle'      => 'new discount',
@@ -45,29 +46,29 @@ $aData = array(
             'oxaddsumtype' => 'abs',
             'oxaddsum'     => 3,
             'oxsort'       => 10,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-             'testarticle' => array( '11,95', '23,90' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+             'testarticle' => [ '11,95', '23,90' ],
+        ],
+        'totals' => [
             'totalBrutto' => '23,90',
             'totalNetto'  => '17,56',
-            'vats' => array(
-                19 => '3,34'
-            ),
-            'discounts' => array(
-                    '_testDiscount' => '3,00'
-                ),
-            'grandTotal'  => '20,90'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+            'vats' => [
+                19 => '3,34',
+            ],
+            'discounts' => [
+                    '_testDiscount' => '3,00',
+                ],
+            'grandTotal'  => '20,90',
+        ],
+    ],
+    'options' => [
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
+use oxField;
 
 class CountryTest extends \OxidTestCase
 {
@@ -80,7 +82,7 @@ class CountryTest extends \OxidTestCase
      */
     public function testLoadingNotExistingCountry()
     {
-        $oObj = oxNew("oxcountry");
+        $oObj = oxNew('oxcountry');
         $this->assertFalse($oObj->load('noSuchCountry'));
     }
 
@@ -105,7 +107,6 @@ class CountryTest extends \OxidTestCase
         $oObj->oxcountry__oxvatstatus = new oxField(0, oxField::T_RAW);
         $this->assertFalse($oObj->isInEU());
     }
-
 
     /**
      * Tests state getter returned count
@@ -136,7 +137,6 @@ class CountryTest extends \OxidTestCase
         $this->assertEquals('WY', $aKeys[61]);
     }
 
-
     /**
      * Tests state getter
      *
@@ -163,11 +163,11 @@ class CountryTest extends \OxidTestCase
 
     public function providerGetVatIdentificationNumberPrefix()
     {
-        return array(
-            array('a7c40f631fc920687.20179984', 'DE'),
+        return [
+            ['a7c40f631fc920687.20179984', 'DE'],
             // Exceptional country
-            array('a7c40f633114e8fc6.25257477', 'EL'),
-        );
+            ['a7c40f633114e8fc6.25257477', 'EL'],
+        ];
     }
 
     /**

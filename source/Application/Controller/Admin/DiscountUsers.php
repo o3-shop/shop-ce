@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -51,11 +51,11 @@ class DiscountUsers extends AdminDetailsController
         // all user-groups
         $oGroups = oxNew(ListModel::class);
         $oGroups->init('oxgroups');
-        $oGroups->selectString("select * from " . Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->_iEditLang));
+        $oGroups->selectString('select * from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups', $this->_iEditLang));
 
         $oRoot = new stdClass();
-        $oRoot->oxgroups__oxid = new Field("");
-        $oRoot->oxgroups__oxtitle = new Field("-- ");
+        $oRoot->oxgroups__oxid = new Field('');
+        $oRoot->oxgroups__oxtitle = new Field('-- ');
         // rebuild list as we need the "no value" entry at the first position
         $aNewList = [];
         $aNewList[] = $oRoot;
@@ -66,14 +66,14 @@ class DiscountUsers extends AdminDetailsController
             $aNewList[$val->oxgroups__oxid->value]->oxgroups__oxtitle = new Field($val->oxgroups__oxtitle->value);
         }
 
-        $this->_aViewData["allgroups2"] = $aNewList;
+        $this->_aViewData['allgroups2'] = $aNewList;
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             $oDiscount = oxNew(Discount::class);
             $oDiscount->load($soxId);
 
             if ($oDiscount->isDerived()) {
-                $this->_aViewData["readonly"] = true;
+                $this->_aViewData['readonly'] = true;
             }
         }
 
@@ -82,14 +82,14 @@ class DiscountUsers extends AdminDetailsController
             $oDiscountGroupsAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountGroupsAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountGroupsAjax->getColumns();
 
-            return "popups/discount_groups.tpl";
+            return 'popups/discount_groups.tpl';
         } elseif ($iAoc == 2) {
             $oDiscountUsersAjax = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiscountUsersAjax::class);
             $this->_aViewData['oxajax'] = $oDiscountUsersAjax->getColumns();
 
-            return "popups/discount_users.tpl";
+            return 'popups/discount_users.tpl';
         }
 
-        return "discount_users.tpl";
+        return 'discount_users.tpl';
     }
 }

@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -26,11 +27,11 @@ $sMetadataVersion = '2.0';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'Vendor1/own_namespace_extending_unified_namespace',
     'title'        => 'Test case 1.10: a namespaced module class inherits from the unified shop namespace',
     'description'  => 'Both module class and shop class use the namespaces, but the shop class is from the unified shop namespace.',
     'thumbnail'    => 'picture.png',
     'version'      => '1.0',
     'author'       => 'OXID eSales AG',
-);
+];

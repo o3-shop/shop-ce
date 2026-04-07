@@ -51,6 +51,6 @@ class CategoryPictures extends AdminDetailsController
             $oCategory->load($soxId);
         }
 
-        return "category_pictures.tpl";
+        return 'category_pictures.tpl';
     }
 }

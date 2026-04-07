@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Application\Component\Widget;
 
 use OxidEsales\TestingLibrary\UnitTestCase;
@@ -48,7 +50,7 @@ class CategoryTreeTest extends UnitTestCase
         \OxidEsales\EshopCommunity\Internal\Container\ContainerFactory::getInstance()->resetContainer();
 
         $categoryTree = oxNew('OxidEsales\EshopCommunity\Application\Component\Widget\CategoryTree');
-        $categoryTree->setViewParameters(array("sWidgetType" => "header"));
+        $categoryTree->setViewParameters(['sWidgetType' => 'header']);
         $this->assertEquals('widget/header/categorylist.tpl', $categoryTree->render());
     }
 }

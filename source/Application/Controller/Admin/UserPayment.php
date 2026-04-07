@@ -87,18 +87,18 @@ class UserPayment extends AdminDetailsController
     public function render()
     {
         parent::render();
-        $this->_aViewData["edit"] = $this->getSelUserPayment();
-        $this->_aViewData["oxpaymentid"] = $this->getPaymentId();
-        $this->_aViewData["paymenttypes"] = $this->getPaymentTypes();
-        $this->_aViewData["edituser"] = $this->getUser();
-        $this->_aViewData["userpayments"] = $this->getUserPayments();
+        $this->_aViewData['edit'] = $this->getSelUserPayment();
+        $this->_aViewData['oxpaymentid'] = $this->getPaymentId();
+        $this->_aViewData['paymenttypes'] = $this->getPaymentTypes();
+        $this->_aViewData['edituser'] = $this->getUser();
+        $this->_aViewData['userpayments'] = $this->getUserPayments();
         $sOxId = $this->getEditObjectId();
 
         if (!$this->_allowAdminEdit($sOxId)) {
             $this->_aViewData['readonly'] = true;
         }
 
-        return "user_payment.tpl";
+        return 'user_payment.tpl';
     }
 
     /**
@@ -118,7 +118,7 @@ class UserPayment extends AdminDetailsController
                 $aParams['oxuserpayments__oxvalue'] = Registry::getUtils()->assignValuesToText($aDynvalues);
             }
 
-            if ($aParams['oxuserpayments__oxid'] == "-1") {
+            if ($aParams['oxuserpayments__oxid'] == '-1') {
                 $aParams['oxuserpayments__oxid'] = null;
             }
 
@@ -136,7 +136,7 @@ class UserPayment extends AdminDetailsController
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
         $soxId = $this->getEditObjectId();
         if ($this->_allowAdminEdit($soxId)) {
-            if ($aParams['oxuserpayments__oxid'] != "-1") {
+            if ($aParams['oxuserpayments__oxid'] != '-1') {
                 $oAddress = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
                 if ($oAddress->load($aParams['oxuserpayments__oxid'])) {
                     $this->_blDelete = (bool) $oAddress->delete();
@@ -155,7 +155,7 @@ class UserPayment extends AdminDetailsController
         if ($this->_oActiveUser == null) {
             $this->_oActiveUser = false;
             $sOxId = $this->getEditObjectId();
-            if (isset($sOxId) && $sOxId != "-1") {
+            if (isset($sOxId) && $sOxId != '-1') {
                 // load object
                 $this->_oActiveUser = oxNew(User::class);
                 $this->_oActiveUser->load($sOxId);
@@ -183,7 +183,7 @@ class UserPayment extends AdminDetailsController
                 }
             }
             if (!$this->_sPaymentId) {
-                $this->_sPaymentId = "-1";
+                $this->_sPaymentId = '-1';
             }
         }
 
@@ -200,7 +200,7 @@ class UserPayment extends AdminDetailsController
         if ($this->_oPaymentTypes == null) {
             // all paymenttypes
             $this->_oPaymentTypes = oxNew(ListModel::class);
-            $this->_oPaymentTypes->init("oxpayment");
+            $this->_oPaymentTypes->init('oxpayment');
             $oListObject = $this->_oPaymentTypes->getBaseObject();
             $oListObject->setLanguage(Registry::getLang()->getObjectTplLanguage());
             $this->_oPaymentTypes->getList();
@@ -220,7 +220,7 @@ class UserPayment extends AdminDetailsController
         if ($this->_oUserPayment == null) {
             $this->_oUserPayment = false;
             $sPaymentId = $this->getPaymentId();
-            if ($sPaymentId != "-1" && isset($sPaymentId)) {
+            if ($sPaymentId != '-1' && isset($sPaymentId)) {
                 $this->_oUserPayment = oxNew(\OxidEsales\Eshop\Application\Model\UserPayment::class);
                 $this->_oUserPayment->load($sPaymentId);
                 $sTemplate = $this->_oUserPayment->oxuserpayments__oxvalue->value;

@@ -58,7 +58,7 @@ class ModuleTranslationPathFinder
             }
         }
         $adminThemeName = $this->getContainer()->get(AdminThemeBridgeInterface::class)->getActiveTheme();
-        $languageDirectory = ($admin) ? 'views' . DIRECTORY_SEPARATOR .  $adminThemeName : 'translations';
+        $languageDirectory = ($admin) ? 'views' . DIRECTORY_SEPARATOR . $adminThemeName : 'translations';
         $fullPath .= DIRECTORY_SEPARATOR . $languageDirectory;
         $fullPath .= DIRECTORY_SEPARATOR . $language;
 

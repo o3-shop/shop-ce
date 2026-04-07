@@ -47,16 +47,13 @@ class ServicesYamlValidatorTest extends TestCase
      */
     public function testValidateNoServicesYaml($directory, $throwsException)
     {
-
         $this->moduleConfiguration->setPath($directory);
 
         $exceptionThrown = false;
 
         try {
-                $this->validator->validate($this->moduleConfiguration, 1);
-        }
-        catch (\Exception $e)
-        {
+            $this->validator->validate($this->moduleConfiguration, 1);
+        } catch (\Exception $e) {
             $exceptionThrown = true;
         }
 
@@ -67,13 +64,12 @@ class ServicesYamlValidatorTest extends TestCase
         );
     }
 
-    public function data() {
-
+    public function data()
+    {
         return [
             ['.', false],
             ['Working', false],
-            ['NotWorking', true]
+            ['NotWorking', true],
         ];
-
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -29,7 +31,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class SepaBICValidatorTest extends \OxidTestCase
 {
-
     /**
      * BIC validation data provider
      *
@@ -37,23 +38,22 @@ class SepaBICValidatorTest extends \OxidTestCase
      */
     public function providerIsValid_validBIC_true()
     {
-        return array(
-            array("ASPKAT2L"),
-            array("AAAACCXX"),
-            array("AAAACC22"),
-            array("AAAACCXXHHH"),
-            array("AAAACC33555"),
-            array("AAAACCXX555"),
-            array(" AAAACCXX"),
-            array("AAAACCXX "),
-            array("\tAAAACCXX"),
-            array("AAAACCXX\n"),
-            array("AAAACCXX\n\r"),
+        return [
+            ['ASPKAT2L'],
+            ['AAAACCXX'],
+            ['AAAACC22'],
+            ['AAAACCXXHHH'],
+            ['AAAACC33555'],
+            ['AAAACCXX555'],
+            [' AAAACCXX'],
+            ['AAAACCXX '],
+            ["\tAAAACCXX"],
+            ["AAAACCXX\n"],
+            ["AAAACCXX\n\r"],
             // Fix for bug entry 0005564: oxSepaValidator::isValidBIC($sBIC) only verifies substring of BIC
-            array("COBADEHD055"),
-        );
+            ['COBADEHD055'],
+        ];
     }
-
 
     /**
      * Test case to check BIC validation
@@ -64,7 +64,7 @@ class SepaBICValidatorTest extends \OxidTestCase
     {
         $oSepaBICValidator = oxNew('oxSepaBICValidator');
 
-        $this->assertTrue($oSepaBICValidator->isValid($sBIC), "BIC must be valid");
+        $this->assertTrue($oSepaBICValidator->isValid($sBIC), 'BIC must be valid');
     }
 
     /**
@@ -74,36 +74,36 @@ class SepaBICValidatorTest extends \OxidTestCase
      */
     public function providerIsValid_invalidBIC_false()
     {
-        return array(
-            array("AAAACCX"),
-            array("AAAACCXXX"),
-            array("AAAACCXXXX"),
-            array("AAAACC2233"),
-            array("AAAACC2233*"),
-            array("AAAACC224444X"),
-            array("AAAACC224444XX"),
-            array("AAA1CC22"),
-            array("1AAAACXX"),
-            array("A1AAACXX"),
-            array("AA1AACXX"),
-            array("AAA1ACXX"),
-            array("AAAA1CXX"),
-            array("AAAAC1XX"),
-            array("AAAAC122"),
-            array("ASPK AT 2L"),
-            array("ASPK\tAT\t2L"),
-            array("123 ASPKAT2L"),
-            array("_ASPKAT2L"),
-            array("ASPKAT2"),
-            array("ASP_AT2L"),
-            array("ASPK*T2L"),
-            array("ASPKA-2L"),
-            array("AAAßCCXX"),
-            array("AAAACßXX"),
-            array("AAAACCXö"),
+        return [
+            ['AAAACCX'],
+            ['AAAACCXXX'],
+            ['AAAACCXXXX'],
+            ['AAAACC2233'],
+            ['AAAACC2233*'],
+            ['AAAACC224444X'],
+            ['AAAACC224444XX'],
+            ['AAA1CC22'],
+            ['1AAAACXX'],
+            ['A1AAACXX'],
+            ['AA1AACXX'],
+            ['AAA1ACXX'],
+            ['AAAA1CXX'],
+            ['AAAAC1XX'],
+            ['AAAAC122'],
+            ['ASPK AT 2L'],
+            ["ASPK\tAT\t2L"],
+            ['123 ASPKAT2L'],
+            ['_ASPKAT2L'],
+            ['ASPKAT2'],
+            ['ASP_AT2L'],
+            ['ASPK*T2L'],
+            ['ASPKA-2L'],
+            ['AAAßCCXX'],
+            ['AAAACßXX'],
+            ['AAAACCXö'],
             // Fix for bug entry 0005564: oxSepaValidator::isValidBIC($sBIC) only verifies substring of BIC
-            array("123COBADEHD055ABC"),
-        );
+            ['123COBADEHD055ABC'],
+        ];
     }
 
     /**
@@ -115,6 +115,6 @@ class SepaBICValidatorTest extends \OxidTestCase
     {
         $oSepaBICValidator = oxNew('oxSepaBICValidator');
 
-        $this->assertFalse($oSepaBICValidator->isValid($sBIC), "BIC must be not valid");
+        $this->assertFalse($oSepaBICValidator->isValid($sBIC), 'BIC must be not valid');
     }
 }

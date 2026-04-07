@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto
  * Price view mode:  netto
@@ -17,66 +18,64 @@
  * Short description:
  * Neto-Neto mode. Additiona products Neto-Neto.
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'                     => 9001,
             'oxprice'                  => 10,
             'oxvat'                    => 19,
             'amount'                   => 510,
-        ),
-
-    ),
-    'costs' => array(
-
-        'delivery' => array(
-            0 => array(
+        ],
+    ],
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxtitle' => '6_abs_del',
                 'oxactive' => 1,
                 'oxaddsum' => 10,
                 'oxaddsumtype' => 'abs',
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
-                'oxparamend' => 99999
-            ),
-        ),
-        'payment' => array(
-            0 => array(
+                'oxparamend' => 99999,
+            ],
+        ],
+        'payment' => [
+            0 => [
                 'oxtitle' => '1 abs payment',
                 'oxaddsum' => 10,
                 'oxaddsumtype' => 'abs',
                 'oxfromamount' => 0,
                 'oxtoamount' => 1000000,
                 'oxchecked' => 1,
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-             9001 => array( '10,00', '5.100,00' ),
-        ),
-        'totals' => array(
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+             9001 => [ '10,00', '5.100,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '6.069,00',
             'totalNetto'  => '5.100,00',
-            'vats' => array(
-                19 => '969,00'
-            ),
-            'delivery' => array(
+            'vats' => [
+                19 => '969,00',
+            ],
+            'delivery' => [
                 'brutto' => '11,90',
                 'netto' => '10,00',
-                'vat' => '1,90'
-            ),
-            'payment' => array(
+                'vat' => '1,90',
+            ],
+            'payment' => [
                 'brutto' => '11,90',
                 'netto' => '10,00',
-                'vat' => '1,90'
-            ),
-            'grandTotal'  => '6.092,80'
-        ),
-    ),
-    'options' => array(
+                'vat' => '1,90',
+            ],
+            'grandTotal'  => '6.092,80',
+        ],
+    ],
+    'options' => [
         // Configs (real named)
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => true,
             'blShowNetPrice' => true,
             'blShowVATForDelivery'=> true,
@@ -86,8 +85,8 @@ $aData = array(
             'blDeliveryVatOnTop' => true,
             'blPaymentVatOnTop' => true,
             'blWrappingVatOnTop' => true,
-        ),
+        ],
         // Other options
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

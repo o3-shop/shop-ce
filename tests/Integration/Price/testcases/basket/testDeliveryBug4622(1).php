@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -10,29 +11,27 @@
  * 0003101: delivery cost is not recalculated after discount in basket
  * 6 with discount total price less than 150, but more without discount
  */
-$aData = array(
-
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
             'oxid'                     => 'vine1',
             'oxprice'                  => 100,
             'oxvat'                    => 19,
             'amount'                   => 1,
-        ),
+        ],
 
-        1 => array(
+        1 => [
             'oxid'                     => 'coupon',
             'oxprice'                  => 50,
             'oxvat'                    => 19,
             'amount'                   => 2,
-            'oxnonmaterial'            => true
-        ),
-    ),
+            'oxnonmaterial'            => true,
+        ],
+    ],
 
-
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxtitle' => '10% from total ',
                 'oxactive' => 1,
                 'oxaddsum' => 10,
@@ -42,36 +41,35 @@ $aData = array(
                 'oxparam' => 0, //from
                 'oxparamend' => 1000, //to
                 'oxsort' => 1,
-            ),
-
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-            'vine1' => array( '100,00', '100,00' ),
-            'coupon' => array( '50,00', '100,00' ),
-        ),
-        'totals' => array(
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+            'vine1' => [ '100,00', '100,00' ],
+            'coupon' => [ '50,00', '100,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '200,00',
             'totalNetto'  => '168,07',
-            'vats' => array(
+            'vats' => [
                 19 => '31,93',
-            ),
-            'delivery' => array(
+            ],
+            'delivery' => [
                 'brutto' => '10,00',
-            ),
-            'grandTotal'  => '210,00'
-        ),
-    ),
-    'options' => array(
+            ],
+            'grandTotal'  => '210,00',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'blShowVATForWrapping' => false,
             'blShowVATForDelivery' => false,
             'sAdditionalServVATCalcMethod' => 'biggest_net',
             'blExclNonMaterialFromDelivery' => true,
-        ),
-    ),
-);
+        ],
+    ],
+];

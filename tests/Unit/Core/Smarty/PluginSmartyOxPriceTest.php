@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
 use OxidEsales\EshopCommunity\Core\Registry;
+use oxPrice;
 use oxRegistry;
-use \stdClass;
-use \oxPrice;
-use \Smarty;
+use Smarty;
+use stdClass;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/function.oxprice.php';
 if (file_exists($filePath)) {
@@ -34,7 +36,6 @@ if (file_exists($filePath)) {
 
 class PluginSmartyOxPriceTest extends \OxidTestCase
 {
-
     /**
      * Data provider
      *
@@ -46,14 +47,14 @@ class PluginSmartyOxPriceTest extends \OxidTestCase
         $oUSDCurrency = $this->_getUsdCurrency();
         $oEmptyCurrency = new stdClass();
 
-        return array(
-            array(new oxPrice(12.12), $oEURCurrency, '12,12 EUR'),
-            array(new oxPrice(0.12), $oEURCurrency, '0,12 EUR'),
-            array(new oxPrice(120012.1), $oUSDCurrency, 'USD120,012.100'),
-            array(new oxPrice(1278), $oEURCurrency, '1.278,00 EUR'),
-            array(new oxPrice(1992.45), $oEmptyCurrency, '1.992,45'),
-            array(new oxPrice(1992.45), null, '1.992,45 ?'),
-        );
+        return [
+            [new oxPrice(12.12), $oEURCurrency, '12,12 EUR'],
+            [new oxPrice(0.12), $oEURCurrency, '0,12 EUR'],
+            [new oxPrice(120012.1), $oUSDCurrency, 'USD120,012.100'],
+            [new oxPrice(1278), $oEURCurrency, '1.278,00 EUR'],
+            [new oxPrice(1992.45), $oEmptyCurrency, '1.992,45'],
+            [new oxPrice(1992.45), null, '1.992,45 ?'],
+        ];
     }
 
     /**
@@ -79,13 +80,13 @@ class PluginSmartyOxPriceTest extends \OxidTestCase
      */
     public function testNoCurrencyObjectAsParameterButInConfig()
     {
-        $this->_setCurrencies(array('EUR@ 1.00@ ,@ #@ €@ 2'));
+        $this->_setCurrencies(['EUR@ 1.00@ ,@ #@ €@ 2']);
 
         $oSmarty = new Smarty();
 
-        $aParams = array(
+        $aParams = [
             'price' => new oxPrice(1992.45),
-        );
+        ];
 
         $this->assertEquals('1#992,45 €', smarty_function_oxprice($aParams, $oSmarty));
     }
@@ -116,17 +117,17 @@ class PluginSmartyOxPriceTest extends \OxidTestCase
         $oEURCurrencyZero = $this->_getEurCurrencyZeroDecimal();
         $oEmptyCurrency = new stdClass();
 
-        return array(
-            array(12.12, $oEURCurrency, '12,12 EUR'),
-            array(12.12, $oEURCurrencyZero, '12 EUR'),
-            array(0.12, $oEURCurrency, '0,12 EUR'),
-            array(0.12, $oEURCurrencyZero, '0 EUR'),
-            array(120012.1, $oUSDCurrency, 'USD120,012.100'),
-            array(1278, $oEURCurrency, '1.278,00 EUR'),
-            array(1278, $oEURCurrencyZero, '1.278 EUR'),
-            array(1992.45, $oEmptyCurrency, '1.992,45'),
-            array(1992.45, null, '1.992,45 ?'),
-        );
+        return [
+            [12.12, $oEURCurrency, '12,12 EUR'],
+            [12.12, $oEURCurrencyZero, '12 EUR'],
+            [0.12, $oEURCurrency, '0,12 EUR'],
+            [0.12, $oEURCurrencyZero, '0 EUR'],
+            [120012.1, $oUSDCurrency, 'USD120,012.100'],
+            [1278, $oEURCurrency, '1.278,00 EUR'],
+            [1278, $oEURCurrencyZero, '1.278 EUR'],
+            [1992.45, $oEmptyCurrency, '1.992,45'],
+            [1992.45, null, '1.992,45 ?'],
+        ];
     }
 
     /**
@@ -160,15 +161,15 @@ class PluginSmartyOxPriceTest extends \OxidTestCase
         $oEURCurrencyZero = $this->_getEurCurrencyZeroDecimal();
         $oEmptyCurrency = new stdClass();
 
-        return array(
-            array('', $oEURCurrency, '0,00 EUR'),
-            array(null, $oUSDCurrency, ''),
-            array(0, $oEURCurrency, '0,00 EUR'),
-            array(0, $oEURCurrencyZero, '0 EUR'),
-            array(0, $oUSDCurrency, 'USD0.000'),
-            array(0, $oEmptyCurrency, ''),
-            array(0, null, '0,00 ?'),
-        );
+        return [
+            ['', $oEURCurrency, '0,00 EUR'],
+            [null, $oUSDCurrency, ''],
+            [0, $oEURCurrency, '0,00 EUR'],
+            [0, $oEURCurrencyZero, '0 EUR'],
+            [0, $oUSDCurrency, 'USD0.000'],
+            [0, $oEmptyCurrency, ''],
+            [0, null, '0,00 ?'],
+        ];
     }
 
     /**

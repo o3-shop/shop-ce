@@ -23,13 +23,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ClassExtension;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ExtensionNotInChainException;
 use Traversable;
 
 class ClassExtensionsChain implements \IteratorAggregate
 {
-    const NAME = 'classExtensions';
+    public const NAME = 'classExtensions';
 
     /**
      * @var array

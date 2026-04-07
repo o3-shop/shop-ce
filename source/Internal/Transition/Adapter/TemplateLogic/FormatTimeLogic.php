@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Internal\Transition\Adapter\TemplateLogic;
 
 class FormatTimeLogic
 {
-
     /**
      * @param int $seconds
      *
@@ -35,6 +34,6 @@ class FormatTimeLogic
         $minutes = floor($seconds % 3600 / 60);
         $seconds = $seconds % 60;
 
-        return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
     }
 }

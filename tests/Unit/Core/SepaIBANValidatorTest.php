@@ -1,14 +1,15 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -29,7 +31,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class SepaIBANValidatorTest extends \OxidTestCase
 {
-
     /**
      * Test case to check setting of IBAN code lengths with custom data
      */
@@ -37,11 +38,11 @@ class SepaIBANValidatorTest extends \OxidTestCase
     {
         $oSepaIBANValidator = oxNew('oxSepaIBANValidator');
 
-        $aCodeLengths = array("DE" => 22);
+        $aCodeLengths = ['DE' => 22];
 
         $oSepaIBANValidator->setCodeLengths($aCodeLengths);
 
-        $this->assertEquals($aCodeLengths, $oSepaIBANValidator->getCodeLengths(), "IBAN code lengths must be set");
+        $this->assertEquals($aCodeLengths, $oSepaIBANValidator->getCodeLengths(), 'IBAN code lengths must be set');
     }
 
     /**
@@ -51,7 +52,7 @@ class SepaIBANValidatorTest extends \OxidTestCase
     {
         $oSepaIBANValidator = oxNew('oxSepaIBANValidator');
 
-        $this->assertFalse($oSepaIBANValidator->isValid("MT84MALT011000012345MTLCAST001S"), "IBAN must be not valid");
+        $this->assertFalse($oSepaIBANValidator->isValid('MT84MALT011000012345MTLCAST001S'), 'IBAN must be not valid');
     }
 
     /**
@@ -61,23 +62,22 @@ class SepaIBANValidatorTest extends \OxidTestCase
      */
     public function providerCodeLengths()
     {
-        $sNotValidMsg = "IBAN code lengths must be not valid";
-        $sValidMsg = "IBAN code lengths must be valid";
+        $sNotValidMsg = 'IBAN code lengths must be not valid';
+        $sValidMsg = 'IBAN code lengths must be valid';
 
-        return array(
-            array(false, null, $sValidMsg),
-            array(false, array("AL", "GR", 33, 21), $sNotValidMsg),
-            array(false, array("GER" => 22), $sNotValidMsg),
-            array(false, array("DE" => "twotwo"), $sNotValidMsg),
-            array(false, array("de" => "22"), $sNotValidMsg),
-            array(false, array("EN" => "2.2"), $sNotValidMsg),
-            array(false, array("22" => "DE"), $sNotValidMsg),
-            array(false, array(22 => "DE"), $sNotValidMsg),
-            array(true, array("DE" => "22"), $sValidMsg),
-            array(true, array("DE" => 22), $sValidMsg),
-        );
+        return [
+            [false, null, $sValidMsg],
+            [false, ['AL', 'GR', 33, 21], $sNotValidMsg],
+            [false, ['GER' => 22], $sNotValidMsg],
+            [false, ['DE' => 'twotwo'], $sNotValidMsg],
+            [false, ['de' => '22'], $sNotValidMsg],
+            [false, ['EN' => '2.2'], $sNotValidMsg],
+            [false, ['22' => 'DE'], $sNotValidMsg],
+            [false, [22 => 'DE'], $sNotValidMsg],
+            [true, ['DE' => '22'], $sValidMsg],
+            [true, ['DE' => 22], $sValidMsg],
+        ];
     }
-
 
     /**
      * Test case to check IBAN code lengths validation
@@ -110,13 +110,13 @@ class SepaIBANValidatorTest extends \OxidTestCase
      */
     public function providerIsValid_validIBAN_true()
     {
-        return array(
-            array("AL47212110090000000235698741", array('AL' => 28)),
-            array("MT84MALT011000012345MTLCAST001S", array('MT' => 31)),
-            array("NO9386011117947", array('NO' => 15)),
-            array("NO9386011117947 ", array('NO' => 15)),
-            array(" NO9386011117947", array('NO' => 15)),
-        );
+        return [
+            ['AL47212110090000000235698741', ['AL' => 28]],
+            ['MT84MALT011000012345MTLCAST001S', ['MT' => 31]],
+            ['NO9386011117947', ['NO' => 15]],
+            ['NO9386011117947 ', ['NO' => 15]],
+            [' NO9386011117947', ['NO' => 15]],
+        ];
     }
 
     /**
@@ -130,7 +130,7 @@ class SepaIBANValidatorTest extends \OxidTestCase
 
         $oSepaIBANValidator->setCodeLengths($aCodeLengths);
 
-        $this->assertTrue($oSepaIBANValidator->isValid($sIBAN), "IBAN must be valid");
+        $this->assertTrue($oSepaIBANValidator->isValid($sIBAN), 'IBAN must be valid');
     }
 
     /**
@@ -140,16 +140,16 @@ class SepaIBANValidatorTest extends \OxidTestCase
      */
     public function providerIsValid_invalidIBAN_false()
     {
-        return array(
-            array("_NO9386011117947", array('NO' => 15)),
-            array("NX9386011117947", array('NX' => 15)),
-            array("MT84MALT011000012345MTLCAST001S", array('MT' => 30)),
-            array("MT84MALT011000012345MTLCAST001S", array('MT' => 32)),
-            array("MT84MALT011000012345MTLCAST001S", array("DE" => 22)),
-            array("MT84MALT011000012345MTLCAST001S", array("DE" => 31)),
+        return [
+            ['_NO9386011117947', ['NO' => 15]],
+            ['NX9386011117947', ['NX' => 15]],
+            ['MT84MALT011000012345MTLCAST001S', ['MT' => 30]],
+            ['MT84MALT011000012345MTLCAST001S', ['MT' => 32]],
+            ['MT84MALT011000012345MTLCAST001S', ['DE' => 22]],
+            ['MT84MALT011000012345MTLCAST001S', ['DE' => 31]],
             // Fix for bug entry 0005538: SEPA validator class IBAN validation issue
-            array("1234567895", array('NO' => 15)),
-        );
+            ['1234567895', ['NO' => 15]],
+        ];
     }
 
     /**
@@ -163,7 +163,7 @@ class SepaIBANValidatorTest extends \OxidTestCase
 
         $oSepaIBANValidator->setCodeLengths($aCodeLengths);
 
-        $this->assertFalse($oSepaIBANValidator->isValid($sIBAN), "IBAN must be not valid");
+        $this->assertFalse($oSepaIBANValidator->isValid($sIBAN), 'IBAN must be not valid');
     }
 
     /**
@@ -171,13 +171,13 @@ class SepaIBANValidatorTest extends \OxidTestCase
      */
     protected function _getTestCodeLengths()
     {
-        return array(
+        return [
             'AL' => 28,
             'DE' => 22,
             'LT' => 20,
             'MT' => 31,
             'NO' => 15,
             'NX' => 15,
-        );
+        ];
     }
 }

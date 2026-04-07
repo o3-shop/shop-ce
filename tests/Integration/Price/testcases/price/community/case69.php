@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto
  * Price view mode: netto
@@ -11,22 +12,22 @@
  *  3. shop; %; 5.5; general
  * Short description: Netto-Netto general discount to user groups, prices ABC and separate discounts;
  */
-$aData = array(
-        'articles' => array(
-                0 => array(
+$aData = [
+        'articles' => [
+                0 => [
                         'oxid'            => 1000,
                         'oxprice'         => 99,
                         'oxpricea'        => 9,
-                        'oxpriceb'        => 5
-                ),
-        ),
-        'user' => array(
+                        'oxpriceb'        => 5,
+                ],
+        ],
+        'user' => [
                 'oxid' => '_testUserB',
                 'oxactive' => 1,
                 'oxusername' => 'groupBUser',
-        ),
-        'discounts' => array(
-                0 => array(
+        ],
+        'discounts' => [
+                0 => [
                         'oxid'             => 'percentForShop',
                         'oxaddsum'         => 5.5,
                         'oxaddsumtype'     => '%',
@@ -36,8 +37,8 @@ $aData = array(
                         'oxamountto'       => 99999,
                         'oxactive'         => 1,
                         'oxsort'           => 10,
-                ),
-                1 => array(
+                ],
+                1 => [
                         'oxid'             => 'groupADiscount',
                         'oxaddsum'         => 10,
                         'oxaddsumtype'     => '%',
@@ -46,10 +47,10 @@ $aData = array(
                         'oxamount'         => 0,
                         'oxamountto'       => 99999,
                         'oxactive'         => 1,
-                        'oxgroups'         => array( 'oxidpricea' ),
+                        'oxgroups'         => [ 'oxidpricea' ],
                         'oxsort'           => 20,
-                ),
-                2 => array(
+                ],
+                2 => [
                         'oxid'             => 'groupBDiscount',
                         'oxaddsum'         => 5,
                         'oxaddsumtype'     => '%',
@@ -58,36 +59,36 @@ $aData = array(
                         'oxamount'         => 0,
                         'oxamountto'       => 99999,
                         'oxactive'         => 1,
-                        'oxgroups'         => array( 'oxidpriceb' ),
+                        'oxgroups'         => [ 'oxidpriceb' ],
                         'oxsort'           => 30,
-                ),
-        ),
-        'group' => array(
-                0 => array(
+                ],
+        ],
+        'group' => [
+                0 => [
                         'oxid' => 'oxidpricea',
                         'oxactive' => 1,
                         'oxtitle' => 'Price A',
-                        'oxobject2group' => array( '_testUserA', 'groupADiscount' ),
-                ),
-                1 => array(
+                        'oxobject2group' => [ '_testUserA', 'groupADiscount' ],
+                ],
+                1 => [
                         'oxid' => 'oxidpriceb',
                         'oxactive' => 1,
                         'oxtitle' => 'Price B',
-                        'oxobject2group' => array( '_testUserB', 'groupBDiscount' ),
-                ),
-        ),
-        'expected' => array(
-                1000 => array(
+                        'oxobject2group' => [ '_testUserB', 'groupBDiscount' ],
+                ],
+        ],
+        'expected' => [
+                1000 => [
                         'base_price'        => '5,00',
                         'price'             => '4,49',
-                ),
-        ),
-        'options' => array(
-                'config' => array(
+                ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => true,
                         'blShowNetPrice' => true,
                         'dDefaultVAT' => 20,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

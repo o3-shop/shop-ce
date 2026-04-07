@@ -82,7 +82,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
         $sListType = $this->getViewParameter('sListType');
 
         if ($sWidgetType && $sListType) {
-            $this->_sTemplate = "widget/" . $sWidgetType . "/" . $sListType . ".tpl";
+            $this->_sTemplate = 'widget/' . $sWidgetType . '/' . $sListType . '.tpl';
         }
 
         $sForceTemplate = $this->getViewParameter('oxwtemplate');
@@ -148,7 +148,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      */
     public function isVatIncluded()
     {
-        return (bool) $this->getViewParameter("isVatIncluded");
+        return (bool) $this->getViewParameter('isVatIncluded');
     }
 
     /**
@@ -271,7 +271,7 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     {
         return $this->addDynParamsToLink($sAddDynParams, $oArticle);
     }
-    
+
     /**
      * Appends dyn params to url.
      *

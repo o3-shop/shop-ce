@@ -193,10 +193,10 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
                . ($sRecommId ? "&amp;recommid={$sRecommId}" : '')
                // END deprecated
                . ($sListType ? "&amp;listtype={$sListType}" : '')
-               . "&amp;fnc=logout"
-               . ($sTplName ? "&amp;tpl=" . basename($sTplName) : '')
-               . ($sContentLoadId ? "&amp;oxloadid=" . $sContentLoadId : '')
-               . "&amp;redirect=1";
+               . '&amp;fnc=logout'
+               . ($sTplName ? '&amp;tpl=' . basename($sTplName) : '')
+               . ($sContentLoadId ? '&amp;oxloadid=' . $sContentLoadId : '')
+               . '&amp;redirect=1';
     }
 
     /**
@@ -220,7 +220,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     public function getHelpPageLink()
     {
         if ($this->_sHelpPageLink === null) {
-            $this->_sHelpPageLink = "";
+            $this->_sHelpPageLink = '';
             $aContentIdents = $this->_getHelpContentIdents();
             $oContent = oxNew(\OxidEsales\Eshop\Application\Model\Content::class);
             foreach ($aContentIdents as $sIdent) {
@@ -1170,7 +1170,6 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         return $this->_oCountryList;
     }
 
-
     /**
      * return path to the requested module file
      *
@@ -1302,7 +1301,6 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         return $sValue;
     }
 
-
     /**
      * Returns true if selection lists must be displayed in details page
      *
@@ -1374,7 +1372,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
             $sLogoImage = $this->getConfig()->getConfigParam('sShopLogo');
             if (empty($sLogoImage)) {
                 $editionSelector = new EditionSelector();
-                $sLogoImage = "logo_" . strtolower($editionSelector->getEdition()) . ".png";
+                $sLogoImage = 'logo_' . strtolower($editionSelector->getEdition()) . '.png';
             }
 
             $this->setShopLogo($sLogoImage);
@@ -1403,7 +1401,7 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         if (\OxidEsales\Eshop\Core\Registry::getSession()->isSessionStarted()) {
             $sessionChallengeToken = $this->getSession()->getSessionChallengeToken();
         } else {
-            $sessionChallengeToken = "";
+            $sessionChallengeToken = '';
         }
 
         return $sessionChallengeToken;

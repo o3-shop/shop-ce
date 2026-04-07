@@ -34,7 +34,7 @@ class ManufacturerTest extends UnitTestCase
         $manufacturer->save();
 
         $seoEncoderManufacturerMock->expects($this->once())->method('onDeleteManufacturer')->with(
-            $this->callback(function($manufacturer) use ($id) {
+            $this->callback(function ($manufacturer) use ($id) {
                 return $manufacturer->getId() == $id;
             })
         );

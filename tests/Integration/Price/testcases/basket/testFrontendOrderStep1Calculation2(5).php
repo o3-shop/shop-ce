@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -21,9 +22,9 @@
  * Brutto-Brutto mode.
  * Short description: test added from selenium test (testFrontendOrderStep1Calculation2) ;Is testing basked Step1 Calculation
  */
-$aData = array(
-    'articles' => array(
-            0 => array(
+$aData = [
+    'articles' => [
+            0 => [
                     'oxid'                     => 10016,
                     'oxprice'                  => 101,
                     'oxvat'                    => 10,
@@ -31,17 +32,16 @@ $aData = array(
                     'oxpricea'       		   => 0,
                     'oxpriceb' 			       => 0,
                     'oxpricec' 			       => 0,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'                     => 1002,
                     'oxprice'                  => 67.00,
                     'oxvat'                    => 19,
                     'amount'                   => 1,
-            ),
-
-    ),
-    'discounts' => array(
-            0 => array(
+            ],
+    ],
+    'discounts' => [
+            0 => [
                     'oxid'         => 'discount1',
                     'oxaddsum'     => 10,
                     'oxaddsumtype' => '%',
@@ -50,35 +50,35 @@ $aData = array(
                     'oxprice'      =>100,
                     'oxpriceto'    =>99999,
                     'oxactive'     => 1,
-                    'oxarticles'   => array( 1002, 1003 ),
+                    'oxarticles'   => [ 1002, 1003 ],
                     'oxsort'       => 10,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'         => 'discount2',
                     'oxaddsum'     => 5,
                     'oxaddsumtype' => 'abs',
                     'oxamount'     => 1,
                     'oxamountto'   => 99999,
                     'oxactive'     => 1,
-                    'oxarticles'   => array( 10016, 1000 ),
+                    'oxarticles'   => [ 10016, 1000 ],
                     'oxsort'       => 20,
-            ),
-    ),
+            ],
+    ],
 
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxactive' => 1,
                 'oxaddsum' => 1.50,
                 'oxaddsumtype' => 'abs',
                 'oxdeltype' => 'p',
                 'oxfinalize' => 1,
                 'oxparamend' => 99999,
-            ),
-        ),
+            ],
+        ],
                    // VOUCHERS
-        'voucherserie' => array(
-            0 => array(
+        'voucherserie' => [
+            0 => [
                 // oxvoucherseries DB fields
                 'oxdiscount' => 5.00,
                 'oxdiscounttype' => '%',
@@ -87,41 +87,41 @@ $aData = array(
                 'oxallowuseanother' => 1,
                 'oxminimumvalue' =>75,
                 // voucher of this voucherserie count
-                'voucher_count' => 1
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                10016 => array( '96,00', '96,00' ),
+                'voucher_count' => 1,
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                10016 => [ '96,00', '96,00' ],
                 //Discount is not used because product price is <100
-                1002 => array( '67,00', '67,00' ),
-        ),
-        'totals' => array(
+                1002 => [ '67,00', '67,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '163,00',
                 'totalNetto'  => '136,40',
-                'vats' => array(
+                'vats' => [
                         10 => '8,29',
                         19 => '10,16',
-                ),
-                'delivery' => array(
+                ],
+                'delivery' => [
                         'brutto' => '1,50',
-                ),
+                ],
                 // Total voucher amounts
-                'voucher' => array(
+                'voucher' => [
                 'brutto' => '8,15',
-                ),
-                'grandTotal'  => '156,35'
-        ),
-    ),
-    'options' => array(
+                ],
+                'grandTotal'  => '156,35',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => false,
                 'blShowVATForDelivery' => false,
                 'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
-    ),
-);
+        ],
+    ],
+];

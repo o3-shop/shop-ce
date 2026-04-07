@@ -51,14 +51,14 @@ class ContentMain extends AdminDetailsController
 
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         // category-tree
         $oCatTree = oxNew(CategoryList::class);
         $oCatTree->loadList();
 
         $oContent = oxNew(Content::class);
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oContent->loadInLang($this->_iEditLang, $soxId);
 
@@ -71,13 +71,13 @@ class ContentMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
             // mark selected
             if ($oContent->oxcontents__oxcatid->value && isset($oCatTree[$oContent->oxcontents__oxcatid->value])) {
@@ -89,20 +89,20 @@ class ContentMain extends AdminDetailsController
             $oContent->oxcontents__oxloadid = new Field($sUId);
         }
 
-        $this->_aViewData["edit"] = $oContent;
-        $this->_aViewData["link"] = "[{ oxgetseourl ident=&quot;" . $oContent->oxcontents__oxloadid->value . "&quot; type=&quot;oxcontent&quot; }]";
-        $this->_aViewData["cattree"] = $oCatTree;
+        $this->_aViewData['edit'] = $oContent;
+        $this->_aViewData['link'] = '[{ oxgetseourl ident=&quot;' . $oContent->oxcontents__oxloadid->value . '&quot; type=&quot;oxcontent&quot; }]';
+        $this->_aViewData['cattree'] = $oCatTree;
 
         // generate editor
-        $sCSS = "content.tpl.css";
+        $sCSS = 'content.tpl.css';
         if ($oContent->oxcontents__oxsnippet->value == '1') {
             $sCSS = null;
         }
 
-        $this->_aViewData["editor"] = $this->generateTextEditor("100%", 300, $oContent, "oxcontents__oxcontent", $sCSS);
-        $this->_aViewData["afolder"] = $myConfig->getConfigParam('aCMSfolder');
+        $this->_aViewData['editor'] = $this->generateTextEditor('100%', 300, $oContent, 'oxcontents__oxcontent', $sCSS);
+        $this->_aViewData['afolder'] = $myConfig->getConfigParam('aCMSfolder');
 
-        return "content_main.tpl";
+        return 'content_main.tpl';
     }
 
     /**
@@ -125,14 +125,14 @@ class ContentMain extends AdminDetailsController
         // check if loadid is unique
         if ($this->checkIdent($aParams['oxcontents__oxloadid'], $soxId)) {
             // loadid already used, display error message
-            $this->_aViewData["blLoadError"] = true;
+            $this->_aViewData['blLoadError'] = true;
 
             $oContent = oxNew(Content::class);
             if ($soxId != '-1') {
                 $oContent->load($soxId);
             }
             $oContent->assign($aParams);
-            $this->_aViewData["edit"] = $oContent;
+            $this->_aViewData['edit'] = $oContent;
 
             return;
         }
@@ -156,7 +156,7 @@ class ContentMain extends AdminDetailsController
 
         $oContent = oxNew(Content::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oContent->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxcontents__oxid'] = null;
@@ -194,7 +194,7 @@ class ContentMain extends AdminDetailsController
 
         $oContent = oxNew(Content::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oContent->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxcontents__oxid'] = null;
@@ -234,7 +234,7 @@ class ContentMain extends AdminDetailsController
     protected function prepareIdent($sIdent)
     {
         if ($sIdent) {
-            return Str::getStr()->preg_replace("/[^a-zA-Z0-9_]*/", "", $sIdent);
+            return Str::getStr()->preg_replace('/[^a-zA-Z0-9_]*/', '', $sIdent);
         }
     }
 
@@ -272,12 +272,12 @@ class ContentMain extends AdminDetailsController
         // null not allowed
         if (!strlen($sIdent)) {
             $blAllow = true;
-        // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
+            // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         } elseif (
-            $masterDb->getOne("select oxid from oxcontents where oxloadid = :oxloadid and oxid != :oxid and oxshopid = :oxshopid", [
+            $masterDb->getOne('select oxid from oxcontents where oxloadid = :oxloadid and oxid != :oxid and oxshopid = :oxshopid', [
             ':oxloadid' => $sIdent,
             ':oxid' => $sOxId,
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
             ])
         ) {
             $blAllow = true;

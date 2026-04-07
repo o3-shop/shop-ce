@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 use oxConfig;
@@ -61,7 +63,7 @@ class Validator
     public function checkTemplates($aExpectedTemplates)
     {
         $aTemplatesToCheck = $this->getConfig()->getConfigParam('aModuleTemplates');
-        $aTemplatesToCheck = is_null($aTemplatesToCheck) ? array() : $aTemplatesToCheck;
+        $aTemplatesToCheck = is_null($aTemplatesToCheck) ? [] : $aTemplatesToCheck;
 
         return ($aExpectedTemplates == $aTemplatesToCheck);
     }
@@ -122,7 +124,7 @@ class Validator
     public function checkFiles($aExpectedFiles)
     {
         $aModuleFilesToCheck = $this->getConfig()->getConfigParam('aModuleFiles');
-        $aModuleFilesToCheck = is_null($aModuleFilesToCheck) ? array() : $aModuleFilesToCheck;
+        $aModuleFilesToCheck = is_null($aModuleFilesToCheck) ? [] : $aModuleFilesToCheck;
 
         return $aExpectedFiles == $aModuleFilesToCheck;
     }
@@ -137,7 +139,7 @@ class Validator
     public function checkControllers($expectedControllers)
     {
         $moduleControllersToCheck = $this->getConfig()->getConfigParam('aModuleControllers');
-        $moduleControllersToCheck = is_null($moduleControllersToCheck) ? array() : $moduleControllersToCheck;
+        $moduleControllersToCheck = is_null($moduleControllersToCheck) ? [] : $moduleControllersToCheck;
 
         return $expectedControllers == $moduleControllersToCheck;
     }
@@ -191,7 +193,7 @@ class Validator
     public function checkVersions($aExpectedVersions)
     {
         $aModuleVersionsToCheck = $this->getConfig()->getConfigParam('aModuleVersions');
-        $aModuleVersionsToCheck = is_null($aModuleVersionsToCheck) ? array() : $aModuleVersionsToCheck;
+        $aModuleVersionsToCheck = is_null($aModuleVersionsToCheck) ? [] : $aModuleVersionsToCheck;
 
         return $aExpectedVersions == $aModuleVersionsToCheck;
     }
@@ -206,7 +208,7 @@ class Validator
     public function checkEvents($aExpectedEvents)
     {
         $aModuleEventsToCheck = $this->getConfig()->getConfigParam('aModuleEvents');
-        $aModuleEventsToCheck = is_null($aModuleEventsToCheck) ? array() : $aModuleEventsToCheck;
+        $aModuleEventsToCheck = is_null($aModuleEventsToCheck) ? [] : $aModuleEventsToCheck;
 
         return $aExpectedEvents == $aModuleEventsToCheck;
     }

@@ -52,13 +52,13 @@ class OrderArticleList extends ListModel
             return;
         }
 
-        $sSelect = "SELECT oxorderarticles.* FROM oxorder ";
-        $sSelect .= "left join oxorderarticles on oxorderarticles.oxorderid = oxorder.oxid ";
-        $sSelect .= "left join oxarticles on oxorderarticles.oxartid = oxarticles.oxid ";
-        $sSelect .= "WHERE oxorder.oxuserid = :oxuserid";
+        $sSelect = 'SELECT oxorderarticles.* FROM oxorder ';
+        $sSelect .= 'left join oxorderarticles on oxorderarticles.oxorderid = oxorder.oxid ';
+        $sSelect .= 'left join oxarticles on oxorderarticles.oxartid = oxarticles.oxid ';
+        $sSelect .= 'WHERE oxorder.oxuserid = :oxuserid';
 
         $this->selectString($sSelect, [
-            ':oxuserid' => $sOxId
+            ':oxuserid' => $sOxId,
         ]);
     }
 }

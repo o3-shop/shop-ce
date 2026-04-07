@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Autoload\BackwardsCom
 
 class ForwardCompatibleInstanceOfOxNewClassRealClassName_6_Test extends \OxidEsales\TestingLibrary\UnitTestCase
 {
-
     /**
      * Test the backwards compatibility of class instances created with oxNew and the alias class name
      */
@@ -38,9 +38,8 @@ class ForwardCompatibleInstanceOfOxNewClassRealClassName_6_Test extends \OxidEsa
         $unifiedNamespaceClassName = \OxidEsales\Eshop\Application\Model\Article::class;
         $backwardsCompatibleClassAlias = 'oxArticle';
         $message = 'Backwards compatible class name - CamelCase string';
-        
-        $object = oxNew($realClassName);
 
+        $object = oxNew($realClassName);
 
         $message = 'An object created with oxNew(\OxidEsales\EshopCommunity\Application\Model\Article::class) is not an instance of "oxArticle"';
         $this->assertNotInstanceOf($backwardsCompatibleClassAlias, $object, $message);

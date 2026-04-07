@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
 use OxidEsales\EshopCommunity\Application\Model\Content;
@@ -26,7 +28,6 @@ use OxidEsales\EshopCommunity\Application\Model\Content;
  */
 class CreditsTest extends \OxidTestCase
 {
-
     /**
      * Test case for Credits::_getSeoObjectId()
      *
@@ -35,7 +36,7 @@ class CreditsTest extends \OxidTestCase
     public function testGetSeoObjectId()
     {
         $oView = oxNew('Credits');
-        $this->assertEquals("oxcredits", $oView->UNITgetSeoObjectId());
+        $this->assertEquals('oxcredits', $oView->UNITgetSeoObjectId());
     }
 
     /**
@@ -49,7 +50,7 @@ class CreditsTest extends \OxidTestCase
         $oView = oxNew('Credits');
         $oContent = $oView->getContent();
         $this->assertTrue($oContent instanceof Content);
-        $this->assertEquals("oxcredits", $oContent->oxcontents__oxloadid->value);
-        $this->assertNotEquals("", $oContent->oxcontents__oxcontent->value);
+        $this->assertEquals('oxcredits', $oContent->oxcontents__oxloadid->value);
+        $this->assertNotEquals('', $oContent->oxcontents__oxcontent->value);
     }
 }

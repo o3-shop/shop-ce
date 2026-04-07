@@ -53,11 +53,11 @@ class ArticleReview extends AdminDetailsController
         parent::render();
 
         $article = oxNew(Article::class);
-        $this->_aViewData["edit"] = $article;
+        $this->_aViewData['edit'] = $article;
 
         $articleId = $this->getEditObjectId();
         $reviewId = Registry::getRequest()->getRequestEscapedParameter('rev_oxid');
-        if (isset($articleId) && $articleId != "-1") {
+        if (isset($articleId) && $articleId != '-1') {
             // load object
             $article->load($articleId);
 
@@ -73,23 +73,23 @@ class ArticleReview extends AdminDetailsController
                     break;
                 }
             }
-            $this->_aViewData["allreviews"] = $reviewList;
+            $this->_aViewData['allreviews'] = $reviewList;
             $this->_aViewData['editlanguage'] = $this->_iEditLang;
 
             if (isset($reviewId)) {
                 $reviewForEditing = oxNew(Review::class);
                 $reviewForEditing->load($reviewId);
-                $this->_aViewData["editreview"] = $reviewForEditing;
+                $this->_aViewData['editreview'] = $reviewForEditing;
 
                 $user = oxNew(User::class);
                 $user->load($reviewForEditing->oxreviews__oxuserid->value);
-                $this->_aViewData["user"] = $user;
+                $this->_aViewData['user'] = $user;
             }
             //show "active" checkbox if moderating is active
-            $this->_aViewData["blShowActBox"] = $config->getConfigParam('blGBModerate');
+            $this->_aViewData['blShowActBox'] = $config->getConfigParam('blGBModerate');
         }
 
-        return "article_review.tpl";
+        return 'article_review.tpl';
     }
 
     /**
@@ -117,8 +117,8 @@ class ArticleReview extends AdminDetailsController
     protected function getReviewList($article)
     {
         $database = DatabaseProvider::getDb();
-        $query = "select oxreviews.* from oxreviews
-                     where oxreviews.OXOBJECTID = " . $database->quote($article->oxarticles__oxid->value) . "
+        $query = 'select oxreviews.* from oxreviews
+                     where oxreviews.OXOBJECTID = ' . $database->quote($article->oxarticles__oxid->value) . "
                      and oxreviews.oxtype = 'oxarticle'";
 
         $variantList = $article->getVariants();
@@ -126,7 +126,7 @@ class ArticleReview extends AdminDetailsController
         if (Registry::getConfig()->getConfigParam('blShowVariantReviews') && count($variantList)) {
             // verifying rights
             foreach ($variantList as $variant) {
-                $query .= "or oxreviews.oxobjectid = " . $database->quote($variant->oxarticles__oxid->value) . " ";
+                $query .= 'or oxreviews.oxobjectid = ' . $database->quote($variant->oxarticles__oxid->value) . ' ';
             }
         }
 
@@ -136,7 +136,7 @@ class ArticleReview extends AdminDetailsController
 
         // all reviews
         $reviewList = oxNew(ListModel::class);
-        $reviewList->init("oxreview");
+        $reviewList->init('oxreview');
         $reviewList->selectString($query);
 
         return $reviewList;

@@ -34,7 +34,7 @@ class CreditsController extends ContentController
      *
      * @var string
      */
-    protected $_sContentId = "oxcredits";
+    protected $_sContentId = 'oxcredits';
 
     /**
      * Returns active content id to load its seo meta info

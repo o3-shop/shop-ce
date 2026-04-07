@@ -52,10 +52,10 @@ class OrderDownloads extends AdminDetailsController
         parent::render();
 
         if ($oOrder = $this->getEditObject()) {
-            $this->_aViewData["edit"] = $oOrder;
+            $this->_aViewData['edit'] = $oOrder;
         }
 
-        return "order_downloads.tpl";
+        return 'order_downloads.tpl';
     }
 
     /**
@@ -66,7 +66,7 @@ class OrderDownloads extends AdminDetailsController
     public function getEditObject()
     {
         $soxId = $this->getEditObjectId();
-        if ($this->_oEditObject === null && isset($soxId) && $soxId != "-1") {
+        if ($this->_oEditObject === null && isset($soxId) && $soxId != '-1') {
             $this->_oEditObject = oxNew(OrderFileList::class);
             $this->_oEditObject->loadOrderFiles($soxId);
         }

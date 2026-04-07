@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -36,21 +37,21 @@ return [
                 'OXITMARTID' => '',
                 'OXITMAMOUNT' => 0,
                 'OXITMMULTIPLE' => 0,
-                'OXSORT' => 100
+                'OXSORT' => 100,
             ],
             'oxobject2discount' => [
                 [
                     'OXID' => 'fa647a823ce118996.58546955',
                     'OXDISCOUNTID' => 'testcatdiscount',
                     'OXOBJECTID' => 'a7c40f631fc920687.20179984',
-                    'OXTYPE' => 'oxcountry'
+                    'OXTYPE' => 'oxcountry',
                 ],
                 [
                     'OXID' => 'fa647a823d5079104.99115703',
                     'OXDISCOUNTID' => 'testcatdiscount',
                     'OXOBJECTID' => 'testcategory0',
-                    'OXTYPE' => 'oxcategories'
-                ]
-            ]
-        ]
+                    'OXTYPE' => 'oxcategories',
+                ],
+            ],
+        ],
 ];

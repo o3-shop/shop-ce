@@ -368,7 +368,7 @@ class StrMb
      */
     public function hasSpecialChars($sStr)
     {
-        return $this->preg_match("/(" . implode("|", $this->_aUmls) . "|(&amp;))/", $sStr);
+        return $this->preg_match('/(' . implode('|', $this->_aUmls) . '|(&amp;))/', $sStr);
     }
 
     /**

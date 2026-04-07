@@ -76,7 +76,7 @@ install_theme() {
 # Function to install dependencies
 install_dependencies() {
     log "${YELLOW}Installing Composer dependencies...${NC}"
-    composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
+    COMPOSER_ROOT_VERSION=dev-b-1.5 composer install --no-interaction --optimize-autoloader || handle_error "Composer installation failed"
     log "${GREEN}Dependencies installed successfully${NC}"
 }
 
@@ -88,6 +88,8 @@ start_apache() {
     a2enmod rewrite || handle_error "Failed to enable Apache rewrite module"
     
     log "${GREEN}Starting Apache...${NC}"
+    rm /tmp/o3setup-running
+
     apache2-foreground
 }
 
@@ -141,9 +143,17 @@ setup_db() {
   bin/o3-setup
 }
 
+clear_cache() {
+    log "${YELLOW}Clearing cache...${NC}"
+    /var/www/html/bin/oe-console oe:cache:clear || handle_error "Failed to clear cache"
+    log "${GREEN}Cache cleared successfully${NC}"
+}
+
 
 # Main execution
 main() {
+    echo "setup is running" > /tmp/o3setup-running
+
     log "${GREEN}Starting shop setup...${NC}"
 
     setup_environment || exit 127
@@ -151,6 +161,7 @@ main() {
     install_demodata || exit 127
     setup_db || exit 127
     install_theme || exit 127
+    clear_cache || exit 127
     start_apache || exit 127
 }
 

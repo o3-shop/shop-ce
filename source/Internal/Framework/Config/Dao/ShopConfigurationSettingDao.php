@@ -24,12 +24,12 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Config\Dao;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Config\DataObject\ShopConfigurationSetting;
-use OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoderInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Event\ShopConfigurationChangedEvent;
+use OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoderInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterface
@@ -136,7 +136,7 @@ class ShopConfigurationSettingDao implements ShopConfigurationSettingDaoInterfac
             ->andWhere('oxmodule = ""')
             ->setParameters([
                 'shopId'    => $shopId,
-                'name'      => $name
+                'name'      => $name,
             ]);
 
         $result = $queryBuilder->execute()->fetch();

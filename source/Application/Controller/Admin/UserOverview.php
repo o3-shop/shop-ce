@@ -40,13 +40,13 @@ class UserOverview extends AdminDetailsController
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oUser = oxNew(User::class);
             $oUser->load($soxId);
-            $this->_aViewData["edit"] = $oUser;
+            $this->_aViewData['edit'] = $oUser;
         }
 
-        return "user_overview.tpl";
+        return 'user_overview.tpl';
     }
 }

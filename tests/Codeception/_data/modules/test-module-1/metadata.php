@@ -29,7 +29,7 @@ $aModule = [
     'version' => '1.0',
     'author' => 'OXID',
     'extend' => [
-        'content' => 'test-module-1/Controller/ContentController'
+        'content' => 'test-module-1/Controller/ContentController',
     ],
     'settings' => [
         /** Group of empty values */
@@ -115,5 +115,5 @@ $aModule = [
             'type' => 'password',
             'value' => 'testPassword',
         ],
-    ]
+    ],
 ];

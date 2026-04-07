@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -19,48 +20,48 @@
  * Brutto-Brutto mode.
  * From basketCalc.csv: II order. With active currency rate.
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9200,
                 'oxprice'                  => 87.00,
                 'oxvat'                    => 17,
                 'amount'                   => 12,
-        ),
-        1 => array(
+        ],
+        1 => [
                 'oxid'                     => 9201,
                 'oxprice'                  => 72.85,
                 'oxvat'                    => 17,
                 'amount'                   => 5,
-        ),
-        2 => array(
+        ],
+        2 => [
                 'oxid'                     => 9202,
                 'oxprice'                  => 16.21,
                 'oxvat'                    => 17,
                 'amount'                   => 39,
-        ),
-    ),
+        ],
+    ],
 
-    'expected' => array(
-        'articles' => array(
-                9200 => array( '59,16', '709,92' ),
-                9201 => array( '49,54', '247,70' ),
-                9202 => array( '11,02', '429,78' ),
-        ),
-        'totals' => array(
+    'expected' => [
+        'articles' => [
+                9200 => [ '59,16', '709,92' ],
+                9201 => [ '49,54', '247,70' ],
+                9202 => [ '11,02', '429,78' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '1.387,40',
                 'totalNetto'  => '1.185,81',
-                'vats' => array(
+                'vats' => [
                         '17' => '201,59',
-                ),
-                'grandTotal'  => '1.387,40'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '1.387,40',
+        ],
+    ],
+    'options' => [
+        'config' => [
             'blEnterNetPrice' => false,
-            'blShowNetPrice' => false
-        ),
+            'blShowNetPrice' => false,
+        ],
         'activeCurrencyRate' => 0.68,
-    ),
-);
+    ],
+];

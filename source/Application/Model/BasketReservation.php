@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\UserBasket;
 use OxidEsales\Eshop\Core\Base;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -304,7 +306,7 @@ class BasketReservation extends Base
 
         $parameters = [
             ':oxtitle'  => 'reservations',
-            ':oxupdate' => $startTime
+            ':oxupdate' => $startTime,
         ];
 
         $reservation = $database->select("select oxid from oxuserbaskets 
@@ -342,10 +344,10 @@ class BasketReservation extends Base
 
             $database->execute('delete from oxuserbasketitems where oxbasketid in (' . $finished . ')');
             $database->execute(
-                "delete from oxuserbasketitems where oxbasketid in (select oxid from oxuserbaskets where 
-                        oxuserid in (select oxid from oxuser where oxshopid= :oxshopid))",
+                'delete from oxuserbasketitems where oxbasketid in (select oxid from oxuserbaskets where 
+                        oxuserid in (select oxid from oxuser where oxshopid= :oxshopid))',
                 [
-                    ':oxshopid' => $shopId
+                    ':oxshopid' => $shopId,
                 ]
             );
 
@@ -356,7 +358,7 @@ class BasketReservation extends Base
                         oxuserbaskets.oxtitle = 'savedbasket' and oxuserbaskets.oxupdate <= :startTime",
                 [
                     ':startTime' => $startTime,
-                    ':oxshopid'  => $shopId
+                    ':oxshopid'  => $shopId,
                 ]
             );
 
@@ -382,8 +384,8 @@ class BasketReservation extends Base
             $oRev = $this->getReservations();
             if ($oRev && $oRev->getId()) {
                 $iTimeout -= (Registry::getUtilsDate()->getTime() - (int) $oRev->oxuserbaskets__oxupdate->value);
-                Registry::getSession()->setVariable("iBasketReservationTimeout", $oRev->oxuserbaskets__oxupdate->value);
-            } elseif (($iSessionTimeout = Registry::getSession()->getVariable("iBasketReservationTimeout"))) {
+                Registry::getSession()->setVariable('iBasketReservationTimeout', $oRev->oxuserbaskets__oxupdate->value);
+            } elseif (($iSessionTimeout = Registry::getSession()->getVariable('iBasketReservationTimeout'))) {
                 $iTimeout -= (Registry::getUtilsDate()->getTime() - (int) $iSessionTimeout);
             }
 
@@ -403,7 +405,7 @@ class BasketReservation extends Base
             $oReserved->oxuserbaskets__oxupdate = new Field($iTime);
             $oReserved->save();
 
-            Registry::getSession()->deleteVariable("iBasketReservationTimeout");
+            Registry::getSession()->deleteVariable('iBasketReservationTimeout');
         }
     }
 

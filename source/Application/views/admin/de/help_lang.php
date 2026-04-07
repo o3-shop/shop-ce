@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -33,7 +34,7 @@
  * <span class="warning_or_important_hint">...</span> for warning and important things
  * <ul> and <li> for lists
  */
-$aLang =  [
+$aLang = [
 'charset'                                     => 'UTF-8',
 'HELP_SHOP_SYSTEM_OTHERCOUNTRYORDER'          => 'Diese Einstellung beeinflusst das Verhalten des O3-Shops, wenn für ein Land, in das Benutzer bestellen wollen, keine Versandkosten definiert sind:<br><ul><li>Wenn die Einstellung aktiv ist, erhalten diese Benutzer im Bestellprozess eine Meldung: Die Versandkosten werden ihnen nachträglich mitgeteilt, wenn Sie damit einverstanden ist. Sie können mit der Bestellung fortfahren.</li><li>Wenn die Einstellung ausgeschaltet ist, können Benutzer aus Ländern, für die keine Versandkosten definiert sind, nicht bestellen.</li></ul>',
 'HELP_SHOP_SYSTEM_DISABLENAVBARS'             => 'Wenn Sie diese Einstellung aktivieren, werden die meisten Navigationselemente im Bestellprozess ausgeblendet. Dadurch werden die Benutzer beim Bestellen nicht unnötig abgelenkt.',

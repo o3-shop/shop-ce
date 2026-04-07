@@ -1,6 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\CE\Internal\Application;
+declare(strict_types=1);
+
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Container\Fixtures\CE\Internal\Container;
 
 class DummyGraphQLType
 {

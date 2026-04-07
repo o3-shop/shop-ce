@@ -43,7 +43,7 @@ class PaymentRdfa extends AdminDetailsController
      *
      * @var string
      */
-    protected $_sThisTemplate = "payment_rdfa.tpl";
+    protected $_sThisTemplate = 'payment_rdfa.tpl';
 
     /**
      * Predefined RDFa payment methods
@@ -52,21 +52,21 @@ class PaymentRdfa extends AdminDetailsController
      * @var array
      */
     protected $_aRDFaPayments = [
-        "ByBankTransferInAdvance" => 0,
-        "ByInvoice"               => 0,
-        "Cash"                    => 0,
-        "CheckInAdvance"          => 0,
-        "COD"                     => 0,
-        "DirectDebit"             => 0,
-        "GoogleCheckout"          => 0,
-        "PayPal"                  => 0,
-        "PaySwarm"                => 0,
-        "AmericanExpress"         => 1,
-        "DinersClub"              => 1,
-        "Discover"                => 1,
-        "JCB"                     => 1,
-        "MasterCard"              => 1,
-        "VISA"                    => 1
+        'ByBankTransferInAdvance' => 0,
+        'ByInvoice'               => 0,
+        'Cash'                    => 0,
+        'CheckInAdvance'          => 0,
+        'COD'                     => 0,
+        'DirectDebit'             => 0,
+        'GoogleCheckout'          => 0,
+        'PayPal'                  => 0,
+        'PaySwarm'                => 0,
+        'AmericanExpress'         => 1,
+        'DinersClub'              => 1,
+        'Discover'                => 1,
+        'JCB'                     => 1,
+        'MasterCard'              => 1,
+        'VISA'                    => 1,
     ];
 
     public function render()
@@ -89,13 +89,13 @@ class PaymentRdfa extends AdminDetailsController
         // Delete old mappings
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("DELETE FROM oxobject2payment WHERE oxpaymentid = :oxpaymentid AND OXTYPE = 'rdfapayment'", [
-            ':oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
+            ':oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
         ]);
 
         // Save new mappings
         foreach ($aRDFaPayments as $sPayment) {
             $oMapping = oxNew(BaseModel::class);
-            $oMapping->init("oxobject2payment");
+            $oMapping->init('oxobject2payment');
             $oMapping->assign($aParams);
             $oMapping->oxobject2payment__oxobjectid = new Field($sPayment);
             $oMapping->save();
@@ -137,7 +137,7 @@ class PaymentRdfa extends AdminDetailsController
         $aRDFaPayments = [];
         $sSelect = 'select oxobjectid from oxobject2payment where oxpaymentid = :oxpaymentid and oxtype = "rdfapayment" ';
         $rs = $oDb->select($sSelect, [
-            ':oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid')
+            ':oxpaymentid' => Registry::getRequest()->getRequestEscapedParameter('oxid'),
         ]);
         if ($rs && $rs->count()) {
             while (!$rs->EOF) {

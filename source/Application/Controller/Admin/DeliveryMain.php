@@ -48,13 +48,13 @@ class DeliveryMain extends AdminDetailsController
         $oLang = Registry::getLang();
 
         // remove itm from list
-        unset($this->_aViewData["sumtype"][2]);
+        unset($this->_aViewData['sumtype'][2]);
 
         // delivery-types
         $aDelTypes = $this->getDeliveryTypes();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oDelivery = oxNew(Delivery::class);
             $oDelivery->loadInLang($this->_iEditLang, $soxId);
@@ -65,7 +65,7 @@ class DeliveryMain extends AdminDetailsController
                 $oDelivery->loadInLang(key($oOtherLang), $soxId);
             }
 
-            $this->_aViewData["edit"] = $oDelivery;
+            $this->_aViewData['edit'] = $oDelivery;
 
             //Disable editing for derived articles
             if ($oDelivery->isDerived()) {
@@ -75,33 +75,33 @@ class DeliveryMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff($oLang->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             // set selected delivery type
             if (!$oDelivery->oxdelivery__oxdeltype->value) {
-                $oDelivery->oxdelivery__oxdeltype = new Field("a"); // default
+                $oDelivery->oxdelivery__oxdeltype = new Field('a'); // default
             }
             $aDelTypes[$oDelivery->oxdelivery__oxdeltype->value]->selected = true;
         }
 
-        $this->_aViewData["deltypes"] = $aDelTypes;
+        $this->_aViewData['deltypes'] = $aDelTypes;
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oDeliveryMainAjax = oxNew(DeliveryMainAjax::class);
             $this->_aViewData['oxajax'] = $oDeliveryMainAjax->getColumns();
 
-            return "popups/delivery_main.tpl";
+            return 'popups/delivery_main.tpl';
         }
 
-        return "delivery_main.tpl";
+        return 'delivery_main.tpl';
     }
 
     /**
@@ -118,7 +118,7 @@ class DeliveryMain extends AdminDetailsController
 
         $oDelivery = oxNew(Delivery::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oDelivery->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxdelivery__oxid'] = null;
@@ -168,7 +168,7 @@ class DeliveryMain extends AdminDetailsController
 
         $oDelivery = oxNew(Delivery::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oDelivery->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxdelivery__oxid'] = null;
@@ -209,20 +209,20 @@ class DeliveryMain extends AdminDetailsController
 
         $aDelTypes = [];
         $oType = new stdClass();
-        $oType->sType = "a";      // amount
-        $oType->sDesc = $oLang->translateString("amount", $iLang);
+        $oType->sType = 'a';      // amount
+        $oType->sDesc = $oLang->translateString('amount', $iLang);
         $aDelTypes['a'] = $oType;
         $oType = new stdClass();
-        $oType->sType = "s";      // Size
-        $oType->sDesc = $oLang->translateString("size", $iLang);
+        $oType->sType = 's';      // Size
+        $oType->sDesc = $oLang->translateString('size', $iLang);
         $aDelTypes['s'] = $oType;
         $oType = new stdClass();
-        $oType->sType = "w";      // Weight
-        $oType->sDesc = $oLang->translateString("weight", $iLang);
+        $oType->sType = 'w';      // Weight
+        $oType->sDesc = $oLang->translateString('weight', $iLang);
         $aDelTypes['w'] = $oType;
         $oType = new stdClass();
-        $oType->sType = "p";      // Price
-        $oType->sDesc = $oLang->translateString("price", $iLang);
+        $oType->sType = 'p';      // Price
+        $oType->sDesc = $oLang->translateString('price', $iLang);
         $aDelTypes['p'] = $oType;
 
         return $aDelTypes;

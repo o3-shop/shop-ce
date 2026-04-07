@@ -31,8 +31,8 @@ use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Application\Model\Object2Group;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Application\Model\Voucher;
-use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Application\Model\VoucherSerie;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopIdCalculator;
@@ -171,7 +171,6 @@ final class VouchersForSpecificCategoriesAndProductsAndUserGroupsTest extends Un
         $basket->addVoucher(self::FIRST_VOUCHER_NUMBER);
         $basket->calculateBasket(true);
         $this->assertEquals(11.76, $basket->getNettoSum());
-
 
         $this->loginUser();
 

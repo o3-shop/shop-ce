@@ -21,9 +21,6 @@
 
 namespace OxidEsales\EshopCommunity\Core\Edition;
 
-use OxidEsales\Eshop\Core\ConfigFile;
-use OxidEsales\Eshop\Core\Registry;
-
 /**
  * Class is responsible for returning edition directory path.
  *
@@ -33,7 +30,7 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class EditionRootPathProvider
 {
-    const EDITIONS_DIRECTORY = 'o3-shop';
+    public const EDITIONS_DIRECTORY = 'o3-shop';
 
     /** @var EditionSelector */
     private $editionSelector;

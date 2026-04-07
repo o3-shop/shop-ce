@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of O3-Shop.
@@ -21,13 +23,13 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\MetaData\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Converter\MetaDataConverterInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\ModuleIdNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataNormalizer;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\InvalidMetaDataException;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Exception\ModuleIdNotValidException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataValidatorInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -160,8 +162,8 @@ class MetaDataProviderTest extends TestCase
         $basicContext = $this->getMockBuilder(BasicContextInterface::class)->getMock();
         $basicContext->method('getBackwardsCompatibilityClassMap')->willReturn(
             [
-                "oxarticle" => "EShopNamespace\\ArticleClass",
-                "oxorder"   => "EShopNamespace\\OrderClass",
+                'oxarticle' => 'EShopNamespace\\ArticleClass',
+                'oxorder'   => 'EShopNamespace\\OrderClass',
             ]
         );
         $metaDataProvider = new MetaDataProvider(
@@ -174,9 +176,9 @@ class MetaDataProviderTest extends TestCase
 
         $this->assertEquals(
             [
-                "EShopNamespace\\ArticleClass" => "VendorNamespace\\VendorClass1",
-                "EShopNamespace\\OrderClass"   => "VendorNamespace\\VendorClass2",
-                "EShopNamespace\\UserClass"    => "VendorNamespace\\VendorClass3",
+                'EShopNamespace\\ArticleClass' => 'VendorNamespace\\VendorClass1',
+                'EShopNamespace\\OrderClass'   => 'VendorNamespace\\VendorClass2',
+                'EShopNamespace\\UserClass'    => 'VendorNamespace\\VendorClass3',
             ],
             $metaData['moduleData']['extend']
         );

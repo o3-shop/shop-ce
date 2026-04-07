@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxutils;
-use \oxDb;
-use \oxRegistry;
-use \oxTestModules;
+use oxDb;
+use oxRegistry;
+use oxTestModules;
+use oxutils;
 
 class modUtils_oxManufacturerlist extends oxutils
 {
@@ -37,7 +39,6 @@ class modUtils_oxManufacturerlist extends oxutils
  */
 class ManufacturerlistTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -69,7 +70,7 @@ class ManufacturerlistTest extends \OxidTestCase
 
         $oManufacturerlist->loadManufacturerList();
 
-        $this->assertTrue((count($oManufacturerlist) > 0), "Manufacturers list not loaded");
+        $this->assertTrue((count($oManufacturerlist) > 0), 'Manufacturers list not loaded');
 
         // checking if vendros are the same
         $sQ = 'select oxid, oxtitle_1, oxshortdesc_1 from oxmanufacturers where oxmanufacturers.oxshopid = "' . $myConfig->getShopID() . '"';
@@ -78,7 +79,7 @@ class ManufacturerlistTest extends \OxidTestCase
         if ($rs != false && $rs->count() > 0) {
             while (!$rs->EOF) {
                 $this->assertEquals($rs->fields[1], $oManufacturerlist[$rs->fields[0]]->oxmanufacturers__oxtitle->value);
-                $this->assertEquals(str_replace("'", "&#039;", $rs->fields[2]), $oManufacturerlist[$rs->fields[0]]->oxmanufacturers__oxshortdesc->value);
+                $this->assertEquals(str_replace("'", '&#039;', $rs->fields[2]), $oManufacturerlist[$rs->fields[0]]->oxmanufacturers__oxshortdesc->value);
                 $rs->fetchRow();
             }
         } else {
@@ -101,7 +102,7 @@ class ManufacturerlistTest extends \OxidTestCase
 
         foreach ($oManufacturerlist as $sVndId => $value) {
             $iArtCount = $oManufacturerlist[$sVndId]->oxmanufacturers__oxnrofarticles->value;
-            $this->assertTrue(($iArtCount > 0), "Manufacturer articles were not counted");
+            $this->assertTrue(($iArtCount > 0), 'Manufacturer articles were not counted');
         }
     }
 
@@ -113,7 +114,7 @@ class ManufacturerlistTest extends \OxidTestCase
         $myConfig = $this->getConfig();
         $myDB = oxDb::getDB();
 
-        $oManufacturerlist = $this->getProxyClass("oxManufacturerList"); //oxNew('oxManufacturerlist', 'core');
+        $oManufacturerlist = $this->getProxyClass('oxManufacturerList'); //oxNew('oxManufacturerlist', 'core');
 
         // get first Manufacturer id
         $sQ = 'select oxid from oxmanufacturers where oxmanufacturers.oxshopid = "' . $myConfig->getShopID() . ' "';
@@ -124,7 +125,6 @@ class ManufacturerlistTest extends \OxidTestCase
 
         //check if root for Manufacturers tree was added
         $aPath = $oManufacturerlist->getPath();
-
 
         $this->assertNotNull($oManufacturerlist->getClickManufacturer());
         $this->assertEquals($sFirstManufacturerId, $oManufacturerlist->getClickManufacturer()->getId());
@@ -147,7 +147,7 @@ class ManufacturerlistTest extends \OxidTestCase
      */
     public function testAddCategoryFields()
     {
-        oxTestModules::addFunction("oxutils", "seoIsActive", "{return false;}");
+        oxTestModules::addFunction('oxutils', 'seoIsActive', '{return false;}');
         $myConfig = $this->getConfig();
 
         $oManufacturerlist = oxNew('oxManufacturerlist');
@@ -172,7 +172,7 @@ class ManufacturerlistTest extends \OxidTestCase
      */
     public function testSEOsetManufacturerData()
     {
-        $oManufacturerlist = $this->getProxyClass("oxManufacturerlist");
+        $oManufacturerlist = $this->getProxyClass('oxManufacturerlist');
         $oManufacturerlist->loadManufacturerList();
 
         $oManufacturerlist->UNITSeosetManufacturerData();

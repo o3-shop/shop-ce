@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -25,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\BootstrapContaine
 use OxidEsales\EshopCommunity\Internal\Container\BootstrapContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\ProductRatingBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;

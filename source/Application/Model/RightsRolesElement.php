@@ -24,9 +24,9 @@ use OxidEsales\Eshop\Core\Model\BaseModel;
 
 class RightsRolesElement extends BaseModel
 {
-    public const TYPE_HIDDEN    = 0;
-    public const TYPE_READONLY  = 1;
-    public const TYPE_EDITABLE  = 2;
+    public const TYPE_HIDDEN = 0;
+    public const TYPE_READONLY = 1;
+    public const TYPE_EDITABLE = 2;
 
     protected $_sCoreTable = 'o3rightsroleselements';
 }

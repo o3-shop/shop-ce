@@ -34,7 +34,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DiscountGroupsAjax extends ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
-    const NEW_DISCOUNT_ID = "-1";
+    public const NEW_DISCOUNT_ID = '-1';
 
     /**
      * Columns array
@@ -87,14 +87,14 @@ class DiscountGroupsAjax extends ListComponentAjax
             $sQAdd = " from {$sGroupTable} where 1 ";
         } else {
             $sQAdd = " from oxobject2discount, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2discount.oxobjectid ";
-            $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) .
+            $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) .
                       " and oxobject2discount.oxtype = 'oxgroups' ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid " .
                       "from oxobject2discount, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2discount.oxobjectid " .
-                      " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) .
+                      ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2discount.oxtype = 'oxgroups' ) ";
         }
 
@@ -108,11 +108,11 @@ class DiscountGroupsAjax extends ListComponentAjax
     {
         $groupIds = $this->getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $query = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $query = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
-            $groupIdsQuoted = implode(", ", DatabaseProvider::getDb()->quoteArray($groupIds));
-            $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $groupIdsQuoted . ") ";
+            $groupIdsQuoted = implode(', ', DatabaseProvider::getDb()->quoteArray($groupIds));
+            $query = 'delete from oxobject2discount where oxobject2discount.oxid in (' . $groupIdsQuoted . ') ';
             DatabaseProvider::getDb()->Execute($query);
         }
     }
@@ -136,7 +136,7 @@ class DiscountGroupsAjax extends ListComponentAjax
                 $object2Discount->init('oxobject2discount');
                 $object2Discount->oxobject2discount__oxdiscountid = new Field($discountId);
                 $object2Discount->oxobject2discount__oxobjectid = new Field($groupId);
-                $object2Discount->oxobject2discount__oxtype = new Field("oxgroups");
+                $object2Discount->oxobject2discount__oxtype = new Field('oxgroups');
                 $object2Discount->save();
             }
         }

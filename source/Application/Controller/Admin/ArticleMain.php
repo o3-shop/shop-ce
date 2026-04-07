@@ -69,16 +69,16 @@ class ArticleMain extends AdminDetailsController
         $sParentId = Registry::getRequest()->getRequestEscapedParameter('oxparentid');
 
         // new variant ?
-        if (isset($sVoxId) && $sVoxId == "-1" && isset($sParentId) && $sParentId && $sParentId != "-1") {
+        if (isset($sVoxId) && $sVoxId == '-1' && isset($sParentId) && $sParentId && $sParentId != '-1') {
             $oParentArticle = oxNew(Article::class);
             $oParentArticle->load($sParentId);
-            $this->_aViewData["parentarticle"] = $oParentArticle;
-            $this->_aViewData["oxparentid"] = $sParentId;
+            $this->_aViewData['parentarticle'] = $oParentArticle;
+            $this->_aViewData['oxparentid'] = $sParentId;
 
-            $this->_aViewData["oxid"] = $sOxId = "-1";
+            $this->_aViewData['oxid'] = $sOxId = '-1';
         }
 
-        if ($sOxId && $sOxId != "-1") {
+        if ($sOxId && $sOxId != '-1') {
             // load object
             $oArticle = $this->updateArticle($oArticle, $sOxId);
 
@@ -93,9 +93,9 @@ class ArticleMain extends AdminDetailsController
             if ($oArticle->oxarticles__oxparentid->value) {
                 $oParentArticle = oxNew(Article::class);
                 $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $oParentArticle;
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
-                $this->_aViewData["issubvariant"] = 1;
+                $this->_aViewData['parentarticle'] = $oParentArticle;
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['issubvariant'] = 1;
             }
 
             // #381A
@@ -106,27 +106,27 @@ class ArticleMain extends AdminDetailsController
 
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        $this->_aViewData["editor"] = $this->generateTextEditor(
-            "100%",
+        $this->_aViewData['editor'] = $this->generateTextEditor(
+            '100%',
             300,
             $oArticle,
-            "oxarticles__oxlongdesc",
-            "details.tpl.css"
+            'oxarticles__oxlongdesc',
+            'details.tpl.css'
         );
-        $this->_aViewData["blUseTimeCheck"] = Registry::getConfig()->getConfigParam('blUseTimeCheck');
+        $this->_aViewData['blUseTimeCheck'] = Registry::getConfig()->getConfigParam('blUseTimeCheck');
 
-        return "article_main.tpl";
+        return 'article_main.tpl';
     }
 
     /**
@@ -184,7 +184,7 @@ class ArticleMain extends AdminDetailsController
 
         // variant-handling
         $sParentId = $oRequest->getRequestEscapedParameter('oxparentid');
-        if (isset($sParentId) && $sParentId && $sParentId != "-1") {
+        if (isset($sParentId) && $sParentId && $sParentId != '-1') {
             $aParams['oxarticles__oxparentid'] = $sParentId;
         } else {
             unset($aParams['oxarticles__oxparentid']);
@@ -193,7 +193,7 @@ class ArticleMain extends AdminDetailsController
         $oArticle = $this->createArticle();
         $oArticle->setLanguage($this->_iEditLang);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oArticle->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxarticles__oxid'] = null;
@@ -214,11 +214,11 @@ class ArticleMain extends AdminDetailsController
             Registry::getConfig()->getConfigParam('blWarnOnSameArtNums') &&
             $oArticle->oxarticles__oxartnum->value != $aParams['oxarticles__oxartnum']
         ) {
-            $sSelect = "select oxid from " . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
-            $sSelect .= " where oxartnum = " . $oDb->quote($aParams['oxarticles__oxartnum']);
-            $sSelect .= " and oxid != " . $oDb->quote($aParams['oxarticles__oxid']);
+            $sSelect = 'select oxid from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
+            $sSelect .= ' where oxartnum = ' . $oDb->quote($aParams['oxarticles__oxartnum']);
+            $sSelect .= ' and oxid != ' . $oDb->quote($aParams['oxarticles__oxid']);
             if ($oArticle->assignRecord($sSelect)) {
-                $this->_aViewData["errorsavingatricle"] = 1;
+                $this->_aViewData['errorsavingatricle'] = 1;
             }
         }
 
@@ -235,9 +235,9 @@ class ArticleMain extends AdminDetailsController
         $oArticle->save();
 
         // set oxid if inserted
-        if ($soxId == "-1") {
+        if ($soxId == '-1') {
             $sFastCat = $oRequest->getRequestEscapedParameter('art_category');
-            if ($sFastCat != "-1") {
+            if ($sFastCat != '-1') {
                 $this->addToCategory($sFastCat, $oArticle->getId());
             }
         }
@@ -304,13 +304,13 @@ class ArticleMain extends AdminDetailsController
     protected function resetCategoriesCounter($sArticleId)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select oxcatnid from oxobject2category where oxobjectid = :oxobjectid";
+        $sQ = 'select oxcatnid from oxobject2category where oxobjectid = :oxobjectid';
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sArticleId
+            ':oxobjectid' => $sArticleId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
-                $this->resetCounter("catArticle", $oRs->fields[0]);
+                $this->resetCounter('catArticle', $oRs->fields[0]);
                 $oRs->fetchRow();
             }
         }
@@ -326,7 +326,7 @@ class ArticleMain extends AdminDetailsController
     public function addToCategory($sCatID, $sOXID)
     {
         $base = oxNew(BaseModel::class);
-        $base->init("oxobject2category");
+        $base->init('oxobject2category');
         $base->oxobject2category__oxtime = new Field(0);
         $base->oxobject2category__oxobjectid = new Field($sOXID);
         $base->oxobject2category__oxcatnid = new Field($sCatID);
@@ -407,9 +407,9 @@ class ArticleMain extends AdminDetailsController
             $oDb = DatabaseProvider::getDb();
 
             //copy variants
-            $sQ = "select oxid from oxarticles where oxparentid = :oxparentid";
+            $sQ = 'select oxid from oxarticles where oxparentid = :oxparentid';
             $oRs = $oDb->select($sQ, [
-                ':oxparentid' => $sOldId
+                ':oxparentid' => $sOldId,
             ]);
             if ($oRs && $oRs->count() > 0) {
                 while (!$oRs->EOF) {
@@ -429,12 +429,12 @@ class ArticleMain extends AdminDetailsController
                     $myConfig->getConfigParam('blWarnOnSameArtNums') &&
                     $oArticle->$sArtNumField->value && $sFncParameter == 'copyArticle'
                 ) {
-                    $sSelect = "select oxid from " . $oArticle->getCoreTableName() .
-                               " where oxartnum = " . $oDb->quote($oArticle->$sArtNumField->value) .
-                               " and oxid != " . $oDb->quote($sNewId);
+                    $sSelect = 'select oxid from ' . $oArticle->getCoreTableName() .
+                               ' where oxartnum = ' . $oDb->quote($oArticle->$sArtNumField->value) .
+                               ' and oxid != ' . $oDb->quote($sNewId);
 
                     if ($oArticle->assignRecord($sSelect)) {
-                        $this->_aViewData["errorsavingatricle"] = 1;
+                        $this->_aViewData['errorsavingatricle'] = 1;
                     }
                 }
             }
@@ -471,7 +471,7 @@ class ArticleMain extends AdminDetailsController
         $sO2CView = Registry::get(TableViewNameGenerator::class)->getViewName('oxobject2category');
         $sQ = "select oxcatnid, oxtime from {$sO2CView} where oxobjectid = :oxobjectid";
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sOldId
+            ':oxobjectid' => $sOldId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
@@ -512,15 +512,15 @@ class ArticleMain extends AdminDetailsController
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxid from oxobject2attribute where oxobjectid = :oxobjectid";
+        $sQ = 'select oxid from oxobject2attribute where oxobjectid = :oxobjectid';
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sOldId
+            ':oxobjectid' => $sOldId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 // #1055A
                 $oAttr = oxNew(BaseModel::class);
-                $oAttr->init("oxobject2attribute");
+                $oAttr->init('oxobject2attribute');
                 $oAttr->load($oRs->fields[0]);
                 $oAttr->setId($myUtilsObject->generateUID());
                 $oAttr->oxobject2attribute__oxobjectid->setValue($sNewId);
@@ -557,9 +557,9 @@ class ArticleMain extends AdminDetailsController
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
 
-        $sQ = "SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid";
+        $sQ = 'SELECT * FROM `oxfiles` WHERE `oxartid` = :oxartid';
         $oRs = $oDb->select($sQ, [
-            ':oxartid' => $sOldId
+            ':oxartid' => $sOldId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
@@ -603,16 +603,16 @@ class ArticleMain extends AdminDetailsController
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid";
+        $sQ = 'select oxselnid from oxobject2selectlist where oxobjectid = :oxobjectid';
         $oRs = $oDb->select($sQ, [
-            ':oxobjectid' => $sOldId
+            ':oxobjectid' => $sOldId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUid = $myUtilsObject->generateUID();
                 $sId = $oRs->fields[0];
-                $sSql = "INSERT INTO oxobject2selectlist (oxid, oxobjectid, oxselnid) " .
-                        "VALUES (:oxid, :oxobjectid, :oxselnid)";
+                $sSql = 'INSERT INTO oxobject2selectlist (oxid, oxobjectid, oxselnid) ' .
+                        'VALUES (:oxid, :oxobjectid, :oxselnid)';
                 $oDb->execute($sSql, [
                     ':oxid' => $sUid,
                     ':oxobjectid' => $sNewId,
@@ -650,20 +650,20 @@ class ArticleMain extends AdminDetailsController
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid";
+        $sQ = 'select oxobjectid from oxobject2article where oxarticlenid = :oxarticlenid';
         $oRs = $oDb->select($sQ, [
-            ':oxarticlenid' => $sOldId
+            ':oxarticlenid' => $sOldId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUid = $myUtilsObject->generateUID();
                 $sId = $oRs->fields[0];
-                $sSql = "INSERT INTO oxobject2article (oxid, oxobjectid, oxarticlenid) " .
-                        "VALUES (:oxid, :oxobjectid, :oxarticlenid)";
+                $sSql = 'INSERT INTO oxobject2article (oxid, oxobjectid, oxarticlenid) ' .
+                        'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
                 $oDb->execute($sSql, [
                     ':oxid' => $sUid,
                     ':oxobjectid' => $sId,
-                    ':oxarticlenid' => $sNewId
+                    ':oxarticlenid' => $sNewId,
                 ]);
                 $oRs->fetchRow();
             }
@@ -697,20 +697,20 @@ class ArticleMain extends AdminDetailsController
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
 
-        $sQ = "select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid";
+        $sQ = 'select oxobjectid from oxaccessoire2article where oxarticlenid = :oxarticlenid';
         $oRs = $oDb->select($sQ, [
-            ':oxarticlenid' => $sOldId
+            ':oxarticlenid' => $sOldId,
         ]);
         if ($oRs && $oRs->count() > 0) {
             while (!$oRs->EOF) {
                 $sUId = $myUtilsObject->generateUid();
                 $sId = $oRs->fields[0];
-                $sSql = "INSERT INTO oxaccessoire2article (oxid, oxobjectid, oxarticlenid) " .
-                        "VALUES (:oxid, :oxobjectid, :oxarticlenid)";
+                $sSql = 'INSERT INTO oxaccessoire2article (oxid, oxobjectid, oxarticlenid) ' .
+                        'VALUES (:oxid, :oxobjectid, :oxarticlenid)';
                 $oDb->execute($sSql, [
                     ':oxid' => $sUId,
                     ':oxobjectid' => $sId,
-                    ':oxarticlenid' => $sNewId
+                    ':oxarticlenid' => $sNewId,
                 ]);
                 $oRs->fetchRow();
             }
@@ -739,12 +739,12 @@ class ArticleMain extends AdminDetailsController
     {
         $sShopId = Registry::getConfig()->getShopId();
         $oPriceList = oxNew(ListModel::class);
-        $oPriceList->init("oxbase", "oxprice2article");
-        $sQ = "select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid " .
-              "and (oxamount > 0 or oxamountto > 0) order by oxamount ";
+        $oPriceList->init('oxbase', 'oxprice2article');
+        $sQ = 'select * from oxprice2article where oxartid = :oxartid and oxshopid = :oxshopid ' .
+              'and (oxamount > 0 or oxamountto > 0) order by oxamount ';
         $oPriceList->selectString($sQ, [
             ':oxartid' => $sOldId,
-            ':oxshopid' => $sShopId
+            ':oxshopid' => $sShopId,
         ]);
         if ($oPriceList->count()) {
             foreach ($oPriceList as $oItem) {
@@ -778,7 +778,7 @@ class ArticleMain extends AdminDetailsController
     protected function copyArtExtends($sOldId, $sNewId)
     {
         $oExt = oxNew(BaseModel::class);
-        $oExt->init("oxartextends");
+        $oExt->init('oxartextends');
         $oExt->load($sOldId);
         $oExt->setId($sNewId);
         $oExt->save();
@@ -834,12 +834,12 @@ class ArticleMain extends AdminDetailsController
             $oParentVariants = $oParentArticle->getAdminVariants($sEditLanguageParameter);
             if ($oParentVariants->count()) {
                 foreach ($oParentVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
                     if ($oVar->$sOxIdField->value == $oArticle->$sOxIdField->value) {
                         $oVariants = $oArticle->getAdminVariants($sEditLanguageParameter);
                         if ($oVariants->count()) {
                             foreach ($oVariants as $oVVar) {
-                                $aJumpList[] = [$oVVar->$sOxIdField->value, " -- " . $this->getTitle($oVVar)];
+                                $aJumpList[] = [$oVVar->$sOxIdField->value, ' -- ' . $this->getTitle($oVVar)];
                             }
                         }
                     }
@@ -851,12 +851,12 @@ class ArticleMain extends AdminDetailsController
             $oVariants = $oArticle->getAdminVariants(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
             if ($oVariants && $oVariants->count()) {
                 foreach ($oVariants as $oVar) {
-                    $aJumpList[] = [$oVar->$sOxIdField->value, " - " . $this->getTitle($oVar)];
+                    $aJumpList[] = [$oVar->$sOxIdField->value, ' - ' . $this->getTitle($oVar)];
                 }
             }
         }
         if (count($aJumpList) > 1) {
-            $this->_aViewData["thisvariantlist"] = $aJumpList;
+            $this->_aViewData['thisvariantlist'] = $aJumpList;
         }
     }
 
@@ -958,9 +958,9 @@ class ArticleMain extends AdminDetailsController
     protected function formQueryForCopyingToCategory($newArticleId, $sUid, $sCatId, $sTime)
     {
         $oDb = DatabaseProvider::getDb();
-        return "insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) " .
-            "VALUES (" . $oDb->quote($sUid) . ", " . $oDb->quote($newArticleId) . ", " .
-            $oDb->quote($sCatId) . ", " . $oDb->quote($sTime) . ") ";
+        return 'insert into oxobject2category (oxid, oxobjectid, oxcatnid, oxtime) ' .
+            'VALUES (' . $oDb->quote($sUid) . ', ' . $oDb->quote($newArticleId) . ', ' .
+            $oDb->quote($sCatId) . ', ' . $oDb->quote($sTime) . ') ';
     }
 
     /**

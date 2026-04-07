@@ -27,11 +27,11 @@ $sMetadataVersion = '2.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'          => 'myTestModule',
     'title'       => 'myTestModule',
     'description' => 'myTestModule',
     'thumbnail'   => 'picture.png',
     'version'     => '1.0',
-    'author'      => 'OXID eSales AG'
-);
+    'author'      => 'OXID eSales AG',
+];

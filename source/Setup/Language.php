@@ -43,18 +43,18 @@ class Language extends Core
     public function getLanguage()
     {
         /** @var Session $oSession */
-        $oSession = $this->getInstance("Session");
+        $oSession = $this->getInstance('Session');
         /** @var Utilities $oUtils */
-        $oUtils = $this->getInstance("Utilities");
+        $oUtils = $this->getInstance('Utilities');
 
-        $iLanguage = $oUtils->getRequestVar("setup_lang", "post");
+        $iLanguage = $oUtils->getRequestVar('setup_lang', 'post');
 
         if (isset($iLanguage)) {
             $oSession->setSessionParam('setup_lang', $iLanguage);
-            $iLanguageSubmit = $oUtils->getRequestVar("setup_lang_submit", "post");
+            $iLanguageSubmit = $oUtils->getRequestVar('setup_lang_submit', 'post');
             if (isset($iLanguageSubmit)) {
                 //updating setup language, so disabling redirect to next step, just reloading same step
-                $_GET['istep'] = $_POST['istep'] = $this->getInstance("Setup")->getStep('STEP_WELCOME');
+                $_GET['istep'] = $_POST['istep'] = $this->getInstance('Setup')->getStep('STEP_WELCOME');
             }
         } elseif ($oSession->getSessionParam('setup_lang') === null) {
             $aLangs = ['en', 'de'];

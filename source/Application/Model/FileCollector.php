@@ -93,7 +93,6 @@ class FileCollector
         return false;
     }
 
-
     /**
      * browse all folders and sub-folders after files which have given extensions
      *
@@ -123,7 +122,7 @@ class FileCollector
         $handle = opendir($this->_sBaseDirectory . $sFolder);
 
         while ($sFile = readdir($handle)) {
-            if ($sFile != "." && $sFile != "..") {
+            if ($sFile != '.' && $sFile != '..') {
                 if (is_dir($this->_sBaseDirectory . $sFolder . $sFile)) {
                     if ($blRecursive) {
                         $aResultList = $this->addDirectoryFiles($sFolder . $sFile . '/', $aExtensions, $blRecursive);

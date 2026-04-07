@@ -27,7 +27,6 @@ use OxidEsales\Eshop\Core\Database\Adapter\Doctrine\Database;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\TestingLibrary\UnitTestCase;
-use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 
@@ -54,7 +53,6 @@ class DatabaseTest extends UnitTestCase
 
         parent::tearDown();
     }
-
 
     /**
      * Call a given protected method on an given instance of a class and return the result.
@@ -86,14 +84,14 @@ class DatabaseTest extends UnitTestCase
         $database = oxDb::getInstance();
         $database->setConfigFile($configFile);
 
-        $actualResult = $this->callProtectedClassMethod($database, 'getConfigParam', array('iDebug'));
+        $actualResult = $this->callProtectedClassMethod($database, 'getConfigParam', ['iDebug']);
 
         $this->assertEquals($debug, $actualResult, 'Result of getConfigParam(iDebug) should match value in config.inc.php');
 
         $debug = 8;
         $configFile->iDebug = $debug;
         $database->setConfigFile($configFile);
-        $actualResult = $this->callProtectedClassMethod($database, 'getConfigParam', array('iDebug'));
+        $actualResult = $this->callProtectedClassMethod($database, 'getConfigParam', ['iDebug']);
 
         $this->assertEquals($debug, $actualResult, 'Result of getConfigParam(iDebug) should match value in config.inc.php');
     }
@@ -104,7 +102,7 @@ class DatabaseTest extends UnitTestCase
         $database = oxDb::getInstance();
         $database->flushTableDescriptionCache();
 
-        $resultSet = oxDb::getDb()->select("SHOW TABLES");
+        $resultSet = oxDb::getDb()->select('SHOW TABLES');
         $count = 3;
         if ($resultSet != false && $resultSet->count() > 0) {
             while (!$resultSet->EOF && $count--) {
@@ -196,7 +194,7 @@ class DatabaseTest extends UnitTestCase
                     OR oxv_oxarticles_1_de.oxsearchkeys LIKE '%ledergürtel%'
                     OR oxv_oxarticles_1_de.oxsearchkeys LIKE '%lederg&uuml;rtel%'
                     OR oxv_oxarticles_1_de.oxartnum LIKE '%ledergürtel%'
-                    OR oxv_oxarticles_1_de.oxartnum LIKE '%lederg&uuml;rtel%'))"
+                    OR oxv_oxarticles_1_de.oxartnum LIKE '%lederg&uuml;rtel%'))",
             ],
             [
                 "SELECT 
@@ -233,8 +231,8 @@ class DatabaseTest extends UnitTestCase
                         OR oxv_oxarticles_de.oxshortdesc LIKE '%&#x84;%'
                         OR oxv_oxarticles_de.oxsearchkeys LIKE '%&#x84;%'
                         OR oxv_oxarticles_de.oxartnum LIKE '%&#x84;%'))
-                LIMIT 10 OFFSET 0"
-            ]
+                LIMIT 10 OFFSET 0",
+            ],
         ];
     }
 

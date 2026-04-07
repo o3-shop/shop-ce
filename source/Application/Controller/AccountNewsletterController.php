@@ -75,7 +75,6 @@ class AccountNewsletterController extends AccountController
         return $this->_sThisTemplate;
     }
 
-
     /**
      * Template variable getter. Returns 0 when newsletter had been changed.
      *

@@ -43,9 +43,9 @@ final class Version20230322214524 extends AbstractMigration
         $this->skipIf(!$column->getType() instanceof BlobType, 'Userpayment values are already decoded');
 
         $this->addSql('ALTER TABLE oxuserpayments ADD COLUMN `OXVALUE_UNENC` text;');
-        $this->addSql("UPDATE oxuserpayments SET `OXVALUE_UNENC` = DECODE(OXVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
+        $this->addSql("UPDATE oxuserpayments SET `OXVALUE_UNENC` = DECODE(OXVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;");
         $this->addSql('ALTER TABLE oxuserpayments MODIFY COLUMN `OXVALUE` text;');
-        $this->addSql("UPDATE oxuserpayments SET `OXVALUE` = `OXVALUE_UNENC` WHERE 1;");
+        $this->addSql('UPDATE oxuserpayments SET `OXVALUE` = `OXVALUE_UNENC` WHERE 1;');
         $this->addSql('ALTER TABLE oxuserpayments DROP COLUMN `OXVALUE_UNENC`;');
     }
 
@@ -61,9 +61,9 @@ final class Version20230322214524 extends AbstractMigration
         $this->skipIf($column->getType() instanceof BlobType, 'Userpayment values are already encoded');
 
         $this->addSql('ALTER TABLE oxuserpayments ADD COLUMN `OXVALUE_ENC` text;');
-        $this->addSql("UPDATE oxuserpayments SET `OXVALUE_ENC` = ENCODE(OXVALUE, '".Config::DEFAULT_CONFIG_KEY."') WHERE 1;");
+        $this->addSql("UPDATE oxuserpayments SET `OXVALUE_ENC` = ENCODE(OXVALUE, '" . Config::DEFAULT_CONFIG_KEY . "') WHERE 1;");
         $this->addSql('ALTER TABLE oxuserpayments MODIFY COLUMN `OXVALUE` blob;');
-        $this->addSql("UPDATE oxuserpayments SET `OXVALUE` = `OXVALUE_ENC` WHERE 1;");
+        $this->addSql('UPDATE oxuserpayments SET `OXVALUE` = `OXVALUE_ENC` WHERE 1;');
         $this->addSql('ALTER TABLE oxuserpayments DROP COLUMN `OXVALUE_ENC`;');
     }
 

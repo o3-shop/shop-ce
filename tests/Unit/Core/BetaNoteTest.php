@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
  */
 class BetaNoteTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -52,11 +53,11 @@ class BetaNoteTest extends \OxidTestCase
      */
     public function linkProvider()
     {
-        return array(
-            array(null, null),
-            array('http://testlink', 'http://testlink'),
-            array('', '')
-        );
+        return [
+            [null, null],
+            ['http://testlink', 'http://testlink'],
+            ['', ''],
+        ];
     }
 
     /**

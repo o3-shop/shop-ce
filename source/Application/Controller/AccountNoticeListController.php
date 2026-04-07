@@ -169,7 +169,7 @@ class AccountNoticeListController extends AccountController
 
         $iBaseLanguage = $oLang->getBaseLanguage();
         $aPath['title'] = $oLang->translateString('MY_ACCOUNT', $iBaseLanguage, false);
-        $aPath['link'] = Registry::getSeoEncoder()->getStaticUrl($sSelfLink . "cl=account");
+        $aPath['link'] = Registry::getSeoEncoder()->getStaticUrl($sSelfLink . 'cl=account');
         $aPaths[] = $aPath;
 
         $aPath['title'] = $oLang->translateString('MY_WISH_LIST', $iBaseLanguage, false);

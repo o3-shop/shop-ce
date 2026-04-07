@@ -86,16 +86,16 @@ class UserGroupMainAjax extends ListComponentAjax
             $sQAdd = " from $sUserTable where 1 ";
         } else {
             $sQAdd = " from $sUserTable, oxobject2group where $sUserTable.oxid=oxobject2group.oxobjectid and ";
-            $sQAdd .= " oxobject2group.oxgroupsid = " . $oDb->quote($sRoleId);
+            $sQAdd .= ' oxobject2group.oxgroupsid = ' . $oDb->quote($sRoleId);
         }
 
         if ($sSynchRoleId && $sSynchRoleId != $sRoleId) {
             $sQAdd .= " and $sUserTable.oxid not in ( select $sUserTable.oxid from $sUserTable, oxobject2group where $sUserTable.oxid=oxobject2group.oxobjectid and ";
-            $sQAdd .= " oxobject2group.oxgroupsid = " . $oDb->quote($sSynchRoleId);
+            $sQAdd .= ' oxobject2group.oxgroupsid = ' . $oDb->quote($sSynchRoleId);
             if (!$myConfig->getConfigParam('blMallUsers')) {
                 $sQAdd .= " and $sUserTable.oxshopid = '" . $myConfig->getShopId() . "' ";
             }
-            $sQAdd .= " ) ";
+            $sQAdd .= ' ) ';
         }
 
         if (!$myConfig->getConfigParam('blMallUsers')) {
@@ -113,10 +113,10 @@ class UserGroupMainAjax extends ListComponentAjax
         $aRemoveGroups = $this->_getActionIds('oxobject2group.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxobject2group.* " . $this->_getQuery());
+            $sQ = $this->_addFilter('delete oxobject2group.* ' . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sQ = "delete from oxobject2group where oxobject2group.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ") ";
+            $sQ = 'delete from oxobject2group where oxobject2group.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -133,7 +133,7 @@ class UserGroupMainAjax extends ListComponentAjax
             $sUserTable = $this->_getViewName('oxuser');
             $aAddUsers = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->_getQuery()));
         }
-        if ($soxId && $soxId != "-1" && is_array($aAddUsers)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddUsers)) {
             foreach ($aAddUsers as $sAdduser) {
                 $oNewGroup = oxNew(Object2Group::class);
                 $oNewGroup->oxobject2group__oxobjectid = new Field($sAdduser);

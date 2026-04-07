@@ -40,7 +40,7 @@ class ArticleSelectionAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxselectlist', 1, 1, 0],
             ['oxident', 'oxselectlist', 1, 0, 0],
@@ -52,7 +52,7 @@ class ArticleSelectionAjax extends ListComponentAjax
             ['oxident', 'oxselectlist', 1, 0, 0],
             ['oxvaldesc', 'oxselectlist', 1, 0, 0],
             ['oxid', 'oxobject2selectlist', 0, 0, 1],
-        ]
+        ],
     ];
 
     /**
@@ -84,20 +84,20 @@ class ArticleSelectionAjax extends ListComponentAjax
 
         $sOxid = ($sArtId) ? $sArtId : $sSynchArtId;
         $sQ = "select oxparentid from {$sArtViewName} where oxid = :oxid and oxparentid != '' ";
-        $sQ .= "and (select count(oxobjectid) from oxobject2selectlist " .
-               "where oxobjectid = :oxobjectid) = 0";
+        $sQ .= 'and (select count(oxobjectid) from oxobject2selectlist ' .
+               'where oxobjectid = :oxobjectid) = 0';
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
         $sParentId = DatabaseProvider::getMaster()->getOne($sQ, [
             ':oxid' => $sOxid,
-            ':oxobjectid' => $sOxid
+            ':oxobjectid' => $sOxid,
         ]);
 
         // all selectlists article is in
         $sQAdd = " from oxobject2selectlist left join {$sSLViewName} " .
                  "on {$sSLViewName}.oxid=oxobject2selectlist.oxselnid  " .
-                 "where oxobject2selectlist.oxobjectid = " . $oDb->quote($sOxid) . " ";
+                 'where oxobject2selectlist.oxobjectid = ' . $oDb->quote($sOxid) . ' ';
         if ($sParentId) {
-            $sQAdd .= "or oxobject2selectlist.oxobjectid = " . $oDb->quote($sParentId) . " ";
+            $sQAdd .= 'or oxobject2selectlist.oxobjectid = ' . $oDb->quote($sParentId) . ' ';
         }
         // all not assigned selectlists
         if ($sSynchArtId) {
@@ -115,12 +115,12 @@ class ArticleSelectionAjax extends ListComponentAjax
     {
         $aChosenArt = $this->getActionIds('oxobject2selectlist.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2selectlist.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2selectlist.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
-            $sQ = "delete from oxobject2selectlist " .
-                  "where oxobject2selectlist.oxid in (" . $sChosenArticles . ") ";
+            $sChosenArticles = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sQ = 'delete from oxobject2selectlist ' .
+                  'where oxobject2selectlist.oxid in (' . $sChosenArticles . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
 
@@ -144,12 +144,12 @@ class ArticleSelectionAjax extends ListComponentAjax
             $aAddSel = $this->getAll($this->addFilter("select $sSLViewName.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddSel)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddSel)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
             $database = DatabaseProvider::getMaster();
             foreach ($aAddSel as $sAdd) {
                 $oNew = oxNew(BaseModel::class);
-                $oNew->init("oxobject2selectlist");
+                $oNew->init('oxobject2selectlist');
                 $sObjectIdField = 'oxobject2selectlist__oxobjectid';
                 $sSelectionIdField = 'oxobject2selectlist__oxselnid';
                 $sOxSortField = 'oxobject2selectlist__oxsort';
@@ -157,10 +157,10 @@ class ArticleSelectionAjax extends ListComponentAjax
                 $oNew->$sObjectIdField = new Field($soxId);
                 $oNew->$sSelectionIdField = new Field($sAdd);
 
-                $sSql = "select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid";
+                $sSql = 'select max(oxsort) + 1 from oxobject2selectlist where oxobjectid = :oxobjectid';
 
                 $oNew->$sOxSortField = new Field((int) $database->getOne($sSql, [
-                    ':oxobjectid' => $soxId
+                    ':oxobjectid' => $soxId,
                 ]));
                 $oNew->save();
             }

@@ -21,6 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Category;
+use OxidEsales\Eshop\Application\Model\Content;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -129,13 +131,13 @@ class SeoEncoderContent extends SeoEncoder
     {
         $oDb = DatabaseProvider::getDb();
         $oDb->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcontent'", [
-            ':oxobjectid' => $sId
+            ':oxobjectid' => $sId,
         ]);
-        $oDb->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $sId
+        $oDb->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $sId,
         ]);
-        $oDb->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $sId
+        $oDb->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $sId,
         ]);
     }
 

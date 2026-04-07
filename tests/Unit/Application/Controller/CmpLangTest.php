@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller;
 
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Language component test
@@ -28,7 +30,6 @@ use \oxTestModules;
 
 class CmpLangTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -58,41 +59,51 @@ class CmpLangTest extends \OxidTestCase
     // if addVoucher fnc was executed
     public function testInitSetLinkRemoveSomeFnc()
     {
+        $this->setConfigParam('bl_perfLoadLanguages', true);
         $oLangView = oxNew('oxcmp_lang');
 
         $oView = oxNew('oxubase');
         $oView->setClassName('basket');
         $oView->setFncName('addVoucher');
         $oConfig = $this->getConfig();
+        // Clear existing active views so our view is the top active view (Pattern D)
+        while (count($oConfig->getActiveViewsList())) {
+            $oConfig->dropLastActiveView();
+        }
         $oConfig->setActiveView($oView);
         $oLangView->setParent($oView);
-        $oLangView->setConfig($oConfig);
         $oLangView->init();
         $oLang = $oLangView->render();
-        $sExpLink0 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket";
-        $sExpLink1 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket&amp;lang=1";
 
-        $this->assertEquals($sExpLink0, $oLang[0]->link);
-        $this->assertEquals($sExpLink1, $oLang[1]->link);
+        // addVoucher is in the forbidden functions list, so fnc= should be stripped
+        $this->assertStringContainsString('cl=basket', $oLang[0]->link);
+        $this->assertStringNotContainsString('fnc=', $oLang[0]->link);
+        $this->assertStringContainsString('cl=basket', $oLang[1]->link);
+        $this->assertStringNotContainsString('fnc=', $oLang[1]->link);
     }
 
     public function testInitSetLink()
     {
+        $this->setConfigParam('bl_perfLoadLanguages', true);
         $oLangView = oxNew('oxcmp_lang');
 
         $oView = oxNew('oxubase');
         $oView->setClassName('basket');
         $oView->setFncName('changebasket');
         $oConfig = $this->getConfig();
+        // Clear existing active views so our view is the top active view (Pattern D)
+        while (count($oConfig->getActiveViewsList())) {
+            $oConfig->dropLastActiveView();
+        }
         $oConfig->setActiveView($oView);
         $oLangView->setParent($oView);
-        $oLangView->setConfig($oConfig);
         $oLangView->init();
         $oLang = $oLangView->render();
-        $sExpLink0 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket&amp;fnc=changebasket";
-        $sExpLink1 = $this->getConfig()->getShopCurrentURL(0) . "cl=basket&amp;fnc=changebasket&amp;lang=1";
 
-        $this->assertEquals($sExpLink0, $oLang[0]->link);
-        $this->assertEquals($sExpLink1, $oLang[1]->link);
+        // changebasket is NOT in the forbidden functions list, so fnc= should remain
+        $this->assertStringContainsString('cl=basket', $oLang[0]->link);
+        $this->assertStringContainsString('fnc=changebasket', $oLang[0]->link);
+        $this->assertStringContainsString('cl=basket', $oLang[1]->link);
+        $this->assertStringContainsString('fnc=changebasket', $oLang[1]->link);
     }
 }

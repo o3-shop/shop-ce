@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,16 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \stdClass;
+use stdClass;
 
 /**
  * Tests for PriceAlarm_List class
  */
 class PriceAlarmListTest extends \OxidTestCase
 {
-
     /**
      * PriceAlarm_List::BuildSelectString() test case
      *
@@ -34,11 +35,11 @@ class PriceAlarmListTest extends \OxidTestCase
      */
     public function testBuildSelectString()
     {
-        $sViewName = getViewName("oxpricealarm");
-        $sArtViewName = getViewName("oxarticles");
+        $sViewName = getViewName('oxpricealarm');
+        $sArtViewName = getViewName('oxarticles');
 
         $sSql = "select {$sViewName}.*, {$sArtViewName}.oxtitle AS articletitle, ";
-        $sSql .= "oxuser.oxlname as userlname, oxuser.oxfname as userfname ";
+        $sSql .= 'oxuser.oxlname as userlname, oxuser.oxfname as userfname ';
         $sSql .= "from {$sViewName} ";
         $sSql .= "left join {$sArtViewName} on {$sArtViewName}.oxid = {$sViewName}.oxartid ";
         $sSql .= "left join oxuser on oxuser.oxid = {$sViewName}.oxuserid WHERE 1 ";
@@ -66,15 +67,22 @@ class PriceAlarmListTest extends \OxidTestCase
      */
     public function testBuildWhere()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
+        $this->setRequestParameter('where', ['oxpricealarm' => ['oxprice' => 15], 'oxarticles' => ['oxprice' => 15]]);
 
-        $this->setRequestParameter('where', array("oxpricealarm" => array("oxprice" => 15), "oxarticles" => array("oxprice" => 15)));
+        $sViewName = getViewName('oxpricealarm');
+        $sArtViewName = getViewName('oxarticles');
 
-        $sViewName = getViewName("oxpricealarm");
-        $sArtViewName = getViewName("oxarticles");
+        // Mock getItemList to avoid SQL execution (the query references oxarticles
+        // columns without a JOIN, which is a pre-existing production design issue).
+        $oListItem = oxNew(\OxidEsales\Eshop\Application\Model\PriceAlarm::class);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmList::class, array("_authorize"));
-        $oView->expects($this->any())->method('_authorize')->will($this->returnValue(true));
+        $oView = $this->getMock(
+            \OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmList::class,
+            ['authorize', 'getItemList', 'getItemListBaseObject']
+        );
+        $oView->expects($this->any())->method('authorize')->will($this->returnValue(true));
+        $oView->expects($this->any())->method('getItemList')->will($this->returnValue(oxNew(\OxidEsales\Eshop\Core\Model\ListModel::class)));
+        $oView->expects($this->any())->method('getItemListBaseObject')->will($this->returnValue($oListItem));
         $oView->init();
 
         $queryWhereParts = $oView->buildWhere();

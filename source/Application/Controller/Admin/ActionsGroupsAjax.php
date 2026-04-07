@@ -50,7 +50,7 @@ class ActionsGroupsAjax extends ListComponentAjax
              ['oxtitle', 'oxgroups', 1, 0, 0],
              ['oxid', 'oxgroups', 0, 0, 0],
              ['oxid', 'oxobject2action', 0, 0, 1],
-         ]
+         ],
     ];
 
     /**
@@ -85,14 +85,14 @@ class ActionsGroupsAjax extends ListComponentAjax
             $sQAdd = " from {$sGroupTable} where 1 ";
         } else {
             $sQAdd = " from oxobject2action, {$sGroupTable} where {$sGroupTable}.oxid=oxobject2action.oxobjectid " .
-                      " and oxobject2action.oxactionid = " . $oDb->quote($sId) .
+                      ' and oxobject2action.oxactionid = ' . $oDb->quote($sId) .
                       " and oxobject2action.oxclass = 'oxgroups' ";
         }
 
         if ($sSynchId && $sSynchId != $sId) {
             $sQAdd .= " and {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid " .
                       "from oxobject2action, {$sGroupTable} where $sGroupTable.oxid=oxobject2action.oxobjectid " .
-                      " and oxobject2action.oxactionid = " . $oDb->quote($sSynchId) .
+                      ' and oxobject2action.oxactionid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2action.oxclass = 'oxgroups' ) ";
         }
 
@@ -106,11 +106,11 @@ class ActionsGroupsAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxobject2action.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2action.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2action.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
-            $sQ = "delete from oxobject2action where oxobject2action.oxid in (" . $sRemoveGroups . ") ";
+            $sRemoveGroups = implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sQ = 'delete from oxobject2action where oxobject2action.oxid in (' . $sRemoveGroups . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -133,13 +133,13 @@ class ActionsGroupsAjax extends ListComponentAjax
         }
 
         $promotionAdded = false;
-        if ($soxId && $soxId != "-1" && is_array($aChosenGroup)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenGroup)) {
             foreach ($aChosenGroup as $sChosenGroup) {
                 $oObject2Promotion = oxNew(BaseModel::class);
                 $oObject2Promotion->init('oxobject2action');
                 $oObject2Promotion->oxobject2action__oxactionid = new Field($soxId);
                 $oObject2Promotion->oxobject2action__oxobjectid = new Field($sChosenGroup);
-                $oObject2Promotion->oxobject2action__oxclass = new Field("oxgroups");
+                $oObject2Promotion->oxobject2action__oxclass = new Field('oxgroups');
                 $oObject2Promotion->save();
             }
 

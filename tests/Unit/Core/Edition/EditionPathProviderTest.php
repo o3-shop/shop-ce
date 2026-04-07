@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,12 +18,12 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Edition;
 
 use OxidEsales\EshopCommunity\Core\Edition\EditionPathProvider;
 use OxidEsales\EshopCommunity\Core\Edition\EditionRootPathProvider;
 use OxidEsales\TestingLibrary\UnitTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class EditionPathProviderTest extends UnitTestCase
 {
@@ -55,7 +56,7 @@ class EditionPathProviderTest extends UnitTestCase
      */
     protected function getEditionPathSelectorMock()
     {
-        $editionSelector = $this->getMockBuilder('EditionRootPathProvider')->setMethods(array('getDirectoryPath'))->getMock();
+        $editionSelector = $this->getMockBuilder('EditionRootPathProvider')->setMethods(['getDirectoryPath'])->getMock();
         $editionSelector->method('getDirectoryPath')->willReturn('/');
         return $editionSelector;
     }

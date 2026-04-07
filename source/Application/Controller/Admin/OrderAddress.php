@@ -43,21 +43,21 @@ class OrderAddress extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oOrder = oxNew(Order::class);
             $oOrder->load($soxId);
 
-            $this->_aViewData["edit"] = $oOrder;
+            $this->_aViewData['edit'] = $oOrder;
         }
 
         $oCountryList = oxNew(\OxidEsales\Eshop\Application\Model\CountryList::class);
         $oCountryList->loadActiveCountries(Registry::getLang()->getObjectTplLanguage());
 
-        $this->_aViewData["countrylist"] = $oCountryList;
+        $this->_aViewData['countrylist'] = $oCountryList;
 
-        return "order_address.tpl";
+        return 'order_address.tpl';
     }
 
     /**
@@ -97,7 +97,7 @@ class OrderAddress extends AdminDetailsController
         // cleanup if empty
         if ($blEmpty) {
             foreach ($aFields as $sName) {
-                $aData[$sName] = "";
+                $aData[$sName] = '';
             }
         }
 
@@ -115,13 +115,13 @@ class OrderAddress extends AdminDetailsController
         $aParams = (array) Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oOrder = oxNew(Order::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oOrder->load($soxId);
         } else {
             $aParams['oxorder__oxid'] = null;
         }
 
-        $aParams = $this->_processAddress($aParams, "oxorder__oxdel", ["oxorder__oxdelsal"]);
+        $aParams = $this->_processAddress($aParams, 'oxorder__oxdel', ['oxorder__oxdelsal']);
         $oOrder->assign($aParams);
         $oOrder->save();
 

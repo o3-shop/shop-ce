@@ -43,16 +43,16 @@ class CountryMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oCountry = oxNew(Country::class);
             $oCountry->loadInLang($this->_iEditLang, $soxId);
 
             if ($oCountry->isForeignCountry()) {
-                $this->_aViewData["blForeignCountry"] = true;
+                $this->_aViewData['blForeignCountry'] = true;
             } else {
-                $this->_aViewData["blForeignCountry"] = false;
+                $this->_aViewData['blForeignCountry'] = false;
             }
 
             $oOtherLang = $oCountry->getAvailableInLangs();
@@ -60,25 +60,25 @@ class CountryMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oCountry->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oCountry;
+            $this->_aViewData['edit'] = $oCountry;
 
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         } else {
-            $this->_aViewData["blForeignCountry"] = true;
+            $this->_aViewData['blForeignCountry'] = true;
         }
 
-        return "country_main.tpl";
+        return 'country_main.tpl';
     }
 
     /**
@@ -97,7 +97,7 @@ class CountryMain extends AdminDetailsController
 
         $oCountry = oxNew(Country::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oCountry->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxcountry__oxid'] = null;
@@ -128,7 +128,7 @@ class CountryMain extends AdminDetailsController
 
         $oCountry = oxNew(Country::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oCountry->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxcountry__oxid'] = null;

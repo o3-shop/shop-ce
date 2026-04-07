@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Autoload\BackwardsCom
 
 class ForwardCompatibleTypeHintWithUnifiedNamespace_3_Test extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * Test the backwards compatibility with camel cased type hints
      */
@@ -41,7 +41,7 @@ class ForwardCompatibleTypeHintWithUnifiedNamespace_3_Test extends \PHPUnit\Fram
                  use type hints from the unified namespace'
             );
         };
-        
+
         $originalErrorHandler = null;
         try {
             $originalErrorHandler = set_error_handler(

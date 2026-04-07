@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +29,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class FormatCurrencyLogicTest extends UnitTestCase
 {
-
     /** @var FormatCurrencyLogic */
     private $numberFormatLogic;
 
@@ -56,11 +56,11 @@ class FormatCurrencyLogicTest extends UnitTestCase
     public function numberFormatProvider(): array
     {
         return [
-            ["EUR@ 1.00@ ,@ .@ EUR@ 2", 25000, '25.000,00'],
-            ["EUR@ 1.00@ ,@ .@ EUR@ 2", 25000.1584, '25.000,16'],
-            ["EUR@ 1.00@ ,@ .@ EUR@ 3", 25000.1584, '25.000,158'],
-            ["EUR@ 1.00@ ,@ .@ EUR@ 0", 25000000.5584, '25.000.001'],
-            ["EUR@ 1.00@ .@ ,@ EUR@ 2", 25000000.5584, '25,000,000.56'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 2', 25000, '25.000,00'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 2', 25000.1584, '25.000,16'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 3', 25000.1584, '25.000,158'],
+            ['EUR@ 1.00@ ,@ .@ EUR@ 0', 25000000.5584, '25.000.001'],
+            ['EUR@ 1.00@ .@ ,@ EUR@ 2', 25000000.5584, '25,000,000.56'],
         ];
     }
 }

@@ -141,9 +141,9 @@ abstract class ImportObject
         }
 
         $viewName = $shopObject->getViewName();
-        $fields = str_ireplace('`' . $viewName . "`.", "", strtoupper($shopObject->getSelectFields()));
-        $fields = str_ireplace([" ", "`"], ["", ""], $fields);
-        $this->fieldList = explode(",", $fields);
+        $fields = str_ireplace('`' . $viewName . '`.', '', strtoupper($shopObject->getSelectFields()));
+        $fields = str_ireplace([' ', '`'], ['', ''], $fields);
+        $this->fieldList = explode(',', $fields);
 
         return $this->fieldList;
     }
@@ -338,7 +338,7 @@ abstract class ImportObject
         $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         $user->loadAdminUser();
 
-        if ($user->oxuser__oxrights->value == "malladmin" || $user->oxuser__oxrights->value == (int) $shopId) {
+        if ($user->oxuser__oxrights->value == 'malladmin' || $user->oxuser__oxrights->value == (int) $shopId) {
             return true;
         }
 
@@ -355,9 +355,9 @@ abstract class ImportObject
     protected function checkIdField($id)
     {
         if (!isset($id) || !$id) {
-            throw new Exception("ERROR: Articlenumber/ID missing!");
+            throw new Exception('ERROR: Articlenumber/ID missing!');
         } elseif (strlen($id) > 32) {
-            throw new Exception("ERROR: Articlenumber/ID longer then allowed (32 chars max.)!");
+            throw new Exception('ERROR: Articlenumber/ID longer then allowed (32 chars max.)!');
         }
     }
 

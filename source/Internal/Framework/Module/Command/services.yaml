@@ -26,3 +26,8 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ApplyModulesConfigurationCommand
     tags:
       - { name: 'console.command', command: 'oe:module:apply-configuration' }
+
+  oxid_esales.command.clear_cache_command:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ClearCacheCommand
+    tags:
+      - { name: 'console.command', command: 'oe:cache:clear' }

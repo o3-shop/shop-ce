@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,10 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxRegistry;
+use oxField;
+use oxRegistry;
 
 class RemarkTest extends \OxidTestCase
 {
@@ -76,8 +78,8 @@ class RemarkTest extends \OxidTestCase
         $oRemark = oxNew('oxremark');
         $oRemark->load($this->_oRemark->getId());
 
-        $oRemark->oxremark__oxtext = new oxField("Test_remark", oxField::T_RAW);
-        $oRemark->oxremark__oxparentid = new oxField("oxdefaultadmin", oxField::T_RAW);
+        $oRemark->oxremark__oxtext = new oxField('Test_remark', oxField::T_RAW);
+        $oRemark->oxremark__oxparentid = new oxField('oxdefaultadmin', oxField::T_RAW);
         $oRemark->save();
 
         $this->assertEquals($oRemark->oxremark__oxtext->value, 'Test_remark');

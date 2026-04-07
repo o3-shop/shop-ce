@@ -31,7 +31,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class ServicesYamlConfigurationErrorEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 
     /**
      * @var string $errorMessage

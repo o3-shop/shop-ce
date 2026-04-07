@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -24,7 +25,7 @@ $sMetadataVersion = '1.1';
 /**
  * Module information
  */
-$aModule = array(
+$aModule = [
     'id'           => 'namespace1',
     'title'        => 'Namespaced module #1',
     'description'  => 'Appends "+ namespace1 to content title"',
@@ -32,6 +33,6 @@ $aModule = array(
     'version'      => '1.0',
     'author'       => 'OXID',
     'extend'      => [
-        ContentController::class => \OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\oxid\namespace1\Controllers\ContentController::class
+        ContentController::class => \OxidEsales\EshopCommunity\Tests\Acceptance\Admin\testData\modules\oxid\namespace1\Controllers\ContentController::class,
     ],
-);
+];

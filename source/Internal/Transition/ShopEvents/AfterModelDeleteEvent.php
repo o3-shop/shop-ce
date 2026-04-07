@@ -33,5 +33,5 @@ class AfterModelDeleteEvent extends Event
 {
     use ModelChangeEventTrait;
 
-    const NAME = self::class;
+    public const NAME = self::class;
 }

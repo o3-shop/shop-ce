@@ -53,7 +53,8 @@ class CompanyVatIn
     public function getCountryCode()
     {
         return (string) Str::getStr()->strtoupper(
-            Str::getStr()->substr($this->_cleanUp($this->_sCompanyVatNumber), 0, 2));
+            Str::getStr()->substr($this->_cleanUp($this->_sCompanyVatNumber), 0, 2)
+        );
     }
 
     /**
@@ -78,7 +79,6 @@ class CompanyVatIn
     {
         return (string) Str::getStr()->preg_replace("/\s|-/", '', $sValue);
     }
-
 
     /**
      * Cast to string

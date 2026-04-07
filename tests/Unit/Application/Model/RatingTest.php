@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,11 +18,11 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxDb;
-use \oxRegistry;
+use oxDb;
+use oxField;
 
 class RatingTest extends \OxidTestCase
 {
@@ -99,8 +100,8 @@ class RatingTest extends \OxidTestCase
         $oRating = oxNew('oxRating');
         $this->assertEquals(2, $oRating->getRatingAverage('xxx', 'oxarticle'));
         $this->assertEquals(2, $oRating->getRatingCount('xxx', 'oxarticle'));
-        $this->assertEquals(3, $oRating->getRatingAverage('xxx', 'oxarticle', array('yyy')));
-        $this->assertEquals(3, $oRating->getRatingCount('xxx', 'oxarticle', array('yyy')));
+        $this->assertEquals(3, $oRating->getRatingAverage('xxx', 'oxarticle', ['yyy']));
+        $this->assertEquals(3, $oRating->getRatingCount('xxx', 'oxarticle', ['yyy']));
     }
 
     public function testGetObjectIdAndType()

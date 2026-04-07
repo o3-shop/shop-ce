@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Selection;
 use OxidEsales\Eshop\Core\Contract\ISelectList;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
@@ -119,8 +120,8 @@ class SelectList extends MultiLanguageModel implements ISelectList
         // remove selectlists from articles also
         if ($blRemove = parent::delete($sOXID)) {
             $oDb = DatabaseProvider::getDb();
-            $oDb->execute("delete from oxobject2selectlist where oxselnid = :oxselnid", [
-                ':oxselnid' => $sOXID
+            $oDb->execute('delete from oxobject2selectlist where oxselnid = :oxselnid', [
+                ':oxselnid' => $sOXID,
             ]);
         }
 

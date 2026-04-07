@@ -74,7 +74,7 @@ class Session extends Core
         session_name($this->_sSessionName);
 
         /** @var Utilities $oUtils */
-        $oUtils = $this->getInstance("Utilities");
+        $oUtils = $this->getInstance('Utilities');
         $sSid = $oUtils->getRequestVar('sid', 'get');
 
         if (empty($sSid)) {
@@ -151,28 +151,28 @@ class Session extends Core
     protected function _initSessionData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         /** @var Utilities $oUtils */
-        $oUtils = $this->getInstance("Utilities");
+        $oUtils = $this->getInstance('Utilities');
 
         //storing country value settings to session
-        $sCountryLang = $oUtils->getRequestVar("country_lang", "post");
+        $sCountryLang = $oUtils->getRequestVar('country_lang', 'post');
         if (isset($sCountryLang)) {
             $this->setSessionParam('country_lang', $sCountryLang);
         }
 
         //storing shop language value settings to session
-        $sShopLang = $oUtils->getRequestVar("sShopLang", "post");
+        $sShopLang = $oUtils->getRequestVar('sShopLang', 'post');
         if (isset($sShopLang)) {
             $this->setSessionParam('sShopLang', $sShopLang);
         }
 
         //storing check for updates settings to session
-        $blCheckForUpdates = $oUtils->getRequestVar("check_for_updates", "post");
+        $blCheckForUpdates = $oUtils->getRequestVar('check_for_updates', 'post');
         if (isset($blCheckForUpdates)) {
             $this->setSessionParam('check_for_updates', $blCheckForUpdates);
         }
 
         // store eula to session
-        $iEula = $oUtils->getRequestVar("iEula", "post");
+        $iEula = $oUtils->getRequestVar('iEula', 'post');
         if (isset($iEula)) {
             $this->setSessionParam('eula', $iEula);
         }

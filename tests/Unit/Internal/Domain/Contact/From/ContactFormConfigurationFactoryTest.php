@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,12 +20,12 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Contact\Form;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Contact\From;
 
+use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormConfigurationFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FieldConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfigurationInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormFieldsConfigurationDataProviderInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormConfigurationFactory;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 
 class ContactFormConfigurationFactoryTest extends \PHPUnit\Framework\TestCase

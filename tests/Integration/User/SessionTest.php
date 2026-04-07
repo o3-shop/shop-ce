@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,25 +18,25 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\User;
 
 use oxBasket;
 use oxField;
+use OxidEsales\Eshop\Application\Model\Basket;
+use OxidEsales\Eshop\Application\Model\BasketItem;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\PriceList;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use oxRegistry;
 use oxUser;
-use \OxidEsales\Eshop\Application\Model\Basket;
-use \OxidEsales\Eshop\Application\Model\User;
-use \OxidEsales\Eshop\Application\Model\BasketItem;
-use \OxidEsales\Eshop\Core\Price;
-use \OxidEsales\Eshop\Core\PriceList;
-
-use \OxidEsales\Eshop\Core\Registry;
 
 class SessionTest extends UnitTestCase
 {
-    const FIRST_ARTICLE_ID = '0963c9792aea84adff1d2ef8aa4a7679';
-    const SECOND_ARTICLE_ID = '09646538b54bac72b4ccb92fb5e3649f';
+    public const FIRST_ARTICLE_ID = '0963c9792aea84adff1d2ef8aa4a7679';
+    public const SECOND_ARTICLE_ID = '09646538b54bac72b4ccb92fb5e3649f';
 
     /**
      * Fixture setUp.
@@ -154,7 +155,7 @@ class SessionTest extends UnitTestCase
             $this->changeSerializedClass(
                 $this->getSerializedBasketWithArticle(self::FIRST_ARTICLE_ID),
                 get_class(oxNew($className)),
-                "DummyDeactivatedModuleClassName"
+                'DummyDeactivatedModuleClassName'
             )
         );
 
@@ -166,7 +167,7 @@ class SessionTest extends UnitTestCase
      */
     public function testReturnsEmptyBasketIfAnonymousUserHasSerializedBasketWithDeactivatedModuleAndNamespacedClass($className)
     {
-        $deactivatedModuleClassFqn = "OxidEsales\\DummySpace\\DeactivatedModuleClassName";
+        $deactivatedModuleClassFqn = 'OxidEsales\\DummySpace\\DeactivatedModuleClassName';
         $this->registerFakeNamespacedDeactivatedModuleClass($deactivatedModuleClassFqn);
 
         $this->storeSerializedBasketToSession(
@@ -186,7 +187,7 @@ class SessionTest extends UnitTestCase
             $this->changeSerializedClass(
                 $this->getSerializedBasketWithArticle(self::FIRST_ARTICLE_ID, true, true),
                 get_class(oxNew(User::class)),
-                "DummyDeactivatedModuleClassName"
+                'DummyDeactivatedModuleClassName'
             )
         );
 
@@ -195,7 +196,7 @@ class SessionTest extends UnitTestCase
 
     public function testReturnsEmptyBasketIfRegisteredUserHasSerializedBasketWithDeactivatedModuleAndNamespacedUserClass()
     {
-        $deactivatedModuleClassFqn = "OxidEsales\\DummySpace\\DeactivatedModuleClassName";
+        $deactivatedModuleClassFqn = 'OxidEsales\\DummySpace\\DeactivatedModuleClassName';
         $this->registerFakeNamespacedDeactivatedModuleClass($deactivatedModuleClassFqn);
 
         $this->storeSerializedBasketToSession(
@@ -220,7 +221,7 @@ class SessionTest extends UnitTestCase
             [Basket::class],
             [BasketItem::class],
             [Price::class],
-            [PriceList::class]
+            [PriceList::class],
         ];
     }
 
@@ -254,9 +255,9 @@ class SessionTest extends UnitTestCase
      */
     private function registerFakeNamespacedDeactivatedModuleClass($fqn)
     {
-        $fqnElements = explode("\\", $fqn);
+        $fqnElements = explode('\\', $fqn);
         $className = array_pop($fqnElements);
-        $namespace = implode("\\", $fqnElements);
+        $namespace = implode('\\', $fqnElements);
 
         spl_autoload_register(function ($classToAutoload) use ($namespace, $className, $fqn) {
             if ($classToAutoload === $fqn) {
@@ -312,7 +313,7 @@ class SessionTest extends UnitTestCase
      */
     private function _createUsers()
     {
-        $firstUser = array(
+        $firstUser = [
             'oxuser__oxactive'    => new oxField('1', oxField::T_RAW),
             'oxuser__oxrights'    => new oxField('user', oxField::T_RAW),
             'oxuser__oxusername'  => new oxField('firstuser@oxideshop.dev', oxField::T_RAW),
@@ -335,8 +336,8 @@ class SessionTest extends UnitTestCase
             'oxuser__oxboni'      => new oxField('1000', oxField::T_RAW),
             'oxuser__oxcreate'    => new oxField('2015-05-20 22:10:51', oxField::T_RAW),
             'oxuser__oxregister'  => new oxField('2015-05-20 22:10:51', oxField::T_RAW),
-            'oxuser__oxboni'      => new oxField('1000', oxField::T_RAW)
-        );
+            'oxuser__oxboni'      => new oxField('1000', oxField::T_RAW),
+        ];
 
         $secondUser = $firstUser;
         $secondUser['oxuser__oxusername'] = new oxField('seconduser@oxideshop.dev', oxField::T_RAW);
@@ -410,7 +411,7 @@ class SessionTest extends UnitTestCase
         $this->setRequestParameter('lgn_usr', $username);
         $this->setRequestParameter('lgn_pwd', $password);
 
-        $parent = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, array('isEnabledPrivateSales'));
+        $parent = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['isEnabledPrivateSales']);
         $parent->expects($this->any())->method('isEnabledPrivateSales')->will($this->returnValue(false));
 
         $userComponent = oxNew('oxcmp_user');

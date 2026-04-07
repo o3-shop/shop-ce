@@ -19,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require_once dirname(__FILE__) . "/bootstrap.php";
+require_once dirname(__FILE__) . '/bootstrap.php';
 
 /**
  * Redirect to Setup, if shop is not configured

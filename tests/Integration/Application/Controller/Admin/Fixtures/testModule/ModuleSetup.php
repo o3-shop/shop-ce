@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Integration\Application\Controller\Admin\Fixtures\testModule;
 
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
-use OxidEsales\EshopCommunity\Tests\Integration\Application\Controller\Admin\Fixtures\testModule\RendererInterface;
 
 class ModuleSetup
 {

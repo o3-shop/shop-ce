@@ -412,7 +412,7 @@ class BasketController extends FrontendController
 
         $iBaseLanguage = Registry::getLang()->getBaseLanguage();
         $aPath['title'] = Registry::getLang()->translateString('CART', $iBaseLanguage, false);
-        $aPath['link']  = $this->getLink();
+        $aPath['link'] = $this->getLink();
         $aPaths[] = $aPath;
 
         return $aPaths;

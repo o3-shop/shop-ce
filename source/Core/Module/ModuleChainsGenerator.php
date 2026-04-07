@@ -22,10 +22,10 @@
 namespace OxidEsales\EshopCommunity\Core\Module;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\ModuleSetupException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateServiceInterface;
@@ -117,11 +117,11 @@ class ModuleChainsGenerator
             $classChains = [];
             /* Get the position of the class name */
             if (false !== $position = array_search($lowerCaseClassName, $allExtendedClasses)) {
-                $classChains[$position] = explode("&", $modules[$lowerCaseClassName]);
+                $classChains[$position] = explode('&', $modules[$lowerCaseClassName]);
             }
             /* Get the position of the alias class name */
             if (false !== $position = array_search($lowerCaseClassAlias, $allExtendedClasses)) {
-                $classChains[$position] = explode("&", $modules[$lowerCaseClassAlias]);
+                $classChains[$position] = explode('&', $modules[$lowerCaseClassAlias]);
             }
 
             /* Notice that the array keys will be ordered, but do not necessarily start at 0 */
@@ -315,7 +315,7 @@ class ModuleChainsGenerator
             return false;
         }
 
-        $moduleClassParentAlias = $moduleClass . "_parent";
+        $moduleClassParentAlias = $moduleClass . '_parent';
         if (!class_exists($moduleClassParentAlias, false)) {
             class_alias($parentClass, $moduleClassParentAlias);
         }
@@ -342,9 +342,9 @@ class ModuleChainsGenerator
          * So do not try to get "sShopDir" like this:
          * $modulesDirectory = \OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam("sShopDir");
          */
-        $modulesDirectory = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar("sShopDir");
+        $modulesDirectory = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)->getVar('sShopDir');
         $moduleClassFile = "$modulesDirectory/modules/$moduleClassPath.php";
-        $moduleClassParentAlias = $moduleClass . "_parent";
+        $moduleClassParentAlias = $moduleClass . '_parent';
 
         /**
          * Test if the class file could be read
@@ -397,7 +397,7 @@ class ModuleChainsGenerator
         $currentClass = $requestedClass;
         $safetyCount = 0;
         do {
-            if (($currentClass == "oxconfig") || ($currentClass == \OxidEsales\Eshop\Core\Config::class)) {
+            if (($currentClass == 'oxconfig') || ($currentClass == \OxidEsales\Eshop\Core\Config::class)) {
                 $isConfigClass = true;
                 break;
             }
@@ -423,7 +423,7 @@ class ModuleChainsGenerator
      */
     protected function onModuleExtensionCreationError($moduleClass)
     {
-        $moduleId = "(module id not availible)";
+        $moduleId = '(module id not availible)';
         if (class_exists("\OxidEsales\Eshop\Core\Module\Module", false)) {
             $module = new \OxidEsales\Eshop\Core\Module\Module();
             $moduleId = $module->getIdByPath($moduleClass);

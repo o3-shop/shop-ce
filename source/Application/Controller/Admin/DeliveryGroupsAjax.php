@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -39,7 +39,7 @@ class DeliveryGroupsAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxtitle', 'oxgroups', 1, 0, 0],
             ['oxid', 'oxgroups', 0, 0, 0],
@@ -87,7 +87,7 @@ class DeliveryGroupsAjax extends ListComponentAjax
         } else {
             $sQAdd = " from oxobject2delivery left join {$sGroupTable} " .
                      "on {$sGroupTable}.oxid=oxobject2delivery.oxobjectid " .
-                     " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sId) .
+                     ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sId) .
                      " and oxobject2delivery.oxtype = 'oxgroups' ";
         }
 
@@ -95,7 +95,7 @@ class DeliveryGroupsAjax extends ListComponentAjax
             $sQAdd .= " and {$sGroupTable}.oxid not in ( select {$sGroupTable}.oxid " .
                       "from oxobject2delivery left join {$sGroupTable} " .
                       "on {$sGroupTable}.oxid=oxobject2delivery.oxobjectid " .
-                      " where oxobject2delivery.oxdeliveryid = " . $oDb->quote($sSynchId) .
+                      ' where oxobject2delivery.oxdeliveryid = ' . $oDb->quote($sSynchId) .
                       " and oxobject2delivery.oxtype = 'oxgroups' ) ";
         }
 
@@ -109,11 +109,11 @@ class DeliveryGroupsAjax extends ListComponentAjax
     {
         $aRemoveGroups = $this->getActionIds('oxobject2delivery.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
-            $sRemoveGroups = implode(", ", DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . $sRemoveGroups . ") ";
+            $sRemoveGroups = implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups));
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . $sRemoveGroups . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -132,7 +132,7 @@ class DeliveryGroupsAjax extends ListComponentAjax
             $aChosenCat = $this->getAll($this->addFilter("select $sGroupTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenCat)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenCat)) {
             foreach ($aChosenCat as $sChosenCat) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');

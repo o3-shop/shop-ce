@@ -58,8 +58,8 @@ class PriceAlarmMain extends AdminDetailsController
 
         $this->_aViewData['iAllCnt'] = $this->getActivePriceAlarmsCount();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oPricealarm = oxNew(PriceAlarm::class);
             $oPricealarm->load($soxId);
@@ -82,7 +82,7 @@ class PriceAlarmMain extends AdminDetailsController
 
             $oLang = Registry::getLang();
             $aLanguages = $oLang->getLanguageNames();
-            $this->_aViewData["edit_lang"] = $aLanguages[$iLang];
+            $this->_aViewData['edit_lang'] = $aLanguages[$iLang];
             // rendering mail message text
             $oLetter = new stdClass();
             $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
@@ -98,14 +98,14 @@ class PriceAlarmMain extends AdminDetailsController
                 $oLang->setTplLanguage($iOldLang);
             }
 
-            $this->_aViewData["editor"] = $this->_generateTextEditor("100%", 300, $oLetter, "oxpricealarm__oxlongdesc", "details.tpl.css");
-            $this->_aViewData["edit"] = $oPricealarm;
-            $this->_aViewData["actshop"] = $config->getShopId();
+            $this->_aViewData['editor'] = $this->_generateTextEditor('100%', 300, $oLetter, 'oxpricealarm__oxlongdesc', 'details.tpl.css');
+            $this->_aViewData['edit'] = $oPricealarm;
+            $this->_aViewData['actshop'] = $config->getShopId();
         }
 
         parent::render();
 
-        return "pricealarm_main.tpl";
+        return 'pricealarm_main.tpl';
     }
 
     /**
@@ -133,16 +133,16 @@ class PriceAlarmMain extends AdminDetailsController
 
             // setting result message
             if ($blSuccess) {
-                $oPricealarm->oxpricealarm__oxsended->setValue(date("Y-m-d H:i:s"));
+                $oPricealarm->oxpricealarm__oxsended->setValue(date('Y-m-d H:i:s'));
                 $oPricealarm->save();
                 $blError = false;
             }
         }
 
         if (!$blError) {
-            $this->_aViewData["mail_succ"] = 1;
+            $this->_aViewData['mail_succ'] = 1;
         } else {
-            $this->_aViewData["mail_err"] = 1;
+            $this->_aViewData['mail_err'] = 1;
         }
     }
 

@@ -45,7 +45,7 @@ class State extends MultiLanguageModel
     public function __construct()
     {
         parent::__construct();
-        $this->init("oxstates");
+        $this->init('oxstates');
     }
 
     /**
@@ -62,12 +62,12 @@ class State extends MultiLanguageModel
         $oDb = DatabaseProvider::getDb();
         $params = [
             ':oxisoalpha2' => $sCode,
-            ':oxcountryid' => $sCountryId
+            ':oxcountryid' => $sCountryId,
         ];
 
-        return $oDb->getOne("SELECT oxid FROM oxstates 
+        return $oDb->getOne('SELECT oxid FROM oxstates 
             WHERE oxisoalpha2 = :oxisoalpha2 
-              AND oxcountryid = :oxcountryid", $params);
+              AND oxcountryid = :oxcountryid', $params);
     }
 
     /**
@@ -81,11 +81,11 @@ class State extends MultiLanguageModel
     public function getTitleById($iStateId)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "SELECT oxtitle FROM " . Registry::get(TableViewNameGenerator::class)->getViewName("oxstates") . " 
-            WHERE oxid = :oxid";
+        $sQ = 'SELECT oxtitle FROM ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxstates') . ' 
+            WHERE oxid = :oxid';
 
         $sStateTitle = $oDb->getOne($sQ, [
-            ':oxid' => $iStateId
+            ':oxid' => $iStateId,
         ]);
 
         return (string) $sStateTitle;

@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -36,13 +36,13 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\State\ModuleStateService
  */
 class ModuleList extends \OxidEsales\Eshop\Core\Base
 {
-    const MODULE_KEY_PATHS = 'Paths';
-    const MODULE_KEY_EVENTS = 'Events';
-    const MODULE_KEY_VERSIONS = 'Versions';
-    const MODULE_KEY_FILES = 'Files';
-    const MODULE_KEY_TEMPLATES = 'Templates';
-    const MODULE_KEY_EXTENSIONS = 'Extensions';
-    const MODULE_KEY_CONTROLLERS = 'Controllers';
+    public const MODULE_KEY_PATHS = 'Paths';
+    public const MODULE_KEY_EVENTS = 'Events';
+    public const MODULE_KEY_VERSIONS = 'Versions';
+    public const MODULE_KEY_FILES = 'Files';
+    public const MODULE_KEY_TEMPLATES = 'Templates';
+    public const MODULE_KEY_EXTENSIONS = 'Extensions';
+    public const MODULE_KEY_CONTROLLERS = 'Controllers';
 
     /**
      * Modules info array
@@ -169,7 +169,6 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
             }
         }
 
-
         return $extendedClasses;
     }
 
@@ -222,7 +221,7 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
         if (is_array($aModules) && count($aModules) > 0) {
             foreach ($aModules as $aModuleClasses) {
                 foreach ($aModuleClasses as $sModule) {
-                    $sModuleId = substr($sModule, 0, strpos($sModule, "/"));
+                    $sModuleId = substr($sModule, 0, strpos($sModule, '/'));
                     $aModulePaths[$sModuleId] = $sModuleId;
                 }
             }
@@ -447,7 +446,7 @@ class ModuleList extends \OxidEsales\Eshop\Core\Base
             $sModuleDirName = basename($sModuleDirPath);
 
             // skipping some file
-            if (in_array($sModuleDirName, $this->_aSkipFiles) || (!is_dir($sModuleDirPath) && substr($sModuleDirName, -4) != ".php")) {
+            if (in_array($sModuleDirName, $this->_aSkipFiles) || (!is_dir($sModuleDirPath) && substr($sModuleDirName, -4) != '.php')) {
                 continue;
             }
 

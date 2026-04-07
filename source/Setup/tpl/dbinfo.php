@@ -19,10 +19,10 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require "_header.php"; ?>
+require '_header.php'; ?>
 <?php
 $this->getText('STEP_3_DESC');
-$aDB = $this->getViewParam("aDB");
+$aDB = $this->getViewParam('aDB');
 $demodataPackageExists = $this->getViewParam('demodataPackageExists');
 
 ?><br>
@@ -58,11 +58,11 @@ $demodataPackageExists = $this->getViewParam('demodataPackageExists');
     <td><?php $this->getText('STEP_3_DB_DEMODATA'); ?>:</td>
     <td>
         &nbsp;&nbsp;<input type="radio" name="aDB[dbiDemoData]" value="1" <?php if ($aDB['dbiDemoData'] == 1) {
-            echo("checked");
-                                                                          } ?> <?php echo !$demodataPackageExists ? "disabled" : "" ?>><?php $this->getText('BUTTON_RADIO_INSTALL_DB_DEMO'); ?> <?php echo !$demodataPackageExists ? "<span class='exclamation-icon'></span>" : "" ?><br>
+            echo('checked');
+        } ?> <?php echo !$demodataPackageExists ? 'disabled' : '' ?>><?php $this->getText('BUTTON_RADIO_INSTALL_DB_DEMO'); ?> <?php echo !$demodataPackageExists ? "<span class='exclamation-icon'></span>" : '' ?><br>
         &nbsp;&nbsp;<input type="radio" name="aDB[dbiDemoData]" value="0" <?php if ($aDB['dbiDemoData'] == 0) {
-            echo("checked");
-                                                                          } ?>><?php $this->getText('BUTTON_RADIO_NOT_INSTALL_DB_DEMO'); ?><br>
+            echo('checked');
+        } ?>><?php $this->getText('BUTTON_RADIO_NOT_INSTALL_DB_DEMO'); ?><br>
     </td>
   </tr>
 </table>
@@ -74,4 +74,4 @@ $demodataPackageExists = $this->getViewParam('demodataPackageExists');
 
 <input type="submit" id="step3Submit" class="edittext" value="<?php $this->getText('BUTTON_DB_CREATE'); ?>">
 </form>
-<?php require "_footer.php";
+<?php require '_footer.php';

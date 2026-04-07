@@ -62,7 +62,7 @@ class AdminlinksList extends AdminListController
     public function getListSorting()
     {
         $aSorting = parent::getListSorting();
-        if (isset($aSorting["oxlinks"][$this->_sDefSortField])) {
+        if (isset($aSorting['oxlinks'][$this->_sDefSortField])) {
             $this->_blDesc = true;
         }
 

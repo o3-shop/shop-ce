@@ -51,7 +51,7 @@ final class ShopConfigurationEventsHandlerTest extends TestCase
             [
                 'testId' => [
                     'onActive' => 'doSomething',
-                ]
+                ],
             ],
             $shopConfigurationSettingDao->get(ShopConfigurationSetting::MODULE_EVENTS, 1)->getValue()
         );
@@ -91,8 +91,7 @@ final class ShopConfigurationEventsHandlerTest extends TestCase
 
     private function getTestShopConfigurationSettingDao(): ShopConfigurationSettingDaoInterface
     {
-        return new class implements ShopConfigurationSettingDaoInterface
-        {
+        return new class () implements ShopConfigurationSettingDaoInterface {
             private $settings = [];
 
             public function save(ShopConfigurationSetting $setting)

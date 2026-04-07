@@ -23,13 +23,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Dao;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Storage\ArrayStorageInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Cache\ShopConfigurationCacheInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataMapper\ShopConfigurationDataMapperInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ShopConfigurationNotFoundException;
+use OxidEsales\EshopCommunity\Internal\Framework\Storage\ArrayStorageInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Storage\FileStorageFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -199,7 +199,6 @@ class ShopConfigurationDao implements ShopConfigurationDaoInterface
     {
         return $this->getShopsConfigurationDirectory() . $shopId . '.yaml';
     }
-
 
     /**
      * @return string

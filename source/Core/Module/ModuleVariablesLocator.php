@@ -138,10 +138,10 @@ class ModuleVariablesLocator
 
         $shopId = $this->getShopIdCalculator()->getShopId();
 
-        $query = "SELECT oxvarvalue FROM oxconfig WHERE oxvarname = :oxvarname AND oxshopid = :oxshopid";
+        $query = 'SELECT oxvarvalue FROM oxconfig WHERE oxvarname = :oxvarname AND oxshopid = :oxshopid';
         $value = $masterDb->getOne($query, [
             ':oxvarname' => $name,
-            ':oxshopid'  => $shopId
+            ':oxshopid'  => $shopId,
         ]);
 
         return unserialize($value);

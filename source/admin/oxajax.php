@@ -32,7 +32,7 @@ if (!defined('OX_ADMIN_DIR')) {
     define('OX_ADMIN_DIR', dirname(__FILE__));
 }
 
-require_once dirname(__FILE__) . "/../bootstrap.php";
+require_once dirname(__FILE__) . '/../bootstrap.php';
 
 // processing ..
 $blAjaxCall = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
@@ -44,8 +44,8 @@ if ($blAjaxCall) {
 
     // Includes Utility module.
     $sUtilModule = $myConfig->getConfigParam('sUtilModule');
-    if ($sUtilModule && file_exists(getShopBasePath() . "modules/" . $sUtilModule)) {
-        include_once getShopBasePath() . "modules/" . $sUtilModule;
+    if ($sUtilModule && file_exists(getShopBasePath() . 'modules/' . $sUtilModule)) {
+        include_once getShopBasePath() . 'modules/' . $sUtilModule;
     }
 
     $myConfig->setConfigParam('blAdmin', true);
@@ -53,13 +53,13 @@ if ($blAjaxCall) {
     // authorization
     if (
         !(
-        Registry::getSession()->checkSessionChallenge()
+            Registry::getSession()->checkSessionChallenge()
         && count(Registry::getUtilsServer()->getOxCookie())
         && Registry::getUtils()->checkAccessRights()
         )
     ) {
-        header("location:index.php");
-        Registry::getUtils()->showMessageAndExit("");
+        header('location:index.php');
+        Registry::getUtils()->showMessageAndExit('');
     }
 
     if ($sContainer = Registry::get(Request::class)->getRequestParameter('container')) {

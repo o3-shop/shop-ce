@@ -24,8 +24,8 @@ namespace OxidEsales\EshopCommunity\Application\Controller;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Form\FormField;
 
 /**
  * Contact window.
@@ -196,7 +196,7 @@ class ContactController extends FrontendController
             [
                 'title' => $title,
                 'link'  => $this->getLink(),
-            ]
+            ],
         ];
     }
 

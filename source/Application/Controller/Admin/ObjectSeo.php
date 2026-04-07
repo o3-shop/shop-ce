@@ -174,7 +174,7 @@ class ObjectSeo extends AdminDetailsController
         return (bool) DatabaseProvider::getMaster()->getOne($sQ, [
             ':oxobjectid' => $this->getEditObjectId(),
             ':oxshopid' => $iShopId,
-            ':oxlang' => $iLang
+            ':oxlang' => $iLang,
         ]);
     }
 

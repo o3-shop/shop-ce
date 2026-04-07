@@ -46,7 +46,7 @@ class UserExtend extends AdminDetailsController
         parent::render();
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oUser = oxNew(User::class);
             $oUser->load($soxId);
@@ -56,14 +56,14 @@ class UserExtend extends AdminDetailsController
             $oCountry->loadInLang(Registry::getLang()->getObjectTplLanguage(), $oUser->oxuser__oxcountryid->value);
             $oUser->oxuser__oxcountry = new Field($oCountry->oxcountry__oxtitle->value);
 
-            $this->_aViewData["edit"] = $oUser;
+            $this->_aViewData['edit'] = $oUser;
         }
 
         if (!$this->_allowAdminEdit($soxId)) {
             $this->_aViewData['readonly'] = true;
         }
 
-        return "user_extend.tpl";
+        return 'user_extend.tpl';
     }
 
     /**
@@ -85,7 +85,7 @@ class UserExtend extends AdminDetailsController
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         $oUser = oxNew(User::class);
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oUser->load($soxId);
         } else {
             $aParams['oxuser__oxid'] = null;

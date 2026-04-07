@@ -46,8 +46,8 @@ class CategoryText extends AdminDetailsController
 
         $this->_aViewData['edit'] = $oCategory = oxNew(Category::class);
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $iCatLang = Registry::getRequest()->getRequestEscapedParameter('catlang');
 
@@ -55,7 +55,7 @@ class CategoryText extends AdminDetailsController
                 $iCatLang = $this->_iEditLang;
             }
 
-            $this->_aViewData["catlang"] = $iCatLang;
+            $this->_aViewData['catlang'] = $iCatLang;
 
             $oCategory->loadInLang($iCatLang, $soxId);
 
@@ -68,13 +68,13 @@ class CategoryText extends AdminDetailsController
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        $this->_aViewData["editor"] = $this->generateTextEditor("100%", 300, $oCategory, "oxcategories__oxlongdesc", "list.tpl.css");
+        $this->_aViewData['editor'] = $this->generateTextEditor('100%', 300, $oCategory, 'oxcategories__oxlongdesc', 'list.tpl.css');
 
-        return "category_text.tpl";
+        return 'category_text.tpl';
     }
 
     /**
@@ -94,7 +94,7 @@ class CategoryText extends AdminDetailsController
         $iCatLang = Registry::getRequest()->getRequestEscapedParameter('catlang');
         $iCatLang = $iCatLang ? $iCatLang : 0;
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oCategory->loadInLang($iCatLang, $soxId);
         } else {
             $aParams['oxcategories__oxid'] = null;

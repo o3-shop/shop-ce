@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,15 +20,15 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Smarty;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Transition\Smarty;
 
 use OxidEsales\EshopCommunity\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
+use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyConfigurationFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyConfigurationFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyBuilder;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyContext;
-use OxidEsales\EshopCommunity\Internal\Framework\Smarty\Configuration\SmartyConfigurationFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Smarty\SmartyContextInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\TestContainerFactory;
 
 class SmartyBuilderTest extends \PHPUnit\Framework\TestCase
@@ -78,7 +80,7 @@ class SmartyBuilderTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'security on' => [1, $this->getSmartySettingsWithSecurityOn()],
-            'security off' => [0, $this->getSmartySettingsWithSecurityOff()]
+            'security off' => [0, $this->getSmartySettingsWithSecurityOff()],
         ];
     }
 
@@ -92,8 +94,8 @@ class SmartyBuilderTest extends \PHPUnit\Framework\TestCase
             'left_delimiter' => '[{',
             'right_delimiter' => '}]',
             'caching' => false,
-            'compile_dir' => $config->getConfigParam('sCompileDir')."/smarty/",
-            'cache_dir' => $config->getConfigParam('sCompileDir')."/smarty/",
+            'compile_dir' => $config->getConfigParam('sCompileDir') . '/smarty/',
+            'cache_dir' => $config->getConfigParam('sCompileDir') . '/smarty/',
             'compile_id' => Registry::getUtilsView()->getTemplateCompileId(),
             'template_dir' => $templateDirs,
             'debugging' => false,
@@ -145,8 +147,8 @@ class SmartyBuilderTest extends \PHPUnit\Framework\TestCase
             'left_delimiter' => '[{',
             'right_delimiter' => '}]',
             'caching' => false,
-            'compile_dir' => $config->getConfigParam('sCompileDir')."/smarty/",
-            'cache_dir' => $config->getConfigParam('sCompileDir')."/smarty/",
+            'compile_dir' => $config->getConfigParam('sCompileDir') . '/smarty/',
+            'cache_dir' => $config->getConfigParam('sCompileDir') . '/smarty/',
             'compile_id' => Registry::getUtilsView()->getTemplateCompileId(),
             'template_dir' => $templateDirs,
             'debugging' => false,

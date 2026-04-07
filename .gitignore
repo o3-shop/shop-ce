@@ -1,3 +1,4 @@
+!.gitkeep
 # Shop configuration
 /source/config.inc.php
 
@@ -10,13 +11,11 @@ runned.txt
 !/source/log/.htaccess
 
 # Cache
-/source/cache/
+/source/cache/*
 !/source/cache/.htaccess
-!/source/cache/dir.txt
 
 # Export
-/source/export/
-!/source/export/.gitkeep
+/source/export/*
 
 # Temporary files
 /source/tmp/
@@ -24,8 +23,7 @@ runned.txt
 
 # Composer
 /vendor/
-/composer.lock
-
+composer.lock
 # Testing library
 /test_config.yml
 /source/Services/
@@ -52,13 +50,28 @@ runned.txt
 .env
 /.phpstorm.meta.php/oxid.meta.php
 /source/Application/views/wave/*
+/source/Application/views/o3-theme/*
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
+
 /source/out/pictures/master/manufacturer/*
 /source/out/pictures/master/product/*
 /source/out/pictures/master/wrapping/img_ecard_03_wp.jpg
 /source/out/pictures/promo/*
 /source/out/wave/*
+/source/out/o3-theme/*
 /var/configuration/shops/1.yaml
 /var/generated/generated_services.yaml
-docker/data
+docker/database/data
+docker/mailpit/data
+coverage
+
+!/source/tmp/!.gitkeep
+.php-cs-fixer.cache
+
+!**/.gitkeep
+
+dir.txt
+oxideshop.log
+/source/modules/testmodule/metadata.php
+/var/configuration-backup/shops/1.yaml

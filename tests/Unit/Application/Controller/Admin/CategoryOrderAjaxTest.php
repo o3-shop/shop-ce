@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxDb;
+use oxDb;
 
 /**
  * Tests for Category_Order_Ajax class
@@ -41,7 +43,7 @@ class CategoryOrderAjaxTest extends \OxidTestCase
 
         if ($this->getConfig()->getEdition() !== 'EE') :
             $this->setArticleViewTable('oxv_oxarticles_de');
-        $this->setObject2CategoryViewTable('oxobject2category');
+            $this->setObject2CategoryViewTable('oxobject2category');
         endif;
 
         $this->addToDatabase("replace into oxcategories set oxid='_testCategory', oxtitle='_testCategory', oxshopid='" . $this->getShopIdTest() . "'", 'oxcategories');
@@ -99,7 +101,7 @@ class CategoryOrderAjaxTest extends \OxidTestCase
     public function testGetQuery()
     {
         $oView = oxNew('category_order_ajax');
-        $this->assertEquals("from " . $this->getArticleViewTable() . " where  1 = 0", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from ' . $this->getArticleViewTable() . ' where  1 = 0', trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -109,12 +111,12 @@ class CategoryOrderAjaxTest extends \OxidTestCase
      */
     public function testGetQueryNewOrderSess()
     {
-        $aOxid = array('_testOxid1', '_testOxid2');
-        $this->setSessionParam("neworder_sess", $aOxid);
+        $aOxid = ['_testOxid1', '_testOxid2'];
+        $this->setSessionParam('neworder_sess', $aOxid);
         $sArticleTable = $this->getArticleViewTable();
 
         $oView = oxNew('category_order_ajax');
-        $this->assertEquals("from " . $sArticleTable . " where  $sArticleTable.oxid in ( '_testOxid1', '_testOxid2' )", trim($oView->UNITgetQuery()));
+        $this->assertEquals('from ' . $sArticleTable . " where  $sArticleTable.oxid in ( '_testOxid1', '_testOxid2' )", trim($oView->UNITgetQuery()));
     }
 
     /**
@@ -125,9 +127,9 @@ class CategoryOrderAjaxTest extends \OxidTestCase
     public function testGetQuerySynchoxid()
     {
         $sSynchoxid = '_testSynchoxid';
-        $aOxid = array('_testOxid1', '_testOxid2');
-        $this->setSessionParam("neworder_sess", $aOxid);
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $aOxid = ['_testOxid1', '_testOxid2'];
+        $this->setSessionParam('neworder_sess', $aOxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
         $sO2CView = $this->getObject2CategoryViewTable();
         $sArticleTable = $this->getArticleViewTable();
 
@@ -146,9 +148,9 @@ class CategoryOrderAjaxTest extends \OxidTestCase
     public function testGetSorting()
     {
         $sSynchoxid = '_testSynchoxid';
-        $this->setRequestParameter("synchoxid", $sSynchoxid);
+        $this->setRequestParameter('synchoxid', $sSynchoxid);
         $oView = oxNew('category_order_ajax');
-        $this->assertEquals("order by _0 asc", trim($oView->UNITgetSorting()));
+        $this->assertEquals('order by _0 asc', trim($oView->UNITgetSorting()));
     }
 
     /**
@@ -159,8 +161,8 @@ class CategoryOrderAjaxTest extends \OxidTestCase
     public function testGetSortingAfterArticleIds()
     {
         $sArticleTable = $this->getArticleViewTable();
-        $aOxid = array('_testOxid1', '_testOxid2');
-        $this->setSessionParam("neworder_sess", $aOxid);
+        $aOxid = ['_testOxid1', '_testOxid2'];
+        $this->setSessionParam('neworder_sess', $aOxid);
         $oView = oxNew('category_order_ajax');
         $this->assertEquals("order by  $sArticleTable.oxid='_testOxid2' ,  $sArticleTable.oxid='_testOxid1'", trim($oView->UNITgetSorting()));
     }
@@ -173,9 +175,9 @@ class CategoryOrderAjaxTest extends \OxidTestCase
     public function testSaveNewOrder()
     {
         $sOxid = '_testCategory';
-        $this->setRequestParameter("oxid", $sOxid);
-        $aOxid = array('_testOxid1', '_testOxid2');
-        $this->setSessionParam("neworder_sess", $aOxid);
+        $this->setRequestParameter('oxid', $sOxid);
+        $aOxid = ['_testOxid1', '_testOxid2'];
+        $this->setSessionParam('neworder_sess', $aOxid);
         $this->assertEquals(0, oxDb::getDb()->getOne("select oxpos from oxobject2category where oxobjectid='_testOxid1'"));
         $this->assertEquals(0, oxDb::getDb()->getOne("select oxpos from oxobject2category where oxobjectid='_testOxid2'"));
 
@@ -183,7 +185,7 @@ class CategoryOrderAjaxTest extends \OxidTestCase
         $oView->saveNewOrder();
         $this->assertEquals(0, oxDb::getDb()->getOne("select oxpos from oxobject2category where oxobjectid='_testOxid1'"));
         $this->assertEquals(1, oxDb::getDb()->getOne("select oxpos from oxobject2category where oxobjectid='_testOxid2'"));
-        $this->assertNull($this->getSessionParam("neworder_sess"));
+        $this->assertNull($this->getSessionParam('neworder_sess'));
     }
 
     /**
@@ -195,9 +197,9 @@ class CategoryOrderAjaxTest extends \OxidTestCase
     {
         $oDb = oxDb::getDb();
         $sOxid = '_testCategory';
-        $this->setRequestParameter("oxid", $sOxid);
-        $aOxid = array('_testOxid1', '_testOxid2');
-        $this->setSessionParam("neworder_sess", $aOxid);
+        $this->setRequestParameter('oxid', $sOxid);
+        $aOxid = ['_testOxid1', '_testOxid2'];
+        $this->setSessionParam('neworder_sess', $aOxid);
         // updating oxtime values
         $sQ = "update oxobject2category set oxpos = 1 where oxobjectid = '_testOxid1' ";
         $oDb->execute($sQ);

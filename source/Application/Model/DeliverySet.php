@@ -71,13 +71,13 @@ class DeliverySet extends MultiLanguageModel
         $oDb = DatabaseProvider::getDb();
 
         $oDb->execute('delete from oxobject2payment where oxobjectid = :oxid', [
-            ':oxid' => $sOxId
+            ':oxid' => $sOxId,
         ]);
         $oDb->execute('delete from oxobject2delivery where oxdeliveryid = :oxid', [
-            ':oxid' => $sOxId
+            ':oxid' => $sOxId,
         ]);
         $oDb->execute('delete from oxdel2delset where oxdelsetid = :oxid', [
-            ':oxid' => $sOxId
+            ':oxid' => $sOxId,
         ]);
 
         return parent::delete($sOxId);
@@ -94,10 +94,10 @@ class DeliverySet extends MultiLanguageModel
     public function getIdByName($sTitle)
     {
         $oDb = DatabaseProvider::getDb();
-        $sQ = "SELECT `oxid` FROM `" . Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset') . "` 
-            WHERE  `oxtitle` = :oxtitle";
+        $sQ = 'SELECT `oxid` FROM `' . Registry::get(TableViewNameGenerator::class)->getViewName('oxdeliveryset') . '` 
+            WHERE  `oxtitle` = :oxtitle';
         $sId = $oDb->getOne($sQ, [
-            ':oxtitle' => $sTitle
+            ':oxtitle' => $sTitle,
         ]);
 
         return $sId;

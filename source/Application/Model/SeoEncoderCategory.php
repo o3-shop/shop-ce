@@ -242,8 +242,8 @@ class SeoEncoderCategory extends SeoEncoder
         // select it from table instead of using object carrying value
         // this is because this method is usually called inside update,
         // where object may already be carrying changed id
-        $aCatInfo = $oDb->getAll("select oxrootid, oxleft, oxright from oxcategories where oxid = :oxid limit 1", [
-            ':oxid' => $oCategory->getId()
+        $aCatInfo = $oDb->getAll('select oxrootid, oxleft, oxright from oxcategories where oxid = :oxid limit 1', [
+            ':oxid' => $oCategory->getId(),
         ]);
 
         // update sub cats
@@ -255,19 +255,19 @@ class SeoEncoderCategory extends SeoEncoder
         $oDb->execute($sQ, [
             ':oxrootid' => $aCatInfo[0][0],
             ':oxleft' => (int) $aCatInfo[0][1],
-            ':oxright' => (int) $aCatInfo[0][2]
+            ':oxright' => (int) $aCatInfo[0][2],
         ]);
 
         // update sub-articles
-        $sQ = "update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category "
-              . "as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft "
-              . "and cat.oxright <= :oxright) as seo2 "
+        $sQ = 'update oxseo as seo1, (select distinct o2c.oxobjectid as id from oxcategories as cat left join oxobject2category '
+              . 'as o2c on o2c.oxcatnid=cat.oxid where cat.oxrootid = :oxrootid and cat.oxleft >= :oxleft '
+              . 'and cat.oxright <= :oxright) as seo2 '
               . "set seo1.oxexpired = '1' where seo1.oxtype = 'oxarticle' and seo1.oxobjectid = seo2.id "
-              . "and seo1.oxfixed = 0";
+              . 'and seo1.oxfixed = 0';
         $oDb->execute($sQ, [
             ':oxrootid' => $aCatInfo[0][0],
             ':oxleft' => (int) $aCatInfo[0][1],
-            ':oxright' => (int) $aCatInfo[0][2]
+            ':oxright' => (int) $aCatInfo[0][2],
         ]);
     }
 
@@ -283,16 +283,16 @@ class SeoEncoderCategory extends SeoEncoder
         $database = DatabaseProvider::getDb();
 
         $database->execute("delete from oxseo where oxseo.oxtype = 'oxarticle' and oxseo.oxparams = :oxparams", [
-            ':oxparams' => $category->getId()
+            ':oxparams' => $category->getId(),
         ]);
         $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxcategory'", [
-            ':oxobjectid' => $category->getId()
+            ':oxobjectid' => $category->getId(),
         ]);
-        $database->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $category->getId()
+        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $category->getId(),
         ]);
-        $database->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $category->getId()
+        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $category->getId(),
         ]);
     }
 
@@ -343,8 +343,7 @@ class SeoEncoderCategory extends SeoEncoder
         $result = DatabaseProvider::getDb()->select($sql, [':oxobjectid' => $category->getId()]);
 
         $urlIdents = [];
-        foreach ($result->fetchAll() as $row)
-        {
+        foreach ($result->fetchAll() as $row) {
             $urlIdents[] = $row[0];
         }
 

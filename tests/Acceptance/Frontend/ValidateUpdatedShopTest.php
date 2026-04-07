@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -65,27 +66,27 @@ class ValidateUpdatedShopTest extends FrontendTestCase
 
         $this->openShop();
 
-        $this->searchFor("1001");
-        $this->clickAndWait("searchList_1");
-        $this->clickAndWait("toBasket");
+        $this->searchFor('1001');
+        $this->clickAndWait('searchList_1');
+        $this->clickAndWait('toBasket');
 
-        $this->loginInFrontend("example_test@oxid-esales.dev", "useruser");
+        $this->loginInFrontend('example_test@oxid-esales.dev', 'useruser');
 
         $this->_checkIfMiniBasketContainsProducts(1);
 
-        $this->addToBasket("1001");
+        $this->addToBasket('1001');
 
-        $sNextStep = "%CONTINUE_TO_NEXT_STEP%";
+        $sNextStep = '%CONTINUE_TO_NEXT_STEP%';
         $this->clickAndWait("//button[text()='{$sNextStep}']");
         $this->clickAndWait("//button[text()='{$sNextStep}']");
-        $this->click("payment_oxidcashondel");
+        $this->click('payment_oxidcashondel');
         $this->clickAndWait("//button[text()='{$sNextStep}']");
 
         // submit
         $this->click("//form[@id='orderConfirmAgbTop']//input[@name='ord_agb' and @value='1']");
 
         $this->clickAndWait("//form[@id='orderConfirmAgbTop']//button");
-        $this->assertEquals("%YOU_ARE_HERE%: / %ORDER_COMPLETED%", $this->getText("breadCrumb"));
+        $this->assertEquals('%YOU_ARE_HERE%: / %ORDER_COMPLETED%', $this->getText('breadCrumb'));
     }
 
     /**
@@ -134,7 +135,7 @@ class ValidateUpdatedShopTest extends FrontendTestCase
      */
     private function _openOrderHistory($oMinkSession)
     {
-        $oMinkSession->visit(shopURL . "en/order-history/");
+        $oMinkSession->visit(shopURL . 'en/order-history/');
         $oPage = $oMinkSession->getPage();
 
         $oLoginInput = $oPage->find('xpath', "//input[contains(@id, 'loginUser')]");
@@ -154,7 +155,7 @@ class ValidateUpdatedShopTest extends FrontendTestCase
     private function _checkIfMiniBasketContainsProducts($iAmount)
     {
         $this->click("//div[@id='miniBasket']/img");
-        $this->waitForItemAppear("basketFlyout");
-        $this->assertEquals("{$iAmount} %ITEMS_IN_BASKET%:", $this->getText("//div[@id='basketFlyout']/p[1]/strong"), "Basket should contain item, as we add it to basket in previous step.");
+        $this->waitForItemAppear('basketFlyout');
+        $this->assertEquals("{$iAmount} %ITEMS_IN_BASKET%:", $this->getText("//div[@id='basketFlyout']/p[1]/strong"), 'Basket should contain item, as we add it to basket in previous step.');
     }
 }

@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\File;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Registry;
@@ -44,7 +45,6 @@ class OrderFile extends BaseModel
      * @var string
      */
     protected $_sClassName = 'oxorderfile';
-
 
     /**
      * Initialises the instance
@@ -157,7 +157,7 @@ class OrderFile extends BaseModel
             'oxorderfiles__oxordernr',
             'oxorderfiles__oxorderdate',
             'oxorderfiles__oxispaid',
-            'oxorderfiles__oxpurchasedonly'
+            'oxorderfiles__oxpurchasedonly',
         ];
 
         if (in_array($sFieldName, $aFieldNames)) {

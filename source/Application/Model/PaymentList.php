@@ -84,7 +84,7 @@ class PaymentList extends ListModel
         $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxpayments');
         $sQ = "select {$sTable}.* from ( select distinct {$sTable}.* from {$sTable} ";
         $sQ .= "left join oxobject2group ON oxobject2group.oxobjectid = {$sTable}.oxid ";
-        $sQ .= "inner join oxobject2payment ON oxobject2payment.oxobjectid = " . $oDb->quote($sShipSetId) . " and oxobject2payment.oxpaymentid = {$sTable}.oxid ";
+        $sQ .= 'inner join oxobject2payment ON oxobject2payment.oxobjectid = ' . $oDb->quote($sShipSetId) . " and oxobject2payment.oxpaymentid = {$sTable}.oxid ";
         $sQ .= "where {$sTable}.oxactive='1' ";
         $sQ .= " and {$sTable}.oxfromboni <= " . $oDb->quote($sBoni) . " and {$sTable}.oxfromamount <= " . $oDb->quote($dPrice) . " and {$sTable}.oxtoamount >= " . $oDb->quote($dPrice);
 
@@ -106,7 +106,7 @@ class PaymentList extends ListModel
         $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
         $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
-        $sCountrySql = $sCountryId ? "exists( select 1 from oxobject2payment as s1 where s1.oxpaymentid={$sTable}.OXID and s1.oxtype='oxcountry' and s1.OXOBJECTID=" . $oDb->quote($sCountryId) . " limit 1 )" : '0';
+        $sCountrySql = $sCountryId ? "exists( select 1 from oxobject2payment as s1 where s1.oxpaymentid={$sTable}.OXID and s1.oxtype='oxcountry' and s1.OXOBJECTID=" . $oDb->quote($sCountryId) . ' limit 1 )' : '0';
         $sGroupSql = $sGroupIds ? "exists( select 1 from oxobject2group as s3 where s3.OXOBJECTID={$sTable}.OXID and s3.OXGROUPSID in ( {$sGroupIds} ) limit 1 )" : '0';
 
         $sQ .= "  order by {$sTable}.oxsort asc ) as $sTable where (
@@ -191,7 +191,7 @@ class PaymentList extends ListModel
             $sQ .= "and $sTable.oxfromamount <= :amount and $sTable.oxtoamount >= :amount";
         }
         $rs = $oDb->select($sQ, [
-            ':amount' => $dPrice
+            ':amount' => $dPrice,
         ]);
         if ($rs && $rs->count() > 0) {
             $oSaved = clone $this->getBaseObject();

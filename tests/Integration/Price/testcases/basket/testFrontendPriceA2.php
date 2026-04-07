@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto
  * Price view mode: brutto
@@ -9,9 +10,9 @@
  * Short description: Brutto-Brutto user group Price B,  option "Use normal article price instead of zero A, B, C price" is ON
  * Test case is moved from selenium test "testFrontendPriceA"
  */
-$aData = array(
-        'articles' => array(
-                0 => array(
+$aData = [
+        'articles' => [
+                0 => [
                         'oxid'            => 1002,
                         'oxprice'         => 50.00,
                         'oxpricea'        => 35,
@@ -19,62 +20,62 @@ $aData = array(
                         'oxpricec'        => 55,
                         'amount'          => 1,
                         'oxvat'           => 19,
-                        'oxtitle'     => "Wall Clock ROBOT",
-                        
+                        'oxtitle'     => 'Wall Clock ROBOT',
+
                         'oxunitname'               => 'kg',
                         'oxunitquantity'           => 2,
-                        'oxweight'        => 10
+                        'oxweight'        => 10,
                     //	'oxheight'        => 2,
-                ),
-        ),
-        'user' => array(
+                ],
+        ],
+        'user' => [
                 'oxid' => '_testUserA',
                 'oxactive' => 1,
                 'oxusername' => 'groupAUser',
-        ),
- 
-        'group' => array(
-                0 => array(
+        ],
+
+        'group' => [
+                0 => [
                         'oxid' => 'oxidpricea',
                         'oxactive' => 1,
                         'oxtitle' => 'Price A',
-                        'oxobject2group' => array(1002, '_testUserA' ),
-                ),
-                1 => array(
+                        'oxobject2group' => [1002, '_testUserA' ],
+                ],
+                1 => [
                         'oxid' => 'oxidpriceb',
                         'oxactive' => 1,
                         'oxtitle' => 'Price B',
-                        'oxobject2group' => array( '_testUserB' ),
-                ),
-                2 => array(
+                        'oxobject2group' => [ '_testUserB' ],
+                ],
+                2 => [
                         'oxid' => 'oxidpricec',
                         'oxactive' => 1,
                         'oxtitle' => 'Price C',
-                        'oxobject2group' => array( '_testUserC' ),
-                ),
-        ),
-        
-        'expected' => array(
-          'articles' => array(
-                1002 => array( '35,00', '35,00' ),
-            ),
-        
-        'totals' => array(
+                        'oxobject2group' => [ '_testUserC' ],
+                ],
+        ],
+
+        'expected' => [
+          'articles' => [
+                1002 => [ '35,00', '35,00' ],
+            ],
+
+        'totals' => [
                 'totalBrutto' => '35,00',
                 'totalNetto'  => '29,41',
-                'vats' => array(
+                'vats' => [
                       19 => '5,59',
-                ),
-                'grandTotal'  => '35,00'
-        ),
-        ),
-        'options' => array(
-                'config' => array(
+                ],
+                'grandTotal'  => '35,00',
+        ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => false,
                         'blShowNetPrice' => false,
                         'blOverrideZeroABCPrices' => true,
                         'dDefaultVAT' => 19,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

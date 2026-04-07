@@ -39,7 +39,7 @@ class VoucherSerieMain extends DynamicExportBaseController
      *
      * @var string
      */
-    public $sClassDo = "voucherSerie_generate";
+    public $sClassDo = 'voucherSerie_generate';
 
     /**
      * Voucher serie object
@@ -53,7 +53,7 @@ class VoucherSerieMain extends DynamicExportBaseController
      *
      * @var string
      */
-    protected $_sThisTemplate = "voucherserie_main.tpl";
+    protected $_sThisTemplate = 'voucherserie_main.tpl';
 
     /**
      * View id, use old class name for compatibility reasons.
@@ -72,12 +72,12 @@ class VoucherSerieMain extends DynamicExportBaseController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oVoucherSerie = oxNew(VoucherSerie::class);
             $oVoucherSerie->load($soxId);
-            $this->_aViewData["edit"] = $oVoucherSerie;
+            $this->_aViewData['edit'] = $oVoucherSerie;
 
             //Disable editing for derived items
             if ($oVoucherSerie->isDerived()) {
@@ -105,10 +105,10 @@ class VoucherSerieMain extends DynamicExportBaseController
         // Voucher Serie Processing
         $oVoucherSerie = oxNew(VoucherSerie::class);
         // if serie already exist use it
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oVoucherSerie->load($soxId);
         } else {
-            $aSerieParams["oxvoucherseries__oxid"] = null;
+            $aSerieParams['oxvoucherseries__oxid'] = null;
         }
 
         //Disable editing for derived items
@@ -116,7 +116,7 @@ class VoucherSerieMain extends DynamicExportBaseController
             return;
         }
 
-        $aSerieParams["oxvoucherseries__oxdiscount"] = abs((float) $aSerieParams["oxvoucherseries__oxdiscount"]);
+        $aSerieParams['oxvoucherseries__oxdiscount'] = abs((float) $aSerieParams['oxvoucherseries__oxdiscount']);
 
         $oVoucherSerie->assign($aSerieParams);
         $oVoucherSerie->save();
@@ -144,7 +144,6 @@ class VoucherSerieMain extends DynamicExportBaseController
     public function prepareExport()
     {
     }
-
 
     /**
      * Returns voucher serie object
@@ -183,14 +182,14 @@ class VoucherSerieMain extends DynamicExportBaseController
         $this->_aViewData['refresh'] = 0;
         $this->_aViewData['iStart'] = 0;
         $iEnd = $this->prepareExport();
-        Registry::getSession()->setVariable("iEnd", $iEnd);
+        Registry::getSession()->setVariable('iEnd', $iEnd);
         $this->_aViewData['iEnd'] = $iEnd;
 
         // saving export info
-        Registry::getSession()->setVariable("voucherid", Registry::getRequest()->getRequestEscapedParameter('voucherid'));
-        Registry::getSession()->setVariable("voucherAmount", abs((int) Registry::getRequest()->getRequestEscapedParameter('voucherAmount')));
-        Registry::getSession()->setVariable("randomVoucherNr", $bRandomNr);
-        Registry::getSession()->setVariable("voucherNr", $sVoucherNr);
+        Registry::getSession()->setVariable('voucherid', Registry::getRequest()->getRequestEscapedParameter('voucherid'));
+        Registry::getSession()->setVariable('voucherAmount', abs((int) Registry::getRequest()->getRequestEscapedParameter('voucherAmount')));
+        Registry::getSession()->setVariable('randomVoucherNr', $bRandomNr);
+        Registry::getSession()->setVariable('voucherNr', $sVoucherNr);
     }
 
     /**

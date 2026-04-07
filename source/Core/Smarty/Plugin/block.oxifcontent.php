@@ -40,8 +40,8 @@ function smarty_block_oxifcontent($params, $content, &$smarty, &$repeat)
 {
     $myConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
 
-    $sIdent  = isset($params['ident']) ? $params['ident'] : null;
-    $sOxid   = isset($params['oxid']) ? $params['oxid'] : null;
+    $sIdent = isset($params['ident']) ? $params['ident'] : null;
+    $sOxid = isset($params['oxid']) ? $params['oxid'] : null;
     $sAssign = isset($params['assign']) ? $params['assign'] : null;
     $sObject = isset($params['object']) ? $params['object'] : 'oCont';
 
@@ -55,7 +55,7 @@ function smarty_block_oxifcontent($params, $content, &$smarty, &$repeat)
             ) {
                 $oContent = $sOxid ? $aContentCache[$sOxid] : $aContentCache[$sIdent];
             } else {
-                $oContent = oxNew("oxContent");
+                $oContent = oxNew('oxContent');
                 $blLoaded = $sOxid ? $oContent->load($sOxid) : ($oContent->loadbyIdent($sIdent));
                 if ($blLoaded && $oContent->isActive()) {
                     $aContentCache[$oContent->getId()] = $aContentCache[$oContent->getLoadId()] = $oContent;

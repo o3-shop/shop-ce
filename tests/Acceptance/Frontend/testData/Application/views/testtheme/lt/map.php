@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$aMap = array(
+$aMap = [
 'ADD_RECOMM_ADDTOLIST'                                            => 'ADD_TO_LIST',
 'ADD_RECOMM_ALLLISTS'                                             => 'ALL_LISTMANIA',
 'ADD_RECOMM_SELECTLIST'                                           => 'SELECT_LISTMANIA_LIST',
@@ -863,4 +864,4 @@ $aMap = array(
 'WIDGET_TAGS_HEADER'                                              => 'TAGS',
 'WIDGET_TAGS_LINKMORE'                                            => 'MORE_2',
 'priceFrom'                                                       => 'PRICE_FROM',
-);
+];

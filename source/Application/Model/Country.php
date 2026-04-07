@@ -89,12 +89,12 @@ class Country extends MultiLanguageModel
         }
 
         $sCountryId = $this->getId();
-        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxstates", $this->getLanguage());
+        $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxstates', $this->getLanguage());
         $sQ = "select * from {$sViewName} where `oxcountryid` = :oxcountryid order by `oxtitle`  ";
         $this->_aStates = oxNew(ListModel::class);
-        $this->_aStates->init("oxstate");
+        $this->_aStates->init('oxstate');
         $this->_aStates->selectString($sQ, [
-            ':oxcountryid' => $sCountryId
+            ':oxcountryid' => $sCountryId,
         ]);
 
         return $this->_aStates;
@@ -112,8 +112,8 @@ class Country extends MultiLanguageModel
     {
         $oDb = DatabaseProvider::getDb();
 
-        return $oDb->getOne("select oxid from oxcountry where oxisoalpha2 = :oxisoalpha2", [
-            ':oxisoalpha2' => $sCode
+        return $oDb->getOne('select oxid from oxcountry where oxisoalpha2 = :oxisoalpha2', [
+            ':oxisoalpha2' => $sCode,
         ]);
     }
 

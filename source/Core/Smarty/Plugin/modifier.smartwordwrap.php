@@ -34,10 +34,9 @@
  */
 function smarty_modifier_smartwordwrap($string, $length = 80, $break = "\n", $cutrows = 0, $tollerance = 0, $etc = '...')
 {
-    $wraptag = "<wrap>";
-    $wrapchars = ["-"];
-    $afterwrapchars = ["-" . $wraptag];
-
+    $wraptag = '<wrap>';
+    $wrapchars = ['-'];
+    $afterwrapchars = ['-' . $wraptag];
 
     $string = trim($string);
 
@@ -46,10 +45,10 @@ function smarty_modifier_smartwordwrap($string, $length = 80, $break = "\n", $cu
     }
 
     //trying to wrap without cut
-    $str  = wordwrap($string, $length, $wraptag, false);
-    $arr  = explode($wraptag, $str);
+    $str = wordwrap($string, $length, $wraptag, false);
+    $arr = explode($wraptag, $str);
 
-    $alt  = [];
+    $alt = [];
 
     $ok = true;
     foreach ($arr as $row) {
@@ -73,8 +72,8 @@ function smarty_modifier_smartwordwrap($string, $length = 80, $break = "\n", $cu
 
     if (!$ok) {
         //trying to wrap with cut
-        $str  = wordwrap($string, $length, $wraptag, true);
-        $arr  = explode($wraptag, $str);
+        $str = wordwrap($string, $length, $wraptag, true);
+        $arr = explode($wraptag, $str);
     }
 
     if ($cutrows && count($arr) > $cutrows) {

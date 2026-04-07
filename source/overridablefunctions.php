@@ -44,9 +44,9 @@ if (!function_exists('redirectIfShopNotConfigured')) {
             ESHOP_CONFIG_FILE
         );
 
-        header("HTTP/1.1 302 Found");
-        header("Location: Setup/index.php");
-        header("Connection: close");
+        header('HTTP/1.1 302 Found');
+        header('Location: Setup/index.php');
+        header('Connection: close');
 
         die($message);
     }
@@ -77,7 +77,6 @@ if (!function_exists('error_404_handler')) {
 }
 
 if (!function_exists('isSearchEngineUrl')) {
-
     /**
      * Returns search engine url status
      *
@@ -128,7 +127,6 @@ if (!function_exists('stopProfile')) {
 }
 
 if (!function_exists('getLangTableIdx')) {
-
     /**
      * Returns language table index
      *
@@ -138,7 +136,7 @@ if (!function_exists('getLangTableIdx')) {
      */
     function getLangTableIdx($iLangId)
     {
-        $iLangPerTable = Registry::getConfig()->getConfigParam("iLangPerTable");
+        $iLangPerTable = Registry::getConfig()->getConfigParam('iLangPerTable');
         //#0002718 min language count per table 2
         $iLangPerTable = ($iLangPerTable > 1) ? $iLangPerTable : 8;
 
@@ -149,7 +147,6 @@ if (!function_exists('getLangTableIdx')) {
 }
 
 if (!function_exists('getLangTableName')) {
-
     /**
      * Returns language table name
      *
@@ -162,8 +159,8 @@ if (!function_exists('getLangTableName')) {
     {
         $iTableIdx = getLangTableIdx($iLangId);
         if ($iTableIdx && in_array($sTable, Registry::getLang()->getMultiLangTables())) {
-            $sLangTableSuffix = Registry::getConfig()->getConfigParam("sLangTableSuffix");
-            $sLangTableSuffix = $sLangTableSuffix ? $sLangTableSuffix : "_set";
+            $sLangTableSuffix = Registry::getConfig()->getConfigParam('sLangTableSuffix');
+            $sLangTableSuffix = $sLangTableSuffix ? $sLangTableSuffix : '_set';
 
             $sTable .= $sLangTableSuffix . $iTableIdx;
         }
@@ -173,7 +170,6 @@ if (!function_exists('getLangTableName')) {
 }
 
 if (!function_exists('getViewName')) {
-
     /**
      * Return the view name of the given table if a view exists, otherwise the table name itself
      *

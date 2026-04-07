@@ -19,7 +19,6 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-use OxidEsales\Eshop\Core\Exception\SystemComponentException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\UtilsObject;
 
@@ -59,7 +58,7 @@ function dumpVar($mVar, $blToFile = false)
     $myConfig = Registry::getConfig();
     if ($blToFile) {
         $out = var_export($mVar, true);
-        $f = fopen($myConfig->getConfigParam('sCompileDir') . "/vardump.txt", "a");
+        $f = fopen($myConfig->getConfigParam('sCompileDir') . '/vardump.txt', 'a');
         fwrite($f, $out);
         fclose($f);
     } else {
@@ -115,7 +114,7 @@ function oxNew($className)
 {
     startProfile('oxNew');
     $arguments = func_get_args();
-    $object = call_user_func_array([UtilsObject::getInstance(), "oxNew"], $arguments);
+    $object = call_user_func_array([UtilsObject::getInstance(), 'oxNew'], $arguments);
     stopProfile('oxNew');
 
     return $object;

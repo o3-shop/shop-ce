@@ -86,12 +86,12 @@ class News extends MultiLanguageModel
         if ($this->_oGroups == null && $sOxid = $this->getId()) {
             // user-groups
             $this->_oGroups = oxNew('oxlist', 'oxgroups');
-            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName("oxgroups", $this->getLanguage());
+            $sViewName = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups', $this->getLanguage());
             $sSelect = "select {$sViewName}.* from {$sViewName}, oxobject2group ";
-            $sSelect .= "where oxobject2group.oxobjectid = :oxobjectid ";
+            $sSelect .= 'where oxobject2group.oxobjectid = :oxobjectid ';
             $sSelect .= "and oxobject2group.oxgroupsid={$sViewName}.oxid ";
             $this->_oGroups->selectString($sSelect, [
-                ':oxobjectid' => $sOxid
+                ':oxobjectid' => $sOxid,
             ]);
         }
 
@@ -139,8 +139,8 @@ class News extends MultiLanguageModel
 
         if ($blDelete = parent::delete($sOxid)) {
             $oDb = DatabaseProvider::getDb();
-            $oDb->execute("delete from oxobject2group where oxobject2group.oxobjectid = :oxobjectid", [
-                ':oxobjectid' => $sOxid
+            $oDb->execute('delete from oxobject2group where oxobject2group.oxobjectid = :oxobjectid', [
+                ':oxobjectid' => $sOxid,
             ]);
         }
 
@@ -171,7 +171,8 @@ class News extends MultiLanguageModel
             $this->oxnews__oxdate = new Field(date('Y-m-d'));
         } else {
             $this->oxnews__oxdate = new Field(
-                Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value, true));
+                Registry::getUtilsDate()->formatDBDate($this->oxnews__oxdate->value, true)
+            );
         }
 
         return parent::_insert();

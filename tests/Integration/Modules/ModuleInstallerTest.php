@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
 use OxidEsales\Eshop\Core\Module\Module;
@@ -27,16 +29,16 @@ class ModuleInstallerTest extends BaseModuleTestCase
     /**
      * @var string The ID of the module we use in this test.
      */
-    const MODULE_ID = 'metadata_controllers_feature';
+    public const MODULE_ID = 'metadata_controllers_feature';
 
     /**
      * @var array The controllers as defined in the module we are using to check the wished behaviour.
      *
      * Keep this in sync with content of test module metadata_controllers_feature metadata.php!
      */
-    const MODULE_CONTROLLERS = [self::MODULE_ID => [
+    public const MODULE_CONTROLLERS = [self::MODULE_ID => [
         'metadata_controllers_feature-controllers-id-1' => 'metadata_controllers_feature-controllers-value-1',
-        'metadata_controllers_feature-controllers-id-2' => 'metadata_controllers_feature-controllers-value-2'
+        'metadata_controllers_feature-controllers-id-2' => 'metadata_controllers_feature-controllers-value-2',
     ]];
 
     /**
@@ -49,7 +51,8 @@ class ModuleInstallerTest extends BaseModuleTestCase
         $this->assertEquals(
             self::MODULE_CONTROLLERS,
             $this->fetchOxConfigModuleControllers(),
-            'While module activation were not added the expected controllers to the module controller map!');
+            'While module activation were not added the expected controllers to the module controller map!'
+        );
     }
 
     /**

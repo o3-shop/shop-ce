@@ -49,7 +49,6 @@ class DiscountList extends ListModel
      */
     protected $_blReload = true;
 
-
     /**
      * If any shops category has "skip discounts" status this parameter value will be true
      *
@@ -138,9 +137,8 @@ class DiscountList extends ListModel
         $oBaseObject = $this->getBaseObject();
 
         $sTable = $oBaseObject->getViewName();
-        $sQ = "select " . $oBaseObject->getSelectFields() . " from $sTable ";
-        $sQ .= "where " . $oBaseObject->getSqlActiveSnippet() . ' ';
-
+        $sQ = 'select ' . $oBaseObject->getSelectFields() . " from $sTable ";
+        $sQ .= 'where ' . $oBaseObject->getSqlActiveSnippet() . ' ';
 
         // defining initial filter parameters
         $sUserId = null;
@@ -166,8 +164,8 @@ class DiscountList extends ListModel
         $sGroupTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxgroups');
         $sCountryTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxcountry');
 
-        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxcountry' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sCountryId) . ")" : '0';
-        $sUserSql = $sUserId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxuser' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sUserId) . ")" : '0';
+        $sCountrySql = $sCountryId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxcountry' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sCountryId) . ')' : '0';
+        $sUserSql = $sUserId ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxuser' and oxobject2discount.OXOBJECTID=" . $oDb->quote($sUserId) . ')' : '0';
         $sGroupSql = $sGroupIds ? "EXISTS(select oxobject2discount.oxid from oxobject2discount where oxobject2discount.OXDISCOUNTID=$sTable.OXID and oxobject2discount.oxtype='oxgroups' and oxobject2discount.OXOBJECTID in ($sGroupIds) )" : '0';
 
         $sQ .= "and (

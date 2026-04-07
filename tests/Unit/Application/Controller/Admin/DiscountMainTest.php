@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Discount;
-
-use \Exception;
-use \oxField;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Discount_Main class
  */
 class DiscountMainTest extends \OxidTestCase
 {
-
     /**
      * Test tear down
      *
@@ -38,7 +38,7 @@ class DiscountMainTest extends \OxidTestCase
      */
     protected function tearDown(): void
     {
-        $this->cleanUpTable("oxdiscount");
+        $this->cleanUpTable('oxdiscount');
 
         parent::tearDown();
     }
@@ -50,8 +50,8 @@ class DiscountMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        oxTestModules::addFunction("oxdiscount", "isDerived", "{return true;}");
-        $this->setRequestParameter("oxid", "testId");
+        oxTestModules::addFunction('oxdiscount', 'isDerived', '{return true;}');
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Discount_Main');
@@ -68,14 +68,14 @@ class DiscountMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Discount_Main');
         $this->assertEquals('discount_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -87,18 +87,18 @@ class DiscountMainTest extends \OxidTestCase
     {
         // testing..
         oxTestModules::addFunction('oxdiscount', 'save', '{ throw new Exception( "save" ); }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('Discount_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Discount_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Discount_Main::save()');
 
             return;
         }
-        $this->fail("error in Discount_Main::save()");
+        $this->fail('error in Discount_Main::save()');
     }
 
     /**
@@ -110,18 +110,18 @@ class DiscountMainTest extends \OxidTestCase
     {
         // testing..
         oxTestModules::addFunction('oxdiscount', 'save', '{ throw new Exception( "save" ); }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('Discount_Main');
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Discount_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Discount_Main::save()');
 
             return;
         }
-        $this->fail("error in Discount_Main::save()");
+        $this->fail('error in Discount_Main::save()');
     }
 
     /**
@@ -136,30 +136,30 @@ class DiscountMainTest extends \OxidTestCase
         $sTitleEn = 'Bottle Cap EGO';
 
         $oTestDiscount = oxNew('oxDiscount');
-        $oTestDiscount->setId("_testDiscountId");
+        $oTestDiscount->setId('_testDiscountId');
         $oTestDiscount->oxdiscount__oxshopid = new oxField($this->getConfig()->getBaseShopId());
         $oTestDiscount->oxdiscount__oxactive = new oxField(1);
-        $oTestDiscount->oxdiscount__oxtitle = new oxField("Test");
+        $oTestDiscount->oxdiscount__oxtitle = new oxField('Test');
         $oTestDiscount->oxdiscount__oxamount = new oxField(1);
         $oTestDiscount->oxdiscount__oxamountto = new oxField(10);
         $oTestDiscount->oxdiscount__oxitmartid = new oxField($sId);
         $oTestDiscount->oxdiscount__oxprice = new oxField(1);
-        $oTestDiscount->oxdiscount__oxaddsumtype = new oxField("%");
+        $oTestDiscount->oxdiscount__oxaddsumtype = new oxField('%');
         $oTestDiscount->oxdiscount__oxaddsum = new oxField(10);
         $oTestDiscount->save();
 
-        $oView = $this->getProxyClass("Discount_Main");
+        $oView = $this->getProxyClass('Discount_Main');
 
-        $oView->setNonPublicVar("_iEditLang", 0);
-        $this->setRequestParameter("oxid", '-1');
-        $this->assertEquals(" -- ", $oView->getItemDiscountProductTitle());
+        $oView->setNonPublicVar('_iEditLang', 0);
+        $this->setRequestParameter('oxid', '-1');
+        $this->assertEquals(' -- ', $oView->getItemDiscountProductTitle());
 
-        $oView->setNonPublicVar("_iEditLang", 0);
-        $this->setRequestParameter("oxid", "_testDiscountId");
+        $oView->setNonPublicVar('_iEditLang', 0);
+        $this->setRequestParameter('oxid', '_testDiscountId');
         $this->assertEquals("$sId $sTitleDe", $oView->getItemDiscountProductTitle());
 
-        $oView->setNonPublicVar("_iEditLang", 1);
-        $this->setRequestParameter("oxid", "_testDiscountId");
+        $oView->setNonPublicVar('_iEditLang', 1);
+        $this->setRequestParameter('oxid', '_testDiscountId');
         $this->assertEquals("$sId $sTitleEn", $oView->getItemDiscountProductTitle());
     }
 }

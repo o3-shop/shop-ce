@@ -52,7 +52,7 @@ class CategoryOrder extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oCategory->load($soxId);
 
@@ -65,9 +65,9 @@ class CategoryOrder extends AdminDetailsController
             $oCategoryOrderAjax = oxNew(CategoryOrderAjax::class);
             $this->_aViewData['oxajax'] = $oCategoryOrderAjax->getColumns();
 
-            return "popups/category_order.tpl";
+            return 'popups/category_order.tpl';
         }
 
-        return "category_order.tpl";
+        return 'category_order.tpl';
     }
 }

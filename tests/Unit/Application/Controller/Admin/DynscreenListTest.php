@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 /**
@@ -24,7 +26,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class DynscreenListTest extends \OxidTestCase
 {
-
     /**
      * Dynscreen_List::Render() test case
      *
@@ -33,8 +34,8 @@ class DynscreenListTest extends \OxidTestCase
     public function testRender()
     {
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenList::class, array("_setupNavigation"));
-        $oView->expects($this->once())->method('_setupNavigation');
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenList::class, ['setupNavigation']);
+        $oView->expects($this->once())->method('setupNavigation');
         $this->assertEquals('dynscreen_list.tpl', $oView->render());
     }
 }

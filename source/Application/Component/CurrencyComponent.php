@@ -119,12 +119,12 @@ class CurrencyComponent extends BaseController
         $oParentView->setActCurrency($this->_oActCur);
 
         $oUrlUtils = Registry::getUtilsUrl();
-        $sUrl = $oUrlUtils->cleanUrl(Registry::getConfig()->getTopActiveView()->getLink(), ["cur"]);
+        $sUrl = $oUrlUtils->cleanUrl(Registry::getConfig()->getTopActiveView()->getLink(), ['cur']);
 
         if (Registry::getConfig()->getConfigParam('bl_perfLoadCurrency')) {
             reset($this->aCurrencies);
             foreach ($this->aCurrencies as $oItem) {
-                $oItem->link = $oUrlUtils->processUrl($sUrl, true, ["cur" => $oItem->id]);
+                $oItem->link = $oUrlUtils->processUrl($sUrl, true, ['cur' => $oItem->id]);
             }
         }
 

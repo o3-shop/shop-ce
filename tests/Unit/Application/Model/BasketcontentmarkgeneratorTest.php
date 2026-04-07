@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,59 +18,60 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxBasketContentMarkGenerator;
+use oxBasketContentMarkGenerator;
 
 class BasketcontentmarkgeneratorTest extends \OxidTestCase
 {
     public function providerGetExplanationMarks()
     {
-        $aResultDownloadable = array(
+        $aResultDownloadable = [
             'skippedDiscount' => null,
             'downloadable'    => '**',
-            'intangible'      => null
-        );
+            'intangible'      => null,
+        ];
 
-        $aResultIntangible = array(
+        $aResultIntangible = [
             'skippedDiscount' => null,
             'downloadable'    => null,
             'intangible'      => '**',
-        );
+        ];
 
-        $aResultSkippedDiscount = array(
+        $aResultSkippedDiscount = [
             'skippedDiscount' => '**',
             'downloadable'    => null,
             'intangible'      => null,
-        );
+        ];
 
-        $aResultDownloadableAndIntangible = array(
+        $aResultDownloadableAndIntangible = [
             'skippedDiscount' => null,
             'downloadable'    => '**',
-            'intangible'      => '***'
-        );
+            'intangible'      => '***',
+        ];
 
-        $aResultDownloadableIntangibleAndSkippedDiscount = array(
+        $aResultDownloadableIntangibleAndSkippedDiscount = [
             'skippedDiscount' => '**',
             'downloadable'    => '***',
-            'intangible'      => '****'
-        );
+            'intangible'      => '****',
+        ];
 
-        $ResultEmptyArray = array(
+        $ResultEmptyArray = [
             'skippedDiscount'   => null,
             'downloadable'      => null,
             'intangible'        => null,
-            'thisDoesNotExists' => null
-        );
+            'thisDoesNotExists' => null,
+        ];
 
-        return array(
-            array(false, true, false, $aResultDownloadable),
-            array(true, false, false, $aResultIntangible),
-            array(false, false, true, $aResultSkippedDiscount),
-            array(true, true, false, $aResultDownloadableAndIntangible),
-            array(true, true, true, $aResultDownloadableIntangibleAndSkippedDiscount),
-            array(false, false, false, $ResultEmptyArray),
-        );
+        return [
+            [false, true, false, $aResultDownloadable],
+            [true, false, false, $aResultIntangible],
+            [false, false, true, $aResultSkippedDiscount],
+            [true, true, false, $aResultDownloadableAndIntangible],
+            [true, true, true, $aResultDownloadableIntangibleAndSkippedDiscount],
+            [false, false, false, $ResultEmptyArray],
+        ];
     }
 
     /**
@@ -83,7 +85,7 @@ class BasketcontentmarkgeneratorTest extends \OxidTestCase
     public function testGetExplanationMarks($blIsIntangible, $blIsDownloadable, $blHasSkippedDiscounts, $aResult)
     {
         /** @var oxBasket $oBasket */
-        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, array('hasArticlesWithIntangibleAgreement', 'hasArticlesWithDownloadableAgreement', 'hasSkipedDiscount'));
+        $oBasket = $this->getMock(\OxidEsales\Eshop\Application\Model\Basket::class, ['hasArticlesWithIntangibleAgreement', 'hasArticlesWithDownloadableAgreement', 'hasSkipedDiscount']);
         $oBasket->expects($this->any())->method('hasArticlesWithIntangibleAgreement')->will($this->returnValue($blIsIntangible));
         $oBasket->expects($this->any())->method('hasArticlesWithDownloadableAgreement')->will($this->returnValue($blIsDownloadable));
         $oBasket->expects($this->any())->method('hasSkipedDiscount')->will($this->returnValue($blHasSkippedDiscounts));

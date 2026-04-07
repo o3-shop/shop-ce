@@ -22,6 +22,10 @@
 namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Exception;
+use OxidEsales\Eshop\Application\Model\Discount;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\Voucher as EshopVoucher;
+use OxidEsales\Eshop\Application\Model\VoucherSerie;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\ObjectException;
@@ -86,11 +90,11 @@ class Voucher extends BaseModel
 
             $sQ = "select {$sViewName}.* from {$sViewName}, {$sSeriesViewName} where
                         {$sSeriesViewName}.oxid = {$sViewName}.oxvoucherserieid and
-                        {$sViewName}.oxvouchernr = " . $oDb->quote($sVoucherNr) . " and ";
+                        {$sViewName}.oxvouchernr = " . $oDb->quote($sVoucherNr) . ' and ';
 
             if (is_array($aVouchers)) {
                 foreach ($aVouchers as $sVoucherId => $sSkipVoucherNr) {
-                    $sQ .= "{$sViewName}.oxid != " . $oDb->quote($sVoucherId) . " and ";
+                    $sQ .= "{$sViewName}.oxid != " . $oDb->quote($sVoucherId) . ' and ';
                 }
             }
             $sQ .= "( {$sViewName}.oxorderid is NULL || {$sViewName}.oxorderid = '' ) ";
@@ -102,7 +106,7 @@ class Voucher extends BaseModel
                 $sQ .= " and {$sViewName}.oxreserved < '{$iTime}' order by {$sViewName}.oxreserved asc ";
             }
 
-            $sQ .= " limit 1 FOR UPDATE";
+            $sQ .= ' limit 1 FOR UPDATE';
 
             if (!($oRet = $this->assignRecord($sQ))) {
                 $oEx = oxNew(VoucherException::class);
@@ -130,7 +134,7 @@ class Voucher extends BaseModel
             $this->oxvouchers__oxorderid->setValue($sOrderId);
             $this->oxvouchers__oxuserid->setValue($sUserId);
             $this->oxvouchers__oxdiscount->setValue($dDiscount);
-            $this->oxvouchers__oxdateused->setValue(date("Y-m-d", Registry::getUtilsDate()->getTime()));
+            $this->oxvouchers__oxdateused->setValue(date('Y-m-d', Registry::getUtilsDate()->getTime()));
             $this->save();
         }
     }
@@ -145,10 +149,10 @@ class Voucher extends BaseModel
 
         if ($sVoucherID) {
             $oDb = DatabaseProvider::getMaster();
-            $sQ = "update oxvouchers set oxreserved = :oxreserved where oxid = :oxid";
+            $sQ = 'update oxvouchers set oxreserved = :oxreserved where oxid = :oxid';
             $oDb->execute($sQ, [
                 ':oxreserved' => time(),
-                ':oxid' => $sVoucherID
+                ':oxid' => $sVoucherID,
             ]);
         }
     }
@@ -163,7 +167,7 @@ class Voucher extends BaseModel
 
         if ($sVoucherID) {
             $oDb = DatabaseProvider::getDb();
-            $sQ = "update oxvouchers set oxreserved = 0 where oxid = :oxid";
+            $sQ = 'update oxvouchers set oxreserved = 0 where oxid = :oxid';
             $oDb->execute($sQ, [':oxid' => $sVoucherID]);
         }
     }
@@ -182,11 +186,11 @@ class Voucher extends BaseModel
     public function getDiscountValue($dPrice)
     {
         if ($this->_isProductVoucher()) {
-            return $this->_getProductDiscountValue((double) $dPrice);
+            return $this->_getProductDiscountValue((float) $dPrice);
         } elseif ($this->_isCategoryVoucher()) {
-            return $this->_getCategoryDiscountValue((double) $dPrice);
+            return $this->_getCategoryDiscountValue((float) $dPrice);
         } else {
-            return $this->_getGenericDiscountValue((double) $dPrice);
+            return $this->_getGenericDiscountValue((float) $dPrice);
         }
     }
 
@@ -297,7 +301,7 @@ class Voucher extends BaseModel
             $oSeries = $this->getSerie();
             if (!$oSeries->oxvoucherseries__oxallowsameseries->value) {
                 foreach ($aVouchers as $voucherId => $voucherNr) {
-                    $oVoucher = oxNew(Voucher::class);
+                    $oVoucher = oxNew(EshopVoucher::class);
                     $oVoucher->load($voucherId);
                     if ($this->oxvouchers__oxvoucherserieid->value == $oVoucher->oxvouchers__oxvoucherserieid->value) {
                         $oEx = oxNew(VoucherException::class);
@@ -333,15 +337,15 @@ class Voucher extends BaseModel
             if (!$oSeries->oxvoucherseries__oxallowotherseries->value) {
                 // just search for vouchers with different series
                 $sSql = "select 1 from oxvouchers where oxvouchers.oxid in ($sIds) and ";
-                $sSql .= "oxvouchers.oxvoucherserieid != :notoxvoucherserieid";
+                $sSql .= 'oxvouchers.oxvoucherserieid != :notoxvoucherserieid';
             } else {
                 // search for vouchers with different series and those vouchers do not allow other series
-                $sSql = "select 1 from oxvouchers left join oxvoucherseries on oxvouchers.oxvoucherserieid=oxvoucherseries.oxid ";
+                $sSql = 'select 1 from oxvouchers left join oxvoucherseries on oxvouchers.oxvoucherserieid=oxvoucherseries.oxid ';
                 $sSql .= "where oxvouchers.oxid in ($sIds) and oxvouchers.oxvoucherserieid != :notoxvoucherserieid ";
-                $sSql .= "and not oxvoucherseries.oxallowotherseries";
+                $sSql .= 'and not oxvoucherseries.oxallowotherseries';
             }
             $blAvailable &= !$oDb->getOne($sSql, [
-                ':notoxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value
+                ':notoxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value,
             ]);
             if (!$blAvailable) {
                 $oEx = oxNew(VoucherException::class);
@@ -367,8 +371,8 @@ class Voucher extends BaseModel
         $iTime = time();
 
         // If date is not set will add day before and day after to check if voucher valid today.
-        $iTomorrow = mktime(0, 0, 0, date("m"), date("d") + 1, date("Y"));
-        $iYesterday = mktime(0, 0, 0, date("m"), date("d") - 1, date("Y"));
+        $iTomorrow = mktime(0, 0, 0, date('m'), date('d') + 1, date('Y'));
+        $iYesterday = mktime(0, 0, 0, date('m'), date('d') - 1, date('Y'));
 
         // Checks if beginning date is set, if not set $iFrom to yesterday, so it will be valid.
         $iFrom = ((int) $oSeries->oxvoucherseries__oxbegindate->value) ?
@@ -454,7 +458,7 @@ class Voucher extends BaseModel
 
             $params = [
                 ':oxuserid' => $oUser->oxuser__oxid->value,
-                ':oxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value
+                ':oxvoucherserieid' => $this->oxvouchers__oxvoucherserieid->value,
             ];
 
             if ($oDb->getOne($sSelect, $params)) {
@@ -550,11 +554,11 @@ class Voucher extends BaseModel
     {
         $oDb = DatabaseProvider::getDb();
         $oSeries = $this->getSerie();
-        $sSelect = "select 1 from oxobject2discount 
-            where oxdiscountid = :oxdiscountid and oxtype = :oxtype";
+        $sSelect = 'select 1 from oxobject2discount 
+            where oxdiscountid = :oxdiscountid and oxtype = :oxtype';
         $blOk = (bool) $oDb->getOne($sSelect, [
             ':oxdiscountid' => $oSeries->getId(),
-            ':oxtype' => 'oxarticles'
+            ':oxtype' => 'oxarticles',
         ]);
 
         return $blOk;
@@ -571,11 +575,11 @@ class Voucher extends BaseModel
     {
         $oDb = DatabaseProvider::getDb();
         $oSeries = $this->getSerie();
-        $sSelect = "select 1 from oxobject2discount 
-            where oxdiscountid = :oxdiscountid and oxtype = :oxtype";
+        $sSelect = 'select 1 from oxobject2discount 
+            where oxdiscountid = :oxdiscountid and oxtype = :oxtype';
         $blOk = (bool) $oDb->getOne($sSelect, [
             ':oxdiscountid' => $oSeries->getId(),
-            ':oxtype' => 'oxcategories'
+            ':oxtype' => 'oxcategories',
         ]);
 
         return $blOk;
@@ -744,7 +748,6 @@ class Voucher extends BaseModel
 
         return $dDiscount;
     }
-
 
     /**
      * Return discount value

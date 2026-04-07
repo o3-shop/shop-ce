@@ -225,7 +225,7 @@ class CategoriesComponent extends BaseController
     {
         return $this->loadManufacturerTree($sActManufacturer);
     }
-    
+
     /**
      * Manufacturer tree loader
      *

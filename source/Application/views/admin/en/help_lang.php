@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -34,7 +35,7 @@
  * <ul> and <li> for lists
  */
 
-$aLang =  [
+$aLang = [
 'charset'                                     => 'UTF-8',
 'HELP_SHOP_SYSTEM_OTHERCOUNTRYORDER'          => 'Here you can set if orders can be made in countries for which no shipping costs are defined:<ul><li>If the setting is checked, users can order: The users are notified that they are informed about the shipping costs manually.</li><li>If the setting is unchecked, users from countries for which no shipping costs are defined cannot order.</li></ul>',
 'HELP_SHOP_SYSTEM_DISABLENAVBARS'             => 'If this setting is checked, most navigation elements aren\'t shown during checkout. Thereby users aren\'t distracted unnecessarily during checkout.',

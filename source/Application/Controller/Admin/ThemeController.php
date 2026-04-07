@@ -41,6 +41,6 @@ class ThemeController extends AdminController
     {
         parent::render();
 
-        return "theme.tpl";
+        return 'theme.tpl';
     }
 }

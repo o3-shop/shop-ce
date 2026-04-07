@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -45,7 +46,7 @@ class TranslateLogicTest extends UnitTestCase
         return [
             ['FIRST_NAME', 0, 'Vorname'],
             ['FIRST_NAME', 1, 'First name'],
-            ['VAT', 1, 'VAT']
+            ['VAT', 1, 'VAT'],
         ];
     }
 
@@ -75,7 +76,7 @@ class TranslateLogicTest extends UnitTestCase
             ['MANUFACTURER_S', 0, 'Opel', '| Hersteller: Opel'],
             ['MANUFACTURER_S', 1, 'Opel', 'Manufacturer: Opel'],
             ['INVITE_TO_SHOP', 0, ['Admin', 'OXID Shop'], 'Eine Einladung von Admin OXID Shop zu besuchen.'],
-            ['INVITE_TO_SHOP', 1, ['Admin', 'OXID Shop'], 'An invitation from Admin to visit OXID Shop']
+            ['INVITE_TO_SHOP', 1, ['Admin', 'OXID Shop'], 'An invitation from Admin to visit OXID Shop'],
         ];
     }
 
@@ -133,6 +134,9 @@ class TranslateLogicTest extends UnitTestCase
         $oShop->save();
 
         $this->assertEquals($translation, $this->multiLangFilterLogic->multiLang($ident));
+
+        // Clear expected log warnings from translating missing translation keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**
@@ -162,6 +166,8 @@ class TranslateLogicTest extends UnitTestCase
         $this->setAdminMode(true);
 
         $this->assertEquals($translation, $this->multiLangFilterLogic->multiLang($ident));
-    }
 
+        // Clear expected log warnings from translating missing translation keys
+        $this->exceptionLogHelper->clearExceptionLogFile();
+    }
 }

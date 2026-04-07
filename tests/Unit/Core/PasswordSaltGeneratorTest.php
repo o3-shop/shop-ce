@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,18 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxPasswordSaltGenerator;
+use oxPasswordSaltGenerator;
 
 class PasswordSaltGeneratorTest extends \OxidTestCase
 {
     public function providerOpenSslRandomBytesGeneratorAvailability()
     {
-        return array(
-            array(true),
-            array(false)
-        );
+        return [
+            [true],
+            [false],
+        ];
     }
 
     /**
@@ -48,7 +50,7 @@ class PasswordSaltGeneratorTest extends \OxidTestCase
     {
         $oOpenSSLFunctionalityChecker = $this->_getOpenSSLFunctionalityChecker($blIsOpenSslRandomBytesGeneratorAvailable);
         $oGenerator = new oxPasswordSaltGenerator($oOpenSSLFunctionalityChecker);
-        $aSalts = array();
+        $aSalts = [];
 
         for ($i = 1; $i <= 100; $i++) {
             $aSalts[] = $oGenerator->generate();
@@ -72,10 +74,9 @@ class PasswordSaltGeneratorTest extends \OxidTestCase
             $oOpenSSLFunctionalityChecker = oxNew('oxOpenSSLFunctionalityChecker');
         } else {
             /** @var oxOpenSSLFunctionalityChecker $oOpenSSLFunctionalityChecker */
-            $oOpenSSLFunctionalityChecker = $this->getMock(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker::class, array('isOpenSslRandomBytesGeneratorAvailable'));
+            $oOpenSSLFunctionalityChecker = $this->getMock(\OxidEsales\Eshop\Core\OpenSSLFunctionalityChecker::class, ['isOpenSslRandomBytesGeneratorAvailable']);
             $oOpenSSLFunctionalityChecker->expects($this->any())->method('isOpenSslRandomBytesGeneratorAvailable')->will($this->returnValue($blIsOpenSslRandomBytesGeneratorAvailable));
         }
-
 
         return $oOpenSSLFunctionalityChecker;
     }

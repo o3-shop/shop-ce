@@ -47,7 +47,7 @@ final class PrivateSalesBasketCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'amount' => 1,
-            'totalPrice' => '50,00 €'
+            'totalPrice' => '50,00 €',
         ];
 
         $basketPage->seeBasketContains([$productData], '50,00 €');
@@ -104,7 +104,7 @@ final class PrivateSalesBasketCest
             'id' => '1000',
             'title' => 'Test product 0 [EN] šÄßüл',
             'description' => 'Test product 0 short desc [EN] šÄßüл',
-            'price' => '50,00 € *'
+            'price' => '50,00 € *',
         ];
 
         $detailsPage = $productNavigation->openProductDetailsPage($productData['id']);

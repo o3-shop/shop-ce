@@ -23,8 +23,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Migrations;
 
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
 
 /**
  * Test migration to create data which could be used to check if Migrations actually works.

@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Codeception;
 
 use Codeception\Actor;
-use OxidEsales\Codeception\Admin\AdminLoginPage;
 use Codeception\Util\Fixtures;
+use OxidEsales\Codeception\Admin\AdminLoginPage;
 use OxidEsales\Codeception\Admin\AdminPanel;
 
 /**

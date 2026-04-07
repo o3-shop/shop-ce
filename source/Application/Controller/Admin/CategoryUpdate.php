@@ -35,7 +35,7 @@ class CategoryUpdate extends AdminController
      *
      * @var string
      */
-    protected $_sThisTemplate = "category_update.tpl";
+    protected $_sThisTemplate = 'category_update.tpl';
 
     /**
      * Category list object

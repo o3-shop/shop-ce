@@ -55,9 +55,9 @@ class ModuleMain extends AdminDetailsController
             if ($oModule->load($sModuleId)) {
                 $iLang = Registry::getLang()->getTplLanguage();
 
-                $this->_aViewData["oModule"] = $oModule;
-                $this->_aViewData["sModuleName"] = basename($oModule->getInfo("title", $iLang));
-                $this->_aViewData["sModuleId"] = str_replace("/", "_", $oModule->getModulePath());
+                $this->_aViewData['oModule'] = $oModule;
+                $this->_aViewData['sModuleName'] = basename($oModule->getInfo('title', $iLang));
+                $this->_aViewData['sModuleId'] = str_replace('/', '_', $oModule->getModulePath());
             } else {
                 Registry::getUtilsView()->addErrorToDisplay(new StandardException('EXCEPTION_MODULE_NOT_LOADED'));
             }

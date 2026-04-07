@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax;
 use OxidEsales\Eshop\Application\Model\Object2Category;
 use OxidEsales\Eshop\Core\DatabaseProvider;
@@ -28,7 +29,6 @@ use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Registry;
-use Exception;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
 
 /**
@@ -49,7 +49,7 @@ class CategoryMainAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -109,7 +109,7 @@ class CategoryMainAjax extends ListComponentAjax
             if ($sSynchOxid && $sOxid != $sSynchOxid) {
                 $sSubSelect = ' and ' . $sArticleTable . '.oxid not in ( ';
                 $sSubSelect .= "select $sArticleTable.oxid from $sO2CView left join $sArticleTable ";
-                $sSubSelect .= "on $sJoin where $sO2CView.oxcatnid =  " . $oDb->quote($sSynchOxid) . " ";
+                $sSubSelect .= "on $sJoin where $sO2CView.oxcatnid =  " . $oDb->quote($sSynchOxid) . ' ';
                 $sSubSelect .= 'and ' . $sArticleTable . '.oxid is not null ) ';
             }
 
@@ -182,11 +182,11 @@ class CategoryMainAjax extends ListComponentAjax
                 $sO2CView = $this->getViewName('oxobject2category');
 
                 $oNew = oxNew(Object2Category::class);
-                $sProdIds = "";
+                $sProdIds = '';
                 foreach ($aArticles as $sAdd) {
                     // check, if it's already in, then don't add it again
                     $sSelect = "select 1 from $sO2CView as oxobject2category where oxobject2category.oxcatnid = :oxcatnid "
-                               . " and oxobject2category.oxobjectid = :oxobjectid";
+                               . ' and oxobject2category.oxobjectid = :oxobjectid';
                     // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
                     if ($database->getOne($sSelect, [':oxcatnid' => $sCategoryID, ':oxobjectid' => $sAdd])) {
                         continue;
@@ -200,7 +200,7 @@ class CategoryMainAjax extends ListComponentAjax
                     $oNew->save();
 
                     if ($sProdIds) {
-                        $sProdIds .= ",";
+                        $sProdIds .= ',';
                     }
                     $sProdIds .= $database->quote($sAdd);
                 }
@@ -209,7 +209,7 @@ class CategoryMainAjax extends ListComponentAjax
                 $this->updateOxTime($sProdIds);
 
                 $this->resetArtSeoUrl($aArticles);
-                $this->resetCounter("catArticle", $sCategoryID);
+                $this->resetCounter('catArticle', $sCategoryID);
             }
         } catch (Exception $exception) {
             DatabaseProvider::getDb()->rollbackTransaction();
@@ -300,7 +300,7 @@ class CategoryMainAjax extends ListComponentAjax
         }
 
         $this->resetArtSeoUrl($aArticles, $sCategoryID);
-        $this->resetCounter("catArticle", $sCategoryID);
+        $this->resetCounter('catArticle', $sCategoryID);
 
         //notify services
         $relation = oxNew(Object2Category::class);
@@ -319,11 +319,10 @@ class CategoryMainAjax extends ListComponentAjax
     protected function removeCategoryArticles($articles, $categoryID)
     {
         $db = DatabaseProvider::getDb();
-        $prodIds = implode(", ", DatabaseProvider::getDb()->quoteArray($articles));
+        $prodIds = implode(', ', DatabaseProvider::getDb()->quoteArray($articles));
 
-        $delete = "delete from oxobject2category ";
+        $delete = 'delete from oxobject2category ';
         $where = $this->getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds);
-
 
         $sQ = $delete . $where;
         $db->execute($sQ);
@@ -344,11 +343,11 @@ class CategoryMainAjax extends ListComponentAjax
     protected function getRemoveCategoryArticlesQueryFilter($categoryID, $prodIds)
     {
         $db = DatabaseProvider::getDb();
-        $where = "where oxcatnid=" . $db->quote($categoryID);
+        $where = 'where oxcatnid=' . $db->quote($categoryID);
 
         $whereProductIdIn = " oxobjectid in ( {$prodIds} )";
         if (!Registry::getConfig()->getConfigParam('blVariantsSelection')) {
-            $whereProductIdIn = "( " . $whereProductIdIn . " OR oxobjectid in (
+            $whereProductIdIn = '( ' . $whereProductIdIn . " OR oxobjectid in (
                                         select oxid from oxarticles where oxparentid in ({$prodIds})
                                         )
             )";

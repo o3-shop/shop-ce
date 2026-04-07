@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -20,9 +22,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Console;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Console\ExecutorInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\DIContainer\ContainerBuilder;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContext;
-use OxidEsales\EshopCommunity\Internal\Framework\Console\ExecutorInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -44,14 +46,14 @@ class ExecutorTest extends TestCase
     {
         $output = $this->executeCommand('oe:tests:test-command');
 
-        $this->assertSame('Command have been executed!'.PHP_EOL, $this->getOutputFromStream($output));
+        $this->assertSame('Command have been executed!' . PHP_EOL, $this->getOutputFromStream($output));
     }
 
     public function testCommandWithChangedNameExecution()
     {
         $output = $this->executeCommand('oe:tests:test-command-changed-name');
 
-        $this->assertSame('Command have been executed!'.PHP_EOL, $this->getOutputFromStream($output));
+        $this->assertSame('Command have been executed!' . PHP_EOL, $this->getOutputFromStream($output));
     }
 
     /**

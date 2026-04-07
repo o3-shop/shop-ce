@@ -47,12 +47,12 @@ class AttributeMain extends AdminDetailsController
         parent::render();
 
         $oAttr = oxNew(Attribute::class);
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         // copy this tree for our article choose
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // generating category tree for select list
-            $this->createCategoryTree("artcattree", $soxId);
+            $this->createCategoryTree('artcattree', $soxId);
             // load object
             $oAttr->loadInLang($this->_iEditLang, $soxId);
 
@@ -70,27 +70,27 @@ class AttributeMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        $this->_aViewData["edit"] = $oAttr;
+        $this->_aViewData['edit'] = $oAttr;
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oAttributeMainAjax = oxNew(AttributeMainAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeMainAjax->getColumns();
 
-            return "popups/attribute_main.tpl";
+            return 'popups/attribute_main.tpl';
         }
 
-        return "attribute_main.tpl";
+        return 'attribute_main.tpl';
     }
 
     /**
@@ -107,7 +107,7 @@ class AttributeMain extends AdminDetailsController
 
         $oAttr = oxNew(Attribute::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oAttr->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxattribute__oxid'] = null;
@@ -143,7 +143,7 @@ class AttributeMain extends AdminDetailsController
 
         $oAttr = oxNew(Attribute::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oAttr->loadInLang($this->_iEditLang, $soxId);
         } else {
             $aParams['oxattribute__oxid'] = null;

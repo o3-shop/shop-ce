@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -74,7 +75,6 @@ class ExceptionHandlerLoggerErrorTest extends \OxidEsales\TestingLibrary\UnitTes
         // container factory
         $this->instanceProperty->setValue(new \stdClass());
 
-
         // write our own log file
         $this->configInstance = Registry::getConfig();
 
@@ -82,7 +82,6 @@ class ExceptionHandlerLoggerErrorTest extends \OxidEsales\TestingLibrary\UnitTes
         $config = $this->getMockBuilder(Config::class)->getMock();
         $config->method('getLogsDir')->willReturn(__DIR__);
         Registry::set(Config::class, $config);
-
     }
 
     public function tearDown(): void
@@ -124,5 +123,4 @@ class ExceptionHandlerLoggerErrorTest extends \OxidEsales\TestingLibrary\UnitTes
         $log = file_get_contents($this->logFileName);
         $this->assertTrue(strpos($log, 'My test exception') !== false);
     }
-
 }

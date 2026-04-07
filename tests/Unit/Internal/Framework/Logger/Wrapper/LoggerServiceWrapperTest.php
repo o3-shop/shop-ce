@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -29,7 +31,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Logger\Wrapper\LoggerWrapper;
  */
 class LoggerServiceWrapperTest extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * @dataProvider dataProviderPsrInterfaceMethods
      *
@@ -37,7 +38,7 @@ class LoggerServiceWrapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testAllInterfaceMethodsExceptLogAreHandled($methodName)
     {
-        $messageToLog = "The message is {myMessage}";
+        $messageToLog = 'The message is {myMessage}';
         $contextToLog = ['myMessage' => 'Hello World!'];
         $loggerMock = $this->getLoggerMock();
         $loggerMock->expects($this->once())
@@ -71,7 +72,7 @@ class LoggerServiceWrapperTest extends \PHPUnit\Framework\TestCase
 
     public function testLog()
     {
-        $messageToLog = "The message is {myMessage}";
+        $messageToLog = 'The message is {myMessage}';
         $contextToLog = ['myMessage' => 'Hello World!'];
         $levelToLog = 'aLevelToLog';
         $loggerMock = $this->getLoggerMock();
@@ -105,7 +106,7 @@ class LoggerServiceWrapperTest extends \PHPUnit\Framework\TestCase
                     'notice',
                     'info',
                     'debug',
-                    'log'
+                    'log',
                 ]
             )
             ->getMock();

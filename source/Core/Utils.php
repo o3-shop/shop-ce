@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
-use stdClass;
 use Exception;
+use stdClass;
 
 /**
  * General utils class
@@ -43,21 +43,21 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      *
      * @var string
      */
-    protected $_sPermanentCachePattern = "/c_fieldnames_|c_tbdsc_|_allfields_/";
+    protected $_sPermanentCachePattern = '/c_fieldnames_|c_tbdsc_|_allfields_/';
 
     /**
      * Pattern used to filter needed to remove language cache files.
      *
      * @var string
      */
-    protected $_sLanguageCachePattern = "/c_langcache_/i";
+    protected $_sLanguageCachePattern = '/c_langcache_/i';
 
     /**
      * Pattern used to filter needed to remove admin menu cache files.
      *
      * @var string
      */
-    protected $_sMenuCachePattern = "/c_menu_/i";
+    protected $_sMenuCachePattern = '/c_menu_/i';
 
     /**
      * File cache contents.
@@ -103,7 +103,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function getArrFldName($sName)
     {
-        return str_replace(".", "__", $sName);
+        return str_replace('.', '__', $sName);
     }
 
     /**
@@ -139,13 +139,13 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function assignValuesToText($aIn)
     {
-        $sRet = "";
+        $sRet = '';
         reset($aIn);
         foreach ($aIn as $sKey => $sVal) {
             $sRet .= $sKey;
-            $sRet .= "__";
+            $sRet .= '__';
             $sRet .= $sVal;
-            $sRet .= "@@";
+            $sRet .= '@@';
         }
 
         return $sRet;
@@ -161,15 +161,15 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     public function currency2Float($sValue)
     {
         $fRet = $sValue;
-        $iPos = strrpos($sValue, ".");
+        $iPos = strrpos($sValue, '.');
         if ($iPos && ((strlen($sValue) - 1 - $iPos) < 2 + 1)) {
             // replace decimal with ","
-            $fRet = substr_replace($fRet, ",", $iPos, 1);
+            $fRet = substr_replace($fRet, ',', $iPos, 1);
         }
         // remove thousands
-        $fRet = str_replace([" ", "."], "", $fRet);
+        $fRet = str_replace([' ', '.'], '', $fRet);
 
-        return (float) str_replace(",", ".", $fRet);
+        return (float) str_replace(',', '.', $fRet);
     }
 
     /**
@@ -181,24 +181,24 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function string2Float($sValue)
     {
-        $fRet = str_replace(" ", "", $sValue);
-        $iCommaPos = strpos($fRet, ",");
-        $iDotPos = strpos($fRet, ".");
+        $fRet = str_replace(' ', '', $sValue);
+        $iCommaPos = strpos($fRet, ',');
+        $iDotPos = strpos($fRet, '.');
         if (!$iDotPos xor !$iCommaPos) {
-            if (substr_count($fRet, ",") > 1 || substr_count($fRet, ".") > 1) {
-                $fRet = str_replace([",", "."], "", $fRet);
+            if (substr_count($fRet, ',') > 1 || substr_count($fRet, '.') > 1) {
+                $fRet = str_replace([',', '.'], '', $fRet);
             } else {
-                $fRet = str_replace(",", ".", $fRet);
+                $fRet = str_replace(',', '.', $fRet);
             }
         } else {
             if ($iDotPos < $iCommaPos) {
-                $fRet = str_replace(".", "", $fRet);
-                $fRet = str_replace(",", ".", $fRet);
+                $fRet = str_replace('.', '', $fRet);
+                $fRet = str_replace(',', '.', $fRet);
             }
         }
 
         // remove thousands
-        return (float) str_replace([" ", ","], "", $fRet);
+        return (float) str_replace([' ', ','], '', $fRet);
     }
 
     /**
@@ -232,7 +232,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
             return;
         }
-        startProfile("isSearchEngine");
+        startProfile('isSearchEngine');
 
         $myConfig = $this->getConfig();
         $blIsSe = false;
@@ -257,7 +257,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
         $this->_blIsSe = $blIsSe;
 
-        stopProfile("isSearchEngine");
+        stopProfile('isSearchEngine');
     }
 
     /**
@@ -275,7 +275,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
             //checking for previous profiles
             $sPrevProfile = \OxidEsales\Eshop\Core\Registry::getUtilsServer()->getOxCookie('oxidadminprofile');
             if (isset($sPrevProfile)) {
-                $aPrevProfile = @explode("@", trim($sPrevProfile));
+                $aPrevProfile = @explode('@', trim($sPrevProfile));
             }
 
             //array to store profiles
@@ -289,7 +289,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
                 $aProfiles[$aPrevProfile[0]][2] = 1;
             }
 
-            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("aAdminProfiles", $aProfiles);
+            \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('aAdminProfiles', $aProfiles);
 
             return $aProfiles;
         }
@@ -324,7 +324,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         // if < 5.3.x this is a workaround for #36008 bug in php - incorrect round() & number_format() result (R)
         static $dprez = null;
         if (!$dprez) {
-            $prez = @ini_get("precision");
+            $prez = @ini_get('precision');
             if (!$prez || $prez > 12) {
                 $prez = 12;
             }
@@ -426,7 +426,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         //only simple arrays are supported
         if (is_array($mContents) && ($sCachePath = $this->getCacheFilePath($sKey, false, 'php'))) {
             // setting meta
-            $this->setCacheMeta($sKey, ["serialize" => false, "cachepath" => $sCachePath]);
+            $this->setCacheMeta($sKey, ['serialize' => false, 'cachepath' => $sCachePath]);
 
             // caching..
             $this->toFileCache($sKey, $mContents);
@@ -443,7 +443,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     public function fromPhpFileCache($sKey)
     {
         // setting meta
-        $this->setCacheMeta($sKey, ["include" => true, "cachepath" => $this->getCacheFilePath($sKey, false, 'php')]);
+        $this->setCacheMeta($sKey, ['include' => true, 'cachepath' => $this->getCacheFilePath($sKey, false, 'php')]);
 
         return $this->fromFileCache($sKey);
     }
@@ -493,7 +493,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         $this->_aFileCacheContents[$sKey] = $aCacheData;
 
         // looking for cache meta
-        $sCachePath = isset($aMeta["cachepath"]) ? $aMeta["cachepath"] : $this->getCacheFilePath($sKey);
+        $sCachePath = isset($aMeta['cachepath']) ? $aMeta['cachepath'] : $this->getCacheFilePath($sKey);
 
         return (bool) $this->_lockFile($sCachePath, $sKey);
     }
@@ -509,13 +509,13 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         if (!array_key_exists($sKey, $this->_aFileCacheContents)) {
             $aMeta = $this->getCacheMeta($sKey);
-            $sCachePath = isset($aMeta["cachepath"]) ? $aMeta["cachepath"] : $this->getCacheFilePath($sKey);
+            $sCachePath = isset($aMeta['cachepath']) ? $aMeta['cachepath'] : $this->getCacheFilePath($sKey);
 
             clearstatcache();
             if (is_readable($sCachePath)) {
                 $this->_lockFile($sCachePath, $sKey, LOCK_SH);
 
-                $blInclude = isset($aMeta["include"]) ? $aMeta["include"] : false;
+                $blInclude = isset($aMeta['include']) ? $aMeta['include'] : false;
                 $sRes = $blInclude ? $this->_includeFile($sCachePath) : $this->_readFile($sCachePath);
 
                 if (isset($sRes['ttl']) && $sRes['ttl'] != 0) {
@@ -581,12 +581,12 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         // looking for cache meta
         $aCacheMeta = $this->getCacheMeta($sKey);
-        $blSerialize = isset($aCacheMeta["serialize"]) ? $aCacheMeta["serialize"] : true;
+        $blSerialize = isset($aCacheMeta['serialize']) ? $aCacheMeta['serialize'] : true;
 
         if ($blSerialize) {
             $mContents = serialize($mContents);
         } else {
-            $mContents = "<?php\n//automatically generated file\n//" . date("Y-m-d H:i:s") . "\n\n\$_aCacheContents = " . var_export($mContents, true) . "\n?>";
+            $mContents = "<?php\n//automatically generated file\n//" . date('Y-m-d H:i:s') . "\n\n\$_aCacheContents = " . var_export($mContents, true) . "\n?>";
         }
 
         return $mContents;
@@ -599,7 +599,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     public function commitFileCache()
     {
         if (!empty($this->_aLockedFileHandles[LOCK_EX])) {
-            startProfile("!__SAVING CACHE__! (warning)");
+            startProfile('!__SAVING CACHE__! (warning)');
             foreach ($this->_aLockedFileHandles[LOCK_EX] as $sKey => $rHandle) {
                 if ($rHandle !== false && isset($this->_aFileCacheContents[$sKey])) {
                     // #0002931A truncate file once more before writing
@@ -613,7 +613,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
                 }
             }
 
-            stopProfile("!__SAVING CACHE__! (warning)");
+            stopProfile('!__SAVING CACHE__! (warning)');
 
             //empty buffer
             $this->_aFileCacheContents = [];
@@ -635,7 +635,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         $rHandle = isset($this->_aLockedFileHandles[$iLockMode][$sIdent]) ? $this->_aLockedFileHandles[$iLockMode][$sIdent] : null;
         if ($rHandle === null) {
             $blLocked = false;
-            $rHandle = @fopen($sFilePath, "a+");
+            $rHandle = @fopen($sFilePath, 'a+');
 
             if ($rHandle !== false) {
                 if (flock($rHandle, $iLockMode | LOCK_NB)) {
@@ -664,7 +664,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
                 // start a blank file to inform other processes we are dealing with it.
                 if (!(file_exists($sFilePath) && !filesize($sFilePath) && abs(time() - filectime($sFilePath) < 40))) {
-                    $rHandle = @fopen($sFilePath, "w");
+                    $rHandle = @fopen($sFilePath, 'w');
                 }
             }
 
@@ -793,9 +793,9 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         if (file_exists($sLocal) && filemtime($sLocal) && filemtime($sLocal) > time() - 86400) {
             return $sLocal;
         }
-        $hRemote = @fopen($sRemote, "rb");
+        $hRemote = @fopen($sRemote, 'rb');
         $blSuccess = false;
-        if (is_resource($hRemote) && $hLocal = @fopen($sLocal, "wb")) {
+        if (is_resource($hRemote) && $hLocal = @fopen($sLocal, 'wb')) {
             stream_copy_to_stream($hRemote, $hLocal);
             fclose($hRemote);
             fclose($hLocal);
@@ -803,18 +803,18 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         } else {
             // try via fsockopen
             $aUrl = @parse_url($sRemote);
-            if (!empty($aUrl["host"])) {
-                $sPath = $aUrl["path"];
+            if (!empty($aUrl['host'])) {
+                $sPath = $aUrl['path'];
                 if (empty($sPath)) {
-                    $sPath = "/";
+                    $sPath = '/';
                 }
-                $sHost = $aUrl["host"];
+                $sHost = $aUrl['host'];
 
                 $hSocket = @fsockopen($sHost, 80, $iErrorNumber, $iErrStr, 5);
                 if ($hSocket) {
-                    fputs($hSocket, "GET " . $sPath . " HTTP/1.0\r\nHost: $sHost\r\n\r\n");
+                    fputs($hSocket, 'GET ' . $sPath . " HTTP/1.0\r\nHost: $sHost\r\n\r\n");
                     $headers = stream_get_line($hSocket, 4096, "\r\n\r\n");
-                    if (($hLocal = @fopen($sLocal, "wb")) !== false) {
+                    if (($hLocal = @fopen($sLocal, 'wb')) !== false) {
                         rewind($hLocal);
                         // does not copy all the data
                         // stream_copy_to_stream($hSocket, $hLocal);
@@ -849,7 +849,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
             $sQ = "SELECT 1 FROM $sTable WHERE MD5( CONCAT( :adminsid, {$sTable}.oxid, {$sTable}.oxpassword, {$sTable}.oxrights ) ) = :previd";
             $blCan = (bool) \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getOne($sQ, [
                 ':adminsid' => $sAdminSid,
-                ':previd'   => $sPrevId
+                ':previd'   => $sPrevId,
             ]);
         }
 
@@ -880,12 +880,12 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
         $blIsAuth = false;
 
-        $sUserID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("auth");
+        $sUserID = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('auth');
 
         // deleting admin marker
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("malladmin", 0);
-        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("blIsAdmin", 0);
-        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable("blIsAdmin");
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('malladmin', 0);
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('blIsAdmin', 0);
+        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable('blIsAdmin');
         $myConfig->setConfigParam('blMallAdmin', false);
         //#1552T
         $myConfig->setConfigParam('blAllowInheritedEdit', false);
@@ -894,19 +894,19 @@ class Utils extends \OxidEsales\Eshop\Core\Base
             // escaping
             $sRights = $this->fetchRightsForUser($sUserID);
 
-            if ($sRights != "user") {
+            if ($sRights != 'user') {
                 // malladmin ?
-                if ($sRights == "malladmin") {
-                    \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("malladmin", 1);
+                if ($sRights == 'malladmin') {
+                    \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('malladmin', 1);
                     $myConfig->setConfigParam('blMallAdmin', true);
 
                     //#1552T
                     //So far this blAllowSharedEdit is Equal to blMallAdmin but in future to be solved over rights and roles
                     $myConfig->setConfigParam('blAllowSharedEdit', true);
 
-                    $sShop = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable("actshop");
+                    $sShop = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('actshop');
                     if (!isset($sShop)) {
-                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("actshop", $myConfig->getBaseShopId());
+                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('actshop', $myConfig->getBaseShopId());
                     }
                     $blIsAuth = true;
                 } else {
@@ -915,9 +915,9 @@ class Utils extends \OxidEsales\Eshop\Core\Base
                     if (isset($sShopID) && $sShopID) {
                         // success, this shop exists
 
-                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("actshop", $sRights);
-                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("currentadminshop", $sRights);
-                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("shp", $sRights);
+                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('actshop', $sRights);
+                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('currentadminshop', $sRights);
+                        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('shp', $sRights);
 
                         // check if this subshop admin is evil.
                         if ('chshp' == \OxidEsales\Eshop\Core\Registry::getConfig()->getRequestParameter('fnc')) {
@@ -939,7 +939,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
                     }
                 }
                 // marking user as admin
-                \OxidEsales\Eshop\Core\Registry::getSession()->setVariable("blIsAdmin", 1);
+                \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('blIsAdmin', 1);
             }
         }
 
@@ -957,8 +957,8 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        return $database->getOne("SELECT oxrights FROM oxuser WHERE oxid = :oxid ", [
-            ':oxid' => $userOxId
+        return $database->getOne('SELECT oxrights FROM oxuser WHERE oxid = :oxid ', [
+            ':oxid' => $userOxId,
         ]);
     }
 
@@ -973,8 +973,8 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         $database = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
 
-        return $database->getOne("SELECT oxid FROM oxshops WHERE oxid = :oxid", [
-            ':oxid' => $oxId
+        return $database->getOne('SELECT oxid FROM oxshops WHERE oxid = :oxid', [
+            ':oxid' => $oxId,
         ]);
     }
 
@@ -1036,7 +1036,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
         $oHeader = oxNew(\OxidEsales\Eshop\Core\Header::class);
         $oHeader->setHeader($sHeaderCode);
         $oHeader->setHeader("Location: $sUrl");
-        $oHeader->setHeader("Connection: close");
+        $oHeader->setHeader('Connection: close');
         $oHeader->sendHeader();
     }
 
@@ -1082,18 +1082,18 @@ class Utils extends \OxidEsales\Eshop\Core\Base
             $sUrl = $this->_addUrlParameters($sUrl, ['redirected' => 1]);
         }
 
-        $sUrl = str_ireplace("&amp;", "&", $sUrl);
+        $sUrl = str_ireplace('&amp;', '&', $sUrl);
 
         switch ($iHeaderCode) {
             case 301:
-                $sHeaderCode = "HTTP/1.1 301 Moved Permanently";
+                $sHeaderCode = 'HTTP/1.1 301 Moved Permanently';
                 break;
             case 500:
-                $sHeaderCode = "HTTP/1.1 500 Internal Server Error";
+                $sHeaderCode = 'HTTP/1.1 500 Internal Server Error';
                 break;
             case 302:
             default:
-                $sHeaderCode = "HTTP/1.1 302 Found";
+                $sHeaderCode = 'HTTP/1.1 302 Found';
         }
 
         $this->_simpleRedirect($sUrl, $sHeaderCode);
@@ -1207,12 +1207,12 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
             // add price info into list
             if (!$this->isAdmin() && $oObject->price != 0) {
-                $aName[0] .= " ";
+                $aName[0] .= ' ';
 
                 $dPrice = $this->_preparePrice($oObject->price, $dVat);
 
                 if ($oObject->price > 0) {
-                    $aName[0] .= "+";
+                    $aName[0] .= '+';
                 }
                 //V FS#2616
                 if ($dVat != null && $oObject->priceUnit == 'abs') {
@@ -1223,12 +1223,12 @@ class Utils extends \OxidEsales\Eshop\Core\Base
                     $aName[0] .= $oObject->fprice;
                 }
                 if ($oObject->priceUnit == 'abs') {
-                    $aName[0] .= " " . $oCur->sign;
+                    $aName[0] .= ' ' . $oCur->sign;
                 }
             }
         } elseif (isset($aPrice[0]) && isset($aPrice[1])) {
             // A. removing unused part of information
-            $aName[0] = getStr()->preg_replace("/!P!.*/", "", $aName[0]);
+            $aName[0] = getStr()->preg_replace('/!P!.*/', '', $aName[0]);
         }
 
         $oObject->name = $aName[0];
@@ -1344,7 +1344,7 @@ class Utils extends \OxidEsales\Eshop\Core\Base
             if (gettype($sText) != 'string') {
                 $sText = var_export($sText, true);
             }
-            $logMessage = "----------------------------------------------\n{$sText}" . (($blNewline) ? "\n" : "") . "\n";
+            $logMessage = "----------------------------------------------\n{$sText}" . (($blNewline) ? "\n" : '') . "\n";
             $logger = Registry::getLogger();
             $logger->debug($logMessage);
         }
@@ -1478,10 +1478,10 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function handlePageNotFoundError($sUrl = '')
     {
-        $this->setHeader("HTTP/1.0 404 Not Found");
-        $this->setHeader("Content-Type: text/html; charset=UTF-8");
+        $this->setHeader('HTTP/1.0 404 Not Found');
+        $this->setHeader('Content-Type: text/html; charset=UTF-8');
 
-        $sReturn = "Page not found.";
+        $sReturn = 'Page not found.';
         $oView = oxNew(\OxidEsales\Eshop\Application\Controller\FrontendController::class);
         $oView->init();
         $oView->render();

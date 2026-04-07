@@ -24,10 +24,9 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Framework\Database\Logger;
 
 use Doctrine\DBAL\Logging\SQLLogger;
-use Psr\Log\LoggerInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\Exception\AdminUserNotFoundException;
-use OxidEsales\Eshop\Core\Registry;
+use Psr\Log\LoggerInterface;
 
 class QueryLogger implements SQLLogger
 {
@@ -131,7 +130,7 @@ class QueryLogger implements SQLLogger
             'file'        => $backTraceInfo['file'] ?? '',
             'line'        => $backTraceInfo['line'] ?? '',
             'query'       => $query,
-            'params'      => serialize($params)
+            'params'      => serialize($params),
         ];
 
         return $queryData;

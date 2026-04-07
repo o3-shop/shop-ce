@@ -64,14 +64,14 @@ class DownloadController extends FrontendController
                     if ($sFileId && $blLoadedAndExists && $oOrderFile->processOrderFile()) {
                         $oArticleFile->download();
                     } else {
-                        $sError = "ERROR_MESSAGE_FILE_DOESNOT_EXIST";
+                        $sError = 'ERROR_MESSAGE_FILE_DOESNOT_EXIST';
                     }
                 }
             } catch (StandardException $oEx) {
-                $sError = "ERROR_MESSAGE_FILE_DOWNLOAD_FAILED";
+                $sError = 'ERROR_MESSAGE_FILE_DOWNLOAD_FAILED';
             }
         } else {
-            $sError = "ERROR_MESSAGE_WRONG_DOWNLOAD_LINK";
+            $sError = 'ERROR_MESSAGE_WRONG_DOWNLOAD_LINK';
         }
         if ($sError) {
             $oEx = new ExceptionToDisplay();

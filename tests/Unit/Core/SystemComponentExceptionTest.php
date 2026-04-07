@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 class SystemComponentExceptionTest extends \OxidTestCase
 {
     public function testSetGetComponent()
     {
-        $sComponent = "a Component";
+        $sComponent = 'a Component';
         $oTestObject = oxNew('oxSystemComponentException');
         $this->assertStringContainsString('SystemComponentException', get_class($oTestObject));
         $oTestObject->setComponent($sComponent);
@@ -34,7 +36,7 @@ class SystemComponentExceptionTest extends \OxidTestCase
     public function testGetString()
     {
         $sMsg = 'Erik was here..';
-        $sComponent = "a Component";
+        $sComponent = 'a Component';
         $oTestObject = oxNew('oxSystemComponentException', $sMsg);
         $oTestObject->setComponent($sComponent);
         $sStringOut = $oTestObject->getString(); // (string)$oTestObject; is not PHP 5.2 compatible (__toString() for string convertion is PHP >= 5.2
@@ -46,7 +48,7 @@ class SystemComponentExceptionTest extends \OxidTestCase
     public function testGetValues()
     {
         $oTestObject = oxNew('oxSystemComponentException');
-        $sComponent = "a Component";
+        $sComponent = 'a Component';
         $oTestObject->setComponent($sComponent);
         $aRes = $oTestObject->getValues();
         $this->assertArrayHasKey('component', $aRes);

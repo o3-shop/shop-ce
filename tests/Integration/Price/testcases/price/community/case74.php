@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: netto
  * Price view mode: netto
@@ -8,41 +9,41 @@
  *  1. shop + abs : 20, 33.55, 5.5
  *  2. shop + %   : 20, 33.55, 5.5
  */
-$aData = array(
-        'articles' => array(
-                1 => array(
+$aData = [
+        'articles' => [
+                1 => [
                         'oxid'                     => '1001_a',
                         'oxprice'                  => 99,
-                        'oxvat'                    => 20
-                ),
-                2 => array(
+                        'oxvat'                    => 20,
+                ],
+                2 => [
                         'oxid'                     => '1001_b',
                         'oxprice'                  => 99,
-                        'oxvat'                    => 20
-                ),
-                3 => array(
+                        'oxvat'                    => 20,
+                ],
+                3 => [
                         'oxid'                     => '1002_a',
                         'oxprice'                  => 299,
-                        'oxvat'                    => 20
-                ),
-                4 => array(
+                        'oxvat'                    => 20,
+                ],
+                4 => [
                         'oxid'                     => '1002_b',
                         'oxprice'                  => 299,
-                        'oxvat'                    => 20
-                ),
-                5 => array(
+                        'oxvat'                    => 20,
+                ],
+                5 => [
                         'oxid'                     => '1003_a',
                         'oxprice'                  => 1,
-                        'oxvat'                    => 33.55
-                ),
-                6 => array(
+                        'oxvat'                    => 33.55,
+                ],
+                6 => [
                         'oxid'                     => '1003_b',
                         'oxprice'                  => 1,
-                        'oxvat'                    => 33.55
-                ),
-        ),
-        'discounts' => array(
-                1 => array(
+                        'oxvat'                    => 33.55,
+                ],
+        ],
+        'discounts' => [
+                1 => [
                         'oxid'         => 'absFor1001',
                         'oxaddsum'     => 5.5,
                         'oxaddsumtype' => 'abs',
@@ -51,10 +52,10 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1001_a' ),
+                        'oxarticles' => [ '1001_a' ],
                         'oxsort'           => 10,
-                ),
-                2 => array(
+                ],
+                2 => [
                         'oxid'         => 'percentFor1001',
                         'oxaddsum'     => 5.5,
                         'oxaddsumtype' => '%',
@@ -63,10 +64,10 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1001_b' ),
+                        'oxarticles' => [ '1001_b' ],
                         'oxsort'           => 20,
-                ),
-                3 => array(
+                ],
+                3 => [
                         'oxid'         => 'absFor1002',
                         'oxaddsum'     => 20,
                         'oxaddsumtype' => 'abs',
@@ -75,10 +76,10 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1002_a' ),
+                        'oxarticles' => [ '1002_a' ],
                         'oxsort'           => 30,
-                ),
-                4 => array(
+                ],
+                4 => [
                         'oxid'         => 'percentFor1002',
                         'oxaddsum'     => 20,
                         'oxaddsumtype' => '%',
@@ -87,10 +88,10 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1002_b' ),
+                        'oxarticles' => [ '1002_b' ],
                         'oxsort'           => 40,
-                ),
-                5 => array(
+                ],
+                5 => [
                         'oxid'         => 'absFor1003',
                         'oxaddsum'     => 33.55,
                         'oxaddsumtype' => 'abs',
@@ -99,10 +100,10 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1003_a' ),
+                        'oxarticles' => [ '1003_a' ],
                         'oxsort'           => 50,
-                ),
-                6 => array(
+                ],
+                6 => [
                         'oxid'         => 'percentFor1003',
                         'oxaddsum'     => 33.55,
                         'oxaddsumtype' => '%',
@@ -111,41 +112,41 @@ $aData = array(
                         'oxamount' => 0,
                         'oxamountto' => 99999,
                         'oxactive' => 1,
-                        'oxarticles' => array( '1003_b' ),
+                        'oxarticles' => [ '1003_b' ],
                         'oxsort'           => 60,
-                ),
-        ),
-        'expected' => array(
-                '1001_a' => array(
+                ],
+        ],
+        'expected' => [
+                '1001_a' => [
                         'base_price' => '99,00',
                         'price' => '93,50',
-                ),
-                '1001_b' => array(
+                ],
+                '1001_b' => [
                         'base_price' => '99,00',
                         'price' => '93,56',
-                ),
-                '1002_a' => array(
+                ],
+                '1002_a' => [
                         'base_price' => '299,00',
                         'price' => '279,00',
-                ),
-                '1002_b' => array(
+                ],
+                '1002_b' => [
                         'base_price' => '299,00',
                         'price' => '239,20',
-                ),
-                '1003_a' => array(
+                ],
+                '1003_a' => [
                         'base_price' => '1,00',
                         'price' => '0,00',
-                ),
-                '1003_b' => array(
+                ],
+                '1003_b' => [
                         'base_price' => '1,00',
                         'price' => '0,66',
-                ),
-        ),
-        'options' => array(
-                'config' => array(
+                ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => true,
                         'blShowNetPrice' => true,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

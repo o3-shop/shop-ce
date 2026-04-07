@@ -39,9 +39,9 @@ class IncludeWidgetLogic
         }
 
         $parentViews = null;
-        if (!empty($params["_parent"])) {
-            $parentViews = explode("|", $params["_parent"]);
-            unset($params["_parent"]);
+        if (!empty($params['_parent'])) {
+            $parentViews = explode('|', $params['_parent']);
+            unset($params['_parent']);
         }
 
         /**

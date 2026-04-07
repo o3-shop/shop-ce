@@ -41,7 +41,7 @@ class ArticleAttributeAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table,         visible, multilanguage, ident
             ['oxtitle', 'oxattribute', 1, 1, 0],
             ['oxid', 'oxattribute', 0, 0, 1],
@@ -84,12 +84,12 @@ class ArticleAttributeAjax extends ListComponentAjax
             // all categories article is in
             $sQAdd = " from {$sO2AViewName} left join {$sAttrViewName} " .
                      "on {$sAttrViewName}.oxid={$sO2AViewName}.oxattrid " .
-                     " where {$sO2AViewName}.oxobjectid = " . $oDb->quote($sArtId) . " ";
+                     " where {$sO2AViewName}.oxobjectid = " . $oDb->quote($sArtId) . ' ';
         } else {
             $sQAdd = " from {$sAttrViewName} where {$sAttrViewName}.oxid not in ( select {$sO2AViewName}.oxattrid " .
                      "from {$sO2AViewName} left join {$sAttrViewName} " .
                      "on {$sAttrViewName}.oxid={$sO2AViewName}.oxattrid " .
-                     " where {$sO2AViewName}.oxobjectid = " . $oDb->quote($sSynchArtId) . " ) ";
+                     " where {$sO2AViewName}.oxobjectid = " . $oDb->quote($sSynchArtId) . ' ) ';
         }
 
         return $sQAdd;
@@ -107,7 +107,7 @@ class ArticleAttributeAjax extends ListComponentAjax
             $sQ = $this->addFilter("delete $sO2AViewName.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sChosenArticles = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt));
             $sQ = "delete from oxobject2attribute where oxobject2attribute.oxid in ({$sChosenArticles}) ";
             DatabaseProvider::getDb()->Execute($sQ);
         }
@@ -128,10 +128,10 @@ class ArticleAttributeAjax extends ListComponentAjax
             $aAddCat = $this->getAll($this->addFilter("select $sAttrViewName.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aAddCat)) {
+        if ($soxId && $soxId != '-1' && is_array($aAddCat)) {
             foreach ($aAddCat as $sAdd) {
                 $oNew = oxNew(BaseModel::class);
-                $oNew->init("oxobject2attribute");
+                $oNew->init('oxobject2attribute');
                 $oNew->oxobject2attribute__oxobjectid = new Field($soxId);
                 $oNew->oxobject2attribute__oxattrid = new Field($sAdd);
                 $oNew->save();
@@ -164,14 +164,14 @@ class ArticleAttributeAjax extends ListComponentAjax
 
             $this->onAttributeValueChange($article);
 
-            if (isset($attributeId) && ("" != $attributeId)) {
-                $viewName = $this->getViewName("oxobject2attribute");
+            if (isset($attributeId) && ('' != $attributeId)) {
+                $viewName = $this->getViewName('oxobject2attribute');
                 $quotedArticleId = $database->quote($article->oxarticles__oxid->value);
                 $select = "select * from {$viewName} where {$viewName}.oxobjectid= {$quotedArticleId} and
                             {$viewName}.oxattrid= " . $database->quote($attributeId);
                 $objectToAttribute = oxNew(MultiLanguageModel::class);
                 $objectToAttribute->setLanguage(Registry::getRequest()->getRequestEscapedParameter('editlanguage'));
-                $objectToAttribute->init("oxobject2attribute");
+                $objectToAttribute->init('oxobject2attribute');
                 if ($objectToAttribute->assignRecord($select)) {
                     $objectToAttribute->oxobject2attribute__oxvalue->setValue($attributeValue);
                     $objectToAttribute->save();

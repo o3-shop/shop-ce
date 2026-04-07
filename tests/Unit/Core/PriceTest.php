@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use \oxPrice;
+use oxPrice;
 
 class PriceTest extends \OxidTestCase
 {
@@ -265,7 +267,6 @@ class PriceTest extends \OxidTestCase
         $this->assertEquals(75, $this->_oPrice->getNettoPrice());
     }
 
-
     public function testAddPercentCalculationWithVat()
     {
         $this->_oPrice->setPrice(118, 18);
@@ -301,7 +302,6 @@ class PriceTest extends \OxidTestCase
         $this->assertEquals(236.00, $this->_oPrice->getBruttoPrice());
         $this->assertEquals(200.00, $this->_oPrice->getNettoPrice());
     }
-
 
     public function testAddPercentCalculationWithVatWithNetPriceMode()
     {
@@ -533,7 +533,6 @@ class PriceTest extends \OxidTestCase
         $this->assertEquals(1.60, $oPrice->getVatValue());
     }
 
-
     /**
      * Test getPrice
      *
@@ -568,7 +567,6 @@ class PriceTest extends \OxidTestCase
         $this->assertEquals(6, $oPrice->getNettoPrice());
         $this->assertEquals(7.14, $oPrice->getBruttoPrice());
         $this->assertEquals(1.14, $oPrice->getVatValue());
-
 
         $oPrice->setDiscount(7, 'abs');
         $oPrice->calculateDiscount();

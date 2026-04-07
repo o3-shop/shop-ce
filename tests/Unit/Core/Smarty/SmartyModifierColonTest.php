@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,9 +18,10 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Smarty;
 
-use \oxRegistry;
+use oxRegistry;
 
 $filePath = oxRegistry::getConfig()->getConfigParam('sShopDir') . 'Core/Smarty/Plugin/modifier.colon.php';
 if (file_exists($filePath)) {
@@ -30,7 +32,6 @@ if (file_exists($filePath)) {
 
 class SmartyModifierColonTest extends \OxidTestCase
 {
-
     /**
      * provides data to testColons
      *
@@ -38,10 +39,10 @@ class SmartyModifierColonTest extends \OxidTestCase
      */
     public function provider()
     {
-        return array(
-            array(':', 'Name:'), // normal colon
-            array(' :', 'Name :') // french, for example, has space before colon
-        );
+        return [
+            [':', 'Name:'], // normal colon
+            [' :', 'Name :'], // french, for example, has space before colon
+        ];
     }
 
     /**
@@ -51,8 +52,8 @@ class SmartyModifierColonTest extends \OxidTestCase
      */
     public function testColons($sTranslation, $sResult)
     {
-        $oLang = $this->getMock(\OxidEsales\Eshop\Core\Language::class, array("translateString"));
-        $oLang->expects($this->any())->method("translateString")->with($this->equalTo('COLON'))->will($this->returnValue($sTranslation));
+        $oLang = $this->getMock(\OxidEsales\Eshop\Core\Language::class, ['translateString']);
+        $oLang->expects($this->any())->method('translateString')->with($this->equalTo('COLON'))->will($this->returnValue($sTranslation));
 
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Language::class, $oLang);
 

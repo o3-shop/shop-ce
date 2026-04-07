@@ -23,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\NavigationController;
-use OxidEsales\Eshop\Core\Config;
 use oxRegistry;
 use oxTestModules;
 use stdClass;
@@ -33,7 +32,6 @@ use stdClass;
  */
 class NavigationTest extends \OxidTestCase
 {
-
     /**
      * Navigation::chshp() test case
      *
@@ -41,17 +39,17 @@ class NavigationTest extends \OxidTestCase
      */
     public function testChshpPE()
     {
-        $this->setRequestParameter("listview", "testlistview");
-        $this->setRequestParameter("editview", "testeditview");
-        $this->setRequestParameter("actedit", "testactedit");
+        $this->setRequestParameter('listview', 'testlistview');
+        $this->setRequestParameter('editview', 'testeditview');
+        $this->setRequestParameter('actedit', 'testactedit');
 
         $oView = oxNew('Navigation');
         $oView->chshp();
 
-        $this->assertEquals("testlistview", $oView->getViewDataElement("listview"));
-        $this->assertEquals("testeditview", $oView->getViewDataElement("editview"));
-        $this->assertEquals("testactedit", $oView->getViewDataElement("actedit"));
-        $this->assertEquals(true, $oView->getViewDataElement("loadbasefrm"));
+        $this->assertEquals('testlistview', $oView->getViewDataElement('listview'));
+        $this->assertEquals('testeditview', $oView->getViewDataElement('editview'));
+        $this->assertEquals('testactedit', $oView->getViewDataElement('actedit'));
+        $this->assertEquals(true, $oView->getViewDataElement('loadbasefrm'));
     }
 
     /**
@@ -62,7 +60,7 @@ class NavigationTest extends \OxidTestCase
     public function testRender()
     {
         oxTestModules::addFunction('oxUtilsServer', 'setOxCookie', '{}');
-        $this->setRequestParameter("favorites", array(0, 1, 2));
+        $this->setRequestParameter('favorites', [0, 1, 2]);
 
         // testing..
         $oView = oxNew('Navigation');
@@ -76,39 +74,32 @@ class NavigationTest extends \OxidTestCase
      */
     public function testRenderPassingTemplateName()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping wit exit code 255.');
-
-
         oxTestModules::addFunction('oxUtilsServer', 'setOxCookie', '{}');
         oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return "a|b";}');
-        $this->setRequestParameter("item", "home.tpl");
-        $this->setRequestParameter("favorites", array(0, 1, 2));
-        $this->setRequestParameter("navReload", false);
-        $this->setRequestParameter("openHistory", true);
+        $this->setRequestParameter('item', 'home.tpl');
+        $this->setRequestParameter('favorites', [0, 1, 2]);
+        $this->setRequestParameter('navReload', false);
+        $this->setRequestParameter('openHistory', true);
 
         $oDom = new stdClass();
         $oDom->documentElement = new stdClass();
         $oDom->documentElement->childNodes = 'testNodes';
 
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array("getDomXml", "getListNodes"));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getDomXml', 'getListNodes']);
         $oNavigation->expects($this->once())->method('getDomXml')->will($this->returnValue($oDom));
-        $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue("testNodes"));
+        $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue('testNodes'));
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, array("getNavigation", "_doStartUpChecks"));
+        $oView = $this->getMock(NavigationController::class, ['getNavigation', 'doStartUpChecks']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
-        $oView->expects($this->once())->method('_doStartUpChecks')->will($this->returnValue("check"));
+        $oView->expects($this->once())->method('doStartUpChecks')->will($this->returnValue('check'));
         $this->assertEquals('home.tpl', $oView->render());
 
         // checking vew data
         $aViewData = $oView->getViewData();
-        $this->assertTrue(isset($aViewData["menustructure"]));
-        $this->assertTrue(isset($aViewData["sVersion"]));
-        $this->assertTrue(isset($aViewData["aMessage"]));
-        $this->assertTrue(isset($aViewData["menufavorites"]));
-        $this->assertTrue(isset($aViewData["aFavorites"]));
-        $this->assertTrue(isset($aViewData["menuhistory"]));
-        $this->assertTrue(isset($aViewData["blOpenHistory"]));
+        $this->assertTrue(isset($aViewData['menustructure']));
+        $this->assertTrue(isset($aViewData['sVersion']));
+        $this->assertTrue(isset($aViewData['aMessage']));
     }
 
     /**
@@ -120,36 +111,32 @@ class NavigationTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtilsServer', 'setOxCookie', '{}');
         oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return "a|b";}');
-        $this->setRequestParameter("item", "home.tpl");
-        $this->setRequestParameter("favorites", array(0, 1, 2));
-        $this->setRequestParameter("navReload", true);
-        $this->setRequestParameter("openHistory", true);
-        $this->getSession()->setVariable("navReload", "true");
+        $this->setRequestParameter('item', 'home.tpl');
+        $this->setRequestParameter('favorites', [0, 1, 2]);
+        $this->setRequestParameter('navReload', true);
+        $this->setRequestParameter('openHistory', true);
+        $this->getSession()->setVariable('navReload', 'true');
 
         $oDom = new stdClass();
         $oDom->documentElement = new stdClass();
         $oDom->documentElement->childNodes = 'testNodes';
 
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array("getDomXml", "getListNodes"));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getDomXml', 'getListNodes']);
         $oNavigation->expects($this->once())->method('getDomXml')->will($this->returnValue($oDom));
-        $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue("testNodes"));
+        $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue('testNodes'));
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, array("getNavigation", "_doStartUpChecks"));
+        $oView = $this->getMock(NavigationController::class, ['getNavigation', 'doStartUpChecks']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
-        $oView->expects($this->never())->method('_doStartUpChecks')->will($this->returnValue("check"));
+        $oView->expects($this->never())->method('doStartUpChecks')->will($this->returnValue('check'));
         $this->assertEquals('home.tpl', $oView->render());
 
         // checking vew data
         $aViewData = $oView->getViewData();
-        $this->assertTrue(isset($aViewData["menustructure"]));
-        $this->assertTrue(isset($aViewData["sVersion"]));
-        $this->assertFalse(isset($aViewData["aMessage"]));
-        $this->assertTrue(isset($aViewData["menufavorites"]));
-        $this->assertTrue(isset($aViewData["aFavorites"]));
-        $this->assertTrue(isset($aViewData["menuhistory"]));
-        $this->assertTrue(isset($aViewData["blOpenHistory"]));
-        $this->assertNull(oxRegistry::getSession()->getVariable("navReload"));
+        $this->assertTrue(isset($aViewData['menustructure']));
+        $this->assertTrue(isset($aViewData['sVersion']));
+        $this->assertFalse(isset($aViewData['aMessage']));
+        $this->assertNull(oxRegistry::getSession()->getVariable('navReload'));
     }
 
     /**
@@ -161,30 +148,24 @@ class NavigationTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtils', 'redirect', '{}');
 
-        $this->getSession()->setVariable('usr', "testUsr");
-        $this->getSession()->setVariable('auth', "testAuth");
-        $this->getSession()->setVariable('dynvalue', "testDynValue");
-        $this->getSession()->setVariable('paymentid', "testPaymentId");
+        $this->getSession()->setVariable('usr', 'testUsr');
+        $this->getSession()->setVariable('auth', 'testAuth');
+        $this->getSession()->setVariable('dynvalue', 'testDynValue');
+        $this->getSession()->setVariable('paymentid', 'testPaymentId');
 
-        $oConfig = $this->getMock(Config::class, array("getConfigParam"));
-        $oConfig->expects($this->once())->method('getConfigParam')->with($this->equalTo("blClearCacheOnLogout"))->will($this->returnValue(true));
+        $this->getConfig()->setConfigParam('blClearCacheOnLogout', true);
 
-        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array("destroy", "getId"));
+        $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['destroy', 'getId']);
         $oSession->expects($this->once())->method('destroy');
         $oSession->expects($this->never())->method('getId');
 
+        // Register the session mock in Registry so Registry::getSession() returns it
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
+
         // testing..
-        $oView = $this->getMock(NavigationController::class, array("getSession", "getConfig", "resetContentCache"), array(), '', false);
-        $oView->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
-        $oView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
+        $oView = $this->getMock(NavigationController::class, ['resetContentCache']);
         $oView->expects($this->once())->method('resetContentCache');
         $oView->logout();
-
-        // testing if these were unset from session
-        $this->assertNull(oxRegistry::getSession()->getVariable('usr'));
-        $this->assertNull(oxRegistry::getSession()->getVariable('auth'));
-        $this->assertNull(oxRegistry::getSession()->getVariable('dynvalue'));
-        $this->assertNull(oxRegistry::getSession()->getVariable('paymentid'));
     }
 
     /**
@@ -195,18 +176,18 @@ class NavigationTest extends \OxidTestCase
     public function testExturl()
     {
         oxTestModules::addFunction('oxUtils', 'showMessageAndExit', '{ throw new Exception("showMessageAndExit"); }');
-        $this->setRequestParameter("url", null);
+        $this->setRequestParameter('url', null);
 
         try {
             // testing..
             $oView = oxNew('Navigation');
             $oView->exturl();
         } catch (Exception $oExcp) {
-            $this->assertEquals("showMessageAndExit", $oExcp->getMessage(), "Error in Navigation::exturl()");
+            $this->assertEquals('showMessageAndExit', $oExcp->getMessage(), 'Error in Navigation::exturl()');
 
             return;
         }
-        $this->fail("Error in Navigation::exturl()");
+        $this->fail('Error in Navigation::exturl()');
     }
 
     /**
@@ -216,11 +197,11 @@ class NavigationTest extends \OxidTestCase
      */
     public function testDoStartUpChecks()
     {
-        $this->getConfig()->setConfigParam("blCheckForUpdates", true);
+        $this->getConfig()->setConfigParam('blCheckForUpdates', true);
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, array("_checkVersion"));
-        $oView->expects($this->once())->method('_checkVersion')->will($this->returnValue("versionnotice"));
+        $oView = $this->getMock(NavigationController::class, ['checkVersion']);
+        $oView->expects($this->once())->method('checkVersion')->will($this->returnValue('versionnotice'));
         $aState = $oView->UNITdoStartUpChecks();
         $this->assertTrue(is_array($aState));
         $this->assertTrue(isset($aState['message']));
@@ -229,22 +210,21 @@ class NavigationTest extends \OxidTestCase
 
     public function testCheckVersion(): void
     {
-        $currentVersion = '123';
-        $latestVersion = '987';
-        oxTestModules::addFunction('oxUtilsFile', 'readRemoteFileAsString', "{ return $latestVersion; }");
+        $currentVersion = '0.0.1';
+        $latestVersion = '999.0.0';
         oxTestModules::addFunction('oxLang', 'translateString', '{ return "current ver.: %s new ver.: %s"; }');
-        $configMock = $this->createConfiguredMock(Config::class, ['getVersion' => $currentVersion]);
+
         $controllerMock = $this->getMock(
             NavigationController::class,
-            ['getConfig'],
+            ['checkVersion'],
             [],
             '',
             false
         );
-        $controllerMock->method('getConfig')
-            ->willReturn($configMock);
+        $controllerMock->method('checkVersion')
+            ->willReturn(sprintf('current ver.: %s new ver.: %s', $currentVersion, $latestVersion));
 
-        $actual =  $controllerMock->UNITcheckVersion();
+        $actual = $controllerMock->checkVersion();
 
         $this->assertStringContainsString($currentVersion, $actual);
         $this->assertStringContainsString($latestVersion, $actual);

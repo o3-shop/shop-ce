@@ -22,15 +22,15 @@
 namespace OxidEsales\EshopCommunity\Core\Module;
 
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ThemedTemplate;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleConfigurationDaoBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration\ThemedTemplate;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
 
 /**
  * Module class.
@@ -168,7 +168,7 @@ class Module extends \OxidEsales\Eshop\Core\Base
     {
         $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getTplLanguage();
 
-        return $this->getInfo("description", $iLang);
+        return $this->getInfo('description', $iLang);
     }
 
     /**
@@ -180,7 +180,7 @@ class Module extends \OxidEsales\Eshop\Core\Base
     {
         $iLang = \OxidEsales\Eshop\Core\Registry::getLang()->getTplLanguage();
 
-        return $this->getInfo("title", $iLang);
+        return $this->getInfo('title', $iLang);
     }
 
     /**
@@ -269,14 +269,14 @@ class Module extends \OxidEsales\Eshop\Core\Base
 
             if (is_array($modulePaths)) {
                 foreach ($modulePaths as $id => $path) {
-                    if (strpos($moduleFile, $path . "/") === 0) {
+                    if (strpos($moduleFile, $path . '/') === 0) {
                         $moduleId = $id;
                     }
                 }
             }
         }
         if (!$moduleId) {
-            $moduleId = substr($moduleFile, 0, strpos($moduleFile, "/"));
+            $moduleId = substr($moduleFile, 0, strpos($moduleFile, '/'));
         }
         if (!$moduleId) {
             $moduleId = $moduleFile;
@@ -514,9 +514,9 @@ class Module extends \OxidEsales\Eshop\Core\Base
 
         $sShopId = $this->getConfig()->getShopId();
 
-        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol("SELECT oxtemplate FROM oxtplblocks WHERE oxmodule = :oxmodule AND oxshopid = :oxshopid", [
+        return \OxidEsales\Eshop\Core\DatabaseProvider::getDb()->getCol('SELECT oxtemplate FROM oxtplblocks WHERE oxmodule = :oxmodule AND oxshopid = :oxshopid', [
             ':oxmodule' => $sModuleId,
-            ':oxshopid' => $sShopId
+            ':oxshopid' => $sShopId,
         ]);
     }
 

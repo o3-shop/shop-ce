@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: netto / bruto
  * Price view mode: netto / brutto
@@ -17,33 +18,33 @@
  * Actions with basket or order:
  * Short description: bug entry / support case other info;
  */
-$aData = array(
-    'articles' => array(
-        0 => array(
+$aData = [
+    'articles' => [
+        0 => [
                 'oxid'                     => 9200,
                 'oxprice'                  => 87,
                 'oxvat'                    => 17,
                 'amount'                   => 1,
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                 9200 => array( '87,00', '87,00' ),
-        ),
-        'totals' => array(
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+                 9200 => [ '87,00', '87,00' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '87,00',
                 'totalNetto'  => '74,36',
-                'vats' => array(
+                'vats' => [
                         17 => '12,64',
-                ),
-                'grandTotal'  => '87,00'
-        ),
-    ),
-    'options' => array(
-        'config' => array(
+                ],
+                'grandTotal'  => '87,00',
+        ],
+    ],
+    'options' => [
+        'config' => [
             'blEnterNetPrice' => false,
             'blViewNetPrice' => false,
-        ),
+        ],
         'activeCurrencyRate' => 1,
-    ),
-);
+    ],
+];

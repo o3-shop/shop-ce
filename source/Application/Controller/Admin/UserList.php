@@ -45,7 +45,7 @@ class UserList extends AdminListController
      *
      * @var string
      */
-    protected $_sDefSortField = "oxusername";
+    protected $_sDefSortField = 'oxusername';
 
     /**
      * Type of list.
@@ -71,8 +71,8 @@ class UserList extends AdminListController
     {
         foreach ($this->getItemList() as $itemId => $user) {
             /** @var User $user */
-            if ($user->inGroup("oxidblacklist") || $user->inGroup("oxidblocked")) {
-                $user->blacklist = "1";
+            if ($user->inGroup('oxidblacklist') || $user->inGroup('oxidblocked')) {
+                $user->blacklist = '1';
             }
             $user->blPreventDelete = false;
             if (!$this->_allowAdminEdit($itemId)) {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -28,7 +30,6 @@ use PHPUnit\Framework\TestCase;
 
 class BootstrapModuleInstallerTest extends TestCase
 {
-
     public function testInstallTriggersAllInstallers()
     {
         $path = 'packagePath';
@@ -45,7 +46,6 @@ class BootstrapModuleInstallerTest extends TestCase
             ->expects($this->once())
             ->method('install')
             ->with($path);
-
 
         $moduleInstaller = new BootstrapModuleInstaller($moduleFilesInstaller, $moduleProjectConfigurationInstaller);
         $moduleInstaller->install($package);

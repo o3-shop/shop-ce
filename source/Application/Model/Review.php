@@ -36,7 +36,6 @@ use OxidEsales\EshopCommunity\Internal\Domain\Review\Bridge\UserReviewAndRatingB
  */
 class Review extends BaseModel
 {
-
     /**
      * Shop control variable
      *
@@ -75,11 +74,11 @@ class Review extends BaseModel
         if (isset($this->oxreviews__oxuserid) && $this->oxreviews__oxuserid->value) {
             $oDb = DatabaseProvider::getDb();
             $params = [
-                ':oxid' => $this->oxreviews__oxuserid->value
+                ':oxid' => $this->oxreviews__oxuserid->value,
             ];
 
-            $firstName = $oDb->getOne("SELECT oxfname FROM oxuser 
-                WHERE oxid = :oxid", $params);
+            $firstName = $oDb->getOne('SELECT oxfname FROM oxuser 
+                WHERE oxid = :oxid', $params);
 
             $this->oxuser__oxfname = new Field($firstName);
         }
@@ -99,7 +98,8 @@ class Review extends BaseModel
         if ($blRet = parent::load($oxId)) {
             // convert date's to international format
             $this->oxreviews__oxcreate->setValue(
-                Registry::getUtilsDate()->formatDBDate($this->oxreviews__oxcreate->value));
+                Registry::getUtilsDate()->formatDBDate($this->oxreviews__oxcreate->value)
+            );
         }
 
         return $blRet;
@@ -137,13 +137,13 @@ class Review extends BaseModel
 
         $params = [
             ':oxtype' => $sType,
-            ':oxlang' => is_null($iLoadInLang) ? (int) Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang
+            ':oxlang' => is_null($iLoadInLang) ? (int) Registry::getLang()->getBaseLanguage() : (int) $iLoadInLang,
         ];
 
         if (is_array($aIds) && count($aIds)) {
-            $sObjectIdWhere = "oxreviews.oxobjectid in ( " . implode(", ", DatabaseProvider::getDb()->quoteArray($aIds)) . " )";
+            $sObjectIdWhere = 'oxreviews.oxobjectid in ( ' . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ' )';
         } elseif (is_string($aIds) && $aIds) {
-            $sObjectIdWhere = "oxreviews.oxobjectid = :oxobjectid";
+            $sObjectIdWhere = 'oxreviews.oxobjectid = :oxobjectid';
             $params[':oxobjectid'] = $aIds;
         } else {
             return $oRevs;

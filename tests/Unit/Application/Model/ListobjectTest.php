@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,25 +18,24 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxListObject;
-use \oxField;
+use oxField;
+use oxListObject;
 
 /**
  * Testing oxshoplist class
  */
 class ListobjectTest extends \OxidTestCase
 {
-
-
     /**
      * Tests getId method
      */
     public function testgetId()
     {
         $oListObject = new oxListObject('table');
-        $oListObject->assign(array('oxid' => 10));
+        $oListObject->assign(['oxid' => 10]);
         $this->assertEquals(10, $oListObject->getId());
     }
 
@@ -54,7 +54,7 @@ class ListobjectTest extends \OxidTestCase
     public function testAssign()
     {
         $oListObject = new oxListObject('table');
-        $oListObject->assign(array('oxid' => 10));
+        $oListObject->assign(['oxid' => 10]);
         $this->assertEquals(new oxField(10), $oListObject->table__oxid);
     }
 
@@ -64,8 +64,8 @@ class ListobjectTest extends \OxidTestCase
     public function testAssignTwo()
     {
         $oListObject = new oxListObject('table');
-        $oListObject->assign(array('oxid' => 10));
-        $oListObject->assign(array('oxname' => 'title'));
+        $oListObject->assign(['oxid' => 10]);
+        $oListObject->assign(['oxname' => 'title']);
         $this->assertEquals(10, $oListObject->table__oxid->value);
         $this->assertEquals('title', $oListObject->table__oxname->value);
     }

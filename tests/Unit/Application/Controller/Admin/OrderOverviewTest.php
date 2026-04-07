@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,22 +18,20 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Order;
 use OxidEsales\EshopCommunity\Application\Model\UserPayment;
-
-use \oxField;
-use \Exception;
-use \oxRegistry;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Order_Overview class
  */
 class OrderOverviewTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -41,7 +40,7 @@ class OrderOverviewTest extends \OxidTestCase
     protected function tearDown(): void
     {
         $this->cleanUpTable('oxorder');
-        $this->cleanUpTable("oxorderarticles");
+        $this->cleanUpTable('oxorderarticles');
         parent::tearDown();
     }
 
@@ -52,7 +51,7 @@ class OrderOverviewTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('Order_Overview');
@@ -72,14 +71,14 @@ class OrderOverviewTest extends \OxidTestCase
         oxTestModules::addFunction('oxpayment', 'load', '{ $this->oxpayments__oxdesc = new oxField("testValue"); return true; }');
 
         // defining parameters
-        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, array("getPaymentType"));
-        $oOrder->oxorder__oxpaymenttype = new oxField("testValue");
+        $oOrder = $this->getMock(\OxidEsales\Eshop\Application\Model\Order::class, ['getPaymentType']);
+        $oOrder->oxorder__oxpaymenttype = new oxField('testValue');
 
         $oView = oxNew('Order_Overview');
         $oUserPayment = $oView->UNITgetPaymentType($oOrder);
 
         $this->assertTrue($oUserPayment instanceof userpayment);
-        $this->assertEquals("testValue", $oUserPayment->oxpayments__oxdesc->value);
+        $this->assertEquals('testValue', $oUserPayment->oxpayments__oxdesc->value);
     }
 
     /**
@@ -97,11 +96,11 @@ class OrderOverviewTest extends \OxidTestCase
             $oView = oxNew('Order_Overview');
             $oView->resetorder();
         } catch (Exception $oExcp) {
-            $this->assertEquals("0000-00-00 00:00:00", $oExcp->getMessage(), "Error in Order_Overview::resetorder()");
+            $this->assertEquals('0000-00-00 00:00:00', $oExcp->getMessage(), 'Error in Order_Overview::resetorder()');
 
             return;
         }
-        $this->fail("Error in Order_Overview::resetorder()");
+        $this->fail('Error in Order_Overview::resetorder()');
     }
 
     /**
@@ -113,40 +112,39 @@ class OrderOverviewTest extends \OxidTestCase
     {
         $soxId = '_testOrderId';
         // writing test order
-        $oOrder = oxNew("oxorder");
+        $oOrder = oxNew('oxorder');
         $oOrder->setId($soxId);
         $oOrder->oxorder__oxshopid = new oxField($this->getConfig()->getBaseShopId());
-        $oOrder->oxorder__oxuserid = new oxField("oxdefaultadmin");
-        $oOrder->oxorder__oxbillcompany = new oxField("Ihr Firmenname");
+        $oOrder->oxorder__oxuserid = new oxField('oxdefaultadmin');
+        $oOrder->oxorder__oxbillcompany = new oxField('Ihr Firmenname');
         $oOrder->oxorder__oxbillemail = new oxField(oxADMIN_LOGIN);
-        $oOrder->oxorder__oxbillfname = new oxField("Hans");
-        $oOrder->oxorder__oxbilllname = new oxField("Musterm0ann");
-        $oOrder->oxorder__oxbillstreet = new oxField("Musterstr");
-        $oOrder->oxorder__oxstorno = new oxField("0");
-        $oOrder->oxorder__oxsenddate = new oxField("0000-00-00 00:00:00");
+        $oOrder->oxorder__oxbillfname = new oxField('Hans');
+        $oOrder->oxorder__oxbilllname = new oxField('Musterm0ann');
+        $oOrder->oxorder__oxbillstreet = new oxField('Musterstr');
+        $oOrder->oxorder__oxstorno = new oxField('0');
+        $oOrder->oxorder__oxsenddate = new oxField('0000-00-00 00:00:00');
         $oOrder->save();
 
         $oView = oxNew('Order_Overview');
 
-        $this->setRequestParameter("oxid", $soxId);
+        $this->setRequestParameter('oxid', $soxId);
         $this->assertFalse($oView->canResetShippingDate());
 
-        $oOrder->oxorder__oxsenddate = new oxField(date("Y-m-d H:i:s", \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
+        $oOrder->oxorder__oxsenddate = new oxField(date('Y-m-d H:i:s', \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime()));
         $oOrder->save();
 
         $this->assertTrue($oView->canResetShippingDate());
 
-        $oOrder->oxorder__oxstorno = new oxField("1");
+        $oOrder->oxorder__oxstorno = new oxField('1');
         $oOrder->save();
 
         $this->assertFalse($oView->canResetShippingDate());
 
-        $oOrder->oxorder__oxsenddate = new oxField("0000-00-00 00:00:00");
+        $oOrder->oxorder__oxsenddate = new oxField('0000-00-00 00:00:00');
         $oOrder->save();
 
         $this->assertFalse($oView->canResetShippingDate());
     }
-
 
     /**
      * Provide name, and correct expected name for testMakeValidFileName
@@ -155,16 +153,16 @@ class OrderOverviewTest extends \OxidTestCase
      */
     public function nameProvider()
     {
-        return array(
-            array('abc', 'abc'),
-            array('ab/c', 'abc'),
-            array('ab!@#$%^&*()c', 'abc'),
-            array('ab_!_@_c', 'ab___c'),
-            array('ab_!_@_c      s', 'ab___c_s'),
-            array('      s', '_s'),
-            array('!@#$%^&*()_+//////\\', '_'),
-            array(null, null),
-        );
+        return [
+            ['abc', 'abc'],
+            ['ab/c', 'abc'],
+            ['ab!@#$%^&*()c', 'abc'],
+            ['ab_!_@_c', 'ab___c'],
+            ['ab_!_@_c      s', 'ab___c_s'],
+            ['      s', '_s'],
+            ['!@#$%^&*()_+//////\\', '_'],
+            [null, null],
+        ];
     }
 
     /**

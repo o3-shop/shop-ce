@@ -55,7 +55,7 @@ class ArticleAccessoriesAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table,         visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -120,24 +120,24 @@ class ArticleAccessoriesAjax extends ListComponentAjax
                 $variantSelectionSql = $blVariantsSelectionParameter ? $trueResponse : $failResponse;
 
                 $outputQuery = " from $object2categoryTable left join {$articleTable} on {$variantSelectionSql}" .
-                               " where $object2categoryTable.oxcatnid = " . $db->quote($oxidId) . " ";
+                               " where $object2categoryTable.oxcatnid = " . $db->quote($oxidId) . ' ';
             } else {
                 $outputQuery = " from oxaccessoire2article left join {$articleTable} " .
                                "on oxaccessoire2article.oxobjectid={$articleTable}.oxid " .
-                               " where oxaccessoire2article.oxarticlenid = " . $db->quote($oxidId) . " ";
+                               ' where oxaccessoire2article.oxarticlenid = ' . $db->quote($oxidId) . ' ';
             }
         }
 
         if ($synchId && $synchId != $oxidId) {
             // performance
             $subSelect = ' select oxaccessoire2article.oxobjectid from oxaccessoire2article ';
-            $subSelect .= " where oxaccessoire2article.oxarticlenid = " . $db->quote($synchId) . " ";
+            $subSelect .= ' where oxaccessoire2article.oxarticlenid = ' . $db->quote($synchId) . ' ';
             $outputQuery .= " and {$articleTable}.oxid not in ( $subSelect )";
         }
 
         // skipping self from list
         $sId = ($synchId) ? $synchId : $oxidId;
-        $outputQuery .= " and {$articleTable}.oxid != " . $db->quote($sId) . " ";
+        $outputQuery .= " and {$articleTable}.oxid != " . $db->quote($sId) . ' ';
 
         // creating AJAX component
         return $outputQuery;
@@ -176,10 +176,10 @@ class ArticleAccessoriesAjax extends ListComponentAjax
         $aChosenArt = $this->_getActionIds('oxaccessoire2article.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->_addFilter("delete oxaccessoire2article.* " . $this->_getQuery());
+            $sQ = $this->_addFilter('delete oxaccessoire2article.* ' . $this->_getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sChosenArticles = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt));
+            $sChosenArticles = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt));
             $sQ = "delete from oxaccessoire2article where oxaccessoire2article.oxid in ({$sChosenArticles}) ";
             DatabaseProvider::getDb()->Execute($sQ);
         }
@@ -200,10 +200,10 @@ class ArticleAccessoriesAjax extends ListComponentAjax
             $aChosenArt = $this->_getAll(parent::_addFilter("select $sArtTable.oxid " . $this->_getQuery()));
         }
 
-        if ($oArticle->load($soxId) && $soxId && $soxId != "-1" && is_array($aChosenArt)) {
+        if ($oArticle->load($soxId) && $soxId && $soxId != '-1' && is_array($aChosenArt)) {
             foreach ($aChosenArt as $sChosenArt) {
                 $oNewGroup = oxNew(BaseModel::class);
-                $oNewGroup->init("oxaccessoire2article");
+                $oNewGroup->init('oxaccessoire2article');
                 $oNewGroup->oxaccessoire2article__oxobjectid = new Field($sChosenArt);
                 $oNewGroup->oxaccessoire2article__oxarticlenid = new Field($oArticle->oxarticles__oxid->value);
                 $oNewGroup->oxaccessoire2article__oxsort = new Field(0);
@@ -223,7 +223,6 @@ class ArticleAccessoriesAjax extends ListComponentAjax
     {
     }
 
-
     /**
      * Applies sorting for Accessoires list
      */
@@ -234,12 +233,11 @@ class ArticleAccessoriesAjax extends ListComponentAjax
         $sortDirection = Registry::getConfig()->getRequestEscapedParameter('direction');
 
         $accessoiresList = oxNew(ListModel::class);
-        $accessoiresList->init("oxbase", "oxaccessoire2article");
-        $sortQuery = "select * from  oxaccessoire2article where OXARTICLENID = :OXARTICLENID order by oxsort,oxid";
+        $accessoiresList->init('oxbase', 'oxaccessoire2article');
+        $sortQuery = 'select * from  oxaccessoire2article where OXARTICLENID = :OXARTICLENID order by oxsort,oxid';
         $accessoiresList->selectString($sortQuery, [
-            ':OXARTICLENID' => $oxidRelationId
+            ':OXARTICLENID' => $oxidRelationId,
         ]);
-
 
         $rebuildList = $this->rebuildAccessoriesSortIndexes($accessoiresList);
 
@@ -270,7 +268,6 @@ class ArticleAccessoriesAjax extends ListComponentAjax
 
         $this->_outputResponse($this->_getData($countQuery, $normalQuery));
     }
-
 
     /**
      * rebuild Accessoires sort indexes

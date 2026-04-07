@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -22,8 +24,8 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Templating\Loa
 
 use org\bovigo\vfs\vfsStream;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Exception\TemplateFileNotFoundException;
-use OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator\FileLocatorInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Loader\TemplateLoader;
+use OxidEsales\EshopCommunity\Internal\Framework\Templating\Locator\FileLocatorInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\Resolver\TemplateNameResolverInterface;
 
 class TemplateLoaderTest extends \PHPUnit\Framework\TestCase
@@ -51,7 +53,7 @@ class TemplateLoaderTest extends \PHPUnit\Framework\TestCase
     public function testGetContext(): void
     {
         $name = 'testSmartyTemplate.tpl';
-        $context = "The new contents of the file";
+        $context = 'The new contents of the file';
         $templateDir = vfsStream::setup('testTemplateDir');
         $template = vfsStream::newFile($name)
             ->at($templateDir)
@@ -68,7 +70,7 @@ class TemplateLoaderTest extends \PHPUnit\Framework\TestCase
     public function testGetPath(): void
     {
         $name = 'testSmartyTemplate.tpl';
-        $context = "The new contents of the file";
+        $context = 'The new contents of the file';
         $templateDir = vfsStream::setup('testTemplateDir');
         $template = vfsStream::newFile($name)
             ->at($templateDir)

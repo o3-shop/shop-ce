@@ -19,19 +19,19 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require "_header.php";
+require '_header.php';
 
 // caching output
 ob_flush();
-require "_footer.php";
+require '_footer.php';
 $sFooter = ob_get_contents();
 ob_clean();
 
 $this->getText('STEP_6_DESC');
-$aPath = $this->getViewParam("aPath");
-$aSetupConfig = $this->getViewParam("aSetupConfig");
-$aDB = $this->getViewParam("aDB");
-$blWritableConfig  = $this->getViewParam("blWritableConfig");
+$aPath = $this->getViewParam('aPath');
+$aSetupConfig = $this->getViewParam('aSetupConfig');
+$aDB = $this->getViewParam('aDB');
+$blWritableConfig = $this->getViewParam('blWritableConfig');
 // This must be done here as it deletes setup and nothing can't be displayed after that.
 $blRemoved = $this->isDeletedSetup($aSetupConfig, $aDB);
 ?>

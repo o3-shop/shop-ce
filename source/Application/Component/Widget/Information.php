@@ -76,7 +76,7 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
     {
         return $this->getContentList();
     }
-    
+
     /**
      * Returns content list object.
      *

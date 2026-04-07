@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * This file is part of O3-Shop.
@@ -19,10 +21,10 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\MetaData;
+namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\MetaData\DataMapper;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataMapper;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\MetaDataProvider;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\DataMapper\MetaDataMapper;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Validator\MetaDataSchemaValidatorInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -60,8 +62,8 @@ class MetaDataMapperTest extends TestCase
                 MetaDataProvider::METADATA_ID       => 'id',
                 MetaDataProvider::METADATA_FILES    => [
                     'name' => 'path',
-                ]
-            ]
+                ],
+            ],
         ];
         $metaDataDataMapper = new MetaDataMapper($this->metaDataValidatorStub);
         $moduleConfiguration = $metaDataDataMapper->fromData($metadata);
@@ -94,10 +96,10 @@ class MetaDataMapperTest extends TestCase
                             'name'  => 'setting',
                             'type'  => 'bool',
                             'value' => 'true',
-                            'position' => '2'
+                            'position' => '2',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ]
         );
 

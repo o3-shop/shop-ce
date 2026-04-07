@@ -39,7 +39,7 @@ class VoucherSerieGenerate extends VoucherSerieMain
      *
      * @var string
      */
-    public $sClassDo = "voucherserie_generate";
+    public $sClassDo = 'voucherserie_generate';
 
     /**
      * Number of vouchers to generate per tick
@@ -53,7 +53,7 @@ class VoucherSerieGenerate extends VoucherSerieMain
      *
      * @var string
      */
-    protected $_sThisTemplate = "voucherserie_generate.tpl";
+    protected $_sThisTemplate = 'voucherserie_generate.tpl';
 
     /**
      * Voucher serie object
@@ -96,7 +96,7 @@ class VoucherSerieGenerate extends VoucherSerieMain
      */
     public function generateVoucher($iCnt)
     {
-        $iAmount = abs((int) Registry::getSession()->getVariable("voucherAmount"));
+        $iAmount = abs((int) Registry::getSession()->getVariable('voucherAmount'));
 
         // creating new vouchers
         if ($iCnt < $iAmount && ($oVoucherSerie = $this->_getVoucherSerie())) {
@@ -104,8 +104,8 @@ class VoucherSerieGenerate extends VoucherSerieMain
                 $this->_iGenerated = $iCnt;
             }
 
-            $blRandomNr = (bool) Registry::getSession()->getVariable("randomVoucherNr");
-            $sVoucherNr = $blRandomNr ? Registry::getUtilsObject()->generateUID() : Registry::getSession()->getVariable("voucherNr");
+            $blRandomNr = (bool) Registry::getSession()->getVariable('randomVoucherNr');
+            $sVoucherNr = $blRandomNr ? Registry::getUtilsObject()->generateUID() : Registry::getSession()->getVariable('voucherNr');
 
             $oNewVoucher = oxNew(Voucher::class);
             $oNewVoucher->oxvouchers__oxvoucherserieid = new Field($oVoucherSerie->getId());

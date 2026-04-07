@@ -71,7 +71,7 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
     {
         return $this->getLoadActionsParam();
     }
-    
+
     /**
      * Returns if actions are ON
      *
@@ -92,7 +92,7 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
     public function getActionName()
     {
         $actionId = $this->getViewParameter('action');
-        $action   = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
+        $action = oxNew(\OxidEsales\Eshop\Application\Model\Actions::class);
         if ($action->load($actionId)) {
             return $action->oxactions__oxtitle->value;
         }

@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class BasketChangedEvent extends Event
 {
-    const NAME = self::class;
+    public const NAME = self::class;
 
     /**
      * Url the shop wants to redirect to after product is put to basket.

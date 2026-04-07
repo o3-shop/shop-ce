@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,14 +18,13 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
-use \oxField;
-use \oxRegistry;
+use oxField;
 
 class PricealarmTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -96,7 +96,7 @@ class PricealarmTest extends \OxidTestCase
         $oAlarm->setId('testalarm');
         $oAlarm->oxpricealarm__oxartid = new oxField('1672', oxField::T_RAW);
         $oAlarm->save();
-        $oProduct = oxNew("oxArticle");
+        $oProduct = oxNew('oxArticle');
         $oProduct->load('1672');
         $oAlarm = oxNew('oxpricealarm');
         $oAlarm->load('testalarm');
@@ -148,8 +148,8 @@ class PricealarmTest extends \OxidTestCase
         $oAlarm->oxpricealarm__oxprice = new oxField('13', oxField::T_RAW);
         $oAlarm->save();
 
-        $oAlarm = $this->getMock(\OxidEsales\Eshop\Application\Model\PriceAlarm::class, array('getPrice'));
-        $oAlarm->expects($this->once())->method('getPrice')->will($this->returnValue("15"));
+        $oAlarm = $this->getMock(\OxidEsales\Eshop\Application\Model\PriceAlarm::class, ['getPrice']);
+        $oAlarm->expects($this->once())->method('getPrice')->will($this->returnValue('15'));
         $oAlarm->load('testalarm');
         $this->assertEquals(0, $oAlarm->getPriceAlarmStatus());
     }
@@ -162,8 +162,8 @@ class PricealarmTest extends \OxidTestCase
         $oAlarm->oxpricealarm__oxsended = new oxField('2010-10-10 00:00:00', oxField::T_RAW);
         $oAlarm->save();
 
-        $oAlarm = $this->getMock(\OxidEsales\Eshop\Application\Model\PriceAlarm::class, array('getPrice'));
-        $oAlarm->expects($this->once())->method('getPrice')->will($this->returnValue("15"));
+        $oAlarm = $this->getMock(\OxidEsales\Eshop\Application\Model\PriceAlarm::class, ['getPrice']);
+        $oAlarm->expects($this->once())->method('getPrice')->will($this->returnValue('15'));
         $oAlarm->load('testalarm');
         $this->assertEquals(2, $oAlarm->getPriceAlarmStatus());
     }
@@ -175,8 +175,8 @@ class PricealarmTest extends \OxidTestCase
         $oAlarm->oxpricealarm__oxprice = new oxField('13', oxField::T_RAW);
         $oAlarm->save();
 
-        $oAlarm = $this->getMock(\OxidEsales\Eshop\Application\Model\PriceAlarm::class, array('getPrice'));
-        $oAlarm->expects($this->once())->method('getPrice')->will($this->returnValue("12"));
+        $oAlarm = $this->getMock(\OxidEsales\Eshop\Application\Model\PriceAlarm::class, ['getPrice']);
+        $oAlarm->expects($this->once())->method('getPrice')->will($this->returnValue('12'));
         $oAlarm->load('testalarm');
         $this->assertEquals(1, $oAlarm->getPriceAlarmStatus());
     }

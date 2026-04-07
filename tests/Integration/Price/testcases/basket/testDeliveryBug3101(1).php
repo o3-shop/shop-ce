@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -10,21 +11,20 @@
  * 0003101: delivery cost is not recalculated after discount in basket
  * 6 with discount total price less than 150, but more without discount
  */
-$aData = array(
-
+$aData = [
     'skipped' => 1, // remove when #3101 will be fixed
 
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             'oxid'                     => 'vine1',
             'oxprice'                  => 27.9,
             'oxvat'                    => 19,
             'amount'                   => 6,
-        ),
-    ),
+        ],
+    ],
 
-    'discounts' => array(
-        0 => array(
+    'discounts' => [
+        0 => [
             'oxid'         => 'discount11',
             'oxaddsum'     => 11,
             'oxaddsumtype' => '%',
@@ -32,12 +32,12 @@ $aData = array(
             'oxamountto' => 99999,
             'oxactive' => 1,
             'oxsort' => 10,
-        ),
-    ),
+        ],
+    ],
 
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxtitle' => 'less than 150 EUR',
                 'oxactive' => 1,
                 'oxaddsum' => 10,
@@ -47,8 +47,8 @@ $aData = array(
                 'oxparam' => 0, //from
                 'oxparamend' => 150, //to
                 'oxsort' => 1,
-            ),
-            1 => array(
+            ],
+            1 => [
                 'oxtitle' => 'more than 150 EUR',
                 'oxactive' => 1,
                 'oxaddsum' => 0,
@@ -58,36 +58,36 @@ $aData = array(
                 'oxparam' => 150.01, //from
                 'oxparamend' => 99999, //to
                 'oxsort' => 2,
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-            'vine1' => array( '27,90', '167,40' ),
-        ),
-        'totals' => array(
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+            'vine1' => [ '27,90', '167,40' ],
+        ],
+        'totals' => [
             'totalBrutto' => '167,40',
             'totalNetto'  => '125,20',
-            'vats' => array(
+            'vats' => [
                 19 => '23,79',
-            ),
-            'delivery' => array(
+            ],
+            'delivery' => [
                 'brutto' => '10,00',
-            ),
-            'discounts' => array(
+            ],
+            'discounts' => [
                 'discount11' => '18,41',
-            ),
-            'grandTotal'  => '158,99'
-        ),
-    ),
-    'options' => array(
+            ],
+            'grandTotal'  => '158,99',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'blShowVATForWrapping' => false,
             'blShowVATForDelivery' => false,
             'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
-    ),
-);
+        ],
+    ],
+];

@@ -53,7 +53,7 @@ class ContentList extends AdminListController
      *
      * @var string
      */
-    protected $_sThisTemplate = "content_list.tpl";
+    protected $_sThisTemplate = 'content_list.tpl';
 
     /**
      * Executes parent method parent::render() and returns current class template
@@ -69,8 +69,8 @@ class ContentList extends AdminListController
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
         $sFolder = $sFolder ? $sFolder : -1;
 
-        $this->_aViewData["folder"] = $sFolder;
-        $this->_aViewData["afolder"] = Registry::getConfig()->getConfigParam('aCMSfolder');
+        $this->_aViewData['folder'] = $sFolder;
+        $this->_aViewData['afolder'] = Registry::getConfig()->getConfigParam('aCMSfolder');
 
         return $this->_sThisTemplate;
     }
@@ -103,7 +103,7 @@ class ContentList extends AdminListController
     {
         $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $sFolder = Registry::getRequest()->getRequestEscapedParameter('folder');
-        $sViewName = getviewName("oxcontents");
+        $sViewName = getviewName('oxcontents');
 
         // searching for empty oxfolder fields
         if ($sFolder == 'CMSFOLDER_NONE' || $sFolder == 'CMSFOLDER_NONE_RR') {
@@ -114,5 +114,5 @@ class ContentList extends AdminListController
         }
 
         return $sQ;
-    }    
+    }
 }

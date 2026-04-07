@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\VoucherSerie;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for VoucherSerie_Main class
  */
 class VoucherSerieMainTest extends \OxidTestCase
 {
-
     /**
      * Cleanup
      *
@@ -38,8 +38,8 @@ class VoucherSerieMainTest extends \OxidTestCase
     public function tearDown(): void
     {
         // cleanup
-        $this->cleanUpTable("oxvouchers");
-        $this->cleanUpTable("oxvoucherseries");
+        $this->cleanUpTable('oxvouchers');
+        $this->cleanUpTable('oxvoucherseries');
 
         parent::tearDown();
     }
@@ -51,7 +51,7 @@ class VoucherSerieMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('VoucherSerie_Main');
@@ -69,7 +69,7 @@ class VoucherSerieMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('VoucherSerie_Main');
@@ -77,7 +77,7 @@ class VoucherSerieMainTest extends \OxidTestCase
 
         $aViewData = $oView->getViewData();
         $this->assertFalse(isset($aViewData['edit']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -94,11 +94,11 @@ class VoucherSerieMainTest extends \OxidTestCase
             $oView = oxNew('VoucherSerie_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in Wrapping_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in Wrapping_Main::save()');
 
             return;
         }
-        $this->fail("error in VoucherSerie_Main::save()");
+        $this->fail('error in VoucherSerie_Main::save()');
     }
 
     /**
@@ -120,17 +120,17 @@ class VoucherSerieMainTest extends \OxidTestCase
     public function testGetStatus()
     {
         // no series..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain::class, array("_getVoucherSerie"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain::class, ['_getVoucherSerie']);
         $oView->expects($this->once())->method('_getVoucherSerie')->will($this->returnValue(false));
         $this->assertNull($oView->getStatus());
 
         // with serie..
-        $oSerie = $this->getMock(\OxidEsales\Eshop\Application\Model\VoucherSerie::class, array("countVouchers"));
-        $oSerie->expects($this->once())->method('countVouchers')->will($this->returnValue("testCountVouchers"));
+        $oSerie = $this->getMock(\OxidEsales\Eshop\Application\Model\VoucherSerie::class, ['countVouchers']);
+        $oSerie->expects($this->once())->method('countVouchers')->will($this->returnValue('testCountVouchers'));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain::class, array("_getVoucherSerie"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VoucherSerieMain::class, ['_getVoucherSerie']);
         $oView->expects($this->once())->method('_getVoucherSerie')->will($this->returnValue($oSerie));
-        $this->assertEquals("testCountVouchers", $oView->getStatus());
+        $this->assertEquals('testCountVouchers', $oView->getStatus());
     }
 
     /**
@@ -140,21 +140,21 @@ class VoucherSerieMainTest extends \OxidTestCase
      */
     public function testStart()
     {
-        $this->setRequestParameter("voucherid", "testvoucherid");
-        $this->setRequestParameter("voucherAmount", "testvoucherAmount");
-        $this->setRequestParameter("randomVoucherNr", "testrandomVoucherNr");
-        $this->setRequestParameter("voucherNr", "testvoucherNr");
-        $this->setRequestParameter("cl", "voucherserie_generate");
+        $this->setRequestParameter('voucherid', 'testvoucherid');
+        $this->setRequestParameter('voucherAmount', 'testvoucherAmount');
+        $this->setRequestParameter('randomVoucherNr', 'testrandomVoucherNr');
+        $this->setRequestParameter('voucherNr', 'testvoucherNr');
+        $this->setRequestParameter('cl', 'voucherserie_generate');
 
         $oView = oxNew('VoucherSerie_Main');
         $oView->start();
 
         $oSession = $this->getSession();
 
-        $this->assertEquals($oSession->getVariable("voucherid"), "testvoucherid");
-        $this->assertEquals($oSession->getVariable("voucherAmount"), 0);
-        $this->assertEquals($oSession->getVariable("randomVoucherNr"), "testrandomVoucherNr");
-        $this->assertEquals($oSession->getVariable("voucherNr"), "testvoucherNr");
+        $this->assertEquals($oSession->getVariable('voucherid'), 'testvoucherid');
+        $this->assertEquals($oSession->getVariable('voucherAmount'), 0);
+        $this->assertEquals($oSession->getVariable('randomVoucherNr'), 'testrandomVoucherNr');
+        $this->assertEquals($oSession->getVariable('voucherNr'), 'testvoucherNr');
     }
 
     /**
@@ -162,21 +162,21 @@ class VoucherSerieMainTest extends \OxidTestCase
      */
     public function testNotAllowEmptyVoucherGeneration()
     {
-        $this->setRequestParameter("voucherid", "testvoucherid");
-        $this->setRequestParameter("voucherAmount", "testvoucherAmount");
-        $this->setRequestParameter("randomVoucherNr", "");
-        $this->setRequestParameter("voucherNr", "");
-        $this->setRequestParameter("cl", "voucherserie_generate");
+        $this->setRequestParameter('voucherid', 'testvoucherid');
+        $this->setRequestParameter('voucherAmount', 'testvoucherAmount');
+        $this->setRequestParameter('randomVoucherNr', '');
+        $this->setRequestParameter('voucherNr', '');
+        $this->setRequestParameter('cl', 'voucherserie_generate');
 
         $oView = oxNew('VoucherSerie_Main');
         $oView->start();
 
         $oSession = $this->getSession();
 
-        $this->assertNull($oSession->getVariable("voucherid"), "testvoucherid");
-        $this->assertNull($oSession->getVariable("voucherAmount"), 0);
-        $this->assertNull($oSession->getVariable("randomVoucherNr"));
-        $this->assertNull($oSession->getVariable("voucherNr"));
+        $this->assertNull($oSession->getVariable('voucherid'), 'testvoucherid');
+        $this->assertNull($oSession->getVariable('voucherAmount'), 0);
+        $this->assertNull($oSession->getVariable('randomVoucherNr'));
+        $this->assertNull($oSession->getVariable('voucherNr'));
     }
 
     /**
@@ -187,17 +187,17 @@ class VoucherSerieMainTest extends \OxidTestCase
     public function testGetVoucherSerie()
     {
         // inserting demo voucher
-        $oVoucherSerie = oxNew("oxvoucherserie");
-        $oVoucherSerie->setId("_testvoucherserie");
+        $oVoucherSerie = oxNew('oxvoucherserie');
+        $oVoucherSerie->setId('_testvoucherserie');
         $oVoucherSerie->save();
 
-        $this->getSession()->setVariable("voucherid", "_testvoucherserie");
+        $this->getSession()->setVariable('voucherid', '_testvoucherserie');
 
         $oView = oxNew('VoucherSerie_Main');
         $oVoucherSerie = $oView->UNITgetVoucherSerie();
 
         $this->assertNotNull($oVoucherSerie);
-        $this->assertEquals("_testvoucherserie", $oVoucherSerie->getId());
+        $this->assertEquals('_testvoucherserie', $oVoucherSerie->getId());
     }
 
     /**
@@ -208,6 +208,6 @@ class VoucherSerieMainTest extends \OxidTestCase
     public function testGetViewId()
     {
         $oView = oxNew('VoucherSerie_Main');
-        $this->assertEquals("tbclvoucherserie_main", $oView->getViewId());
+        $this->assertEquals('tbclvoucherserie_main', $oView->getViewId());
     }
 }

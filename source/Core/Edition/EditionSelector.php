@@ -33,7 +33,7 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class EditionSelector
 {
-    const COMMUNITY = 'CE';
+    public const COMMUNITY = 'CE';
 
     /** @var string Edition abbreviation  */
     private $edition = null;
@@ -75,7 +75,7 @@ class EditionSelector
     protected function findEdition()
     {
         if (!class_exists('OxidEsales\EshopCommunity\Core\Registry') || !Registry::instanceExists('oxConfigFile')) {
-            $configFile = new ConfigFile(OX_BASE_PATH . DIRECTORY_SEPARATOR . "config.inc.php");
+            $configFile = new ConfigFile(OX_BASE_PATH . DIRECTORY_SEPARATOR . 'config.inc.php');
         }
         $configFile = isset($configFile) ? $configFile : Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class);
         $edition = $configFile->getVar('edition') ?: $this->getEditionByExistingClasses();

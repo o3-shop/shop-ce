@@ -110,8 +110,8 @@ class RssController extends FrontendController
 
         $this->_aViewData['oxEngineTemplateId'] = $this->getViewId();
         // return rss xml, no further processing
-        $sCharset = Registry::getLang()->translateString("charset");
-        Registry::getUtils()->setHeader("Content-Type: text/xml; charset=" . $sCharset);
+        $sCharset = Registry::getLang()->translateString('charset');
+        Registry::getUtils()->setHeader('Content-Type: text/xml; charset=' . $sCharset);
         Registry::getUtils()->showMessageAndExit(
             $this->processOutput(
                 $renderer->renderTemplate($this->_sThisTemplate, $this->_aViewData)
@@ -209,7 +209,7 @@ class RssController extends FrontendController
     public function searcharts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssSearch')) {
-            $sSearchParameter = Registry::getRequest()->getRequestEscapedParameter('searchparam', true);
+            $sSearchParameter = Registry::getRequest()->getRequestParameter('searchparam');
             $sCatId = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
             $sVendorId = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
             $sManufacturerId = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');

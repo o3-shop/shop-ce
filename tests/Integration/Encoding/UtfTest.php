@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Encoding;
 
 use oxArticleList;
@@ -31,6 +33,7 @@ use oxField;
 use oxGroups;
 use OxidEsales\Eshop\Application\Model\Order;
 use OxidEsales\Eshop\Core\Field;
+use OxidEsales\EshopCommunity\Application\Model\Attribute;
 use OxidEsales\EshopCommunity\Application\Model\RssFeed;
 use oxLinks;
 use oxList;
@@ -49,7 +52,6 @@ use oxUserPayment;
 use oxUtils;
 use oxUtilsString;
 use stdClass;
-use OxidEsales\EshopCommunity\Application\Model\Attribute;
 
 /**
  * Class Unit_utf8Test
@@ -141,10 +143,10 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxaddress__oxcompany', 'oxaddress__oxfname', 'oxaddress__oxlname',
+        $aFields = ['oxaddress__oxcompany', 'oxaddress__oxfname', 'oxaddress__oxlname',
                          'oxaddress__oxstreet', 'oxaddress__oxstreetnr', 'oxaddress__oxaddinfo',
                          'oxaddress__oxcity', 'oxaddress__oxcountry', 'oxaddress__oxzip',
-                         'oxaddress__oxfon', 'oxaddress__oxfax', 'oxaddress__oxsal');
+                         'oxaddress__oxfon', 'oxaddress__oxfax', 'oxaddress__oxsal'];
 
         $oAddress = new oxBase();
         $oAddress->init('oxaddress');
@@ -159,7 +161,7 @@ class UtfTest extends \OxidTestCase
         $oAddress->load('_testAddress');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oAddress->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oAddress->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oAddress->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oAddress->{$sFieldName}->value . ')');
         }
     }
 
@@ -205,7 +207,7 @@ class UtfTest extends \OxidTestCase
 
     public function testOxArticleSaveAndLoad()
     {
-        $aData = array(
+        $aData = [
             'oxarticles__oxtitle'       => 'Опрос жителей больших городов pergalių seriją Wertschöpfungskette gebündeltem',
             'oxarticles__oxshortdesc'   => 'Žiniasklaidai vis dažniau užsimenant šičęвсе чаще сообщают Außergewöhnliche Performance, geringer Server-Ressourcen Verbrauch',
             'oxarticles__oxurldesc'     => 'Miestiečiai - už protestus, bet prie Šiaurės ęčūпримет меры по предотвращению беспорядков Umfassende Möglichkeiten für funktionale und visuelle Anpassungen',
@@ -214,7 +216,7 @@ class UtfTest extends \OxidTestCase
             'oxarticles__oxsearchkeys'  => 'ministrų „žvalgybos создании Жемайтийской Zubehörprodukte',
             'oxarticles__oxvarname'     => 'Žemkalniui звездой Gästebuch',
             'oxarticles__oxvarselect'   => 'agentū безрабо. Veröffentlicht',
-        );
+        ];
         $sLongDesc = 'Nekilnojamojo turto agentūrų verslo sėkme Литовские европарламентарии, срок полномочий которых в 2009 году подходит к концу Der Umstieg war für uns ein voller Erfolg. O3-Shop ist flexibel und benutzerfreundlich';
 
         $oArticle = oxNew('oxArticle');
@@ -255,7 +257,7 @@ class UtfTest extends \OxidTestCase
 
     public function testOxArticleGetPersParam()
     {
-        $aPersParam = array('_testArticle' => 'sėkme Литовские für');
+        $aPersParam = ['_testArticle' => 'sėkme Литовские für'];
         $this->getSession()->setVariable('persparam', $aPersParam);
         $oArticle = oxNew('oxArticle');
         $oArticle->setId('_testArticle');
@@ -348,10 +350,9 @@ class UtfTest extends \OxidTestCase
         $oO2a->oxobject2attribute__oxvalue = new oxField();
         $oO2a->save();
 
-
         // finally testing
         $oArtList = new oxArticleList();
-        $oArtList->loadCategoryIds($sCatId, array($sCatId => array('0' => array('_testAttribute1' => 'Литовские-'))));
+        $oArtList->loadCategoryIds($sCatId, [$sCatId => ['0' => ['_testAttribute1' => 'Литовские-']]]);
         $aKeys = $oArtList->arrayKeys();
 
         $this->assertTrue(in_array('_testArticle1', $aKeys));
@@ -359,7 +360,7 @@ class UtfTest extends \OxidTestCase
         $this->assertFalse(in_array('_testArticle3', $aKeys));
 
         $oArtList = new oxArticleList();
-        $oArtList->loadCategoryIds($sCatId, array($sCatId => array('0' => array('_testAttribute2' => 'agentūrų-'))));
+        $oArtList->loadCategoryIds($sCatId, [$sCatId => ['0' => ['_testAttribute2' => 'agentūrų-']]]);
         $aKeys = $oArtList->arrayKeys();
 
         $this->assertFalse(in_array('_testArticle1', $aKeys));
@@ -367,7 +368,7 @@ class UtfTest extends \OxidTestCase
         $this->assertFalse(in_array('_testArticle3', $aKeys));
 
         $oArtList = new oxArticleList();
-        $oArtList->loadCategoryIds($sCatId, array($sCatId => array('0' => array('_testAttribute3' => 'für-'))));
+        $oArtList->loadCategoryIds($sCatId, [$sCatId => ['0' => ['_testAttribute3' => 'für-']]]);
         $aKeys = $oArtList->arrayKeys();
 
         $this->assertFalse(in_array('_testArticle1', $aKeys));
@@ -407,27 +408,26 @@ class UtfTest extends \OxidTestCase
     {
         $oTestArticle1 = oxNew('oxArticle');
         $oTestArticle1->setId('_testArticle1');
-        $oTestArticle1->oxarticles__oxtitle = new oxField("testart_ä");
+        $oTestArticle1->oxarticles__oxtitle = new oxField('testart_ä');
         $oTestArticle1->save();
 
         $oTestArticle2 = oxNew('oxArticle');
         $oTestArticle2->setId('_testArticle2');
-        $oTestArticle2->oxarticles__oxtitle = new oxField("testart_o");
+        $oTestArticle2->oxarticles__oxtitle = new oxField('testart_o');
         $oTestArticle2->save();
 
         $oTestArticle3 = oxNew('oxArticle');
         $oTestArticle3->setId('_testArticle3');
-        $oTestArticle3->oxarticles__oxtitle = new oxField("testart_a");
+        $oTestArticle3->oxarticles__oxtitle = new oxField('testart_a');
         $oTestArticle3->save();
 
         $oArtList = new oxArticleList();
-        $oArtList->setCustomSorting(getViewName('oxarticles') . ".oxtitle desc");
+        $oArtList->setCustomSorting(getViewName('oxarticles') . '.oxtitle desc');
         $oArtList->loadSearchIds('testart');
         $aKeys = $oArtList->arrayKeys();
 
-        $this->assertEquals(array('_testArticle2', '_testArticle1', '_testArticle3'), $aKeys);
+        $this->assertEquals(['_testArticle2', '_testArticle1', '_testArticle3'], $aKeys);
     }
-
 
     public function testOxAttributeSaveAndLoad()
     {
@@ -448,15 +448,15 @@ class UtfTest extends \OxidTestCase
     {
         $oArticle = oxNew('oxArticle');
         $oArticle->setId('_testArticle');
-        $oArticle->oxarticles__oxtitle = new oxField("agentūrų Литовские");
-        $oArticle->oxarticles__oxvarselect = new oxField("für");
+        $oArticle->oxarticles__oxtitle = new oxField('agentūrų Литовские');
+        $oArticle->oxarticles__oxvarselect = new oxField('für');
         $oArticle->save();
 
         $oBasketItem = new oxBasketItem();
         $oBasketItem->UNITsetArticle('_testArticle');
 
-        $this->assertEquals("agentūrų Литовские, für", $oBasketItem->getTitle());
-        $this->assertEquals("für", $oBasketItem->getVarSelect());
+        $this->assertEquals('agentūrų Литовские, für', $oBasketItem->getTitle());
+        $this->assertEquals('für', $oBasketItem->getVarSelect());
     }
 
     public function testOxCategorySaveAndLoad()
@@ -551,13 +551,13 @@ class UtfTest extends \OxidTestCase
         $activeCategory = $this->getTestConfig()->getShopEdition() == 'EE' ? '3ee44bf933cf342e2.99739972' : '8a142c3e44ea4e714.31136811';
         $activeRoot = $this->getTestConfig()->getShopEdition() == 'EE' ? '30e44ab83fdee7564.23264141' : '8a142c3e4143562a5.46426637';
 
-        $categoryList = $this->getProxyClass("oxCategoryList");
+        $categoryList = $this->getProxyClass('oxCategoryList');
         $categoryList->setNonPublicVar('sShopID', null);
 
         $categoryList->buildTree($activeCategory, 0, 0, 1);
 
         //Check root order
-        $currentRootOrder = array();
+        $currentRootOrder = [];
         foreach ($categoryList as $category) {
             $currentRootOrder[] = $category->oxcategories__oxsort->value;
         }
@@ -566,7 +566,7 @@ class UtfTest extends \OxidTestCase
         $this->assertEquals(implode(',', $expectedRootOrder), implode(',', $currentRootOrder));
 
         //Check subcategory order
-        $currentSubcategoryOrder = array();
+        $currentSubcategoryOrder = [];
         foreach ($categoryList[$activeRoot]->getSubCats() as $category) {
             $currentSubcategoryOrder[] = $category->oxcategories__oxsort->value;
         }
@@ -582,8 +582,8 @@ class UtfTest extends \OxidTestCase
      */
     public function testOxConfigCheckParamSpecialChars()
     {
-        $sIn = "a&g<e>n\"t'ūrų Л" . chr(0) . "итовские fü\\r";
-        $sOut = "a&amp;g&lt;e&gt;n&quot;t&#039;ūrų Литовские fü&#092;r";
+        $sIn = "a&g<e>n\"t'ūrų Л" . chr(0) . 'итовские fü\\r';
+        $sOut = 'a&amp;g&lt;e&gt;n&quot;t&#039;ūrų Литовские fü&#092;r';
 
         $this->assertEquals($sOut, $this->getConfig()->checkParamSpecialChars($sIn));
     }
@@ -630,7 +630,7 @@ class UtfTest extends \OxidTestCase
         $oCurr4->decimal = '2';
         $oCurr4->selected = '0';
 
-        $aCurrArray = array($oCurr1, $oCurr2, $oCurr3, $oCurr4);
+        $aCurrArray = [$oCurr1, $oCurr2, $oCurr3, $oCurr4];
 
         $this->assertEquals($aCurrArray, $this->getConfig()->getCurrencyArray());
     }
@@ -641,7 +641,7 @@ class UtfTest extends \OxidTestCase
 
         $oContent = new oxContent();
         $oContent->setId('_testContent');
-        $oContent->oxcontents__oxloadid = new oxField("_testLoadId");
+        $oContent->oxcontents__oxloadid = new oxField('_testLoadId');
         $oContent->oxcontents__oxtitle = new oxField($sValue);
         $oContent->oxcontents__oxcontent = new oxField($sValue);
         $oContent->oxcontents__oxfolder = new oxField($sValue);
@@ -662,9 +662,9 @@ class UtfTest extends \OxidTestCase
         $oCountry = oxNew('oxCountry');
         $oCountry->setId('_testCountry');
         $oCountry->oxcountry__oxtitle = new oxField($sValue);
-        $oCountry->oxcountry__oxisoalpha2 = new oxField("ėЛ");
-        $oCountry->oxcountry__oxisoalpha3 = new oxField("ėЛü");
-        $oCountry->oxcountry__oxunnum3 = new oxField("ėЛü");
+        $oCountry->oxcountry__oxisoalpha2 = new oxField('ėЛ');
+        $oCountry->oxcountry__oxisoalpha3 = new oxField('ėЛü');
+        $oCountry->oxcountry__oxunnum3 = new oxField('ėЛü');
         $oCountry->oxcountry__oxshortdesc = new oxField($sValue);
         $oCountry->oxcountry__oxlongdesc = new oxField($sValue);
         $oCountry->save();
@@ -673,9 +673,9 @@ class UtfTest extends \OxidTestCase
         $oCountry->load('_testCountry');
 
         $this->assertEquals($sValue, $oCountry->oxcountry__oxtitle->value);
-        $this->assertEquals("ėЛ", $oCountry->oxcountry__oxisoalpha2->value);
-        $this->assertEquals("ėЛü", $oCountry->oxcountry__oxisoalpha3->value);
-        $this->assertEquals("ėЛü", $oCountry->oxcountry__oxunnum3->value);
+        $this->assertEquals('ėЛ', $oCountry->oxcountry__oxisoalpha2->value);
+        $this->assertEquals('ėЛü', $oCountry->oxcountry__oxisoalpha3->value);
+        $this->assertEquals('ėЛü', $oCountry->oxcountry__oxunnum3->value);
         $this->assertEquals($sValue, $oCountry->oxcountry__oxshortdesc->value);
         $this->assertEquals($sValue, $oCountry->oxcountry__oxlongdesc->value);
     }
@@ -706,7 +706,7 @@ class UtfTest extends \OxidTestCase
 
         $oCountry = $oCountryList->current();
         $this->assertTrue((bool) $oCountry);
-        $this->assertEquals("_testCountry", $oCountry->getId());
+        $this->assertEquals('_testCountry', $oCountry->getId());
     }
 
     public function testOxDeliverySaveAndLoad()
@@ -781,14 +781,14 @@ class UtfTest extends \OxidTestCase
         $oLang = oxRegistry::getLang();
 
         // testing some constants ..
-        $this->assertEquals('Ihr Passwort wurde geändert.', $oLang->translateString("MESSAGE_PASSWORD_CHANGED", 0, false));
-        $this->assertEquals('Keine Grußkarte', $oLang->translateString("NO_GREETING_CARD", 0, false));
-        $this->assertEquals('UTF-8', $oLang->translateString("charset", 0, false));
+        $this->assertEquals('Ihr Passwort wurde geändert.', $oLang->translateString('MESSAGE_PASSWORD_CHANGED', 0, false));
+        $this->assertEquals('Keine Grußkarte', $oLang->translateString('NO_GREETING_CARD', 0, false));
+        $this->assertEquals('UTF-8', $oLang->translateString('charset', 0, false));
         $this->assertEquals('\/ß[]~ä#-', $oLang->translateString("\/ß[]~ä#-"));
 
-        $this->assertEquals('Bitte Kategorien wählen', $oLang->translateString("GENERAL_CATEGORYSELECT", 0, true));
-        $this->assertEquals('Notiz anfügen', $oLang->translateString("TOOLTIPS_NEWREMARK", 0, true));
-        $this->assertEquals('UTF-8', $oLang->translateString("charset", 0, true));
+        $this->assertEquals('Bitte Kategorien wählen', $oLang->translateString('GENERAL_CATEGORYSELECT', 0, true));
+        $this->assertEquals('Notiz anfügen', $oLang->translateString('TOOLTIPS_NEWREMARK', 0, true));
+        $this->assertEquals('UTF-8', $oLang->translateString('charset', 0, true));
     }
 
     public function testOxLinksSaveAndLoad()
@@ -831,7 +831,7 @@ class UtfTest extends \OxidTestCase
         $oMedia->save();
         $oMedia->setId('_testMan2');
         $oMedia->oxmediaurls__oxdesc = new oxField($sValue);
-        $oMedia->oxmediaurls__oxurl = new oxField("http://www.youtube.com/watch?v=ZN239G6aJZo");
+        $oMedia->oxmediaurls__oxurl = new oxField('http://www.youtube.com/watch?v=ZN239G6aJZo');
         $oMedia->save();
 
         $oMedia = oxNew('oxMediaUrl');
@@ -906,7 +906,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxorder__oxbillcompany', 'oxorder__oxbillemail', 'oxorder__oxbillfname',
+        $aFields = ['oxorder__oxbillcompany', 'oxorder__oxbillemail', 'oxorder__oxbillfname',
                          'oxorder__oxbilllname', 'oxorder__oxbillstreet', 'oxorder__oxbillstreetnr',
                          'oxorder__oxbilladdinfo', 'oxorder__oxbillustid', 'oxorder__oxbillcity',
                          'oxorder__oxbillzip', 'oxorder__oxbillfon',
@@ -917,7 +917,7 @@ class UtfTest extends \OxidTestCase
                          'oxorder__oxdelfax', 'oxorder__oxdelsal', 'oxorder__oxbillnr',
                          'oxorder__oxtrackcode', 'oxorder__oxremark', 'oxorder__oxcurrency',
                          'oxorder__oxtransid', 'oxorder__oxcardtext',
-                         'oxorder__oxxid', 'oxorder__oxip');
+                         'oxorder__oxxid', 'oxorder__oxip'];
 
         $oOrder = oxNew('oxorder');
         $oOrder->setId('_testOrder');
@@ -930,26 +930,26 @@ class UtfTest extends \OxidTestCase
         $oOrder->load('_testOrder');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oOrder->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oOrder->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oOrder->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oOrder->{$sFieldName}->value . ')');
         }
     }
 
     public function testOxOrderSetPaymentWithDynValues()
     {
-        $aDynVal = array(
+        $aDynVal = [
             'lsbankname'   => 'Bank name',
             'lsblz'        => '12345678',
             'lsktonr'      => '123456789',
-            'lsktoinhaber' => 'Hans Mustermann'
-        );
+            'lsktoinhaber' => 'Hans Mustermann',
+        ];
         $this->getSession()->setVariable('dynvalue', $aDynVal);
 
-        $oOrder = $this->getProxyClass("oxOrder");
+        $oOrder = $this->getProxyClass('oxOrder');
         $oOrder->oxorder__oxuserid = new oxField();
 
         $oUserpayment = $oOrder->UNITsetPayment('oxiddebitnote');
 
-        $sValue = "lsbankname__Bank name@@lsblz__12345678@@lsktonr__123456789@@lsktoinhaber__Hans Mustermann@@";
+        $sValue = 'lsbankname__Bank name@@lsblz__12345678@@lsktonr__123456789@@lsktoinhaber__Hans Mustermann@@';
         $this->assertEquals($sValue, $oUserpayment->oxuserpayments__oxvalue->value);
         $this->assertEquals(4, count($oUserpayment->aDynValues));
     }
@@ -972,13 +972,13 @@ class UtfTest extends \OxidTestCase
     {
         $value = 'agentūЛитовfür';
 
-        $fieldsToCheck = array('oxorderarticles__oxartnum', 'oxorderarticles__oxtitle', 'oxorderarticles__oxshortdesc',
+        $fieldsToCheck = ['oxorderarticles__oxartnum', 'oxorderarticles__oxtitle', 'oxorderarticles__oxshortdesc',
                                'oxorderarticles__oxselvariant', 'oxorderarticles__oxpersparam', 'oxorderarticles__oxexturl',
                                'oxorderarticles__oxurldesc', 'oxorderarticles__oxurlimg', 'oxorderarticles__oxthumb',
                                'oxorderarticles__oxpic1', 'oxorderarticles__oxpic2',
                                'oxorderarticles__oxpic3', 'oxorderarticles__oxpic4', 'oxorderarticles__oxpic5',
                                'oxorderarticles__oxfile', 'oxorderarticles__oxsearchkeys', 'oxorderarticles__oxtemplate',
-                               'oxorderarticles__oxquestionemail', 'oxorderarticles__oxfolder', 'oxorderarticles__oxsubclass');
+                               'oxorderarticles__oxquestionemail', 'oxorderarticles__oxfolder', 'oxorderarticles__oxsubclass'];
 
         if ($this->getTestConfig()->getShopEdition() == 'EE') {
             $fieldsToCheck[] = 'oxorderarticles__oxerpstatus';
@@ -1000,7 +1000,7 @@ class UtfTest extends \OxidTestCase
         $orderArticle->load('_testOrder');
 
         foreach ($fieldsToCheck as $fieldName) {
-            $this->assertTrue(strcmp($orderArticle->{$fieldName}->value, $value) === 0, "$fieldName (" . $orderArticle->{$fieldName}->value . ")");
+            $this->assertTrue(strcmp($orderArticle->{$fieldName}->value, $value) === 0, "$fieldName (" . $orderArticle->{$fieldName}->value . ')');
         }
     }
 
@@ -1014,7 +1014,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxpayments__oxdesc', 'oxpayments__oxvaldesc');
+        $aFields = ['oxpayments__oxdesc', 'oxpayments__oxvaldesc'];
 
         $oPayment = oxNew('oxpayment');
         $oPayment->setId('_testPayment');
@@ -1027,7 +1027,7 @@ class UtfTest extends \OxidTestCase
         $oPayment->load('_testPayment');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oPayment->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oPayment->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oPayment->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oPayment->{$sFieldName}->value . ')');
         }
     }
 
@@ -1035,7 +1035,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxpricealarm__oxemail', 'oxpricealarm__oxcurrency');
+        $aFields = ['oxpricealarm__oxemail', 'oxpricealarm__oxcurrency'];
 
         $oPricealarm = oxNew('oxpricealarm');
         $oPricealarm->setId('_testPricealarm');
@@ -1048,7 +1048,7 @@ class UtfTest extends \OxidTestCase
         $oPricealarm->load('_testPricealarm');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oPricealarm->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oPricealarm->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oPricealarm->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oPricealarm->{$sFieldName}->value . ')');
         }
     }
 
@@ -1056,7 +1056,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxrecommlists__oxauthor', 'oxrecommlists__oxtitle', 'oxrecommlists__oxdesc');
+        $aFields = ['oxrecommlists__oxauthor', 'oxrecommlists__oxtitle', 'oxrecommlists__oxdesc'];
 
         $oRecList = oxNew('oxrecommlist');
         $oRecList->setId('_testRecommlist');
@@ -1069,7 +1069,7 @@ class UtfTest extends \OxidTestCase
         $oRecList->load('_testRecommlist');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oRecList->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oRecList->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oRecList->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oRecList->{$sFieldName}->value . ')');
         }
     }
 
@@ -1077,7 +1077,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxrecommlists__oxauthor', 'oxrecommlists__oxtitle', 'oxrecommlists__oxdesc');
+        $aFields = ['oxrecommlists__oxauthor', 'oxrecommlists__oxtitle', 'oxrecommlists__oxdesc'];
 
         $oRecList = oxNew('oxrecommlist');
         $oRecList->setId('_testRecommlist');
@@ -1086,9 +1086,9 @@ class UtfTest extends \OxidTestCase
         }
         $oRecList->save();
         $oObj2List = new oxBase();
-        $oObj2List->init("oxobject2list");
-        $oObj2List->setId("_testRecom");
-        $oObj2List->oxobject2list__oxobjectid = new oxField("2000");
+        $oObj2List->init('oxobject2list');
+        $oObj2List->setId('_testRecom');
+        $oObj2List->oxobject2list__oxobjectid = new oxField('2000');
         $oObj2List->oxobject2list__oxlistid = new oxField('_testRecommlist');
         $oObj2List->save();
 
@@ -1100,7 +1100,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxremark__oxtext');
+        $aFields = ['oxremark__oxtext'];
 
         $oRemark = oxNew('oxremark');
         $oRemark->setId('_testRemark');
@@ -1113,7 +1113,7 @@ class UtfTest extends \OxidTestCase
         $oRemark->load('_testRemark');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oRemark->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oRemark->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oRemark->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oRemark->{$sFieldName}->value . ')');
         }
     }
 
@@ -1121,7 +1121,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxreviews__oxtext');
+        $aFields = ['oxreviews__oxtext'];
 
         $oReview = oxNew('oxreview');
         $oReview->setId('_testReview');
@@ -1134,14 +1134,14 @@ class UtfTest extends \OxidTestCase
         $oReview->load('_testReview');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oReview->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oReview->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oReview->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oReview->{$sFieldName}->value . ')');
         }
     }
 
     public function testOxRssFeedGetArticleItems()
     {
         $config = $this->getConfig();
-        $config->setConfigParam('aCurrencies', array('EUR@1.00@.@.@EUR@1'));
+        $config->setConfigParam('aCurrencies', ['EUR@1.00@.@.@EUR@1']);
         $this->getConfig()->setConfigParam('bl_perfParseLongDescinSmarty', false);
 
         $rssFeed = oxNew('oxrssfeed');
@@ -1149,10 +1149,10 @@ class UtfTest extends \OxidTestCase
 
         $shortDescription = 'agentūrų Литовские für';
         $longDescription = new stdClass();
-        $longDescription->value = "";
+        $longDescription->value = '';
 
-        $articleMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, array("getLink", 'getLongDescription'));
-        $articleMock->expects($this->any())->method('getLink')->will($this->returnValue("artlink"));
+        $articleMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getLink', 'getLongDescription']);
+        $articleMock->expects($this->any())->method('getLink')->will($this->returnValue('artlink'));
         $articleMock->expects($this->any())->method('getLongDescription')->will($this->returnValue($longDescription));
         $articleMock->oxarticles__oxtitle = new oxField('title2');
         $articleMock->oxarticles__oxprice = new oxField(10);
@@ -1160,17 +1160,17 @@ class UtfTest extends \OxidTestCase
         $articleMock->oxarticles__oxtimestamp = new oxField('2011-09-06 09:46:42');
 
         $articleList = new oxarticlelist();
-        $articleList->assign(array($articleMock));
+        $articleList->assign([$articleMock]);
 
         $expectedArticle = new stdClass();
         $expectedArticle->title = 'title2 10.0 EUR';
         $expectedArticle->link = 'artlink';
         $expectedArticle->guid = 'artlink';
         $expectedArticle->isGuidPermalink = true;
-        $expectedArticle->description = "&lt;img src=&#039;" . $articleMock->getThumbnailUrl() . "&#039; border=0 align=&#039;left&#039; hspace=5&gt;" . $shortDescription;
-        $expectedArticle->date = "Tue, 06 Sep 2011 09:46:42 +0200";
+        $expectedArticle->description = '&lt;img src=&#039;' . $articleMock->getThumbnailUrl() . '&#039; border=0 align=&#039;left&#039; hspace=5&gt;' . $shortDescription;
+        $expectedArticle->date = 'Tue, 06 Sep 2011 09:46:42 +0200';
 
-        $this->assertEquals(array($expectedArticle), $rssFeed->UNITgetArticleItems($articleList));
+        $this->assertEquals([$expectedArticle], $rssFeed->UNITgetArticleItems($articleList));
     }
 
     public function testOxRssFeedPrepareFeedName()
@@ -1178,7 +1178,7 @@ class UtfTest extends \OxidTestCase
         $sValue = 'agentūrų Литовские für';
         $oRss = oxNew('oxrssfeed');
 
-        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getActiveShop'));
+        $oCfg = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveShop']);
         $oShop = oxNew('oxShop');
         $oShop->oxshops__oxname = new oxField($sValue);
         $oCfg->expects($this->any())->method('getActiveShop')->will($this->returnValue($oShop));
@@ -1193,7 +1193,7 @@ class UtfTest extends \OxidTestCase
         $sValue = 'agentūЛитовfür';
         $oRss = new oxrssfeed();
         $sResult = $this->getConfig()->getShopUrl() . 'rss/Suche/?searchparam=agent%C5%AB%D0%9B%D0%B8%D1%82%D0%BE%D0%B2f%C3%BCr&amp;searchcnid=BB&amp;searchvendor=CC&amp;searchmanufacturer=DD';
-        $this->assertEquals($sResult, $oRss->getSearchArticlesUrl($sValue, "BB", "CC", "DD"));
+        $this->assertEquals($sResult, $oRss->getSearchArticlesUrl($sValue, 'BB', 'CC', 'DD'));
     }
 
     public function testOxRssFeedGetSearchArticlesTitle()
@@ -1203,7 +1203,7 @@ class UtfTest extends \OxidTestCase
         $shop = oxNew('oxShop');
         $shop->oxshops__oxname = new oxField('Test Shop');
 
-        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array('getActiveShop'));
+        $config = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['getActiveShop']);
         $config->expects($this->any())->method('getActiveShop')->will($this->returnValue($shop));
 
         $rssFeedMock = $this->getMock(RssFeed::class, ['_getSearchParamsTranslation']);
@@ -1225,7 +1225,7 @@ class UtfTest extends \OxidTestCase
         $sValue = 'ū';
 
         // forcing config
-        $this->getConfig()->setConfigParam('aSearchCols', array('oxlongdesc'));
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
 
         $sQ = " and ( (  oxv_oxartextends_en.oxlongdesc like '%$sValue%' )  ) ";
 
@@ -1236,9 +1236,9 @@ class UtfTest extends \OxidTestCase
 
         $sFix = $oSearch->UNITgetWhere($sValue);
 
-        $aSearch = array("/\s+/", "/\t+/", "/\r+/", "/\n+/");
-        $sQ = trim(strtolower(preg_replace($aSearch, " ", $sQ)));
-        $sFix = trim(strtolower(preg_replace($aSearch, " ", $sFix)));
+        $aSearch = ["/\s+/", "/\t+/", "/\r+/", "/\n+/"];
+        $sQ = trim(strtolower(preg_replace($aSearch, ' ', $sQ)));
+        $sFix = trim(strtolower(preg_replace($aSearch, ' ', $sFix)));
 
         $this->assertEquals($sQ, $sFix);
     }
@@ -1264,7 +1264,7 @@ class UtfTest extends \OxidTestCase
 
         $oVal1 = new stdClass();
         $oVal1->name = "{$sValue}&lt;br&gt;1";
-        $oVal1->value = "";
+        $oVal1->value = '';
 
         $oVal2 = clone $oVal1;
         $oVal2->name = "{$sValue}&lt;a&gt;2";
@@ -1272,14 +1272,14 @@ class UtfTest extends \OxidTestCase
         $oVal3 = clone $oVal1;
         $oVal3->name = "{$sValue}3";
 
-        $aList = array($oVal1, $oVal2, $oVal3);
+        $aList = [$oVal1, $oVal2, $oVal3];
         $this->assertEquals($aList, $oSelList->getFieldList());
     }
 
     public function testOxSeoEncoderEncodeString()
     {
-        $sIn = "agentūлитовfür";
-        $sOut = "agentūлитовfuer";
+        $sIn = 'agentūлитовfür';
+        $sOut = 'agentūлитовfuer';
 
         $oSeoEncoder = new oxSeoEncoder();
         $this->assertEquals($sOut, $oSeoEncoder->encodeString($sIn));
@@ -1289,7 +1289,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxshops__oxdefcurrency', 'oxshops__oxname', 'oxshops__oxtitleprefix',
+        $aFields = ['oxshops__oxdefcurrency', 'oxshops__oxname', 'oxshops__oxtitleprefix',
                          'oxshops__oxtitlesuffix', 'oxshops__oxstarttitle', 'oxshops__oxinfoemail',
                          'oxshops__oxorderemail', 'oxshops__oxowneremail', 'oxshops__oxordersubject',
                          'oxshops__oxregistersubject', 'oxshops__oxforgotpwdsubject', 'oxshops__oxsendednowsubject',
@@ -1302,7 +1302,7 @@ class UtfTest extends \OxidTestCase
                          'oxshops__oxtelefax', 'oxshops__oxurl', 'oxshops__oxhrbnr',
                          'oxshops__oxcourt', 'oxshops__oxadbutlerid', 'oxshops__oxaffilinetid',
                          'oxshops__oxsuperclicksid', 'oxshops__oxaffiliweltid', 'oxshops__oxaffili24id',
-                         'oxshops__oxversion');
+                         'oxshops__oxversion'];
 
         $oShop = oxNew('oxShop');
         $oShop->setId(5);
@@ -1315,7 +1315,7 @@ class UtfTest extends \OxidTestCase
         $oShop->load(5);
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oShop->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oShop->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oShop->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oShop->{$sFieldName}->value . ')');
         }
     }
 
@@ -1323,13 +1323,13 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxuser__oxusername',
+        $aFields = ['oxuser__oxusername',
                          'oxuser__oxustid', 'oxuser__oxcompany', 'oxuser__oxfname',
                          'oxuser__oxlname', 'oxuser__oxstreet', 'oxuser__oxstreetnr',
                          'oxuser__oxaddinfo', 'oxuser__oxcity', 'oxuser__oxzip',
                          'oxuser__oxfon', 'oxuser__oxfax', 'oxuser__oxsal',
                          'oxuser__oxprivfon', 'oxuser__oxmobfon', 'oxuser__oxurl',
-                         'oxuser__oxupdatekey');
+                         'oxuser__oxupdatekey'];
 
         if ($this->getTestConfig()->getShopEdition() == 'EE') {
             $aFields[] = 'oxuser__oxldapkey';
@@ -1346,7 +1346,7 @@ class UtfTest extends \OxidTestCase
         $oUser->load('_testUser');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oUser->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oUser->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oUser->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oUser->{$sFieldName}->value . ')');
         }
     }
 
@@ -1369,8 +1369,8 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'ūЛü';
 
-        $oValidator = $this->getMock(\OxidEsales\Eshop\Core\InputValidator::class, array("_addValidationError"));
-        $oValidator->expects($this->once())->method('_addValidationError')->with($this->equalTo("oxuser__oxpassword"));
+        $oValidator = $this->getMock(\OxidEsales\Eshop\Core\InputValidator::class, ['_addValidationError']);
+        $oValidator->expects($this->once())->method('_addValidationError')->with($this->equalTo('oxuser__oxpassword'));
         $oValidator->checkPassword(new oxUser(), $sValue, $sValue, true);
     }
 
@@ -1378,7 +1378,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxuserbaskets__oxtitle');
+        $aFields = ['oxuserbaskets__oxtitle'];
 
         $oUBasket = oxNew('oxuserbasket');
         $oUBasket->setId('_testUBasket');
@@ -1391,7 +1391,7 @@ class UtfTest extends \OxidTestCase
         $oUBasket->load('_testUBasket');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oUBasket->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oUBasket->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oUBasket->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oUBasket->{$sFieldName}->value . ')');
         }
     }
 
@@ -1402,7 +1402,7 @@ class UtfTest extends \OxidTestCase
         $oUBasketItem = new oxUserBasketItem();
         $oUBasketItem->setId('_testUBasketItem');
         $oUBasketItem->oxuserbasketitems__oxamount = new oxField($sValue);
-        $oUBasketItem->setSelList(array($sValue));
+        $oUBasketItem->setSelList([$sValue]);
         $oUBasketItem->save();
 
         $oUBasketItem = new oxUserBasketItem();
@@ -1492,7 +1492,7 @@ class UtfTest extends \OxidTestCase
         $oVal3->name = 'agentūЛитовfür3 +30%';
         $oVal3->value = '';
 
-        $aValue = array($oVal1, $oVal2, $oVal3);
+        $aValue = [$oVal1, $oVal2, $oVal3];
 
         $oUtils = new oxUtils();
         $this->assertEquals($aValue, $oUtils->assignValuesFromText($sParam, 15));
@@ -1517,7 +1517,7 @@ class UtfTest extends \OxidTestCase
         $oVal3->name = 'agentūЛитовfür3';
         $oVal3->value = '';
 
-        $aValue = array($oVal1, $oVal2, $oVal3);
+        $aValue = [$oVal1, $oVal2, $oVal3];
 
         $oUtils = new oxUtils();
         $this->assertEquals($aValue, $oUtils->assignValuesFromText($sParam, 15));
@@ -1535,7 +1535,7 @@ class UtfTest extends \OxidTestCase
     public function testOxUtilsStringMinimizeTruncateString()
     {
         $sString = "agentūЛитов \t\n\rfüragentūЛитовfür";
-        $sExpected = "agentūЛитов fü";
+        $sExpected = 'agentūЛитов fü';
 
         $oUtils = new oxUtilsString();
         $this->assertEquals($sExpected, $oUtils->minimizeTruncateString($sString, 14));
@@ -1554,7 +1554,7 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = 'agentūЛитовfür';
 
-        $aFields = array('oxvendor__oxicon', 'oxvendor__oxtitle', 'oxvendor__oxshortdesc');
+        $aFields = ['oxvendor__oxicon', 'oxvendor__oxtitle', 'oxvendor__oxshortdesc'];
 
         $oVendor = oxNew('oxvendor');
         $oVendor->setId('_testVendor');
@@ -1567,7 +1567,7 @@ class UtfTest extends \OxidTestCase
         $oVendor->load('_testVendor');
 
         foreach ($aFields as $sFieldName) {
-            $this->assertTrue(strcmp($oVendor->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oVendor->{$sFieldName}->value . ")");
+            $this->assertTrue(strcmp($oVendor->{$sFieldName}->value, $sValue) === 0, "$sFieldName (" . $oVendor->{$sFieldName}->value . ')');
         }
     }
 
@@ -1630,8 +1630,8 @@ class UtfTest extends \OxidTestCase
         $oCat = new oxCategory();
         $oCat->oxcategories__oxtitle = new oxField($sValue);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getCatTreePath'));
-        $oView->expects($this->once())->method('getCatTreePath')->will($this->returnValue(array($oCat)));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getCatTreePath']);
+        $oView->expects($this->once())->method('getCatTreePath')->will($this->returnValue([$oCat]));
 
         $this->assertEquals($sResult, $oView->UNITgetCatPathString());
     }
@@ -1640,11 +1640,11 @@ class UtfTest extends \OxidTestCase
     {
         $sValue = "agentūЛитовfür \n \r \t \xc2\x95 \xc2\xa0";
         $oActCat = new oxCategory();
-        $oActCat->oxcategories__oxlongdesc = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oActCat->oxcategories__oxlongdesc = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oActCat->oxcategories__oxlongdesc->expects($this->once())->method('__get')->will($this->returnValue(''));
 
         $oArticle = oxNew('oxArticle');
-        $oArticle->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oArticle->oxarticles__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oArticle->oxarticles__oxtitle->expects($this->exactly(2))->method('__get')->will($this->returnValue($sValue));
 
         $oArtList = new oxlist();
@@ -1653,7 +1653,7 @@ class UtfTest extends \OxidTestCase
 
         $sCatPathString = 'sCatPathString';
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getArticleList', '_getCatPathString'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getArticleList', '_getCatPathString']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oActCat));
         $oListView->expects($this->any())->method('getArticleList')->will($this->returnValue($oArtList));
         $oListView->expects($this->any())->method('_getCatPathString')->will($this->returnValue($sCatPathString));
@@ -1661,7 +1661,7 @@ class UtfTest extends \OxidTestCase
         $sMeta = 'sCatPathString - ' . $sValue;
 
         $oView = new oxubase();
-        $this->assertEquals($oView->UNITprepareMetaDescription($sMeta . ", " . $sValue), $oListView->UNITcollectMetaDescription(false));
+        $this->assertEquals($oView->UNITprepareMetaDescription($sMeta . ', ' . $sValue), $oListView->UNITcollectMetaDescription(false));
     }
 
     public function testaListPrepareMetaDescription()
@@ -1669,13 +1669,13 @@ class UtfTest extends \OxidTestCase
         $sValue = "agentūЛитовfür\n\r\t\xc2\x95\xc2\xa0";
         $sDescription = oxRegistry::getLang()->translateString('INC_HEADER_YOUAREHERE');
         $oActCat = new oxCategory();
-        $oActCat->oxcategories__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, array('__get'));
+        $oActCat->oxcategories__oxtitle = $this->getMock(\OxidEsales\Eshop\Core\Field::class, ['__get']);
         $oActCat->oxcategories__oxtitle->expects($this->once())->method('__get')->will($this->returnValue($sValue));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oActCat));
 
-        $sDescription = "agentūЛитовfür     . " . $this->getConfig()->getActiveShop()->oxshops__oxtitleprefix->value;
+        $sDescription = 'agentūЛитовfür     . ' . $this->getConfig()->getActiveShop()->oxshops__oxtitleprefix->value;
 
         $oView = new oxubase();
         $this->assertEquals($sDescription, $oListView->UNITprepareMetaDescription(false));
@@ -1702,10 +1702,10 @@ class UtfTest extends \OxidTestCase
         $aCatTree[] = $oParentCategory;
         $aCatTree[] = $oCategory;
 
-        $oCategoryTree = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, array('getPath'));
+        $oCategoryTree = $this->getMock(\OxidEsales\Eshop\Application\Model\CategoryList::class, ['getPath']);
         $oCategoryTree->expects($this->any())->method('getPath')->will($this->returnValue($aCatTree));
 
-        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getActiveCategory', 'getCategoryTree'));
+        $oListView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getActiveCategory', 'getCategoryTree']);
         $oListView->expects($this->any())->method('getActiveCategory')->will($this->returnValue($oCategory));
         $oListView->expects($this->any())->method('getCategoryTree')->will($this->returnValue($oCategoryTree));
 
@@ -1721,12 +1721,12 @@ class UtfTest extends \OxidTestCase
         $oArt->setArticleLongDesc($sValue);
         $oArtList = new oxlist();
         $oArtList->offsetSet(0, $oArt);
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, array('getArticleList', '_prepareMetaDescription', '_getCatPathString'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleListController::class, ['getArticleList', '_prepareMetaDescription', '_getCatPathString']);
         $oView->expects($this->once())->method('getArticleList')->will($this->returnValue($oArtList));
         $oView->expects($this->once())->method('_getCatPathString')->will($this->returnValue(''));
         $oView->expects($this->once())->method('_prepareMetaDescription')->with($this->equalTo($sResult), $this->equalTo(-1), $this->equalTo(false))->will($this->returnValue($sResult));
 
-        $this->assertEquals('agentū, литовfür, test, best, nest, fest', $oView->UNITcollectMetaKeyword(array()));
+        $this->assertEquals('agentū, литовfür, test, best, nest, fest', $oView->UNITcollectMetaKeyword([]));
     }
 
     public function testDetailsSettingKeywordsAndDescriptionInRender()
@@ -1738,7 +1738,7 @@ class UtfTest extends \OxidTestCase
         $oArt->setArticleLongDesc($sValue);
         $oArt->oxarticles__oxsearchkeys = new oxField($sValue, oxField::T_RAW);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, array('getProduct'));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\ArticleDetailsController::class, ['getProduct']);
         $oView->expects($this->any())->method('getProduct')->will($this->returnValue($oArt));
 
         $this->assertEquals('agentūЛитовfür test, best nest fest - agentūЛитовfür test, best nest fest', $oView->getMetaDescription());
@@ -1750,12 +1750,12 @@ class UtfTest extends \OxidTestCase
      */
     public function testuBasePrepareMetaDescriptionRemovesSpecChars()
     {
-        $sDesc = "&nbsp; \" " . '\'' . " : ! ? \n \r \t \xc2\x95 \xc2\xa0 ;";
+        $sDesc = '&nbsp; " ' . '\'' . " : ! ? \n \r \t \xc2\x95 \xc2\xa0 ;";
 
         $oView = new oxubase();
         $sResult = $oView->UNITprepareMetaDescription($sDesc);
 
-        $this->assertEquals("&quot; &#039; : ! ?", $sResult);
+        $this->assertEquals('&quot; &#039; : ! ?', $sResult);
     }
 
     public function testuBasePrepareMetaDescription()
@@ -1772,7 +1772,7 @@ class UtfTest extends \OxidTestCase
         $sValue = 'agentūЛитовfür test best nest fest test';
         $sResult = 'test, best, nest, fest';
 
-        $this->getConfig()->setConfigParam('aSkipTags', array('agentūЛитовfür'));
+        $this->getConfig()->setConfigParam('aSkipTags', ['agentūЛитовfür']);
 
         $oView = new oxubase();
         $this->assertEquals($sResult, $oView->UNITprepareMetaKeyword($sValue));
@@ -1789,23 +1789,23 @@ class UtfTest extends \OxidTestCase
 
     public function testOxEmailIncludeImages()
     {
-        $utilsObjectInstanceMock = $this->getMock(\OxidEsales\Eshop\Core\UtilsObject::class, array('generateUID'));
+        $utilsObjectInstanceMock = $this->getMock(\OxidEsales\Eshop\Core\UtilsObject::class, ['generateUID']);
         $utilsObjectInstanceMock->expects($this->any())->method('generateUID')->will($this->returnValue('xxx'));
 
-        $sBodyToReturn = "agentūлитовfür <img src=\"" . __DIR__ . "/Fixtures/stars.jpg\" alt=\"agentūлитовfür\">";
-        $sBodyToSet = "agentūлитовfür <img src=\"cid:xxx\" alt=\"agentūлитовfür\">";
+        $sBodyToReturn = 'agentūлитовfür <img src="' . __DIR__ . '/Fixtures/stars.jpg" alt="agentūлитовfür">';
+        $sBodyToSet = 'agentūлитовfür <img src="cid:xxx" alt="agentūлитовfür">';
 
-        $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, array('getBody', 'setBody', 'getUtilsObjectInstance'));
+        $oEmail = $this->getMock(\OxidEsales\Eshop\Core\Email::class, ['getBody', 'setBody', 'getUtilsObjectInstance']);
         $oEmail->expects($this->once())->method('getBody')->will($this->returnValue($sBodyToReturn));
         $oEmail->expects($this->once())->method('setBody')->with($this->equalTo($sBodyToSet));
         $oEmail->expects($this->once())->method('getUtilsObjectInstance')->will($this->returnValue($utilsObjectInstanceMock));
-        $oEmail->UNITincludeImages(__DIR__ . "/Fixtures", null, null, $this->getConfig()->getImageDir());
+        $oEmail->UNITincludeImages(__DIR__ . '/Fixtures', null, null, $this->getConfig()->getImageDir());
     }
 
     public function testOxEmailSetBody()
     {
-        $sBodyToSet = "agentūлитовfür <a href=\"someurl.php?cl=comecl&amp;sid=somesid&amp;something=something\" title=\"agentūлитовfür\">";
-        $sBodyWillGet = "agentūлитовfür <a href=\"someurl.php?cl=comecl&amp;shp=" . $this->getConfig()->getBaseShopId() . "&amp;something=something\" title=\"agentūлитовfür\">";
+        $sBodyToSet = 'agentūлитовfür <a href="someurl.php?cl=comecl&amp;sid=somesid&amp;something=something" title="agentūлитовfür">';
+        $sBodyWillGet = 'agentūлитовfür <a href="someurl.php?cl=comecl&amp;shp=' . $this->getConfig()->getBaseShopId() . '&amp;something=something" title="agentūлитовfür">';
 
         $oEmail = new oxEmail();
         $oEmail->setBody($sBodyToSet);
@@ -1814,8 +1814,8 @@ class UtfTest extends \OxidTestCase
 
     public function testOxEmailSetAltBody()
     {
-        $sBodyToSet = "agentūлитовfür <a href=\"someurl.php?cl=comecl&amp;sid=somesid&amp;something=something\" title=\"agentūлитовfür\">";
-        $sBodyWillGet = "agentūлитовfür <a href=\"someurl.php?cl=comecl&shp=" . $this->getConfig()->getBaseShopId() . "&something=something\" title=\"agentūлитовfür\">";
+        $sBodyToSet = 'agentūлитовfür <a href="someurl.php?cl=comecl&amp;sid=somesid&amp;something=something" title="agentūлитовfür">';
+        $sBodyWillGet = 'agentūлитовfür <a href="someurl.php?cl=comecl&shp=' . $this->getConfig()->getBaseShopId() . '&something=something" title="agentūлитовfür">';
 
         $oEmail = new oxEmail();
         $oEmail->setAltBody($sBodyToSet);
@@ -1834,7 +1834,7 @@ class UtfTest extends \OxidTestCase
     public function testUserIDNMailaddress()
     {
         if (!function_exists('idn_to_ascii')) {
-            $this->markTestSkipped("Function idn_to_ascii does not exists, cannot test.");
+            $this->markTestSkipped('Function idn_to_ascii does not exists, cannot test.');
         }
 
         $mail = oxNew('oxEmail');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -19,17 +20,17 @@
  */
 return [
     'existingUser' => [
-        "userId" => "testuser",
-        "userLoginName" => "example_test@oxid-esales.dev",
-        "userPassword" => "useruser",
-        "userName" => "UserNamešÄßüл",
-        "userLastName" => "UserSurnamešÄßüл",
+        'userId' => 'testuser',
+        'userLoginName' => 'example_test@oxid-esales.dev',
+        'userPassword' => 'useruser',
+        'userName' => 'UserNamešÄßüл',
+        'userLastName' => 'UserSurnamešÄßüл',
     ],
     'adminUser' => [
-        "userId" => "admin",
-        "userLoginName" => "admin@my-o3-shop.com",
-        "userPassword" => "admin0303",
-        "userName" => "John",
-        "userLastName" => "Doe",
+        'userId' => 'admin',
+        'userLoginName' => 'admin@my-o3-shop.com',
+        'userPassword' => 'admin0303',
+        'userName' => 'John',
+        'userLastName' => 'Doe',
     ],
 ];

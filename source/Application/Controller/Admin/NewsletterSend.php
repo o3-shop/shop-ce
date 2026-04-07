@@ -69,21 +69,21 @@ class NewsletterSend extends NewsletterSelection
 
         // send emails....
         $oDB = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        $sQGroups = " ( oxobject2group.oxgroupsid in ( ";
+        $sQGroups = ' ( oxobject2group.oxgroupsid in ( ';
         $blSep = false;
         foreach ($oNewsletterGroups as $sInGroup) {
             $sSearchKey = $sInGroup->oxgroups__oxid->value;
             if ($blSep) {
-                $sQGroups .= ",";
+                $sQGroups .= ',';
             }
             $sQGroups .= $oDB->quote($sSearchKey);
             $blSep = true;
         }
-        $sQGroups .= ") )";
+        $sQGroups .= ') )';
 
         // no group selected
         if (!$blSep) {
-            $sQGroups = " oxobject2group.oxobjectid is null ";
+            $sQGroups = ' oxobject2group.oxobjectid is null ';
         }
 
         $myConfig = Registry::getConfig();
@@ -101,20 +101,20 @@ class NewsletterSend extends NewsletterSelection
            group by oxnewssubscribed.oxemail";
 
         $oRs = $oDB->selectLimit($sQ, 100, $iStart, [
-            ':oxshopid' => $sShopId
+            ':oxshopid' => $sShopId,
         ]);
         $blContinue = ($oRs != false && $oRs->count() > 0);
 
         if ($blContinue) {
             $blLoadAction = $myConfig->getConfigParam('bl_perfLoadAktion');
             while (!$oRs->EOF && $iSendCnt < $iMaxCnt) {
-                if ($oRs->fields['oxemailfailed'] != "1") {
+                if ($oRs->fields['oxemailfailed'] != '1') {
                     $sUserId = $oRs->fields['oxuserid'];
                     $iSendCnt++;
 
                     // must check if such user is in DB
                     // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-                    if (!DatabaseProvider::getMaster()->getOne("select oxid from oxuser where oxid = :oxid", [':oxid' => $sUserId])) {
+                    if (!DatabaseProvider::getMaster()->getOne('select oxid from oxuser where oxid = :oxid', [':oxid' => $sUserId])) {
                         $sUserId = null;
                     }
 
@@ -137,10 +137,10 @@ class NewsletterSend extends NewsletterSelection
                         $oRemark->oxremark__oxtext = new Field($oNewsletter->getPlainText());
                         $oRemark->oxremark__oxparentid = new Field($sUserId);
                         $oRemark->oxremark__oxshopid = new Field($sShopId);
-                        $oRemark->oxremark__oxtype = new Field("n");
+                        $oRemark->oxremark__oxtype = new Field('n');
                         $oRemark->save();
                     } else {
-                        $this->_aMailErrors[] = "problem sending to : " . $oRs->fields['oxemail'];
+                        $this->_aMailErrors[] = 'problem sending to : ' . $oRs->fields['oxemail'];
                     }
                 }
 
@@ -152,16 +152,16 @@ class NewsletterSend extends NewsletterSelection
         $iSend = $iSendCnt + (ceil($iStart / $iMaxCnt) - 1) * $iMaxCnt;
         $iSend = min($iSend, $iUserCount);
 
-        $this->_aViewData["iStart"] = $iStart;
-        $this->_aViewData["iSend"] = $iSend;
+        $this->_aViewData['iStart'] = $iStart;
+        $this->_aViewData['iSend'] = $iSend;
 
         // end ?
         if ($blContinue) {
-            return "newsletter_send.tpl";
+            return 'newsletter_send.tpl';
         } else {
             $this->resetUserCount();
 
-            return "newsletter_done.tpl";
+            return 'newsletter_done.tpl';
         }
     }
 
@@ -173,10 +173,10 @@ class NewsletterSend extends NewsletterSelection
      */
     public function getUserCount()
     {
-        $iCnt = Registry::getSession()->getVariable("iUserCount");
+        $iCnt = Registry::getSession()->getVariable('iUserCount');
         if ($iCnt === null) {
             $iCnt = parent::getUserCount();
-            Registry::getSession()->setVariable("iUserCount", $iCnt);
+            Registry::getSession()->setVariable('iUserCount', $iCnt);
         }
 
         return $iCnt;
@@ -187,7 +187,7 @@ class NewsletterSend extends NewsletterSelection
      */
     public function resetUserCount()
     {
-        Registry::getSession()->deleteVariable("iUserCount");
+        Registry::getSession()->deleteVariable('iUserCount');
         $this->_iUserCount = null;
     }
 

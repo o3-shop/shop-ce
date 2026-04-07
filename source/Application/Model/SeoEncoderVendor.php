@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Vendor;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -159,13 +160,13 @@ class SeoEncoderVendor extends SeoEncoder
         $database = DatabaseProvider::getDb();
         $vendorId = $vendor->getId();
         $database->execute("delete from oxseo where oxobjectid = :oxobjectid and oxtype = 'oxvendor'", [
-            ':oxobjectid' => $vendorId
+            ':oxobjectid' => $vendorId,
         ]);
-        $database->execute("delete from oxobject2seodata where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $vendorId
+        $database->execute('delete from oxobject2seodata where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $vendorId,
         ]);
-        $database->execute("delete from oxseohistory where oxobjectid = :oxobjectid", [
-            ':oxobjectid' => $vendorId
+        $database->execute('delete from oxseohistory where oxobjectid = :oxobjectid', [
+            ':oxobjectid' => $vendorId,
         ]);
     }
 

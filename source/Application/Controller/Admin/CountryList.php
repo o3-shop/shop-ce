@@ -68,7 +68,7 @@ class CountryList extends AdminListController
     {
         parent::render();
 
-        return "country_list.tpl";
+        return 'country_list.tpl';
     }
 
     /**

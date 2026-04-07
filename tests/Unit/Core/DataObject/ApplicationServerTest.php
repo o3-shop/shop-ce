@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\DataObject;
 
 /**
@@ -79,12 +81,12 @@ class ApplicationServerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function dataProviderServerIsInUse()
     {
         $currentTime = 1400000000;
-        return array(
-            array(null, $currentTime - (25 * 3600), true),         // If server timestamp is not set at all.
-            array(1, $currentTime - (25 * 3600), true),            // If server timestamp is not valid.
-            array($currentTime, $currentTime - (25 * 3600), false),// If server TTL has exceeded.
-            array($currentTime, $currentTime - (11 * 3600), true)  // If server TTL didn't exceeded.
-        );
+        return [
+            [null, $currentTime - (25 * 3600), true],         // If server timestamp is not set at all.
+            [1, $currentTime - (25 * 3600), true],            // If server timestamp is not valid.
+            [$currentTime, $currentTime - (25 * 3600), false],// If server TTL has exceeded.
+            [$currentTime, $currentTime - (11 * 3600), true],  // If server TTL didn't exceeded.
+        ];
     }
 
     /**
@@ -107,12 +109,12 @@ class ApplicationServerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function dataProviderNeedToDeleteAppServer()
     {
         $currentTime = 1400000000;
-        return array(
-            array(null, $currentTime - (73 * 3600), false),       // Don't remove server if timestamp is not set at all.
-            array(1, $currentTime - (73 * 3600), false),          // Don't remove server if timestamp is not valid.
-            array($currentTime, $currentTime - (73 * 3600), true),// Remove server if its TTL has exceeded.
-            array($currentTime, $currentTime - (11 * 3600), false)// Don't remove server if its TTL didn't exceeded.
-        );
+        return [
+            [null, $currentTime - (73 * 3600), false],       // Don't remove server if timestamp is not set at all.
+            [1, $currentTime - (73 * 3600), false],          // Don't remove server if timestamp is not valid.
+            [$currentTime, $currentTime - (73 * 3600), true],// Remove server if its TTL has exceeded.
+            [$currentTime, $currentTime - (11 * 3600), false],// Don't remove server if its TTL didn't exceeded.
+        ];
     }
 
     /**
@@ -135,13 +137,13 @@ class ApplicationServerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     public function dataProviderNeedToUpdateAppServer()
     {
         $currentTime = 1400000000;
-        return array(
-            array(null, $currentTime - (25 * 3600), true),         // Update server if server time is not set at all.
-            array($currentTime, $currentTime - (25 * 3600), true), // Time when server information must be updated.
-            array($currentTime, $currentTime - (24 * 3600), true), // Exact time when server information must be updated.
-            array($currentTime, $currentTime - (11 * 3600), false),// Time when server information is up to date.
-            array($currentTime, $currentTime, false),              // When node time is the same as current time.
-            array($currentTime, $currentTime + (11 * 3600), true)  // Update server if server time is not valid.
-        );
+        return [
+            [null, $currentTime - (25 * 3600), true],         // Update server if server time is not set at all.
+            [$currentTime, $currentTime - (25 * 3600), true], // Time when server information must be updated.
+            [$currentTime, $currentTime - (24 * 3600), true], // Exact time when server information must be updated.
+            [$currentTime, $currentTime - (11 * 3600), false],// Time when server information is up to date.
+            [$currentTime, $currentTime, false],              // When node time is the same as current time.
+            [$currentTime, $currentTime + (11 * 3600), true],  // Update server if server time is not valid.
+        ];
     }
 }

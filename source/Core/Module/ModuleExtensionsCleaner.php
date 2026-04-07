@@ -21,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Core\Module;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ShopConfigurationDaoBridgeInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exception\ModuleConfigurationNotFoundException;
 
 /**
  * Class responsible for cleaning not used extensions for module which is going to be activated.
@@ -34,7 +34,6 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\Sho
  */
 class ModuleExtensionsCleaner
 {
-
     /**
      * Removes garbage ( module not used extensions ) from all installed extensions list.
      * For example: some classes were renamed, so these should be removed.

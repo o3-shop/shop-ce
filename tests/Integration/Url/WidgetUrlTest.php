@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Url;
 
 use oxRegistry;
@@ -30,21 +32,21 @@ class WidgetUrlTest extends \oxUnitTestCase
         $basicUrl = $this->shopUrl . 'widget.php';
         $urlWithoutParams = $basicUrl . '?lang=0';
 
-        $urlParameters = array('param1' => 'value1', 'param2' => 'value2');
+        $urlParameters = ['param1' => 'value1', 'param2' => 'value2'];
         $urlWithParams = $basicUrl . '?lang=0&amp;param1=value1&amp;param2=value2';
 
-        $urlLanguageParameters = array('lang' => '1', 'param1' => 'value1', 'param2' => 'value2');
+        $urlLanguageParameters = ['lang' => '1', 'param1' => 'value1', 'param2' => 'value2'];
         $urlWithLanguageParams = $basicUrl . '?lang=1&amp;param1=value1&amp;param2=value2';
 
-        $urlLeveledParameters = array('lang' => '1', 'param1' => array('value1', 'value2'));
+        $urlLeveledParameters = ['lang' => '1', 'param1' => ['value1', 'value2']];
         $urlWithLeveledParameters = $basicUrl . '?lang=1&amp;param1%5B0%5D=value1&amp;param1%5B1%5D=value2';
 
-        return array(
-            array(array(), $urlWithoutParams),
-            array($urlParameters, $urlWithParams),
-            array($urlLanguageParameters, $urlWithLanguageParams),
-            array($urlLeveledParameters, $urlWithLeveledParameters),
-        );
+        return [
+            [[], $urlWithoutParams],
+            [$urlParameters, $urlWithParams],
+            [$urlLanguageParameters, $urlWithLanguageParams],
+            [$urlLeveledParameters, $urlWithLeveledParameters],
+        ];
     }
 
     /**
@@ -68,10 +70,10 @@ class WidgetUrlTest extends \oxUnitTestCase
 
     public function providerGetWidgetUrlAddCorrectLanguage()
     {
-        return array(
-            array(1),
-            array(2),
-        );
+        return [
+            [1],
+            [2],
+        ];
     }
 
     /**
@@ -89,15 +91,15 @@ class WidgetUrlTest extends \oxUnitTestCase
         $config->setConfigParam('sShopURL', $this->shopUrl);
         $config->init();
 
-        $this->assertEquals($this->shopUrl. 'widget.php?lang='. $iLang, $config->getWidgetUrl());
+        $this->assertEquals($this->shopUrl . 'widget.php?lang=' . $iLang, $config->getWidgetUrl());
     }
 
     public function providerGetWidgetUrlAddCorrectLanguageWithParameter()
     {
-        return array(
-            array(1),
-            array(2),
-        );
+        return [
+            [1],
+            [2],
+        ];
     }
 
     /**
@@ -115,6 +117,6 @@ class WidgetUrlTest extends \oxUnitTestCase
         $config->setConfigParam('sShopURL', $this->shopUrl);
         $config->init();
 
-        $this->assertEquals($this->shopUrl. 'widget.php?lang='. $iLang, $config->getWidgetUrl($iLang));
+        $this->assertEquals($this->shopUrl . 'widget.php?lang=' . $iLang, $config->getWidgetUrl($iLang));
     }
 }

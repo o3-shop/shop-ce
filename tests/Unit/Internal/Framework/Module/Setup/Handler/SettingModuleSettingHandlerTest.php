@@ -24,8 +24,8 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Framework\Module\Setup\Handler;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ModuleConfiguration;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Handler\SettingModuleSettingHandler;
 use PHPUnit\Framework\TestCase;
 

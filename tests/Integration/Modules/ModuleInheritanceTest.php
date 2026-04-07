@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,15 +18,16 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Integration\Modules;
 
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapter;
-use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\DataObject\OxidEshopPackage;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleInstallerInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Exception\InvalidClassExtensionNamespaceException;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapter;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\TestContainerFactory;
 use OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\namespaced_from_ns\MyClass as namespaced_from_ns;
@@ -253,49 +255,49 @@ class ModuleInheritanceTest extends UnitTestCase
                 //Test case 1.1 plain module extends plain shop class
                 'moduleToActivate'  => ['bc_module_inheritance_1_1'],
                 'moduleClassName'   => 'vendor_1_module_1_myclass',
-                'shopClassNames'    => ['oxArticle']
+                'shopClassNames'    => ['oxArticle'],
             ],
             'case_1_2' => [
                 //Test case 1.2 plain module extends namespaced Shop Community class
                 'moduleToActivate' => ['bc_module_inheritance_1_2'],
                 'moduleClassName'  => 'vendor_1_module_2_myclass',
-                'shopClassNames'    => ['OxidEsales\EshopCommunity\Application\Model\Article']
+                'shopClassNames'    => ['OxidEsales\EshopCommunity\Application\Model\Article'],
             ],
             'case_1_5' => [
                 //Test case 1.5 plain module extends Shop unified namespace class
                 'moduleToActivate' => ['bc_module_inheritance_1_5'],
                 'moduleClassName'  => 'vendor_1_module_5_myclass',
-                'shopClassNames'   => [\OxidEsales\Eshop\Application\Model\Article::class]
+                'shopClassNames'   => [\OxidEsales\Eshop\Application\Model\Article::class],
             ],
             'case_1_6'  => [
                 // Test case 1.6 namespaced module extends plain shop class
                'moduleToActivate' => ['Vendor1/ModuleInheritance16'],
                'moduleClassName'  => \OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleInheritance16\MyClass::class,
-               'shopClassNames'    => [\OxidEsales\EshopCommunity\Application\Model\Article::class, 'oxArticle']
+               'shopClassNames'    => [\OxidEsales\EshopCommunity\Application\Model\Article::class, 'oxArticle'],
             ],
             'case_1_7'  => [
                 // Test case 1.7 namespaced module extends namespaced Shop Community class
                 'moduleToActivate' => ['Vendor1/namespaced_from_ns'],
                 'moduleClassName'  => namespaced_from_ns::class,
-                'shopClassNames'   => [\OxidEsales\EshopCommunity\Application\Model\Article::class]
+                'shopClassNames'   => [\OxidEsales\EshopCommunity\Application\Model\Article::class],
             ],
             'case_1_10' => [
                 // Test case 1.10 namespaced module extends Shop unified namespace class
                 'moduleToActivate' => ['Vendor1/own_namespace_extending_unified_namespace'],
                 'moduleClassName'  => own_namespace_extending_unified_namespace::class,
-                'shopClassNames'   => [\OxidEsales\Eshop\Application\Model\Article::class]
+                'shopClassNames'   => [\OxidEsales\Eshop\Application\Model\Article::class],
             ],
             'case_3_1' => [
                 //Test case 3.1 plain module chain extends plain O3-Shop class
                 'moduleToActivate' => ['module_chain_extension_3_1'],
                 'moduleClassName'  => 'vendor_1_module_3_1_myclass',
-                'shopClassNames'   => ['oxArticle']
+                'shopClassNames'   => ['oxArticle'],
             ],
             'case_3_3' => [
                 //Test case 3.3 plain module chain extends unified namespace O3-Shop class
                 'moduleToActivate' => ['module_chain_extension_3_3'],
                 'moduleClassName'  => 'vendor_1_module_3_3_myclass',
-                'shopClassNames'   => [\OxidEsales\Eshop\Application\Model\Article::class]
+                'shopClassNames'   => [\OxidEsales\Eshop\Application\Model\Article::class],
             ],
             'case_3_6' => [
                 // Test case 3.6 namespaced module class chain extends unified namespace O3-Shop class
@@ -319,7 +321,7 @@ class ModuleInheritanceTest extends UnitTestCase
                 'moduleToActivate' => ['module_chain_extension_3_2'],
                 'moduleClassName'  => 'vendor_1_module_3_2_myclass',
                 'shopClassNames'   => [\OxidEsales\EshopCommunity\Application\Model\Article::class],
-                'expectsException' => \OxidEsales\EshopCommunity\Application\Model\Article::class . ' => module_chain_extension_3_2/vendor_1_module_3_2_myclass'
+                'expectsException' => \OxidEsales\EshopCommunity\Application\Model\Article::class . ' => module_chain_extension_3_2/vendor_1_module_3_2_myclass',
             ],
             'case_3_5' => [
                 // Test case 3.5 namespaced module class chain extends namespaced O3-Shop Community class
@@ -327,7 +329,7 @@ class ModuleInheritanceTest extends UnitTestCase
                 'moduleClassName'  => \OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension35\MyClass35::class,
                 'shopClassNames'   => [\OxidEsales\EshopCommunity\Application\Model\Article::class],
                 'expectsException' => \OxidEsales\EshopCommunity\Application\Model\Article::class .
-                                      ' => ' . \OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension35\MyClass35::class
+                                      ' => ' . \OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension35\MyClass35::class,
             ],
         ];
     }
@@ -344,19 +346,19 @@ class ModuleInheritanceTest extends UnitTestCase
                 //Test case 2.1 plain module class extends same module's extended plain module class
                 'modulesToActivate' => ['bc_module_inheritance_1_1'],
                 'moduleClassName'   => 'vendor_1_module_1_anotherclass',
-                'shopClassNames'    => ['vendor_1_module_1_myclass', \OxidEsales\Eshop\Application\Model\Article::class]
+                'shopClassNames'    => ['vendor_1_module_1_myclass', \OxidEsales\Eshop\Application\Model\Article::class],
             ],
             'case_2_1_2' => [
                 //Test case 2.1 plain module class extends an other modules extended plain module class
                 'modulesToActivate' => ['bc_module_inheritance_1_1', 'bc_module_inheritance_2_1'],
                 'moduleClassName'   => 'vendor_2_module_1_myclass',
-                'shopClassNames'    => ['vendor_1_module_1_myclass', \OxidEsales\Eshop\Application\Model\Article::class]
+                'shopClassNames'    => ['vendor_1_module_1_myclass', \OxidEsales\Eshop\Application\Model\Article::class],
             ],
             'case_2_2' => [
                 // Test case 2.2 plain module class extends an other modules extended namespaced module class
                 'modulesToActivate' => ['Vendor1/namespaced_from_ns', 'module_inheritance_2_2_a'],
                 'moduleClassName' => 'vendor_2_module_2_myclass',
-                'shopClassNames' => [\OxidEsales\EshopCommunity\Application\Model\Article::class]
+                'shopClassNames' => [\OxidEsales\EshopCommunity\Application\Model\Article::class],
             ],
             'case_2_3' => [
                 // Test case 2.3 namespaced module class extends an other modules extended plain module class
@@ -365,56 +367,56 @@ class ModuleInheritanceTest extends UnitTestCase
                 'shopClassName' => [
                     \OxidEsales\EshopCommunity\Application\Model\Article::class,
                     'vendor_1_module_1_myclass2',
-                    'vendor_1_module_1_anotherclass'
-                ]
+                    'vendor_1_module_1_anotherclass',
+                ],
             ],
             'case_2_4' => [
                 // Test case 2.4 namespaced module class extends an other modules extended namespaced module class
                 'modulesToActivate' => ['Vendor1/namespaced_from_ns', 'Vendor2/ModuleInheritance24'],
                 'moduleClassName' => ModuleInheritance24MyClass::class,
-                'shopClassNames' => [namespaced_from_ns::class, \OxidEsales\EshopCommunity\Application\Model\Article::class]
+                'shopClassNames' => [namespaced_from_ns::class, \OxidEsales\EshopCommunity\Application\Model\Article::class],
             ],
             'case_2_5' => [
                 //Test case 2.5 plain module_2 extends plain module_1
                 'modulesToActivate' => ['bc_module_inheritance_1_1', 'bc_module_inheritance_2_5'],
                 'moduleClassName'   => 'vendor_2_module_5_myclass',
-                'shopClassNames'    => ['vendor_1_module_1_onemoreclass']
+                'shopClassNames'    => ['vendor_1_module_1_onemoreclass'],
             ],
             'case_2_6' => [
                 // Test case 2.6 plain module_2 extends namespaced module_1
                 'modulesToActivate' => ['Vendor1/namespaced_from_ns', 'module_inheritance_2_6'],
                 'moduleClassName'   => 'vendor_2_module_6_myclass',
-                'shopClassNames'    => [namespaced_from_ns::class]
+                'shopClassNames'    => [namespaced_from_ns::class],
             ],
             'case_2_7' => [
                 // Test case 2.7 namespaced module_2 extends plain module_1
                 'modulesToActivate' => ['Vendor2/ModuleInheritance27', 'bc_module_inheritance_1_1'],
                 'moduleClassName'   => ModuleInheritance27MyClass::class,
-                'shopClassNames'    => ['vendor_1_module_1_onemoreclass']
+                'shopClassNames'    => ['vendor_1_module_1_onemoreclass'],
             ],
             'case_2_8' => [
                 // Test case 2.8 namespaced module_2 extends namespaced module_1
                 'modulesToActivate' => ['Vendor1/ModuleInheritance28a', 'Vendor2/ModuleInheritance28b'],
                 'moduleClassName'   => \OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleInheritance28b\MyClass::class,
-                'shopClassNames'    => [\OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleInheritance28a\MyClass::class]
+                'shopClassNames'    => [\OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleInheritance28a\MyClass::class],
             ],
             'case_4_1' => [
                 // Test case 4.1 plain module_2 chain extends plain module_1
                 'modulesToActivate' => ['module_chain_extension_4_1_a', 'module_chain_extension_4_1_b'],
                 'moduleClassName'   => 'vendor_1_module_4_1_b_myclass',
-                'shopClassNames'    => ['vendor_1_module_4_1_a_myclass']
+                'shopClassNames'    => ['vendor_1_module_4_1_a_myclass'],
             ],
             'case_4_2' => [
                 // Test case 4.2 plain module_2 chain extends namespaced module_1
                 'modulesToActivate' => ['Vendor1/ModuleChainExtension42', 'module_chain_extension_4_2'],
                 'moduleClassName'   => 'module_chain_extension_4_2_myclass',
-                'shopClassNames'    => [\OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension42\MyClass42::class]
+                'shopClassNames'    => [\OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension42\MyClass42::class],
             ],
             'case_4_3' => [
                 // Test case 4.3 namespaced module class chain extends plain module class
                 'moduleToActivate' => ['bc_module_inheritance_4_3', 'Vendor2/ModuleChainExtension43'],
                 'moduleClassName'  => \OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension43\MyClass43::class,
-                'shopClassNames'   => ['vendor_1_module_4_3_myclass']
+                'shopClassNames'   => ['vendor_1_module_4_3_myclass'],
             ],
             'case_4_4' => [
                 // Test case 4.4 namespaced module class chain extends other namespaced module class
@@ -477,10 +479,10 @@ class ModuleInheritanceTest extends UnitTestCase
      */
     protected function setModuleChainAsRequestParameter($storedModuleChain)
     {
-        $modulesSendToController = ["OxidEsales---Eshop---Application---Model---Article" => $storedModuleChain];
+        $modulesSendToController = ['OxidEsales---Eshop---Application---Model---Article' => $storedModuleChain];
         $json = json_encode($modulesSendToController);
 
-        $this->setRequestParameter("aModules", $json);
+        $this->setRequestParameter('aModules', $json);
     }
 
     /**
@@ -496,42 +498,42 @@ class ModuleInheritanceTest extends UnitTestCase
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension37a\MyClass37a',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension37b\MyClass37b',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor3\ModuleChainExtension37c\MyClass37c',
-                ]
+                ],
             ],
             'case_2' => [
                 'storedModuleChain' => [
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension37a\MyClass37a',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor3\ModuleChainExtension37c\MyClass37c',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension37b\MyClass37b',
-                ]
+                ],
             ],
             'case_3' => [
                 'storedModuleChain' => [
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension37b\MyClass37b',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension37a\MyClass37a',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor3\ModuleChainExtension37c\MyClass37c',
-                ]
+                ],
             ],
             'case_4' => [
                 'storedModuleChain' => [
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension37b\MyClass37b',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor3\ModuleChainExtension37c\MyClass37c',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension37a\MyClass37a',
-                ]
+                ],
             ],
             'case_5' => [
                 'storedModuleChain' => [
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor3\ModuleChainExtension37c\MyClass37c',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension37a\MyClass37a',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension37b\MyClass37b',
-                ]
+                ],
             ],
             'case_6' => [
                 'storedModuleChain' => [
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor3\ModuleChainExtension37c\MyClass37c',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor2\ModuleChainExtension37b\MyClass37b',
                     'OxidEsales\EshopCommunity\Tests\Integration\Modules\TestDataInheritance\modules\Vendor1\ModuleChainExtension37a\MyClass37a',
-                ]
+                ],
             ],
         ];
     }

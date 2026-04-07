@@ -61,161 +61,161 @@ class Emos
      *
      * @var string
      */
-    protected $_sIncScript = "";
+    protected $_sIncScript = '';
 
     /**
      * JS format init code goes here
      *
      * @var string
      */
-    protected $_sPrescript = "";
+    protected $_sPrescript = '';
 
     /**
      * JS format parameters goes here
      *
      * @var string
      */
-    protected $_sPostscript = "";
+    protected $_sPostscript = '';
 
     /**
      * path to the empos2.js script-file
      *
      * @var string
      */
-    protected $_sPathToFile = "";
+    protected $_sPathToFile = '';
 
     /**
      * Name of the script-file
      *
      * @var string
      */
-    protected $_sScriptFileName = "emos2.js";
+    protected $_sScriptFileName = 'emos2.js';
 
     /**
      * tracker content
      *
      * @var string
      */
-    protected $_content             = null;
+    protected $_content = null;
 
     /**
      * order process step information
      *
      * @var string
      */
-    protected $_orderProcess        = null;
+    protected $_orderProcess = null;
 
     /**
      * site ID
      *
      * @var string
      */
-    protected $_siteid              = null;
+    protected $_siteid = null;
 
     /**
      * Language ID
      *
      * @var string
      */
-    protected $_langid              = null;
+    protected $_langid = null;
 
     /**
      * Country ID
      *
      * @var string
      */
-    protected $_countryid           = null;
+    protected $_countryid = null;
 
     /**
      * Page ID
      *
      * @var string
      */
-    protected $_pageid              = null;
+    protected $_pageid = null;
 
     /**
      * Search Query string
      *
      * @var string
      */
-    protected $_searchQuery         = null;
+    protected $_searchQuery = null;
 
     /**
      * Number of search hits
      *
      * @var int
      */
-    protected $_searchNumberOfHits   = null;
+    protected $_searchNumberOfHits = null;
 
     /**
      * Register user hash
      *
      * @var string
      */
-    protected $_registerUser        = null;
+    protected $_registerUser = null;
 
     /**
      * Registration result
      *
      * @var string
      */
-    protected $_registerResult      = null;
+    protected $_registerResult = null;
 
     /**
      * Login user hash
      *
      * @var string
      */
-    protected $_loginUser           = null;
+    protected $_loginUser = null;
 
     /**
      * Login result
      *
      * @var string
      */
-    protected $_loginResult         = null;
+    protected $_loginResult = null;
 
     /**
      * Contact information
      *
      * @var string
      */
-    protected $_scontact            = null;
+    protected $_scontact = null;
 
     /**
      * Download file information
      *
      * @var string
      */
-    protected $_download            = null;
+    protected $_download = null;
 
     /**
      * Billing information
      *
      * @var array
      */
-    protected $_billing            = null;
+    protected $_billing = null;
 
     /**
      * ec event array
      *
      * @var array
      */
-    protected $_ecEvent             = null;
+    protected $_ecEvent = null;
 
     /**
      * if we use pretty print, we will set the lineseparator
      *
      * @var string
      */
-    protected $_br = "";
+    protected $_br = '';
 
     /**
      * if we use pretty print, we will set the tab here
      *
      * @var string
      */
-    protected $_tab = "";
+    protected $_tab = '';
 
     /**
      * Constructor
@@ -224,7 +224,7 @@ class Emos
      * @param string $sPathToFile     The path to the js-bib (/opt/myjs)
      * @param string $sScriptFileName If we want to have annother Filename than emos2.js you can set it here
      */
-    public function __construct($sPathToFile = "", $sScriptFileName = "emos2.js")
+    public function __construct($sPathToFile = '', $sScriptFileName = 'emos2.js')
     {
         $this->_sPathToFile = $sPathToFile;
         $this->_sScriptFileName = $sScriptFileName;
@@ -389,7 +389,7 @@ class Emos
         $aBasketItems = [];
         foreach ($aBasket as $oItem) {
             $oItem = $this->_emos_ItemFormat($oItem);
-            $aBasketItems[] = ["buy", $oItem->productId, $oItem->productName,
+            $aBasketItems[] = ['buy', $oItem->productId, $oItem->productName,
                                   $oItem->price, $oItem->productGroup, $oItem->quantity,
                                   $oItem->variant1, $oItem->variant2, $oItem->variant3 ];
         }
@@ -404,7 +404,7 @@ class Emos
      */
     public function addDetailView($oItem)
     {
-        $this->_setEmosECPageArray($oItem, "view");
+        $this->_setEmosECPageArray($oItem, 'view');
     }
 
     /**
@@ -414,7 +414,7 @@ class Emos
      */
     public function removeFromBasket($oItem)
     {
-        $this->_setEmosECPageArray($oItem, "c_rmv");
+        $this->_setEmosECPageArray($oItem, 'c_rmv');
     }
 
     /**
@@ -424,7 +424,7 @@ class Emos
      */
     public function addToBasket($oItem)
     {
-        $this->_setEmosECPageArray($oItem, "c_add");
+        $this->_setEmosECPageArray($oItem, 'c_add');
     }
 
     /**
@@ -437,7 +437,7 @@ class Emos
      * @param string $sCip            customer ip
      * @param string $sCity           customer city title
      */
-    public function addEmosBillingPageArray($sBillingId = "", $sCustomerNumber = "", $iTotal = 0, $sCountry = "", $sCip = "", $sCity = "")
+    public function addEmosBillingPageArray($sBillingId = '', $sCustomerNumber = '', $iTotal = 0, $sCountry = '', $sCip = '', $sCity = '')
     {
         $this->_setEmosBillingArray($sBillingId, $sCustomerNumber, $iTotal, $sCountry, $sCip, $sCity);
     }
@@ -453,7 +453,7 @@ class Emos
      * @param string $sCity           customer city title
      * @deprecated underscore prefix violates PSR12, will be renamed to "setEmosBillingArray" in next major
      */
-    protected function _setEmosBillingArray($sBillingId = "", $sCustomerNumber = "", $iTotal = 0, $sCountry = "", $sCip = "", $sCity = "") // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _setEmosBillingArray($sBillingId = '', $sCustomerNumber = '', $iTotal = 0, $sCountry = '', $sCip = '', $sCity = '') // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         /******************* prepare data *************************************/
         /* md5 the customer id to fullfill requirements of german datenschutzgeesetz */
@@ -464,13 +464,13 @@ class Emos
         $sCity = $this->_emos_DataFormat($sCity);
 
         /* get a / separated location stzring for later drilldown */
-        $ort = "";
+        $ort = '';
         if ($sCountry) {
             $ort .= "$sCountry/";
         }
 
         if ($sCip) {
-            $ort .= getStr()->substr($sCip, 0, 1) . "/" . getStr()->substr($sCip, 0, 2) . "/";
+            $ort .= getStr()->substr($sCip, 0, 1) . '/' . getStr()->substr($sCip, 0, 2) . '/';
         }
 
         if ($sCity) {
@@ -544,24 +544,24 @@ class Emos
 
         //2007-05-10 replace translated &nbsp; with spaces
         $nbsp = chr(0xa0);
-        $sStr = str_replace($nbsp, " ", $sStr);
-        $sStr = str_replace("\"", "", $sStr);
-        $sStr = str_replace("'", "", $sStr);
-        $sStr = str_replace("%", "", $sStr);
-        $sStr = str_replace(",", "", $sStr);
-        $sStr = str_replace(";", "", $sStr);
+        $sStr = str_replace($nbsp, ' ', $sStr);
+        $sStr = str_replace('"', '', $sStr);
+        $sStr = str_replace("'", '', $sStr);
+        $sStr = str_replace('%', '', $sStr);
+        $sStr = str_replace(',', '', $sStr);
+        $sStr = str_replace(';', '', $sStr);
         /* remove unnecessary white spaces*/
         while (true) {
             $sStr_temp = $sStr;
-            $sStr = str_replace("  ", " ", $sStr);
+            $sStr = str_replace('  ', ' ', $sStr);
 
             if ($sStr == $sStr_temp) {
                 break;
             }
         }
-        $sStr = str_replace(" / ", "/", $sStr);
-        $sStr = str_replace(" /", "/", $sStr);
-        $sStr = str_replace("/ ", "/", $sStr);
+        $sStr = str_replace(' / ', '/', $sStr);
+        $sStr = str_replace(' /', '/', $sStr);
+        $sStr = str_replace('/ ', '/', $sStr);
 
         $sStr = getStr()->substr($sStr, 0, 254);
         //$sStr = rawurlencode( $sStr );
@@ -574,30 +574,30 @@ class Emos
      */
     public function _prepareScript() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->_sPrescript =  '<script type="text/javascript">window.emosTrackVersion = 2;</script>' . $this->_br;
+        $this->_sPrescript = '<script type="text/javascript">window.emosTrackVersion = 2;</script>' . $this->_br;
 
-        $this->_sIncScript .= "<script type=\"text/javascript\" " .
-        "src=\"" . $this->_sPathToFile . $this->_sScriptFileName . "\">" .
-        "</script>" . $this->_br;
+        $this->_sIncScript .= '<script type="text/javascript" ' .
+        'src="' . $this->_sPathToFile . $this->_sScriptFileName . '">' .
+        '</script>' . $this->_br;
 
-        $this->_sPostscript  = '<script type="text/javascript"><!--' . $this->_br;
+        $this->_sPostscript = '<script type="text/javascript"><!--' . $this->_br;
         $this->_sPostscript .= $this->_tab . 'var emospro = {};' . $this->_br;
 
-        $this->_sPostscript .= $this->_addJsFormat("content", $this->_content);
-        $this->_sPostscript .= $this->_addJsFormat("orderProcess", $this->_orderProcess);
-        $this->_sPostscript .= $this->_addJsFormat("siteid", $this->_siteid);
-        $this->_sPostscript .= $this->_addJsFormat("langid", $this->_langid);
-        $this->_sPostscript .= $this->_addJsFormat("countryid", $this->_countryid);
-        $this->_sPostscript .= $this->_addJsFormat("pageId", $this->_pageid);
-        $this->_sPostscript .= $this->_addJsFormat("scontact", $this->_scontact);
-        $this->_sPostscript .= $this->_addJsFormat("download", $this->_download);
-        $this->_sPostscript .= $this->_addJsFormat("billing", [$this->_billing]);
+        $this->_sPostscript .= $this->_addJsFormat('content', $this->_content);
+        $this->_sPostscript .= $this->_addJsFormat('orderProcess', $this->_orderProcess);
+        $this->_sPostscript .= $this->_addJsFormat('siteid', $this->_siteid);
+        $this->_sPostscript .= $this->_addJsFormat('langid', $this->_langid);
+        $this->_sPostscript .= $this->_addJsFormat('countryid', $this->_countryid);
+        $this->_sPostscript .= $this->_addJsFormat('pageId', $this->_pageid);
+        $this->_sPostscript .= $this->_addJsFormat('scontact', $this->_scontact);
+        $this->_sPostscript .= $this->_addJsFormat('download', $this->_download);
+        $this->_sPostscript .= $this->_addJsFormat('billing', [$this->_billing]);
 
-        $this->_sPostscript .= $this->_addJsFormat("search", [[$this->_searchQuery, $this->_searchNumberOfHits]]);
-        $this->_sPostscript .= $this->_addJsFormat("register", [[$this->_registerUser, $this->_registerResult]]);
-        $this->_sPostscript .= $this->_addJsFormat("login", [[$this->_loginUser, $this->_loginResult]]);
+        $this->_sPostscript .= $this->_addJsFormat('search', [[$this->_searchQuery, $this->_searchNumberOfHits]]);
+        $this->_sPostscript .= $this->_addJsFormat('register', [[$this->_registerUser, $this->_registerResult]]);
+        $this->_sPostscript .= $this->_addJsFormat('login', [[$this->_loginUser, $this->_loginResult]]);
 
-        $this->_sPostscript .= $this->_addJsFormat("ec_Event", $this->_ecEvent);
+        $this->_sPostscript .= $this->_addJsFormat('ec_Event', $this->_ecEvent);
 
         $this->_sPostscript .= $this->_tab . 'window.emosPropertiesEvent(emospro);' . $this->_br;
         $this->_sPostscript .= '//-->' . $this->_br . '</script>' . $this->_br;

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -25,165 +26,165 @@
  * Brutto-Brutto mode.
  * From basketCalc.csv: Complex order calculation order VII.
  */
-$aData = array(
-    'articles' => array(
-            0 => array(
+$aData = [
+    'articles' => [
+            0 => [
                     'oxid'                     => 9200,
                     'oxprice'                  => 87,
                     'oxvat'                    => 17,
                     'amount'                   => 20315,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'                     => 9201,
                     'oxprice'                  => 72.85,
                     'oxvat'                    => 17,
                     'amount'                   => 210,
-            ),
-            2 => array(
+            ],
+            2 => [
                     'oxid'                     => 9202,
                     'oxprice'                  => 16.20,
                     'oxvat'                    => 17,
                     'amount'                   => 56,
-            ),
-            3 => array(
+            ],
+            3 => [
                     'oxid'                     => 9208,
                     'oxprice'                  => 72.11,
                     'oxvat'                    => 17,
                     'amount'                   => 691,
-            ),
-            4 => array(
+            ],
+            4 => [
                     'oxid'                     => 9212,
                     'oxprice'                  => 16.37,
                     'oxvat'                    => 17,
                     'amount'                   => 548,
-            ),
-            5 => array(
+            ],
+            5 => [
                     'oxid'                     => 9216,
                     'oxprice'                  => 56.45,
                     'oxvat'                    => 17,
                     'amount'                   => 36,
-            ),
-    ),
-    'discounts' => array(
-            0 => array(
+            ],
+    ],
+    'discounts' => [
+            0 => [
                     'oxid'         => 'discount5for9200',
                     'oxaddsum'     => 5,
                     'oxaddsumtype' => '%',
                     'oxamount' => 0,
                     'oxamountto' => 99999,
                     'oxactive' => 1,
-                    'oxarticles' => array( 9200 ),
+                    'oxarticles' => [ 9200 ],
                     'oxsort' => 10,
-            ),
-            1 => array(
+            ],
+            1 => [
                     'oxid'         => 'discount2for9201',
                     'oxaddsum'     => 2,
                     'oxaddsumtype' => '%',
                     'oxamount' => 0,
                     'oxamountto' => 99999,
                     'oxactive' => 1,
-                    'oxarticles' => array( 9201 ),
+                    'oxarticles' => [ 9201 ],
                     'oxsort' => 20,
-            ),
-            2 => array(
+            ],
+            2 => [
                     'oxid'         => 'discount3for9208',
                     'oxaddsum'     => 3,
                     'oxaddsumtype' => '%',
                     'oxamount' => 0,
                     'oxamountto' => 99999,
                     'oxactive' => 1,
-                    'oxarticles' => array( 9208 ),
+                    'oxarticles' => [ 9208 ],
                     'oxsort' => 30,
-            ),
-            3 => array(
+            ],
+            3 => [
                     'oxid'         => 'discount1for9212',
                     'oxaddsum'     => 1,
                     'oxaddsumtype' => '%',
                     'oxamount' => 0,
                     'oxamountto' => 99999,
                     'oxactive' => 1,
-                    'oxarticles' => array( 9212 ),
+                    'oxarticles' => [ 9212 ],
                     'oxsort' => 40,
-            ),
-    ),
-    'costs' => array(
-            'wrapping' => array(
-                    0 => array(
+            ],
+    ],
+    'costs' => [
+            'wrapping' => [
+                    0 => [
                             'oxtype' => 'WRAP',
                             'oxname' => 'wrapFor9202',
                             'oxprice' => 0.63,
                             'oxactive' => 1,
-                            'oxarticles' => array( 9202 )
-                    ),
-                    1 => array(
+                            'oxarticles' => [ 9202 ],
+                    ],
+                    1 => [
                             'oxtype' => 'WRAP',
                             'oxname' => 'wrapFor9216',
                             'oxprice' => 0.33,
                             'oxactive' => 1,
-                            'oxarticles' => array( 9216 )
-                    ),
-            ),
-            'delivery' => array(
-                    0 => array(
+                            'oxarticles' => [ 9216 ],
+                    ],
+            ],
+            'delivery' => [
+                    0 => [
                             'oxactive' => 1,
                             'oxaddsum' => 117,
                             'oxaddsumtype' => 'abs',
                             'oxdeltype' => 'p',
                             'oxfinalize' => 1,
                             'oxparamend' => 9999999,
-                    ),
-            ),
-            'payment' => array(
-                    0 => array(
+                    ],
+            ],
+            'payment' => [
+                    0 => [
                         'oxaddsum' => 3,
                         'oxaddsumtype' => 'abs',
                         'oxfromamount' => 0,
                         'oxtoamount' => 2000000,
                         'oxchecked' => 1,
-                    ),
-            ),
-    ),
-    'expected' => array(
-        'articles' => array(
-                9200 => array( '82,65', '1.679.034,75' ),
-                9201 => array( '71,39', '14.991,90' ),
-                9202 => array( '16,20', '907,20' ),
-                9208 => array( '69,95', '48.335,45' ),
-                9212 => array( '16,21', '8.883,08' ),
-                9216 => array( '56,45', '2.032,20' ),
-        ),
-        'totals' => array(
+                    ],
+            ],
+    ],
+    'expected' => [
+        'articles' => [
+                9200 => [ '82,65', '1.679.034,75' ],
+                9201 => [ '71,39', '14.991,90' ],
+                9202 => [ '16,20', '907,20' ],
+                9208 => [ '69,95', '48.335,45' ],
+                9212 => [ '16,21', '8.883,08' ],
+                9216 => [ '56,45', '2.032,20' ],
+        ],
+        'totals' => [
                 'totalBrutto' => '1.754.184,58',
                 'totalNetto'  => '1.499.303,06',
-                'vats' => array(
+                'vats' => [
                         17 => '254.881,52',
-                ),
-                'wrapping' => array(
+                ],
+                'wrapping' => [
                         'brutto' => '47,16',
                         'netto' => '40,30',
-                        'vat' => '6,86'
-                ),
-                'delivery' => array(
+                        'vat' => '6,86',
+                ],
+                'delivery' => [
                         'brutto' => '117,00',
                         'netto' => '100,00',
-                        'vat' => '17,00'
-                ),
-                'payment' => array(
+                        'vat' => '17,00',
+                ],
+                'payment' => [
                         'brutto' => '3,00',
                         'netto' => '2,56',
-                        'vat' => '0,44'
-                ),
-                'grandTotal'  => '1.754.351,74'
-        ),
-    ),
-    'options' => array(
+                        'vat' => '0,44',
+                ],
+                'grandTotal'  => '1.754.351,74',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
                 'blEnterNetPrice' => false,
                 'blShowNetPrice' => false,
                 'blShowVATForWrapping' => true,
                 'blShowVATForPayCharge' => true,
                 'blShowVATForDelivery' => true,
-        ),
-    ),
-);
+        ],
+    ],
+];

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -18,14 +20,14 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\Setting;
+namespace OxidEsales\EshopCommunity\Tests\Integration\Internal\Framework\Module\ShopModuleSetting;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Framework\Config\Utility\ShopSettingEncoderInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Dao\EntryDoesNotExistDaoException;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\Setting;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Setting\SettingDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\Internal\ContainerTrait;
@@ -261,7 +263,7 @@ class SettingDaoTest extends TestCase
                 [
                     'element'   => 'value',
                     'element2'  => 'value',
-                ]
+                ],
             ],
         ];
     }

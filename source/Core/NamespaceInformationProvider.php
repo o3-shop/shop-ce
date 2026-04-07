@@ -75,7 +75,6 @@ class NamespaceInformationProvider
         return static::$unifiedNamespace;
     }
 
-
     /**
      * @param string $className
      *

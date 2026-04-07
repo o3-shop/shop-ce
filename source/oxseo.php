@@ -23,9 +23,9 @@
 if (isset($_REQUEST['mod_rewrite_module_is'])) {
     $sMode = $_REQUEST['mod_rewrite_module_is'];
     if ($sMode == 'on') {
-        die("mod_rewrite_on");
+        die('mod_rewrite_on');
     } else {
-        die("mod_rewrite_off");
+        die('mod_rewrite_off');
     }
 }
 

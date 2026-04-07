@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: Brutto;
  * Price view mode: Brutto;
@@ -15,43 +16,42 @@
  *
  * books and stuff added
  */
-$aData = array(
-
-    'categories' => array(
-        0 =>  array(
+$aData = [
+    'categories' => [
+        0 =>  [
             'oxid'       => 'books',
             'oxparentid' => 'oxrootid',
             'oxshopid'   => 1,
             'oxactive'   => 1,
-            'oxarticles' => array( 'book' )
-        ),
-        1 =>  array(
+            'oxarticles' => [ 'book' ],
+        ],
+        1 =>  [
             'oxid'       => 'otherStuff',
             'oxparentid' => 'oxrootid',
             'oxshopid'   => 1,
             'oxactive'   => 1,
-            'oxarticles' => array( 'stuff' )
-        ),
-    ),
+            'oxarticles' => [ 'stuff' ],
+        ],
+    ],
 
-    'articles' => array(
-        0 => array(
+    'articles' => [
+        0 => [
             'oxid'                     => 'stuff',
             'oxprice'                  => 20,
             'oxvat'                    => 20,
             'amount'                   => 6,
-        ),
-        1 => array(
+        ],
+        1 => [
             'oxid'                     => 'book',
             'oxprice'                  => 10,
             'oxvat'                    => 10,
             'amount'                   => 1,
-        ),
-    ),
+        ],
+    ],
 
-    'costs' => array(
-        'delivery' => array(
-            0 => array(
+    'costs' => [
+        'delivery' => [
+            0 => [
                 'oxactive' => 1,
                 'oxaddsum' => 2,
                 'oxaddsumtype' => 'abs',
@@ -59,8 +59,8 @@ $aData = array(
                 'oxparam' => 0, //from
                 'oxparamend' => 99999, //to
                 'oxsort' => 1,
-            ),
-            1 => array(
+            ],
+            1 => [
                 'oxactive' => 1,
                 'oxaddsum' => 3,
                 'oxaddsumtype' => 'abs',
@@ -68,38 +68,38 @@ $aData = array(
                 'oxparam' => 0, //from
                 'oxparamend' => 99999, //to
                 'oxsort' => 2,
-                'oxcategories' => array(
-                    'otherStuff'
-                ),
-            ),
-        ),
-    ),
-    'expected' => array(
-        'articles' => array(
-            'book' => array( '10,00', '10,00' ),
-            'stuff' => array( '20,00', '120,00' )
-        ),
-        'totals' => array(
+                'oxcategories' => [
+                    'otherStuff',
+                ],
+            ],
+        ],
+    ],
+    'expected' => [
+        'articles' => [
+            'book' => [ '10,00', '10,00' ],
+            'stuff' => [ '20,00', '120,00' ],
+        ],
+        'totals' => [
             'totalBrutto' => '130,00',
             'totalNetto'  => '109,09',
-            'vats' => array(
+            'vats' => [
                 10 => '0,91',
-                20 => '20,00'
-            ),
-            'delivery' => array(
+                20 => '20,00',
+            ],
+            'delivery' => [
                 'brutto' => '5,00',
-            ),
-            'grandTotal'  => '135,00'
-        ),
-    ),
-    'options' => array(
+            ],
+            'grandTotal'  => '135,00',
+        ],
+    ],
+    'options' => [
         'activeCurrencyRate' => 1,
-        'config' => array(
+        'config' => [
             'blEnterNetPrice' => false,
             'blShowNetPrice' => false,
             'blShowVATForWrapping' => false,
             'blShowVATForDelivery' => false,
             'sAdditionalServVATCalcMethod' => 'biggest_net',
-        ),
-    ),
-);
+        ],
+    ],
+];

@@ -69,7 +69,7 @@ class DIConfigWrapperTest extends TestCase
     {
         $configArray = ['imports' => [
             ['resource' => $this->servicePath1],
-            ['resource' => $this->servicePath2]
+            ['resource' => $this->servicePath2],
         ]];
 
         $wrapper = new DIConfigWrapper($configArray);
@@ -104,7 +104,7 @@ class DIConfigWrapperTest extends TestCase
     {
         $configArray = ['imports' => [
             ['resource' => $this->servicePath1],
-            ['resource' => $this->servicePath2]
+            ['resource' => $this->servicePath2],
         ]];
 
         $wrapper = new DIConfigWrapper($configArray);
@@ -131,9 +131,9 @@ class DIConfigWrapperTest extends TestCase
                 [
                     'testmodulesubscriber' =>
                     [
-                        'class' => TestEventSubscriber::class
-                    ]
-                ]
+                        'class' => TestEventSubscriber::class,
+                    ],
+                ],
             ]
         );
         $service = $projectYaml->getService('testmodulesubscriber');
@@ -159,12 +159,12 @@ class DIConfigWrapperTest extends TestCase
                             [
                                 'method' => 'setActiveShops',
                                 'arguments' => [
-                                    [1, 5, 7]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                                    [1, 5, 7],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -189,11 +189,11 @@ class DIConfigWrapperTest extends TestCase
                         'calls' => [
                             [
                                 'method' => 'setActiveShops',
-                                'arguments' => [[1, 5, 7]]
-                            ]
-                        ]
-                    ]
-                ]
+                                'arguments' => [[1, 5, 7]],
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -208,8 +208,8 @@ class DIConfigWrapperTest extends TestCase
             [
                 'services' =>
                 [
-                    TestEventSubscriber::class => null
-                ]
+                    TestEventSubscriber::class => null,
+                ],
             ]
         );
 
@@ -228,8 +228,8 @@ class DIConfigWrapperTest extends TestCase
             [
                 'services' =>
                 [
-                    TestEventSubscriber::class => []
-                ]
+                    TestEventSubscriber::class => [],
+                ],
             ]
         );
 
@@ -247,7 +247,7 @@ class DIConfigWrapperTest extends TestCase
         ['testmodulesubscriber' =>
         [
             'class' => TestEventSubscriber::class,
-            'calls' => [['method' => 'setActiveShops', 'arguments' => [[1]]]]
+            'calls' => [['method' => 'setActiveShops', 'arguments' => [[1]]]],
         ]]]);
         $service = $projectYaml->getService('testmodulesubscriber');
         $service->removeActiveShops([1]);
@@ -281,7 +281,6 @@ class DIConfigWrapperTest extends TestCase
         ['testmodulesubscriber' =>
         ['class' => TestEventSubscriber::class]]]);
 
-
         $this->assertTrue($servicesYaml->checkServiceClassesCanBeLoaded());
     }
 
@@ -290,7 +289,6 @@ class DIConfigWrapperTest extends TestCase
         $servicesYaml = new DIConfigWrapper(['services' =>
         ['testmodulesubscriber' =>
         ['class' => 'OxidEsales\EshopCommunity\Tests\SomeNotExistingClass']]]);
-
 
         $this->assertFalse($servicesYaml->checkServiceClassesCanBeLoaded());
     }

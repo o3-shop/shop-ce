@@ -40,11 +40,11 @@ class ToolsController extends AdminController
     public function render()
     {
         if (Registry::getConfig()->isDemoShop()) {
-            return Registry::getUtils()->showMessageAndExit("Access denied !");
+            return Registry::getUtils()->showMessageAndExit('Access denied !');
         }
 
         parent::render();
 
-        return "tools.tpl";
+        return 'tools.tpl';
     }
 }

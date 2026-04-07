@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -18,7 +19,7 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-$aLang = array(
+$aLang = [
     'charset'                                        => 'UTF-8',
 
     'SHOP_MODULE_GROUP_settingsEmpty'                => 'Empty Settings Group',
@@ -42,4 +43,4 @@ $aLang = array(
     'SHOP_MODULE_testFilledSelectConfig_1'           => 'Option 1',
     'SHOP_MODULE_testFilledSelectConfig_2'           => 'Option 2',
     'SHOP_MODULE_testFilledPasswordConfig'           => 'Filled Password Config',
-);
+];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Price enter mode: brutto;
  * Price view mode: brutto;
@@ -20,9 +21,9 @@
  * Short description:
  * Testing basket item price calculator also sets items discounts
  */
-$aData = array(
-        'articles' => array(
-                0 => array(
+$aData = [
+        'articles' => [
+                0 => [
                         'oxid'        => 'testarticle',
                         'oxprice'     => 19,
                         'oxweight'    => 10,
@@ -30,11 +31,11 @@ $aData = array(
                         'oxstockflag' => 2,
                         'oxskipdiscounts' => 1,
                         'amount'      => 1,
-                        'scaleprices' => array(),
-                ),
-        ),
-        'discounts' => array(
-                0 => array(
+                        'scaleprices' => [],
+                ],
+        ],
+        'discounts' => [
+                0 => [
                         'oxid'        => 'testdiscount0',
                         'oxactive'    => 1,
                         'oxtitle'     => 'Test discount 0',
@@ -45,8 +46,8 @@ $aData = array(
                         'oxaddsumtype'=> 'abs',
                         'oxaddsum'    => 5,
                         'oxsort'      => 10,
-                ),
-                1 => array(
+                ],
+                1 => [
                         'oxid'        => 'testdiscount1',
                         'oxactive'    => 1,
                         'oxtitle'     => 'Test discount 1',
@@ -57,29 +58,29 @@ $aData = array(
                         'oxaddsumtype'=> 'abs',
                         'oxaddsum'    => 7,
                         'oxsort'      => 20,
-                ),
-        ),
-        'expected' => array(
-                'articles' => array(
-                        'testarticle' => array( '19,00', '19,00' ),
-                ),
-                'totals' => array(
+                ],
+        ],
+        'expected' => [
+                'articles' => [
+                        'testarticle' => [ '19,00', '19,00' ],
+                ],
+                'totals' => [
                         'totalBrutto' => '19,00',
                         'totalNetto'  => '15,97',
-                        'vats' => array(
-                                19 => '3,03'
-                        ),
-                        'discounts' => array(
+                        'vats' => [
+                                19 => '3,03',
+                        ],
+                        'discounts' => [
                                 //in this case discounts are skipped
-                        ),
-                        'grandTotal'  => '19,00'
-                ),
-        ),
-        'options' => array(
-                'config' => array(
+                        ],
+                        'grandTotal'  => '19,00',
+                ],
+        ],
+        'options' => [
+                'config' => [
                         'blEnterNetPrice' => false,
                         'blShowNetPrice' => false,
-                ),
+                ],
                 'activeCurrencyRate' => 1,
-        ),
-);
+        ],
+];

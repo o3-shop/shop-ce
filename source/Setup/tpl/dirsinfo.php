@@ -3,13 +3,13 @@
 /**
  * This file is part of O3-Shop.
  *
- * O3-Shop is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * O3-Shop is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
@@ -19,18 +19,18 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
-require "_header.php"; ?>
+require '_header.php'; ?>
 <br><br>
 <?php
 $this->getText('STEP_4_DESC');
-$aPath = $this->getViewParam("aPath");
-$aSetupConfig = $this->getViewParam("aSetupConfig");
-$aAdminData   = $this->getViewParam("aAdminData");
-$sChecked = "";
+$aPath = $this->getViewParam('aPath');
+$aSetupConfig = $this->getViewParam('aSetupConfig');
+$aAdminData = $this->getViewParam('aAdminData');
+$sChecked = '';
 if (!isset($aSetupConfig['blDelSetupDir']) || $aSetupConfig['blDelSetupDir']) {
-    $sChecked = "1";
+    $sChecked = '1';
 } else {
-    $sChecked = "0";
+    $sChecked = '0';
 }
 ?><br>
 <br>
@@ -73,4 +73,4 @@ if (!isset($aSetupConfig['blDelSetupDir']) || $aSetupConfig['blDelSetupDir']) {
 <input type="hidden" name="sid" value="<?php $this->getSid(); ?>">
 <input type="submit" id="step4Submit" class="edittext" value="<?php $this->getText('BUTTON_WRITE_DATA'); ?>">
 </form>
-<?php require "_footer.php";
+<?php require '_footer.php';

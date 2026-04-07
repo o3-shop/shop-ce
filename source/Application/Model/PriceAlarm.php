@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\Model\BaseModel;
@@ -193,7 +194,7 @@ class PriceAlarm extends BaseModel
                 if ($oArticle->oxarticles__oxparentid->value && !$oArticle->oxarticles__oxtitle->value) {
                     $oParent = oxNew(Article::class);
                     $oParent->load($oArticle->oxarticles__oxparentid->value);
-                    $this->_sTitle = $oParent->oxarticles__oxtitle->value . " " . $oArticle->oxarticles__oxvarselect->value;
+                    $this->_sTitle = $oParent->oxarticles__oxtitle->value . ' ' . $oArticle->oxarticles__oxvarselect->value;
                 }
             }
         }
@@ -263,7 +264,7 @@ class PriceAlarm extends BaseModel
             }
 
             // suggestion to user is sent
-            if ($this->oxpricealarm__oxsended->value != "0000-00-00 00:00:00") {
+            if ($this->oxpricealarm__oxsended->value != '0000-00-00 00:00:00') {
                 $this->_iStatus = 2;
             }
         }

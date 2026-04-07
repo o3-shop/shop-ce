@@ -35,7 +35,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DiscountCategoriesAjax extends ListComponentAjax
 {
     /** If this discount id comes from request, it means that new discount should be created. */
-    const NEW_DISCOUNT_ID = "-1";
+    public const NEW_DISCOUNT_ID = '-1';
 
     /**
      * Columns array
@@ -92,7 +92,7 @@ class DiscountCategoriesAjax extends ListComponentAjax
         } else {
             $sQAdd = " from oxobject2discount, {$sCategoryTable} " .
                      "where {$sCategoryTable}.oxid=oxobject2discount.oxobjectid " .
-                     " and oxobject2discount.oxdiscountid = " . $oDb->quote($sId) .
+                     ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sId) .
                      " and oxobject2discount.oxtype = 'oxcategories' ";
         }
 
@@ -100,7 +100,7 @@ class DiscountCategoriesAjax extends ListComponentAjax
             // performance
             $sSubSelect = " select {$sCategoryTable}.oxid from oxobject2discount, {$sCategoryTable} " .
                           "where {$sCategoryTable}.oxid=oxobject2discount.oxobjectid " .
-                          " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchId) .
+                          ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchId) .
                           " and oxobject2discount.oxtype = 'oxcategories' ";
             if (stristr($sQAdd, 'where') === false) {
                 $sQAdd .= ' where ';
@@ -112,7 +112,7 @@ class DiscountCategoriesAjax extends ListComponentAjax
 
         return $sQAdd;
     }
-    
+
     /**
      * Removes selected category (categories) from discount list
      */
@@ -121,11 +121,11 @@ class DiscountCategoriesAjax extends ListComponentAjax
         $categoryIds = $this->getActionIds('oxobject2discount.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $query = $this->addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $query = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($query);
         } elseif (is_array($categoryIds)) {
-            $chosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($categoryIds));
-            $query = "delete from oxobject2discount where oxobject2discount.oxid in (" . $chosenCategories . ") ";
+            $chosenCategories = implode(', ', DatabaseProvider::getDb()->quoteArray($categoryIds));
+            $query = 'delete from oxobject2discount where oxobject2discount.oxid in (' . $chosenCategories . ') ';
             DatabaseProvider::getDb()->Execute($query);
         }
     }
@@ -163,7 +163,7 @@ class DiscountCategoriesAjax extends ListComponentAjax
         $object2Discount->init('oxobject2discount');
         $object2Discount->oxobject2discount__oxdiscountid = new Field($discountId);
         $object2Discount->oxobject2discount__oxobjectid = new Field($categoryId);
-        $object2Discount->oxobject2discount__oxtype = new Field("oxcategories");
+        $object2Discount->oxobject2discount__oxtype = new Field('oxcategories');
 
         $object2Discount->save();
     }

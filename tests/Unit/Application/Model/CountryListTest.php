@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 use oxField;
@@ -32,16 +34,16 @@ class CountryListTest extends \OxidTestCase
     {
         parent::setUp();
         /** Insert a total of 8 inactive countries with different titles and the same oxorder */
-        $aCountryTitle = array(
-        '_CountryListTestId_0' =>  "_CountryListTestTitle_0",
-        '_CountryListTestId_1' =>  "_CountryListTestTitle_1",
-        '_CountryListTestId_2' =>  "_CountryListTestTitle_ä",
-        '_CountryListTestId_3' =>  "_CountryListTestTitle_á",
-        '_CountryListTestId_4' =>  "_CountryListTestTitle_à",
-        '_CountryListTestId_5' =>  "_CountryListTestTitle_a",
-        '_CountryListTestId_6' =>  "_CountryListTestTitle_b",
-        '_CountryListTestId_7' =>  "_CountryListTestTitle_c"
-        );
+        $aCountryTitle = [
+        '_CountryListTestId_0' =>  '_CountryListTestTitle_0',
+        '_CountryListTestId_1' =>  '_CountryListTestTitle_1',
+        '_CountryListTestId_2' =>  '_CountryListTestTitle_ä',
+        '_CountryListTestId_3' =>  '_CountryListTestTitle_á',
+        '_CountryListTestId_4' =>  '_CountryListTestTitle_à',
+        '_CountryListTestId_5' =>  '_CountryListTestTitle_a',
+        '_CountryListTestId_6' =>  '_CountryListTestTitle_b',
+        '_CountryListTestId_7' =>  '_CountryListTestTitle_c',
+        ];
 
         foreach ($aCountryTitle as $oxid => $title) {
             /** @var \OxidEsales\Eshop\Application\Controller\Admin\CountryController $country */
@@ -88,7 +90,7 @@ class CountryListTest extends \OxidTestCase
         $query = "SELECT oxid FROM oxcountry WHERE oxid LIKE '\_CountryListTestId\_%' ORDER BY oxorder, oxtitle";
         $countryList ->selectString($query);
 
-        $expectedArrayKeys = array(
+        $expectedArrayKeys = [
             '_CountryListTestId_0',
             '_CountryListTestId_1',
             '_CountryListTestId_2',
@@ -97,7 +99,7 @@ class CountryListTest extends \OxidTestCase
             '_CountryListTestId_5',
             '_CountryListTestId_6',
             '_CountryListTestId_7',
-            );
+            ];
         $actualArrayKeys = $countryList->arrayKeys();
 
         $this->assertEquals($expectedArrayKeys, $actualArrayKeys, 'The countries are properly sorted by the field oxorder');
@@ -105,7 +107,6 @@ class CountryListTest extends \OxidTestCase
 
     public function testSelectStringChangeOrderRetrievesResultInProperOrder()
     {
-
         /** Put the first row to the end of the results by giving it an oxsort of 999 */
         /** @var \oxCountry $country */
         $country = oxNew('oxCountry');
@@ -118,7 +119,7 @@ class CountryListTest extends \OxidTestCase
         $query = "SELECT oxid FROM oxcountry WHERE oxid LIKE '\_CountryListTestId\_%' ORDER BY oxorder, oxtitle";
         $countryList->selectString($query);
 
-        $expectedArrayKeys = array(
+        $expectedArrayKeys = [
             '_CountryListTestId_1',
             '_CountryListTestId_2',
             '_CountryListTestId_3',
@@ -126,7 +127,7 @@ class CountryListTest extends \OxidTestCase
             '_CountryListTestId_5',
             '_CountryListTestId_6',
             '_CountryListTestId_7',
-            '_CountryListTestId_0');
+            '_CountryListTestId_0'];
         $actualArrayKeys = $countryList->arrayKeys();
 
         $this->assertEquals($expectedArrayKeys, $actualArrayKeys, 'The countries are properly sorted by the field oxorder after the field oxd order is changed');
@@ -139,7 +140,7 @@ class CountryListTest extends \OxidTestCase
         $query = "SELECT oxid FROM oxcountry WHERE oxid LIKE '\_CountryListTestId\_%' ORDER BY oxorder, oxtitle";
         $countryList->selectString($query);
 
-        $expectedArrayKeys = array(
+        $expectedArrayKeys = [
             '_CountryListTestId_0',
             '_CountryListTestId_1',
             '_CountryListTestId_2',
@@ -148,7 +149,7 @@ class CountryListTest extends \OxidTestCase
             '_CountryListTestId_5',
             '_CountryListTestId_6',
             '_CountryListTestId_7',
-        );
+        ];
         $actualArrayKeys = $countryList->arrayKeys();
 
         $this->assertEquals($expectedArrayKeys, $actualArrayKeys, 'The countries are properly sorted by the field oxtitle');

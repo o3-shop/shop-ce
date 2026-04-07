@@ -153,7 +153,7 @@ class DiagnosticsMain extends AdminDetailsController
             $this->_aViewData['sErrorMessage'] = $this->getErrorMessage();
         }
 
-        return "diagnostics_form.tpl";
+        return 'diagnostics_form.tpl';
     }
 
     /**
@@ -235,14 +235,14 @@ class DiagnosticsMain extends AdminDetailsController
     protected function _getFileCheckReport($oFileCheckerResult) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aViewData = [
-            "sVersion"       => Registry::getConfig()->getVersion(),
-            "sEdition"       => (new Facts())->getEdition(),
-            "sRevision"      => Registry::getConfig()->getRevision(),
-            "aResultSummary" => $oFileCheckerResult->getResultSummary(),
-            "aResultOutput"  => $oFileCheckerResult->getResult(),
+            'sVersion'       => Registry::getConfig()->getVersion(),
+            'sEdition'       => (new Facts())->getEdition(),
+            'sRevision'      => Registry::getConfig()->getRevision(),
+            'aResultSummary' => $oFileCheckerResult->getResultSummary(),
+            'aResultOutput'  => $oFileCheckerResult->getResult(),
         ];
 
-        return $this->_oRenderer->renderTemplate("version_checker_result.tpl", $aViewData);
+        return $this->_oRenderer->renderTemplate('version_checker_result.tpl', $aViewData);
     }
 
     /**
@@ -253,10 +253,10 @@ class DiagnosticsMain extends AdminDetailsController
      */
     public function startDiagnostics()
     {
-        $sReport = "";
+        $sReport = '';
 
         $aDiagnosticsResult = $this->runBasicDiagnostics();
-        $sReport .= $this->_oRenderer->renderTemplate("diagnostics_main.tpl", $aDiagnosticsResult);
+        $sReport .= $this->_oRenderer->renderTemplate('diagnostics_main.tpl', $aDiagnosticsResult);
 
         /**
          * @deprecated since v6.3 (2018-06-04); This functionality will be removed completely.
@@ -364,7 +364,7 @@ class DiagnosticsMain extends AdminDetailsController
 
         return $aViewData;
     }
-    
+
     /**
      * Downloads result of system file check
      */
@@ -382,8 +382,8 @@ class DiagnosticsMain extends AdminDetailsController
     public function getSupportContactForm()
     {
         $aLinks = [
-            "de" => "https://community.o3-shop.com/",
-            "en" => "https://community.o3-shop.com/"
+            'de' => 'https://community.o3-shop.com/',
+            'en' => 'https://community.o3-shop.com/',
         ];
 
         $oLang = Registry::getLang();
@@ -392,7 +392,7 @@ class DiagnosticsMain extends AdminDetailsController
         $sLangCode = $aLanguages[$iLangId]->abbr;
 
         if (!array_key_exists($sLangCode, $aLinks)) {
-            $sLangCode = "de";
+            $sLangCode = 'de';
         }
 
         return $aLinks[$sLangCode];

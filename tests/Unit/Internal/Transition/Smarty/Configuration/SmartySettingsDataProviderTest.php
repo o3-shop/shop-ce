@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -43,7 +45,7 @@ class SmartySettingsDataProviderTest extends \PHPUnit\Framework\TestCase
             'debugging' => true,
             'compile_check' => true,
             'php_handling' => 1,
-            'security' => false
+            'security' => false,
         ];
 
         $this->assertEquals($settings, $dataProvider->getSettings());

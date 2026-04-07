@@ -35,7 +35,7 @@ use OxidEsales\Eshop\Core\TableViewNameGenerator;
 class ShopList extends AdminListController
 {
     /** New Shop indicator. */
-    const NEW_SHOP_ID = '-1';
+    public const NEW_SHOP_ID = '-1';
 
     /**
      * Forces main frame update is set TRUE
@@ -78,7 +78,7 @@ class ShopList extends AdminListController
 
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         if (isset($soxId) && $soxId != self::NEW_SHOP_ID) {
             // load object
             $oShop = oxNew(Shop::class);
@@ -97,7 +97,7 @@ class ShopList extends AdminListController
 
         if ($this->_aViewData['updatenav']) {
             //skipping requirements checking when reloading nav frame
-            Registry::getSession()->setVariable("navReload", true);
+            Registry::getSession()->setVariable('navReload', true);
         }
 
         //making sure we really change shops on low level
@@ -121,7 +121,7 @@ class ShopList extends AdminListController
         $this->_aWhere = parent::buildWhere();
         if (!Registry::getSession()->getVariable('malladmin')) {
             // we only allow to see our shop
-            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName("oxshops") . ".oxid"] = Registry::getSession()->getVariable("actshop");
+            $this->_aWhere[Registry::get(TableViewNameGenerator::class)->getViewName('oxshops') . '.oxid'] = Registry::getSession()->getVariable('actshop');
         }
 
         return $this->_aWhere;

@@ -50,7 +50,7 @@ class ThemeMain extends AdminDetailsController
         }
 
         if ($oTheme->load($soxId)) {
-            $this->_aViewData["oTheme"] = $oTheme;
+            $this->_aViewData['oTheme'] = $oTheme;
         } else {
             Registry::getUtilsView()->addErrorToDisplay(oxNew(StandardException::class, 'EXCEPTION_THEME_NOT_LOADED'));
         }
@@ -76,7 +76,6 @@ class ThemeMain extends AdminDetailsController
 
         return ($blThemeSet || $blCustomThemeSet);
     }
-
 
     /**
      * Set theme

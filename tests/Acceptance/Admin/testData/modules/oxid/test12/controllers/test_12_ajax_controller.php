@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop Community Edition.
  *
@@ -26,14 +27,14 @@ class test_12_ajax_controller extends \OxidEsales\Eshop\Application\Controller\A
     {
         parent::render();
 
-        if (oxRegistry::getConfig()->getRequestParameter("aoc")) {
-            $ajax = oxNew("test_12_ajax_controller_ajax");
+        if (oxRegistry::getConfig()->getRequestParameter('aoc')) {
+            $ajax = oxNew('test_12_ajax_controller_ajax');
             $this->_aViewData['oxajax_result'] = oxRegistry::getConfig()->getConfigParam('testModule12AjaxCalledSuccessfully');
             $this->_aViewData['oxajax'] = $ajax->getFeedback();
 
-            return "test_12_popup.tpl";
+            return 'test_12_popup.tpl';
         }
 
-        return "test_12_ajax_controller.tpl";
+        return 'test_12_ajax_controller.tpl';
     }
 }

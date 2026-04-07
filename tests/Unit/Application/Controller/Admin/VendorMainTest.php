@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\Vendor;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for Vendor_Main class
  */
 class VendorMainTest extends \OxidTestCase
 {
-
     /**
      * Vendor_Main::Render() test case
      *
@@ -37,10 +37,10 @@ class VendorMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMain::class, array("_createCategoryTree"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\VendorMain::class, ['_createCategoryTree']);
         $oView->expects($this->once())->method('_createCategoryTree');
         $this->assertEquals('vendor_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
@@ -55,7 +55,7 @@ class VendorMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('Vendor_Main');
@@ -63,7 +63,7 @@ class VendorMainTest extends \OxidTestCase
 
         $aViewData = $oView->getViewData();
         $this->assertFalse(isset($aViewData['edit']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -85,11 +85,11 @@ class VendorMainTest extends \OxidTestCase
             $oView = oxNew('Vendor_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in Vendor_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in Vendor_Main::save()');
 
             return;
         }
-        $this->fail("Error in Vendor_Main::save()");
+        $this->fail('Error in Vendor_Main::save()');
     }
 
     /**
@@ -111,10 +111,10 @@ class VendorMainTest extends \OxidTestCase
             $oView = oxNew('Vendor_Main');
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in Vendor_Main::saveinnlang()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in Vendor_Main::saveinnlang()');
 
             return;
         }
-        $this->fail("Error in Vendor_Main::saveinnlang()");
+        $this->fail('Error in Vendor_Main::saveinnlang()');
     }
 }

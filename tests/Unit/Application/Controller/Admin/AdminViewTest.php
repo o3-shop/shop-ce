@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,20 +18,20 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use oxArticleHelper;
-use \oxDb;
+use oxDb;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminController;
-use \oxRegistry;
-use \oxTestModules;
+use oxRegistry;
+use oxTestModules;
 
 /**
  * Testing oxAdminView class
  */
 class AdminViewTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -45,7 +46,7 @@ class AdminViewTest extends \OxidTestCase
         oxArticleHelper::cleanup();
 
         //resetting cached testing values
-        $_GET["testReset"] = null;
+        $_GET['testReset'] = null;
 
         parent::tearDown();
     }
@@ -57,23 +58,23 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetServiceProtocol()
     {
+        // getServiceProtocol() uses Registry::getConfig()->isSsl(), not $this->getConfig().
+
         // SSL on
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("isSsl"));
+        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl']);
         $oConfig->expects($this->once())->method('isSsl')->will($this->returnValue(true));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig);
 
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array("getConfig"), array(), '', false);
-        $oAdminView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-
-        $this->assertEquals("https", $oAdminView->UNITgetServiceProtocol());
+        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, null, [], '', false);
+        $this->assertEquals('https', $oAdminView->UNITgetServiceProtocol());
 
         // SSL off
-        $oConfig = $this->getMock(\OxidEsales\Eshop\Core\Config::class, array("isSsl"));
-        $oConfig->expects($this->once())->method('isSsl')->will($this->returnValue(false));
+        $oConfig2 = $this->getMock(\OxidEsales\Eshop\Core\Config::class, ['isSsl']);
+        $oConfig2->expects($this->once())->method('isSsl')->will($this->returnValue(false));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Config::class, $oConfig2);
 
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array("getConfig"), array(), '', false);
-        $oAdminView->expects($this->once())->method('getConfig')->will($this->returnValue($oConfig));
-
-        $this->assertEquals("http", $oAdminView->UNITgetServiceProtocol());
+        $oAdminView2 = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, null, [], '', false);
+        $this->assertEquals('http', $oAdminView2->UNITgetServiceProtocol());
     }
 
     /**
@@ -83,26 +84,27 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetServiceUrl()
     {
+        // getServiceUrl() calls getServiceProtocol() (without underscore) and ShopVersion::getVersion().
+        // Mock getServiceProtocol on the view, and use the real ShopVersion.
         $sPref = $this->getConfig()->getEdition();
+        $sVersion = \OxidEsales\Eshop\Core\ShopVersion::getVersion();
 
-        // no lang abbr
         $this->getProxyClass(AdminController::class);
-        $oAdminView = $this->getMock("OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy", array("_getServiceProtocol", "_getCountryByCode", "_getShopVersionNr"), array(), '', false);
-        $oAdminView->expects($this->any())->method('_getServiceProtocol')->will($this->returnValue("testprotocol"));
-        $oAdminView->expects($this->any())->method('_getShopVersionNr')->will($this->returnValue("testshopversion"));
+        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['getServiceProtocol'], [], '', false);
+        $oAdminView->expects($this->any())->method('getServiceProtocol')->will($this->returnValue('testprotocol'));
 
         $this->getSession()->setVariable('tpllanguage', 'de');
 
-        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/testshopversion/international/de/";
+        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/$sVersion/international/de/";
         $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl());
 
         $oAdminView->setNonPublicVar('_sServiceUrl', null);
-        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/testshopversion/international/en/";
+        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/$sVersion/international/en/";
         $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl('fr'));
 
         $oAdminView->setNonPublicVar('_sServiceUrl', null);
-        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/testshopversion/international/en/";
-        $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl("en"));
+        $sTestUrl = "testprotocol://admin.oxid-esales.com/$sPref/$sVersion/international/en/";
+        $this->assertEquals($sTestUrl, $oAdminView->getServiceUrl('en'));
     }
 
     /**
@@ -114,7 +116,7 @@ class AdminViewTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtils', 'getPreviewId', '{ return "123"; }');
         $oAdminView = oxNew('oxadminview');
-        $this->assertEquals("123", $oAdminView->getPreviewId());
+        $this->assertEquals('123', $oAdminView->getPreviewId());
     }
 
     /**
@@ -124,9 +126,10 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testInit()
     {
-        $this->markTestSkipped('Overwork due => tests are stoping without message.');
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array('_authorize'));
-        $oAdminView->expects($this->once())->method('_authorize')->will($this->returnValue(true));
+        // init() calls authorize() (without underscore). If it returns false,
+        // it calls redirect() + exit() which kills the process.
+        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['authorize']);
+        $oAdminView->expects($this->once())->method('authorize')->will($this->returnValue(true));
         $oAdminView->init();
 
         $this->assertEquals(oxRegistry::getSession()->getVariable('malladmin'), $oAdminView->getViewDataElement('malladmin'));
@@ -139,11 +142,11 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testSetupNavigation()
     {
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array('getListUrl', 'getEditUrl'));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getListUrl', 'getEditUrl']);
         $oNavigation->expects($this->once())->method('getListUrl')->with($this->equalTo('xxx'))->will($this->returnValue('listurl'));
         $oNavigation->expects($this->once())->method('getEditUrl')->with($this->equalTo('xxx'))->will($this->returnValue('editurl'));
 
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array('getNavigation'));
+        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['getNavigation']);
         $oAdminView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
 
         $oAdminView->UNITsetupNavigation('xxx');
@@ -169,10 +172,10 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetViewIdMocked()
     {
-        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, array('getClassId'));
+        $oNavigation = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['getClassId']);
         $oNavigation->expects($this->once())->method('getClassId')->will($this->returnValue('xxx'));
 
-        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array('getNavigation'));
+        $oAdminView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, ['getNavigation']);
         $oAdminView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
 
         $this->assertEquals('xxx', $oAdminView->getViewId());
@@ -228,7 +231,7 @@ class AdminViewTest extends \OxidTestCase
         $oAdminView = oxNew('oxAdminView');
         $oAdminView->resetContentCache();
 
-        $this->assertEquals('resetDoneMain', $_GET["testReset"]);
+        $this->assertEquals('resetDoneMain', $_GET['testReset']);
     }
 
     /**
@@ -240,12 +243,12 @@ class AdminViewTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtils', 'oxResetFileCache', '{ $_GET["testReset"] = "resetDone"; }');
 
-        $this->getConfig()->setConfigParam("blClearCacheOnLogout", 1);
+        $this->getConfig()->setConfigParam('blClearCacheOnLogout', 1);
 
         $oAdminView = oxNew('oxAdminView');
         $oAdminView->resetContentCache();
 
-        $this->assertEquals(null, $_GET["testReset"]);
+        $this->assertEquals(null, $_GET['testReset']);
     }
 
     /**
@@ -258,12 +261,12 @@ class AdminViewTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxUtils', 'oxResetFileCache', '{ $_GET["testReset"] = "resetDone"; }');
 
-        $this->getConfig()->setConfigParam("blClearCacheOnLogout", 1);
+        $this->getConfig()->setConfigParam('blClearCacheOnLogout', 1);
 
         $oAdminView = oxNew('oxAdminView');
         $oAdminView->resetContentCache(true);
 
-        $this->assertEquals('resetDone', $_GET["testReset"]);
+        $this->assertEquals('resetDone', $_GET['testReset']);
     }
 
     /**
@@ -273,7 +276,7 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testResetCounter()
     {
-        $this->getConfig()->setConfigParam("blClearCacheOnLogout", null);
+        $this->getConfig()->setConfigParam('blClearCacheOnLogout', null);
         oxTestModules::addFunction('oxUtilsCount', 'resetPriceCatArticleCount', '{ $_GET["testReset"]["priceCatCount"] = $aA[0]; }');
         oxTestModules::addFunction('oxUtilsCount', 'resetCatArticleCount', '{ $_GET["testReset"]["catCount"] = $aA[0]; }');
         oxTestModules::addFunction('oxUtilsCount', 'resetVendorArticleCount', '{ $_GET["testReset"]["vendorCount"] = $aA[0]; }');
@@ -285,10 +288,10 @@ class AdminViewTest extends \OxidTestCase
         $oAdminView->resetCounter('vendorArticle', 'testValue');
         $oAdminView->resetCounter('manufacturerArticle', 'testValue');
 
-        $this->assertEquals('testValue', $_GET["testReset"]["priceCatCount"]);
-        $this->assertEquals('testValue', $_GET["testReset"]["catCount"]);
-        $this->assertEquals('testValue', $_GET["testReset"]["vendorCount"]);
-        $this->assertEquals('testValue', $_GET["testReset"]["manufacturerCount"]);
+        $this->assertEquals('testValue', $_GET['testReset']['priceCatCount']);
+        $this->assertEquals('testValue', $_GET['testReset']['catCount']);
+        $this->assertEquals('testValue', $_GET['testReset']['vendorCount']);
+        $this->assertEquals('testValue', $_GET['testReset']['manufacturerCount']);
     }
 
     /**
@@ -298,7 +301,7 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testResetCounterWhenResetOnLogoutEnabled()
     {
-        $this->getConfig()->setConfigParam("blClearCacheOnLogout", 1);
+        $this->getConfig()->setConfigParam('blClearCacheOnLogout', 1);
 
         oxTestModules::addFunction('oxUtilsCount', 'resetPriceCatArticleCount', '{ $_GET["testReset"]["priceCatCount"] = $aA[0]; }');
         oxTestModules::addFunction('oxUtilsCount', 'resetCatArticleCount', '{ $_GET["testReset"]["catCount"] = $aA[0]; }');
@@ -311,15 +314,15 @@ class AdminViewTest extends \OxidTestCase
         $oAdminView->resetCounter('vendorArticle', 'testValue');
         $oAdminView->resetCounter('manufacturerArticle', 'testValue');
 
-        $this->assertEquals(null, $_GET["testReset"]["priceCatCount"]);
-        $this->assertEquals(null, $_GET["testReset"]["catCount"]);
-        $this->assertEquals(null, $_GET["testReset"]["vendorCount"]);
-        $this->assertEquals(null, $_GET["testReset"]["manufacturerCount"]);
+        $this->assertEquals(null, $_GET['testReset']['priceCatCount']);
+        $this->assertEquals(null, $_GET['testReset']['catCount']);
+        $this->assertEquals(null, $_GET['testReset']['vendorCount']);
+        $this->assertEquals(null, $_GET['testReset']['manufacturerCount']);
     }
 
     public function testAddGlobalParamsAddsSid()
     {
-        $oUU = $this->getMock(\OxidEsales\Eshop\Core\UtilsUrl::class, array('processUrl'));
+        $oUU = $this->getMock(\OxidEsales\Eshop\Core\UtilsUrl::class, ['processUrl']);
         $oUU->expects($this->any())->method('processUrl')->will($this->returnValue('sess:url'));
         oxTestModules::addModuleObject('oxUtilsUrl', $oUU);
 
@@ -336,20 +339,19 @@ class AdminViewTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtils', 'checkAccessRights', '{return true;}');
         oxTestModules::addFunction('oxUtilsServer', 'getOxCookie', '{return array("asd");}');
 
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        // Production code uses Registry::getSession(), not $this->getSession()
+        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(true));
-        $oAView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array('getSession'));
-        $oAView->expects($this->once())->method('getSession')->will($this->returnValue($oSess));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSess);
+        $oAView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class);
         $this->assertEquals(true, $oAView->UNITauthorize());
 
-
-        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, array('checkSessionChallenge'));
+        $oSess = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['checkSessionChallenge']);
         $oSess->expects($this->once())->method('checkSessionChallenge')->will($this->returnValue(false));
-        $oAView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class, array('getSession'));
-        $oAView->expects($this->once())->method('getSession')->will($this->returnValue($oSess));
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSess);
+        $oAView = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\AdminController::class);
         $this->assertEquals(false, $oAView->UNITauthorize());
     }
-
 
     /**
      * Tests oxAdminView::_getCountryByCode()
@@ -358,9 +360,9 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetCountryByCode()
     {
-        $oSubj = $this->getProxyClass("oxadminView");
-        $sTestCode = "en";
-        $this->assertEquals("international", $oSubj->UNITgetCountryByCode($sTestCode));
+        $oSubj = $this->getProxyClass('oxadminView');
+        $sTestCode = 'en';
+        $this->assertEquals('international', $oSubj->UNITgetCountryByCode($sTestCode));
     }
 
     /**
@@ -371,13 +373,13 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetCountryByCodeNoEng()
     {
-        $oLang = $this->getMock(\OxidEsales\Eshop\Core\Language::class, array('getLanguageIds'));
-        $oLang->expects($this->any())->method('getLanguageIds')->will($this->returnValue(array('de')));
+        $oLang = $this->getMock(\OxidEsales\Eshop\Core\Language::class, ['getLanguageIds']);
+        $oLang->expects($this->any())->method('getLanguageIds')->will($this->returnValue(['de']));
         oxTestModules::addModuleObject('oxLang', $oLang);
 
         $oSubj = oxNew('oxadminView');
-        $sTestCode = "de";
-        $this->assertEquals("germany", $oSubj->UNITgetCountryByCode($sTestCode));
+        $sTestCode = 'de';
+        $this->assertEquals('germany', $oSubj->UNITgetCountryByCode($sTestCode));
     }
 
     /**
@@ -388,17 +390,17 @@ class AdminViewTest extends \OxidTestCase
     public function testGetCountryByCodeEnglishDefault()
     {
         //faking language array
-        $aLangArray = array("0" => "en", "1" => "de");
+        $aLangArray = ['0' => 'en', '1' => 'de'];
 
-        $oLangMock = $this->getMock(\OxidEsales\Eshop\Core\Language::class, array("getLanguageIds"));
-        $oLangMock->expects($this->atLeastOnce())->method("getLanguageIds")->will($this->returnValue($aLangArray));
+        $oLangMock = $this->getMock(\OxidEsales\Eshop\Core\Language::class, ['getLanguageIds']);
+        $oLangMock->expects($this->atLeastOnce())->method('getLanguageIds')->will($this->returnValue($aLangArray));
         oxTestModules::addModuleObject('oxLang', $oLangMock);
 
-        $oSubj = $this->getProxyClass("oxadminView");
-        $sTestCode = "de";
+        $oSubj = $this->getProxyClass('oxadminView');
+        $sTestCode = 'de';
 
         //expecting same result due to faked language array
-        $this->assertEquals("germany", $oSubj->UNITgetCountryByCode($sTestCode));
+        $this->assertEquals('germany', $oSubj->UNITgetCountryByCode($sTestCode));
     }
 
     /**
@@ -406,24 +408,24 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testSetEditObjectIdGetEditObjectId()
     {
-        $this->setRequestParameter("oxid", null);
-        $this->getSession()->setVariable("saved_oxid", "testSessId");
+        $this->setRequestParameter('oxid', null);
+        $this->getSession()->setVariable('saved_oxid', 'testSessId');
 
         $oView = oxNew('oxAdminView');
-        $this->assertEquals("testSessId", $oView->getEditObjectId());
+        $this->assertEquals('testSessId', $oView->getEditObjectId());
 
-        $this->setRequestParameter("oxid", "testRequestId");
-        $this->getSession()->setVariable("saved_oxid", "testSessId");
-
-        $oView = oxNew('oxAdminView');
-        $this->assertEquals("testRequestId", $oView->getEditObjectId());
-
-        $this->setRequestParameter("oxid", "testRequestId");
-        $this->getSession()->setVariable("saved_oxid", "testSessId");
+        $this->setRequestParameter('oxid', 'testRequestId');
+        $this->getSession()->setVariable('saved_oxid', 'testSessId');
 
         $oView = oxNew('oxAdminView');
-        $oView->setEditObjectId("testSetId");
-        $this->assertEquals("testSetId", $oView->getEditObjectId());
+        $this->assertEquals('testRequestId', $oView->getEditObjectId());
+
+        $this->setRequestParameter('oxid', 'testRequestId');
+        $this->getSession()->setVariable('saved_oxid', 'testSessId');
+
+        $oView = oxNew('oxAdminView');
+        $oView->setEditObjectId('testSetId');
+        $this->assertEquals('testSetId', $oView->getEditObjectId());
     }
 }
 

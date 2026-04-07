@@ -53,10 +53,10 @@ class ArticleStock extends AdminDetailsController
 
         parent::render();
 
-        $this->_aViewData["edit"] = $oArticle = oxNew(Article::class);
+        $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         $soxId = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oArticle->loadInLang($this->_iEditLang, $soxId);
 
@@ -71,7 +71,7 @@ class ArticleStock extends AdminDetailsController
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
 
             if ($oArticle->isDerived()) {
@@ -82,8 +82,8 @@ class ArticleStock extends AdminDetailsController
             if ($oArticle->oxarticles__oxparentid->value) {
                 $oParentArticle = oxNew(Article::class);
                 $oParentArticle->load($oArticle->oxarticles__oxparentid->value);
-                $this->_aViewData["parentarticle"] = $oParentArticle;
-                $this->_aViewData["oxparentid"] = $oArticle->oxarticles__oxparentid->value;
+                $this->_aViewData['parentarticle'] = $oParentArticle;
+                $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
             }
 
             if ($myConfig->getConfigParam('blMallInterchangeArticles')) {
@@ -94,17 +94,17 @@ class ArticleStock extends AdminDetailsController
             }
 
             $oPriceList = oxNew(ListModel::class);
-            $oPriceList->init('oxbase', "oxprice2article");
-            $sQ = "select * from oxprice2article where oxartid = :oxartid " .
+            $oPriceList->init('oxbase', 'oxprice2article');
+            $sQ = 'select * from oxprice2article where oxartid = :oxartid ' .
                   "and {$sShopSelect} and (oxamount > 0 or oxamountto > 0) order by oxamount ";
             $oPriceList->selectstring($sQ, [
-                ':oxartid' => $soxId
+                ':oxartid' => $soxId,
             ]);
 
-            $this->_aViewData["amountprices"] = $oPriceList;
+            $this->_aViewData['amountprices'] = $oPriceList;
         }
 
-        return "article_stock.tpl";
+        return 'article_stock.tpl';
     }
 
     /**
@@ -170,7 +170,7 @@ class ArticleStock extends AdminDetailsController
 
         //replacing commas
         foreach ($aParams as $key => $sParam) {
-            $aParams[$key] = str_replace(",", ".", $sParam);
+            $aParams[$key] = str_replace(',', '.', $sParam);
         }
 
         $aParams['oxprice2article__oxshopid'] = $myConfig->getShopID();
@@ -181,7 +181,7 @@ class ArticleStock extends AdminDetailsController
 
         $aParams['oxprice2article__oxartid'] = $sOxArtId;
         if (!isset($aParams['oxprice2article__oxamount']) || !$aParams['oxprice2article__oxamount']) {
-            $aParams['oxprice2article__oxamount'] = "1";
+            $aParams['oxprice2article__oxamount'] = '1';
         }
 
         if (!$myConfig->getConfigParam('blAllowUnevenAmounts')) {
@@ -193,7 +193,7 @@ class ArticleStock extends AdminDetailsController
         $sType = $aParams['pricetype'];
 
         $oArticlePrice = oxNew(BaseModel::class);
-        $oArticlePrice->init("oxprice2article");
+        $oArticlePrice->init('oxprice2article');
         $oArticlePrice->assign($aParams);
 
         $oArticlePrice->$sType = new Field($dPrice);
@@ -222,7 +222,7 @@ class ArticleStock extends AdminDetailsController
             if (is_null($sOXID)) {
                 $sOXID = $oArticlePrice->getId();
             }
-            $this->_aViewData["errorscaleprice"][] = $sOXID;
+            $this->_aViewData['errorscaleprice'][] = $sOXID;
         }
     }
 
@@ -242,7 +242,6 @@ class ArticleStock extends AdminDetailsController
         $this->onArticleAmountPriceChange($sOxArtId);
     }
 
-
     /**
      * Adds amount price to article
      */
@@ -252,9 +251,9 @@ class ArticleStock extends AdminDetailsController
 
         $oDb = DatabaseProvider::getDb();
         $articleId = $this->getEditObjectId();
-        $oDb->execute("delete from oxprice2article where oxid = :oxid and oxartid = :oxartid", [
+        $oDb->execute('delete from oxprice2article where oxid = :oxid and oxartid = :oxartid', [
             ':oxid' => Registry::getRequest()->getRequestEscapedParameter('priceid'),
-            ':oxartid' => $articleId
+            ':oxartid' => $articleId,
         ]);
 
         $this->onArticleAmountPriceChange($articleId);

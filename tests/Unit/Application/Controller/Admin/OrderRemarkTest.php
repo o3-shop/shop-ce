@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,19 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
-use \oxField;
-use \Exception;
-use \oxDb;
-use \oxTestModules;
+use Exception;
+use oxDb;
+use oxField;
+use oxTestModules;
 
 /**
  * Testing Order_Remark class
  */
 class OrderRemarkTest extends \OxidTestCase
 {
-
     /**
      * Tear down the fixture.
      *
@@ -49,11 +50,11 @@ class OrderRemarkTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
-        $this->setRequestParameter("rem_oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
+        $this->setRequestParameter('rem_oxid', 'testId');
 
         $oView = oxNew('order_remark');
-        $this->assertEquals("order_remark.tpl", $oView->render());
+        $this->assertEquals('order_remark.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['allremark']));
         $this->assertTrue($aViewData['allremark'] instanceof \OxidEsales\EshopCommunity\Core\Model\ListModel);
@@ -75,8 +76,8 @@ class OrderRemarkTest extends \OxidTestCase
         $oOrder->save();
         $oView = oxNew('order_remark');
         $oView->save();
-        $oRemark = oxNew("oxRemark");
-        $oRemark->load("_testRemark");
+        $oRemark = oxNew('oxRemark');
+        $oRemark->load('_testRemark');
         $this->assertEquals('r', oxDb::getDB()->getOne('select oxtype from oxremark where oxtext = "test text"'));
         $this->assertEquals('oxdefaultadmin', oxDb::getDB()->getOne('select oxparentid from oxremark where oxtext = "test text"'));
     }
@@ -95,10 +96,10 @@ class OrderRemarkTest extends \OxidTestCase
             $oView = oxNew('order_remark');
             $oView->delete();
         } catch (Exception $oExcp) {
-            $this->assertEquals("delete", $oExcp->getMessage(), "Error in order_remark::delete()");
+            $this->assertEquals('delete', $oExcp->getMessage(), 'Error in order_remark::delete()');
 
             return;
         }
-        $this->fail("Error in order_remark::delete()");
+        $this->fail('Error in order_remark::delete()');
     }
 }

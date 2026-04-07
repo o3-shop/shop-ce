@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\ModuleSortList;
@@ -44,7 +46,7 @@ class ModuleSortListTest extends \OxidTestCase
             Article::class => [
                 'dir1/module1',
                 'dir2/module2',
-            ]
+            ],
         ];
 
         $this->setRequestParameter('aModules', json_encode($chain));
@@ -60,7 +62,7 @@ class ModuleSortListTest extends \OxidTestCase
                 'OxidEsales---Eshop---Application---Model---Article' => [
                     'dir1/module1',
                     'dir2/module2',
-                ]
+                ],
             ],
             $viewData['aExtClasses']
         );
@@ -73,9 +75,9 @@ class ModuleSortListTest extends \OxidTestCase
      */
     public function testRemove()
     {
-        $this->setRequestParameter("noButton", true);
+        $this->setRequestParameter('noButton', true);
         $oView = oxNew('Module_SortList');
         $oView->remove();
-        $this->assertTrue($this->getSession()->getVariable("blSkipDeletedExtChecking"));
+        $this->assertTrue($this->getSession()->getVariable('blSkipDeletedExtChecking'));
     }
 }

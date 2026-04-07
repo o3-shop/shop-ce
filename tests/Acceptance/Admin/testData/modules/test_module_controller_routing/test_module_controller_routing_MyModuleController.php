@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -54,7 +55,7 @@ class test_module_controller_routing_MyModuleController extends \OxidEsales\Esho
      */
     public function displayMessage()
     {
-        $this->_aViewData['the_module_message'] =  $this->getMessage();
+        $this->_aViewData['the_module_message'] = $this->getMessage();
         $this->render();
     }
 

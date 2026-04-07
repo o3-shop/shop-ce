@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer;
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -180,7 +181,9 @@ class Manufacturer extends MultiLanguageModel implements IUrl
         $this->setId('root');
         $this->oxmanufacturers__oxicon = new Field('', Field::T_RAW);
         $this->oxmanufacturers__oxtitle = new Field(
-            Registry::getLang()->translateString('BY_MANUFACTURER', $this->getLanguage(), false), Field::T_RAW);
+            Registry::getLang()->translateString('BY_MANUFACTURER', $this->getLanguage(), false),
+            Field::T_RAW
+        );
         $this->oxmanufacturers__oxshortdesc = new Field('', Field::T_RAW);
 
         return true;
@@ -245,7 +248,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
             $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=manufacturerlist" . ($blAddId ? "&amp;mnid=" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=manufacturerlist' . ($blAddId ? '&amp;mnid=' . $this->getId() : '');
     }
 
     /**
@@ -377,7 +380,7 @@ class Manufacturer extends MultiLanguageModel implements IUrl
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return Registry::getPictureHandler()->getPicUrl("manufacturer/icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl('manufacturer/icon/', $sIcon, $sSize);
         }
     }
 

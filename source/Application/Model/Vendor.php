@@ -21,6 +21,7 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\SeoEncoderVendor;
 use OxidEsales\Eshop\Core\Contract\IUrl;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -148,7 +149,9 @@ class Vendor extends MultiLanguageModel implements IUrl
         $this->setId('root');
         $this->oxvendor__oxicon = new Field('', Field::T_RAW);
         $this->oxvendor__oxtitle = new Field(
-            Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false), Field::T_RAW);
+            Registry::getLang()->translateString('BY_VENDOR', $this->getLanguage(), false),
+            Field::T_RAW
+        );
         $this->oxvendor__oxshortdesc = new Field('', Field::T_RAW);
 
         return true;
@@ -213,7 +216,7 @@ class Vendor extends MultiLanguageModel implements IUrl
             $sUrl = Registry::getConfig()->getShopUrl($iLang, false);
         }
 
-        return $sUrl . "index.php?cl=vendorlist" . ($blAddId ? "&amp;cnid=v_" . $this->getId() : "");
+        return $sUrl . 'index.php?cl=vendorlist' . ($blAddId ? '&amp;cnid=v_' . $this->getId() : '');
     }
 
     /**
@@ -331,7 +334,6 @@ class Vendor extends MultiLanguageModel implements IUrl
         return false;
     }
 
-
     /**
      * Returns article picture
      *
@@ -346,7 +348,7 @@ class Vendor extends MultiLanguageModel implements IUrl
                 $sSize = $oConfig->getConfigParam('sIconsize');
             }
 
-            return Registry::getPictureHandler()->getPicUrl("vendor/icon/", $sIcon, $sSize);
+            return Registry::getPictureHandler()->getPicUrl('vendor/icon/', $sIcon, $sSize);
         }
     }
 

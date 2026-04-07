@@ -44,22 +44,22 @@ class AttributeCategory extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
-        if (isset($soxId) && $soxId != "-1") {
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oAttr = oxNew(Attribute::class);
             $oAttr->load($soxId);
-            $this->_aViewData["edit"] = $oAttr;
+            $this->_aViewData['edit'] = $oAttr;
         }
 
         if (Registry::getRequest()->getRequestEscapedParameter('aoc')) {
             $oAttributeCategoryAjax = oxNew(AttributeCategoryAjax::class);
             $this->_aViewData['oxajax'] = $oAttributeCategoryAjax->getColumns();
 
-            return "popups/attribute_category.tpl";
+            return 'popups/attribute_category.tpl';
         }
 
-        return "attribute_category.tpl";
+        return 'attribute_category.tpl';
     }
 }

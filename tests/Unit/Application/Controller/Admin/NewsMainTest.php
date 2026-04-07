@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\News;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for News_Main class
  */
 class NewsMainTest extends \OxidTestCase
 {
-
     /**
      * News_Main::Render() test case
      *
@@ -37,7 +37,7 @@ class NewsMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('News_Main');
@@ -54,14 +54,14 @@ class NewsMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('News_Main');
         $this->assertEquals('news_main.tpl', $oView->render());
         $aViewData = $oView->getViewData();
         $this->assertTrue(isset($aViewData['oxid']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -73,18 +73,18 @@ class NewsMainTest extends \OxidTestCase
     {
         // testing..
         oxTestModules::addFunction('oxnews', 'save', '{ throw new Exception( "save" ); }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('News_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in News_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in News_Main::save()');
 
             return;
         }
-        $this->fail("error in News_Main::save()");
+        $this->fail('error in News_Main::save()');
     }
 
     /**
@@ -96,17 +96,17 @@ class NewsMainTest extends \OxidTestCase
     {
         // testing..
         oxTestModules::addFunction('oxnews', 'save', '{ throw new Exception( "save" ); }');
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('News_Main');
             $oView->saveinnlang();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "error in News_Main::saveinnlang()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'error in News_Main::saveinnlang()');
 
             return;
         }
-        $this->fail("error in News_Main::saveinnlang()");
+        $this->fail('error in News_Main::saveinnlang()');
     }
 }

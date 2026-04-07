@@ -25,7 +25,6 @@ use OxidEsales\Eshop\Core\Registry;
 
 class FormatPriceLogic
 {
-
     /**
      * @param array $params
      *

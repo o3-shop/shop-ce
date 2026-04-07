@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,19 +18,18 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\EshopCommunity\Application\Model\Groups;
-
-use \Exception;
-use \oxTestModules;
+use oxTestModules;
 
 /**
  * Tests for UserGroup_Main class
  */
 class UserGroupMainTest extends \OxidTestCase
 {
-
     /**
      * UserGroup_Main::Render() test case
      *
@@ -37,7 +37,7 @@ class UserGroupMainTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "testId");
+        $this->setRequestParameter('oxid', 'testId');
 
         // testing..
         $oView = oxNew('UserGroup_Main');
@@ -54,7 +54,7 @@ class UserGroupMainTest extends \OxidTestCase
      */
     public function testRenderNoRealObjectId()
     {
-        $this->setRequestParameter("oxid", "-1");
+        $this->setRequestParameter('oxid', '-1');
 
         // testing..
         $oView = oxNew('UserGroup_Main');
@@ -62,7 +62,7 @@ class UserGroupMainTest extends \OxidTestCase
 
         $aViewData = $oView->getViewData();
         $this->assertFalse(isset($aViewData['edit']));
-        $this->assertEquals("-1", $aViewData['oxid']);
+        $this->assertEquals('-1', $aViewData['oxid']);
     }
 
     /**
@@ -76,18 +76,18 @@ class UserGroupMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxgroups', 'assign', '{ return true; }');
         oxTestModules::addFunction('oxgroups', 'save', '{ throw new Exception( "save" ); }');
 
-        $this->setRequestParameter("oxid", "testId");
-        $this->getConfig()->setConfigParam("blAllowSharedEdit", true);
+        $this->setRequestParameter('oxid', 'testId');
+        $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
         // testing..
         try {
             $oView = oxNew('UserGroup_Main');
             $oView->save();
         } catch (Exception $oExcp) {
-            $this->assertEquals("save", $oExcp->getMessage(), "Error in UserGroup_Main::save()");
+            $this->assertEquals('save', $oExcp->getMessage(), 'Error in UserGroup_Main::save()');
 
             return;
         }
-        $this->fail("Error in UserGroup_Main::save()");
+        $this->fail('Error in UserGroup_Main::save()');
     }
 }

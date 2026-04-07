@@ -103,7 +103,7 @@ class SystemEventHandler
             \OxidEsales\Eshop\Core\Service\ApplicationServerService::class,
             $appServerDao,
             $utilsServer,
-            \OxidEsales\Eshop\Core\Registry::get("oxUtilsDate")->getTime()
+            \OxidEsales\Eshop\Core\Registry::get('oxUtilsDate')->getTime()
         );
 
         return $appServerService;

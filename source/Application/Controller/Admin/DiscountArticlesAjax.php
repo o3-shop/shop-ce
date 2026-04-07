@@ -35,7 +35,7 @@ use OxidEsales\Eshop\Core\Registry;
 class DiscountArticlesAjax extends ListComponentAjax
 {
     /**  */
-    const NEW_DISCOUNT_LIST_ID = "-1";
+    public const NEW_DISCOUNT_LIST_ID = '-1';
 
     /**
      * If true extended column selection will be build
@@ -113,14 +113,14 @@ class DiscountArticlesAjax extends ListComponentAjax
                 $sQAdd .= " where $sO2CView.oxcatnid = " . $oDb->quote($sOxid) . " and $sArticleTable.oxid is not null ";
             } else {
                 $sQAdd = " from oxobject2discount, $sArticleTable where $sArticleTable.oxid=oxobject2discount.oxobjectid ";
-                $sQAdd .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
+                $sQAdd .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
             }
         }
 
         if ($sSynchOxid && $sSynchOxid != $sOxid) {
             // performance
             $sSubSelect = " select $sArticleTable.oxid from oxobject2discount, $sArticleTable where $sArticleTable.oxid=oxobject2discount.oxobjectid ";
-            $sSubSelect .= " and oxobject2discount.oxdiscountid = " . $oDb->quote($sSynchOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
+            $sSubSelect .= ' and oxobject2discount.oxdiscountid = ' . $oDb->quote($sSynchOxid) . " and oxobject2discount.oxtype = 'oxarticles' ";
 
             if (stristr($sQAdd, 'where') === false) {
                 $sQAdd .= ' where ';
@@ -141,10 +141,10 @@ class DiscountArticlesAjax extends ListComponentAjax
         $aChosenArt = $this->getActionIds('oxobject2discount.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::addFilter("delete oxobject2discount.* " . $this->getQuery());
+            $sQ = parent::addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sQ = "delete from oxobject2discount where oxobject2discount.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
+            $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ') ';
             DatabaseProvider::getDb()->execute($sQ);
         }
     }
@@ -183,7 +183,7 @@ class DiscountArticlesAjax extends ListComponentAjax
         $object2Discount->init('oxobject2discount');
         $object2Discount->oxobject2discount__oxdiscountid = new Field($discountListId);
         $object2Discount->oxobject2discount__oxobjectid = new Field($articleId);
-        $object2Discount->oxobject2discount__oxtype = new Field("oxarticles");
+        $object2Discount->oxobject2discount__oxtype = new Field('oxarticles');
 
         $object2Discount->save();
     }

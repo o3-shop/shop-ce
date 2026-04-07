@@ -279,7 +279,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         return $this->getAddUrlParams();
     }
-    
+
     /**
      * In case list type is "search" returns search parameters which will be added to product details link.
      *
@@ -287,7 +287,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      */
     public function getAddUrlParams()
     {
-        if ($this->getListType() == "search") {
+        if ($this->getListType() == 'search') {
             return $this->getDynUrlParams();
         }
     }
@@ -302,7 +302,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         return $this->processProduct($oProduct);
     }
-    
+
     /**
      * Processes product by setting link type and in case list type is search adds search parameters to details link.
      *
@@ -388,10 +388,10 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
                 $this->_iLinkType = OXARTICLE_LINKTYPE_VENDOR;
             } elseif ('manufacturer' == $sListType) {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_MANUFACTURER;
-            // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
+                // @deprecated since v5.3 (2016-06-17); Listmania will be moved to an own module.
             } elseif ('recommlist' == $sListType) {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_RECOMM;
-            // END deprecated
+                // END deprecated
             } else {
                 $this->_iLinkType = OXARTICLE_LINKTYPE_CATEGORY;
 
@@ -858,7 +858,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             }
         }
 
-        return (double) $this->_dRatingValue;
+        return (float) $this->_dRatingValue;
     }
 
     /**
@@ -932,7 +932,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         $oProduct = $this->getProduct();
         $sParentIdField = 'oxarticles__oxparentid';
         if (($oParent = $this->getParentProduct($oProduct->$sParentIdField->value))) {
-            $sVarSelId = Registry::getRequest()->getRequestEscapedParameter("varselid");
+            $sVarSelId = Registry::getRequest()->getRequestEscapedParameter('varselid');
 
             return $oParent->getVariantSelections($sVarSelId, $oProduct->getId());
         }
@@ -1007,7 +1007,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     {
         return $this->setSortingParameters();
     }
-    
+
     /**
      * Set item sorting for widget based of retrieved parameters.
      */
@@ -1038,7 +1038,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         $oCategory = oxNew(Category::class);
 
         // if category parameter is not found, use category from product
-        $sCatId = $this->getViewParameter("cnid");
+        $sCatId = $this->getViewParameter('cnid');
 
         if (!$sCatId && $oProduct->getCategory()) {
             $oCategory = $oProduct->getCategory();
@@ -1131,7 +1131,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
 
         if ($this->getListType() != 'search' && $oCategory && $oCategory instanceof Category) {
             if ($sSortBy = $oCategory->getDefaultSorting()) {
-                $sSortDir = ($oCategory->getDefaultSortingMode()) ? "desc" : "asc";
+                $sSortDir = ($oCategory->getDefaultSortingMode()) ? 'desc' : 'asc';
                 $aSorting = ['sortby' => $sSortBy, 'sortdir' => $sSortDir];
             }
         }

@@ -40,14 +40,14 @@ use OxidEsales\Eshop\Core\Registry;
 class ShopMain extends AdminDetailsController
 {
     /** Identifies new shop. */
-    const NEW_SHOP_ID = "-1";
+    public const NEW_SHOP_ID = '-1';
 
     /**
      * Shop field set size, limited to 64bit by MySQL
      *
      * @var int
      */
-    const SHOP_FIELD_SET_SIZE = 64;
+    public const SHOP_FIELD_SET_SIZE = 64;
 
     /**
      * Controller render method, which returns the name of the template file.
@@ -59,7 +59,7 @@ class ShopMain extends AdminDetailsController
         $config = Registry::getConfig();
         parent::render();
 
-        $shopId = $this->_aViewData["oxid"] = $this->getEditObjectId();
+        $shopId = $this->_aViewData['oxid'] = $this->getEditObjectId();
 
         $templateName = $this->renderNewShop();
 
@@ -80,14 +80,14 @@ class ShopMain extends AdminDetailsController
             }
 
             if ($subjLang && $subjLang > 0) {
-                $this->_aViewData["subjlang"] = $subjLang;
+                $this->_aViewData['subjlang'] = $subjLang;
             }
 
             $shop->loadInLang($subjLang, $shopId);
 
-            $this->_aViewData["edit"] = $shop;
+            $this->_aViewData['edit'] = $shop;
             //\OxidEsales\Eshop\Core\Session::setVar( "actshop", $soxId);//echo "<h2>$soxId</h2>";
-            Registry::getSession()->setVariable("shp", $shopId);
+            Registry::getSession()->setVariable('shp', $shopId);
         }
 
         $this->checkParent($shop);
@@ -97,7 +97,7 @@ class ShopMain extends AdminDetailsController
             $this->_aViewData['updatenav'] = Registry::getRequest()->getRequestEscapedParameter('updatenav');
         }
 
-        return "shop_main.tpl";
+        return 'shop_main.tpl';
     }
 
     /**
@@ -142,7 +142,7 @@ class ShopMain extends AdminDetailsController
         $shop->setLanguage($shopLanguageId);
 
         if (($newSMPTPass = Registry::getRequest()->getRequestEscapedParameter('oxsmtppwd'))) {
-            $shop->oxshops__oxsmtppwd->setValue($newSMPTPass == '-' ? "" : $newSMPTPass);
+            $shop->oxshops__oxsmtppwd->setValue($newSMPTPass == '-' ? '' : $newSMPTPass);
         }
 
         $canCreateShop = $this->canCreateShop($shopId, $shop);
@@ -157,11 +157,11 @@ class ShopMain extends AdminDetailsController
             return;
         }
 
-        $this->_aViewData["updatelist"] = "1";
+        $this->_aViewData['updatelist'] = '1';
 
         $this->updateShopInformation($config, $shop, $shopId);
 
-        Registry::getSession()->setVariable("actshop", $shopId);
+        Registry::getSession()->setVariable('actshop', $shopId);
     }
 
     /**
@@ -227,25 +227,25 @@ class ShopMain extends AdminDetailsController
                 if (!in_array($configName, $nonCopyVars)) {
                     $newId = $utilsObject->generateUID();
                     $insertNewConfigQuery =
-                        "insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue, oxmodule)
-                         values (:oxid, :oxshopid, :oxvarname, :oxvartype, :value, :oxmodule)";
+                        'insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue, oxmodule)
+                         values (:oxid, :oxshopid, :oxvarname, :oxvartype, :value, :oxmodule)';
                     $db->execute($insertNewConfigQuery, [
                         ':oxid' => $newId,
                         ':oxshopid' => $shop->getId(),
                         ':oxvarname' => $shopConfiguration->fields[0],
                         ':oxvartype' => $shopConfiguration->fields[1],
                         ':value' => $shopConfiguration->fields[2],
-                        ':oxmodule' => $shopConfiguration->fields[3]
+                        ':oxmodule' => $shopConfiguration->fields[3],
                     ]);
                 }
                 $shopConfiguration->fetchRow();
             }
         }
 
-        $inheritAll = $shop->oxshops__oxisinherited->value ? "true" : "false";
+        $inheritAll = $shop->oxshops__oxisinherited->value ? 'true' : 'false';
         $multiShopTables = $config->getConfigParam('aMultiShopTables');
         foreach ($multiShopTables as $multishopTable) {
-            $config->saveShopConfVar("bool", 'blMallInherit_' . strtolower($multishopTable), $inheritAll, $shop->oxshops__oxid->value);
+            $config->saveShopConfVar('bool', 'blMallInherit_' . strtolower($multishopTable), $inheritAll, $shop->oxshops__oxid->value);
         }
     }
 

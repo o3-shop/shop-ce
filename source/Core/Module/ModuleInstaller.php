@@ -21,8 +21,8 @@
 
 namespace OxidEsales\EshopCommunity\Core\Module;
 
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Module\Module as EshopModule;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 

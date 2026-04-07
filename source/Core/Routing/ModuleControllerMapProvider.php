@@ -21,9 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Core\Routing;
 
-use OxidEsales\Eshop\Core\Routing\Module\ClassProviderStorage;
 use OxidEsales\Eshop\Core\Contract\ControllerMapProviderInterface;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Routing\Module\ClassProviderStorage;
 
 /**
  * Provide the controller mappings from the metadata of all active modules.

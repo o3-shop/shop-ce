@@ -21,6 +21,11 @@
 
 namespace OxidEsales\EshopCommunity\Application\Model;
 
+use OxidEsales\Eshop\Application\Model\Article;
+use OxidEsales\Eshop\Application\Model\Contract\ArticleInterface;
+use OxidEsales\Eshop\Application\Model\Order;
+use OxidEsales\Eshop\Application\Model\OrderFile;
+use OxidEsales\Eshop\Application\Model\Wrapping;
 use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\Eshop\Core\Exception\DatabaseConnectionException;
 use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
@@ -30,7 +35,6 @@ use OxidEsales\Eshop\Core\Model\BaseModel;
 use OxidEsales\Eshop\Core\Price;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Str;
-use OxidEsales\EshopCommunity\Application\Model\Contract\ArticleInterface;
 
 /**
  * Order article manager.
@@ -122,12 +126,12 @@ class OrderArticle extends BaseModel implements ArticleInterface
         foreach ($aObjectVars as $sName => $sValue) {
             if (isset($oProduct->$sName->value)) {
                 $sFieldName = preg_replace('/oxarticles__/', 'oxorderarticles__', $sName);
-                if ($sFieldName != "oxorderarticles__oxtimestamp") {
+                if ($sFieldName != 'oxorderarticles__oxtimestamp') {
                     $this->$sFieldName = $oProduct->$sName;
                 }
                 // formatting view
                 if (!Registry::getConfig()->getConfigParam('blSkipFormatConversion')) {
-                    if ($sFieldName == "oxorderarticles__oxinsert") {
+                    if ($sFieldName == 'oxorderarticles__oxinsert') {
                         Registry::getUtilsDate()->convertDBDate($this->$sFieldName, true);
                     }
                 }
@@ -170,7 +174,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
             $oArticle->oxarticles__oxstock = new Field($iStockCount);
             $oDb->execute('update oxarticles set oxarticles.oxstock = :oxstock where oxarticles.oxid = :oxid', [
                 ':oxstock' => $iStockCount,
-                ':oxid' => $this->oxorderarticles__oxartid->value
+                ':oxid' => $this->oxorderarticles__oxartid->value,
             ]);
             $oArticle->onChange(ACTION_UPDATE_STOCK);
         }
@@ -198,7 +202,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
         $sQ = 'select oxstock from oxarticles 
             where oxid = :oxid';
         $iStockCount = (float) $masterDb->getOne($sQ, [
-            ':oxid' => $this->oxorderarticles__oxartid->value
+            ':oxid' => $this->oxorderarticles__oxartid->value,
         ]);
 
         $iStockCount += $dAddAmount;
@@ -307,10 +311,10 @@ class OrderArticle extends BaseModel implements ArticleInterface
 
         $oDb = DatabaseProvider::getDb();
         $oArticle = oxNew(Article::class);
-        $sQ = "select oxparentid from " . $oArticle->getViewName() . " 
-            where oxid = :oxid";
+        $sQ = 'select oxparentid from ' . $oArticle->getViewName() . ' 
+            where oxid = :oxid';
         $this->oxarticles__oxparentid = new Field($oDb->getOne($sQ, [
-            ':oxid' => $this->getProductId()
+            ':oxid' => $this->getProductId(),
         ]));
 
         return $this->oxarticles__oxparentid->value;
@@ -433,7 +437,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
             $aRet = [];
 
             if ($oArticle = $this->_getOrderArticle($sArtId)) {
-                $aList = explode(", ", $sOrderArtSelList);
+                $aList = explode(', ', $sOrderArtSelList);
                 $oStr = Str::getStr();
 
                 $aArticleSelList = $oArticle->getSelectLists();
@@ -442,7 +446,7 @@ class OrderArticle extends BaseModel implements ArticleInterface
                 if (count($aArticleSelList) > 0) {
                     foreach ($aList as $sList) {
                         if ($sList) {
-                            $aVal = explode(":", $sList);
+                            $aVal = explode(':', $sList);
                             if (isset($aVal[0]) && isset($aVal[1])) {
                                 $sOrderArtListTitle = $oStr->strtolower(trim($aVal[0]));
                                 $sOrderArtSelValue = $oStr->strtolower(trim($aVal[1]));
@@ -818,7 +822,6 @@ class OrderArticle extends BaseModel implements ArticleInterface
         return parent::_insert();
     }
 
-
     /**
      * Set article
      *
@@ -845,7 +848,6 @@ class OrderArticle extends BaseModel implements ArticleInterface
 
         return $this->_oArticle;
     }
-
 
     /**
      * Set order files

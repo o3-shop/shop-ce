@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * This file is part of O3-Shop.
  *
@@ -68,7 +70,7 @@ class ComponentInstallerTest extends TestCase
         $packageStub = $this->getMockBuilder(Package::class)->disableOriginalConstructor()->getMock();
         $installer = new ComponentInstaller(
             new NullIO(),
-            (new Facts)->getShopRootPath(),
+            (new Facts())->getShopRootPath(),
             $packageStub
         );
         return $installer;

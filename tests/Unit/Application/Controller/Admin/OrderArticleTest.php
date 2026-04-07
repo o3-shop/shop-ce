@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,13 +18,14 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use oxField;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Order;
-use \oxOrder;
-use \oxField;
-use \oxTestModules;
+use oxOrder;
+use oxTestModules;
 
 /**
  * Module for oxorder testing
@@ -39,7 +41,7 @@ class OrderArticleHelper extends oxOrder
      *
      * @return null
      */
-    public function recalculateOrder($aNewOrderArticles = array(), $blChangeDelivery = false, $blChangeDiscount = false)
+    public function recalculateOrder($aNewOrderArticles = [], $blChangeDelivery = false, $blChangeDiscount = false)
     {
         $this->oxorder__oxtotalbrutsum = new oxField(1);
         $this->save();
@@ -63,7 +65,6 @@ class OrderArticleHelper extends oxOrder
  */
 class OrderArticleTest extends \OxidTestCase
 {
-
     /**
      * Initialize the fixture.
      *
@@ -93,10 +94,10 @@ class OrderArticleTest extends \OxidTestCase
         $oArticle->save();
 
         //set order
-        $oOrder = oxNew("oxOrder");
+        $oOrder = oxNew('oxOrder');
         $oOrder->setId('_testOrderId1');
         $oOrder->oxorder__oxshopid = new oxField($myConfig->getShopId(), oxField::T_RAW);
-        $oOrder->oxorder__oxuserid = new oxField("_testUserId", oxField::T_RAW);
+        $oOrder->oxorder__oxuserid = new oxField('_testUserId', oxField::T_RAW);
         $oOrder->oxorder__oxbillcountryid = new oxField('10', oxField::T_RAW);
         $oOrder->oxorder__oxdelcountryid = new oxField('11', oxField::T_RAW);
         $oOrder->oxorder__oxdeltype = new oxField('_testDeliverySetId', oxField::T_RAW);
@@ -133,10 +134,10 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testAddThisArticle()
     {
-        oxTestModules::addFunction("oxutilsserver", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
-        $this->setRequestParameter("aid", '_testArticle');
-        $this->setRequestParameter("am", 4);
-        $this->setRequestParameter("oxid", '_testOrder');
+        oxTestModules::addFunction('oxutilsserver', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
+        $this->setRequestParameter('aid', '_testArticle');
+        $this->setRequestParameter('am', 4);
+        $this->setRequestParameter('oxid', '_testOrder');
 
         $oObj = oxNew('order_article');
         $oObj->addThisArticle();
@@ -158,7 +159,7 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testAddThisArticle2()
     {
-        oxTestModules::addFunction("oxUtilsServer", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
+        oxTestModules::addFunction('oxUtilsServer', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
         oxAddClassModule(\OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin\OrderArticleHelper::class, 'oxorder');
 
         $this->setRequestParameter('aid', '2000');
@@ -168,7 +169,7 @@ class OrderArticleTest extends \OxidTestCase
         $oOrderArticle = oxNew('order_article');
         $oOrderArticle->addThisArticle();
 
-        $oOrder = oxNew("oxOrder");
+        $oOrder = oxNew('oxOrder');
         $oOrder->load('_testOrderId1');
         $this->assertEquals(1, $oOrder->oxorder__oxtotalbrutsum->value);
     }
@@ -180,10 +181,10 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testDeleteThisArticle()
     {
-        oxTestModules::addFunction("oxutilsserver", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
-        $this->setRequestParameter("aid", '_testArticle');
-        $this->setRequestParameter("am", 4);
-        $this->setRequestParameter("oxid", '_testOrder');
+        oxTestModules::addFunction('oxutilsserver', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
+        $this->setRequestParameter('aid', '_testArticle');
+        $this->setRequestParameter('am', 4);
+        $this->setRequestParameter('oxid', '_testOrder');
 
         $oObj = oxNew('order_article');
         $oObj->addThisArticle();
@@ -197,7 +198,7 @@ class OrderArticleTest extends \OxidTestCase
         $this->assertEquals('_testArticle', $oOrderArticles->current()->oxorderarticles__oxartnum->value);
         $this->assertEquals(4, $oOrderArticles->current()->oxorderarticles__oxamount->value);
 
-        $this->setRequestParameter("sArtID", $oOrderArticles->current()->getId());
+        $this->setRequestParameter('sArtID', $oOrderArticles->current()->getId());
 
         $oObj->deleteThisArticle();
 
@@ -216,10 +217,10 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testStorno()
     {
-        oxTestModules::addFunction("oxutilsserver", "getServerVar", "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
-        $this->setRequestParameter("aid", '_testArticle');
-        $this->setRequestParameter("am", 4);
-        $this->setRequestParameter("oxid", '_testOrder');
+        oxTestModules::addFunction('oxutilsserver', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
+        $this->setRequestParameter('aid', '_testArticle');
+        $this->setRequestParameter('am', 4);
+        $this->setRequestParameter('oxid', '_testOrder');
 
         $oObj = oxNew('order_article');
         $oObj->addThisArticle();
@@ -233,7 +234,7 @@ class OrderArticleTest extends \OxidTestCase
         $this->assertEquals(4, $oOrderArticles->current()->oxorderarticles__oxamount->value);
         $this->assertEquals(0, $oOrderArticles->current()->oxorderarticles__oxstorno->value);
 
-        $this->setRequestParameter("sArtID", $oOrderArticles->current()->getId());
+        $this->setRequestParameter('sArtID', $oOrderArticles->current()->getId());
 
         // canceling
         $oObj->storno();
@@ -244,7 +245,7 @@ class OrderArticleTest extends \OxidTestCase
         $this->assertEquals(1, $oOrderArticles->count());
         $this->assertEquals(1, $oOrderArticles->current()->oxorderarticles__oxstorno->value);
 
-        $this->setRequestParameter("sArtID", $oOrderArticles->current()->getId());
+        $this->setRequestParameter('sArtID', $oOrderArticles->current()->getId());
 
         // "un"-canceling
         $oObj->storno();
@@ -256,7 +257,6 @@ class OrderArticleTest extends \OxidTestCase
         $this->assertEquals(0, $oOrderArticles->current()->oxorderarticles__oxstorno->value);
     }
 
-
     /**
      * Test get edit object.
      *
@@ -264,12 +264,12 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testGetEditObject()
     {
-        $this->setRequestParameter("oxid", null);
+        $this->setRequestParameter('oxid', null);
 
         $oView = oxNew('Order_Article');
         $this->assertNull($oView->getEditObject());
 
-        $this->setRequestParameter("oxid", "_testOrderId1");
+        $this->setRequestParameter('oxid', '_testOrderId1');
 
         $oView = oxNew('Order_Article');
         $oOrder = $oView->getEditObject();
@@ -283,11 +283,11 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testGetSearchProductArtNr()
     {
-        $this->setRequestParameter("sSearchArtNum", null);
+        $this->setRequestParameter('sSearchArtNum', null);
         $oView = oxNew('Order_Article');
         $this->assertNull($oView->getSearchProductArtNr());
 
-        $this->setRequestParameter("sSearchArtNum", 123);
+        $this->setRequestParameter('sSearchArtNum', 123);
         $oView = oxNew('Order_Article');
         $this->assertEquals(123, $oView->getSearchProductArtNr());
     }
@@ -299,13 +299,13 @@ class OrderArticleTest extends \OxidTestCase
      */
     public function testGetSearchProduct()
     {
-        $sProdArtNr = "xxx";
+        $sProdArtNr = 'xxx';
         $oProduct = oxNew('oxArticle');
         $oProduct->oxarticles__oxartnum = new oxField($sProdArtNr);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderArticle::class, array("getSearchProductArtNr", "getProductList"));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\OrderArticle::class, ['getSearchProductArtNr', 'getProductList']);
         $oView->expects($this->once())->method('getSearchProductArtNr')->will($this->returnValue($sProdArtNr));
-        $oView->expects($this->once())->method('getProductList')->will($this->returnValue(array($oProduct)));
+        $oView->expects($this->once())->method('getProductList')->will($this->returnValue([$oProduct]));
 
         $this->assertEquals($oProduct, $oView->getSearchProduct());
     }
@@ -318,19 +318,19 @@ class OrderArticleTest extends \OxidTestCase
     public function testGetMainProduct()
     {
         // product number not set
-        $this->setRequestParameter("sSearchArtNum", null);
+        $this->setRequestParameter('sSearchArtNum', null);
 
         $oView = oxNew('Order_Article');
         $this->assertNull($oView->getMainProduct());
 
         // not existing product number
-        $this->setRequestParameter("sSearchArtNum", "xxx");
+        $this->setRequestParameter('sSearchArtNum', 'xxx');
 
         $oView = oxNew('Order_Article');
         $this->assertFalse($oView->getMainProduct());
 
         // existing product
-        $this->setRequestParameter("sSearchArtNum", "1126");
+        $this->setRequestParameter('sSearchArtNum', '1126');
 
         $oView = oxNew('Order_Article');
         $oProduct = $oView->getMainProduct();
@@ -345,19 +345,19 @@ class OrderArticleTest extends \OxidTestCase
     public function testGetProductList()
     {
         // empty list
-        $this->setRequestParameter("sSearchArtNum", null);
+        $this->setRequestParameter('sSearchArtNum', null);
 
         $oView = oxNew('Order_Article');
         $oList = $oView->getProductList();
         $this->assertEquals(0, $oList->count());
 
         $iCnt = 4;
-        $searchArticleNumber = "2077";
+        $searchArticleNumber = '2077';
         if ($this->getConfig()->getEdition() === 'EE') {
             $iCnt = 3;
-            $searchArticleNumber = "1661";
+            $searchArticleNumber = '1661';
         }
-        $this->setRequestParameter("sSearchArtNum", $searchArticleNumber);
+        $this->setRequestParameter('sSearchArtNum', $searchArticleNumber);
 
         $oView = oxNew('Order_Article');
         $oList = $oView->getProductList();
@@ -380,7 +380,7 @@ class OrderArticleTest extends \OxidTestCase
         $oOrderArticle = oxNew('order_article');
         $oOrderArticle->addThisArticle();
 
-        $oOrder = oxNew("oxOrder");
+        $oOrder = oxNew('oxOrder');
         $oOrder->load('_testOrderId1');
         $this->assertEquals(0, $oOrder->oxorder__oxtotalbrutsum->value);
     }
@@ -401,7 +401,7 @@ class OrderArticleTest extends \OxidTestCase
         $oOrderArticle = oxNew('order_article');
         $oOrderArticle->addThisArticle();
 
-        $oOrder = oxNew("oxOrder");
+        $oOrder = oxNew('oxOrder');
         $oOrder->load('_testOrderId1');
         $this->assertEquals(0, $oOrder->oxorder__oxtotalbrutsum->value);
     }

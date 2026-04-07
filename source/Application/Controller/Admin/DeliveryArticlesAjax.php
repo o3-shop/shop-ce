@@ -39,7 +39,7 @@ class DeliveryArticlesAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -148,10 +148,10 @@ class DeliveryArticlesAjax extends ListComponentAjax
         $aChosenArt = $this->getActionIds('oxobject2delivery.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = parent::addFilter("delete oxobject2delivery.* " . $this->getQuery());
+            $sQ = parent::addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
-            $sQ = "delete from oxobject2delivery where oxobject2delivery.oxid in (" . implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ") ";
+            $sQ = 'delete from oxobject2delivery where oxobject2delivery.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt)) . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -170,13 +170,13 @@ class DeliveryArticlesAjax extends ListComponentAjax
             $aChosenArt = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
-        if ($soxId && $soxId != "-1" && is_array($aChosenArt)) {
+        if ($soxId && $soxId != '-1' && is_array($aChosenArt)) {
             foreach ($aChosenArt as $sChosenArt) {
                 $oObject2Delivery = oxNew(BaseModel::class);
                 $oObject2Delivery->init('oxobject2delivery');
                 $oObject2Delivery->oxobject2delivery__oxdeliveryid = new Field($soxId);
                 $oObject2Delivery->oxobject2delivery__oxobjectid = new Field($sChosenArt);
-                $oObject2Delivery->oxobject2delivery__oxtype = new Field("oxarticles");
+                $oObject2Delivery->oxobject2delivery__oxtype = new Field('oxarticles');
                 $oObject2Delivery->save();
             }
         }

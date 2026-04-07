@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use OxidEsales\EshopCommunity\Application\Model\OrderArticleList;
@@ -26,7 +28,6 @@ use OxidEsales\EshopCommunity\Application\Model\OrderArticleList;
  */
 class UserArticleTest extends \OxidTestCase
 {
-
     /**
      * User_Article::Render() test case
      *
@@ -34,7 +35,7 @@ class UserArticleTest extends \OxidTestCase
      */
     public function testRender()
     {
-        $this->setRequestParameter("oxid", "oxdefaultadmin");
+        $this->setRequestParameter('oxid', 'oxdefaultadmin');
 
         // testing..
         $oView = oxNew('User_Article');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -38,15 +39,15 @@ class ProductInfoAdminTest extends AdminTestCase
      */
     public function testEuroSignInTitle()
     {
-        $this->loginAdmin("Administer Products", "Products");
+        $this->loginAdmin('Administer Products', 'Products');
         $this->changeAdminListLanguage('Deutsch');
-        $this->type("where[oxarticles][oxartnum]", "1002");
-        $this->clickAndWaitFrame("submitit", 'list');
-        $this->openListItem("link=1002");
-        $this->assertEquals("[DE 2] Test product 2 šÄßüл", $this->getValue("editval[oxarticles__oxtitle]"));
-        $this->type("editval[oxarticles__oxtitle]", "[DE 2] Test product 2 šÄßüл €");
-        $this->clickAndWaitFrame("saveArticle", 'list');
-        $this->assertEquals("[DE 2] Test product 2 šÄßüл €", $this->getValue("editval[oxarticles__oxtitle]"));
+        $this->type('where[oxarticles][oxartnum]', '1002');
+        $this->clickAndWaitFrame('submitit', 'list');
+        $this->openListItem('link=1002');
+        $this->assertEquals('[DE 2] Test product 2 šÄßüл', $this->getValue('editval[oxarticles__oxtitle]'));
+        $this->type('editval[oxarticles__oxtitle]', '[DE 2] Test product 2 šÄßüл €');
+        $this->clickAndWaitFrame('saveArticle', 'list');
+        $this->assertEquals('[DE 2] Test product 2 šÄßüл €', $this->getValue('editval[oxarticles__oxtitle]'));
     }
 
     /**
@@ -56,17 +57,17 @@ class ProductInfoAdminTest extends AdminTestCase
      */
     public function testActivationCheckIsShown()
     {
-        $fromDate = strval(intval(date("Y")) - 2) . '-01-01 00:00:00';
-        $toDate = strval(intval(date("Y")) + 2) . '-01-01 00:00:00';
+        $fromDate = strval(intval(date('Y')) - 2) . '-01-01 00:00:00';
+        $toDate = strval(intval(date('Y')) + 2) . '-01-01 00:00:00';
         $query = "UPDATE `oxarticles` SET `oxactive` = 0, `oxactivefrom` = ?, `oxactiveto` = ? WHERE `oxartnum` = '1401'";
         DatabaseProvider::getDb()->execute($query, [$fromDate, $toDate]);
 
-        Registry::getConfig()->saveShopConfVar("bool", "blUseTimeCheck", true);
+        Registry::getConfig()->saveShopConfVar('bool', 'blUseTimeCheck', true);
 
-        $this->loginAdmin("Administer Products", "Products");
-        $this->type("where[oxarticles][oxartnum]", "1401");
-        $this->clickAndWaitFrame("submitit", 'list');
-        $this->openListItem("link=1401");
+        $this->loginAdmin('Administer Products', 'Products');
+        $this->type('where[oxarticles][oxartnum]', '1401');
+        $this->clickAndWaitFrame('submitit', 'list');
+        $this->openListItem('link=1401');
 
         $this->frame('list');
         $activationCheckElement = $this->getElementLazy($this->translate("//*[@id='row.1']/td[1]"));
@@ -86,12 +87,12 @@ class ProductInfoAdminTest extends AdminTestCase
         $aPriceAlarmData['oxartid'] = '1001';
         $this->callShopSC('oxPriceAlarm', 'save', null, $aPriceAlarmData);
 
-        $this->loginAdmin("Customer Info", "Wished Price");
-        $this->type("where[oxpricealarm][oxemail]", "example_test@oxid-esales.dev");
-        $this->clickAndWait("submitit");
-        $this->assertEquals("example_test@oxid-esales.dev", $this->getText("//tr[@id='row.1']/td[1]"));
-        $this->assertEquals("Test product 1 [EN] šÄßüл", $this->getText("//tr[@id='row.1']/td[5]"));
-        $this->assertEquals("99,99 EUR", $this->getText("//tr[@id='row.1']/td[6]"));
-        $this->assertEquals("100,00 EUR", $this->getText("//tr[@id='row.1']/td[7]"));
+        $this->loginAdmin('Customer Info', 'Wished Price');
+        $this->type('where[oxpricealarm][oxemail]', 'example_test@oxid-esales.dev');
+        $this->clickAndWait('submitit');
+        $this->assertEquals('example_test@oxid-esales.dev', $this->getText("//tr[@id='row.1']/td[1]"));
+        $this->assertEquals('Test product 1 [EN] šÄßüл', $this->getText("//tr[@id='row.1']/td[5]"));
+        $this->assertEquals('99,99 EUR', $this->getText("//tr[@id='row.1']/td[6]"));
+        $this->assertEquals('100,00 EUR', $this->getText("//tr[@id='row.1']/td[7]"));
     }
 }

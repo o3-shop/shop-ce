@@ -41,14 +41,17 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         exif \
         zip
 
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && echo "xdebug.mode=coverage,debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 RUN echo "date.timezone = Europe/Berlin" > /usr/local/etc/php/conf.d/timezone.ini \
     && echo "memory_limit = 11000M" > /usr/local/etc/php/conf.d/memory-limit.ini \
     && echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/upload-size.ini \
     && echo "post_max_size = 100M" > /usr/local/etc/php/conf.d/post-size.ini
 
 # Php Error Logging
-
-Run echo "error_reporting = E_ALL" > /usr/local/etc/php/conf.d/error-reporting.ini \
+RUN echo "error_reporting = E_ALL" > /usr/local/etc/php/conf.d/error-reporting.ini \
     && echo "display_errors = On" >> /usr/local/etc/php/conf.d/error-reporting.ini \
     && echo "log_errors = On" >> /usr/local/etc/php/conf.d/error-reporting.ini \
     && echo "error_log = /tmp/php_errors.log" >> /usr/local/etc/php/conf.d/error-reporting.ini
@@ -63,7 +66,14 @@ WORKDIR /var/www/html
 
 COPY --from=composer:2.2 /usr/bin/composer /usr/local/bin/composer
 
+# Install PHP CS Fixer globally
+RUN composer global require friendsofphp/php-cs-fixer \
+    && ln -s /root/.composer/vendor/bin/php-cs-fixer /usr/local/bin/php-cs-fixer
+
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/source|g' /etc/apache2/sites-available/000-default.conf \
     && sed -i '/<VirtualHost \*:80>/a <Directory /var/www/html/source>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>' /etc/apache2/sites-available/000-default.conf
+
+RUN echo "[client]" > /root/.my.cnf \
+    && echo "skip-ssl = true" >> /root/.my.cnf
 
 CMD ["docker/entrypoint.sh"]

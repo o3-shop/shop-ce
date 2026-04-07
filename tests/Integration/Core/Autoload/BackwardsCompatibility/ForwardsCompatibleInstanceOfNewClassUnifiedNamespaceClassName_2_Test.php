@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -22,7 +23,6 @@ namespace OxidEsales\EshopCommunity\Tests\Integration\Core\Autoload\BackwardsCom
 
 class ForwardsCompatibleInstanceOfNewClassUnifiedNamespaceClassName_2_Test extends \PHPUnit\Framework\TestCase
 {
-
     /**
      * Test the backwards compatibility of class instances created with oxNew and the alias class name
      */

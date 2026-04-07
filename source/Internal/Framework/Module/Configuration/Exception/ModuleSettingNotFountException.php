@@ -28,5 +28,4 @@ namespace OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Exce
  */
 class ModuleSettingNotFountException extends \Exception
 {
-
 }

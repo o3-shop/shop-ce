@@ -44,8 +44,8 @@ class DeliverySetPayment extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $odeliveryset = oxNew(DeliverySet::class);
             $odeliveryset->setLanguage($this->_iEditLang);
@@ -59,7 +59,7 @@ class DeliverySetPayment extends AdminDetailsController
                 $odeliveryset->load($soxId);
             }
 
-            $this->_aViewData["edit"] = $odeliveryset;
+            $this->_aViewData['edit'] = $odeliveryset;
 
             //Disable editing for derived articles
             if ($odeliveryset->isDerived()) {
@@ -72,14 +72,14 @@ class DeliverySetPayment extends AdminDetailsController
             $oDeliverysetPaymentAjax = oxNew(DeliverySetPaymentAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetPaymentAjax->getColumns();
 
-            return "popups/deliveryset_payment.tpl";
+            return 'popups/deliveryset_payment.tpl';
         } elseif ($iAoc == 2) {
             $oDeliverysetCountryAjax = oxNew(DeliverySetCountryAjax::class);
             $this->_aViewData['oxajax'] = $oDeliverysetCountryAjax->getColumns();
 
-            return "popups/deliveryset_country.tpl";
+            return 'popups/deliveryset_country.tpl';
         }
 
-        return "deliveryset_payment.tpl";
+        return 'deliveryset_payment.tpl';
     }
 }

@@ -216,7 +216,6 @@ class EmosAdapter extends \OxidEsales\Eshop\Core\Base
         return $sContent;
     }
 
-
     /**
      * Returns formatted product title
      *
@@ -229,7 +228,7 @@ class EmosAdapter extends \OxidEsales\Eshop\Core\Base
     {
         $sTitle = $oProduct->oxarticles__oxtitle->value;
         if ($oProduct->oxarticles__oxvarselect->value) {
-            $sTitle .= " " . $oProduct->oxarticles__oxvarselect->value;
+            $sTitle .= ' ' . $oProduct->oxarticles__oxvarselect->value;
         }
 
         return $sTitle;
@@ -245,7 +244,7 @@ class EmosAdapter extends \OxidEsales\Eshop\Core\Base
      * @return EMOS_Item
      * @deprecated underscore prefix violates PSR12, will be renamed to "convProd2EmosItem" in next major
      */
-    protected function _convProd2EmosItem($oProduct, $sCatPath = "NULL", $iQty = 1) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function _convProd2EmosItem($oProduct, $sCatPath = 'NULL', $iQty = 1) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oItem = $this->_getNewEmosItem();
 
@@ -259,8 +258,8 @@ class EmosAdapter extends \OxidEsales\Eshop\Core\Base
         $oItem->productGroup = "{$sCatPath}/{$oProduct->oxarticles__oxtitle->value}";
         $oItem->quantity = $iQty;
         // #3452: Add brands to econda tracking
-        $oItem->variant1 = $oProduct->getVendor() ? $oProduct->getVendor()->getTitle() : "NULL";
-        $oItem->variant2 = $oProduct->getManufacturer() ? $oProduct->getManufacturer()->getTitle() : "NULL";
+        $oItem->variant1 = $oProduct->getVendor() ? $oProduct->getVendor()->getTitle() : 'NULL';
+        $oItem->variant2 = $oProduct->getManufacturer() ? $oProduct->getManufacturer()->getTitle() : 'NULL';
         $oItem->variant3 = $oProduct->getId();
 
         return $oItem;
@@ -644,7 +643,7 @@ class EmosAdapter extends \OxidEsales\Eshop\Core\Base
                             //$sPath = $this->_getDeepestCategoryPath( $oProduct );
                             $sPath = $this->_getBasketProductCatPath($oProduct);
                             $oEmos->removeFromBasket($this->_convProd2EmosItem($oProduct, $sPath, ($aItemData['oldam'] - $aItemData['am'])));
-                        //$oEmos->appendPreScript($aItemData['oldam'].'->'.$aItemData['am'].':'.$oProduct->load( $aItemData['aid']));
+                            //$oEmos->appendPreScript($aItemData['oldam'].'->'.$aItemData['am'].':'.$oProduct->load( $aItemData['aid']));
                         } elseif ($aItemData['oldam'] < $aItemData['am'] && $oProduct->load($aItemData['aid'])) {
                             $sPath = $this->_getBasketProductCatPath($oProduct);
                             $oEmos->addToBasket($this->_convProd2EmosItem($oProduct, $sPath, $aItemData['am'] - $aItemData['oldam']));

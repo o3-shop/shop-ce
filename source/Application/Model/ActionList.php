@@ -52,9 +52,9 @@ class ActionList extends ListModel
         $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
 
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and oxactiveto>0 and oxactiveto < " . $oDb->quote($sDate) . "
-               " . $this->_getUserGroupFilter() . "
-               order by oxactiveto desc, oxactivefrom desc limit " . (int) $iCount;
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and oxactiveto>0 and oxactiveto < " . $oDb->quote($sDate) . '
+               ' . $this->_getUserGroupFilter() . '
+               order by oxactiveto desc, oxactivefrom desc limit ' . (int) $iCount;
         $this->selectString($sQ);
         $this->_aArray = array_reverse($this->_aArray, true);
     }
@@ -71,9 +71,9 @@ class ActionList extends ListModel
         $sDateTo = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
         $sDateFrom = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() - $iTimespan);
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and oxactiveto < " . $oDb->quote($sDateTo) . " and oxactiveto > " . $oDb->quote($sDateFrom) . "
-               " . $this->_getUserGroupFilter() . "
-               order by oxactiveto, oxactivefrom";
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and oxactiveto < " . $oDb->quote($sDateTo) . ' and oxactiveto > ' . $oDb->quote($sDateFrom) . '
+               ' . $this->_getUserGroupFilter() . '
+               order by oxactiveto, oxactivefrom';
         $this->selectString($sQ);
     }
 
@@ -85,9 +85,9 @@ class ActionList extends ListModel
         $sViewName = $this->getBaseObject()->getViewName();
         $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom != 0 and oxactivefrom < " . $oDb->quote($sDate) . "
-               " . $this->_getUserGroupFilter() . "
-               order by oxactiveto, oxactivefrom";
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . ' or oxactiveto=0) and oxactivefrom != 0 and oxactivefrom < ' . $oDb->quote($sDate) . '
+               ' . $this->_getUserGroupFilter() . '
+               order by oxactiveto, oxactivefrom';
         $this->selectString($sQ);
     }
 
@@ -102,9 +102,9 @@ class ActionList extends ListModel
         $sViewName = $this->getBaseObject()->getViewName();
         $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom > " . $oDb->quote($sDate) . "
-               " . $this->_getUserGroupFilter() . "
-               order by oxactiveto, oxactivefrom limit " . (int) $iCount;
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . ' or oxactiveto=0) and oxactivefrom > ' . $oDb->quote($sDate) . '
+               ' . $this->_getUserGroupFilter() . '
+               order by oxactiveto, oxactivefrom limit ' . (int) $iCount;
         $this->selectString($sQ);
     }
 
@@ -120,9 +120,9 @@ class ActionList extends ListModel
         $sDate = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime());
         $sDateTo = date('Y-m-d H:i:s', Registry::getUtilsDate()->getTime() + $iTimespan);
         $oDb = DatabaseProvider::getDb();
-        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . " or oxactiveto=0) and oxactivefrom > " . $oDb->quote($sDate) . " and oxactivefrom < " . $oDb->quote($sDateTo) . "
-               " . $this->_getUserGroupFilter() . "
-               order by oxactiveto, oxactivefrom";
+        $sQ = "select * from {$sViewName} where oxtype=2 and oxactive=1 and oxshopid='" . Registry::getConfig()->getShopId() . "' and (oxactiveto > " . $oDb->quote($sDate) . ' or oxactiveto=0) and oxactivefrom > ' . $oDb->quote($sDate) . ' and oxactivefrom < ' . $oDb->quote($sDateTo) . '
+               ' . $this->_getUserGroupFilter() . '
+               order by oxactiveto, oxactivefrom';
         $this->selectString($sQ);
     }
 
@@ -149,7 +149,7 @@ class ActionList extends ListModel
             }
         }
 
-        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2action.oxid from oxobject2action where oxobject2action.oxactionid=$sTable.OXID and oxobject2action.oxclass='oxgroups' and oxobject2action.OXOBJECTID in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ") )" : '0';
+        $sGroupSql = count($aIds) ? "EXISTS(select oxobject2action.oxid from oxobject2action where oxobject2action.oxactionid=$sTable.OXID and oxobject2action.oxclass='oxgroups' and oxobject2action.OXOBJECTID in (" . implode(', ', DatabaseProvider::getDb()->quoteArray($aIds)) . ') )' : '0';
         return " and (
                 if(EXISTS(select 1 from oxobject2action, $sGroupTable where $sGroupTable.oxid=oxobject2action.oxobjectid and oxobject2action.oxactionid=$sTable.OXID and oxobject2action.oxclass='oxgroups' LIMIT 1),
                     $sGroupSql,
@@ -168,7 +168,6 @@ class ActionList extends ListModel
         return (bool) $this->fetchExistsActivePromotion();
     }
 
-
     /**
      * Fetch the information, if there is an active promotion.
      *
@@ -177,14 +176,14 @@ class ActionList extends ListModel
      */
     protected function fetchExistsActivePromotion()
     {
-        $query = "select 1 from " . Registry::get(TableViewNameGenerator::class)->getViewName('oxactions') . " 
+        $query = 'select 1 from ' . Registry::get(TableViewNameGenerator::class)->getViewName('oxactions') . ' 
             where oxtype = :oxtype and oxactive = :oxactive and oxshopid = :oxshopid 
-            limit 1";
+            limit 1';
 
         return DatabaseProvider::getDb()->getOne($query, [
             ':oxtype' => 2,
             ':oxactive' => 1,
-            ':oxshopid' => Registry::getConfig()->getShopId()
+            ':oxshopid' => Registry::getConfig()->getShopId(),
         ]);
     }
 
@@ -197,7 +196,7 @@ class ActionList extends ListModel
         $oViewName = $oBaseObject->getViewName();
         $sQ = "select * from {$oViewName} where oxtype=3 and " . $oBaseObject->getSqlActiveSnippet()
               . " and oxshopid='" . Registry::getConfig()->getShopId() . "' " . $this->_getUserGroupFilter()
-              . " order by oxsort";
+              . ' order by oxsort';
         $this->selectString($sQ);
     }
 }

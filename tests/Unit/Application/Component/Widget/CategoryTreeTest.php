@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -17,6 +18,7 @@
  * @copyright  Copyright (c) 2022 O3-Shop (https://www.o3-shop.com)
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 
 use OxidEsales\TestingLibrary\UnitTestCase;
@@ -25,7 +27,7 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  * Tests for oxwCategoryTree class
  */
 class CategoryTreeTest extends UnitTestCase
-    {
+{
     /**
      * Testing OxidEsales\EshopCommunity\Application\Component\Widget\CategoryTree::getDeepLevel()
      *
@@ -34,7 +36,7 @@ class CategoryTreeTest extends UnitTestCase
     public function testGetDeepLevel()
     {
         $categoryTree = oxNew('OxidEsales\EshopCommunity\Application\Component\Widget\CategoryTree');
-        $categoryTree->setViewParameters(array("deepLevel" => 2));
+        $categoryTree->setViewParameters(['deepLevel' => 2]);
         $this->assertEquals(2, $categoryTree->getDeepLevel());
     }
 

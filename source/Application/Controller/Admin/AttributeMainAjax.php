@@ -48,7 +48,7 @@ class AttributeMainAjax extends ListComponentAjax
      * @var array
      */
     protected $_aColumns = [
-        'container1' => [ 
+        'container1' => [
             // field , table, visible, multilanguage, ident
             ['oxartnum', 'oxarticles', 1, 0, 0],
             ['oxtitle', 'oxarticles', 1, 1, 0],
@@ -112,7 +112,7 @@ class AttributeMainAjax extends ListComponentAjax
             $sSqlIfFalse = " {$sArticleTable}.oxid=oxobject2category.oxobjectid ";
             $sVariantSelectionSql = $blVariantsSelectionParameter ? $sSqlIfTrue : $sSqlIfFalse;
             $sQAdd = " from {$sOCatView} as oxobject2category left join {$sArticleTable} on {$sVariantSelectionSql}" .
-                     " where oxobject2category.oxcatnid = " . $oDb->quote($sDelId) . " ";
+                     ' where oxobject2category.oxcatnid = ' . $oDb->quote($sDelId) . ' ';
         } else {
             $sQAdd = " from {$sOAttrView} left join {$sArticleTable} " .
                      "on {$sArticleTable}.oxid={$sOAttrView}.oxobjectid " .
@@ -122,7 +122,7 @@ class AttributeMainAjax extends ListComponentAjax
 
         if ($sSynchDelId && $sSynchDelId != $sDelId) {
             $sQAdd .= " and {$sArticleTable}.oxid not in ( select {$sOAttrView}.oxobjectid from {$sOAttrView} " .
-                      "where {$sOAttrView}.oxattrid = " . $oDb->quote($sSynchDelId) . " ) ";
+                      "where {$sOAttrView}.oxattrid = " . $oDb->quote($sSynchDelId) . ' ) ';
         }
 
         return $sQAdd;
@@ -159,7 +159,7 @@ class AttributeMainAjax extends ListComponentAjax
             $sQ .= ' group by ' . $this->getViewName('oxarticles') . '.oxid ';
 
             $oStr = Str::getStr();
-            if ($oStr->strpos($sQ, "select count( * ) ") === 0) {
+            if ($oStr->strpos($sQ, 'select count( * ) ') === 0) {
                 $sQ = "select count( * ) from ( {$sQ} ) as _cnttable";
             }
         }
@@ -180,8 +180,8 @@ class AttributeMainAjax extends ListComponentAjax
             $sQ = parent::addFilter("delete $sO2AttributeView.* " . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
-            $sChosenCategories = implode(", ", DatabaseProvider::getDb()->quoteArray($aChosenCat));
-            $sQ = "delete from oxobject2attribute where oxobject2attribute.oxid in (" . $sChosenCategories . ") ";
+            $sChosenCategories = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCat));
+            $sQ = 'delete from oxobject2attribute where oxobject2attribute.oxid in (' . $sChosenCategories . ') ';
             DatabaseProvider::getDb()->Execute($sQ);
         }
     }
@@ -205,7 +205,7 @@ class AttributeMainAjax extends ListComponentAjax
         if ($oAttribute->load($soxId) && is_array($aAddArticle)) {
             foreach ($aAddArticle as $sAdd) {
                 $oNewGroup = oxNew(BaseModel::class);
-                $oNewGroup->init("oxobject2attribute");
+                $oNewGroup->init('oxobject2attribute');
                 $oNewGroup->oxobject2attribute__oxobjectid = new Field($sAdd);
                 $oNewGroup->oxobject2attribute__oxattrid = new Field($oAttribute->oxattribute__oxid->value);
                 $oNewGroup->save();

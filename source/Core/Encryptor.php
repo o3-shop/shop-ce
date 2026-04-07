@@ -42,7 +42,7 @@ class Encryptor
 
         $string = $string ^ $key;
         $string = base64_encode($string);
-        $string = str_replace("=", "!", $string);
+        $string = str_replace('=', '!', $string);
 
         return "ox_$string";
     }

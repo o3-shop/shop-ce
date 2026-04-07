@@ -44,8 +44,8 @@ class WrappingMain extends AdminDetailsController
     {
         parent::render();
 
-        $soxId = $this->_aViewData["oxid"] = $this->getEditObjectId();
-        if (isset($soxId) && $soxId != "-1") {
+        $soxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
+        if (isset($soxId) && $soxId != '-1') {
             // load object
             $oWrapping = oxNew(Wrapping::class);
             $oWrapping->loadInLang($this->_iEditLang, $soxId);
@@ -55,7 +55,7 @@ class WrappingMain extends AdminDetailsController
                 // echo "language entry doesn't exist! using: ".key($oOtherLang);
                 $oWrapping->loadInLang(key($oOtherLang), $soxId);
             }
-            $this->_aViewData["edit"] = $oWrapping;
+            $this->_aViewData['edit'] = $oWrapping;
 
             //Disable editing for derived articles
             if ($oWrapping->isDerived()) {
@@ -65,18 +65,18 @@ class WrappingMain extends AdminDetailsController
             // remove already created languages
             $aLang = array_diff(Registry::getLang()->getLanguageNames(), $oOtherLang);
             if (count($aLang)) {
-                $this->_aViewData["posslang"] = $aLang;
+                $this->_aViewData['posslang'] = $aLang;
             }
 
             foreach ($oOtherLang as $id => $language) {
                 $oLang = new stdClass();
                 $oLang->sLangDesc = $language;
                 $oLang->selected = ($id == $this->_iEditLang);
-                $this->_aViewData["otherlang"][$id] = clone $oLang;
+                $this->_aViewData['otherlang'][$id] = clone $oLang;
             }
         }
 
-        return "wrapping_main.tpl";
+        return 'wrapping_main.tpl';
     }
 
     /**
@@ -98,7 +98,7 @@ class WrappingMain extends AdminDetailsController
 
         $oWrapping = oxNew(Wrapping::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oWrapping->loadInLang($this->_iEditLang, $soxId);
             // #1173M - not all pic are deleted, after article is removed
             Registry::getUtilsPic()->overwritePic($oWrapping, 'oxwrapping', 'oxpic', 'WP', '0', $aParams, Registry::getConfig()->getPictureDir(false));
@@ -140,7 +140,7 @@ class WrappingMain extends AdminDetailsController
 
         $oWrapping = oxNew(Wrapping::class);
 
-        if ($soxId != "-1") {
+        if ($soxId != '-1') {
             $oWrapping->load($soxId);
         } else {
             $aParams['oxwrapping__oxid'] = null;

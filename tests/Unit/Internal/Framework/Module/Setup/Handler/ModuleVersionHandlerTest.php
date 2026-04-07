@@ -62,7 +62,7 @@ final class ModuleVersionHandlerTest extends TestCase
             ->setType(ShopSettingType::ARRAY)
             ->setValue([
                 'moduleToStayActive' => '0.0.1',
-                'moduleToDeactivate' => '0.0.2'
+                'moduleToDeactivate' => '0.0.2',
             ]);
 
         $shopConfigurationSettingDao->save($shopConfigurationSetting);
@@ -84,8 +84,7 @@ final class ModuleVersionHandlerTest extends TestCase
 
     private function getTestShopConfigurationSettingDao(): ShopConfigurationSettingDaoInterface
     {
-        return new class implements ShopConfigurationSettingDaoInterface
-        {
+        return new class () implements ShopConfigurationSettingDaoInterface {
             private $settings = [];
 
             public function save(ShopConfigurationSetting $setting)

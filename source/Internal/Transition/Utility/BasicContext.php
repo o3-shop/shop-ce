@@ -35,7 +35,7 @@ use Webmozart\PathUtil\Path;
  */
 class BasicContext implements BasicContextInterface
 {
-    const COMMUNITY_EDITION = EditionSelector::COMMUNITY;
+    public const COMMUNITY_EDITION = EditionSelector::COMMUNITY;
 
     /**
      * @var Facts

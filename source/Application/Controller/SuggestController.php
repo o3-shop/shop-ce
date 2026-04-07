@@ -102,7 +102,7 @@ class SuggestController extends FrontendController
      */
     public function send()
     {
-        $aParams = Registry::getRequest()->getRequestEscapedParameter('editval', true);
+        $aParams = Registry::getRequest()->getRequestParameter('editval');
         if (!is_array($aParams)) {
             return;
         }
@@ -123,17 +123,17 @@ class SuggestController extends FrontendController
         }
 
         if (
-            !oxNew(MailValidator::class)->isValidEmail($aParams["rec_email"])
-            || !oxNew(MailValidator::class)->isValidEmail($aParams["send_email"])
+            !oxNew(MailValidator::class)->isValidEmail($aParams['rec_email'])
+            || !oxNew(MailValidator::class)->isValidEmail($aParams['send_email'])
         ) {
             $oUtilsView->addErrorToDisplay('SUGGEST_INVALIDMAIL');
 
             return;
         }
 
-        $sReturn = "";
+        $sReturn = '';
         // #1834M - specialchar search
-        $sSearchParamForLink = rawurlencode(Registry::getRequest()->getRequestEscapedParameter('searchparam', true));
+        $sSearchParamForLink = rawurlencode(Registry::getRequest()->getRequestParameter('searchparam'));
         if ($sSearchParamForLink) {
             $sReturn .= "&searchparam=$sSearchParamForLink";
         }

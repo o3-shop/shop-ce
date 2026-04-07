@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -20,10 +21,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
+use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\ThemeMain;
 use OxidEsales\EshopCommunity\Core\Theme;
-
-use Exception;
 use OxidTestCase;
 use oxTestModules;
 
@@ -58,7 +58,7 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testSetTheme()
     {
-        $oTM = $this->getMock(ThemeMain::class, array('getEditObjectId'));
+        $oTM = $this->getMock(ThemeMain::class, ['getEditObjectId']);
         $oTM->expects($this->any())->method('getEditObjectId')->will($this->returnValue('azure'));
 
         oxTestModules::addFunction('oxTheme', 'load($name)', '{if ($name != "azure") throw new Exception("FAIL TO LOAD"); return true;}');
@@ -77,7 +77,7 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionInRender()
     {
-        $oTM = $this->getMock(ThemeMain::class, array('themeInConfigFile'));
+        $oTM = $this->getMock(ThemeMain::class, ['themeInConfigFile']);
         $oTM->expects($this->once())->method('themeInConfigFile');
         $oTM->render();
     }
@@ -96,12 +96,12 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionSTheme()
     {
-        $oConfig               = oxNew('oxConfig');
-        $oConfig->sTheme       = 'azure';
-        $oConfig->sCustomTheme = null;
+        // Production code uses Registry::getConfig()->sTheme, so set it on the real config
+        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        $oConfig->sTheme = 'azure';
+        unset($oConfig->sCustomTheme);
 
         $oView = oxNew('Theme_Main');
-        $oView->setConfig($oConfig);
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sTheme.');
     }
 
@@ -110,12 +110,12 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionSCustomTheme()
     {
-        $oConfig               = oxNew('oxConfig');
-        $oConfig->sTheme       = null;
+        // Production code uses Registry::getConfig()->sCustomTheme, so set it on the real config
+        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        unset($oConfig->sTheme);
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
-        $oView->setConfig($oConfig);
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sCustomTheme.');
     }
 
@@ -124,12 +124,12 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testThemeConfigExceptionSThemeSCustomTheme()
     {
-        $oConfig               = oxNew('oxConfig');
-        $oConfig->sTheme       = 'azure';
+        // Production code uses Registry::getConfig(), so set properties on the real config
+        $oConfig = \OxidEsales\Eshop\Core\Registry::getConfig();
+        $oConfig->sTheme = 'azure';
         $oConfig->sCustomTheme = 'someTheme';
 
         $oView = oxNew('Theme_Main');
-        $oView->setConfig($oConfig);
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sTheme and sCustomTheme.');
     }
 }

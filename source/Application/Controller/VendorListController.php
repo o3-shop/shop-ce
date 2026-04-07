@@ -425,7 +425,7 @@ class VendorListController extends ArticleListController
         $sAddParams = parent::getAddUrlParams();
         $sAddParams .= ($sAddParams ? '&amp;' : '') . "listtype={$this->_sListType}";
         if ($oVendor = $this->getActVendor()) {
-            $sAddParams .= "&amp;cnid=v_" . $oVendor->getId();
+            $sAddParams .= '&amp;cnid=v_' . $oVendor->getId();
         }
 
         return $sAddParams;
@@ -454,7 +454,6 @@ class VendorListController extends ArticleListController
 
         return $aPaths;
     }
-
 
     /**
      * Returns vendor tree

@@ -22,8 +22,10 @@ namespace OxidEsales\EshopCommunity\Application\Model;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
+use OxidEsales\Eshop\Application\Model\RightsRoles;
+use OxidEsales\Eshop\Application\Model\RightsRolesElement;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Model\ListModel;
-use OxidEsales\EshopCommunity\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 
@@ -44,7 +46,7 @@ class RightsRolesElementsList extends ListModel
             ->where(
                 $queryBuilder->expr()->eq(
                     'objectid',
-                    $queryBuilder->createNamedParameter( $objectId)
+                    $queryBuilder->createNamedParameter($objectId)
                 )
             );
 
@@ -164,7 +166,7 @@ class RightsRolesElementsList extends ListModel
         return array_combine(
             array_filter(
                 array_map(
-                /** @var $item RightsRolesElement */
+                    /** @var $item RightsRolesElement */
                     function ($item) {
                         return $item->getFieldData('elementid');
                     },
@@ -174,7 +176,7 @@ class RightsRolesElementsList extends ListModel
             ),
             array_filter(
                 array_map(
-                /** @var $item RightsRolesElement */
+                    /** @var $item RightsRolesElement */
                     function ($item) {
                         return $item->getFieldData('type');
                     },
@@ -192,7 +194,7 @@ class RightsRolesElementsList extends ListModel
             ->where(
                 $delete->expr()->eq(
                     'objectid',
-                    $delete->createNamedParameter( $objectId)
+                    $delete->createNamedParameter($objectId)
                 )
             );
         $delete->execute();
@@ -202,7 +204,7 @@ class RightsRolesElementsList extends ListModel
             $element->assign([
                 'elementid' => $naviSetting,
                 'objectid'  => $objectId,
-                'type'      => $rightType
+                'type'      => $rightType,
             ]);
             $element->save();
         }
@@ -221,6 +223,6 @@ class RightsRolesElementsList extends ListModel
 
     protected function filterEmptyButZero($var)
     {
-        return ($var !== NULL && $var !== FALSE && $var !== '');
+        return ($var !== null && $var !== false && $var !== '');
     }
 }

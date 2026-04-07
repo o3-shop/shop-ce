@@ -148,7 +148,7 @@ class AdminListController extends AdminController
             $this->_aCurrSorting = Registry::getRequest()->getRequestEscapedParameter('sort');
 
             if (!$this->_aCurrSorting && $this->_sDefSortField && ($baseObject = $this->getItemListBaseObject())) {
-                $this->_aCurrSorting[$baseObject->getCoreTableName()] = [$this->_sDefSortField => "asc"];
+                $this->_aCurrSorting[$baseObject->getCoreTableName()] = [$this->_sDefSortField => 'asc'];
             }
         }
 
@@ -398,7 +398,7 @@ class AdminListController extends AdminController
                     $query .= ((($addSeparator) ? ', ' : '')) . DatabaseProvider::getDb()->quoteIdentifier($field);
 
                     //V oxActive field search always DESC
-                    if ($descending || $column == "oxactive" || strcasecmp($sortDirectory, 'desc') == 0) {
+                    if ($descending || $column == 'oxactive' || strcasecmp($sortDirectory, 'desc') == 0) {
                         $query .= ' desc ';
                     }
 
@@ -432,7 +432,7 @@ class AdminListController extends AdminController
      */
     protected function buildSelectString($listObject = null)
     {
-        return $listObject !== null ? $listObject->buildSelectString(null) : "";
+        return $listObject !== null ? $listObject->buildSelectString(null) : '';
     }
 
     /**
@@ -464,9 +464,9 @@ class AdminListController extends AdminController
         $stringModifier = Str::getStr();
 
         //removing % symbols
-        $fieldValue = $stringModifier->preg_replace("/^%|%$/", "", trim($fieldValue));
+        $fieldValue = $stringModifier->preg_replace('/^%|%$/', '', trim($fieldValue));
 
-        return $stringModifier->preg_replace("/\s+/", " ", $fieldValue);
+        return $stringModifier->preg_replace("/\s+/", ' ', $fieldValue);
     }
 
     /**
@@ -497,10 +497,10 @@ class AdminListController extends AdminController
     {
         if ($isSearchValue) {
             //is search string, using LIKE
-            $query = " like " . DatabaseProvider::getDb()->quote('%' . $value . '%') . " ";
+            $query = ' like ' . DatabaseProvider::getDb()->quote('%' . $value . '%') . ' ';
         } else {
             //not search string, values must be equal
-            $query = " = " . DatabaseProvider::getDb()->quote($value) . " ";
+            $query = ' = ' . DatabaseProvider::getDb()->quote($value) . ' ';
         }
 
         return $query;
@@ -663,7 +663,7 @@ class AdminListController extends AdminController
                             // #M1260: if field is date
                             if ($localDateFormat && $localDateFormat != 'ISO' && isset($listItem->$field)) {
                                 $fieldType = $listItem->{$field}->fldtype;
-                                if ("datetime" == $fieldType || "date" == $fieldType) {
+                                if ('datetime' == $fieldType || 'date' == $fieldType) {
                                     $value = $this->convertToDBDate($value, $fieldType);
                                 }
                             }
@@ -704,8 +704,8 @@ class AdminListController extends AdminController
     {
         $convertedObject = new Field();
         $convertedObject->setValue($value);
-        if ($fieldType == "datetime") {
-            if (strlen($value) == 10 || strlen($value) == 22 || (strlen($value) == 19 && !stripos($value, "m"))) {
+        if ($fieldType == 'datetime') {
+            if (strlen($value) == 10 || strlen($value) == 22 || (strlen($value) == 19 && !stripos($value, 'm'))) {
                 Registry::getUtilsDate()->convertDBDateTime($convertedObject, true);
             } else {
                 if (strlen($value) > 10) {
@@ -714,7 +714,7 @@ class AdminListController extends AdminController
                     return $this->convertDate($value);
                 }
             }
-        } elseif ($fieldType == "date") {
+        } elseif ($fieldType == 'date') {
             if (strlen($value) == 10) {
                 Registry::getUtilsDate()->convertDBDate($convertedObject, true);
             } else {
@@ -749,18 +749,18 @@ class AdminListController extends AdminController
     {
         // regexps to validate input
         $datePatterns = [
-            "/^([0-9]{2})\.([0-9]{4})/" => "EUR2", // MM.YYYY
-            "/^([0-9]{2})\.([0-9]{2})/" => "EUR1", // DD.MM
-            "/^([0-9]{2})\/([0-9]{4})/" => "USA2", // MM.YYYY
-            "/^([0-9]{2})\/([0-9]{2})/" => "USA1" // DD.MM
+            "/^([0-9]{2})\.([0-9]{4})/" => 'EUR2', // MM.YYYY
+            "/^([0-9]{2})\.([0-9]{2})/" => 'EUR1', // DD.MM
+            "/^([0-9]{2})\/([0-9]{4})/" => 'USA2', // MM.YYYY
+            "/^([0-9]{2})\/([0-9]{2})/" => 'USA1', // DD.MM
         ];
 
         // date/time formatting rules
         $dateFormats = [
-            "EUR1" => [2, 1],
-            "EUR2" => [2, 1],
-            "USA1" => [1, 2],
-            "USA2" => [2, 1]
+            'EUR1' => [2, 1],
+            'EUR2' => [2, 1],
+            'USA1' => [1, 2],
+            'USA2' => [2, 1],
         ];
 
         // looking for date field
@@ -768,7 +768,7 @@ class AdminListController extends AdminController
         $stringModifier = Str::getStr();
         foreach ($datePatterns as $pattern => $type) {
             if ($stringModifier->preg_match($pattern, $date, $dateMatches)) {
-                $date = $dateMatches[$dateFormats[$type][0]] . "-" . $dateMatches[$dateFormats[$type][1]];
+                $date = $dateMatches[$dateFormats[$type][0]] . '-' . $dateMatches[$dateFormats[$type][1]];
                 break;
             }
         }
@@ -806,17 +806,17 @@ class AdminListController extends AdminController
 
         // looking for time field
         $time = substr($fullDate, 11);
-        if ($stringModifier->preg_match("/([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/", $time, $timeMatches)) {
-            if ($timeMatches[3] == "PM") {
+        if ($stringModifier->preg_match('/([0-9]{2}):([0-9]{2}) ([AP]{1}[M]{1})$/', $time, $timeMatches)) {
+            if ($timeMatches[3] == 'PM') {
                 $intVal = (int)$timeMatches[1];
                 if ($intVal < 13) {
-                    $time = ($intVal + 12) . ":" . $timeMatches[2];
+                    $time = ($intVal + 12) . ':' . $timeMatches[2];
                 }
             } else {
-                $time = $timeMatches[1] . ":" . $timeMatches[2];
+                $time = $timeMatches[1] . ':' . $timeMatches[2];
             }
-        } elseif ($stringModifier->preg_match("/([0-9]{2}) ([AP]{1}[M]{1})$/", $time, $timeMatches)) {
-            if ($timeMatches[2] == "PM") {
+        } elseif ($stringModifier->preg_match('/([0-9]{2}) ([AP]{1}[M]{1})$/', $time, $timeMatches)) {
+            if ($timeMatches[2] == 'PM') {
                 $intVal = (int)$timeMatches[1];
                 if ($intVal < 13) {
                     $time = ($intVal + 12);
@@ -825,10 +825,10 @@ class AdminListController extends AdminController
                 $time = $timeMatches[1];
             }
         } else {
-            $time = str_replace(".", ":", $time);
+            $time = str_replace('.', ':', $time);
         }
 
-        return $convertedObject->value . " " . $time;
+        return $convertedObject->value . ' ' . $time;
     }
 
     /**

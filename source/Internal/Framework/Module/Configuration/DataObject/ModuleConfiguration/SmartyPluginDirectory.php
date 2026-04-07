@@ -30,7 +30,6 @@ class SmartyPluginDirectory
      */
     private $directory;
 
-
     /**
      * @param string $directory
      */
