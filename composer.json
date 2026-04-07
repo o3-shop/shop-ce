@@ -27,7 +27,7 @@
         "o3-shop/smarty": "~2.6.34",
         "doctrine/dbal": "<=2.12.1",
         "doctrine/collections": "^1.4.0",
-        "monolog/monolog": "^v1.23.0",
+        "monolog/monolog": "^v2.10",
         "psr/container": "1.0.*",
         "symfony/event-dispatcher": "^3.4",
         "symfony/dependency-injection": "^3.4.26",
@@ -40,7 +40,7 @@
         "symfony/finder": "^3.4",
         "symfony/filesystem": "^4.4.17",
         "vlucas/phpdotenv": "^5.5",
-        "o3-shop/shop-doctrine-migration-wrapper": "^v1.0.0",
+        "o3-shop/shop-doctrine-migration-wrapper": "v1.0.2",
         "o3-shop/shop-db-views-generator": "^v1.0.0",
         "o3-shop/shop-demodata-installer": "^v1.0.0",
         "o3-shop/shop-composer-plugin": "^v1.1.0",
@@ -48,10 +48,13 @@
         "o3-shop/shop-facts": "^v1.0.0"
     },
     "require-dev": {
-        "o3-shop/testing-library": "^v1.0.0",
+        "o3-shop/testing-library": "^v1.1.2",
         "incenteev/composer-parameter-handler": "~v2.0",
         "o3-shop/shop-ide-helper": "^v1.0.0",
-        "squizlabs/php_codesniffer": "^3.5.4"
+        "squizlabs/php_codesniffer": "^3.5.4",
+        "phpspec/prophecy": "^1.22",
+        "rector/rector": "^2.1",
+        "phpspec/prophecy-phpunit": "^2.4"
     },
     "autoload": {
         "psr-4": {
@@ -77,6 +80,11 @@
         ],
         "oe:ide-helper:generate": [
             "if [ -f ./vendor/bin/oe-eshop-ide_helper ]; then oe-eshop-ide_helper; fi"
+        ],
+        "oe:install:module:paypal": [
+            "composer require oxid-solution-catalysts/paypal-module ^2.6.0",
+            "vendor/bin/oe-console oe:module:install-configuration source/modules/osc/paypal",
+            "vendor/bin/oe-console oe:cache:clear"
         ]
     },
     "extra": {
