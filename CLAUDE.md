@@ -85,6 +85,48 @@ bin/oe-console                   # Symfony Console CLI entry point
 - **Branches:** Feature branches off `b-1.5`. Naming: `NNN-short-description` (issue number prefix).
 - **Main branch:** `b-1.5`
 
+## Logging Standards
+
+Reference: https://projects.wiki.tro.net/books/00002-development/page/how-to-write-good-log-files
+
+### The 3 W's: When, Where, What
+
+- **When:** Handled by Monolog. Timestamps must include microseconds and timezone (ISO 8601: `Y-m-d\TH:i:s.uP`).
+- **Where:** Always prefix with `__METHOD__ . ' - '` (dash separates where from what).
+- **What:** Describe what the software is doing. Full sentences, in English, ending with `.`
+
+### Rules
+
+1. **`__METHOD__` prefix** with dash: `__METHOD__ . ' - '`
+2. **Full sentences** ending with a period `.`
+3. **Quote variables** with single quotes: `'$variable'` — makes empty values visible as `''`
+4. **Label IDs** by meaning: `order-ID '$orderId'` not just `ID '$id'`
+5. **Use active language**, not "trying to": `Fetching articles.` not `Trying to fetch articles.`
+6. **Tell what it means**: `Service returned '200'. Token is still valid.` not just `Service returned '200'.`
+7. **English only** — always, even for "just this moment"
+8. **No line breaks** in log messages — DevOps tools are line-based
+9. **No binary data** — replace with `(deleted data for logfile)`
+10. **Use the data parameter** (second argument, array) for structured context
+
+### Log levels (RFC 5424)
+
+`DEBUG` < `INFO` < `NOTICE` < `WARNING` < `ERROR` < `CRITICAL` < `ALERT` < `EMERGENCY`
+
+### Examples
+
+```php
+// Correct
+Registry::getLogger()->info(__METHOD__ . " - Fetching user '$userName' from IDP.");
+Registry::getLogger()->error(__METHOD__ . " - Connection to API failed: '$error'.");
+Registry::getLogger()->warning(__METHOD__ . " - Invalid token received from: '$source'.", ['token' => $token]);
+Registry::getLogger()->debug(__METHOD__ . " - Found '3' orders for customer-ID '$customerId'.");
+
+// Wrong — missing dash, no quotes, no period, "trying to", unlabeled ID
+Registry::getLogger()->info(__METHOD__ . 'Trying to fetch user ' . $userName);
+Registry::getLogger()->error('Connection failed', ['error' => $e->getMessage()]);
+Registry::getLogger()->debug(__METHOD__ . " - Found order with ID '$id'.");
+```
+
 ## Agent Memory
 
 This repo has a shared memory system at `.claude/memory/`. All agents working here contribute to it.
