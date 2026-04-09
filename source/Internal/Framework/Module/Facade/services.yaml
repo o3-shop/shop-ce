@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingService
+    public: true
+    arguments:
+      $bridge: '@OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Bridge\ModuleSettingBridgeInterface'
