@@ -19,23 +19,26 @@
 <p class="desc">
     <b>[{oxmultilang ident="HOME_DESC"}]</b>
 </p>
-<hr>
+<hr style="margin-bottom:20px">
+
+[{assign var="hasNotices" value=false}]
 
 [{if $aMessage}]
+    [{assign var="hasNotices" value=true}]
     <div class="messagebox">
-        [{oxmultilang ident="MAIN_INFO"}]:<br>
+        <div style="margin-bottom:5px">[{oxmultilang ident="MAIN_INFO"}]:</div>
         [{foreach from=$aMessage item=sMessage key=class}]
             <p class="[{$class}]">[{$sMessage}]</p>
         [{/foreach}]
     </div>
-    <hr>
 [{/if}]
 
 [{block name="admin_home_updatecheck"}]
 [{if $updateCheckResult}]
     [{if $updateCheckResult->isCoreUpdateAvailable() || $updateCheckResult->getOutdatedModules()}]
+    [{assign var="hasNotices" value=true}]
     <div class="messagebox">
-        <b>[{oxmultilang ident="UPDATECHECK_TITLE"}]</b><br><br>
+        <div style="margin-bottom:5px"><b>[{oxmultilang ident="UPDATECHECK_TITLE"}]</b></div>
         [{if $updateCheckResult->isCoreUpdateAvailable()}]
             <p class="warning">
                 [{oxmultilang ident="UPDATECHECK_CORE_NOTICE" args=$updateCheckResult->getLatestCoreVersion()}]
@@ -61,10 +64,13 @@
             </table>
         [{/if}]
     </div>
-    <hr>
     [{/if}]
 [{/if}]
 [{/block}]
+
+[{if $hasNotices}]
+    <hr>
+[{/if}]
 
 [{block name="admin_home_navigation_items"}]
 
