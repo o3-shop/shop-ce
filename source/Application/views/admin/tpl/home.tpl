@@ -31,6 +31,41 @@
     <hr>
 [{/if}]
 
+[{block name="admin_home_updatecheck"}]
+[{if $updateCheckResult}]
+    [{if $updateCheckResult->isCoreUpdateAvailable() || $updateCheckResult->getOutdatedModules()}]
+    <div class="messagebox">
+        <b>[{oxmultilang ident="UPDATECHECK_TITLE"}]</b><br><br>
+        [{if $updateCheckResult->isCoreUpdateAvailable()}]
+            <p class="warning">
+                [{oxmultilang ident="UPDATECHECK_CORE_NOTICE" args=$updateCheckResult->getLatestCoreVersion()}]
+                [{if $updateCheckResult->getUpdateLink()}]
+                    <a href="[{$updateCheckResult->getUpdateLink()}]" target="_blank">[{oxmultilang ident="UPDATECHECK_CORE_LINK"}]</a>
+                [{/if}]
+            </p>
+        [{/if}]
+        [{if $updateCheckResult->getOutdatedModules()}]
+            <table cellspacing="0" cellpadding="2" border="0">
+                <tr>
+                    <td><b>[{oxmultilang ident="UPDATECHECK_MODULE_ID"}]</b></td>
+                    <td><b>[{oxmultilang ident="UPDATECHECK_MODULE_LATEST"}]</b></td>
+                    <td></td>
+                </tr>
+                [{foreach from=$updateCheckResult->getOutdatedModules() item=module}]
+                <tr>
+                    <td>[{$module.id}]</td>
+                    <td>[{$module.latest_version}]</td>
+                    <td>[{if $module.url}]<a href="[{$module.url}]" target="_blank">[{oxmultilang ident="UPDATECHECK_MODULE_LINK"}]</a>[{/if}]</td>
+                </tr>
+                [{/foreach}]
+            </table>
+        [{/if}]
+    </div>
+    <hr>
+    [{/if}]
+[{/if}]
+[{/block}]
+
 [{block name="admin_home_navigation_items"}]
 
     <table width="100%" height="84%">

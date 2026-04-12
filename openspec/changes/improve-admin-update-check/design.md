@@ -110,9 +110,9 @@ Two distinct uses of the module list:
 
 ### D6 — Fallback to GitHub API when O3-Shop endpoint unavailable
 
-**Decision:** If the POST to the update endpoint returns non-200 or times out, the service falls back to the existing GitHub Releases API for core-only version comparison. Module check is skipped silently.
+**Decision:** If the POST to the update endpoint returns non-200 or times out, the service logs a **warning** via `Registry::getLogger()` and falls back to the existing GitHub Releases API for core-only version comparison. Module check is skipped silently. If the endpoint returns HTTP 200 but the response body is malformed or missing required fields, the service logs an **error**. In both cases the admin user is NOT shown any error — the UI either shows the fallback result or nothing.
 
-**Rationale:** Existing behaviour is preserved. An unavailable update server must not break the admin login. The GitHub API fallback ensures the core version notice keeps working during an endpoint rollout.
+**Rationale:** Existing behaviour is preserved. An unavailable update server must not break the admin login. The GitHub API fallback ensures the core version notice keeps working during an endpoint rollout. Logging gives operators observability without polluting the admin UI.
 
 ---
 

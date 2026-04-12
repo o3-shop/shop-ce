@@ -794,6 +794,13 @@ $aLang = [
     'NAVIGATION_NEWVERSIONAVAILABLE'                 => 'Version %s is available.',
     // END deprecated
     'NAVIGATION_NEW_VERSION_AVAILABLE'               => 'You are using version %s, version %s is now available. Please update now.',
+    'UPDATECHECK_TITLE'                              => 'Update Check',
+    'UPDATECHECK_CORE_NOTICE'                        => 'A new shop version %s is available.',
+    'UPDATECHECK_CORE_LINK'                          => 'Download update',
+    'UPDATECHECK_MODULE_ID'                          => 'Module',
+    'UPDATECHECK_MODULE_LATEST'                      => 'Available Version',
+    'UPDATECHECK_MODULE_LINK'                        => 'Details',
+    'UPDATECHECK_BUTTON'                             => 'Check for updates',
     // @deprecated 6.5.6 "News" feature will be removed completely
     'NEWS_LIST_TITLE'                                => '[OXID News Administration]',
     'NEWS_LIST_SHORTTEXT'                            => 'Title',
