@@ -107,7 +107,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
         $response = $this->postJson(self::ENDPOINT, $payload);
 
         if ($response !== null) {
-            return $this->parseEndpointResponse($response);
+            return $this->parseEndpointResponse($response, $payload['modules'] ?? []);
         }
 
         Registry::getLogger()->warning(
@@ -161,7 +161,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
      *
      * @return UpdateCheckResult
      */
-    private function parseEndpointResponse(array $response): UpdateCheckResult
+    private function parseEndpointResponse(array $response, array $installedModules = []): UpdateCheckResult
     {
         $coreUpdateAvailable = !empty($response['core_not_actual']);
         $latestCoreVersion = $response['actual_version'] ?? '';
@@ -183,6 +183,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
 
                 $outdatedModules[] = [
                     'id' => $moduleId,
+                    'installed_version' => $installedModules[$moduleId] ?? '',
                     'latest_version' => $plugin['version'] ?? '',
                     'url' => $plugin['url'] ?? '',
                 ];

@@ -798,7 +798,8 @@ $aLang = [
     'UPDATECHECK_CORE_NOTICE'                        => 'A new shop version %s is available.',
     'UPDATECHECK_CORE_LINK'                          => 'Download update',
     'UPDATECHECK_MODULE_ID'                          => 'Module',
-    'UPDATECHECK_MODULE_LATEST'                      => 'Available Version',
+    'UPDATECHECK_MODULE_INSTALLED'                   => 'Installed',
+    'UPDATECHECK_MODULE_LATEST'                      => 'Available',
     'UPDATECHECK_MODULE_LINK'                        => 'Details',
     'UPDATECHECK_BUTTON'                             => 'Check for updates',
     // @deprecated 6.5.6 "News" feature will be removed completely
@@ -811,7 +812,7 @@ $aLang = [
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Invisible for User Group',
     // END deprecated
     'NAVIGATION_SYSREQ_MESSAGE'                      => 'System health check shows setup/server setup of this O3-Shop might be broken. Probably this O3-Shop behaves strange in some cases. Please fix this as soon as possible. Support for fixing find in ',
-    'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>system health check</b>.',
+    'NAVIGATION_SYSREQ_MESSAGE2'                     => 'system health check.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'The permanent system health check has been deactivated. You can re-activate it in the Perform. tab at Master settings -> Core settings. To check it anyway, please click on this link: ',
     'NAVIGATION_SHOPFRONT'                           => "Shop's start page",
     'NAVIGATION_FULLVIEW'                            => 'show expert menu',
