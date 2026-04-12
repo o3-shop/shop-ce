@@ -40,7 +40,7 @@ class UpdateCheckResult
      * @param bool   $coreUpdateAvailable
      * @param string $latestCoreVersion
      * @param string $updateLink
-     * @param array  $outdatedModules Each item: ['id' => string, 'latest_version' => string, 'url' => string]
+     * @param array  $outdatedModules Each item: ['id' => string, 'installed_version' => string, 'latest_version' => string, 'url' => string]
      */
     public function __construct(
         bool $coreUpdateAvailable = false,
@@ -78,7 +78,7 @@ class UpdateCheckResult
     }
 
     /**
-     * @return array Each item: ['id' => string, 'latest_version' => string, 'url' => string]
+     * @return array Each item: ['id' => string, 'installed_version' => string, 'latest_version' => string, 'url' => string]
      */
     public function getOutdatedModules(): array
     {
