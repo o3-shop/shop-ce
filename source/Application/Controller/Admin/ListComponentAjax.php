@@ -220,7 +220,7 @@ class ListComponentAjax extends Base
             $this->$function();
             $this->dispatchEvent(new AfterAdminAjaxRequestProcessedEvent());
         } else {
-            $sQAdd = $this->getQuery();
+            $sQAdd = $this->_getQuery();
 
             // formatting SQL queries
             $sQ = $this->getDataQuery($sQAdd);
