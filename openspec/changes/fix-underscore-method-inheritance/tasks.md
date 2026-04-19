@@ -14,15 +14,15 @@
 
 ## 2. Phase 1 — Inheritance-contract test
 
-- [ ] 2.1 Create `tests/Unit/Core/InheritanceContractTest.php` (namespace `OxidEsales\EshopCommunity\Tests\Unit\Core`) with a PHPUnit data-provider method that reads `baseline_underscore_methods.json` and yields one case per inventory entry
-- [ ] 2.2 For each provider case, map the concrete baseline class `OxidEsales\EshopCommunity\...` to its unified-namespace FQCN by replacing the `OxidEsales\EshopCommunity\` prefix with `OxidEsales\Eshop\` — reflection MUST use the unified name, concrete names are never used for reflection
-- [ ] 2.3 Handle the early-exit branches: class missing (concrete gone or unified unresolvable) → aggregate for D7 `markTestIncomplete` at the end of the run; underscore method no longer present → skip (existing removal tests cover this); underscore method present and no sibling non-underscore method → pass trivially
-- [ ] 2.4 When both `_method()` and `method()` exist: build a synthetic subclass via `eval()` with a unique class name, extending the unified-name class, overriding `_method()` to set `$this->__overrideCalled = true` and return a safe default of the declared return type; generate the override signature from `ReflectionMethod` on the parent so the eval body stays type-compatible
-- [ ] 2.5 Instantiate the synthetic subclass via `ReflectionClass::newInstanceWithoutConstructor()` to bypass DI/Registry requirements
-- [ ] 2.6 Invoke the non-underscore `method()` via `ReflectionMethod::invokeArgs()` with type-defaulted nulls (`[]` for arrays, `0` for ints, `''` for strings, `null` for nullable/mixed); wrap in `try/catch(\Throwable)`
-- [ ] 2.7 Assertion & finding classification: if `__overrideCalled === true` → pass; if false and no throwable → `observed: "override_not_called"`; if false and a throwable fired before the override → `observed: "exception_before_dispatch"`
-- [ ] 2.8 Accumulate findings across the data-provider run; emit `openspec/changes/fix-underscore-method-inheritance/findings.json` via an `@afterClass` hook or a dedicated runner under `bin/`, with entries sorted deterministically by `class` then `method`, including both `class` (concrete) and `unified_class` fields
-- [ ] 2.9 Wire the test into the existing PHPUnit config so it runs in the normal `tests/Unit/` suite (no new suite); accept that CI will be red until Phase 2 fixes land the same session (per D5)
+- [x] 2.1 Create `tests/Unit/Core/InheritanceContractTest.php` (namespace `OxidEsales\EshopCommunity\Tests\Unit\Core`) with a PHPUnit data-provider method that reads `baseline_underscore_methods.json` and yields one case per inventory entry
+- [x] 2.2 For each provider case, map the concrete baseline class `OxidEsales\EshopCommunity\...` to its unified-namespace FQCN by replacing the `OxidEsales\EshopCommunity\` prefix with `OxidEsales\Eshop\` — reflection MUST use the unified name, concrete names are never used for reflection
+- [x] 2.3 Handle the early-exit branches: class missing (concrete gone or unified unresolvable) → aggregate for D7 `markTestIncomplete` at the end of the run; underscore method no longer present → skip (existing removal tests cover this); underscore method present and no sibling non-underscore method → pass trivially
+- [x] 2.4 When both `_method()` and `method()` exist: build a synthetic subclass via `eval()` with a unique class name, extending the unified-name class, overriding `_method()` to set `$this->__overrideCalled = true` and return a safe default of the declared return type; generate the override signature from `ReflectionMethod` on the parent so the eval body stays type-compatible
+- [x] 2.5 Instantiate the synthetic subclass via `ReflectionClass::newInstanceWithoutConstructor()` to bypass DI/Registry requirements
+- [x] 2.6 Invoke the non-underscore `method()` via `ReflectionMethod::invokeArgs()` with type-defaulted nulls (`[]` for arrays, `0` for ints, `''` for strings, `null` for nullable/mixed); wrap in `try/catch(\Throwable)`
+- [x] 2.7 Assertion & finding classification: if `__overrideCalled === true` → pass; if false and no throwable → `observed: "override_not_called"`; if false and a throwable fired before the override → `observed: "exception_before_dispatch"`
+- [x] 2.8 Accumulate findings across the data-provider run; emit `openspec/changes/fix-underscore-method-inheritance/findings.json` via an `@afterClass` hook or a dedicated runner under `bin/`, with entries sorted deterministically by `class` then `method`, including both `class` (concrete) and `unified_class` fields
+- [x] 2.9 Wire the test into the existing PHPUnit config so it runs in the normal `tests/Unit/` suite (no new suite); accept that CI will be red until Phase 2 fixes land the same session (per D5)
 
 ## 3. Verification gate (USER)
 
