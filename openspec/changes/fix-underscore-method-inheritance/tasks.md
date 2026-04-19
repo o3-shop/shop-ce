@@ -9,7 +9,7 @@
 - [x] 1.7 Walk every `.php` file under `source/` in the snapshot (skip `tests/`, `bin/`, other top-level dirs) and tokenize with PHP's built-in `token_get_all()`; for each class, enumerate declared (not inherited) `protected` and `public` methods whose name begins with `_` but not `__`; emit entries with fields `class` (FQCN under `OxidEsales\EshopCommunity\...`), `method`, `visibility`, `is_static`, `is_abstract`, `baseline_file`
 - [x] 1.8 Sort the entry list deterministically (by `class` then `method`); serialize as pretty-printed JSON with a trailing newline; write atomically to the resolved `--output` path
 - [x] 1.9 Run the script against the pinned baseline to produce `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`; leave the file in the working tree for user review
-- [ ] 1.9b **User step:** approve the generated baseline inventory; on approval, Claude stages and commits the file
+- [x] 1.9b **User step:** approve the generated baseline inventory; on approval, Claude stages and commits the file
 - [x] 1.10 Smoke-test: invoke the script from `/tmp` with `--revision=<pinned-sha>`, verify output matches the committed inventory byte-for-byte; invoke with `--help` and confirm zero side effects; invoke with a bogus `--revision=deadbeef` and confirm non-zero exit with no output file written
 
 ## 2. Phase 1 — Inheritance-contract test
