@@ -26,8 +26,9 @@
 
 ## 3. Verification gate (USER)
 
-- [ ] 3.1 **User step:** review `openspec/changes/fix-underscore-method-inheritance/findings.json` produced by the Phase 1 test run
-- [ ] 3.2 **User step:** approve the findings list for remediation OR annotate out-of-scope entries; communicate any entries to exclude from Phase 2 before Claude proceeds
+- [x] 3.1 **User step:** review `openspec/changes/fix-underscore-method-inheritance/findings.json` produced by the Phase 1 test run
+- [x] 3.2 **User step:** approve the findings list for remediation OR annotate out-of-scope entries; communicate any entries to exclude from Phase 2 before Claude proceeds
+      - User decision 2026-04-19: **all 226 entries are in-scope** for Phase 2, including the 162 `exception_before_dispatch` cases
 
 ## 4. Phase 2 — Remediation
 
