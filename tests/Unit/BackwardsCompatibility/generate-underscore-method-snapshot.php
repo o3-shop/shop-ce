@@ -24,7 +24,7 @@
 declare(strict_types=1);
 
 const DEFAULT_REVISION = 'ebe86dc08875034d5a3d0533b7cbdede7cc6abff';
-const DEFAULT_OUTPUT_RELATIVE = 'tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json';
+const DEFAULT_OUTPUT_RELATIVE = 'tests/Unit/BackwardsCompatibility/underscore-method-snapshot.json';
 
 exit(main($argv));
 
@@ -81,7 +81,7 @@ function usage_text(): string
     $out = DEFAULT_OUTPUT_RELATIVE;
 
     return <<<USAGE
-Usage: generate-underscore-method-inventory.php [OPTIONS]
+Usage: generate-underscore-method-snapshot.php [OPTIONS]
 
 Extract the inventory of protected/public methods whose name begins with an
 underscore, from a pinned git revision, as the authoritative input to the
@@ -102,7 +102,7 @@ Options:
                      other flags.
 
 Example (from outside the repo):
-  php /path/to/shop-ce/bin/generate-underscore-method-inventory.php
+  php /path/to/shop-ce/tests/Unit/BackwardsCompatibility/generate-underscore-method-snapshot.php
 
 The script resolves the repo root from its own location
 (git -C __DIR__ rev-parse --show-toplevel) and does not trust the caller's

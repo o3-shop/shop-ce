@@ -25,7 +25,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
+namespace OxidEsales\EshopCommunity\Tests\Unit\BackwardsCompatibility;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -39,7 +39,7 @@ use Throwable;
 
 class InheritanceContractTest extends TestCase
 {
-    private const INVENTORY_PATH = __DIR__ . '/LegacyMethodInheritanceData/baseline_underscore_methods.json';
+    private const INVENTORY_PATH = __DIR__ . '/underscore-method-snapshot.json';
     private const FINDINGS_PATH = __DIR__ . '/../../../openspec/changes/fix-underscore-method-inheritance/findings.json';
     private const CONCRETE_PREFIX = 'OxidEsales\\EshopCommunity\\';
     private const UNIFIED_PREFIX = 'OxidEsales\\Eshop\\';
@@ -255,8 +255,9 @@ class InheritanceContractTest extends TestCase
         $signature = $this->renderMethodSignature($underscoreMethod);
         $returnStmt = $this->renderReturnStatement($underscoreMethod);
 
+        $namespace = __NAMESPACE__;
         $code = <<<PHP
-namespace OxidEsales\\EshopCommunity\\Tests\\Unit\\Core;
+namespace {$namespace};
 class {$shortName} extends \\{$parentFqcn} {
     public bool \$__inheritanceContractProbeFired = false;
     {$signature} {
