@@ -126,10 +126,53 @@ Both the baseline `class` (concrete `OxidEsales\EshopCommunity\...`) and the `un
 **Decision:** Claude Code applies the remediation interactively in the same work session as Phase 1, after the user approves the findings list. There is no hand-editing by the user and no blanket codemod. For each entry on the verified list Claude performs the same mechanical transform per class:
 1. Move the implementation body from `method()` back to `_method()`. Keep `_method()`'s signature **verbatim** — parameter types, defaults, variadics, return type, and PHPDoc unchanged. This is the BC surface modules rely on and must not shift.
 2. Reduce `method()` to a one-line delegate: `return $this->_method(...$args);` (or `$this->_method(...);` without `return` if `_method()` is `void`). Parameter signature of `method()` is preserved verbatim — no type tightening in this change.
-3. Ensure `_method()` retains its `@deprecated` PHPDoc block pointing to `method()`; add one if the current shim lost it.
-4. Run the inheritance-contract test; confirm the entry now passes.
+3. Add or update a PHPDoc hint on `method()` directing downstream override authors to preserve the class chain. Canonical text:
+
+   ```php
+   /**
+    * @internal If your override does not fully replace the behavior, call
+    *           parent::<methodName>() (not the deprecated _<methodName>())
+    *           so downstream overrides in the class chain are preserved.
+    *           Template-method refactor tracked in o3-shop/o3-shop#108.
+    */
+   ```
+
+   Adjust phrasing to match existing PHPDoc conventions in the file, but the two load-bearing clauses — "call `parent::method()`, not `_method()`" and the issue reference — must be present.
+4. Ensure `_method()`'s PHPDoc contains a clear `@deprecated` tag whose message names `method()` as the replacement and tells authors of new code (including new modules) to use `method()` instead of `_method()`. If the current shim already has such a block, leave it in place, updating only the message if it does not already mention `method()` by name. If the block is missing (e.g. the shim lost it during `e4e180cc`), add one. Canonical text:
+
+   ```php
+   /**
+    * @deprecated Use <methodName>() instead. This underscore-prefixed name
+    *             is retained only for backward compatibility with module
+    *             subclasses that already override it; new code, including
+    *             new modules, MUST NOT call or override _<methodName>().
+    */
+   ```
+
+   As with the `method()` hint, phrasing may be adjusted to match local PHPDoc style, but three load-bearing clauses must be present: (a) the `@deprecated` tag, (b) a direct reference to `method()` as the successor, and (c) the advice that new code should not call or override `_method()`.
+5. Run the inheritance-contract test; confirm the entry now passes.
 
 Commits are grouped per file (all entries for one class in one commit) or per directory (see open question on granularity).
+
+**Mid-chain override discipline (nuance that is NOT fully fixed by this change).** The inversion restores the baseline single-subclass contract: a subclass that overrides `_method()` sees its override fire for any caller entering through either name. It does **not** guarantee correctness for chains of overrides where a middle link uses the modern name terminally. Concrete failure scenario:
+
+- Parent (core) after inversion: `method()` is a delegate to `_method()`; `_method()` holds the real implementation.
+- Module A (middle, modern): overrides `method()` with a terminal body that does not call `parent::method()` or `$this->_method()`.
+- Module B (grandchild, old): overrides `_method()`.
+- Any parent-originated call path reaches `$this->method()`, dispatches to Module A's terminal override, and **never reaches Module B's `_method()` override**. Module B is effectively bypassed for those call paths.
+
+The PHPDoc hint added at step 3 is the mitigation: it tells Module A's author to call `parent::method()` so the parent's delegate can route to `$this->_method()` and Module B's override fires. It is advisory — PHP does not enforce it, and an existing Module A that predates the hint will still break downstream modules. The structural fix (making `method()` `final` and moving all override authority onto `_method()`, or the template-method refactor) is deliberately out of scope here and handed off to [o3-shop/o3-shop#108](https://github.com/o3-shop/o3-shop/issues/108).
+
+Dispatch matrix assuming single subclass, post-inversion:
+
+| Caller uses | Subclass overrides | Outcome |
+|---|---|---|
+| `method()` | `_method()` | delegate → `$this->_method()` → **override fires** |
+| `_method()` | `_method()` | direct dispatch → **override fires** |
+| `method()` | `method()` | direct dispatch → **override fires** |
+| `_method()` | `method()` | parent `_method()` runs directly → **override bypassed** |
+
+Row 4 is the asymmetry that also seeds the multi-level-chain failure above. Row 4 is acceptable because `method()`-only overrides are (a) a small, recent population and (b) were already being bypassed by underscore-name callers in the broken state that motivated this change.
 
 **Native type declarations on `method()` are explicitly out of scope.** Although `method()` is being rewritten and typing it from the existing PHPDoc would be a natural co-benefit, adding native types is an LSP-breaking change for any consumer that already overrides the new `method()` name (introduced by `e4e180cc` in October 2024 — old enough for modules to have adopted it). This change ships in the `b-1.5` minor line, so signature tightening is deferred to the next major release. Tracked in [o3-shop/o3-shop#108](https://github.com/o3-shop/o3-shop/issues/108).
 
