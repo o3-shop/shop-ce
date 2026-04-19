@@ -31,7 +31,7 @@ Stakeholders: core devs maintaining b-1.5 and future releases; module authors wh
 
 ### D1 — Inventory source and format
 
-**Decision:** Extract the baseline inventory via PHP's built-in tokenizer (`token_get_all`) running over a `git archive`-exported snapshot of revision `ebe86dc0`. Store the result as JSON at `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`.
+**Decision:** Extract the baseline inventory via PHP's built-in tokenizer (`token_get_all`) running over a `git archive`-exported snapshot of revision `ebe86dc0`. Restrict enumeration to `.php` files under `source/` — classes under `tests/`, `bin/`, and other top-level directories are not part of the shop's module BC surface and are excluded. Magic methods (names starting with `__`) are also excluded. Store the result as JSON at `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`.
 
 **Schema (one line per method):**
 ```json

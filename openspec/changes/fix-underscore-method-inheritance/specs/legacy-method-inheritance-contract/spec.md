@@ -2,7 +2,7 @@
 
 ### Requirement: Pinned baseline inventory
 
-The system SHALL maintain a committed JSON inventory that enumerates every `protected` or `public` method whose name begins with `_` and that is declared (not inherited) on a class in revision `ebe86dc08875034d5a3d0533b7cbdede7cc6abff`, grouped by fully qualified class name using the concrete `OxidEsales\EshopCommunity\...` namespace.
+The system SHALL maintain a committed JSON inventory that enumerates every `protected` or `public` method whose name begins with `_` (but not `__`, to exclude PHP magic methods) and that is declared (not inherited) on a class in a file under `source/` in revision `ebe86dc08875034d5a3d0533b7cbdede7cc6abff`, grouped by fully qualified class name using the concrete `OxidEsales\EshopCommunity\...` namespace. Files outside `source/` (notably `tests/`, `bin/`, and tooling) are intentionally excluded — they are not part of the shop's module BC surface and their class chains are not resolved through the unified namespace.
 
 Each inventory entry MUST include the following fields:
 - `class`: concrete FQCN under `OxidEsales\EshopCommunity\...`

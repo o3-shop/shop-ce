@@ -1,16 +1,16 @@
 ## 1. Phase 1 — Baseline inventory generator
 
-- [ ] 1.1 Create `bin/generate-underscore-method-inventory.php`: CLI skeleton that accepts `--revision=<sha>`, `--output=<path>`, `--help`, `-h`; default revision `ebe86dc08875034d5a3d0533b7cbdede7cc6abff`; default output is the canonical inventory path resolved against the repo root
-- [ ] 1.2 Implement `--help` / `-h` handler: print synopsis, description, options with defaults, one example invocation from outside the repo, pointer to `design.md` D2; exit 0; no git calls, no output written, no `chdir`; takes precedence over all other flags
-- [ ] 1.3 Resolve repo root via `git -C __DIR__ rev-parse --show-toplevel`; exit non-zero with a clear diagnostic if `__DIR__` is not inside a git work tree
-- [ ] 1.4 Validate `--revision` exists in the resolved work tree via `git -C <repo-root> rev-parse --verify <revision>^{commit}`; exit non-zero with a diagnostic naming the missing revision and the resolved repo root if validation fails; do not write any output in this case
-- [ ] 1.5 Interpret `--output` POSIX-style: absolute path used as-is; relative path resolved against the caller's `$cwd`; default resolved against the repo root (`tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`)
-- [ ] 1.6 Extract a snapshot of the resolved revision with `git archive` into a temp directory; clean the temp directory on exit (success or failure) and do not leave the caller's cwd changed
-- [ ] 1.7 Walk every `.php` file in the snapshot and tokenize with PHP's built-in `token_get_all()`; for each class, enumerate declared (not inherited) `protected` and `public` methods whose name begins with `_`; emit entries with fields `class` (FQCN under `OxidEsales\EshopCommunity\...`), `method`, `visibility`, `is_static`, `is_abstract`, `baseline_file`
-- [ ] 1.8 Sort the entry list deterministically (by `class` then `method`); serialize as pretty-printed JSON with a trailing newline; write atomically to the resolved `--output` path
-- [ ] 1.9 Run the script against the pinned baseline to produce `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`; leave the file in the working tree for user review
+- [x] 1.1 Create `bin/generate-underscore-method-inventory.php`: CLI skeleton that accepts `--revision=<sha>`, `--output=<path>`, `--help`, `-h`; default revision `ebe86dc08875034d5a3d0533b7cbdede7cc6abff`; default output is the canonical inventory path resolved against the repo root
+- [x] 1.2 Implement `--help` / `-h` handler: print synopsis, description, options with defaults, one example invocation from outside the repo, pointer to `design.md` D2; exit 0; no git calls, no output written, no `chdir`; takes precedence over all other flags
+- [x] 1.3 Resolve repo root via `git -C __DIR__ rev-parse --show-toplevel`; exit non-zero with a clear diagnostic if `__DIR__` is not inside a git work tree
+- [x] 1.4 Validate `--revision` exists in the resolved work tree via `git -C <repo-root> rev-parse --verify <revision>^{commit}`; exit non-zero with a diagnostic naming the missing revision and the resolved repo root if validation fails; do not write any output in this case
+- [x] 1.5 Interpret `--output` POSIX-style: absolute path used as-is; relative path resolved against the caller's `$cwd`; default resolved against the repo root (`tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`)
+- [x] 1.6 Extract a snapshot of the resolved revision with `git archive` into a temp directory; clean the temp directory on exit (success or failure) and do not leave the caller's cwd changed
+- [x] 1.7 Walk every `.php` file under `source/` in the snapshot (skip `tests/`, `bin/`, other top-level dirs) and tokenize with PHP's built-in `token_get_all()`; for each class, enumerate declared (not inherited) `protected` and `public` methods whose name begins with `_` but not `__`; emit entries with fields `class` (FQCN under `OxidEsales\EshopCommunity\...`), `method`, `visibility`, `is_static`, `is_abstract`, `baseline_file`
+- [x] 1.8 Sort the entry list deterministically (by `class` then `method`); serialize as pretty-printed JSON with a trailing newline; write atomically to the resolved `--output` path
+- [x] 1.9 Run the script against the pinned baseline to produce `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`; leave the file in the working tree for user review
 - [ ] 1.9b **User step:** approve the generated baseline inventory; on approval, Claude stages and commits the file
-- [ ] 1.10 Smoke-test: invoke the script from `/tmp` with `--revision=<pinned-sha>`, verify output matches the committed inventory byte-for-byte; invoke with `--help` and confirm zero side effects; invoke with a bogus `--revision=deadbeef` and confirm non-zero exit with no output file written
+- [x] 1.10 Smoke-test: invoke the script from `/tmp` with `--revision=<pinned-sha>`, verify output matches the committed inventory byte-for-byte; invoke with `--help` and confirm zero side effects; invoke with a bogus `--revision=deadbeef` and confirm non-zero exit with no output file written
 
 ## 2. Phase 1 — Inheritance-contract test
 
