@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -45,7 +46,7 @@ function main(array $argv): int
     $outputPath = resolve_output_path($args['output'], $cwd, $repoRoot);
 
     $tempDir = make_temp_dir();
-    register_shutdown_function(fn() => cleanup_temp_dir($tempDir));
+    register_shutdown_function(fn () => cleanup_temp_dir($tempDir));
 
     extract_archive($repoRoot, $args['revision'], $tempDir);
 

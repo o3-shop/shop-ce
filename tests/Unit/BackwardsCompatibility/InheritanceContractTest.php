@@ -58,7 +58,7 @@ class InheritanceContractTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        usort(self::$findings, static fn(array $a, array $b): int => [$a['class'], $a['method']] <=> [$b['class'], $b['method']]);
+        usort(self::$findings, static fn (array $a, array $b): int => [$a['class'], $a['method']] <=> [$b['class'], $b['method']]);
 
         $dir = dirname(self::FINDINGS_PATH);
         if (!is_dir($dir)) {
@@ -232,7 +232,7 @@ class InheritanceContractTest extends TestCase
         }
 
         $preview = array_map(
-            static fn(array $f): string => sprintf('  - %s::%s  (%s)', $f['class'], $f['method'], $f['observed']),
+            static fn (array $f): string => sprintf('  - %s::%s  (%s)', $f['class'], $f['method'], $f['observed']),
             array_slice(self::$findings, 0, 15)
         );
         $more = count(self::$findings) - count($preview);
@@ -341,10 +341,10 @@ PHP;
             return '';
         }
         if ($t instanceof ReflectionUnionType) {
-            return implode('|', array_map(fn(ReflectionType $x): string => $this->renderSingleType($x), $t->getTypes()));
+            return implode('|', array_map(fn (ReflectionType $x): string => $this->renderSingleType($x), $t->getTypes()));
         }
         if ($t instanceof ReflectionIntersectionType) {
-            return implode('&', array_map(fn(ReflectionType $x): string => $this->renderSingleType($x), $t->getTypes()));
+            return implode('&', array_map(fn (ReflectionType $x): string => $this->renderSingleType($x), $t->getTypes()));
         }
         return $this->renderSingleType($t);
     }

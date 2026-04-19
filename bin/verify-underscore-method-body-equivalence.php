@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * This file is part of O3-Shop.
  *
@@ -316,7 +317,7 @@ function normalise(string $body): string
 {
     // Strip leading/trailing blank lines; strip trailing whitespace on each line.
     $lines = preg_split('/\R/', $body);
-    $lines = array_map(static fn(string $l): string => rtrim($l), $lines);
+    $lines = array_map(static fn (string $l): string => rtrim($l), $lines);
     // drop leading empties
     while ($lines !== [] && $lines[0] === '') {
         array_shift($lines);
