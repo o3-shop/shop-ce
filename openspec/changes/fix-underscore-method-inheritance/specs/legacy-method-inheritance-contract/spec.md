@@ -12,7 +12,7 @@ Each inventory entry MUST include the following fields:
 - `is_abstract`: boolean
 - `baseline_file`: repo-relative path to the source file in the baseline revision
 
-The inventory file SHALL be stored at `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json` and SHALL be sorted deterministically by `class` then `method` so that diffs remain stable across regenerations.
+The inventory file SHALL be stored at `tests/Unit/BackwardsCompatibility/underscore-method-snapshot.json` and SHALL be sorted deterministically by `class` then `method` so that diffs remain stable across regenerations.
 
 #### Scenario: Inventory is the single source of truth
 
@@ -92,7 +92,7 @@ Findings entries SHALL be sorted deterministically by `class` then `method`.
 
 ### Requirement: Reproducible generator script
 
-The system SHALL provide a generator script at `bin/generate-underscore-method-inventory.php` that produces the baseline inventory JSON for a given git revision. The script MUST:
+The system SHALL provide a generator script at `tests/Unit/BackwardsCompatibility/generate-underscore-method-snapshot.php` that produces the baseline inventory JSON for a given git revision. The script MUST:
 - Resolve the repo root by running `git -C __DIR__ rev-parse --show-toplevel` and MUST NOT rely on the caller's current working directory
 - Accept `--revision=<sha>`; default value: the pinned baseline `ebe86dc08875034d5a3d0533b7cbdede7cc6abff`
 - Accept `--output=<path>`: relative paths are interpreted against the caller's current working directory, absolute paths are used as-is; default: the canonical inventory path resolved against the repo root

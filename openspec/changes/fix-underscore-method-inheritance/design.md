@@ -31,7 +31,7 @@ Stakeholders: core devs maintaining b-1.5 and future releases; module authors wh
 
 ### D1 — Inventory source and format
 
-**Decision:** Extract the baseline inventory via PHP's built-in tokenizer (`token_get_all`) running over a `git archive`-exported snapshot of revision `ebe86dc0`. Restrict enumeration to `.php` files under `source/` — classes under `tests/`, `bin/`, and other top-level directories are not part of the shop's module BC surface and are excluded. Magic methods (names starting with `__`) are also excluded. Store the result as JSON at `tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`.
+**Decision:** Extract the baseline inventory via PHP's built-in tokenizer (`token_get_all`) running over a `git archive`-exported snapshot of revision `ebe86dc0`. Restrict enumeration to `.php` files under `source/` — classes under `tests/`, `bin/`, and other top-level directories are not part of the shop's module BC surface and are excluded. Magic methods (names starting with `__`) are also excluded. Store the result as JSON at `tests/Unit/BackwardsCompatibility/underscore-method-snapshot.json`.
 
 **Schema (one line per method):**
 ```json
@@ -54,23 +54,23 @@ Stakeholders: core devs maintaining b-1.5 and future releases; module authors wh
 
 ### D2 — Inventory generator script
 
-**Decision:** Commit a one-off CLI script `bin/generate-underscore-method-inventory.php` that accepts `--revision=<sha>` and `--output=<path>`. It internally calls `git archive` into a temp dir, walks the tree, tokenizes each `.php` file, filters for protected/public methods whose name starts with `_`, emits the JSON.
+**Decision:** Commit a one-off CLI script `tests/Unit/BackwardsCompatibility/generate-underscore-method-snapshot.php` that accepts `--revision=<sha>` and `--output=<path>`. It internally calls `git archive` into a temp dir, walks the tree, tokenizes each `.php` file, filters for protected/public methods whose name starts with `_`, emits the JSON.
 
 **Invocation independence (MUST):** The script must be invokable from any working directory — from the repo root, from a subdirectory, or from a path outside the repo entirely. Concretely:
 - The script resolves the repo root itself by running `git -C __DIR__ rev-parse --show-toplevel` (not by trusting `$cwd`). All `git archive` and file-walk operations are run against that resolved path.
-- A relative `--output=<path>` is interpreted relative to the caller's `$cwd`, matching POSIX tool convention. An absolute `--output=<path>` is used as-is. If `--output` is omitted, the default is the canonical inventory path inside the repo (`tests/Unit/Core/LegacyMethodInheritanceData/baseline_underscore_methods.json`, resolved against the repo root, not `$cwd`).
+- A relative `--output=<path>` is interpreted relative to the caller's `$cwd`, matching POSIX tool convention. An absolute `--output=<path>` is used as-is. If `--output` is omitted, the default is the canonical inventory path inside the repo (`tests/Unit/BackwardsCompatibility/underscore-method-snapshot.json`, resolved against the repo root, not `$cwd`).
 - `--revision` accepts any `git` revision spec (SHA, tag, branch name). If omitted, the default is the pinned baseline `ebe86dc08875034d5a3d0533b7cbdede7cc6abff`.
 - The script accepts `--help` and `-h`. When either is passed, the script prints a usage summary (synopsis line; description; list of options with their defaults; one short example of invocation from outside the repo; pointer to the design doc) to stdout and exits with status 0. No side effects: no `git` calls, no output file written, no cwd change. `--help` takes precedence over any other flag on the same command line.
 - The script must not `chdir()` into the repo root and leave it there on exit; if it changes directory internally it restores the original `$cwd` before returning so that error/log messages printed after the chdir still reference the caller's expected paths.
 - The script must emit a clear error and exit non-zero (rather than silently misbehaving) in either of these cases:
   - `__DIR__` is not inside a git work tree — the only way this script makes sense.
-  - The resolved `--revision` does not exist in the work tree's git history (verified via `git -C <repo-root> rev-parse --verify <revision>^{commit}`). This catches the common mistake of running the script from the wrong checkout — for example, from a sibling repo that happens to contain a `bin/generate-underscore-method-inventory.php` but whose history does not include the pinned baseline SHA — and prevents silently producing an inventory against an unintended revision.
+  - The resolved `--revision` does not exist in the work tree's git history (verified via `git -C <repo-root> rev-parse --verify <revision>^{commit}`). This catches the common mistake of running the script from the wrong checkout — for example, from a sibling repo that happens to contain a `tests/Unit/BackwardsCompatibility/generate-underscore-method-snapshot.php` but whose history does not include the pinned baseline SHA — and prevents silently producing an inventory against an unintended revision.
 
 **Rationale:** Reproducibility plus ergonomics. Someone regenerating the inventory from `vendor/` after a composer install, from a CI runner with an arbitrary working directory, or from a wrapper script should not have to remember to `cd` first. Naming the script `bin/...` matches the existing `bin/oe-console` convention. Runtime: seconds.
 
 ### D3 — Test mechanics: runtime override-and-observe
 
-**Decision:** A single data-provider-driven PHPUnit test `InheritanceContractTest::testUnderscoreShimPreservesOverride(string $class, string $underscoreMethod)`. The data provider reads `baseline_underscore_methods.json` and yields one case per entry.
+**Decision:** A single data-provider-driven PHPUnit test `InheritanceContractTest::testUnderscoreShimPreservesOverride(string $class, string $underscoreMethod)`. The data provider reads `underscore-method-snapshot.json` and yields one case per entry.
 
 **Per-case procedure:**
 1. Map the baseline `OxidEsales\EshopCommunity\...` class name to its unified-namespace FQCN by replacing the `OxidEsales\EshopCommunity\` prefix with `OxidEsales\Eshop\`. For the running example, `OxidEsales\EshopCommunity\Application\Controller\Admin\AdminListController` → `OxidEsales\Eshop\Application\Controller\Admin\AdminListController`. All subsequent reflection **must** use the unified name, not the concrete `EshopCommunity` name, so the module class chain participates in dispatch. If the unified name is unresolvable (class absent from the virtual namespace map), the case is handled per D7.
