@@ -18,25 +18,20 @@
  * type-defaulted arguments, and asserts the marker fired. Findings are
  * aggregated into openspec/changes/fix-underscore-method-inheritance/findings.json.
  *
- * Run in isolation:
- *   ./docker.sh test --fast tests/Unit/BackwardsCompatibility/InheritanceContractTest.php
- *   ./docker.sh quarantine
- *
- * Why `@group quarantine` at the class level: the probe invokes arbitrary
- * protected method bodies via reflection with type-defaulted arguments. Some
- * shop code paths reach `Utils::redirect()` (and similar) which internally
- * calls `exit()` — that terminates the PHP process with exit 0, silently
- * aborting any PHPUnit run that includes other tests. Isolating this test
- * with `@group quarantine` keeps the default `./docker.sh test` / `test-all`
- * suite safe; the inheritance contract runs via its own invocation path.
- * A future improvement (tracked in o3-shop/o3-shop#108 sibling work) can
- * move the probe into a subprocess so the test joins the default suite.
+ * The probe invokes arbitrary protected method bodies via reflection with
+ * type-defaulted arguments. Some shop code paths reach Utils::redirect()
+ * (and similar) which internally calls exit() — that would terminate the
+ * PHP process with exit 0, silently aborting any PHPUnit run that includes
+ * other tests. To keep the test safe inside the default suite, setUpBeforeClass
+ * installs a Utils stub in the Registry whose redirect() and showMessageAndExit()
+ * throw a RuntimeException instead of terminating PHP. Since every showMessageAndExit
+ * and the sole redirect() live on Core\Utils (and the remaining `exit()` sites
+ * under source/ are in code paths that call through Utils::redirect() first),
+ * the stub eliminates the termination risk for every realistic probe.
  *
  * Design: openspec/changes/fix-underscore-method-inheritance/design.md (D3/D4/D7/D8)
  * Spec:   openspec/changes/fix-underscore-method-inheritance/specs/
  *         legacy-method-inheritance-contract/spec.md
- *
- * @group quarantine
  */
 
 declare(strict_types=1);
@@ -53,9 +48,6 @@ use ReflectionType;
 use ReflectionUnionType;
 use Throwable;
 
-/**
- * @group quarantine
- */
 class InheritanceContractTest extends TestCase
 {
     private const INVENTORY_PATH = __DIR__ . '/underscore-method-snapshot.json';
