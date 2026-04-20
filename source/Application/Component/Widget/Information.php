@@ -70,24 +70,32 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
      * Returns content list object.
      *
      * @return object|ContentList
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getContentList" in next major
+     * @deprecated Use getContentList() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getContentList().
      */
     protected function _getContentList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getContentList();
-    }
-
-    /**
-     * Returns content list object.
-     *
-     * @return object|ContentList
-     */
-    protected function getContentList()
     {
         if (!$this->_oContentList) {
             $this->_oContentList = oxNew(ContentList::class);
         }
 
         return $this->_oContentList;
+    }
+
+    /**
+     * Returns content list object.
+     *
+     * @return object|ContentList
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getContentList() (not the deprecated _getContentList()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getContentList()
+    {
+        return $this->_getContentList();
     }
 }
