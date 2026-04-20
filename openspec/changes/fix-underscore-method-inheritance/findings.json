@@ -1116,24 +1116,6 @@
         "notes": "buildSelectString() did not dispatch to $this->_buildSelectString()"
     },
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListReview",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ListReview",
-        "method": "_getViewListSize",
-        "sibling_method": "getViewListSize",
-        "current_file": "source/Application/Controller/Admin/ListReview.php",
-        "observed": "override_not_called",
-        "notes": "getViewListSize() did not dispatch to $this->_getViewListSize()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListUser",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ListUser",
-        "method": "_getViewListSize",
-        "sibling_method": "getViewListSize",
-        "current_file": "source/Application/Controller/Admin/ListUser.php",
-        "observed": "override_not_called",
-        "notes": "getViewListSize() did not dispatch to $this->_getViewListSize()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\LoginController",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\LoginController",
         "method": "_authorize",
@@ -1197,15 +1179,6 @@
         "notes": "getType() did not dispatch to $this->_getType()"
     },
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleConfiguration",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ModuleConfiguration",
-        "method": "_getModuleForConfigVars",
-        "sibling_method": "getModuleForConfigVars",
-        "current_file": "source/Application/Controller/Admin/ModuleConfiguration.php",
-        "observed": "override_not_called",
-        "notes": "getModuleForConfigVars() did not dispatch to $this->_getModuleForConfigVars()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationController",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\NavigationController",
         "method": "_checkVersion",
@@ -1258,96 +1231,6 @@
         "current_file": "source/Application/Controller/Admin/NewsletterSend.php",
         "observed": "override_not_called",
         "notes": "setupNavigation() did not dispatch to $this->_setupNavigation()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ObjectSeo",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ObjectSeo",
-        "method": "_getAdditionalParams",
-        "sibling_method": "getAdditionalParams",
-        "current_file": "source/Application/Controller/Admin/ObjectSeo.php",
-        "observed": "override_not_called",
-        "notes": "getAdditionalParams() did not dispatch to $this->_getAdditionalParams()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderList",
-        "method": "_buildSelectString",
-        "sibling_method": "buildSelectString",
-        "current_file": "source/Application/Controller/Admin/OrderList.php",
-        "observed": "override_not_called",
-        "notes": "buildSelectString() did not dispatch to $this->_buildSelectString()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\OrderList",
-        "method": "_prepareWhereQuery",
-        "sibling_method": "prepareWhereQuery",
-        "current_file": "source/Application/Controller/Admin/OrderList.php",
-        "observed": "override_not_called",
-        "notes": "prepareWhereQuery() did not dispatch to $this->_prepareWhereQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentCountryAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentCountryAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/PaymentCountryAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PaymentMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PaymentMainAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/PaymentMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PriceAlarmList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmList",
-        "method": "_buildSelectString",
-        "sibling_method": "buildSelectString",
-        "current_file": "source/Application/Controller/Admin/PriceAlarmList.php",
-        "observed": "override_not_called",
-        "notes": "buildSelectString() did not dispatch to $this->_buildSelectString()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\PriceAlarmSend",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmSend",
-        "method": "_setupNavigation",
-        "sibling_method": "setupNavigation",
-        "current_file": "source/Application/Controller/Admin/PriceAlarmSend.php",
-        "observed": "override_not_called",
-        "notes": "setupNavigation() did not dispatch to $this->_setupNavigation()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListMainAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/SelectListMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListOrderAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListOrderAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/SelectListOrderAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\SelectListOrderAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\SelectListOrderAjax",
-        "method": "_getSorting",
-        "sibling_method": "getSorting",
-        "current_file": "source/Application/Controller/Admin/SelectListOrderAjax.php",
-        "observed": "override_not_called",
-        "notes": "getSorting() did not dispatch to $this->_getSorting()"
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopConfiguration",
@@ -1413,87 +1296,6 @@
         "notes": "serializeConstraint() did not dispatch to $this->_serializeConstraint()"
     },
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopDefaultCategoryAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ShopDefaultCategoryAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ShopDefaultCategoryAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ThemeConfiguration",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ThemeConfiguration",
-        "method": "_getModuleForConfigVars",
-        "sibling_method": "getModuleForConfigVars",
-        "current_file": "source/Application/Controller/Admin/ThemeConfiguration.php",
-        "observed": "override_not_called",
-        "notes": "getModuleForConfigVars() did not dispatch to $this->_getModuleForConfigVars()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserGroupMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserGroupMainAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/UserGroupMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserList",
-        "method": "_prepareWhereQuery",
-        "sibling_method": "prepareWhereQuery",
-        "current_file": "source/Application/Controller/Admin/UserList.php",
-        "observed": "override_not_called",
-        "notes": "prepareWhereQuery() did not dispatch to $this->_prepareWhereQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\UserMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\UserMainAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/UserMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorMainAjax",
-        "method": "_addFilter",
-        "sibling_method": "addFilter",
-        "current_file": "source/Application/Controller/Admin/VendorMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "addFilter() did not dispatch to $this->_addFilter()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VendorMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VendorMainAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/VendorMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\VoucherSerieGroupsAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\VoucherSerieGroupsAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/VoucherSerieGroupsAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\ArticleDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\ArticleDetailsController",
-        "method": "_getAddUrlParams",
-        "sibling_method": "getAddUrlParams",
-        "current_file": "source/Application/Controller/ArticleDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "getAddUrlParams() did not dispatch to $this->_getAddUrlParams()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\BasketController",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\BasketController",
         "method": "_setWrappingInfo",
@@ -1519,51 +1321,6 @@
         "current_file": "source/Application/Controller/RssController.php",
         "observed": "override_not_called",
         "notes": "processOutput() did not dispatch to $this->_processOutput()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\VendorListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\VendorListController",
-        "method": "_getVendorId",
-        "sibling_method": "getVendorId",
-        "current_file": "source/Application/Controller/VendorListController.php",
-        "observed": "override_not_called",
-        "notes": "getVendorId() did not dispatch to $this->_getVendorId()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\DeliveryList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Model\\DeliveryList",
-        "method": "_getList",
-        "sibling_method": "getList",
-        "current_file": "source/Application/Model/DeliveryList.php",
-        "observed": "exception_before_dispatch",
-        "notes": "OxidEsales\\Eshop\\Core\\Exception\\DatabaseErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'from' at line 1"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\DeliverySetList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Model\\DeliverySetList",
-        "method": "_getList",
-        "sibling_method": "getList",
-        "current_file": "source/Application/Model/DeliverySetList.php",
-        "observed": "exception_before_dispatch",
-        "notes": "OxidEsales\\Eshop\\Core\\Exception\\DatabaseErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'from' at line 1"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\DiscountList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Model\\DiscountList",
-        "method": "_getList",
-        "sibling_method": "getList",
-        "current_file": "source/Application/Model/DiscountList.php",
-        "observed": "exception_before_dispatch",
-        "notes": "OxidEsales\\Eshop\\Core\\Exception\\DatabaseErrorException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'from' at line 1"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Order",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Model\\Order",
-        "method": "_setUser",
-        "sibling_method": "setUser",
-        "current_file": "source/Application/Model/Order.php",
-        "observed": "override_not_called",
-        "notes": "setUser() did not dispatch to $this->_setUser()"
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderArticle",

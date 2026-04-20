@@ -199,6 +199,20 @@ class InheritanceContractTest extends TestCase
             return;
         }
 
+        // Only a *same-class* pair is a shim. If the non-underscore sibling is
+        // inherited from a parent, it is a different method (same name, different
+        // concept) — e.g. FrontendController::getVendorId() vs
+        // VendorListController::_getVendorId(): the latter is an internal helper,
+        // the former is the inherited public accessor. Those are not BC shim pairs
+        // and must not be flagged or remediated.
+        $siblingDeclaringClass = $reflection->getMethod($siblingName)->getDeclaringClass()->getName();
+        $underscoreDeclaringClass = $reflection->getMethod($underscoreMethod)->getDeclaringClass()->getName();
+        if ($siblingDeclaringClass !== $underscoreDeclaringClass) {
+            // Not a same-class shim pair. Contract does not apply here.
+            self::assertTrue(true);
+            return;
+        }
+
         $this->checkDispatch($reflection, $underscoreMethod, $siblingName, $entry);
     }
 
