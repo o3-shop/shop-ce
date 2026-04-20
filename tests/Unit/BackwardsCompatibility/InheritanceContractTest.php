@@ -18,9 +18,25 @@
  * type-defaulted arguments, and asserts the marker fired. Findings are
  * aggregated into openspec/changes/fix-underscore-method-inheritance/findings.json.
  *
+ * Run in isolation:
+ *   ./docker.sh test --fast tests/Unit/BackwardsCompatibility/InheritanceContractTest.php
+ *   ./docker.sh quarantine
+ *
+ * Why `@group quarantine` at the class level: the probe invokes arbitrary
+ * protected method bodies via reflection with type-defaulted arguments. Some
+ * shop code paths reach `Utils::redirect()` (and similar) which internally
+ * calls `exit()` — that terminates the PHP process with exit 0, silently
+ * aborting any PHPUnit run that includes other tests. Isolating this test
+ * with `@group quarantine` keeps the default `./docker.sh test` / `test-all`
+ * suite safe; the inheritance contract runs via its own invocation path.
+ * A future improvement (tracked in o3-shop/o3-shop#108 sibling work) can
+ * move the probe into a subprocess so the test joins the default suite.
+ *
  * Design: openspec/changes/fix-underscore-method-inheritance/design.md (D3/D4/D7/D8)
  * Spec:   openspec/changes/fix-underscore-method-inheritance/specs/
  *         legacy-method-inheritance-contract/spec.md
+ *
+ * @group quarantine
  */
 
 declare(strict_types=1);
@@ -37,6 +53,9 @@ use ReflectionType;
 use ReflectionUnionType;
 use Throwable;
 
+/**
+ * @group quarantine
+ */
 class InheritanceContractTest extends TestCase
 {
     private const INVENTORY_PATH = __DIR__ . '/underscore-method-snapshot.json';
@@ -50,14 +69,56 @@ class InheritanceContractTest extends TestCase
     /** @var array<int, string> */
     private static array $incomplete = [];
 
+    /** @var object|null */
+    private static $originalUtils = null;
+
     public static function setUpBeforeClass(): void
     {
         self::$findings = [];
         self::$incomplete = [];
+        self::installExitSafeUtilsStub();
+    }
+
+    /**
+     * Replace the Registry-bound Utils with a subclass whose exit-calling
+     * methods throw instead of terminating PHP. Prior tests in the same
+     * PHPUnit run may have populated Registry with a live Utils — when a
+     * probe body reaches Registry::getUtils()->redirect(...), the real
+     * redirect() calls showMessageAndExit() which calls exit(). That kills
+     * the whole PHPUnit process (exit 0, wrapper misreports success).
+     * This stub converts both into catchable RuntimeExceptions so the
+     * probe records the finding as exception_before_dispatch instead of
+     * aborting the run.
+     */
+    private static function installExitSafeUtilsStub(): void
+    {
+        self::$originalUtils = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\Utils::class);
+
+        $stub = new class () extends \OxidEsales\Eshop\Core\Utils {
+            public function redirect($sUrl, $blAddRedirectParam = true, $iHeaderCode = 302): void
+            {
+                throw new \RuntimeException('InheritanceContractProbe: Utils::redirect intercepted to prevent exit()');
+            }
+
+            public function showMessageAndExit($sMsg): void
+            {
+                throw new \RuntimeException('InheritanceContractProbe: Utils::showMessageAndExit intercepted to prevent exit()');
+            }
+        };
+
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $stub);
+    }
+
+    private static function uninstallExitSafeUtilsStub(): void
+    {
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, self::$originalUtils);
+        self::$originalUtils = null;
     }
 
     public static function tearDownAfterClass(): void
     {
+        self::uninstallExitSafeUtilsStub();
+
         usort(self::$findings, static fn (array $a, array $b): int => [$a['class'], $a['method']] <=> [$b['class'], $b['method']]);
 
         $dir = dirname(self::FINDINGS_PATH);
