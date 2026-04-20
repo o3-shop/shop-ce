@@ -69,25 +69,32 @@ class RssController extends FrontendController
      * get RssFeed
      *
      * @return RssFeed
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getRssFeed" in next major
+     * @deprecated Use getRssFeed() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getRssFeed().
      */
     protected function _getRssFeed() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getRssFeed();
-    }
-
-    /**
-     * get RssFeed
-     *
-     * @return RssFeed
-     */
-    protected function getRssFeed()
     {
         if (!$this->_oRss) {
             $this->_oRss = oxNew(RssFeed::class);
         }
 
         return $this->_oRss;
+    }
+
+    /**
+     * get RssFeed
+     *
+     * @return RssFeed
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getRssFeed()
+     *           (not the deprecated _getRssFeed()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getRssFeed()
+    {
+        return $this->_getRssFeed();
     }
 
     /**
@@ -137,11 +144,14 @@ class RssController extends FrontendController
      * @param string $sInput input to process
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processOutput" in next major
+     * @deprecated Use processOutput() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processOutput().
      */
     protected function _processOutput($sInput) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->processOutput($sInput);
+        return Str::getStr()->recodeEntities($sInput);
     }
 
     /**
@@ -150,10 +160,15 @@ class RssController extends FrontendController
      * @param string $sInput input to process
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processOutput() (not the deprecated _processOutput()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     protected function processOutput($sInput)
     {
-        return Str::getStr()->recodeEntities($sInput);
+        return $this->_processOutput($sInput);
     }
 
     /**

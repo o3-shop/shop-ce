@@ -1,23 +1,5 @@
 [
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\AccountController",
-        "method": "_getLoginTemplate",
-        "sibling_method": "getLoginTemplate",
-        "current_file": "source/Application/Controller/AccountController.php",
-        "observed": "override_not_called",
-        "notes": "getLoginTemplate() did not dispatch to $this->_getLoginTemplate()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\AccountDownloadsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\AccountDownloadsController",
-        "method": "_prepareForTemplate",
-        "sibling_method": "prepareForTemplate",
-        "current_file": "source/Application/Controller/AccountDownloadsController.php",
-        "observed": "override_not_called",
-        "notes": "prepareForTemplate() did not dispatch to $this->_prepareForTemplate()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsArticleAjax",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsArticleAjax",
         "method": "_getQuery",
@@ -1294,33 +1276,6 @@
         "current_file": "source/Application/Controller/Admin/ShopConfiguration.php",
         "observed": "override_not_called",
         "notes": "serializeConstraint() did not dispatch to $this->_serializeConstraint()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\BasketController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\BasketController",
-        "method": "_setWrappingInfo",
-        "sibling_method": "setWrappingInfo",
-        "current_file": "source/Application/Controller/BasketController.php",
-        "observed": "override_not_called",
-        "notes": "setWrappingInfo() did not dispatch to $this->_setWrappingInfo()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\RssController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\RssController",
-        "method": "_getRssFeed",
-        "sibling_method": "getRssFeed",
-        "current_file": "source/Application/Controller/RssController.php",
-        "observed": "override_not_called",
-        "notes": "getRssFeed() did not dispatch to $this->_getRssFeed()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\RssController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\RssController",
-        "method": "_processOutput",
-        "sibling_method": "processOutput",
-        "current_file": "source/Application/Controller/RssController.php",
-        "observed": "override_not_called",
-        "notes": "processOutput() did not dispatch to $this->_processOutput()"
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Model\\SeoEncoderArticle",
