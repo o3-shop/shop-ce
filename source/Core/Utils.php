@@ -1117,7 +1117,9 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     public function showMessageAndExit($sMsg)
     {
         $this->prepareToExit();
-        exit($sMsg);
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(0, (string) $sMsg);
     }
 
     /**
