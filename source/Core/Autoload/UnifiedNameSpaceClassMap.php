@@ -2711,6 +2711,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Core\Exception\ExitCalledException'                        => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\ExitCalledException::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Core\Exception\FileException'                              => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\FileException::class,
         'isAbstract'       => false,
