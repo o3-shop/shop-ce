@@ -2651,6 +2651,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Core\Exception\AccessDeniedException'                      => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\AccessDeniedException::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Core\Exception\ArticleException'                           => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\ArticleException::class,
         'isAbstract'       => false,
