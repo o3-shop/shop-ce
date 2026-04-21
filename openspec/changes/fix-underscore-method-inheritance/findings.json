@@ -1,59 +1,5 @@
 [
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsArticleAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsArticleAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ActionsArticleAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsGroupsAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsGroupsAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ActionsGroupsAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsList",
-        "method": "_prepareWhereQuery",
-        "sibling_method": "prepareWhereQuery",
-        "current_file": "source/Application/Controller/Admin/ActionsList.php",
-        "observed": "override_not_called",
-        "notes": "prepareWhereQuery() did not dispatch to $this->_prepareWhereQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsMainAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ActionsMainAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsOrderAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsOrderAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ActionsOrderAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsOrderAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ActionsOrderAjax",
-        "method": "_getSorting",
-        "sibling_method": "getSorting",
-        "current_file": "source/Application/Controller/Admin/ActionsOrderAjax.php",
-        "observed": "override_not_called",
-        "notes": "getSorting() did not dispatch to $this->_getSorting()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminController",
         "method": "_getEditShop",

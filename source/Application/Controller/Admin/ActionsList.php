@@ -79,23 +79,12 @@ class ActionsList extends AdminListController
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
+     * @deprecated Use prepareWhereQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareWhereQuery().
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->prepareWhereQuery($whereQuery, $fullQuery);
-    }
-
-    /**
-     * Adds active promotion check
-     *
-     * @param array $whereQuery SQL condition array
-     * @param string $fullQuery SQL query string
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function prepareWhereQuery($whereQuery, $fullQuery)
     {
         $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
@@ -119,5 +108,24 @@ class ActionsList extends AdminListController
         }
 
         return $sQ;
+    }
+
+    /**
+     * Adds active promotion check
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareWhereQuery() (not the deprecated _prepareWhereQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        return $this->_prepareWhereQuery($whereQuery, $fullQuery);
     }
 }
