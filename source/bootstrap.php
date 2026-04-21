@@ -235,6 +235,16 @@ $configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.p
 \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\ConfigFile::class, $configFile);
 
 /**
+ * Register the default exit handler. Tests swap this for a throwing fake via
+ * Registry::set() (see tests/Unit/ExitHandlerTestTrait.php) so exit() calls
+ * in the code under test do not tear down the PHPUnit process.
+ */
+\OxidEsales\Eshop\Core\Registry::set(
+    \OxidEsales\Eshop\Core\ExitHandlerInterface::class,
+    new \OxidEsales\Eshop\Core\ExitHandler()
+);
+
+/**
  * Ensure tmp directory exists for shop functionality.
  * This directory is required for caching, Smarty compilation, and other temporary files.
  */
