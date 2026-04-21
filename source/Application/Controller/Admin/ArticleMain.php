@@ -260,21 +260,12 @@ class ArticleMain extends AdminDetailsController
      * @param string $sValue value to fix
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processLongDesc" in next major
+     * @deprecated Use processLongDesc() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processLongDesc().
      */
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->processLongDesc($sValue);
-    }
-
-    /**
-     * Fixes html broken by html editor
-     *
-     * @param string $sValue value to fix
-     *
-     * @return string
-     */
-    protected function processLongDesc($sValue)
     {
         // TODO: the code below is redundant, optimize it, assignments should go smooth without conversions
         // hack, if editor screws up text (htmledit tends to do so)
@@ -289,16 +280,19 @@ class ArticleMain extends AdminDetailsController
     }
 
     /**
-     * Resets article categories counters
+     * Fixes html broken by html editor
      *
-     * @param string $sArticleId Article id
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetCategoriesCounter" in next major
+     * @param string $sValue value to fix
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::processLongDesc()
+     *           (not the deprecated _processLongDesc()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _resetCategoriesCounter($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function processLongDesc($sValue)
     {
-        $this->resetCategoriesCounter($sArticleId);
+        return $this->_processLongDesc($sValue);
     }
 
     /**
@@ -307,8 +301,12 @@ class ArticleMain extends AdminDetailsController
      * @param string $sArticleId Article id
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Use resetCategoriesCounter() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _resetCategoriesCounter().
      */
-    protected function resetCategoriesCounter($sArticleId)
+    protected function _resetCategoriesCounter($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oDb = DatabaseProvider::getDb();
         $sQ = 'select oxcatnid from oxobject2category where oxobjectid = :oxobjectid';
@@ -321,6 +319,23 @@ class ArticleMain extends AdminDetailsController
                 $oRs->fetchRow();
             }
         }
+    }
+
+    /**
+     * Resets article categories counters
+     *
+     * @param string $sArticleId Article id
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::resetCategoriesCounter() (not the deprecated _resetCategoriesCounter())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function resetCategoriesCounter($sArticleId)
+    {
+        $this->_resetCategoriesCounter($sArticleId);
     }
 
     /**
@@ -455,22 +470,12 @@ class ArticleMain extends AdminDetailsController
      * @param string $newArticleId ID from new article
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "copyCategories" in next major
+     * @deprecated Use copyCategories() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _copyCategories().
      */
     protected function _copyCategories($sOldId, $newArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->copyCategories($sOldId, $newArticleId);
-    }
-
-    /**
-     * Copying category assignments
-     *
-     * @param string $sOldId ID from old article
-     * @param string $newArticleId ID from new article
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    protected function copyCategories($sOldId, $newArticleId)
     {
         $myUtilsObject = Registry::getUtilsObject();
         $oDb = DatabaseProvider::getDb();
@@ -490,6 +495,23 @@ class ArticleMain extends AdminDetailsController
                 $oRs->fetchRow();
             }
         }
+    }
+
+    /**
+     * Copying category assignments
+     *
+     * @param string $sOldId ID from old article
+     * @param string $newArticleId ID from new article
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::copyCategories()
+     *           (not the deprecated _copyCategories()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function copyCategories($sOldId, $newArticleId)
+    {
+        $this->_copyCategories($sOldId, $newArticleId);
     }
 
     /**

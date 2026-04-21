@@ -226,21 +226,12 @@ class ArticleFiles extends AdminDetailsController
      * @param array $aParams params
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processOptions" in next major
+     * @deprecated Use processOptions() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processOptions().
      */
     protected function _processOptions($aParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->processOptions($aParams);
-    }
-
-    /**
-     * Process config options. If value is not set, save as "-1" to database
-     *
-     * @param array $aParams params
-     *
-     * @return array
-     */
-    protected function processOptions($aParams)
     {
         if (!is_array($aParams)) {
             $aParams = [];
@@ -260,5 +251,21 @@ class ArticleFiles extends AdminDetailsController
         }
 
         return $aParams;
+    }
+
+    /**
+     * Process config options. If value is not set, save as "-1" to database
+     *
+     * @param array $aParams params
+     *
+     * @return array
+     *
+     * @internal If your override does not fully replace the behavior, call parent::processOptions()
+     *           (not the deprecated _processOptions()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function processOptions($aParams)
+    {
+        return $this->_processOptions($aParams);
     }
 }

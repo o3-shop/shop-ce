@@ -171,23 +171,12 @@ class ArticleSeo extends ObjectSeo
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
+     * @deprecated Use getCategoryList() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getCategoryList().
      */
     protected function _getCategoryList($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getCategoryList($oArticle);
-    }
-
-    /**
-     * Returns array of product categories
-     *
-     * @param Article $oArticle Article object
-     *
-     * @return array
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    protected function getCategoryList($oArticle)
     {
         $sMainCatId = false;
         if ($oMainCat = $oArticle->getCategory()) {
@@ -224,6 +213,25 @@ class ArticleSeo extends ObjectSeo
         }
 
         return $aCatList;
+    }
+
+    /**
+     * Returns array of product categories
+     *
+     * @param Article $oArticle Article object
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getCategoryList() (not the deprecated _getCategoryList()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getCategoryList($oArticle)
+    {
+        return $this->_getCategoryList($oArticle);
     }
 
     /**

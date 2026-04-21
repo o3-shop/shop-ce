@@ -99,22 +99,12 @@ class ArticleReview extends AdminDetailsController
      *
      * @return ListModel
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getReviewList" in next major
+     * @deprecated Use getReviewList() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getReviewList().
      */
     protected function _getReviewList($article) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getReviewList($article);
-    }
-
-    /**
-     * returns reviews list for article
-     *
-     * @param Article $article Article object
-     *
-     * @return ListModel
-     * @throws DatabaseConnectionException
-     */
-    protected function getReviewList($article)
     {
         $database = DatabaseProvider::getDb();
         $query = 'select oxreviews.* from oxreviews
@@ -140,6 +130,23 @@ class ArticleReview extends AdminDetailsController
         $reviewList->selectString($query);
 
         return $reviewList;
+    }
+
+    /**
+     * returns reviews list for article
+     *
+     * @param Article $article Article object
+     *
+     * @return ListModel
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getReviewList()
+     *           (not the deprecated _getReviewList()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getReviewList($article)
+    {
+        return $this->_getReviewList($article);
     }
 
     /**
