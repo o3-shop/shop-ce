@@ -192,7 +192,8 @@ class AdminController extends BaseController
         // authorization check
         if (!$this->authorize()) {
             Registry::getUtils()->redirect('index.php?cl=login', true, 302);
-            exit('Authorization error occurred!');
+            Registry::get(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)
+                ->exit(0, 'Authorization error occurred!');
         }
 
         $oLang = Registry::getLang();
