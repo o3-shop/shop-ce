@@ -2801,6 +2801,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Core\ExitHandler'                                          => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\ExitHandler::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Core\ExitHandlerInterface'                                 => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\ExitHandlerInterface::class,
         'isAbstract'       => false,
