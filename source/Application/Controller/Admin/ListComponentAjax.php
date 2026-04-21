@@ -765,7 +765,8 @@ class ListComponentAjax extends Base
      */
     protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getDataFields($sQ);
+        // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
+        return DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
     }
 
     /**
@@ -776,11 +777,14 @@ class ListComponentAjax extends Base
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getDataFields()
+     *           (not the deprecated _getDataFields()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getDataFields($sQ)
     {
-        // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
-        return DatabaseProvider::getMaster(DatabaseProvider::FETCH_MODE_ASSOC)->getAll($sQ, false);
+        return $this->_getDataFields($sQ);
     }
 
     /**

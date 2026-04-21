@@ -1,59 +1,5 @@
 [
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAccessoriesAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleAccessoriesAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ArticleAccessoriesAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleAttributeAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleBundleAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleBundleAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ArticleBundleAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ArticleCrosssellingAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleExtendAjax",
-        "method": "_getDataFields",
-        "sibling_method": "getDataFields",
-        "current_file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
-        "observed": "exception_before_dispatch",
-        "notes": "TypeError: Doctrine\\DBAL\\Connection::handleExceptionDuringQuery(): Argument #2 ($sql) must be of type string, null given, called in /var/www/html/vendor/doctrine/dbal/lib/Doctrine/DBAL/Connection.php on line 1263"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleExtendAjax",
-        "method": "_getQuery",
-        "sibling_method": "getQuery",
-        "current_file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
-        "observed": "override_not_called",
-        "notes": "getQuery() did not dispatch to $this->_getQuery()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleFiles",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleFiles",
         "method": "_processOptions",
