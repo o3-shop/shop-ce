@@ -153,21 +153,12 @@ class AdminController extends BaseController
      * @param string $sShopId shop id
      *
      * @return Shop
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEditShop" in next major
+     * @deprecated Use getEditShop() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getEditShop().
      */
     protected function _getEditShop($sShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getEditShop($sShopId);
-    }
-
-    /**
-     * Returns (cached) shop object
-     *
-     * @param string $sShopId shop id
-     *
-     * @return Shop
-     */
-    protected function getEditShop($sShopId)
     {
         if (!$this->_oEditShop) {
             $this->_oEditShop = Registry::getConfig()->getActiveShop();
@@ -180,6 +171,22 @@ class AdminController extends BaseController
         }
 
         return $this->_oEditShop;
+    }
+
+    /**
+     * Returns (cached) shop object
+     *
+     * @param string $sShopId shop id
+     *
+     * @return Shop
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getEditShop()
+     *           (not the deprecated _getEditShop()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getEditShop($sShopId)
+    {
+        return $this->_getEditShop($sShopId);
     }
 
     /**
@@ -250,21 +257,29 @@ class AdminController extends BaseController
      * Returns service url protocol: "https" is admin works in ssl mode, "http" if no ssl
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getServiceProtocol" in next major
+     * @deprecated Use getServiceProtocol() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getServiceProtocol().
      */
     protected function _getServiceProtocol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getServiceProtocol();
+        return Registry::getConfig()->isSsl() ? 'https' : 'http';
     }
 
     /**
      * Returns service url protocol: "https" is admin works in ssl mode, "http" if no ssl
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getServiceProtocol() (not the deprecated _getServiceProtocol()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getServiceProtocol()
     {
-        return Registry::getConfig()->isSsl() ? 'https' : 'http';
+        return $this->_getServiceProtocol();
     }
 
     /**

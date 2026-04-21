@@ -86,7 +86,11 @@ class ActionsList extends AdminListController
      */
     protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::prepareWhereQuery($whereQuery, $fullQuery);
+        // NOTE: call parent::_prepareWhereQuery() (not parent::prepareWhereQuery()) to avoid
+        // infinite recursion through the parent's delegate: parent::prepareWhereQuery() now
+        // routes back to $this->_prepareWhereQuery() (virtual dispatch to this subclass). This
+        // restores the baseline (ebe86dc0) call shape. See o3-shop/o3-shop#107 remediation.
+        $sQ = parent::_prepareWhereQuery($whereQuery, $fullQuery);
         $sDisplayType = (int) Registry::getRequest()->getRequestEscapedParameter('displaytype');
         $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxactions');
 

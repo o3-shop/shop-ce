@@ -1,176 +1,5 @@
 [
     {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminController",
-        "method": "_getEditShop",
-        "sibling_method": "getEditShop",
-        "current_file": "source/Application/Controller/Admin/AdminController.php",
-        "observed": "override_not_called",
-        "notes": "getEditShop() did not dispatch to $this->_getEditShop()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminController",
-        "method": "_getServiceProtocol",
-        "sibling_method": "getServiceProtocol",
-        "current_file": "source/Application/Controller/Admin/AdminController.php",
-        "observed": "override_not_called",
-        "notes": "getServiceProtocol() did not dispatch to $this->_getServiceProtocol()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_createCategoryTree",
-        "sibling_method": "createCategoryTree",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "createCategoryTree() did not dispatch to $this->_createCategoryTree()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_generateTextEditor",
-        "sibling_method": "generateTextEditor",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "generateTextEditor() did not dispatch to $this->_generateTextEditor()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_getCategoryTree",
-        "sibling_method": "getCategoryTree",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "getCategoryTree() did not dispatch to $this->_getCategoryTree()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_getEditValue",
-        "sibling_method": "getEditValue",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "getEditValue() did not dispatch to $this->_getEditValue()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_processEditValue",
-        "sibling_method": "processEditValue",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "processEditValue() did not dispatch to $this->_processEditValue()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_resetCounts",
-        "sibling_method": "resetCounts",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "resetCounts() did not dispatch to $this->_resetCounts()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminDetailsController",
-        "method": "_setupNavigation",
-        "sibling_method": "setupNavigation",
-        "current_file": "source/Application/Controller/Admin/AdminDetailsController.php",
-        "observed": "override_not_called",
-        "notes": "setupNavigation() did not dispatch to $this->_setupNavigation()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_buildFilter",
-        "sibling_method": "buildFilter",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "buildFilter() did not dispatch to $this->_buildFilter()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_buildSelectString",
-        "sibling_method": "buildSelectString",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "buildSelectString() did not dispatch to $this->_buildSelectString()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_calcListItemsCount",
-        "sibling_method": "calcListItemsCount",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "calcListItemsCount() did not dispatch to $this->_calcListItemsCount()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_getUserDefListSize",
-        "sibling_method": "getUserDefListSize",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "getUserDefListSize() did not dispatch to $this->_getUserDefListSize()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_getViewListSize",
-        "sibling_method": "getViewListSize",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "getViewListSize() did not dispatch to $this->_getViewListSize()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_isSearchValue",
-        "sibling_method": "isSearchValue",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "isSearchValue() did not dispatch to $this->_isSearchValue()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_prepareOrderByQuery",
-        "sibling_method": "prepareOrderByQuery",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "prepareOrderByQuery() did not dispatch to $this->_prepareOrderByQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_prepareWhereQuery",
-        "sibling_method": "prepareWhereQuery",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "prepareWhereQuery() did not dispatch to $this->_prepareWhereQuery()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_processFilter",
-        "sibling_method": "processFilter",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "processFilter() did not dispatch to $this->_processFilter()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\AdminListController",
-        "method": "_setCurrentListPosition",
-        "sibling_method": "setCurrentListPosition",
-        "current_file": "source/Application/Controller/Admin/AdminListController.php",
-        "observed": "override_not_called",
-        "notes": "setCurrentListPosition() did not dispatch to $this->_setCurrentListPosition()"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAccessoriesAjax",
         "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleAccessoriesAjax",
         "method": "_getQuery",
@@ -241,15 +70,6 @@
         "current_file": "source/Application/Controller/Admin/ArticleMain.php",
         "observed": "override_not_called",
         "notes": "copyCategories() did not dispatch to $this->_copyCategories()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ArticleMain",
-        "method": "_getEditValue",
-        "sibling_method": "getEditValue",
-        "current_file": "source/Application/Controller/Admin/ArticleMain.php",
-        "observed": "override_not_called",
-        "notes": "getEditValue() did not dispatch to $this->_getEditValue()"
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
@@ -466,15 +286,6 @@
         "current_file": "source/Application/Controller/Admin/CategoryUpdate.php",
         "observed": "override_not_called",
         "notes": "getCategoryList() did not dispatch to $this->_getCategoryList()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ContentList",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ContentList",
-        "method": "_prepareWhereQuery",
-        "sibling_method": "prepareWhereQuery",
-        "current_file": "source/Application/Controller/Admin/ContentList.php",
-        "observed": "override_not_called",
-        "notes": "prepareWhereQuery() did not dispatch to $this->_prepareWhereQuery()"
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ContentMain",
@@ -1033,15 +844,6 @@
         "current_file": "source/Application/Controller/Admin/ListComponentAjax.php",
         "observed": "override_not_called",
         "notes": "isExtendedColumn() did not dispatch to $this->_isExtendedColumn()"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListReview",
-        "unified_class": "OxidEsales\\Eshop\\Application\\Controller\\Admin\\ListReview",
-        "method": "_buildSelectString",
-        "sibling_method": "buildSelectString",
-        "current_file": "source/Application/Controller/Admin/ListReview.php",
-        "observed": "override_not_called",
-        "notes": "buildSelectString() did not dispatch to $this->_buildSelectString()"
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\LoginController",

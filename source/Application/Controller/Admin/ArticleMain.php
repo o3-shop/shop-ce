@@ -136,11 +136,20 @@ class ArticleMain extends AdminDetailsController
      * @param string                                 $sField  name of editable field
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEditValue" in next major
+     * @deprecated Use getEditValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getEditValue().
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getEditValue($oObject, $sField);
+        $sEditObjectValue = '';
+        if ($oObject) {
+            $oDescField = $oObject->getLongDescription();
+            $sEditObjectValue = $this->processEditValue($oDescField->getRawValue());
+        }
+
+        return $sEditObjectValue;
     }
 
     /**
@@ -150,16 +159,14 @@ class ArticleMain extends AdminDetailsController
      * @param string                                 $sField  name of editable field
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getEditValue()
+     *           (not the deprecated _getEditValue()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getEditValue($oObject, $sField)
     {
-        $sEditObjectValue = '';
-        if ($oObject) {
-            $oDescField = $oObject->getLongDescription();
-            $sEditObjectValue = $this->processEditValue($oDescField->getRawValue());
-        }
-
-        return $sEditObjectValue;
+        return $this->_getEditValue($oObject, $sField);
     }
 
     /**
