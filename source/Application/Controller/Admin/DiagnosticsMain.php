@@ -371,7 +371,9 @@ class DiagnosticsMain extends AdminDetailsController
     public function downloadResultFile()
     {
         $this->_oOutput->downloadResultFile();
-        exit(0);
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(0);
     }
 
     /**
