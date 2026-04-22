@@ -89,19 +89,11 @@ class DiagnosticsMain extends AdminDetailsController
      * Error status getter
      *
      * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "hasError" in next major
+     * @deprecated Use hasError() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _hasError().
      */
     protected function _hasError() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->hasError();
-    }
-
-    /**
-     * Error status getter
-     *
-     * @return bool
-     */
-    protected function hasError()
     {
         return $this->_blError;
     }
@@ -109,22 +101,42 @@ class DiagnosticsMain extends AdminDetailsController
     /**
      * Error status getter
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getErrorMessage" in next major
+     * @return bool
+     *
+     * @internal If your override does not fully replace the behavior, call parent::hasError()
+     *           (not the deprecated _hasError()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function hasError()
     {
-        return $this->getErrorMessage();
+        return $this->_hasError();
     }
 
     /**
      * Error status getter
      *
      * @return string
+     * @deprecated Use getErrorMessage() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getErrorMessage().
+     */
+    protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->_sErrorMessage;
+    }
+
+    /**
+     * Error status getter
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getErrorMessage()
+     *           (not the deprecated _getErrorMessage()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getErrorMessage()
     {
-        return $this->_sErrorMessage;
+        return $this->_getErrorMessage();
     }
 
     /**
@@ -285,22 +297,11 @@ class DiagnosticsMain extends AdminDetailsController
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "runBasicDiagnostics" in next major
+     * @deprecated Use runBasicDiagnostics() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _runBasicDiagnostics().
      */
     protected function _runBasicDiagnostics() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->runBasicDiagnostics();
-    }
-
-    /**
-     * Performs main system diagnostic.
-     * Shop and module details, database health, php parameters, server information
-     *
-     * @return array
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    protected function runBasicDiagnostics()
     {
         $aViewData = [];
         $oDiagnostics = oxNew(Diagnostics::class);
@@ -363,6 +364,23 @@ class DiagnosticsMain extends AdminDetailsController
         }
 
         return $aViewData;
+    }
+
+    /**
+     * Performs main system diagnostic.
+     * Shop and module details, database health, php parameters, server information
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::runBasicDiagnostics()
+     *           (not the deprecated _runBasicDiagnostics()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function runBasicDiagnostics()
+    {
+        return $this->_runBasicDiagnostics();
     }
 
     /**
