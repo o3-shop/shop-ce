@@ -65,6 +65,8 @@ function main(array $argv): int
         }
     }
 
+    $entries = filter_unprobable_entries($entries, $repoRoot);
+
     usort($entries, function (array $a, array $b): int {
         return [$a['class'], $a['method']] <=> [$b['class'], $b['method']];
     });
@@ -74,6 +76,76 @@ function main(array $argv): int
 
     fprintf(STDERR, "wrote %d entries to %s\n", count($entries), $outputPath);
     return 0;
+}
+
+/**
+ * Drop baseline entries whose class has no current unified-namespace alias,
+ * because the contract test reflects via the unified namespace and cannot
+ * probe them.
+ *
+ * Two known causes for a missing alias:
+ *  - the class was removed from the current tree after the baseline revision
+ *    (e.g. Core\CreditCardValidator, removed in e18ac787 on 2023-03-26), or
+ *  - the class lives in a source tree that is excluded from the unified
+ *    namespace generator by design (source/Setup/ runs before the shop is
+ *    bootstrapped, so no virtual aliases are generated for it).
+ *
+ * Both cases produce PHPUnit `skipped` outcomes at runtime with no useful
+ * signal; filtering here keeps the inventory to entries the test can actually
+ * exercise.
+ *
+ * @param array<int, array<string, mixed>> $entries
+ * @return array<int, array<string, mixed>>
+ */
+function filter_unprobable_entries(array $entries, string $repoRoot): array
+{
+    $aliasRoot = $repoRoot . '/vendor/o3-shop/shop-unified-namespace-generator/generated';
+    $currentMethods = [];
+    $kept = [];
+    foreach ($entries as $entry) {
+        $class = (string) $entry['class'];
+        $method = (string) $entry['method'];
+
+        // Translate OxidEsales\EshopCommunity\... → OxidEsales\Eshop\...
+        $unified = preg_replace('/^OxidEsales\\\\EshopCommunity\\\\/', 'OxidEsales\\\\Eshop\\\\', $class);
+        $aliasFile = $aliasRoot . '/' . str_replace('\\', '/', $unified) . '.php';
+        if (!is_file($aliasFile)) {
+            continue;
+        }
+
+        // Also drop if the underscore method no longer exists in the concrete
+        // current source. Method-level removal (e.g. e18ac787 stripped a set
+        // of credit-card-related helpers) has no probe target.
+        $concreteFile = $repoRoot . '/source/' . str_replace('\\', '/', substr($class, strlen('OxidEsales\\EshopCommunity\\'))) . '.php';
+        if (!isset($currentMethods[$concreteFile])) {
+            $currentMethods[$concreteFile] = is_file($concreteFile)
+                ? extract_method_names($concreteFile)
+                : [];
+        }
+        if (!in_array($method, $currentMethods[$concreteFile], true)) {
+            continue;
+        }
+
+        $kept[] = $entry;
+    }
+    return $kept;
+}
+
+/**
+ * Return the list of method names declared in a PHP file.
+ *
+ * @return array<int, string>
+ */
+function extract_method_names(string $file): array
+{
+    $source = @file_get_contents($file);
+    if ($source === false) {
+        return [];
+    }
+    if (!preg_match_all('/function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/i', $source, $m)) {
+        return [];
+    }
+    return array_values(array_unique($m[1]));
 }
 
 function usage_text(): string

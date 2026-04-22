@@ -2169,14 +2169,6 @@
     },
     {
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\PaymentController",
-        "method": "_filterDynData",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Application/Controller/PaymentController.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\PaymentController",
         "method": "_setDefaultEmptyPayment",
         "visibility": "protected",
         "is_static": false,
@@ -3880,30 +3872,6 @@
         "baseline_file": "source/Core/Controller/BaseController.php"
     },
     {
-        "class": "OxidEsales\\EshopCommunity\\Core\\CreditCardValidator",
-        "method": "_isExpired",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Core/CreditCardValidator.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Core\\CreditCardValidator",
-        "method": "_isValidNumer",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Core/CreditCardValidator.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Core\\CreditCardValidator",
-        "method": "_isValidType",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Core/CreditCardValidator.php"
-    },
-    {
         "class": "OxidEsales\\EshopCommunity\\Core\\Curl",
         "method": "_close",
         "visibility": "protected",
@@ -5366,53 +5334,5 @@
         "is_static": false,
         "is_abstract": false,
         "baseline_file": "source/Core/WidgetControl.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Setup\\Dispatcher",
-        "method": "_chooseCurrentAction",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Setup/Dispatcher.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Setup\\Session",
-        "method": "_getNewSessionID",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Setup/Session.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Setup\\Session",
-        "method": "_initSessionData",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Setup/Session.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Setup\\Session",
-        "method": "_startSession",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Setup/Session.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Setup\\Session",
-        "method": "_validateSession",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Setup/Session.php"
-    },
-    {
-        "class": "OxidEsales\\EshopCommunity\\Setup\\Utilities",
-        "method": "_extractPath",
-        "visibility": "protected",
-        "is_static": false,
-        "is_abstract": false,
-        "baseline_file": "source/Setup/Utilities.php"
     }
 ]

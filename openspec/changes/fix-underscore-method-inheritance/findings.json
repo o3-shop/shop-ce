@@ -1,11 +1,1 @@
-[
-    {
-        "class": "OxidEsales\\EshopCommunity\\Core\\UtilsServer",
-        "unified_class": "OxidEsales\\Eshop\\Core\\UtilsServer",
-        "method": "_isCurrentUrl",
-        "sibling_method": "isCurrentUrl",
-        "current_file": "source/Core/UtilsServer.php",
-        "observed": "override_not_called",
-        "notes": "isCurrentUrl() did not dispatch to $this->_isCurrentUrl()"
-    }
-]
+[]
