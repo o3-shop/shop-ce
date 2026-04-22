@@ -181,19 +181,11 @@ class ActionsMainAjax extends ListComponentAjax
      * Returns SQL query addon for sorting
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
+     * @deprecated Use getSorting() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getSorting().
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getSorting();
-    }
-
-    /**
-     * Returns SQL query addon for sorting
-     *
-     * @return string
-     */
-    protected function getSorting()
     {
         $sOxIdParameter = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchOxidParameter = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -201,7 +193,24 @@ class ActionsMainAjax extends ListComponentAjax
             return 'order by oxactions2article.oxsort ';
         }
 
-        return parent::getSorting();
+        // NOTE: call parent::_getSorting() (not parent::getSorting()) to avoid infinite
+        // recursion through the parent's delegate. Restores baseline (ebe86dc0) call shape.
+        // See o3-shop/o3-shop#107 remediation.
+        return parent::_getSorting();
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getSorting()
+     *           (not the deprecated _getSorting()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getSorting()
+    {
+        return $this->_getSorting();
     }
 
     /**
