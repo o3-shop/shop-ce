@@ -2,9 +2,9 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit;
 
+use OxidEsales\Eshop\Core\Exception\ExitCalledException;
 use OxidEsales\Eshop\Core\ExitHandlerInterface;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Exception\ExitCalledException;
 
 /**
  * Use in any unit test that exercises code paths which call exit().
@@ -18,7 +18,7 @@ trait ExitHandlerTestTrait
     {
         Registry::set(
             ExitHandlerInterface::class,
-            new class implements ExitHandlerInterface {
+            new class () implements ExitHandlerInterface {
                 public function exit(int $code = 0, ?string $message = null): void
                 {
                     throw new ExitCalledException($code, $message);

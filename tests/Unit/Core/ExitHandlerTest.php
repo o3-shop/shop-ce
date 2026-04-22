@@ -1,4 +1,5 @@
 <?php
+
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use OxidEsales\Eshop\Core\ExitHandler;
