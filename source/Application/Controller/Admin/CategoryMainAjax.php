@@ -134,11 +134,21 @@ class CategoryMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
+     * @deprecated Use addFilter() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _addFilter().
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->addFilter($sQ);
+        $sArtTable = $this->getViewName('oxarticles');
+        $sQ = parent::_addFilter($sQ);
+
+        // display variants or not ?
+        if (!Registry::getConfig()->getConfigParam('blVariantsSelection')) {
+            $sQ .= " and {$sArtTable}.oxparentid = '' ";
+        }
+
+        return $sQ;
     }
 
     /**
@@ -148,18 +158,14 @@ class CategoryMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::addFilter()
+     *           (not the deprecated _addFilter()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function addFilter($sQ)
     {
-        $sArtTable = $this->getViewName('oxarticles');
-        $sQ = parent::addFilter($sQ);
-
-        // display variants or not ?
-        if (!Registry::getConfig()->getConfigParam('blVariantsSelection')) {
-            $sQ .= " and {$sArtTable}.oxparentid = '' ";
-        }
-
-        return $sQ;
+        return $this->_addFilter($sQ);
     }
 
     /**

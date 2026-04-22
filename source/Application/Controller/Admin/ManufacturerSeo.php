@@ -58,21 +58,27 @@ class ManufacturerSeo extends ObjectSeo
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderManufacturer
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
+     * @deprecated Use getEncoder() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getEncoder().
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getEncoder();
+        return Registry::get(SeoEncoderManufacturer::class);
     }
 
     /**
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderManufacturer
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getEncoder()
+     *           (not the deprecated _getEncoder()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getEncoder()
     {
-        return Registry::get(SeoEncoderManufacturer::class);
+        return $this->_getEncoder();
     }
 
     /**
@@ -89,21 +95,27 @@ class ManufacturerSeo extends ObjectSeo
      * Returns url type
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getType" in next major
+     * @deprecated Use getType() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getType().
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getType();
+        return 'oxmanufacturer';
     }
 
     /**
      * Returns url type
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getType()
+     *           (not the deprecated _getType()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getType()
     {
-        return 'oxmanufacturer';
+        return $this->_getType();
     }
 
     /**

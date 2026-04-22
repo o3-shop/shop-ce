@@ -147,21 +147,27 @@ class ShopConfiguration extends AdminDetailsController
      * return theme filter for config variables
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getModuleForConfigVars" in next major
+     * @deprecated Use getModuleForConfigVars() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getModuleForConfigVars().
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getModuleForConfigVars();
+        return '';
     }
 
     /**
      * return theme filter for config variables
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getModuleForConfigVars()
+     *           (not the deprecated _getModuleForConfigVars()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getModuleForConfigVars()
     {
-        return '';
+        return $this->_getModuleForConfigVars();
     }
 
     /**
@@ -286,11 +292,16 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $constraint serialized constraint
      *
      * @return array|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "parseConstraint" in next major
+     * @deprecated Use parseConstraint() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _parseConstraint().
      */
     protected function _parseConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->parseConstraint($type, $constraint);
+        if ($type == 'select') {
+            return array_map('trim', explode('|', $constraint));
+        }
+        return null;
     }
 
     /**
@@ -300,13 +311,14 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $constraint serialized constraint
      *
      * @return array|null
+     *
+     * @internal If your override does not fully replace the behavior, call parent::parseConstraint()
+     *           (not the deprecated _parseConstraint()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function parseConstraint($type, $constraint)
     {
-        if ($type == 'select') {
-            return array_map('trim', explode('|', $constraint));
-        }
-        return null;
+        return $this->_parseConstraint($type, $constraint);
     }
 
     /**
@@ -316,27 +328,33 @@ class ShopConfiguration extends AdminDetailsController
      * @param mixed  $constraint constraint value
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "serializeConstraint" in next major
+     * @deprecated Use serializeConstraint() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _serializeConstraint().
      */
     protected function _serializeConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->serializeConstraint($type, $constraint);
-    }
-
-    /**
-     * serialize constraint from type and value
-     *
-     * @param string $type       variable type
-     * @param mixed  $constraint constraint value
-     *
-     * @return string
-     */
-    protected function serializeConstraint($type, $constraint)
     {
         if ($type == 'select') {
             return implode('|', array_map('trim', $constraint));
         }
         return '';
+    }
+
+    /**
+     * serialize constraint from type and value
+     *
+     * @param string $type       variable type
+     * @param mixed  $constraint constraint value
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::serializeConstraint()
+     *           (not the deprecated _serializeConstraint()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function serializeConstraint($type, $constraint)
+    {
+        return $this->_serializeConstraint($type, $constraint);
     }
 
     /**
@@ -436,11 +454,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array with text
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "arrayToMultiline" in next major
+     * @deprecated Use arrayToMultiline() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _arrayToMultiline().
      */
     protected function _arrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->arrayToMultiline($input);
+        return implode("\n", (array) $input);
     }
 
     /**
@@ -449,10 +469,14 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array with text
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::arrayToMultiline()
+     *           (not the deprecated _arrayToMultiline()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function arrayToMultiline($input)
     {
-        return implode("\n", (array) $input);
+        return $this->_arrayToMultiline($input);
     }
 
     /**
@@ -461,21 +485,11 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $multiline Multiline text
      *
      * @return array|void
-     * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToArray" in next major
+     * @deprecated Use multilineToArray() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _multilineToArray().
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->multilineToArray($multiline);
-    }
-
-    /**
-     * Converts Multiline text to simple array. Returns this array.
-     *
-     * @param string $multiline Multiline text
-     *
-     * @return array|void
-     */
-    protected function multilineToArray($multiline)
     {
         $array = explode("\n", $multiline);
         if (is_array($array)) {
@@ -491,16 +505,19 @@ class ShopConfiguration extends AdminDetailsController
     }
 
     /**
-     * Converts associative array to multiline text. Returns this text.
+     * Converts Multiline text to simple array. Returns this array.
      *
-     * @param array $input Array to convert
+     * @param string $multiline Multiline text
      *
-     * @return string|void
-     * @deprecated underscore prefix violates PSR12, will be renamed to "aarrayToMultiline" in next major
+     * @return array|void
+     *
+     * @internal If your override does not fully replace the behavior, call parent::multilineToArray()
+     *           (not the deprecated _multilineToArray()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function multilineToArray($multiline)
     {
-        return $this->aarrayToMultiline($input);
+        return $this->_multilineToArray($multiline);
     }
 
     /**
@@ -509,8 +526,11 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array to convert
      *
      * @return string|void
+     * @deprecated Use aarrayToMultiline() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _aarrayToMultiline().
      */
-    protected function aarrayToMultiline($input)
+    protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($input)) {
             $multiline = '';
@@ -526,16 +546,19 @@ class ShopConfiguration extends AdminDetailsController
     }
 
     /**
-     * Converts Multiline text to associative array. Returns this array.
+     * Converts associative array to multiline text. Returns this text.
      *
-     * @param string $multiline Multiline text
+     * @param array $input Array to convert
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToAarray" in next major
+     * @return string|void
+     *
+     * @internal If your override does not fully replace the behavior, call parent::aarrayToMultiline()
+     *           (not the deprecated _aarrayToMultiline()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function aarrayToMultiline($input)
     {
-        return $this->multilineToAarray($multiline);
+        return $this->_aarrayToMultiline($input);
     }
 
     /**
@@ -544,8 +567,11 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $multiline Multiline text
      *
      * @return array
+     * @deprecated Use multilineToAarray() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _multilineToAarray().
      */
-    protected function multilineToAarray($multiline)
+    protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $string = Str::getStr();
         $array = [];
@@ -562,6 +588,22 @@ class ShopConfiguration extends AdminDetailsController
         }
 
         return $array;
+    }
+
+    /**
+     * Converts Multiline text to associative array. Returns this array.
+     *
+     * @param string $multiline Multiline text
+     *
+     * @return array
+     *
+     * @internal If your override does not fully replace the behavior, call parent::multilineToAarray()
+     *           (not the deprecated _multilineToAarray()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function multilineToAarray($multiline)
+    {
+        return $this->_multilineToAarray($multiline);
     }
 
     /**
