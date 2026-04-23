@@ -70,7 +70,7 @@ class ExceptionToDisplayTest extends \OxidTestCase
         $this->assertEquals('TEST_EXCEPTION', $oTestObject->getOxMessage());
 
         // getOxMessage() internally calls translateString() which logs a warning for unknown keys
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     public function testSetGetMessage_withStringArguments()
@@ -82,7 +82,7 @@ class ExceptionToDisplayTest extends \OxidTestCase
         $this->assertEquals('TEST 100 ERROR 200 STRING mineralinis', $oTestObject->getOxMessage());
 
         // getOxMessage() internally calls translateString() which logs a warning for unknown keys
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     public function testSetGetMessageIfDebugOn()
@@ -94,7 +94,7 @@ class ExceptionToDisplayTest extends \OxidTestCase
         $this->assertEquals($oTestObject, $oTestObject->getOxMessage());
 
         // getOxMessage() internally calls translateString() which logs a warning for unknown keys
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     public function testToString()
@@ -112,7 +112,7 @@ class ExceptionToDisplayTest extends \OxidTestCase
         $this->assertEquals($sRet, $oTestObject->__toString());
 
         // __toString() calls getOxMessage() which calls translateString() and logs a warning for unknown keys
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     public function testSetMessageArgs()

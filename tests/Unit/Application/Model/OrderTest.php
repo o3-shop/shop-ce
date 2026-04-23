@@ -1663,7 +1663,7 @@ class OrderTest extends \OxidTestCase
         );
 
         // The debug log entry "Order already exists" is expected in this test case
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     /**

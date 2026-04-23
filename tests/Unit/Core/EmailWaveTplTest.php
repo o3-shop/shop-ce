@@ -372,7 +372,7 @@ class EmailWaveTplTest extends \OxidTestCase
         $this->checkMailBody('testSendOrderEMailToOwner', $oEmail->getBody());
 
         // Clear log entries from email template rendering (empty salutation fields etc.)
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     /**
@@ -441,7 +441,7 @@ class EmailWaveTplTest extends \OxidTestCase
         $this->assertStringContainsString('The following products have been ordered in testShopName right now:', $oEmail->getBody());
 
         // Clear log entries from email template rendering (empty salutation fields etc.)
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     /**

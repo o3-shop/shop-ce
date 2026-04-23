@@ -290,7 +290,7 @@ class SessionTest extends \OxidTestCase
         $this->assertEquals('Different browser (oldone, none), creating new SID...<br>', $oExcp->getOxMessage());
 
         // Clear expected log warning from translation of debug session message
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->clearExpectedLoggedExceptions();
     }
 
     public function testIsSidNeededPassingCustomUrl()
