@@ -19,15 +19,58 @@
 <p class="desc">
     <b>[{oxmultilang ident="HOME_DESC"}]</b>
 </p>
-<hr>
+<hr style="margin-bottom:20px">
+
+[{assign var="hasNotices" value=false}]
 
 [{if $aMessage}]
+    [{assign var="hasNotices" value=true}]
     <div class="messagebox">
-        [{oxmultilang ident="MAIN_INFO"}]:<br>
+        <div style="margin-bottom:10px"><b>[{oxmultilang ident="MAIN_INFO"}]</b></div>
         [{foreach from=$aMessage item=sMessage key=class}]
-            <p class="[{$class}]">[{$sMessage}]</p>
+            <p class="[{$class}]" style="font-weight:normal; margin:0 0 5px 0">[{$sMessage|replace:"<br>":"</p><p class=\"`$class`\" style=\"font-weight:normal; margin:0 0 5px 0\">"}]</p>
         [{/foreach}]
     </div>
+[{/if}]
+
+[{block name="admin_home_updatecheck"}]
+[{if $updateCheckResult}]
+    [{if $updateCheckResult->isCoreUpdateAvailable() || $updateCheckResult->getOutdatedModules()}]
+    [{assign var="hasNotices" value=true}]
+    <div class="messagebox">
+        <div style="margin-bottom:10px"><b>[{oxmultilang ident="UPDATECHECK_TITLE"}]</b></div>
+        [{if $updateCheckResult->isCoreUpdateAvailable()}]
+            <p style="color:#e67e22; margin:0 0 5px 0">
+                [{oxmultilang ident="UPDATECHECK_CORE_NOTICE" args=$updateCheckResult->getLatestCoreVersion()}]
+                [{if $updateCheckResult->getUpdateLink()}]
+                    <a href="[{$updateCheckResult->getUpdateLink()}]" target="_blank">[{oxmultilang ident="UPDATECHECK_CORE_LINK"}]</a>
+                [{/if}]
+            </p>
+        [{/if}]
+        [{if $updateCheckResult->getOutdatedModules()}]
+            <table cellspacing="0" cellpadding="2" border="0">
+                <tr>
+                    <td style="padding-right:15px"><b>[{oxmultilang ident="UPDATECHECK_MODULE_ID"}]</b></td>
+                    <td style="padding-right:15px; text-align:center"><b>[{oxmultilang ident="UPDATECHECK_MODULE_INSTALLED"}]</b></td>
+                    <td style="padding-right:15px; text-align:center"><b>[{oxmultilang ident="UPDATECHECK_MODULE_LATEST"}]</b></td>
+                    <td></td>
+                </tr>
+                [{foreach from=$updateCheckResult->getOutdatedModules() item=module}]
+                <tr>
+                    <td style="padding-right:15px">[{$module.id}]</td>
+                    <td style="padding-right:15px; text-align:center">[{$module.installed_version}]</td>
+                    <td style="padding-right:15px; text-align:center">[{$module.latest_version}]</td>
+                    <td>[{if $module.url}]<a href="[{$module.url}]" target="_blank">[{oxmultilang ident="UPDATECHECK_MODULE_LINK"}]</a>[{/if}]</td>
+                </tr>
+                [{/foreach}]
+            </table>
+        [{/if}]
+    </div>
+    [{/if}]
+[{/if}]
+[{/block}]
+
+[{if $hasNotices}]
     <hr>
 [{/if}]
 

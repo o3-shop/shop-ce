@@ -588,13 +588,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     public function isInList()
     {
         if ($this->_blIsInUserList !== null) {
-            Registry::getLogger()->debug('isInList [cache] id=' . $this->getId() . ' result=' . ($this->_blIsInUserList ? 'true' : 'false'));
+            // TODO: re-enable once #103 (ExceptionLogFileHelper) is fixed
+            // Registry::getLogger()->debug('isInList [cache] id=' . $this->getId() . ' result=' . ($this->_blIsInUserList ? 'true' : 'false'));
             return $this->_blIsInUserList;
         }
 
         $oUser = $this->getUser();
         if (!$oUser) {
-            Registry::getLogger()->debug('isInList [db] id=' . $this->getId() . ' no user → false');
+            // TODO: re-enable once #103 (ExceptionLogFileHelper) is fixed
+            // Registry::getLogger()->debug('isInList [db] id=' . $this->getId() . ' no user → false');
             return false;
         }
 
@@ -602,13 +604,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         foreach (['noticelist', 'wishlist'] as $listType) {
             foreach ($oUser->getBasket($listType)->getItems() as $oItem) {
                 if ($oItem->oxuserbasketitems__oxartid->value === $articleId) {
-                    Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' found in ' . $listType . ' → true');
+                    // TODO: re-enable once #103 (ExceptionLogFileHelper) is fixed
+                    // Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' found in ' . $listType . ' → true');
                     return true;
                 }
             }
         }
 
-        Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' not found → false');
+        // TODO: re-enable once #103 (ExceptionLogFileHelper) is fixed
+        // Registry::getLogger()->debug('isInList [db] id=' . $articleId . ' not found → false');
         return false;
     }
 

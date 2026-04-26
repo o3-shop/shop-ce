@@ -794,6 +794,14 @@ $aLang = [
     'NAVIGATION_NEWVERSIONAVAILABLE'                 => 'Version %s ist verfügbar!',
     // END deprecated
     'NAVIGATION_NEW_VERSION_AVAILABLE'               => 'Sie verwenden Version %s, Version %s ist jetzt verfügbar. Bitte aktualisieren Sie jetzt.',
+    'UPDATECHECK_TITLE'                              => 'Update-Prüfung',
+    'UPDATECHECK_CORE_NOTICE'                        => 'Eine neue Shop-Version %s ist verfügbar.',
+    'UPDATECHECK_CORE_LINK'                          => 'Update herunterladen',
+    'UPDATECHECK_MODULE_ID'                          => 'Modul',
+    'UPDATECHECK_MODULE_INSTALLED'                   => 'Installiert',
+    'UPDATECHECK_MODULE_LATEST'                      => 'Verfügbar',
+    'UPDATECHECK_MODULE_LINK'                        => 'Details',
+    'UPDATECHECK_BUTTON'                             => 'Nach Updates suchen',
     // @deprecated 6.5.6 "News" feature will be removed completely
     'NEWS_LIST_TITLE'                                => '[OXID Newsverwaltung]',
     'NEWS_LIST_SHORTTEXT'                            => 'Titel',
@@ -804,7 +812,7 @@ $aLang = [
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Nicht sichtbar für Benutzergruppe',
     // END deprecated
     'NAVIGATION_SYSREQ_MESSAGE'                      => 'Die Systemgesundheit dieses Shops ist gefährdet. Möglicherweise verhält sich Ihr O3-Shop in einigen Bereichen unerwartet. Bitte stellen Sie sicher, dass die Servereinstellungen korrekt vorgenommen werden. Unterstützung finden Sie in der ',
-    'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>Systemgesundheitsprüfung</b>.',
+    'NAVIGATION_SYSREQ_MESSAGE2'                     => 'Systemgesundheitsprüfung.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'Die permanente Systemgesundheitsprüfung wurde deaktiviert. Sie können diese auf der Registerkarte Perform. unter Stammdaten -> Grundeinstellungen aktivieren. Um dennoch zu prüfen, klicken Sie bitte hier: ',
     'NAVIGATION_SHOPFRONT'                           => 'Startseite des Shops',
     'NAVIGATION_FULLVIEW'                            => 'Expertenmenü zeigen',
