@@ -839,7 +839,6 @@ class UtilsTest extends \OxidTestCase
         $this->assertEquals(false, oxRegistry::getUtils()->GetRemoteCachePath('http://www.blafoo.null', 'misc/blafoo.test'));
 
         // Clear log warnings about missing translations triggered by theme activation
-        $this->clearExpectedLoggedExceptions();
     }
 
     public function testCheckAccessRights()

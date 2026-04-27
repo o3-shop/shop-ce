@@ -206,7 +206,6 @@ class ArticleExtendTest extends \OxidTestCase
         // getOxMessage() calls translateString() which logs a warning when admin
         // language files are not loaded in the test context. Clear the log to
         // prevent failOnLoggedExceptions() in tearDown from failing.
-        $this->clearExpectedLoggedExceptions();
     }
 
     /**

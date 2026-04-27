@@ -51,7 +51,6 @@ class ExceptionTest extends UnitTestCase
         $testObject->debugOut();
 
         $this->assertTrue($this->testLogHandler->hasErrorThatContains($message));
-        $this->clearExpectedLoggedExceptions();
     }
 
     // Test set & get message

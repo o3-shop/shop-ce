@@ -225,7 +225,6 @@ class CmpUtilsTest extends \OxidTestCase
 
         // toList() emits DEBUG-level log entries; clear the log so tearDown's
         // failOnLoggedExceptions() does not fail when the local log level is DEBUG.
-        $this->clearExpectedLoggedExceptions();
     }
 
     /**

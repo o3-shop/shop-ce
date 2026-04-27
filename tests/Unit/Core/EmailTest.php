@@ -1129,7 +1129,6 @@ class EmailTest extends \OxidTestCase
         $this->assertEquals($aTo, $oEmail->getRecipient());
 
         // Clear log entries from email template rendering (empty salutation fields etc.)
-        $this->clearExpectedLoggedExceptions();
     }
 
     /**

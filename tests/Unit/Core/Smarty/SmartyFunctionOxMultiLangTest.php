@@ -90,7 +90,6 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
         $this->assertEquals($sTranslation, smarty_function_oxmultilang(['ident' => $sIndent, 'suffix' => $sSuffixIndent], $oSmarty));
 
         // Clear expected log warnings from translating non-translatable suffix strings
-        $this->clearExpectedLoggedExceptions();
     }
 
     /**
@@ -123,7 +122,6 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
         $this->assertEquals($sTranslation, smarty_function_oxmultilang($aArgs, $oSmarty));
 
         // Clear expected log warnings from translating non-existing idents and suffixes
-        $this->clearExpectedLoggedExceptions();
     }
 
     /**
@@ -179,7 +177,6 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
         $this->assertEquals($sTranslation, smarty_function_oxmultilang($aArgs, $oSmarty));
 
         // Clear expected log warnings from translating missing translation keys
-        $this->clearExpectedLoggedExceptions();
     }
 
     /**
@@ -218,6 +215,5 @@ class SmartyFunctionOxMultiLangTest extends \OxidTestCase
         $this->assertEquals($sTranslation, smarty_function_oxmultilang($aArgs, $oSmarty));
 
         // Clear expected log warnings from translating missing translation keys
-        $this->clearExpectedLoggedExceptions();
     }
 }
