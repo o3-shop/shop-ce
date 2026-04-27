@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Guard against GHSA-qrr6-mg7r-m243: argument injection via newline in PHPUnit <ini> values.
  * Mirrors the validation that phpunit/phpunit 12.5.22 / 13.1.6 added in JobRunner::settingsToParameters().
@@ -32,7 +33,7 @@ foreach ($files as $file) {
     }
 
     foreach ($xml->getElementsByTagName('ini') as $node) {
-        $name  = $node->getAttribute('name');
+        $name = $node->getAttribute('name');
         $value = $node->getAttribute('value');
 
         if (preg_match('/[\r\n]/', $value)) {
