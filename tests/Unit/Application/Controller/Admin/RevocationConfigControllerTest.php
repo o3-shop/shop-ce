@@ -27,6 +27,8 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationConfigController;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use Psr\Log\NullLogger;
 
@@ -178,6 +180,59 @@ class RevocationConfigControllerTest extends UnitTestCase
         );
     }
 
+    public function testTemplateGateRejectsActivationWhenAssetsAreMissing(): void
+    {
+        $this->requestParams = [
+            'blShowRevocationForm'       => '1',
+            'blRevocationRequireLogin'   => '0',
+            'blRevocationNotifyOperator' => '1',
+            'sRevocationOperatorEmail'   => 'ops@example.com',
+        ];
+        $missing = [
+            new MissingAsset(
+                MissingAsset::TYPE_PAGE_TEMPLATE,
+                '/path/to/revocation.tpl',
+                null,
+                'Install the missing page template under the active theme.'
+            ),
+        ];
+
+        $controller = $this->makeController($missing);
+        $controller->save();
+
+        $this->assertSame(
+            [],
+            $this->savedConfVars,
+            'No row may be persisted when the template-presence gate rejects (all-or-nothing per D11).'
+        );
+        $this->assertSame(
+            $missing,
+            $controller->getMissingAssets(),
+            'The missing-asset list must surface for the template re-render.'
+        );
+        $this->assertGreaterThanOrEqual(1, $this->errorsDisplayed);
+    }
+
+    public function testTemplateGateNotInvokedWhenFeatureRemainsOff(): void
+    {
+        $this->requestParams = [
+            'blShowRevocationForm'       => '0',
+            'blRevocationRequireLogin'   => '0',
+            'blRevocationNotifyOperator' => '0',
+            'sRevocationOperatorEmail'   => '',
+        ];
+        // Even though our injected validator would report missing assets,
+        // it must NOT be consulted — the feature is staying off.
+        $missing = [
+            new MissingAsset(MissingAsset::TYPE_PAGE_TEMPLATE, '/whatever.tpl', null, 'unused'),
+        ];
+        $controller = $this->makeController($missing);
+        $controller->save();
+
+        $this->assertCount(4, $this->savedConfVars, 'Save must succeed regardless of validator state when feature is off.');
+        $this->assertSame([], $controller->getMissingAssets());
+    }
+
     public function testSubmittedValuesAreRetainedForReRender(): void
     {
         $this->requestParams = [
@@ -205,10 +260,16 @@ class RevocationConfigControllerTest extends UnitTestCase
      * its name field, which doesn't exist in this unit-test environment.
      * Skip the constructor entirely — `save()` doesn't depend on what the
      * constructor sets up; it only reads from Registry which we mock.
+     *
+     * @param MissingAsset[] $missingAssets — what the injected validator returns
      */
-    private function makeController(): RevocationConfigController
+    private function makeController(array $missingAssets = []): RevocationConfigController
     {
-        return (new \ReflectionClass(RevocationConfigController::class))->newInstanceWithoutConstructor();
+        $controller = (new \ReflectionClass(RevocationConfigController::class))->newInstanceWithoutConstructor();
+        $validator = $this->createMock(RevocationTemplateValidator::class);
+        $validator->method('validate')->willReturn($missingAssets);
+        $controller->setTemplateValidator($validator);
+        return $controller;
     }
 
     private function mockRegistry(): void

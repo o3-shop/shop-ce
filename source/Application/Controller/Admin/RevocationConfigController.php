@@ -25,6 +25,9 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 
 /**
  * §356a BGB electronic revocation feature — admin configuration page.
@@ -73,6 +76,12 @@ class RevocationConfigController extends AdminDetailsController
     /** @var array<string,mixed> values the operator submitted (used to re-render on rejection) */
     private array $submittedValues = [];
 
+    /** @var MissingAsset[] surfaced by the template-presence gate on rejection */
+    private array $missingAssets = [];
+
+    /** @var RevocationTemplateValidator|null lazy-resolved; settable for tests */
+    private ?RevocationTemplateValidator $templateValidator = null;
+
     /**
      * @return string admin template name to render
      */
@@ -92,6 +101,15 @@ class RevocationConfigController extends AdminDetailsController
 
         $this->_aViewData['revocation'] = $bag;
         $this->_aViewData['revocationErrors'] = $this->validationErrors;
+        $this->_aViewData['revocationMissingAssets'] = array_map(
+            static fn (MissingAsset $a) => [
+                'type' => $a->getAssetType(),
+                'path' => $a->getExpectedPath(),
+                'lang' => $a->getLangId(),
+                'hint' => $a->getRemediationHint(),
+            ],
+            $this->missingAssets
+        );
 
         return parent::render();
     }
@@ -114,6 +132,12 @@ class RevocationConfigController extends AdminDetailsController
 
         if (!$this->isCrossFieldRuleSatisfied($submitted)) {
             // form-input-preservation.md — render() reads $this->submittedValues.
+            return;
+        }
+
+        if ($submitted['blShowRevocationForm'] && !$this->templatePresenceGatePasses()) {
+            // Same all-or-nothing rule as the cross-field check: nothing
+            // is persisted and the form re-renders with submitted values.
             return;
         }
 
@@ -161,6 +185,68 @@ class RevocationConfigController extends AdminDetailsController
     }
 
     /**
+     * Template-presence gate (spec D11). Runs only when the operator is
+     * activating the feature (or saving the form while it is on). Reports
+     * each missing template / translation key as an admin error and
+     * populates {@see $missingAssets} for the template re-render.
+     */
+    private function templatePresenceGatePasses(): bool
+    {
+        $config = Registry::getConfig();
+        $shopId = (int) $config->getShopId();
+        $themeId = (string) ($config->getConfigParam('sCustomTheme') ?: $config->getConfigParam('sTheme'));
+        if ($themeId === '') {
+            $themeId = 'wave';
+        }
+
+        $activeLangIds = [];
+        $params = $config->getConfigParam('aLanguageParams');
+        if (is_array($params)) {
+            foreach ($params as $entry) {
+                if (is_array($entry) && isset($entry['active']) && (int) $entry['active'] === 1) {
+                    $activeLangIds[] = isset($entry['baseId']) ? (int) $entry['baseId'] : 0;
+                }
+            }
+        }
+        if ($activeLangIds === []) {
+            $activeLangIds = [0];
+        }
+
+        $this->missingAssets = $this->getTemplateValidator()->validate($shopId, $themeId, $activeLangIds);
+        if ($this->missingAssets === []) {
+            return true;
+        }
+
+        // Surface each missing asset as an admin error so the operator can
+        // act on the list. Keep the message short — the template renders
+        // the full per-asset list with remediation hints.
+        foreach ($this->missingAssets as $asset) {
+            $error = oxNew(DisplayError::class);
+            $error->setMessage($asset->getRemediationHint());
+            Registry::getUtilsView()->addErrorToDisplay($error);
+        }
+        return false;
+    }
+
+    private function getTemplateValidator(): RevocationTemplateValidator
+    {
+        if ($this->templateValidator === null) {
+            $this->templateValidator = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(RevocationTemplateValidator::class);
+        }
+        return $this->templateValidator;
+    }
+
+    /**
+     * Test seam — inject a mocked validator without touching the DI container.
+     */
+    public function setTemplateValidator(RevocationTemplateValidator $validator): void
+    {
+        $this->templateValidator = $validator;
+    }
+
+    /**
      * Test seam: assert internal state after a save() call without
      * touching the DB.
      *
@@ -179,5 +265,13 @@ class RevocationConfigController extends AdminDetailsController
     public function getSubmittedValues(): array
     {
         return $this->submittedValues;
+    }
+
+    /**
+     * @return MissingAsset[]
+     */
+    public function getMissingAssets(): array
+    {
+        return $this->missingAssets;
     }
 }

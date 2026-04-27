@@ -3,6 +3,27 @@
 [{* §356a BGB electronic revocation feature — admin configuration form. *}]
 [{* Cross-field rule: when blRevocationNotifyOperator is on, *}]
 [{* sRevocationOperatorEmail must be non-empty AND syntactically valid. *}]
+[{* Template-presence gate: cannot enable the feature unless every page *}]
+[{* template, every per-language email template, and every translation *}]
+[{* key resolves. The activation save is rejected all-or-nothing per D11. *}]
+
+[{if $revocationMissingAssets}]
+    <div class="errorbox" role="alert">
+        <strong>[{oxmultilang ident="O3_REVOCATION_ADMIN_GATE_HEADING"}]</strong>
+        <ul>
+            [{foreach from=$revocationMissingAssets item=asset}]
+                <li>
+                    <code>[{$asset.path|escape:'html'}]</code>
+                    [{if $asset.lang !== null}]
+                        <small>[{oxmultilang ident="O3_REVOCATION_ADMIN_GATE_LANG_TAG"}] [{$asset.lang}]</small>
+                    [{/if}]
+                    <br>
+                    <em>[{$asset.hint|escape:'html'}]</em>
+                </li>
+            [{/foreach}]
+        </ul>
+    </div>
+[{/if}]
 
 <form name="myedit" id="myedit" action="[{$oViewConf->getSelfLink()}]" method="post">
     [{$oViewConf->getHiddenSid()}]
