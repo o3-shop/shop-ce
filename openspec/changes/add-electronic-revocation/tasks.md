@@ -124,9 +124,9 @@
 
 ## 12. Wiring: visibility data, render-context plumbing (shop-ce)
 
-- [ ] 12.1 Extend `ViewConfig` (or equivalent) with a `getRevocationLinkVisible(): bool` helper that resolves the visibility matrix from the current shop config and the current user state. Strict types on the new method.
-- [ ] 12.2 Make the helper available to the footer template — that's the only consumer.
-- [ ] 12.3 Unit-test the helper against the matrix: feature off → false; feature on + no-login-required + anonymous → true; feature on + no-login-required + authenticated → true; feature on + login-required + anonymous → false; feature on + login-required + authenticated → true.
+- [x] 12.1 `ViewConfig::getRevocationLinkVisible(): bool` added to `source/Core/ViewConfig.php`. New method has typed signature; the file's existing untyped methods are left unchanged (no `declare(strict_types=1)` added — would change semantics elsewhere). Logic encodes the four-row visibility matrix from spec / D5: feature off → false; otherwise login-not-required → true; otherwise check `User::loadActiveUser()`.
+- [x] 12.2 Wave-theme's `tpl/layout/footer.tpl` consumes the helper via `{if $oViewConf->getRevocationLinkVisible()}` (already wired in phase 11). The Smarty template reads no shop config directly — only the single boolean.
+- [x] 12.3 Unit-tested in `tests/Unit/Core/Revocation/ViewConfigRevocationTest.php` — 6 tests / 9 assertions cover all four matrix rows: feature off (4 sub-cases — config and user state irrelevant); feature-on + no-login-required + anonymous + authenticated; feature-on + login-required + anonymous + authenticated; plus a return-type-is-bool assertion. Tests use `UtilsObject::setClassInstance(User::class, $mock)` to override the `oxNew(User::class)` instantiation inside the helper.
 
 ## 13. Negative-requirement verification (shop-ce)
 
