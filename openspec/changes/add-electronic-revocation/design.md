@@ -99,7 +99,7 @@ Notes:
 
 One new `VersionYYYYMMDDhhmmss.php` migration that:
 1. `CREATE TABLE IF NOT EXISTS o3revocation (...)`
-2. `INSERT IGNORE INTO oxcontents` one row per active shop language with `OXIDENT='o3_revocation_notice'`, `OXACTIVE=0`, `OXCONTENT=''`, `OXTITLE` from a translation key. *Idempotent — never overwrites operator-edited content.*
+2. `INSERT IGNORE INTO oxcontents` one row per shop with `OXLOADID='o3_revocation_notice'`, `OXSNIPPET=1`, `OXTYPE=0`, all per-language slots `OXACTIVE_*=0`, `OXTITLE_*=''`, `OXCONTENT_*=''`. The `oxcontents` schema uses suffixed columns for multi-language (one row per snippet, columns per language slot), so one row covers every active language. *Idempotent — `INSERT IGNORE` keyed on the `OXLOADID` UNIQUE index never overwrites operator-edited content.*
 3. **Does NOT** seed `oxconfig` rows. Defaults are handled by D5 (code defaults for absent rows; `initial_data.sql` for fresh-install seed of `blShowRevocationForm`).
 
 Doctrine migrations run on both fresh installs and upgrades, so any defaulting logic that branches on environment is fragile. We split fresh-install seeding into `source/Setup/Sql/initial_data.sql` (fresh-install only) and rely on code-side defaults for the absent-row case (= upgrade) — see D5. The migration here covers the schema parts that must exist on both paths.

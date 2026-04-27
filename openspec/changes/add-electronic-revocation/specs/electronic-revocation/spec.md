@@ -303,7 +303,7 @@ The runtime fallback in step 2 is **asymmetric** with the admin-save validation:
 
 ### Requirement: Operator notice above the form via CMS snippet
 
-The form page SHALL include the CMS snippet identified by `OXIDENT = 'o3_revocation_notice'` directly above the form, scoped to the consumer's current language. The snippet MUST render nothing visible (no whitespace artifact, no heading, no border) when it is missing, inactive, or empty.
+The form page SHALL include the CMS snippet identified by `OXLOADID = 'o3_revocation_notice'` directly above the form, scoped to the consumer's current language. The snippet MUST render nothing visible (no whitespace artifact, no heading, no border) when it is missing, inactive, or empty for the current language.
 
 #### Scenario: Snippet inactive
 - **WHEN** the form page is rendered and the `o3_revocation_notice` snippet has `OXACTIVE = 0`
@@ -404,7 +404,7 @@ A fresh shop install SHALL come up with all four feature `oxconfig` rows already
 
 ### Requirement: Doctrine migration creates schema and seeds CMS snippet only
 
-The Doctrine migration delivered by this change SHALL `CREATE TABLE IF NOT EXISTS o3revocation` and `INSERT IGNORE INTO oxcontents` one inactive empty row per active shop language with `OXIDENT = 'o3_revocation_notice'`. The migration MUST NOT touch `oxconfig`. Re-running the migration MUST be a no-op.
+The Doctrine migration delivered by this change SHALL `CREATE TABLE IF NOT EXISTS o3revocation` and `INSERT IGNORE INTO oxcontents` one row per shop with `OXLOADID = 'o3_revocation_notice'`, `OXSNIPPET = 1`, `OXTYPE = 0`, and every per-language slot inactive and empty (`OXACTIVE_* = 0`, `OXTITLE_* = ''`, `OXCONTENT_* = ''`). The migration MUST NOT touch `oxconfig`. Re-running the migration MUST be a no-op.
 
 #### Scenario: Migration on a clean database
 - **WHEN** the migration runs against a database that does not yet contain `o3revocation`

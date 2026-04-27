@@ -6,14 +6,14 @@
 
 ## 1. Database schema and seeding (shop-ce)
 
-- [ ] 1.1 Create new Doctrine migration file `source/migration/data/Version<TIMESTAMP>.php` (use today's UTC timestamp as `YYYYMMDDhhmmss`).
-- [ ] 1.2 In the migration's `up()`: `CREATE TABLE IF NOT EXISTS o3revocation (...)` matching the schema in design D3 — every column carries its `COMMENT`; table-level `COMMENT` cites § 356a BGB and the effective date; `OXIP` and `OXUSERAGENT` columns are NOT created.
-- [ ] 1.3 In the migration's `up()`: `INSERT IGNORE INTO oxcontents` one row per active shop language with `OXIDENT='o3_revocation_notice'`, `OXACTIVE=0`, `OXCONTENT=''`, `OXTITLE` resolved from a translation key. Idempotent — never overwrites operator content on re-run.
-- [ ] 1.4 In the migration's `down()`: `DROP TABLE IF EXISTS o3revocation` and `DELETE FROM oxcontents WHERE OXIDENT='o3_revocation_notice'`. Rollback is theoretically possible; in practice operators won't run it on prod with real submissions.
-- [ ] 1.5 Add an integration test that runs the migration against a clean test DB, asserts the table exists with the expected columns, and asserts the `oxcontents` rows are present, inactive, and empty.
-- [ ] 1.6 Add an integration test that runs the migration twice on the same DB (operator-edited snippet between runs) and asserts the operator's content is preserved.
-- [ ] 1.7 Add four `INSERT INTO oxconfig` rows to `source/Setup/Sql/initial_data.sql`: `blShowRevocationForm = '1'` (bool), `blRevocationRequireLogin = '0'` (bool), `blRevocationNotifyOperator = '1'` (bool), `sRevocationOperatorEmail = ''` (str). Use `OXVARTYPE` and `OXVARVALUE` consistent with the nine config rows already in the file.
-- [ ] 1.8 Verify a fresh `./docker.sh rebuild` brings the shop up with all four `oxconfig` rows present (`SELECT * FROM oxconfig WHERE OXVARNAME LIKE '%Revocation%'`).
+- [x] 1.1 Create new Doctrine migration file `source/migration/data/Version<TIMESTAMP>.php` (use today's UTC timestamp as `YYYYMMDDhhmmss`).
+- [x] 1.2 In the migration's `up()`: `CREATE TABLE IF NOT EXISTS o3revocation (...)` matching the schema in design D3 — every column carries its `COMMENT`; table-level `COMMENT` cites § 356a BGB and the effective date; `OXIP` and `OXUSERAGENT` columns are NOT created.
+- [x] 1.3 In the migration's `up()`: `INSERT IGNORE INTO oxcontents` one row per shop with `OXLOADID='o3_revocation_notice'`, `OXSNIPPET=1`, `OXTYPE=0`, every per-language slot inactive and empty (`OXACTIVE_*=0`, `OXTITLE_*=''`, `OXCONTENT_*=''`). `oxcontents` uses suffixed columns for multi-language; one row covers every language. Idempotent via `INSERT IGNORE` on the `OXLOADID` UNIQUE index — never overwrites operator content on re-run.
+- [x] 1.4 In the migration's `down()`: `DROP TABLE IF EXISTS o3revocation` and `DELETE FROM oxcontents WHERE OXLOADID='o3_revocation_notice'`. Rollback is theoretically possible; in practice operators won't run it on prod with real submissions.
+- [x] 1.5 Add an integration test that runs the migration against a clean test DB, asserts the table exists with the expected columns, and asserts the `oxcontents` rows are present, inactive, and empty.
+- [x] 1.6 Add an integration test that runs the migration twice on the same DB (operator-edited snippet between runs) and asserts the operator's content is preserved.
+- [x] 1.7 Add four `INSERT INTO oxconfig` rows to `source/Setup/Sql/initial_data.sql`: `blShowRevocationForm = '1'` (bool), `blRevocationRequireLogin = '0'` (bool), `blRevocationNotifyOperator = '1'` (bool), `sRevocationOperatorEmail = ''` (str). Use `OXVARTYPE` and `OXVARVALUE` consistent with the nine config rows already in the file.
+- [x] 1.8 Verify a fresh `./docker.sh rebuild` brings the shop up with all four `oxconfig` rows present (`SELECT * FROM oxconfig WHERE OXVARNAME LIKE '%Revocation%'`).
 
 ## 2. Model and persistence (shop-ce)
 

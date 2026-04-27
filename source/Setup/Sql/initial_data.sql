@@ -1533,3 +1533,14 @@ VALUES (@defaultAdminId, 1, 'malladmin', 1, 'admin',
 
 INSERT INTO `oxconfig` (`OXID`, `OXSHOPID`, `OXMODULE`, `OXVARNAME`, `OXVARTYPE`, `OXVARVALUE`)
 VALUES ('2a944b2cc31311e8957700163e4021bf', 1, '', 'includeProductReviewLinksInEmail', 'bool', '');
+
+-- §356a BGB electronic revocation feature (issue #99). Default-on for fresh
+-- installs (legally safe out of the box for typical B2C shops); upgrades inherit
+-- the absent-row → off behaviour from code defaults. Operator can flip these in
+-- admin once the templates and operator email are in place.
+INSERT INTO `oxconfig` (`OXID`, `OXSHOPID`, `OXMODULE`, `OXVARNAME`, `OXVARTYPE`, `OXVARVALUE`)
+VALUES
+    ('c7c6ef985f845e56417339ae7b930b20', 1, '', 'blShowRevocationForm',       'bool', '1'),
+    ('b4f36c830c18f275eef33491246b822e', 1, '', 'blRevocationRequireLogin',   'bool', '0'),
+    ('f4a110db564dcf6528ede68bddebe75c', 1, '', 'blRevocationNotifyOperator', 'bool', '1'),
+    ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  '');
