@@ -515,15 +515,27 @@ The runtime SHALL emit log lines at five points using the project's logging conv
 
 ### Requirement: Storefront templates portable across themes
 
-Storefront template files added by this feature SHALL be authored portably so that copying them from `wave-theme` to `o3-Theme` is mechanical. Template files MUST NOT bake in wave-specific CSS class names that are returned from PHP, and controllers MUST NOT branch on `Registry::getConfig()->getActiveTheme()` for revocation-specific behaviour.
+Storefront template files added by this feature SHALL be authored portably so that copying them from `wave-theme` to `o3-Theme` is mechanical. Template files MUST NOT bake in wave-specific CSS class names that are returned from PHP, and **controllers MUST NOT branch on `Registry::getConfig()->getActiveTheme()` for revocation-specific behaviour**.
+
+Why controllers must stay theme-agnostic — five compounding reasons, all of which apply:
+
+1. **Separation of concerns.** Controllers carry business logic and HTTP-handling responsibility; themes carry visual presentation. A `getActiveTheme()` check inside a controller mixes the two layers and makes a presentation concern leak into business code.
+2. **The wave → o3-theme cutover is imminent** (planned before 2026-05-01, see shared memory `project_o3-theme-migration.md`). If controllers branch on theme, porting the feature to `o3-theme` becomes a *cross-repo* change (shop-ce + o3-Theme) instead of a single theme-repo PR. The cutover is supposed to be a mechanical theme port; controller edits during a theme cutover are exactly the friction we're trying to avoid.
+3. **Future themes scale unmaintainably.** Every additional theme that ships would need its own branch in the controller (`if ($theme == 'wave') ... elseif ($theme == 'o3-theme') ... elseif ($theme == 'partner-x') ...`), producing a switch statement that grows linearly with the theme catalogue. Themes are supposed to be drop-in replacements that don't require core changes.
+4. **Hidden coupling.** A reviewer reading `RevocationController.php` does not expect business logic to vary by theme. A `getActiveTheme()` check is a non-obvious surprise that bites at debug time ("works on wave, broken on o3-theme — but I only changed the theme!"). Keeping controllers theme-blind makes the controller's behaviour visible from the controller alone.
+5. **Testability.** Theme-branching controllers force every test to set up theme detection or mock it, multiplying setup permutations (`testSubmit_OnWave`, `testSubmit_OnO3Theme`, …). Theme-agnostic controllers test once and the result holds across themes.
+
+What goes where instead: anything that needs to look different across themes belongs in the **templates** themselves (the theme repo has full control over its own Smarty files); anything that needs to vary based on the active *shop* (currency, language, configuration) belongs in the **controller** as before but driven by the shop config, not the theme.
 
 #### Scenario: Audit for theme branching in controllers
-- **WHEN** a reviewer greps the revocation controller(s) for `getActiveTheme()`
-- **THEN** no match is found
+- **WHEN** a reviewer greps `source/Application/Controller/Revocation*.php` and `source/Application/Controller/Admin/Revocation*.php` for `getActiveTheme()`
+- **THEN** zero matches are found
+- **AND** if any future PR introduces a `getActiveTheme()` call into a revocation controller, the review explicitly asks the author to move the variation into the templates instead
 
 #### Scenario: Template file paths mirror across themes
 - **WHEN** the o3-Theme port is performed by copying template files from wave-theme
 - **THEN** the destination paths and file names are identical to the source paths and file names
+- **AND** no controller code in shop-ce needs to be modified as part of the port
 
 ### Requirement: PHP version and strict typing for new code
 
