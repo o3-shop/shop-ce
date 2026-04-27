@@ -191,7 +191,7 @@ The submission row MUST be persisted before any email send is attempted. Failure
 #### Scenario: Customer email fails after persist
 - **WHEN** persistence succeeds but the customer email send returns failure
 - **THEN** the `o3revocation` row remains in place
-- **AND** the admin detail view displays a "delivery failed" flag for that row
+- **AND** the admin detail view displays a "send failed" flag for that row (we can only detect that the synchronous send call returned an error — we cannot detect downstream delivery failure such as bounces, spam classification, or non-delivery-report timeouts)
 - **AND** one `ERROR` log line names the submission ID and the underlying error
 - **AND** the consumer-side flow still completes with a receipt page
 
@@ -446,7 +446,7 @@ Any rejection path on any form introduced by this feature (admin or storefront) 
 
 ### Requirement: Admin list view of submissions
 
-The admin SHALL provide a list view of all `o3revocation` rows for the current shop, accessible under "Customer Info → Revocations" (or equivalent placement). The list SHALL show at minimum: submission ID, name, order identifier, email, submission timestamp, and a "delivery failed" indicator when the customer email send failed.
+The admin SHALL provide a list view of all `o3revocation` rows for the current shop, accessible under "Customer Info → Revocations" (or equivalent placement). The list SHALL show at minimum: submission ID, name, order identifier, email, submission timestamp, and a **"send failed"** indicator when the synchronous customer email send returned an error. The indicator MUST NOT claim "delivery failed" — we cannot detect downstream delivery state (bounces, spam folder, non-delivery-report timeouts); we only know whether the local send call succeeded.
 
 #### Scenario: List view renders with submissions
 - **WHEN** an admin opens the revocations list with at least one row in `o3revocation`
@@ -460,15 +460,16 @@ The admin SHALL provide a list view of all `o3revocation` rows for the current s
 
 The admin SHALL provide a detail view per submission containing the persisted values, the submission timestamp, and a "Resend confirmation" button. Clicking the button MUST re-attempt only the customer confirmation email and update `OXTIMESTAMP` (housekeeping) without altering `OXSUBMITTED`.
 
-#### Scenario: Resend on a delivery-failed row
-- **WHEN** an admin clicks "Resend confirmation" on a row flagged "delivery failed"
+#### Scenario: Resend on a send-failed row
+- **WHEN** an admin clicks "Resend confirmation" on a row flagged "send failed"
 - **THEN** the customer email is re-attempted
 - **AND** `OXSUBMITTED` is unchanged after the action
 - **AND** `OXTIMESTAMP` is updated to the time of the resend
 
 #### Scenario: Resend success clears the failure flag
-- **WHEN** the resend succeeds on a previously-failed row
-- **THEN** the "delivery failed" flag is cleared on subsequent renders of the detail view
+- **WHEN** the resend succeeds on a previously-failed row (i.e. the synchronous send call returned without error)
+- **THEN** the "send failed" flag is cleared on subsequent renders of the detail view
+- **AND** the admin sees no claim about delivery — only that the most recent send attempt succeeded synchronously
 
 ### Requirement: No automatic deletion of submissions
 
@@ -486,21 +487,31 @@ The system MUST NOT include any scheduled job, cron task, time-based purge, or a
 
 The runtime SHALL emit log lines at five points using the project's logging conventions (`__METHOD__ . ' - '` prefix, full English sentence ending in `.`, ISO-8601 microsecond timestamp via Monolog):
 - `INFO` on form render (debug-level acceptable)
-- `INFO` on submit-step validation pass
-- `NOTICE` on confirm-step persist (with submission ID)
-- `ERROR` on email send failure (customer or operator) with the underlying error
+- `INFO` on validation pass inside the submit handler
+- `NOTICE` on persist (after the `o3revocation` row is written; includes the submission's `OXID`)
+- `ERROR` on email send failure (customer or operator); includes the submission's `OXID` and the underlying error
 - `WARNING` on anti-spam reject or session-token mismatch
 
-No log line MUST embed personal data (name, email, free-text) in the message body; structured context goes through the data array parameter.
+**Personal-data rule:**
+- The message body MUST NOT embed personal data: no consumer name, no email address, no free-text content, no other field a person would recognise as "their data".
+- The message body MAY (and is encouraged to) embed **opaque identifiers** for log correlation: the submission's `OXID` (`o3revocation.OXID`), and where a logged-in user is involved, the user's `OXID` (`oxuser.OXID`). These are synthetic identifiers that don't reveal anything *about* the person to someone reading the log; they exist precisely to let an operator find "the row this incident is about" via `SELECT * FROM o3revocation WHERE OXID = '...'`.
+- Structured context (HTTP request headers, response codes, internal state machine values, exception details) goes through the data-array parameter, not the message body — same convention used elsewhere in the codebase.
 
 #### Scenario: Successful submit produces the expected log sequence
-- **WHEN** a consumer completes a successful form → confirm flow
+- **WHEN** a consumer completes a successful form → submit flow
 - **THEN** the log contains, in order, an `INFO` for form render, an `INFO` for validation pass, and a `NOTICE` for persist
+- **AND** the `NOTICE` line names the submission's `OXID`
 - **AND** none of these lines includes the consumer's name, email, or free-text in the message body
 
 #### Scenario: Email failure produces an ERROR log line
 - **WHEN** the customer email send returns failure
-- **THEN** one `ERROR` log line names the submission ID and the underlying error message
+- **THEN** one `ERROR` log line names the submission's `OXID` and the underlying error message
+- **AND** the message body MUST NOT include the consumer's email address (the `OXID` is the correlation handle to find the row in the DB if needed)
+
+#### Scenario: Logged-in submitter — user OXID also logged
+- **WHEN** an authenticated visitor completes a successful submit
+- **THEN** the `NOTICE` persist log line names the submission's `OXID` AND the visitor's `oxuser.OXID`
+- **AND** still no personal data appears in the message body
 
 ### Requirement: Storefront templates portable across themes
 
