@@ -308,7 +308,7 @@ class RevocationController extends FrontendController
      */
     private function sendCustomerEmail(O3Revocation $submission): bool
     {
-        $mailer = Registry::getMailer();
+        $mailer = Registry::get(\OxidEsales\Eshop\Core\Email::class);
         if (method_exists($mailer, 'sendRevocationEmailToCustomer')) {
             return (bool) $mailer->sendRevocationEmailToCustomer($submission);
         }
@@ -320,7 +320,7 @@ class RevocationController extends FrontendController
      */
     private function sendOperatorEmail(O3Revocation $submission): bool
     {
-        $mailer = Registry::getMailer();
+        $mailer = Registry::get(\OxidEsales\Eshop\Core\Email::class);
         if (method_exists($mailer, 'sendRevocationEmailToOperator')) {
             return (bool) $mailer->sendRevocationEmailToOperator($submission);
         }

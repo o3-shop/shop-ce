@@ -84,16 +84,18 @@
 
 ## 9. Admin: list view, detail view, manual resend, manual delete (shop-ce)
 
-- [ ] 9.1 Create `source/Application/Controller/Admin/RevocationListController.php` extending the appropriate admin list base class. Maps to `o3revocation`. Strict types.
-- [ ] 9.2 Create the admin list template `source/Application/views/admin/tpl/revocation_list.tpl` showing submission ID, name, order identifier, email, submission timestamp, and a "send failed" indicator (translation key `O3_REVOCATION_ADMIN_FLAG_SEND_FAILED`). Empty-state message via `O3_REVOCATION_ADMIN_LIST_EMPTY`.
-- [ ] 9.3 Create `source/Application/Controller/Admin/RevocationDetailController.php` for the per-row detail view.
-- [ ] 9.4 Create the admin detail template `source/Application/views/admin/tpl/revocation_detail.tpl` showing all persisted fields and a "Resend confirmation" button.
-- [ ] 9.5 Implement the "Resend confirmation" admin action: re-attempt only the customer email; update `OXTIMESTAMP` (DB engine); leave `OXSUBMITTED` untouched; clear the "send failed" flag if the resend succeeded.
-- [ ] 9.6 Implement the manual-delete action with a confirmation prompt; emit one `NOTICE` log line naming the submission `OXID` and the admin user `OXID`.
-- [ ] 9.7 Add the admin nav entry under "Customer Info → Revocations" — extend `menu.xml` (or whichever the admin nav config is in this codebase).
-- [ ] 9.8 Verify the admin's "send failed" indicator wording does NOT claim "delivery failed" (review-time grep).
-- [ ] 9.9 Unit-test resend action preserves `OXSUBMITTED` and updates `OXTIMESTAMP`; manual delete writes the audit log line.
-- [ ] 9.10 Manual smoke test admin: open `http://localhost:8080/admin/`, navigate to "Customer Info → Revocations", confirm the test submission shows up in the list with the correct columns; open the detail view; click resend; verify Mailpit gets a fresh customer email and the "send failed" flag clears; manually delete one row via the admin button and verify it disappears with the audit `NOTICE` log line.
+- [x] 9.1 Created `source/Application/Controller/Admin/RevocationList.php` extending `AdminListController`, mapped to the `O3Revocation` model. Strict types.
+- [x] 9.2 Admin list template `source/Application/views/admin/tpl/revocation_list.tpl` shows submission timestamp, name, email, order identifier, and a "send failed" / "sent" status indicator. Empty-state message via `O3_REVOCATION_ADMIN_LIST_EMPTY`. Click-to-edit row binding into `revocation_main`.
+- [x] 9.3 Created `source/Application/Controller/Admin/RevocationMain.php` for the per-row detail view; loads via `getEditObjectId()` into `_aViewData['edit']`.
+- [x] 9.4 Admin detail template `source/Application/views/admin/tpl/revocation_main.tpl` lists all persisted fields read-only with "Resend confirmation" + "Delete" buttons.
+- [x] 9.5 `RevocationMain::resend()`: re-attempts the customer email via `Registry::get(Email::class)->sendRevocationEmailToCustomer()`. On success → `markSendSucceeded()` + NOTICE log; on failure → `markSendFailed()` + ERROR log. `OXSUBMITTED` is untouched (write-once invariant from phase 2 model). Verified by integration test.
+- [x] 9.6 `RevocationMain::deleteEntry()`: emits one NOTICE audit log line naming both the submission OXID and the admin user OXID, then calls `$submission->delete()`. Confirmation prompt is JS-side via `onclick="return confirm(...)"` (the standard OXID admin pattern).
+- [x] 9.7 Admin nav: `source/Application/views/admin/menu.xml` gains two SUBMENU entries under the existing customer-info MAINMENU — `mxrevocations` (list with detail TAB) and `mxrevocationconfig` (the dedicated configuration page from phase 7).
+- [x] 9.8 Audit grep on the admin templates: `grep -rIE "delivery.failed" source/Application/views/admin/tpl/revocation_*.tpl` returns zero matches. Status indicators say "send failed" / "sent" only — never "delivery failed".
+- [x] 9.9 Integration tested in `tests/Integration/Application/Controller/Admin/RevocationMainTest.php`: 3 tests / 6 assertions cover successful resend (clears `OXSENDFAILED`, preserves `OXSUBMITTED`); failed resend (keeps flag, preserves `OXSUBMITTED`); manual delete (row removed, single audit NOTICE emitted with submission OXID).
+- [ ] 9.10 Manual smoke test admin — deferred. Same dependency as 4.9: needs phase 11's storefront templates so a real consumer flow can produce a real submission for the admin to view. Will re-open after phase 11 lands.
+
+**Phase-4 controller bug fix (carried in this commit):** `Registry::getMailer()` doesn't exist in OXID — was a typo that the phase-4 controller's `try/catch(Throwable)` swallowed silently. Replaced with the correct `Registry::get(\OxidEsales\Eshop\Core\Email::class)`. Phase 4 unit tests adjusted to use `onlyMethods()` (the email methods are real after phase 5).
 
 ## 10. Translation keys (shop-ce — admin and email)
 

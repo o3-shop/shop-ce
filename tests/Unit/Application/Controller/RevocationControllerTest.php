@@ -326,7 +326,7 @@ class RevocationControllerTest extends UnitTestCase
         // Use addMethods() for the not-yet-existing methods (delivered in phase 5).
         $mailer = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
-            ->addMethods(['sendRevocationEmailToCustomer', 'sendRevocationEmailToOperator'])
+            ->onlyMethods(['sendRevocationEmailToCustomer', 'sendRevocationEmailToOperator'])
             ->getMock();
         $mailer->method('sendRevocationEmailToCustomer')->willReturnCallback(
             fn () => $this->customerEmailReturn
