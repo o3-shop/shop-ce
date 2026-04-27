@@ -5,7 +5,10 @@
 ## What Changes
 
 - Add a new **electronic revocation** capability to the storefront covering the four-step flow defined in § 356a BGB:
-  1. Permanent revocation-entry button in the footer (visible without login on every page); default German label *"Vertrag widerrufen"* shipped via the translation system
+  1. Permanent revocation-entry link in the footer of every storefront page, subject to the visibility matrix below (default German label *"Vertrag widerrufen"* shipped via the translation system):
+     - When the feature is on and `blRevocationRequireLogin = 0` (guest access allowed): link visible to anonymous and authenticated visitors alike — meets § 356a "easily accessible" for shops with guest checkout.
+     - When the feature is on and `blRevocationRequireLogin = 1` (login mandatory): link visible only to logged-in users; hidden from anonymous visitors, since they could not have placed an order in the first place and therefore have no contract to revoke. Showing the link to them would advertise an entry-point they cannot use.
+     - When the feature is off: link never rendered, regardless of login state.
   2. Revocation form with the three statutory mandatory fields (name, contract/order identification, electronic communication channel) plus an optional free-text field for partial revocation. **Above the form**, render an operator-editable notice area (see "Operator notice above form" below) so shop owners can communicate scope-limiting or shop-specific information ("Revocation only for products X and Y", processing-time info, contact details for unusual cases, etc.).
   3. Confirmation step button that makes the declaration legally effective; default German label *"Widerruf bestätigen"* shipped via the translation system
   4. Immediate confirmation receipt to the consumer on a durable medium (email), including the declaration content and timestamp of receipt
