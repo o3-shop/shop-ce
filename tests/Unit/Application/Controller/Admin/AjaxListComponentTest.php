@@ -127,11 +127,11 @@ class AjaxListComponentTest extends \OxidTestCase
      */
     public function testProcessRequest()
     {
-        $oComponent = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax::class, ['testFnc', 'getQuery', 'getDataQuery', 'getCountQuery', 'outputResponse', 'getData']);
+        $oComponent = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax::class, ['testFnc', '_getQuery', '_getDataQuery', '_getCountQuery', 'outputResponse', 'getData']);
         $oComponent->expects($this->never())->method('testFnc');
-        $oComponent->expects($this->once())->method('getQuery');
-        $oComponent->expects($this->once())->method('getDataQuery');
-        $oComponent->expects($this->once())->method('getCountQuery');
+        $oComponent->expects($this->once())->method('_getQuery'); // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+        $oComponent->expects($this->once())->method('_getDataQuery');
+        $oComponent->expects($this->once())->method('_getCountQuery');
         $oComponent->expects($this->once())->method('outputResponse');
         $oComponent->expects($this->once())->method('getData');
         $oComponent->processRequest();
