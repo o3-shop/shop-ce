@@ -1,9 +1,8 @@
 ## 0. Hard prerequisite — issue #114 (entrypoint git-clone bootstrap)
 
-- [ ] 0.1 Confirm #114 has landed and `docker/entrypoint.sh` clones wave-theme via `git clone` instead of `wget`/`unzip`. Block all subsequent storefront-theme tasks until verified.
-- [ ] 0.2 On the dev machine, ensure `source/Application/views/wave/.git` exists (real working tree) — if not, follow the migration procedure: `./docker.sh stop && rm -rf source/Application/views/wave && ./docker.sh start`.
-- [ ] 0.3 In the wave-theme working tree, switch the remote to SSH: `cd source/Application/views/wave && git remote set-url origin git@github.com:o3-shop/wave-theme.git`. Confirm the remote with `git remote -v`.
-- [ ] 0.4 Create the feature branch in wave-theme: `git checkout -b 99-add-electronic-revocation-function`. The shop-ce branch (`99-add-electronic-revocation-function-b2`) already exists — same logical change, two coordinated PRs.
+- [x] 0.1 Confirm #114 has landed and `docker/entrypoint.sh` clones wave-theme via `git clone` instead of `wget`/`unzip`. Block all subsequent storefront-theme tasks until verified.
+- [x] 0.2 On the dev machine, ensure `source/Application/views/wave/.git` exists (real working tree) — if not, follow the migration procedure: `./docker.sh stop && rm -rf source/Application/views/wave && ./docker.sh start`.
+- [x] 0.3 Create the feature branch in wave-theme: `cd source/Application/views/wave && git checkout -b 99-add-electronic-revocation-function`. The shop-ce branch (`99-add-electronic-revocation-function-b2`) already exists — same logical change, two coordinated PRs. The HTTPS remote that the bootstrap clone produces works for pushes as-is on a dev machine where `gh auth login` has been run (gh sets up a credential helper). Switching to SSH is a personal-preference option, not required.
 
 ## 1. Database schema and seeding (shop-ce)
 
