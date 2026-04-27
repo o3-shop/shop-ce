@@ -38,39 +38,91 @@ setup_environment() {
     fi
 }
 
-# Function to download and install theme
-install_theme() {
-    log "${YELLOW}Installing Wave theme...${NC}"
-    
-    # Check if theme is already installed
-    if [ -d "source/Application/views/wave" ] && [ "$(ls -A source/Application/views/wave)" ]; then
-        log "Wave theme appears to be already installed, skipping"
-        return 0
+# Clones a theme repo into source/Application/views/<theme> and symlinks
+# source/out/<theme> at its in-tree out/<theme> so Apache serves assets
+# directly out of the working tree.
+#
+# Args: <theme-name> <git-url>
+install_theme_from_git() {
+    local theme="$1"
+    local repo_url="$2"
+    local view_dir="source/Application/views/${theme}"
+    local out_dir="source/out/${theme}"
+
+    log "${YELLOW}Installing ${theme} theme...${NC}"
+
+    if [ -d "$view_dir" ] && [ "$(ls -A "$view_dir")" ]; then
+        if [ ! -d "$view_dir/.git" ]; then
+            handle_error "$(cat <<EOF
+
+Detected old detached snapshot at ${view_dir} (no .git/ subdirectory).
+This is the layout the previous wget/unzip bootstrap produced. The entrypoint
+now expects a git working tree there so you can pull/commit/push to
+${repo_url} directly.
+
+If you have NO uncommitted edits in ${view_dir}, run:
+
+    ./docker.sh stop
+    rm -rf ${view_dir} ${out_dir}
+    ./docker.sh start
+
+If you DO have uncommitted edits there — be careful: ${view_dir} is gitignored,
+so nothing is version-controlled by anything. Steps:
+
+    1. Copy your edits somewhere safe OUTSIDE ${view_dir} (e.g. ~/${theme}-edits/).
+    2. Run the three commands above.
+    3. After ./docker.sh start, ${view_dir} is a real ${theme} working tree.
+       Replay your edits there, then commit and push to ${repo_url}.
+
+Aborting so no work is destroyed.
+EOF
+            )"
+        fi
+        log "${theme}: working tree already present, skipping clone"
+    else
+        log "Cloning ${theme} from ${repo_url}..."
+        git clone --branch main "$repo_url" "$view_dir" \
+            || handle_error "Failed to clone ${theme} from ${repo_url}"
     fi
-    
-    # Download theme
-    log "Downloading theme from GitHub..."
-    wget -q https://github.com/o3-shop/wave-theme/archive/refs/heads/main.zip -O main.zip || handle_error "Failed to download theme"
-    
-    # Extract theme
-    log "Extracting theme..."
-    unzip -q main.zip || handle_error "Failed to extract theme archive"
-    
-    # Copy theme files
-    log "Copying theme files to appropriate directories..."
-    mkdir -p source/out/ || handle_error "Failed to create out directory"
-    cp -r wave-theme-main/out/* source/out/ || handle_error "Failed to copy theme out files"
-    
-    mkdir -p source/Application/views/wave || handle_error "Failed to create theme views directory"
-    rm -rf wave-theme-main/out
-    cp -r wave-theme-main/* source/Application/views/wave || handle_error "Failed to copy theme view files"
-    
-    # Clean up
-    log "Cleaning up temporary files..."
-    rm -rf wave-theme-main
-    rm main.zip
-    
-    log "${GREEN}Wave theme installed successfully${NC}"
+
+    if [ -e "$out_dir" ] && [ ! -L "$out_dir" ]; then
+        handle_error "$(cat <<EOF
+
+${out_dir} exists and is a regular directory.
+Expected: a symlink pointing to ../Application/views/${theme}/out/${theme}
+(so Apache serves theme assets directly out of the working tree).
+
+This is leftover content from the previous wget/unzip bootstrap. Safe to remove:
+the canonical assets live under ${view_dir}/out/${theme} now.
+
+Run:
+
+    ./docker.sh stop
+    rm -rf ${view_dir} ${out_dir}
+    ./docker.sh start
+
+(Removing ${view_dir} too keeps both paths in sync — the next start re-clones
+the working tree and re-creates the symlink in one shot.)
+
+Aborting.
+EOF
+        )"
+    fi
+    if [ ! -e "$out_dir" ]; then
+        mkdir -p source/out || handle_error "Failed to create source/out"
+        ln -s "../Application/views/${theme}/out/${theme}" "$out_dir" \
+            || handle_error "Failed to create symlink ${out_dir} -> ../Application/views/${theme}/out/${theme}"
+    fi
+
+    log "${GREEN}${theme} theme ready${NC}"
+}
+
+install_theme() {
+    install_theme_from_git wave https://github.com/o3-shop/wave-theme.git
+}
+
+install_o3_theme() {
+    install_theme_from_git o3-theme https://github.com/o3-shop/o3-Theme.git
 }
 
 # Function to install dependencies
@@ -156,6 +208,7 @@ main() {
     install_demodata || exit 127
     setup_db || exit 127
     install_theme || exit 127
+    install_o3_theme || exit 127
     start_apache || exit 127
 }
 

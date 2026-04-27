@@ -217,11 +217,15 @@ class ContentMain extends AdminDetailsController
      * @param string $sIdent ident to filter
      *
      * @return string|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareIdent" in next major
+     * @deprecated Use prepareIdent() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _prepareIdent().
      */
     protected function _prepareIdent($sIdent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->prepareIdent($sIdent);
+        if ($sIdent) {
+            return Str::getStr()->preg_replace('/[^a-zA-Z0-9_]*/', '', $sIdent);
+        }
     }
 
     /**
@@ -230,12 +234,14 @@ class ContentMain extends AdminDetailsController
      * @param string $sIdent ident to filter
      *
      * @return string|void
+     *
+     * @internal If your override does not fully replace the behavior, call parent::prepareIdent()
+     *           (not the deprecated _prepareIdent()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function prepareIdent($sIdent)
     {
-        if ($sIdent) {
-            return Str::getStr()->preg_replace('/[^a-zA-Z0-9_]*/', '', $sIdent);
-        }
+        return $this->_prepareIdent($sIdent);
     }
 
     /**
@@ -246,23 +252,11 @@ class ContentMain extends AdminDetailsController
      *
      * @return null
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkIdent" in next major
+     * @deprecated Use checkIdent() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _checkIdent().
      */
     protected function _checkIdent($sIdent, $sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->checkIdent($sIdent, $sOxId);
-    }
-
-    /**
-     * Check if ident is unique
-     *
-     * @param string $sIdent ident
-     * @param string $sOxId Object id
-     *
-     * @return null
-     * @throws DatabaseConnectionException
-     */
-    protected function checkIdent($sIdent, $sOxId)
     {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = DatabaseProvider::getMaster();
@@ -284,5 +278,23 @@ class ContentMain extends AdminDetailsController
         }
 
         return $blAllow;
+    }
+
+    /**
+     * Check if ident is unique
+     *
+     * @param string $sIdent ident
+     * @param string $sOxId Object id
+     *
+     * @return null
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::checkIdent()
+     *           (not the deprecated _checkIdent()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function checkIdent($sIdent, $sOxId)
+    {
+        return $this->_checkIdent($sIdent, $sOxId);
     }
 }

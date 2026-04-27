@@ -68,20 +68,11 @@ class CategoryOrderAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getQuery().
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         // looking for table/view
         $sArtTable = $this->getViewName('oxarticles');
@@ -108,15 +99,18 @@ class CategoryOrderAjax extends ListComponentAjax
     }
 
     /**
-     * Returns SQL query addon for sorting
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getQuery()
+     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getQuery()
     {
-        return $this->getSorting();
+        return $this->_getQuery();
     }
 
     /**
@@ -124,12 +118,18 @@ class CategoryOrderAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Use getSorting() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getSorting().
      */
-    protected function getSorting()
+    protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sOrder = '';
         if (Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
-            $sOrder = parent::getSorting();
+            // NOTE: call parent::_getSorting() (not parent::getSorting()) to avoid
+            // infinite recursion through the parent's delegate. Restores baseline
+            // (ebe86dc0) call shape. See o3-shop/o3-shop#107 remediation.
+            $sOrder = parent::_getSorting();
         } elseif (($aSkipArt = Registry::getSession()->getVariable('neworder_sess'))) {
             $sOrderBy = '';
             $sArtTable = $this->getViewName('oxarticles');
@@ -142,6 +142,21 @@ class CategoryOrderAjax extends ListComponentAjax
         }
 
         return $sOrder;
+    }
+
+    /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getSorting()
+     *           (not the deprecated _getSorting()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getSorting()
+    {
+        return $this->_getSorting();
     }
 
     /**

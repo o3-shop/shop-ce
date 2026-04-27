@@ -428,16 +428,16 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * Used to collect user validation errors. This method is called from all of
      * the input checking functionality to report found error.
      *
-     * @deprecated since v6.0.0(2017-12-22); Use addValidationError.
-     *
-     * @param string            $fieldName Field name.
+     * @deprecated Use addValidationError() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _addValidationError().
      * @param StandardException $error     Exception.
      *
      * @return StandardException
      */
     protected function _addValidationError($fieldName, $error) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->addValidationError($fieldName, $error);
+        return $this->_aInputValidationErrors[$fieldName][] = $error;
     }
 
     /**
@@ -448,10 +448,14 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * @param StandardException $error
      *
      * @return StandardException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::addValidationError()
+     *           (not the deprecated _addValidationError()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     public function addValidationError($fieldName, $error)
     {
-        return $this->_aInputValidationErrors[$fieldName][] = $error;
+        return $this->_addValidationError($fieldName, $error);
     }
 
     /**

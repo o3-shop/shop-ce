@@ -51,21 +51,27 @@ class SeoEncoderArticle extends SeoEncoder
      * Returns target "extension" (.html)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Use getUrlExtension() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getUrlExtension().
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getUrlExtension();
+        return '.html';
     }
 
     /**
      * Returns target "extension" (.html)
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getUrlExtension()
+     *           (not the deprecated _getUrlExtension()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getUrlExtension()
     {
-        return '.html';
+        return $this->_getUrlExtension();
     }
 
     /**
@@ -76,23 +82,11 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    user defined language id
      *
      * @return Article
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getProductForLang" in next major
+     * @deprecated Use getProductForLang() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getProductForLang().
      */
     protected function _getProductForLang($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getProductForLang($oArticle, $iLang);
-    }
-
-    /**
-     * Checks if current article is in same language as preferred (language id passed by param).
-     * In case languages are not the same - reloads article object in different language
-     *
-     * @param Article $oArticle article to check language
-     * @param int                                         $iLang    user defined language id
-     *
-     * @return Article
-     */
-    protected function getProductForLang($oArticle, $iLang)
     {
         if (isset($iLang) && $iLang != $oArticle->getLanguage()) {
             $sId = $oArticle->getId();
@@ -102,6 +96,24 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oArticle;
+    }
+
+    /**
+     * Checks if current article is in same language as preferred (language id passed by param).
+     * In case languages are not the same - reloads article object in different language
+     *
+     * @param Article $oArticle article to check language
+     * @param int                                         $iLang    user defined language id
+     *
+     * @return Article
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getProductForLang()
+     *           (not the deprecated _getProductForLang()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getProductForLang($oArticle, $iLang)
+    {
+        return $this->_getProductForLang($oArticle, $iLang);
     }
 
     /**
@@ -175,21 +187,27 @@ class SeoEncoderArticle extends SeoEncoder
      * Returns active list type
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getListType" in next major
+     * @deprecated Use getListType() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getListType().
      */
     protected function _getListType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getListType();
+        return Registry::getConfig()->getActiveView()->getListType();
     }
 
     /**
      * Returns active list type
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getListType()
+     *           (not the deprecated _getListType()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getListType()
     {
-        return Registry::getConfig()->getActiveView()->getListType();
+        return $this->_getListType();
     }
 
     /**
@@ -201,24 +219,11 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "createArticleCategoryUri" in next major
+     * @deprecated Use createArticleCategoryUri() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _createArticleCategoryUri().
      */
     protected function _createArticleCategoryUri($oArticle, $oCategory, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->createArticleCategoryUri($oArticle, $oCategory, $iLang);
-    }
-
-    /**
-     * create article uri for given category and save it
-     *
-     * @param Article $oArticle article object
-     * @param Category $oCategory category object
-     * @param int $iLang language to generate uri for
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function createArticleCategoryUri($oArticle, $oCategory, $iLang)
     {
         startProfile(__FUNCTION__);
         $oArticle = $this->_getProductForLang($oArticle, $iLang);
@@ -250,6 +255,25 @@ class SeoEncoderArticle extends SeoEncoder
         stopProfile(__FUNCTION__);
 
         return $sSeoUri;
+    }
+
+    /**
+     * create article uri for given category and save it
+     *
+     * @param Article $oArticle article object
+     * @param Category $oCategory category object
+     * @param int $iLang language to generate uri for
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::createArticleCategoryUri()
+     *           (not the deprecated _createArticleCategoryUri()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function createArticleCategoryUri($oArticle, $oCategory, $iLang)
+    {
+        return $this->_createArticleCategoryUri($oArticle, $oCategory, $iLang);
     }
 
     /**
@@ -302,22 +326,11 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    language id
      *
      * @return Category|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategory" in next major
+     * @deprecated Use getCategory() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getCategory().
      */
     protected function _getCategory($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getCategory($oArticle, $iLang);
-    }
-
-    /**
-     * Returns active category if available
-     *
-     * @param Article $oArticle product
-     * @param int                                         $iLang    language id
-     *
-     * @return Category|null
-     */
-    protected function getCategory($oArticle, $iLang)
     {
         $oCat = null;
         $oView = Registry::getConfig()->getActiveView();
@@ -331,17 +344,20 @@ class SeoEncoderArticle extends SeoEncoder
     }
 
     /**
-     * Returns products main category id
+     * Returns active category if available
      *
      * @param Article $oArticle product
+     * @param int                                         $iLang    language id
      *
-     * @return Category
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getMainCategory" in next major
+     * @return Category|null
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getCategory()
+     *           (not the deprecated _getCategory()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getMainCategory($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getCategory($oArticle, $iLang)
     {
-        return $this->getMainCategory($oArticle);
+        return $this->_getCategory($oArticle, $iLang);
     }
 
     /**
@@ -351,8 +367,11 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return Category
      * @throws DatabaseConnectionException
+     * @deprecated Use getMainCategory() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getMainCategory().
      */
-    protected function getMainCategory($oArticle)
+    protected function _getMainCategory($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oMainCat = null;
 
@@ -385,6 +404,23 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oMainCat;
+    }
+
+    /**
+     * Returns products main category id
+     *
+     * @param Article $oArticle product
+     *
+     * @return Category
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getMainCategory()
+     *           (not the deprecated _getMainCategory()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getMainCategory($oArticle)
+    {
+        return $this->_getMainCategory($oArticle);
     }
 
     /**
@@ -440,23 +476,11 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareArticleTitle" in next major
+     * @deprecated Use prepareArticleTitle() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _prepareArticleTitle().
      */
     protected function _prepareArticleTitle($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->prepareArticleTitle($oArticle);
-    }
-
-    /**
-     * Returns seo title for current article (if oxTitle field is empty, oxArtnum is used).
-     * Additionally - if oxVarSelect is set - title is appended with its value
-     *
-     * @param Article $oArticle article object
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function prepareArticleTitle($oArticle)
     {
         // create title part for uri
         if (!($sTitle = $oArticle->oxarticles__oxtitle->value)) {
@@ -483,6 +507,24 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $this->_prepareTitle($sTitle, false, $oArticle->getLanguage()) . $this->_getUrlExtension();
+    }
+
+    /**
+     * Returns seo title for current article (if oxTitle field is empty, oxArtnum is used).
+     * Additionally - if oxVarSelect is set - title is appended with its value
+     *
+     * @param Article $oArticle article object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::prepareArticleTitle()
+     *           (not the deprecated _prepareArticleTitle()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareArticleTitle($oArticle)
+    {
+        return $this->_prepareArticleTitle($oArticle);
     }
 
     /**
@@ -541,22 +583,11 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    language id
      *
      * @return Vendor|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getVendor" in next major
+     * @deprecated Use getVendor() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getVendor().
      */
     protected function _getVendor($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getVendor($oArticle, $iLang);
-    }
-
-    /**
-     * Returns active vendor if available
-     *
-     * @param Article $oArticle product
-     * @param int                                         $iLang    language id
-     *
-     * @return Vendor|null
-     */
-    protected function getVendor($oArticle, $iLang)
     {
         $oView = Registry::getConfig()->getActiveView();
 
@@ -576,6 +607,23 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oVendor;
+    }
+
+    /**
+     * Returns active vendor if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Vendor|null
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getVendor()
+     *           (not the deprecated _getVendor()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getVendor($oArticle, $iLang)
+    {
+        return $this->_getVendor($oArticle, $iLang);
     }
 
     /**
@@ -633,22 +681,11 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    language id
      *
      * @return Manufacturer|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturer" in next major
+     * @deprecated Use getManufacturer() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getManufacturer().
      */
     protected function _getManufacturer($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getManufacturer($oArticle, $iLang);
-    }
-
-    /**
-     * Returns active manufacturer if available
-     *
-     * @param Article $oArticle product
-     * @param int                                         $iLang    language id
-     *
-     * @return Manufacturer|null
-     */
-    protected function getManufacturer($oArticle, $iLang)
     {
         $oManufacturer = null;
         if ($sActManufacturerId = $oArticle->oxarticles__oxmanufacturerid->value) {
@@ -669,6 +706,23 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oManufacturer;
+    }
+
+    /**
+     * Returns active manufacturer if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Manufacturer|null
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getManufacturer()
+     *           (not the deprecated _getManufacturer()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getManufacturer($oArticle, $iLang)
+    {
+        return $this->_getManufacturer($oArticle, $iLang);
     }
 
     /**
@@ -763,24 +817,11 @@ class SeoEncoderArticle extends SeoEncoder
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Use getAltUri() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getAltUri().
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getAltUri($sObjectId, $iLang);
-    }
-
-    /**
-     * Returns alternative uri used while updating seo
-     *
-     * @param string $sObjectId object id
-     * @param int $iLang language id
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    protected function getAltUri($sObjectId, $iLang)
     {
         $sSeoUrl = null;
         $oArticle = oxNew(Article::class);
@@ -801,5 +842,24 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $sSeoUrl;
+    }
+
+    /**
+     * Returns alternative uri used while updating seo
+     *
+     * @param string $sObjectId object id
+     * @param int $iLang language id
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getAltUri()
+     *           (not the deprecated _getAltUri()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getAltUri($sObjectId, $iLang)
+    {
+        return $this->_getAltUri($sObjectId, $iLang);
     }
 }

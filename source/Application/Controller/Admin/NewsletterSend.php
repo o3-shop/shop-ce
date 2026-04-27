@@ -205,19 +205,11 @@ class NewsletterSend extends NewsletterSelection
      * Overrides parent method to pass referred id
      *
      * @param string $sNode referred id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Use setupNavigation() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _setupNavigation().
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setupNavigation($sNode);
-    }
-
-    /**
-     * Overrides parent method to pass referred id
-     *
-     * @param string $sNode referred id
-     */
-    protected function setupNavigation($sNode)
     {
         $sNode = 'newsletter_list';
 
@@ -237,6 +229,20 @@ class NewsletterSend extends NewsletterSelection
 
         // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
+    }
+
+    /**
+     * Overrides parent method to pass referred id
+     *
+     * @param string $sNode referred id
+     *
+     * @internal If your override does not fully replace the behavior, call parent::setupNavigation()
+     *           (not the deprecated _setupNavigation()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
     }
 
     /**

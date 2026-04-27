@@ -144,21 +144,11 @@ class NavigationController extends AdminController
      *
      * @return array
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "doStartUpChecks" in next major
+     * @deprecated Use doStartUpChecks() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _doStartUpChecks().
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->doStartUpChecks();
-    }
-
-    /**
-     * Every Time Admin starts we perform these checks
-     * returns some messages if there is something to display
-     *
-     * @return array
-     * @throws Exception
-     */
-    protected function doStartUpChecks()
     {
         $messages = [];
 
@@ -204,24 +194,31 @@ class NavigationController extends AdminController
     }
 
     /**
-     * Checks if newer shop version available. If true - returns message
+     * Every Time Admin starts we perform these checks
+     * returns some messages if there is something to display
      *
-     * @return string
+     * @return array
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkVersion" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call parent::doStartUpChecks()
+     *           (not the deprecated _doStartUpChecks()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function doStartUpChecks()
     {
-        return $this->checkVersion();
+        return $this->_doStartUpChecks();
     }
 
     /**
      * Checks if newer shop version available. If true - returns message
      *
-     * @return string|void
+     * @return string
      * @throws Exception
+     * @deprecated Use checkVersion() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _checkVersion().
      */
-    protected function checkVersion()
+    protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $json = file_get_contents('https://api.github.com/repos/o3-shop/o3-shop/releases/latest', false, stream_context_create([
             'http' => [
@@ -249,6 +246,21 @@ class NavigationController extends AdminController
                 );
             }
         }
+    }
+
+    /**
+     * Checks if newer shop version available. If true - returns message
+     *
+     * @return string|void
+     * @throws Exception
+     *
+     * @internal If your override does not fully replace the behavior, call parent::checkVersion()
+     *           (not the deprecated _checkVersion()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function checkVersion()
+    {
+        return $this->_checkVersion();
     }
 
     public function canHaveRestrictedView()

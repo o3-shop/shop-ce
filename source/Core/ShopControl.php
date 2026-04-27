@@ -761,8 +761,9 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
 
     protected function handleAccessDeniedException(AccessDeniedException $exception)
     {
-        echo $exception->getMessage();
-        exit();
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(0, $exception->getMessage());
     }
 
     /**

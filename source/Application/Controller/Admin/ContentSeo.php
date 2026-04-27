@@ -36,42 +36,54 @@ class ContentSeo extends ObjectSeo
      * Returns url type
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getType" in next major
+     * @deprecated Use getType() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getType().
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getType();
+        return 'oxcontent';
     }
 
     /**
      * Returns url type
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getType()
+     *           (not the deprecated _getType()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getType()
     {
-        return 'oxcontent';
+        return $this->_getType();
     }
 
     /**
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderContent
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
+     * @deprecated Use getEncoder() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getEncoder().
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getEncoder();
+        return Registry::get(SeoEncoderContent::class);
     }
 
     /**
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderContent
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getEncoder()
+     *           (not the deprecated _getEncoder()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getEncoder()
     {
-        return Registry::get(SeoEncoderContent::class);
+        return $this->_getEncoder();
     }
 
     /**

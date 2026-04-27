@@ -69,21 +69,11 @@ class NavigationTree extends Base
      * @param DOMDocument $dom         dom object
      * @param string $parentXPath parent xpath
      * @param string $childXPath  child xpath from parent
-     * @deprecated underscore prefix violates PSR12, will be renamed to "cleanEmptyParents" in next major
+     * @deprecated Use cleanEmptyParents() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _cleanEmptyParents().
      */
     protected function _cleanEmptyParents($dom, $parentXPath, $childXPath) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->cleanEmptyParents($dom, $parentXPath, $childXPath);
-    }
-
-    /**
-     * clean empty nodes from tree
-     *
-     * @param DOMDocument $dom         dom object
-     * @param string $parentXPath parent xpath
-     * @param string $childXPath  child xpath from parent
-     */
-    protected function cleanEmptyParents($dom, $parentXPath, $childXPath)
     {
         $xPath = new DomXPath($dom);
         $nodeList = $xPath->query($parentXPath);
@@ -95,6 +85,22 @@ class NavigationTree extends Base
                 $node->parentNode->removeChild($node);
             }
         }
+    }
+
+    /**
+     * clean empty nodes from tree
+     *
+     * @param DOMDocument $dom         dom object
+     * @param string $parentXPath parent xpath
+     * @param string $childXPath  child xpath from parent
+     *
+     * @internal If your override does not fully replace the behavior, call parent::cleanEmptyParents()
+     *           (not the deprecated _cleanEmptyParents()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function cleanEmptyParents($dom, $parentXPath, $childXPath)
+    {
+        $this->_cleanEmptyParents($dom, $parentXPath, $childXPath);
     }
 
     /**

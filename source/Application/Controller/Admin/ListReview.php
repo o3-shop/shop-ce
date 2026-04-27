@@ -47,14 +47,26 @@ class ListReview extends ArticleList
     protected $_sListClass = 'oxreview';
 
     /**
-     * Viewable list size getter
+     * Viewable list size getter.
+     *
+     * NOTE: this override is a no-op — historical pre-existing bug: the original
+     * underscore-prefixed shim ended with `return $this->getViewListSize()();` (note
+     * the double-parens typo), which would invoke the integer return value as a
+     * callable and throw. Nothing in production called this shim directly; with the
+     * parent now delegating (`parent::getViewListSize()` is a thin delegate to
+     * `$this->_getViewListSize()`), we must not let virtual dispatch land in the
+     * buggy code path. Defer to the parent implementation, preserving the original
+     * behaviour of "use the parent's list size" for review listings.
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getViewListSize" in next version
+     * @deprecated Use getViewListSize() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getViewListSize().
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getViewListSize()();
+        return parent::_getViewListSize();
     }
 
     /**
@@ -81,21 +93,12 @@ class ListReview extends ArticleList
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
+     * @deprecated Use buildSelectString() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _buildSelectString().
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->buildSelectString($listObject);
-    }
-
-    /**
-     * Returns select query string
-     *
-     * @param object $listObject list item object
-     *
-     * @return string
-     */
-    protected function buildSelectString($listObject = null)
     {
         $sArtTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iEditLang);
 
@@ -113,18 +116,20 @@ class ListReview extends ArticleList
     }
 
     /**
-     * Adds filtering conditions to query string
+     * Returns select query string
      *
-     * @param array $whereQuery filter conditions
-     * @param string $fullQuery query string
+     * @param object $listObject list item object
      *
      * @return string
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::buildSelectString() (not the deprecated _buildSelectString()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function buildSelectString($listObject = null)
     {
-        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+        return $this->_buildSelectString($listObject);
     }
 
     /**
@@ -135,10 +140,17 @@ class ListReview extends ArticleList
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Use prepareWhereQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareWhereQuery().
      */
-    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sSql = parent::prepareWhereQuery($whereQuery, $fullQuery);
+        // NOTE: call parent::_prepareWhereQuery() (not parent::prepareWhereQuery()) to avoid
+        // infinite recursion through the parent's delegate. Restores baseline (ebe86dc0) call
+        // shape. See o3-shop/o3-shop#107 remediation.
+        $sSql = parent::_prepareWhereQuery($whereQuery, $fullQuery);
 
         $sArtTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iEditLang);
         $sArtTitleField = "{$sArtTable}.oxtitle";
@@ -150,5 +162,24 @@ class ListReview extends ArticleList
         }
 
         return $sSql;
+    }
+
+    /**
+     * Adds filtering conditions to query string
+     *
+     * @param array $whereQuery filter conditions
+     * @param string $fullQuery query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareWhereQuery() (not the deprecated _prepareWhereQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        return $this->_prepareWhereQuery($whereQuery, $fullQuery);
     }
 }

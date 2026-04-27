@@ -171,23 +171,11 @@ class UtilsComponent extends BaseController
      * @param double $dAmount product amount
      * @param array $aSel product selection list
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "toList" in next major
+     * @deprecated Use toList() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _toList().
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->toList($sListType, $sProductId, $dAmount, $aSel);
-    }
-
-    /**
-     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
-     *
-     * @param string $sListType user product list type
-     * @param string $sProductId product id
-     * @param double $dAmount product amount
-     * @param array $aSel product selection list
-     * @throws Exception
-     */
-    protected function toList($sListType, $sProductId, $dAmount, $aSel)
     {
         // only if user is logged in
         if ($oUser = $this->getUser()) {
@@ -243,6 +231,24 @@ class UtilsComponent extends BaseController
                 }
             }
         }
+    }
+
+    /**
+     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
+     *
+     * @param string $sListType user product list type
+     * @param string $sProductId product id
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
+     *
+     * @internal If your override does not fully replace the behavior, call parent::toList()
+     *           (not the deprecated _toList()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function toList($sListType, $sProductId, $dAmount, $aSel)
+    {
+        return $this->_toList($sListType, $sProductId, $dAmount, $aSel);
     }
 
     /**

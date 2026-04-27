@@ -192,11 +192,13 @@ class LoginController extends AdminController
      * Rewrites authorization method.
      *
      * @return boolean
-     * @deprecated underscore prefix violates PSR12, will be renamed to "authorize" in next major
+     * @deprecated Use authorize() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _authorize().
      */
     protected function _authorize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->authorize();
+        return true;
     }
 
     /**
@@ -204,10 +206,14 @@ class LoginController extends AdminController
      * Rewrites authorization method.
      *
      * @return boolean
+     *
+     * @internal If your override does not fully replace the behavior, call parent::authorize()
+     *           (not the deprecated _authorize()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function authorize()
     {
-        return true;
+        return $this->_authorize();
     }
 
     /**
@@ -224,19 +230,11 @@ class LoginController extends AdminController
      * Get available admin interface languages
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAvailableLanguages" in next major
+     * @deprecated Use getAvailableLanguages() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getAvailableLanguages().
      */
     protected function _getAvailableLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getAvailableLanguages();
-    }
-
-    /**
-     * Get available admin interface languages
-     *
-     * @return array
-     */
-    protected function getAvailableLanguages()
     {
         $sDefLang = Registry::getUtilsServer()->getOxCookie('oxidadminlanguage');
         $sDefLang = $sDefLang ? $sDefLang : $this->getBrowserLanguage();
@@ -250,23 +248,43 @@ class LoginController extends AdminController
     }
 
     /**
-     * Get detected user browser language abbreviation
+     * Get available admin interface languages
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getBrowserLanguage" in next major
+     * @return array
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getAvailableLanguages()
+     *           (not the deprecated _getAvailableLanguages()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getBrowserLanguage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getAvailableLanguages()
     {
-        return $this->getBrowserLanguage();
+        return $this->_getAvailableLanguages();
     }
 
     /**
      * Get detected user browser language abbreviation
      *
      * @return string
+     * @deprecated Use getBrowserLanguage() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getBrowserLanguage().
+     */
+    protected function _getBrowserLanguage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+    }
+
+    /**
+     * Get detected user browser language abbreviation
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getBrowserLanguage()
+     *           (not the deprecated _getBrowserLanguage()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getBrowserLanguage()
     {
-        return strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2));
+        return $this->_getBrowserLanguage();
     }
 }

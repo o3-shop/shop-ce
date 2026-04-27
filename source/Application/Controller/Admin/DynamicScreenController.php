@@ -49,19 +49,11 @@ class DynamicScreenController extends AdminListController
      * Sets up navigation for current view
      *
      * @param string $sNode None name
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Use setupNavigation() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _setupNavigation().
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setupNavigation($sNode);
-    }
-
-    /**
-     * Sets up navigation for current view
-     *
-     * @param string $sNode None name
-     */
-    protected function setupNavigation($sNode)
     {
         $myAdminNavig = $this->getNavigation();
         $sNode = Registry::getRequest()->getRequestEscapedParameter('menu');
@@ -101,6 +93,20 @@ class DynamicScreenController extends AdminListController
 
         // buttons
         $this->_aViewData['bottom_buttons'] = $myAdminNavig->getBtn($sNode);
+    }
+
+    /**
+     * Sets up navigation for current view
+     *
+     * @param string $sNode None name
+     *
+     * @internal If your override does not fully replace the behavior, call parent::setupNavigation()
+     *           (not the deprecated _setupNavigation()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
     }
 
     /**
