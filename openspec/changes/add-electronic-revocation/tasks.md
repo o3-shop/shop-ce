@@ -130,11 +130,11 @@
 
 ## 13. Negative-requirement verification (shop-ce)
 
-- [ ] 13.1 Grep audit: `grep -rE "DELETE FROM o3revocation" source/` returns matches only in (a) the migration's `down()`, (b) the admin manual-delete action, (c) tests. No scheduler, no cron, no auto-purge.
-- [ ] 13.2 Grep audit: `grep -rE "OXIP|OXUSERAGENT" source/Application/Model/O3Revocation.php source/migration/data/Version*.php` returns no matches (no IP/UserAgent persistence).
-- [ ] 13.3 Grep audit: `grep -rE "getActiveTheme" source/Application/Controller/Revocation*.php source/Application/Controller/Admin/Revocation*.php` returns no matches (no theme branching in controllers).
-- [ ] 13.4 Grep audit: `grep -rE "(oxorder.OXBILLEMAIL|oxuser.OXUSERNAME)" source/Application/Controller/RevocationController.php source/Application/Model/O3Revocation.php` returns no matches (no email-vs-order matching).
-- [ ] 13.5 Grep audit: every new `.php` file under `source/Application/{Controller,Model}/Revocation*`, `source/Application/Controller/Admin/Revocation*`, `source/Internal/.../Revocation/`, and the new migration begins with `declare(strict_types=1);`.
+- [x] 13.1 Grep audit: `grep -rE "DELETE FROM o3revocation" source/` returns zero matches. The admin manual-delete path uses the model's `$submission->delete($oxid)` which generates the SQL internally; the migration's `down()` uses `DROP TABLE` (table-level) plus a `DELETE FROM oxcontents` for the snippet (not o3revocation). No scheduler, no cron, no bulk purge.
+- [x] 13.2 Grep audit: `grep -rE "OXIP|OXUSERAGENT" source/Application/Model/O3Revocation.php source/migration/data/Version*.php` returns zero matches. No IP / User-Agent persistence anywhere.
+- [x] 13.3 Grep audit: `grep -rE "getActiveTheme" source/Application/Controller/RevocationController.php source/Application/Controller/Admin/Revocation*.php source/Internal/Domain/Revocation/` returns zero matches. Theme branching is templates-only per spec D9.
+- [x] 13.4 Grep audit: `grep -rE "(oxorder.OXBILLEMAIL|oxuser.OXUSERNAME)" source/Application/Controller/RevocationController.php source/Application/Model/O3Revocation.php source/Internal/Domain/Revocation/` returns zero matches. No email-vs-order or email-vs-user matching anywhere — the law forbids such gatekeeping.
+- [x] 13.5 Grep audit: all 11 new revocation PHP files declare `strict_types=1`: the public controller, three admin controllers, the model, the antispam interface + noop, the template validator + missing-asset DTO + CLI command, and the Doctrine migration. Verified via per-file `head -25 | grep declare(strict_types=1)`.
 
 ## 14. Project-wide quality gates (final pass)
 
