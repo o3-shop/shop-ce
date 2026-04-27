@@ -60,8 +60,11 @@ class RevocationTemplateValidator
     ];
 
     /**
-     * Email templates. Each filename appears in {html,plain} per language
-     * directory; the subject template is HTML-only.
+     * Email templates. One set per theme — language-specific text comes
+     * from `{oxmultilang}` lookups inside the template, NOT from a
+     * per-language subdirectory. (OXID convention; mirrors `order_cust.tpl`
+     * which lives at `<theme>/tpl/email/html/order_cust.tpl` and is
+     * shared across all shop languages.)
      *
      * @var string[]
      */
@@ -158,20 +161,17 @@ class RevocationTemplateValidator
             }
         }
 
-        // Email templates — checked per-language (one set of files per
-        // language directory under the theme root).
-        foreach ($activeLangIds as $langId) {
-            $langDir = $this->resolveLanguageDir($themeId, $langId);
-            foreach (array_merge(self::EMAIL_BODY_RELPATHS, self::EMAIL_SUBJECT_RELPATHS) as $relpath) {
-                $absolute = $langDir . $relpath;
-                if (!is_file($absolute)) {
-                    $missing[] = new MissingAsset(
-                        MissingAsset::TYPE_EMAIL_TEMPLATE,
-                        $absolute,
-                        $langId,
-                        "Install the missing email template for language ID $langId: $absolute"
-                    );
-                }
+        // Email templates — one set per theme; language-specific text comes
+        // from `{oxmultilang}` calls inside the template (OXID convention).
+        foreach (array_merge(self::EMAIL_BODY_RELPATHS, self::EMAIL_SUBJECT_RELPATHS) as $relpath) {
+            $absolute = $themeRoot . $relpath;
+            if (!is_file($absolute)) {
+                $missing[] = new MissingAsset(
+                    MissingAsset::TYPE_EMAIL_TEMPLATE,
+                    $absolute,
+                    null,
+                    "Install the missing email template under the active theme: $absolute"
+                );
             }
         }
 
@@ -197,22 +197,6 @@ class RevocationTemplateValidator
     {
         $base = rtrim($this->shopDir, '/');
         return $base . '/Application/views/' . $themeId . '/';
-    }
-
-    /**
-     * Theme language directory. OXID convention: per-language email templates
-     * live under `<theme>/<langCode>/email/{html,plain}/...`. The lang code is
-     * resolved from the language abbreviation registered with the language object.
-     */
-    private function resolveLanguageDir(string $themeId, int $langId): string
-    {
-        $abbr = $this->language->getLanguageAbbr($langId);
-        if ($abbr === null || $abbr === '') {
-            // Fallback — better to flag a misconfigured language than to silently
-            // skip. The path will fail is_file() and be reported as missing.
-            $abbr = 'lang-' . $langId;
-        }
-        return $this->resolveThemeRoot($themeId) . $abbr . '/';
     }
 
     private function translationExists(string $key, int $langId): bool

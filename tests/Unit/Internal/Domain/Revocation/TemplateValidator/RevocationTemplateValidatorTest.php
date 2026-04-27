@@ -84,15 +84,17 @@ class RevocationTemplateValidatorTest extends TestCase
         $this->assertNull($missing[0]->getLangId(), 'Page templates are not language-scoped.');
     }
 
-    public function testReportsMissingEmailTemplateScopedToLanguage(): void
+    public function testReportsMissingEmailTemplateAtThemeRoot(): void
     {
         $themeId = 'wave';
         $langIds = [0, 1];
 
         $this->seedFullThemeTree($themeId, $langIds);
-        // Knock out one email template for lang 1 only — lang 0 stays clean.
+        // Knock out one email template at the theme root (OXID convention:
+        // email templates are NOT per-language; per-language text comes
+        // from `{oxmultilang}` inside the template).
         unlink(
-            $this->shopDir . '/Application/views/wave/en/tpl/email/html/revocation_customer_confirmation.tpl'
+            $this->shopDir . '/Application/views/wave/tpl/email/html/revocation_customer_confirmation.tpl'
         );
         $language = $this->buildLanguageStub($langIds, true);
 
@@ -103,8 +105,12 @@ class RevocationTemplateValidatorTest extends TestCase
             $missing,
             fn (MissingAsset $a) => $a->getAssetType() === MissingAsset::TYPE_EMAIL_TEMPLATE
         ));
-        $this->assertCount(1, $emailMissing);
-        $this->assertSame(1, $emailMissing[0]->getLangId());
+        $this->assertCount(
+            1,
+            $emailMissing,
+            'A single missing email template surfaces exactly once — it is not duplicated across languages.'
+        );
+        $this->assertNull($emailMissing[0]->getLangId(), 'Email templates are not language-scoped.');
     }
 
     public function testReportsMissingTranslationKey(): void
@@ -144,18 +150,20 @@ class RevocationTemplateValidatorTest extends TestCase
             ->validate(1, $themeId, $langIds);
 
         $this->assertGreaterThanOrEqual(
-            2 + 6 + 22, // 2 page templates + 6 per-language email files + ~22 keys
+            2 + 6 + 22, // 2 page templates + 6 email files (one set per theme) + ~22 keys
             count($missing),
             'A completely-empty installation should surface every required asset as missing.'
         );
     }
 
     /**
-     * Build the on-disk theme tree the validator expects: every page
-     * template, every per-language email template (HTML/plain/subject)
-     * for each language, all as zero-byte placeholders.
+     * Build the on-disk theme tree the validator expects: page templates
+     * and email templates as zero-byte placeholders. Email templates live
+     * at `<theme>/tpl/email/...` (not per-language) per OXID convention.
      *
-     * @param int[] $langIds
+     * @param int[] $langIds  unused for file seeding, retained to keep
+     *                        the test signature aligned with the
+     *                        validator API
      */
     private function seedFullThemeTree(string $themeId, array $langIds): void
     {
@@ -166,23 +174,19 @@ class RevocationTemplateValidatorTest extends TestCase
         touch($pageDir . 'revocation.tpl');
         touch($pageDir . 'revocationreceipt.tpl');
 
-        $abbrs = [0 => 'de', 1 => 'en'];
-        foreach ($langIds as $langId) {
-            $abbr = $abbrs[$langId] ?? ('lang-' . $langId);
-            $emailHtml = $themeRoot . $abbr . '/tpl/email/html/';
-            $emailPlain = $themeRoot . $abbr . '/tpl/email/plain/';
-            mkdir($emailHtml, 0777, true);
-            mkdir($emailPlain, 0777, true);
-            foreach ([
-                $emailHtml . 'revocation_customer_confirmation.tpl',
-                $emailPlain . 'revocation_customer_confirmation.tpl',
-                $emailHtml . 'revocation_customer_confirmation_subj.tpl',
-                $emailHtml . 'revocation_operator_notification.tpl',
-                $emailPlain . 'revocation_operator_notification.tpl',
-                $emailHtml . 'revocation_operator_notification_subj.tpl',
-            ] as $file) {
-                touch($file);
-            }
+        $emailHtml = $themeRoot . 'tpl/email/html/';
+        $emailPlain = $themeRoot . 'tpl/email/plain/';
+        mkdir($emailHtml, 0777, true);
+        mkdir($emailPlain, 0777, true);
+        foreach ([
+            $emailHtml . 'revocation_customer_confirmation.tpl',
+            $emailPlain . 'revocation_customer_confirmation.tpl',
+            $emailHtml . 'revocation_customer_confirmation_subj.tpl',
+            $emailHtml . 'revocation_operator_notification.tpl',
+            $emailPlain . 'revocation_operator_notification.tpl',
+            $emailHtml . 'revocation_operator_notification_subj.tpl',
+        ] as $file) {
+            touch($file);
         }
     }
 
