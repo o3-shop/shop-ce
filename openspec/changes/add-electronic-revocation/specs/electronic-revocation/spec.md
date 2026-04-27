@@ -102,6 +102,48 @@ The form SHALL present exactly three mandatory fields — *full name*, *order/co
 - **WHEN** the visitor submits the form with all mandatory fields filled and the free-text field empty
 - **THEN** the system MUST NOT treat the empty free-text as a validation error
 
+### Requirement: Form markup contract
+
+The rendered form HTML SHALL conform to the following markup contract. The contract specifies *behavioural* HTML — input types, accessibility hooks, structural elements — that affects how mobile keyboards, password managers, screen readers, and HTML5 client-side validation behave. It deliberately does **not** specify pixel-level visual design (column layout, colours, spacing, button shape, typography); those remain the theme's responsibility.
+
+- **Form element:** the four input fields and the submit button SHALL be wrapped in a single `<form method="post" action="…?cl=revocation&fnc=submit">` element. There MUST NOT be multiple `<form>` elements, nested forms, or AJAX-only submission paths that bypass the standard POST.
+- **Name field:** `<input type="text" required name="…">` with a unique `id`. Server still validates non-empty after trim — the `required` attribute is an HTML5 client-side hint only.
+- **Order identification field:** same as Name — `<input type="text" required name="…">`.
+- **Email field:** `<input type="email" required name="…">`. The `type="email"` is a hint that triggers email-style on-screen keyboards on mobile and HTML5-level format validation in the browser. The server still independently runs `FILTER_VALIDATE_EMAIL`; the client hint is convenience, not security.
+- **Free-text field:** `<textarea name="…"></textarea>` — multi-line, NOT marked `required`, NOT decorated with a required marker. Empty submission is valid for this field.
+- **Label binding:** every input and the textarea SHALL have a `<label for="…">` element whose `for` attribute matches the input's `id`. The label MUST contain the human-readable field name resolved from the relevant `O3_REVOCATION_FIELD_*_LABEL` translation key, not a separate non-`<label>` text node. Implicit-association (`<label><input></label>`) is acceptable as an alternative to explicit `for`.
+- **Required-field signalling:** the three mandatory fields SHALL carry both a *visual* required marker (theme's choice — typical conventions: a trailing red asterisk, "(required)" text, or an outline style) AND `aria-required="true"` on the input element itself. Screen readers and visual users alike must know which fields are mandatory.
+- **Error association:** when a server-side validation error is being shown for a field, the field's input element SHALL have `aria-describedby="<error-element-id>"` pointing at the DOM element that contains the error message. Screen-reader users hear the error when the field receives focus.
+- **Submit button:** exactly **one** `<button type="submit">` (or `<input type="submit">`) inside the form, labelled from `O3_REVOCATION_CONFIRM_BUTTON` ("Widerruf bestätigen"). There MUST NOT be a "preview" button, a "save draft" button, or any other secondary action button on the form.
+
+#### Scenario: Single form element with POST action
+- **WHEN** the form page is rendered
+- **THEN** the page contains exactly one `<form>` whose `method` attribute is (case-insensitively) `post` and whose `action` attribute resolves to `?cl=revocation&fnc=submit`
+
+#### Scenario: Field types match the contract
+- **WHEN** the form page is rendered
+- **THEN** the *name* and *order identification* inputs carry `type="text" required`
+- **AND** the *email* input carries `type="email" required`
+- **AND** the *free-text* field is a `<textarea>` element with no `required` attribute
+
+#### Scenario: Every input has an associated label
+- **WHEN** the form page is rendered
+- **THEN** for every `<input>` and `<textarea>` representing a form field, either an explicit `<label for="…">` whose `for` matches the input's `id` exists, or the input is wrapped in an enclosing `<label>` element
+
+#### Scenario: Required fields signal both visually and to assistive tech
+- **WHEN** the form page is rendered
+- **THEN** the three mandatory inputs each carry `aria-required="true"`
+- **AND** each mandatory field is visually marked as required (theme-specific — verified by inspecting the rendered DOM around each mandatory field for the theme's required-marker convention)
+- **AND** the *free-text* field carries neither `aria-required` nor a visual required marker
+
+#### Scenario: Validation error is associated to its field
+- **WHEN** the server rejects a submission for a field-level reason (e.g. invalid email format) and the form re-renders
+- **THEN** the offending input element carries `aria-describedby="<id>"` whose value matches the `id` of the element rendering the error message text
+
+#### Scenario: Exactly one submit button
+- **WHEN** the form page is rendered
+- **THEN** the form contains exactly one `<button type="submit">` (or `<input type="submit">`) and no other action button
+
 ### Requirement: No matching of submitted email against order data
 
 The system MUST NOT validate, match, or compare the submitted email address against `oxorder.OXBILLEMAIL`, `oxuser.OXUSERNAME`, or any other stored email field. The system MUST NOT validate or match the submitted order identifier against `oxorder.OXORDERNR` or any other stored order field. The submission MUST be accepted regardless of whether the typed values exist in the shop's records.
