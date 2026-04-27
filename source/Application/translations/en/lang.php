@@ -802,4 +802,72 @@ $aLang = [
 'PARTNERS'                                                    => 'Partners',
 
 'MY_REVIEWS'                                                  => 'My reviews',
+
+// §356a BGB electronic revocation feature (issue #99) — admin, email and
+// storefront default strings. Theme-specific storefront strings may be
+// overridden in wave / o3-theme lang files. All keys share the `O3_REVOCATION_` prefix.
+
+// Storefront — defaults (overridable by wave / o3-theme)
+'O3_REVOCATION_FOOTER_LINK'                                   => 'Cancel contract',
+'O3_REVOCATION_FORM_HEADING'                                  => 'Cancel contract',
+'O3_REVOCATION_FIELD_NAME_LABEL'                              => 'Full name',
+'O3_REVOCATION_FIELD_ORDERNUMBER_LABEL'                       => 'Order ID',
+'O3_REVOCATION_FIELD_EMAIL_LABEL'                             => 'Email address',
+'O3_REVOCATION_FIELD_FREETEXT_LABEL'                          => 'Notes (optional)',
+'O3_REVOCATION_CONFIRM_BUTTON'                                => 'Confirm revocation',
+'O3_REVOCATION_CONFIRMATION_PAGE_HEADING'                     => 'Revocation received',
+'O3_REVOCATION_VALIDATION_REQUIRED'                           => 'Required.',
+'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Your session has expired. Please submit the form again.',
+'O3_REVOCATION_VALIDATION_SPAM'                               => 'Your request could not be processed at this time. Please try again later.',
+
+// Admin: configuration page
+'O3_REVOCATION_ADMIN_NAV_LABEL'                               => 'Revocations',
+'O3_REVOCATION_CONFIG_SHOW_LABEL'                             => 'Show revocation form in the footer',
+'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL'                     => 'Require login to access the revocation form',
+'O3_REVOCATION_CONFIG_NOTIFY_LABEL'                           => 'Notify operator by email on each revocation',
+'O3_REVOCATION_CONFIG_OPERATOR_EMAIL_LABEL'                   => 'Email recipient for revocation notifications',
+
+// Admin: validation messages
+'O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED'            => 'Please enter an email address for revocation notifications, or disable the notification.',
+'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
+
+// Admin: activation gate
+'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Activation blocked — missing templates or translations:',
+'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'language',
+
+// Admin: list view
+'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Revocations',
+'O3_REVOCATION_ADMIN_LIST_EMPTY'                              => 'No revocations recorded.',
+'O3_REVOCATION_ADMIN_LIST_COL_SUBMITTED'                      => 'Received',
+'O3_REVOCATION_ADMIN_LIST_COL_NAME'                           => 'Name',
+'O3_REVOCATION_ADMIN_LIST_COL_EMAIL'                          => 'Email',
+'O3_REVOCATION_ADMIN_LIST_COL_ORDER'                          => 'Order ID',
+'O3_REVOCATION_ADMIN_LIST_COL_STATUS'                         => 'Status',
+'O3_REVOCATION_ADMIN_FLAG_SENT'                               => 'Send succeeded',
+'O3_REVOCATION_ADMIN_FLAG_SEND_FAILED'                        => 'Send failed',
+
+// Admin: detail view
+'O3_REVOCATION_ADMIN_DETAIL_HEADING'                          => 'Revocation — details',
+'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Submission ID',
+'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Received at',
+'O3_REVOCATION_ADMIN_FIELD_NAME'                              => 'Name',
+'O3_REVOCATION_ADMIN_FIELD_ORDER_IDENT'                       => 'Order ID (as typed by the consumer)',
+'O3_REVOCATION_ADMIN_FIELD_EMAIL'                             => 'Email address (as typed by the consumer)',
+'O3_REVOCATION_ADMIN_FIELD_FREETEXT'                          => 'Free text / notes',
+'O3_REVOCATION_ADMIN_FIELD_FREETEXT_EMPTY'                    => '(empty)',
+'O3_REVOCATION_ADMIN_FIELD_STATUS'                            => 'Send status',
+'O3_REVOCATION_ADMIN_ACTIONS_HEADING'                         => 'Actions',
+'O3_REVOCATION_ADMIN_RESEND_BUTTON'                           => 'Resend confirmation',
+'O3_REVOCATION_ADMIN_DELETE_BUTTON'                           => 'Delete record',
+'O3_REVOCATION_ADMIN_DELETE_CONFIRM'                          => 'Permanently delete this revocation record? This action cannot be undone.',
+
+// Customer email (receipt of declaration per § 356a Abs. 4 BGB)
+'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'We have received your revocation declaration',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_INTRO'                     => 'we hereby confirm that your revocation declaration has been received.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_RECEIPT_NOTE'              => 'Please note that this is solely a confirmation of receipt. The validity and scope of your revocation declaration will be reviewed separately. We will get back to you on this shortly.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_FOOTER'                    => 'Kind regards',
+
+// Operator email (notification — operational, not legally required)
+'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'New revocation received',
+'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'A new revocation declaration has been received in the shop pursuant to § 356a BGB. The record is available in the admin area under "Customer Info → Revocations".',
 ];

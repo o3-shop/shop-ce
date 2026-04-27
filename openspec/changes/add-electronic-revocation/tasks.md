@@ -99,10 +99,10 @@
 
 ## 10. Translation keys (shop-ce — admin and email)
 
-- [ ] 10.1 Add all `O3_REVOCATION_*` keys used by admin templates and email templates to `source/Application/translations/de/lang.php`. Required keys per the spec: `O3_REVOCATION_CONFIG_SHOW_LABEL`, `O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL`, `O3_REVOCATION_CONFIG_NOTIFY_LABEL`, `O3_REVOCATION_CONFIG_OPERATOR_EMAIL_LABEL`, `O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED`, `O3_REVOCATION_VALIDATION_EMAIL_FORMAT`, `O3_REVOCATION_ADMIN_NAV_LABEL`, `O3_REVOCATION_ADMIN_LIST_HEADING`, `O3_REVOCATION_ADMIN_LIST_EMPTY`, `O3_REVOCATION_ADMIN_FLAG_SEND_FAILED`, `O3_REVOCATION_ADMIN_RESEND_BUTTON`, `O3_REVOCATION_ADMIN_DELETE_BUTTON`, `O3_REVOCATION_ADMIN_DELETE_CONFIRM`. Plus the `_CUSTOMER_EMAIL_*` and `_OPERATOR_EMAIL_*` body/subject keys.
-- [ ] 10.2 Mirror every key from 10.1 to `source/Application/translations/en/lang.php` with English translations.
-- [ ] 10.3 Add the `oxcontents` snippet description text — the title used for the seeded `oxcontents` rows. One key per language.
-- [ ] 10.4 Audit grep: `grep -rE "O3_REVOCATION_" source/Application/translations/{de,en}/lang.php` lists every key used in the codebase. Manually cross-check against the shop-ce templates and PHP files: every key referenced is present in both `de` and `en`.
+- [x] 10.1 Added all 48 `O3_REVOCATION_*` keys to `source/Application/translations/de/lang.php`. Coverage: storefront defaults (footer link, form heading, field labels, confirm button, validation messages — overridable by wave/o3-theme), admin labels (config + list + detail + nav + activation gate), email subject + body keys for both customer and operator. German wording matches the §356a BGB phrasing from the original GitHub issue.
+- [x] 10.2 Mirrored every key to `source/Application/translations/en/lang.php` with idiomatic English. Diff confirms identical key sets in both files.
+- [ ] 10.3 `oxcontents` snippet description text — deferred. The migration's `OXTITLE_*` columns are seeded empty (operator fills them in via the CMS module). A separate "snippet description" string per spec is no longer needed because the CMS module's standard "ident / shop / language" listing identifies the snippet by its `OXLOADID` (`o3_revocation_notice`) which is already self-explanatory.
+- [x] 10.4 Audit grep: 48 distinct `O3_REVOCATION_*` keys referenced across shop-ce code/templates; all 48 present in both `de` and `en`. Verified via `comm -23 used_keys de_keys` (zero output) and `comm -23 used_keys en_keys` (zero output). Live verification: `bin/oe-console o3:check-templates` dropped from 60 missing assets to 14 (all 14 are template-file paths, zero are translation keys) — all translation gaps closed.
 
 ## 11. Storefront templates (wave-theme repo)
 
