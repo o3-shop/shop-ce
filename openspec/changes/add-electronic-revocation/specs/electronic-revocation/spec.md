@@ -44,11 +44,26 @@ When the link is rendered, its text SHALL be resolved from `O3_REVOCATION_FOOTER
 
 When a visitor with access (per the footer-link visibility matrix) reaches the form, the system SHALL render it via controller `?cl=revocation` (default action) containing exactly the three statutory mandatory input fields, one optional free-text field, the operator notice block above the form, a session challenge token, and a submit button. Form rendering MUST be the same for anonymous and authenticated visitors that are allowed in — login state controls *access*, not form *content*.
 
-#### Scenario: Form renders for any visitor with access
-- **WHEN** a visitor allowed by the visibility matrix loads `?cl=revocation`
-- **THEN** the form renders with fields *name*, *order identification*, *email address*, *optional free-text* and a submit button labelled from `O3_REVOCATION_SUBMIT_BUTTON`
+**On the initial GET, every input field MUST render empty** — regardless of login state. The system MUST NOT pre-fill *name* from `oxuser__oxfname`/`oxlname`, MUST NOT pre-fill *email* from `oxuser__oxusername`, and MUST NOT pre-fill *order identification* from any order the logged-in user has placed. Reasons: (a) § 356a Abs. 2 frames the mandatory inputs as values the consumer provides on the form — pre-filling implicitly transfers data from the user record into the submission, blurring what was actually typed; (b) the logged-in user may be revoking on behalf of someone else (household member, etc.) and a different name/email may be intended; (c) blank-by-default is the simpler, more predictable rule. The only case in which the form re-renders with previously-typed values is on rejection — covered by the form-input-preservation requirement.
+
+#### Scenario: Initial GET — anonymous visitor, all fields empty
+- **WHEN** an anonymous visitor with access loads `?cl=revocation` for the first time
+- **THEN** the form renders with fields *name*, *order identification*, *email address*, *optional free-text* and a submit button labelled from `O3_REVOCATION_CONFIRM_BUTTON` (default German label *"Widerruf bestätigen"* — the click on this button is the legally-effective declaration; there is no separate confirmation step)
+- **AND** every input field is rendered with an empty value
 - **AND** a hidden `stoken` input is present
 - **AND** the operator notice from CMS snippet `o3_revocation_notice` is included above the form
+
+#### Scenario: Initial GET — authenticated visitor, fields still empty (no pre-fill from profile)
+- **WHEN** an authenticated visitor loads `?cl=revocation` for the first time
+- **THEN** the form renders identically to the anonymous case
+- **AND** the *name* field is empty even though the user's `oxuser__oxfname`/`oxlname` is known
+- **AND** the *email address* field is empty even though the user's `oxuser__oxusername` is known
+- **AND** the *order identification* field is empty even though the user has placed orders
+- **AND** the rendered HTML must not contain the user's profile data anywhere in the form region
+
+#### Scenario: Re-load after rejection — values preserved
+- **WHEN** a previous submission was rejected (validation, anti-spam, token mismatch, template gate) and the form re-renders
+- **THEN** every field the user typed into is pre-filled with the value they submitted, per the form-input-preservation requirement
 
 ### Requirement: Direct-URL access control
 
@@ -66,16 +81,22 @@ When a visitor navigates directly to `?cl=revocation` (rather than via the foote
 
 ### Requirement: Mandatory and optional form fields
 
-The form SHALL present exactly three mandatory fields — *full name*, *order/contract identification*, *electronic communication channel (email)* — and one optional *free-text* field. No additional field MAY be marked as required. The optional free-text field MUST NOT be enforced as mandatory under any configuration.
+The form SHALL present exactly three mandatory fields — *full name*, *order/contract identification*, *electronic communication channel (email)* — and one optional *free-text* field. No additional field MAY be marked as required. The optional free-text field MUST NOT be enforced as mandatory under any configuration. Server-side validation SHALL enforce: each mandatory field is non-empty after trimming whitespace; the *email address* field additionally is syntactically a valid email (validated via `filter_var($value, FILTER_VALIDATE_EMAIL)`). The system MUST NOT validate the email against any other data source (no MX-record check, no comparison against existing customer or order emails).
 
 #### Scenario: Submit with all mandatory fields filled
 - **WHEN** the visitor submits the form with all three mandatory fields populated and the free-text field empty
 - **THEN** validation passes and the flow advances to the confirmation step
 
 #### Scenario: Submit with one mandatory field empty
-- **WHEN** the visitor submits the form with the *email address* field left blank
+- **WHEN** the visitor submits the form with the *email address* field left blank (or whitespace-only)
 - **THEN** validation fails and the form re-renders with the previously-typed values for *name* and *order identification* preserved
 - **AND** the *email address* field shows an error styled around it with message resolved from `O3_REVOCATION_VALIDATION_REQUIRED`
+
+#### Scenario: Submit with syntactically invalid email
+- **WHEN** the visitor submits the form with the *email address* field set to a value that fails `FILTER_VALIDATE_EMAIL` (e.g. `"foo"`, `"foo@"`, `"@bar.com"`, `"foo@@bar.com"`)
+- **THEN** validation fails and the form re-renders with the previously-typed values for *name*, *order identification*, *email address*, and *free-text* all preserved (so the user only fixes the email)
+- **AND** the *email address* field shows a format error styled around it with message resolved from `O3_REVOCATION_VALIDATION_EMAIL_FORMAT`
+- **AND** the field MUST NOT silently transform the value (no auto-lowercase, no trimming-then-saving) before showing it back to the user — what they typed is what they see, plus the error
 
 #### Scenario: Submit with free-text omitted
 - **WHEN** the visitor submits the form with all mandatory fields filled and the free-text field empty
@@ -93,9 +114,9 @@ The system MUST NOT validate, match, or compare the submitted email address agai
 - **WHEN** the visitor submits the form with an `OXORDERIDENT` value that has no matching row in `oxorder.OXORDERNR`
 - **THEN** the submission is accepted and the flow advances to the confirmation step
 
-### Requirement: Session challenge token required on state-changing actions
+### Requirement: Session challenge token required on the submit action
 
-The submit action (`?cl=revocation&fnc=submit`) and the confirm action (`?cl=revocation&fnc=confirm`) MUST verify the session challenge token (`stoken`) before processing input. Requests with an absent or mismatched token MUST be rejected without persisting any data and without emitting any email.
+The submit action (`?cl=revocation&fnc=submit`) MUST verify the session challenge token (`stoken`) before processing input. Requests with an absent or mismatched token MUST be rejected without persisting any data and without emitting any email.
 
 #### Scenario: Submit without token
 - **WHEN** a POST arrives at `?cl=revocation&fnc=submit` with no `stoken` parameter
@@ -108,60 +129,60 @@ The submit action (`?cl=revocation&fnc=submit`) and the confirm action (`?cl=rev
 - **WHEN** a POST arrives at `?cl=revocation&fnc=submit` with a `stoken` value that does not match the session token
 - **THEN** the same rejection behaviour applies as for the absent-token case
 
-#### Scenario: Confirm without token
-- **WHEN** a POST arrives at `?cl=revocation&fnc=confirm` with no valid `stoken`
-- **THEN** no `o3revocation` row is written, no email is sent, and the visitor is redirected back to the form
+### Requirement: Anti-spam verification with two-mode IP rate-limit default
 
-### Requirement: Anti-spam verification with 3-per-minute IP rate-limit default
+After the session challenge token check passes, the submit and confirm actions MUST call the configured `RevocationAntiSpamService::verify()` and reject the request if it returns `false`. The default service implementation `NoopAntiSpamService` SHALL enforce two independent IP-based counters in a transient cache store:
+- **Failed-submission counter** — at most 3 failed attempts per IP within a 60-second sliding window. "Failed" means the request reached the controller and was rejected at any step after `verify()` (validation error, token mismatch, etc.). Each rejection increments the counter via `recordFailure()`.
+- **Successful-submission lockout** — when a submission is successfully persisted, the IP is locked out for 300 seconds (5 minutes). The controller MUST call `recordSuccess()` immediately after a successful persist; this sets a counter that causes any subsequent `verify()` from the same IP to return `false` for the next 300 seconds, regardless of the failed counter.
 
-After the session challenge token check passes, the submit and confirm actions MUST call the configured `RevocationAntiSpamService::verify()` and reject the request if it returns `false`. The default service implementation `NoopAntiSpamService` SHALL enforce a 3-submissions-per-IP-per-minute limit. Rejection responses MUST display a generic translated error and MUST NOT reveal which signal triggered the rejection.
+Rejection responses MUST display a generic translated error resolved from `O3_REVOCATION_VALIDATION_SPAM` and MUST NOT reveal which counter triggered the rejection.
 
-#### Scenario: First three submissions within a minute from the same IP succeed
-- **WHEN** a single IP submits three valid forms within 60 seconds
-- **THEN** all three are processed normally
+#### Scenario: Three failed attempts within 60 s — all reach the controller
+- **WHEN** a single IP submits three forms within 60 seconds and each one is rejected by validation (e.g. typo in the email field, fixed and re-typoed)
+- **THEN** all three submissions reach the controller and produce validation errors normally (the rate limit does not kick in within the 3-attempt window)
+- **AND** the user can see and fix each validation error normally per the form-input-preservation rule
 
-#### Scenario: Fourth submission within a minute is rejected
-- **WHEN** a single IP submits a fourth valid form within the same 60-second window
-- **THEN** the form re-renders with the submitted values preserved and a generic error message resolved from `O3_REVOCATION_VALIDATION_SPAM`
+#### Scenario: Fourth failed attempt within 60 s is rate-limited
+- **WHEN** the same IP submits a fourth form within the same 60-second window after three rejections
+- **THEN** `verify()` returns `false` and the form re-renders with the submitted values preserved
+- **AND** the displayed error is the generic `O3_REVOCATION_VALIDATION_SPAM` message
 - **AND** no row is written to `o3revocation`
 - **AND** one `WARNING` log line is emitted
+
+#### Scenario: Successful submission triggers 5-minute lockout
+- **WHEN** an IP successfully completes the form → confirm flow and a row is persisted to `o3revocation`
+- **THEN** `recordSuccess()` is called and the IP is locked out
+- **AND** any subsequent submit from that IP within the next 300 seconds is rejected with the generic `O3_REVOCATION_VALIDATION_SPAM` message regardless of how many failed attempts the IP had used
+
+#### Scenario: Lockout expires after 5 minutes
+- **WHEN** an IP that was locked out by a successful submission attempts to submit again more than 300 seconds later
+- **THEN** `verify()` allows the attempt and the flow proceeds normally
+
+#### Scenario: Failed counter does not block legitimate retry path
+- **WHEN** an IP submits the form, hits a server-side validation error, fixes the field, and resubmits successfully — all within 30 seconds
+- **THEN** the first submission is rejected by validation but `verify()` allowed it through
+- **AND** the second submission succeeds and triggers the 5-minute lockout via `recordSuccess()`
 
 #### Scenario: Anti-spam service replacement
 - **WHEN** the DI container rebinds `RevocationAntiSpamService` to a different implementation (e.g. `AltchaAntiSpamService`)
 - **THEN** the controller code MUST NOT need to change
+- **AND** the new implementation receives the same `verify()` / `recordSuccess()` / `recordFailure()` contract
 
-### Requirement: Confirmation step (step 2 view)
+### Requirement: Form submit persists and triggers emails (step 2)
 
-When validation in step 2 passes, the system SHALL stash the validated submission data in the user session under key `o3_revocation_pending` and render a confirmation page that displays the submitted values back to the visitor along with a "confirm" button (label resolved from `O3_REVOCATION_CONFIRM_BUTTON`) and a fresh session challenge token. The confirmation page MUST NOT persist anything to the database and MUST NOT emit any email.
+The form's submit button is labelled from `O3_REVOCATION_CONFIRM_BUTTON` ("Widerruf bestätigen") — clicking it IS the legally-effective declaration per § 356a Abs. 3. There is no separate "preview-then-confirm" view. When the visitor submits the form with a valid session challenge token and the data passes validation and the anti-spam check, the system SHALL persist the submission to the `o3revocation` table first, then attempt to send the customer confirmation email and the operator notification email, then issue a 303 redirect to the receipt page. The system MUST NOT carry inter-request state between any two steps of this flow (no session stash, no DB DRAFT row, no hidden re-post page).
 
-#### Scenario: Validation passes — confirmation step renders
-- **WHEN** the submit action processes a valid form
-- **THEN** the validated values are written to the session key `o3_revocation_pending`
-- **AND** the visitor sees the confirmation step with submitted values displayed read-only
-- **AND** the visitor sees a confirm button and a fresh `stoken` hidden input
-- **AND** no row exists in `o3revocation` yet
-- **AND** no email has been sent
-
-#### Scenario: Visitor refreshes the confirmation page
-- **WHEN** the visitor refreshes the confirmation step page
-- **THEN** the page re-renders with the same data from session and no row is created
-
-### Requirement: Confirmation submission persists and triggers emails (step 3)
-
-When the visitor submits the confirm action with a valid token, the system SHALL persist the submission to the `o3revocation` table first, then attempt to send the customer confirmation email and the operator notification email, then clear the session key, then issue a 303 redirect to the receipt page.
-
-#### Scenario: Successful confirm — full flow
-- **WHEN** the visitor submits `?cl=revocation&fnc=confirm` with a valid token and a populated session key
+#### Scenario: Successful submit — full flow in one click
+- **WHEN** the visitor submits `?cl=revocation&fnc=submit` with a valid `stoken`, valid field values, and the anti-spam check passes
 - **THEN** a new row is inserted into `o3revocation` with `OXSUBMITTED` set to the current timestamp
 - **AND** `sendRevocationEmailToCustomer($submission)` is called
 - **AND** `sendRevocationEmailToOperator($submission)` is called when `blRevocationNotifyOperator = 1`
-- **AND** the session key `o3_revocation_pending` is cleared
+- **AND** `recordSuccess()` is called on the anti-spam service to start the 5-minute lockout
 - **AND** the response is HTTP 303 to `?cl=revocation&fnc=receipt`
 
-#### Scenario: Confirm with empty session
-- **WHEN** the visitor submits the confirm action but the session key `o3_revocation_pending` is missing or expired
-- **THEN** the visitor is redirected back to `?cl=revocation` with a translated info message
-- **AND** no row is written and no email is sent
+#### Scenario: No inter-step state to expire
+- **WHEN** the architecture is reviewed for "session timed out between form and confirm" failure modes
+- **THEN** none exists — the form-to-persist transition is a single POST with no intermediate state to expire
 
 ### Requirement: Persist-first ordering for legal robustness
 
@@ -178,12 +199,12 @@ The submission row MUST be persisted before any email send is attempted. Failure
 - **WHEN** persistence succeeds, the customer email succeeds, and the operator email send returns failure
 - **THEN** the row remains in place, the customer receives their receipt, and one `ERROR` log line records the operator-email failure
 
-### Requirement: Receipt page (step 4)
+### Requirement: Receipt page (step 3)
 
-After a successful confirm, the system SHALL render a receipt page in response to the GET request at `?cl=revocation&fnc=receipt`. The page MUST acknowledge the submission and indicate that a confirmation email has been (or is being) sent. The page MUST NOT require the visitor to remain in any particular session state.
+After a successful submit, the system SHALL render a receipt page in response to the GET request at `?cl=revocation&fnc=receipt`. The page MUST acknowledge the submission and indicate that a confirmation email has been (or is being) sent. The page MUST NOT require the visitor to remain in any particular session state.
 
-#### Scenario: GET receipt after confirm
-- **WHEN** the visitor follows the 303 redirect from the confirm action
+#### Scenario: GET receipt after submit
+- **WHEN** the visitor follows the 303 redirect from the submit action
 - **THEN** the receipt page renders with heading `O3_REVOCATION_CONFIRMATION_PAGE_HEADING`
 
 #### Scenario: GET receipt without prior submission
@@ -209,23 +230,34 @@ The customer confirmation email SHALL be sent in the consumer's submission langu
 
 ### Requirement: Operator notification email
 
-When `blRevocationNotifyOperator = 1`, the system SHALL send an operator-facing email per submission via Smarty templates `tpl/email/{html,plain}/revocation_operator_notification.tpl`. The recipient address SHALL be `sRevocationOperatorEmail` when non-empty, otherwise `oxshops.oxorderemail`. If both are empty the operator email MUST be skipped (consumer flow unaffected) and one `ERROR` log line emitted. The email MUST be rendered in the shop's default language.
+When `blRevocationNotifyOperator = 1`, the system SHALL send an operator-facing email per submission via Smarty templates `tpl/email/{html,plain}/revocation_operator_notification.tpl`. The email MUST be rendered in the shop's default language.
 
-#### Scenario: Notification on, recipient configured
+The runtime recipient resolution SHALL follow this two-step fallback chain:
+1. If `sRevocationOperatorEmail` is non-empty and syntactically valid, send to that address.
+2. Else if `oxshops.oxorderemail` is non-empty, send to that address as a fallback (for fresh shops or upgraded shops where the operator has not yet opened the revocation config form). Emit one `NOTICE` log line per send so the operator can spot the implicit fallback in logs and configure their own address.
+3. Else skip the operator email entirely, emit one `ERROR` log line, and let the consumer-side flow complete normally.
+
+The runtime fallback in step 2 is **asymmetric** with the admin-save validation: read-time is lenient (fresh installs work out of the box), save-time is strict (once the operator opens the form, they must consciously specify the address — see the cross-field validation in the configuration-switches requirement). This gives operators a working default without ever silently accepting an incomplete configuration once they've shown intent by editing.
+
+#### Scenario: Notification on, dedicated recipient configured
 - **WHEN** a submission is persisted with `blRevocationNotifyOperator = 1` and `sRevocationOperatorEmail = "ops@example.com"`
-- **THEN** an operator email is sent to `ops@example.com`
+- **THEN** the operator email is sent to `ops@example.com` and no fallback log line is emitted
 
-#### Scenario: Notification on, recipient empty, fallback
+#### Scenario: Notification on, recipient empty, fallback to order email
 - **WHEN** a submission is persisted with `blRevocationNotifyOperator = 1` and `sRevocationOperatorEmail = ""` and `oxshops.oxorderemail = "shop@example.com"`
 - **THEN** the operator email is sent to `shop@example.com`
+- **AND** one `NOTICE` log line names the implicit fallback with a hint to configure `sRevocationOperatorEmail` for an explicit recipient
+- **AND** the consumer-side flow completes normally
 
 #### Scenario: Notification on, both addresses empty
 - **WHEN** a submission is persisted with `blRevocationNotifyOperator = 1` and `sRevocationOperatorEmail = ""` and `oxshops.oxorderemail = ""`
-- **THEN** the operator email is skipped, one `ERROR` log line names the misconfiguration, and the consumer receipt path completes normally
+- **THEN** the operator email is skipped
+- **AND** one `ERROR` log line names the misconfiguration with a remediation hint ("set `sRevocationOperatorEmail` in admin or disable `blRevocationNotifyOperator`")
+- **AND** the consumer-side flow completes normally
 
 #### Scenario: Notification off
 - **WHEN** a submission is persisted with `blRevocationNotifyOperator = 0`
-- **THEN** no operator email is sent and no error is logged
+- **THEN** no operator email is sent and no log line is emitted
 
 ### Requirement: Operator notice above the form via CMS snippet
 
@@ -261,33 +293,72 @@ Each accepted submission SHALL be stored as a single row in the `o3revocation` t
 
 The admin shop configuration SHALL expose four `oxconfig` entries: `blShowRevocationForm` (bool), `blRevocationRequireLogin` (bool), `blRevocationNotifyOperator` (bool), and `sRevocationOperatorEmail` (string). Each switch label SHALL be resolved from a translation key under the `O3_REVOCATION_CONFIG_*` family.
 
+`sRevocationOperatorEmail` is **conditionally mandatory at admin save time**: when `blRevocationNotifyOperator = 1`, the field MUST be non-empty AND syntactically valid (`filter_var(..., FILTER_VALIDATE_EMAIL)`). When `blRevocationNotifyOperator = 0`, the field is optional and ignored. Cross-field validation runs on every admin save of this form: if both conditions ("notify on" and "valid email") are not met simultaneously, the entire save is rejected per the all-or-nothing rule (D11).
+
+This save-time strictness is **asymmetric** with the runtime behaviour: at runtime the operator-notification path falls back to `oxshops.oxorderemail` when `sRevocationOperatorEmail` is empty (see the operator-notification-email requirement). Why the asymmetry: a fresh-install or upgraded shop where the operator has not yet opened the revocation config form should still receive notifications somewhere sensible (the order email is always set on a functioning shop). But once the operator opens the form and clicks save, the implicit fallback should not silently "fix" an incomplete configuration — the operator is given the opportunity to consciously confirm the recipient.
+
 #### Scenario: Admin form lists the four entries
 - **WHEN** an admin opens the shop configuration page section that hosts the revocation feature
 - **THEN** the page renders four form fields corresponding to the four config keys with labels translated for the admin's UI language
 
-#### Scenario: Operator-email field accepts an empty value
-- **WHEN** an admin saves the configuration with `sRevocationOperatorEmail = ""`
-- **THEN** the save succeeds (the field is not mandatory)
+#### Scenario: Save rejected — notify on, email empty
+- **WHEN** an admin saves the configuration with `blRevocationNotifyOperator = 1` and `sRevocationOperatorEmail = ""`
+- **THEN** the entire form save is rejected (no field on this form is committed)
+- **AND** the form re-renders with every submitted value pre-filled (per the form-input-preservation rule)
+- **AND** an error styled around the email field shows a translated message resolved from `O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED`
+
+#### Scenario: Save rejected — notify on, email syntactically invalid
+- **WHEN** an admin saves the configuration with `blRevocationNotifyOperator = 1` and `sRevocationOperatorEmail = "ops"` (or any value that fails `FILTER_VALIDATE_EMAIL`)
+- **THEN** the entire form save is rejected
+- **AND** an error styled around the email field shows a translated message resolved from `O3_REVOCATION_VALIDATION_EMAIL_FORMAT`
+
+#### Scenario: Save accepted — notify on, valid email
+- **WHEN** an admin saves the configuration with `blRevocationNotifyOperator = 1` and `sRevocationOperatorEmail = "ops@example.com"`
+- **THEN** the save succeeds
+
+#### Scenario: Save accepted — notify off, email field ignored
+- **WHEN** an admin saves the configuration with `blRevocationNotifyOperator = 0` and `sRevocationOperatorEmail = ""` (or any value, valid or not)
+- **THEN** the save succeeds and the email value is stored verbatim (so re-enabling notify later doesn't lose what was typed)
 
 ### Requirement: Per-flag default behaviour for absent oxconfig rows
 
 The application code SHALL treat absent `oxconfig` rows as: `blShowRevocationForm = false`, `blRevocationRequireLogin = false`, `blRevocationNotifyOperator = true`, `sRevocationOperatorEmail = ""`. Reading code MUST pass these defaults explicitly to `getConfigParam()` rather than relying on global system defaults.
 
-#### Scenario: Upgrade with no rows seeded
+The `blRevocationNotifyOperator = true` default is functionally dormant while the form is off (no submissions can happen, so no email is ever sent). It exists to make the first-activation path safe: when the operator later flips `blShowRevocationForm` from `0` to `1`, the save-time cross-field validation sees `notify=on` + `email=""` and rejects the save until the operator provides a valid email — guiding them into the fully-configured end-state. If the default were `false` instead, the activation would silently succeed without notifications and submissions could pile up unseen.
+
+#### Scenario: Upgrade with no rows seeded — feature inert
 - **WHEN** an upgraded shop has no `oxconfig` rows for any of the four feature keys
-- **THEN** the storefront treats the form as off, login as not required, operator notification as on (default), and the operator-email recipient as empty (which makes notification fall back to `oxshops.oxorderemail`)
+- **THEN** the storefront treats the form as off (no footer link, no `?cl=revocation` page, no submissions accepted)
+- **AND** the values of `blRevocationNotifyOperator` and `sRevocationOperatorEmail` have no observable effect because no submission can be created in this state
 
-### Requirement: Fresh-install seeding of `blShowRevocationForm = 1`
+#### Scenario: Operator opens admin and activates the form (first activation path)
+- **WHEN** the operator on a previously-unseeded shop opens the admin config form (which renders `blRevocationNotifyOperator` as checked from its `true` default and `sRevocationOperatorEmail` as empty), ticks `blShowRevocationForm`, leaves `blRevocationNotifyOperator` checked, and saves with the email field still empty
+- **THEN** the save is rejected by the cross-field validation
+- **AND** the form re-renders with all submitted values pre-filled and an error styled around the email field
+- **AND** the operator types a valid email and saves, the save succeeds, and the feature goes live with notifications on
 
-A fresh shop install SHALL come up with `blShowRevocationForm = 1` already present in `oxconfig`, seeded by `source/Setup/Sql/initial_data.sql`. An upgrade MUST NOT seed this row through any path.
+### Requirement: Fresh-install seeding of all four feature config rows
+
+A fresh shop install SHALL come up with all four feature `oxconfig` rows already present, seeded by `source/Setup/Sql/initial_data.sql`. The seeded values MUST match the canonical absent-row defaults from the per-flag-defaults requirement, so seeding is purely for explicitness in the database (state is self-documenting via `SELECT * FROM oxconfig WHERE OXVARNAME LIKE '%Revocation%'`) without changing any runtime behaviour. An upgrade MUST NOT seed any of these rows through any path; upgrades rely on the absent-row code defaults.
+
+| Row | `OXVARTYPE` | `OXVARVALUE` |
+|---|---|---|
+| `blShowRevocationForm` | `bool` | `1` |
+| `blRevocationRequireLogin` | `bool` | `0` |
+| `blRevocationNotifyOperator` | `bool` | `1` |
+| `sRevocationOperatorEmail` | `str` | `""` (empty string — runtime falls back to `oxshops.oxorderemail`) |
 
 #### Scenario: Fresh install via the install wizard
 - **WHEN** the install wizard runs `source/Setup/Sql/initial_data.sql`
-- **THEN** `oxconfig` contains a row with `OXVARNAME = 'blShowRevocationForm'`, `OXVARTYPE = 'bool'`, `OXVARVALUE = '1'`
+- **THEN** `oxconfig` contains four rows for the feature with `OXVARNAME` and values matching the table above
 
 #### Scenario: Upgrade does not seed
 - **WHEN** an existing shop runs only the Doctrine migrations (no install wizard)
-- **THEN** no row is added to `oxconfig` for `blShowRevocationForm` by any code path of this change
+- **THEN** no row is added to `oxconfig` for any of the four feature keys by any code path of this change
+
+#### Scenario: Seeded values match the absent-row code defaults
+- **WHEN** the application reads any of the four config keys via `getConfigParam($key, $default)` on a fresh install
+- **THEN** the value returned is identical to the value that would be returned on an upgrade where no row exists (because the seeded value matches the code default verbatim)
 
 ### Requirement: Doctrine migration creates schema and seeds CMS snippet only
 

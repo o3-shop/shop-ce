@@ -33,9 +33,10 @@ Use a single classic O3 controller `OxidEsales\EshopCommunity\Application\Contro
 | Step | Action | URL | Token check |
 |---|---|---|---|
 | 1 | Footer link target → render form (embed `stoken` hidden field via `Session::hiddenSid()`) | `?cl=revocation` (default action) | none |
-| 2 | Form submit → `Session::checkSessionChallenge()` → validate → stash in session → render confirmation step (embed fresh `stoken` for step 3) | `?cl=revocation&fnc=submit` | `stoken` required |
-| 3 | Confirm submit → `Session::checkSessionChallenge()` → persist + send email → 303 redirect | `?cl=revocation&fnc=confirm` | `stoken` required |
-| 4 | GET receipt page after redirect | `?cl=revocation&fnc=receipt` | none |
+| 2 | Form submit (button labelled "Widerruf bestätigen" → `O3_REVOCATION_CONFIRM_BUTTON`) → `Session::checkSessionChallenge()` → validate → persist + send emails → 303 redirect | `?cl=revocation&fnc=submit` | `stoken` required |
+| 3 | GET receipt page after redirect | `?cl=revocation&fnc=receipt` | none |
+
+**Why no separate confirm step:** § 356a Abs. 3 requires that the form's action button be labelled unambiguously ("Widerruf bestätigen") and that clicking it makes the declaration legally effective. The unambiguous label *is* the legal safeguard against accidental revocations — a separate "preview-and-confirm" step would be UX overhead without legal necessity. The form's submit button carries the `O3_REVOCATION_CONFIRM_BUTTON` label directly.
 
 Why this shape over alternatives:
 - **Symfony controllers** would require new DI wiring and break the convention of every other public form in the shop (contact, newsletter). Not worth the cost for one form.
@@ -43,14 +44,16 @@ Why this shape over alternatives:
 - **Single action with branching on `$_POST['step']`** would tangle three view templates into one method.
 The four-action pattern keeps each concern in one method (~30–50 lines each), matches O3's existing public-form idioms, and gives reviewers a clear matchup to the four steps in § 356a.
 
-### D2. Session-stashed state between submit and confirm, no DB draft row
+### D2. Single POST: form submit IS the legally-effective declaration; no inter-step state needed
 
-After step 2 validation passes, write the submission data into the user session under a dedicated key (`o3_revocation_pending`). Step 3 (`fnc=confirm`) reads it, persists, sends mail, then clears the key. State has the existing O3 session TTL (typically 30 min — sufficient for the user to read and click "confirm").
+The form is processed in one POST. The submit button's label `O3_REVOCATION_CONFIRM_BUTTON` ("Widerruf bestätigen") is the unambiguous, legally-meaningful action label. On submit: validate → if valid, persist + send emails + 303 redirect to the receipt page. There is no separate confirm view, no second POST, and therefore no inter-request state to carry — no session stash, no hidden form re-post, no DB DRAFT row.
 
-Alternatives:
-- **Hidden re-post (form fields preserved in the confirmation page)** — leaks into URL/back-button history, doubles the wire size, and trivially bypasses the confirm-step intent (a script could submit step 3 without ever rendering step 2).
-- **DRAFT row in DB then promote to FINAL on confirm** — pollutes the table with abandoned drafts and creates a retention question the law doesn't answer. Cleanup job out of scope.
-Session is the lowest-friction option that keeps the legally-meaningful "confirm" gesture intact.
+This collapses what an earlier draft of this design treated as a two-step "submit → preview → confirm" flow. § 356a Abs. 3 requires the action button to be unambiguously labelled (so the consumer cannot misunderstand what they're doing) and for the click to make the declaration legally effective. A separate preview-and-confirm step is UX overhead without legal necessity once the button label carries the legal meaning.
+
+Risks eliminated by this decision:
+- No "session expired between form and confirm" failure mode.
+- No "user navigates away with a draft in session" cleanup question.
+- No "script bypasses preview by POSTing the confirm action directly" surface (because there is no confirm action).
 
 ### D3. DB schema: new `o3revocation` table; O3 column conventions on the rest
 
@@ -110,9 +113,9 @@ The migration writes **no** `oxconfig` rows for any of the four feature config k
 | `blShowRevocationForm` | bool | **false** | Install wizard writes `1` on fresh install only; absent on upgrade. | Fresh install = on (legally safe). Upgrade = off (don't silently change behaviour for B2B-only shops or shops with external solutions). Operator flips it on after legal review. |
 | `blRevocationRequireLogin` | bool | **false** | Admin form (operator opt-in). | Most shops have guest checkout; opt-in keeps the form reachable. |
 | `blRevocationNotifyOperator` | bool | **true** | Admin form (operator can disable). | If off by default, operator never finds out about submissions. Legal/operational risk too high. |
-| `sRevocationOperatorEmail` | string | **`""`** (falls back to `oxshops.oxorderemail` at send time) | Admin form (optional). | Every functioning shop already has `oxorderemail` set; out-of-the-box delivery without operator action. |
+| `sRevocationOperatorEmail` | string | **`""`** at runtime, falls back to `oxshops.oxorderemail` at send time. **Strictly mandatory and validated at admin save time** when `blRevocationNotifyOperator = 1` — the entire form save is rejected if the field is empty or fails `FILTER_VALIDATE_EMAIL`. | Admin form (conditionally mandatory — see asymmetry note below). | Every functioning shop already has `oxorderemail` set; out-of-the-box delivery for fresh installs and unconfigured upgrades. Once the operator opens the admin form, save-time validation forces a conscious choice instead of silently accepting the implicit fallback. |
 
-Implementation pattern (every read site):
+Implementation pattern at **runtime** (every read site — lenient, falls back to make fresh installs work):
 ```php
 $showForm = (bool) Registry::getConfig()->getConfigParam('blShowRevocationForm', false);
 $reqLogin = (bool) Registry::getConfig()->getConfigParam('blRevocationRequireLogin', false);
@@ -120,11 +123,27 @@ $notify   = (bool) Registry::getConfig()->getConfigParam('blRevocationNotifyOper
 
 $opEmail = trim((string) Registry::getConfig()->getConfigParam('sRevocationOperatorEmail', ''));
 if ($opEmail === '') {
-    $opEmail = Registry::getConfig()->getActiveShop()->oxshops__oxorderemail->value;
+    $opEmail = trim((string) Registry::getConfig()->getActiveShop()->oxshops__oxorderemail->value);
+    if ($opEmail !== '') {
+        // Log NOTICE per the operator-notification-email requirement
+    }
 }
 ```
 
-**Fresh-install seeding** for `blShowRevocationForm = 1` happens in **`source/Setup/Sql/initial_data.sql`** (loaded by the install wizard at `source/Setup/Controller.php:639` on every fresh install, with or without optional demo data). The change is one extra `INSERT INTO oxconfig (...)` row alongside the nine that already live there for the default baseline; no new extension point needed. Critically: `initial_data.sql` is **not** loaded on shop upgrades — Doctrine migrations under `source/migration/data/` are. So an upgrade gets the absent-row → false behaviour from code (= off, the safe upgrade default), and a fresh install gets the explicit row → true (= on, legally safe out of the box). Two distinct code paths, each with its own semantics, no fragile detection logic in either.
+Implementation pattern at **admin save time** (cross-field validation in the config controller — strict, refuses the save):
+```php
+if ((bool) $submitted['blRevocationNotifyOperator'] === true) {
+    $email = trim((string) $submitted['sRevocationOperatorEmail']);
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        // Reject entire form save per the all-or-nothing rule (D11);
+        // re-render with submitted values pre-filled per form-input-preservation rule.
+    }
+}
+```
+
+The asymmetry is intentional: runtime is lenient so fresh and unconfigured shops still get notifications somewhere sensible; admin-save is strict so once the operator interacts with the form they must consciously choose the recipient instead of silently relying on the implicit fallback.
+
+**Fresh-install seeding** for the four feature rows happens in **`source/Setup/Sql/initial_data.sql`** (loaded by the install wizard at `source/Setup/Controller.php:639` on every fresh install, with or without optional demo data). The change is **four** extra `INSERT INTO oxconfig (...)` rows alongside the nine that already live there for the default baseline — one per feature key, with values matching the absent-row code defaults from the table above. Seeding is purely for self-documentation: a fresh-install database lets an operator inspect `SELECT * FROM oxconfig WHERE OXVARNAME LIKE '%Revocation%'` and see the canonical state explicitly, instead of inferring it from "the row is missing, therefore the default applies". No runtime behaviour difference from the upgrade case. Critically: `initial_data.sql` is **not** loaded on shop upgrades — Doctrine migrations under `source/migration/data/` are. So an upgrade reads the four config keys via the absent-row code defaults, and a fresh install reads the same values from explicit rows. Two distinct code paths converging on identical runtime behaviour, no fragile detection logic in either.
 
 Effect: every flag has a sensible default whether the row exists or not. Fresh installs (any kind — with or without demo data) get the show-form flag on via `initial_data.sql`. Upgrades inherit the safe defaults from code. No fragile environment-detection heuristics, no new install-wizard hook.
 
@@ -187,7 +206,23 @@ incoming POST
 controller business logic
 ```
 
-Add a `RevocationAntiSpamService` interface with one method `bool verify(\OxidEsales\Eshop\Core\Request $request)`. Default implementation `NoopAntiSpamService` returns `true` after a small IP rate-limit check (the rate-limit lives inside the noop precisely because the *anti-spam decision* belongs in the anti-spam service — not in the controller, not in D10). The rate-limit threshold is **3 submissions per IP per minute** (class constant, not admin-configurable in this change). Why 3 and not 1: a legitimate user who hits a server-side validation error, fixes the offending field, and resubmits can easily produce two submissions in 20 seconds — and the form-input-preservation rule in shared memory means we *want* them to retry. Adding a third slot covers the "submit, validation error, fix, validation error again, fix, succeed" path. Bot loops still hit the ceiling almost immediately. Wire it via the DI container (`source/Internal/Framework/.../services.yaml`) so #113 can rebind to `AltchaAntiSpamService` without touching the controller. The submit action calls `$antiSpam->verify(...)` after the D10 token check; on `false`, render the form again with a generic translated error (`O3_REVOCATION_VALIDATION_SPAM`) — no leaking which signal failed.
+Add a `RevocationAntiSpamService` interface with one method `bool verify(\OxidEsales\Eshop\Core\Request $request)` and a hook `recordSuccess(\OxidEsales\Eshop\Core\Request $request): void` that the controller calls right after a successful persist. Default implementation `NoopAntiSpamService` enforces a **two-mode IP rate limit** against a transient cache counter store (the rate limit lives inside the anti-spam service precisely because the decision belongs there — not in the controller, not in D10):
+
+| Counter | Limit | TTL | Purpose |
+|---|---|---|---|
+| Failed-submission | **3** per IP | **60 s** sliding window | Lets a fumbling legitimate user retry: typo → server-side validation error → fix → submit, easily 2 attempts in 20 s; a 3rd slot covers "fix, error again, fix, succeed". Bot loops hit the ceiling almost immediately. |
+| Successful-submission | **1** per IP | **300 s** (5 min) lockout | After a successful persist, the same IP is blocked for 5 minutes regardless of failed-counter state. Rationale: under normal use a single human does not legitimately submit two revocations from the same IP inside 5 minutes; the second attempt is overwhelmingly abuse. The trade-off: a household with two orders to revoke from the same router has to wait 5 minutes between submissions — accepted as a rare-but-tolerable edge case in exchange for cutting off the obvious abuse path. |
+
+Behaviour at `verify()`:
+1. If the successful-submission counter for this IP is present → return `false` (5-min lockout).
+2. Else if the failed-submission counter for this IP is `>= 3` → return `false`.
+3. Else return `true`.
+
+After a successful confirm → persist, the controller calls `recordSuccess()` which sets the successful-submission counter for the IP with a 300-second TTL. On rejection from any later step (validation, token mismatch — anything past `verify()` returning `true`), the controller calls `recordFailure()` (sister hook) which increments the failed-submission counter with a 60-second TTL.
+
+Why two separate counters and not one combined "rejection" counter: a legitimate user can produce up to 3 failed attempts en route to a successful one — that path needs to count as "fumbling, not abuse". Once they succeed, they're done; further attempts are abusive. Combining the counters either punishes the fumble path (too tight) or fails to catch the after-success abuse (too loose). Two counters with different TTLs gives us the right shape.
+
+Wire it via the DI container (`source/Internal/Framework/.../services.yaml`) so #113 can rebind to `AltchaAntiSpamService` without touching the controller. On `verify() == false`, the submit action renders the form again with a generic translated error (`O3_REVOCATION_VALIDATION_SPAM`) — no leaking which counter triggered the rejection.
 
 This is the smallest hook that lets #113 land independently. The `Request` parameter is wide enough to read POST fields (Altcha) or headers (rate-limit) without further interface changes.
 
@@ -198,14 +233,14 @@ Why two distinct layers and not one combined check: the D10 `stoken` is *built i
 | Repo | Files added/changed |
 |---|---|
 | `o3-shop/shop-ce` | `Application/Controller/RevocationController.php`, `Application/Controller/Admin/RevocationListController.php`, `Application/Controller/Admin/RevocationDetailController.php`, `Application/Model/O3Revocation.php`, `Core/Email.php` (extend), `migration/data/Version<ts>.php`, `Application/views/admin/<lang>/lang.php` (new keys), `Application/views/admin/tpl/revocation_*.tpl`, `Internal/.../services.yaml` (anti-spam binding) |
-| `o3-shop/wave-theme` | **Page templates** — `tpl/page/revocation/revocation.tpl` (form, step 1), `tpl/page/revocation/revocationconfirm.tpl` (confirmation step, step 2 view), `tpl/page/revocation/revocationreceipt.tpl` (receipt page, step 4); **Footer extension** — `tpl/layout/footer.tpl`; **Storefront lang keys** — `de/lang.php` + `en/lang.php`; **Email templates** (mirror existing `order_cust`/`order_owner` placement) — `tpl/email/html/revocation_customer_confirmation.tpl`, `tpl/email/plain/revocation_customer_confirmation.tpl`, `tpl/email/html/revocation_customer_confirmation_subj.tpl`, `tpl/email/html/revocation_operator_notification.tpl`, `tpl/email/plain/revocation_operator_notification.tpl`, `tpl/email/html/revocation_operator_notification_subj.tpl` |
+| `o3-shop/wave-theme` | **Page templates** — `tpl/page/revocation/revocation.tpl` (form, step 1) and `tpl/page/revocation/revocationreceipt.tpl` (receipt page, step 3 — there is no step-2 view, the form submit goes straight to persist+email+receipt-redirect per D2); **Footer extension** — `tpl/layout/footer.tpl`; **Storefront lang keys** — `de/lang.php` + `en/lang.php`; **Email templates** (mirror existing `order_cust`/`order_owner` placement) — `tpl/email/html/revocation_customer_confirmation.tpl`, `tpl/email/plain/revocation_customer_confirmation.tpl`, `tpl/email/html/revocation_customer_confirmation_subj.tpl`, `tpl/email/html/revocation_operator_notification.tpl`, `tpl/email/plain/revocation_operator_notification.tpl`, `tpl/email/html/revocation_operator_notification_subj.tpl` |
 | `o3-shop/o3-Theme` | Same set as wave-theme, ported during the cutover |
 
 Two coordinated PRs (shop-ce + wave-theme) for the immediate ship; o3-Theme follows with its own PR. Cross-link in all PR descriptions.
 
 ### D10. Session challenge token on every state-changing action ("must have visited the form first")
 
-To prevent direct submissions to `?cl=revocation&fnc=submit` (and `&fnc=confirm`) from clients that never rendered the form — i.e. scripts and cross-origin CSRF attempts — every state-changing action requires the O3 session challenge token (`stoken`). The mechanism is built into core and already conventional across the codebase:
+To prevent direct submissions to `?cl=revocation&fnc=submit` from clients that never rendered the form — i.e. scripts and cross-origin CSRF attempts — the single state-changing action requires the O3 session challenge token (`stoken`). The mechanism is built into core and already conventional across the codebase:
 
 - **Form render** (step 1) embeds `<input type="hidden" name="stoken" value="...">` via `Session::hiddenSid()` (auto-included by the Smarty form helpers used everywhere else; explicit in our case for clarity).
 - **Submit / confirm controllers** (steps 2 + 3) start with `if (!Registry::getSession()->checkSessionChallenge()) { redirectToForm(); return; }`. Reference: `Session::checkSessionChallenge()` at `source/Core/Session.php:319` and existing usages in `BasketController`, `OrderController`, `ContactController`, etc.
@@ -234,7 +269,6 @@ Move the bulk of the missing-template defence out of the consumer-facing runtime
 | Template type | Path pattern in the active theme | Lives in repo |
 |---|---|---|
 | Page (form) | `<active-theme>/tpl/page/revocation/revocation.tpl` | wave-theme today; o3-Theme post-cutover |
-| Page (confirm step) | `<active-theme>/tpl/page/revocation/revocationconfirm.tpl` | wave-theme today; o3-Theme post-cutover |
 | Page (receipt) | `<active-theme>/tpl/page/revocation/revocationreceipt.tpl` | wave-theme today; o3-Theme post-cutover |
 | Customer email body (HTML + plain) | `<active-theme>/<lang>/tpl/email/{html,plain}/revocation_customer_confirmation.tpl` | wave-theme today; o3-Theme post-cutover |
 | Customer email subject | `<active-theme>/<lang>/tpl/email/html/revocation_customer_confirmation_subj.tpl` | wave-theme today; o3-Theme post-cutover |
@@ -297,9 +331,7 @@ Five log points, all using `__METHOD__ . ' - '` prefix and the structured `data`
 
 [**Confirmation email fails after persist**] → The legal declaration is recorded; the legally-required acknowledgement isn't delivered. *Mitigation:* admin "delivery failed" surface + manual resend button + email-failure ERROR log. The legal position remains "we received the declaration on date X" which the operator can prove from the table even without the email.
 
-[**Session timeout between form and confirm**] → A slow consumer reads the confirmation step past the 30-min TTL and submits "confirm" with empty session state. *Mitigation:* if the session key is gone on `fnc=confirm`, redirect back to `?cl=revocation` with a translated info message ("Please re-submit, your session expired"). Logged at NOTICE.
-
-[**Bot abuse before #113 ships**] → Public form with no CAPTCHA invites garbage submissions. *Mitigation (layered):* (1) the O3 session challenge token (D10) blocks zero-effort direct/cross-origin POSTs out of the box at no implementation cost; (2) the `NoopAntiSpamService` ships with a 3-submissions-per-IP-per-minute rate-limit so we are not naked against bot loops if #113 slips, while leaving headroom for the legitimate user who hits validation errors and retries (D8); (3) #113 lands and replaces the noop with Altcha for scaled-bot resistance.
+[**Bot abuse before #113 ships**] → Public form with no CAPTCHA invites garbage submissions. *Mitigation (layered):* (1) the O3 session challenge token (D10) blocks zero-effort direct/cross-origin POSTs out of the box at no implementation cost; (2) the `NoopAntiSpamService` ships with a two-mode IP rate limit (D8): up to 3 failed attempts in a 60 s window for the legitimate fumble path, plus a 5-minute lockout after each successful persist that catches any after-success abuse. Bot loops hit one ceiling or the other almost immediately while real users with typos retain headroom; (3) #113 lands and replaces the noop with Altcha for scaled-bot resistance.
 
 [**Migration attempts to seed `oxconfig` after fresh-install seeding**] → Inconsistent default if both code paths write. *Mitigation:* migration writes nothing; only the install wizard writes the default-on row. Code reads the absent-row case as off.
 
@@ -335,4 +367,4 @@ Five log points, all using `__METHOD__ . ' - '` prefix and the structured `data`
 3. ~~CSV / PDF export from admin list~~ — **out of scope.** Operators dealing with legal evidence can use the standard admin list view; an export feature is a separate concern and will be considered as its own issue if and when an operator asks for it. Not deferred-but-implied; explicitly off the table for this change.
 4. ~~Retention policy / automated deletion~~ — **resolved: no automatic deletion, ever.** Submissions remain in `o3revocation` until the operator manually deletes them (or runs their own external retention job against the table). Rationale: revocation declarations carry legal weight; an automated cron quietly destroying evidence rows would be the wrong default and could expose operators to claims they can't refute. Retention is the operator's responsibility under their own privacy notice and record-keeping policy, exactly as they handle order data today. Admin help text states this clearly; the codebase ships nothing scheduled, configurable, or otherwise that touches existing rows.
 5. ~~IP storage opt-out~~ — **resolved**: we do not persist IP or User-Agent in the submission row at all (D3). In-flight rate-limit (D8) reads the request IP for the duration of the check only, against a transient cache counter — no DB column, no admin flag required.
-6. ~~Rate-limit threshold for the temporary anti-spam fallback~~ — **resolved: 3 submissions per IP per minute.** Hardcoded as a class constant in `NoopAntiSpamService`; not admin-configurable in this change. Rationale: leaves headroom for the legitimate user who hits a server-side validation error, fixes a field, retries — that path can easily produce 2 submissions in 20 seconds and we want them to succeed. Bot loops still hit the ceiling almost immediately. See D8.
+6. ~~Rate-limit threshold for the temporary anti-spam fallback~~ — **resolved: two-mode IP rate limit.** Up to 3 failed attempts per IP within a 60-second sliding window (covers the fumble path) plus a 5-minute lockout per IP after each successful persist (cuts after-success abuse). Both thresholds are class constants in `NoopAntiSpamService`; not admin-configurable in this change. See D8.
