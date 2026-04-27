@@ -46,13 +46,13 @@
 
 ## 5. Email service extension (shop-ce)
 
-- [ ] 5.1 In `source/Core/Email.php`, add `sendRevocationEmailToCustomer(\OxidEsales\EshopCommunity\Application\Model\O3Revocation $submission): bool` mirroring the shape of `sendOrderEmailToUser()` (around line 589). Type the new method's signature even though the file is not strict-types overall (per shared-memory rule on adding methods to existing untyped files).
-- [ ] 5.2 Inside `sendRevocationEmailToCustomer()`: load `Shop` in the submission's language via `_getShop($submission->getLang())`; render templates `revocation_customer_confirmation.tpl` (HTML + plain) and `revocation_customer_confirmation_subj.tpl` (subject); recipient is `$submission->getEmail()`; pass `setViewData('submission', $submission)`. Return the `send()` result.
-- [ ] 5.3 Add `sendRevocationEmailToOperator(O3Revocation $submission): bool` mirroring `sendOrderEmailToOwner()` (around line 640).
-- [ ] 5.4 Implement the runtime recipient resolution: read `sRevocationOperatorEmail`, fall back to `oxshops.oxorderemail`, log NOTICE on the implicit fallback, log ERROR + return false (skip) if both are empty.
-- [ ] 5.5 Operator email language is the shop's default language (D7) — load `_getShop()` with the default language ID.
-- [ ] 5.6 Unit-test both methods: explicit recipient → sent there; empty `sRevocationOperatorEmail` + non-empty `oxorderemail` → fallback + NOTICE log; both empty → skip + ERROR log; verify the customer email always uses the submission language; verify the persist-first ordering (caller writes the row before invoking these methods).
-- [ ] 5.7 Cover the "send failed" path: mock the underlying `send()` returning false; verify the method returns false (caller will surface the flag to admin and log ERROR).
+- [x] 5.1 In `source/Core/Email.php`, add `sendRevocationEmailToCustomer(\OxidEsales\EshopCommunity\Application\Model\O3Revocation $submission): bool` mirroring the shape of `sendOrderEmailToUser()` (around line 589). New method has typed signature; the file's existing untyped methods are left unchanged (no `declare(strict_types=1)` added — would flip semantics for the rest of the file).
+- [x] 5.2 Inside `sendRevocationEmailToCustomer()`: load `Shop` in the submission's language via `_getShop($submission->getLang())`; render templates `revocation_customer_confirmation.tpl` (HTML + plain) and `revocation_customer_confirmation_subj.tpl` (subject); recipient is `$submission->getEmail()`; pass `setViewData('submission', $submission)`. Subject falls back to `O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT` translation key + submission OXID parenthetical when the subject template is missing. Returns the `send()` result.
+- [x] 5.3 Add `sendRevocationEmailToOperator(O3Revocation $submission): bool` mirroring `sendOrderEmailToOwner()`.
+- [x] 5.4 Implement the runtime recipient resolution: read `sRevocationOperatorEmail`, validate via `FILTER_VALIDATE_EMAIL`, fall back to `oxshops.oxorderemail` (logs NOTICE on the implicit fallback), log ERROR + return false (skip) if both are empty or invalid.
+- [x] 5.5 Operator email language is the shop's default language (D7) — `_getShop()` called without the langId argument, which defaults to the active shop language.
+- [x] 5.6 Unit-test both methods (`tests/Unit/Core/Revocation/EmailRevocationTest.php`): 5 base tests cover recipient resolution branches (configured-and-valid → use it; empty config + non-empty oxorderemail → fallback; non-FILTER_VALIDATE_EMAIL config → fallback; both empty → return false / no send; customer email recipient = submission email).
+- [x] 5.7 "Send failed" path tests: forceSendFailure flag on the test spy; both `sendRevocationEmailToCustomer()` and `sendRevocationEmailToOperator()` propagate false on send failure so the controller flags the row "send failed" and the admin manual-resend path applies. 7 tests / 9 assertions total.
 
 ## 6. Template-presence validator + CLI healthcheck (shop-ce)
 

@@ -223,6 +223,27 @@ class Email extends PHPMailer
      */
     protected $_sOrderOwnerSubjectTemplate = 'email/html/order_owner_subj.tpl';
 
+    // §356a BGB electronic revocation feature (issue #99). Template paths
+    // mirror the order_cust / order_owner placement convention.
+
+    /** @var string Revocation customer-confirmation HTML template */
+    protected $_sRevocationCustomerTemplate = 'email/html/revocation_customer_confirmation.tpl';
+
+    /** @var string Revocation customer-confirmation plain text template */
+    protected $_sRevocationCustomerPlainTemplate = 'email/plain/revocation_customer_confirmation.tpl';
+
+    /** @var string Revocation customer-confirmation subject template */
+    protected $_sRevocationCustomerSubjectTemplate = 'email/html/revocation_customer_confirmation_subj.tpl';
+
+    /** @var string Revocation operator-notification HTML template */
+    protected $_sRevocationOperatorTemplate = 'email/html/revocation_operator_notification.tpl';
+
+    /** @var string Revocation operator-notification plain text template */
+    protected $_sRevocationOperatorPlainTemplate = 'email/plain/revocation_operator_notification.tpl';
+
+    /** @var string Revocation operator-notification subject template */
+    protected $_sRevocationOperatorSubjectTemplate = 'email/html/revocation_operator_notification_subj.tpl';
+
     /**
      * Price alarm e-mail for shop owner template
      *
@@ -720,6 +741,127 @@ class Email extends PHPMailer
         $remark->oxremark__oxparentid = new \OxidEsales\Eshop\Core\Field($user->getId(), \OxidEsales\Eshop\Core\Field::T_RAW);
         $remark->oxremark__oxtype = new \OxidEsales\Eshop\Core\Field('o', \OxidEsales\Eshop\Core\Field::T_RAW);
         $remark->save();
+    }
+
+    /**
+     * Send the consumer's revocation confirmation receipt (§ 356a Abs. 4 BGB).
+     *
+     * Mirrors the {@see sendOrderEmailToUser()} pattern: render the body and
+     * subject templates in the consumer's submission language, then dispatch
+     * via {@see send()}. The submission's `OXLANG` drives the rendering
+     * language; missing translation keys fall through to the shop default
+     * via the OXID translation engine, no custom code needed.
+     *
+     * @param \OxidEsales\EshopCommunity\Application\Model\O3Revocation $submission
+     *
+     * @return bool true on synchronous send success; false on failure (caller
+     *              flags the row "send failed" and a manual resend is offered
+     *              in admin).
+     */
+    public function sendRevocationEmailToCustomer(
+        \OxidEsales\EshopCommunity\Application\Model\O3Revocation $submission
+    ): bool {
+        $shop = $this->_getShop($submission->getLang());
+        $this->_clearMailer();
+        $this->_setMailParams($shop);
+        $this->setSmtp($shop);
+
+        $renderer = $this->getRenderer();
+        $this->setViewData('submission', $submission);
+        $this->_processViewArray();
+
+        $this->setBody($renderer->renderTemplate($this->_sRevocationCustomerTemplate, $this->getViewData()));
+        $this->setAltBody($renderer->renderTemplate($this->_sRevocationCustomerPlainTemplate, $this->getViewData()));
+
+        if ($renderer->exists($this->_sRevocationCustomerSubjectTemplate)) {
+            $subject = $renderer->renderTemplate($this->_sRevocationCustomerSubjectTemplate, $this->getViewData());
+        } else {
+            $subject = \OxidEsales\Eshop\Core\Registry::getLang()->translateString(
+                'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT',
+                $submission->getLang()
+            ) . ' (#' . $submission->getId() . ')';
+        }
+        $this->setSubject($subject);
+
+        $this->setRecipient($submission->getEmail(), $submission->getName());
+        $this->setReplyTo($shop->oxshops__oxorderemail->value, $shop->oxshops__oxname->getRawValue());
+
+        return $this->send();
+    }
+
+    /**
+     * Send the operator's revocation notification email (best-effort —
+     * not legally required, but the operator can't act on what they
+     * don't know about).
+     *
+     * Recipient resolution per design D5 / spec "Operator notification email":
+     *   1. `sRevocationOperatorEmail` if non-empty AND syntactically valid.
+     *   2. Else `oxshops.oxorderemail` (fallback for fresh installs and
+     *      unconfigured upgrades; logs a NOTICE so the operator can spot
+     *      the implicit fallback in logs).
+     *   3. Else skip the send, log ERROR, return false.
+     *
+     * Always rendered in the shop's default language (the operator chose
+     * their own admin language; we don't translate per-submission for them).
+     *
+     * @param \OxidEsales\EshopCommunity\Application\Model\O3Revocation $submission
+     *
+     * @return bool true on synchronous send success; false on misconfigured
+     *              recipient or send failure.
+     */
+    public function sendRevocationEmailToOperator(
+        \OxidEsales\EshopCommunity\Application\Model\O3Revocation $submission
+    ): bool {
+        $config = $this->getConfig();
+        $logger = \OxidEsales\Eshop\Core\Registry::getLogger();
+
+        $configured = trim((string) $config->getConfigParam('sRevocationOperatorEmail', ''));
+        $configuredIsValid = $configured !== '' && filter_var($configured, FILTER_VALIDATE_EMAIL);
+
+        $shop = $this->_getShop();
+        $orderEmail = trim((string) $shop->oxshops__oxorderemail->value);
+
+        if ($configuredIsValid) {
+            $recipient = $configured;
+        } elseif ($orderEmail !== '') {
+            $recipient = $orderEmail;
+            $logger->notice(
+                __METHOD__ . ' - Operator revocation email recipient falling back to oxshops.oxorderemail '
+                . "for submission OXID '" . $submission->getId() . "'. "
+                . 'Set sRevocationOperatorEmail in admin for an explicit recipient.'
+            );
+        } else {
+            $logger->error(
+                __METHOD__ . " - Operator revocation email skipped for submission OXID '"
+                . $submission->getId() . "': sRevocationOperatorEmail empty and oxshops.oxorderemail empty. "
+                . 'Set sRevocationOperatorEmail in admin or disable blRevocationNotifyOperator.'
+            );
+            return false;
+        }
+
+        $this->_clearMailer();
+        $this->_setMailParams($shop);
+        $this->setSmtp($shop);
+
+        $renderer = $this->getRenderer();
+        $this->setViewData('submission', $submission);
+        $this->_processViewArray();
+
+        $this->setBody($renderer->renderTemplate($this->_sRevocationOperatorTemplate, $this->getViewData()));
+        $this->setAltBody($renderer->renderTemplate($this->_sRevocationOperatorPlainTemplate, $this->getViewData()));
+
+        if ($renderer->exists($this->_sRevocationOperatorSubjectTemplate)) {
+            $subject = $renderer->renderTemplate($this->_sRevocationOperatorSubjectTemplate, $this->getViewData());
+        } else {
+            $subject = \OxidEsales\Eshop\Core\Registry::getLang()->translateString(
+                'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'
+            ) . ' (#' . $submission->getId() . ')';
+        }
+        $this->setSubject($subject);
+
+        $this->setRecipient($recipient, \OxidEsales\Eshop\Core\Registry::getLang()->translateString('ORDERS'));
+
+        return $this->send();
     }
 
     /**
