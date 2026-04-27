@@ -17,11 +17,11 @@
 
 ## 2. Model and persistence (shop-ce)
 
-- [ ] 2.1 Create `source/Application/Model/O3Revocation.php`. Strict types, extends the standard OXID base model class. Map to table `o3revocation`. Property accessors via the framework's magic-getter convention.
-- [ ] 2.2 Implement `getId(): string`, `getLang(): int`, `getSubmittedAt(): \DateTimeInterface`, `getName(): string`, `getOrderIdent(): string`, `getEmail(): string`, `getFreeText(): ?string`. All declare types per D11.
-- [ ] 2.3 Add a `markSendFailed(): void` and `markSendSucceeded(): void` (or equivalent property/persist mechanism) so admin can flag "send failed" rows. Decide whether the flag is a separate column or a derived state from a "last send error" column — capture the decision in a code comment.
-- [ ] 2.4 Ensure `OXSUBMITTED` is set exactly once on first save and never updated; `OXTIMESTAMP` is left to MySQL. Cover both invariants with a unit test.
-- [ ] 2.5 Add a unit test that creates an `O3Revocation`, saves, modifies a non-`OXSUBMITTED` field, saves again — asserts `OXSUBMITTED` is unchanged, `OXTIMESTAMP` advanced.
+- [x] 2.1 Create `source/Application/Model/O3Revocation.php`. Strict types, extends the standard OXID base model class. Map to table `o3revocation`. Property accessors via the framework's magic-getter convention.
+- [x] 2.2 Implement `getId(): string`, `getLang(): int`, `getSubmittedAt(): \DateTimeInterface`, `getName(): string`, `getOrderIdent(): string`, `getEmail(): string`, `getFreeText(): ?string`. All declare types per D11.
+- [x] 2.3 Add a `markSendFailed(): void` and `markSendSucceeded(): void` (or equivalent property/persist mechanism) so admin can flag "send failed" rows. Decision: dedicated `OXSENDFAILED tinyint(1)` column (added in phase 1 schema). Captured in the model's class docblock.
+- [x] 2.4 Ensure `OXSUBMITTED` is set exactly once on first save and never updated; `OXTIMESTAMP` is left to MySQL. Cover both invariants with a unit test.
+- [x] 2.5 Add a unit test that creates an `O3Revocation`, saves, modifies a non-`OXSUBMITTED` field, saves again — asserts `OXSUBMITTED` is unchanged, `OXTIMESTAMP` advanced.
 
 ## 3. Anti-spam service with two-mode rate limit (shop-ce)
 
