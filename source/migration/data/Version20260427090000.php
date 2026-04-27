@@ -80,8 +80,8 @@ final class Version20260427090000 extends AbstractMigration
         $this->addSql(
             <<<'SQL'
 CREATE TABLE IF NOT EXISTS `o3revocation` (
-  `OXID`         CHAR(32)     NOT NULL
-                              COMMENT 'O3 convention: 32-char primary key, generated with UtilsObject::generateUID().',
+  `OXID`         CHAR(32)     CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL
+                              COMMENT 'O3 convention: 32-char primary key, generated with UtilsObject::generateUID(). latin1_general_ci collation matches every other OXID column in the schema (verified by SystemRequirements::checkCollation).',
   `OXSHOPID`     INT          NOT NULL DEFAULT 1
                               COMMENT 'Owning shop ID (multi-shop installations).',
   `OXLANG`       INT          NOT NULL

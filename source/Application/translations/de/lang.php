@@ -836,7 +836,7 @@ $aLang = [
 'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
 
 // Admin: Aktivierungs-Gate
-'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Aktivierung nicht möglich – fehlende Vorlagen oder Übersetzungen:',
+'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Aktivierung nicht möglich – fehlende Vorlagen oder Übersetzungen',
 'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'Sprache',
 
 // Admin: Listenansicht

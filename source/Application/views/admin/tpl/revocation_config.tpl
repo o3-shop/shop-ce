@@ -9,7 +9,9 @@
 
 [{if $revocationMissingAssets}]
     <div class="errorbox" role="alert">
-        <strong>[{oxmultilang ident="O3_REVOCATION_ADMIN_GATE_HEADING"}]</strong>
+        [{* OXID lang convention forbids trailing colons in lang values *}]
+        [{* (LangIntegrityTest::testColonsAtTheEnd). The colon is added in the template. *}]
+        <strong>[{oxmultilang ident="O3_REVOCATION_ADMIN_GATE_HEADING"}]:</strong>
         <ul>
             [{foreach from=$revocationMissingAssets item=asset}]
                 <li>

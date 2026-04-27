@@ -832,7 +832,7 @@ $aLang = [
 'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
 
 // Admin: activation gate
-'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Activation blocked — missing templates or translations:',
+'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Activation blocked — missing templates or translations',
 'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'language',
 
 // Admin: list view
