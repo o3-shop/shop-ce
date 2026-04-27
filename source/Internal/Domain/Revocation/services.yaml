@@ -10,3 +10,16 @@ services:
     OxidEsales\EshopCommunity\Internal\Domain\Revocation\AntiSpam\RevocationAntiSpamServiceInterface:
         class: OxidEsales\EshopCommunity\Internal\Domain\Revocation\AntiSpam\NoopAntiSpamService
         public: true
+
+    # Template-presence validator. Used by three admin trigger sites
+    # (config save / language activation / theme switch) and by the
+    # `o3:check-templates` CLI command — see design D11.
+    OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator:
+        public: true
+
+    # CLI healthcheck command. Name is `o3:check-templates` —
+    # feature-neutral so future features can plug additional validators
+    # in without renaming the published entry-point.
+    OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\CheckTemplatesCommand:
+        tags:
+            - { name: 'console.command', command: 'o3:check-templates' }
