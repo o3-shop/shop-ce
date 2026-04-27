@@ -140,9 +140,9 @@
 
 Per-section unit, integration, and smoke tests live inside their respective phases above (1.5–1.6, 2.5, 3.6, 4.8–4.9, 5.6–5.7, 6.5, 6.9–6.10, 7.4, 8.4–8.5, 9.9–9.10, 12.3, 13.x). This phase runs the project-wide gates *after* all of those have passed.
 
-- [ ] 14.1 Run `./docker.sh cs-fixer` — fix every PSR-12 / php-cs-fixer warning the new code produces.
-- [ ] 14.2 Run the full unit test suite: `./docker.sh test`. All new tests pass; no regression in existing tests.
-- [ ] 14.3 Run with coverage: `./docker.sh test-all-coverage`. Aim for the new files to be > 80 % line-covered. Coverage holes that are intentional (e.g. defensive branches) get a `// uncovered: defensive — see test foo` comment.
+- [x] 14.1 `./docker.sh cs-fixer` — 0 fixes needed. Project-wide PSR-12 clean.
+- [x] 14.2 `./docker.sh test` — 7779 tests / 14572 assertions, all green (~2m 28s). Two regressions surfaced by the gate (collation mismatch on `o3revocation.OXID` — fixed via the migration to `latin1_general_ci`; trailing colon in `O3_REVOCATION_ADMIN_GATE_HEADING` — fixed by moving the colon to the admin template per OXID convention) and resolved before the green run.
+- [x] 14.3 `./docker.sh test-all-coverage` — same suite passes (~5m 27s); clover XML + HTML coverage reports generated under `coverage/`. The 32 new revocation tests across phases 1–12 are all part of the full suite run.
 
 ## 15. PRs and cross-linking
 
