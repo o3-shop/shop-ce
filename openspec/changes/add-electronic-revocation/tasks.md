@@ -25,12 +25,12 @@
 
 ## 3. Anti-spam service with two-mode rate limit (shop-ce)
 
-- [ ] 3.1 Create `source/Internal/.../Revocation/AntiSpam/RevocationAntiSpamServiceInterface.php` (strict types) declaring `verify(\OxidEsales\Eshop\Core\Request $request): bool`, `recordSuccess(\OxidEsales\Eshop\Core\Request $request): void`, `recordFailure(\OxidEsales\Eshop\Core\Request $request): void`.
-- [ ] 3.2 Create `NoopAntiSpamService` implementing the interface. Class constants: `FAILED_LIMIT = 3`, `FAILED_WINDOW_SECONDS = 60`, `SUCCESS_LOCKOUT_SECONDS = 300`.
-- [ ] 3.3 Implement `verify()` against a transient cache counter store (use the existing OXID cache abstraction; key per IP). Order: success-lockout check first, then failed-counter check.
-- [ ] 3.4 Implement `recordSuccess()` (set success counter with TTL 300s) and `recordFailure()` (increment failed counter with TTL 60s).
-- [ ] 3.5 Wire the binding in `source/Internal/Framework/.../services.yaml`: default implementation is `NoopAntiSpamService`, ID is `RevocationAntiSpamServiceInterface`. Issue #113 will rebind to `AltchaAntiSpamService`.
-- [ ] 3.6 Unit-test all three methods against a mocked cache: 3 failures in 60s allowed, 4th rejected; 1 success triggers 300s lockout that rejects subsequent attempts; lockout expires correctly.
+- [x] 3.1 Create `source/Internal/Domain/Revocation/AntiSpam/RevocationAntiSpamServiceInterface.php` (strict types) declaring `verify(\OxidEsales\Eshop\Core\Request $request): bool`, `recordSuccess(\OxidEsales\Eshop\Core\Request $request): void`, `recordFailure(\OxidEsales\Eshop\Core\Request $request): void`.
+- [x] 3.2 Create `NoopAntiSpamService` implementing the interface. Class constants: `FAILED_LIMIT = 3`, `FAILED_WINDOW_SECONDS = 60`, `SUCCESS_LOCKOUT_SECONDS = 300`.
+- [x] 3.3 Implement `verify()` against a transient cache counter store (`Registry::getUtils()->fromFileCache/toFileCache`; IP md5-hashed for filename safety). Order: success-lockout check first, then failed-counter check.
+- [x] 3.4 Implement `recordSuccess()` (set success counter with TTL 300s) and `recordFailure()` (increment failed counter with TTL 60s).
+- [x] 3.5 Wire the binding in `source/Internal/Domain/Revocation/services.yaml` (imported from `Internal/Domain/services.yaml`): default implementation is `NoopAntiSpamService`, ID is `RevocationAntiSpamServiceInterface`. Issue #113 will rebind to `AltchaAntiSpamService`.
+- [x] 3.6 Unit-test all three methods against a mocked cache: 3 failures in 60s allowed, 4th rejected; 1 success triggers 300s lockout that rejects subsequent attempts; per-IP isolation; no-op behaviour when IP is unavailable.
 
 ## 4. Public controller (shop-ce)
 

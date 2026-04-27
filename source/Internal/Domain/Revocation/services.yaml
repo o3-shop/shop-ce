@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        autowire: true
+        public: false
+
+    # §356a BGB electronic revocation feature (issue #99). The default
+    # anti-spam implementation is a two-mode IP rate limit (no CAPTCHA);
+    # issue #113 will rebind this interface to `AltchaAntiSpamService`
+    # without controller changes. See design D8.
+    OxidEsales\EshopCommunity\Internal\Domain\Revocation\AntiSpam\RevocationAntiSpamServiceInterface:
+        class: OxidEsales\EshopCommunity\Internal\Domain\Revocation\AntiSpam\NoopAntiSpamService
+        public: true
