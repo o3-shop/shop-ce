@@ -784,8 +784,14 @@ class Email extends PHPMailer
         // Email does not extend BaseController, so $oViewConf is not in the
         // view data by default — but every email template includes
         // email/html/header.tpl which unconditionally calls
-        // $oViewConf->getConfig(). Set it explicitly.
-        $this->setViewData('oViewConf', $this->getViewConfig());
+        // $oViewConf->getConfig(). Resolve via the active view when one is
+        // present (normal request flow), fall back to a fresh ViewConfig
+        // otherwise (unit-test contexts where no controller is active —
+        // Email::getViewConfig() chains through ->getActiveView() which
+        // returns null without a request).
+        $activeView = $this->getConfig()->getActiveView();
+        $oViewConf = $activeView ? $activeView->getViewConfig() : oxNew(\OxidEsales\Eshop\Core\ViewConfig::class);
+        $this->setViewData('oViewConf', $oViewConf);
         $this->_processViewArray();
 
         // When the resend is triggered from the admin (RevocationMain::resend),
@@ -876,8 +882,11 @@ class Email extends PHPMailer
 
         $renderer = $this->getRenderer();
         $this->setViewData('submission', $submission);
-        // See sendRevocationEmailToCustomer() — header.tpl needs $oViewConf.
-        $this->setViewData('oViewConf', $this->getViewConfig());
+        // See sendRevocationEmailToCustomer() — header.tpl needs $oViewConf;
+        // also see the same fallback note for the unit-test path.
+        $activeView = $this->getConfig()->getActiveView();
+        $oViewConf = $activeView ? $activeView->getViewConfig() : oxNew(\OxidEsales\Eshop\Core\ViewConfig::class);
+        $this->setViewData('oViewConf', $oViewConf);
         $this->_processViewArray();
 
         // See sendRevocationEmailToCustomer() — when called from the admin
