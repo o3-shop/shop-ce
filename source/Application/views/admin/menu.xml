@@ -180,7 +180,7 @@
                 <TAB id="tbclpricealarm_mail" cl="pricealarm_mail" />
             </SUBMENU>
             <!-- §356a BGB electronic revocation feature (issue #99) -->
-            <SUBMENU id="mxrevocations" cl="revocation_list" list="revocation_list">
+            <SUBMENU id="mxrevocations" cl="admin_revocation" list="revocation_list">
                 <TAB id="tbclrevocation_main" cl="revocation_main" />
             </SUBMENU>
             <SUBMENU id="mxrevocationconfig" cl="revocation_config" list="revocation_config">

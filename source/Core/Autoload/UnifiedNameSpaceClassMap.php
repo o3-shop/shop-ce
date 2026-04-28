@@ -353,6 +353,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminRevocation'              => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRevocation::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\AdminRights'              => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRights::class,
         'isAbstract'       => false,
@@ -1723,6 +1729,12 @@ return [
     ],
     'OxidEsales\Eshop\Application\Controller\ReviewController'                   => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\ReviewController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Application\Controller\RevocationController'               => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\RevocationController::class,
         'isAbstract'       => false,
         'isInterface'      => false,
         'isDeprecated'     => false,
