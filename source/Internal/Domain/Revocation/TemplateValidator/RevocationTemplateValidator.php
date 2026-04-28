@@ -90,6 +90,18 @@ class RevocationTemplateValidator
      *
      * @var string[]
      */
+    /**
+     * The validator only checks STOREFRONT-facing keys: form labels,
+     * validation messages, and email-template strings (emails are rendered
+     * in the storefront-language domain even when triggered from admin —
+     * see Email::send*RevocationEmail*'s setAdminMode(false) bracket).
+     *
+     * Admin-only keys (`O3_REVOCATION_CONFIG_*`, `O3_REVOCATION_ADMIN_*`)
+     * live in `views/admin/{lang}/lang.php` and don't gate consumer-facing
+     * rendering — leaving them out keeps the validator from reporting
+     * false positives in `bin/oe-console o3:check-templates` and from
+     * blocking the language/theme activation gates over admin-domain keys.
+     */
     private const REQUIRED_TRANSLATION_KEYS = [
         // Storefront
         'O3_REVOCATION_FOOTER_LINK',
@@ -112,12 +124,6 @@ class RevocationTemplateValidator
         // Email — operator
         'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT',
         'O3_REVOCATION_OPERATOR_EMAIL_BODY',
-        // Admin
-        'O3_REVOCATION_CONFIG_SHOW_LABEL',
-        'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL',
-        'O3_REVOCATION_CONFIG_NOTIFY_LABEL',
-        'O3_REVOCATION_ADMIN_NAV_LABEL',
-        'O3_REVOCATION_ADMIN_LIST_HEADING',
     ];
 
     private ?string $shopDir;

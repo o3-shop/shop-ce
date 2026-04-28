@@ -150,7 +150,7 @@ class RevocationTemplateValidatorTest extends TestCase
             ->validate(1, $themeId, $langIds);
 
         $this->assertGreaterThanOrEqual(
-            2 + 6 + 22, // 2 page templates + 6 email files (one set per theme) + ~22 keys
+            2 + 6 + 18, // 2 page templates + 6 email files (one set per theme) + 18 storefront/email keys
             count($missing),
             'A completely-empty installation should surface every required asset as missing.'
         );

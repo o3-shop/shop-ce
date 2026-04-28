@@ -31,6 +31,9 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 use PDOException;
 
 /**
@@ -124,6 +127,16 @@ class LanguageMain extends AdminDetailsController
         $this->_aLangData = $this->getLanguages();
         //checking input errors
         if (!$this->validateInput()) {
+            return;
+        }
+
+        // §356a BGB template-presence gate (issue #99). When the operator
+        // activates a NEW language while the revocation form is enabled,
+        // refuse the save if the new language is missing revocation
+        // assets (templates / translations) — sibling guard to phase 8.1
+        // on the revocation config screen. Existing already-active
+        // languages are not re-validated; only the newly-activated one.
+        if (!$this->revocationActivationGatePasses($sOxId, $aParams)) {
             return;
         }
 
@@ -816,5 +829,98 @@ class LanguageMain extends AdminDetailsController
         }
 
         return $this->noJsValidator;
+    }
+
+    /**
+     * §356a template-presence gate for language activation (phase 8.2).
+     *
+     * Returns true (proceed with save) when:
+     *   - the revocation feature is off, OR
+     *   - the language is being saved as inactive, OR
+     *   - the language was already active and is just being re-saved, OR
+     *   - the validator finds no missing revocation assets for the
+     *     newly-activated language.
+     *
+     * Returns false (reject the save) when the language is being activated
+     * and the validator reports missing revocation templates/translations
+     * for that language. Side effect on rejection: each missing asset's
+     * remediation hint is pushed to the admin error display, and the
+     * raw missing-asset list is exposed to the template via
+     * `_aViewData['revocationMissingAssets']` so the operator sees the
+     * concrete list of files/keys to add.
+     *
+     * @param string             $sOxId   the language OXID being saved
+     * @param array<string,mixed> $aParams submitted form values
+     */
+    protected function revocationActivationGatePasses(string $sOxId, array $aParams): bool
+    {
+        $config = Registry::getConfig();
+        if (!$config->getConfigParam('blShowRevocationForm', false)) {
+            return true;
+        }
+        if (empty($aParams['active'])) {
+            return true;
+        }
+
+        // Only validate when the language is *transitioning* to active.
+        // _aLangData reflects the pre-save state at this point in save().
+        $wasActive = isset($this->_aLangData['params'][$sOxId]['active'])
+            && $this->_aLangData['params'][$sOxId]['active'];
+        $isNewLanguage = ($sOxId === '-1' || !isset($this->_aLangData['params'][$sOxId]));
+        if (!$isNewLanguage && $wasActive) {
+            return true;
+        }
+
+        $themeId = (string) ($config->getConfigParam('sCustomTheme') ?: $config->getConfigParam('sTheme'));
+        if ($themeId === '') {
+            $themeId = 'wave';
+        }
+        $shopId = (int) $config->getShopId();
+        $newBaseId = isset($this->_aLangData['params'][$sOxId]['baseId'])
+            ? (int) $this->_aLangData['params'][$sOxId]['baseId']
+            : (int) $this->getAvailableLangBaseId();
+
+        $missing = $this->getRevocationTemplateValidator()->validate($shopId, $themeId, [$newBaseId]);
+        if ($missing === []) {
+            return true;
+        }
+
+        foreach ($missing as $asset) {
+            $oEx = oxNew(ExceptionToDisplay::class);
+            $oEx->setMessage('§356a — ' . $asset->getRemediationHint());
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
+        }
+        $this->_aViewData['revocationMissingAssets'] = array_map(
+            static fn (MissingAsset $a) => [
+                'type' => $a->getAssetType(),
+                'path' => $a->getExpectedPath(),
+                'lang' => $a->getLangId(),
+                'hint' => $a->getRemediationHint(),
+            ],
+            $missing
+        );
+
+        return false;
+    }
+
+    /** @var RevocationTemplateValidator|null lazy-resolved; settable for tests */
+    protected ?RevocationTemplateValidator $revocationTemplateValidator = null;
+
+    /**
+     * Test seam — inject a mocked validator without driving the DI container.
+     */
+    public function setRevocationTemplateValidator(RevocationTemplateValidator $validator): void
+    {
+        $this->revocationTemplateValidator = $validator;
+    }
+
+    protected function getRevocationTemplateValidator(): RevocationTemplateValidator
+    {
+        if ($this->revocationTemplateValidator === null) {
+            $this->revocationTemplateValidator = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(RevocationTemplateValidator::class);
+        }
+        return $this->revocationTemplateValidator;
     }
 }
