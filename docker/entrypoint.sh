@@ -146,24 +146,48 @@ start_apache() {
 }
 
 install_demodata() {
-    if [ -d "vendor/o3-shop/shop-demodata-ce" ] && [ "$(ls -A vendor/o3-shop/shop-demodata-ce)" ]; then
-      log "${GREEN}Demodata is already downloaded. Skipping download."
-      return 0
+    local repo_url="https://github.com/o3-shop/shop-demodata-ce.git"
+    local target_dir="vendor/o3-shop/shop-demodata-ce"
+
+    log "${YELLOW}Installing shop-demodata-ce...${NC}"
+
+    if [ -d "$target_dir" ] && [ "$(ls -A "$target_dir")" ]; then
+        if [ ! -d "$target_dir/.git" ]; then
+            handle_error "$(cat <<EOF
+
+Detected old detached snapshot at ${target_dir} (no .git/ subdirectory).
+This is the layout the previous bootstrap produced (clone to /tmp, drop
+.git, copy into vendor/). The entrypoint now expects a git working tree
+there so demodata tweaks can be committed and pushed back to ${repo_url}
+directly.
+
+If you have NO uncommitted edits in ${target_dir}, run:
+
+    ./docker.sh stop
+    rm -rf ${target_dir}
+    ./docker.sh start
+
+If you DO have uncommitted edits there — be careful: ${target_dir} is
+gitignored, so nothing is version-controlled by anything. Steps:
+
+    1. Copy your edits somewhere safe OUTSIDE ${target_dir}.
+    2. Run the three commands above.
+    3. After ./docker.sh start, ${target_dir} is a real shop-demodata-ce
+       working tree. Replay your edits, commit, push to ${repo_url}.
+
+Aborting so no work is destroyed.
+EOF
+            )"
+        fi
+        log "shop-demodata-ce: working tree already present, skipping clone"
+        return 0
     fi
 
-    log "${YELLOW}Downloading demo data"
+    log "Cloning shop-demodata-ce from ${repo_url}..."
+    git clone --branch main "$repo_url" "$target_dir" \
+        || handle_error "Failed to clone shop-demodata-ce from ${repo_url}"
 
-    cd /tmp
-    git clone https://github.com/o3-shop/shop-demodata-ce
-    rm -rf shop-demodata-ce/.git
-
-    log "Moving demo data into target directory 'vendor/o3-shop'"
-    cp -r shop-demodata-ce /var/www/html/vendor/o3-shop
-
-    # rm -rf shop-demodata-ce
-    log "${GREEN}Installed demo data package"
-
-    cd /var/www/html
+    log "${GREEN}shop-demodata-ce ready${NC}"
 }
 
 setup_db() {
