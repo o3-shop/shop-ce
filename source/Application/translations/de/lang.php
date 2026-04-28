@@ -821,49 +821,9 @@ $aLang = [
 'O3_REVOCATION_CONFIRM_BUTTON'                                => 'Widerruf bestätigen',
 'O3_REVOCATION_CONFIRMATION_PAGE_HEADING'                     => 'Widerruf eingegangen',
 'O3_REVOCATION_VALIDATION_REQUIRED'                           => 'Bitte ausfüllen.',
+'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
 'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Ihre Sitzung ist abgelaufen. Bitte senden Sie das Formular erneut.',
 'O3_REVOCATION_VALIDATION_SPAM'                               => 'Ihre Anfrage konnte derzeit nicht entgegengenommen werden. Bitte versuchen Sie es später erneut.',
-
-// Admin: Konfigurationsseite
-'O3_REVOCATION_ADMIN_NAV_LABEL'                               => 'Widerrufe',
-'O3_REVOCATION_CONFIG_SHOW_LABEL'                             => 'Widerrufsformular im Footer anzeigen',
-'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL'                     => 'Login zum Aufruf des Widerrufsformulars erforderlich',
-'O3_REVOCATION_CONFIG_NOTIFY_LABEL'                           => 'Shop-Betreiber per E-Mail über jeden Widerruf benachrichtigen',
-'O3_REVOCATION_CONFIG_OPERATOR_EMAIL_LABEL'                   => 'E-Mail-Empfänger für Widerrufsbenachrichtigungen',
-
-// Admin: Validierungsmeldungen
-'O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED'            => 'Bitte geben Sie eine E-Mail-Adresse für Widerrufsbenachrichtigungen an, oder deaktivieren Sie die Benachrichtigung.',
-'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
-
-// Admin: Aktivierungs-Gate
-'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Aktivierung nicht möglich – fehlende Vorlagen oder Übersetzungen',
-'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'Sprache',
-
-// Admin: Listenansicht
-'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Widerrufe',
-'O3_REVOCATION_ADMIN_LIST_EMPTY'                              => 'Keine Widerrufe vorhanden.',
-'O3_REVOCATION_ADMIN_LIST_COL_SUBMITTED'                      => 'Eingegangen',
-'O3_REVOCATION_ADMIN_LIST_COL_NAME'                           => 'Name',
-'O3_REVOCATION_ADMIN_LIST_COL_EMAIL'                          => 'E-Mail',
-'O3_REVOCATION_ADMIN_LIST_COL_ORDER'                          => 'Bestellnummer',
-'O3_REVOCATION_ADMIN_LIST_COL_STATUS'                         => 'Status',
-'O3_REVOCATION_ADMIN_FLAG_SENT'                               => 'Versand erfolgreich',
-'O3_REVOCATION_ADMIN_FLAG_SEND_FAILED'                        => 'Versand fehlgeschlagen',
-
-// Admin: Detailansicht
-'O3_REVOCATION_ADMIN_DETAIL_HEADING'                          => 'Widerruf – Details',
-'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Vorgangs-ID',
-'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Eingegangen am',
-'O3_REVOCATION_ADMIN_FIELD_NAME'                              => 'Name',
-'O3_REVOCATION_ADMIN_FIELD_ORDER_IDENT'                       => 'Bestellnummer (vom Kunden eingegeben)',
-'O3_REVOCATION_ADMIN_FIELD_EMAIL'                             => 'E-Mail-Adresse (vom Kunden eingegeben)',
-'O3_REVOCATION_ADMIN_FIELD_FREETEXT'                          => 'Freitext / Anmerkungen',
-'O3_REVOCATION_ADMIN_FIELD_FREETEXT_EMPTY'                    => '(leer)',
-'O3_REVOCATION_ADMIN_FIELD_STATUS'                            => 'Versand-Status',
-'O3_REVOCATION_ADMIN_ACTIONS_HEADING'                         => 'Aktionen',
-'O3_REVOCATION_ADMIN_RESEND_BUTTON'                           => 'Bestätigung erneut senden',
-'O3_REVOCATION_ADMIN_DELETE_BUTTON'                           => 'Datensatz löschen',
-'O3_REVOCATION_ADMIN_DELETE_CONFIRM'                          => 'Diesen Widerrufs-Datensatz wirklich endgültig löschen? Diese Aktion ist nicht rückgängig zu machen.',
 
 // Kunden-E-Mail (Eingangsbestätigung gemäß § 356a Abs. 4 BGB)
 'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'Wir haben Ihre Widerrufserklärung erhalten',

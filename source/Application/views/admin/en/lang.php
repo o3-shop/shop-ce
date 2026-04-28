@@ -2042,6 +2042,41 @@ $aLang = [
     'MESSAGE'                        => 'Message',
     'ADMIN_SETTINGS_LICENSE_VERSION_FETCH_INFO_ERROR' => 'Error when fetching version information',
     'CURL_EXECUTE_ERROR' => 'Connection error (%s). Please try again later',
+
+    // §356a BGB electronic revocation feature — admin keys (issue #99).
+    // Storefront-side keys (form labels, customer/operator email bodies)
+    // live in source/Application/translations/{en,de}/lang.php instead.
+    'O3_REVOCATION_ADMIN_NAV_LABEL'                               => 'Revocations',
+    'O3_REVOCATION_CONFIG_SHOW_LABEL'                             => 'Show revocation form in the footer',
+    'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL'                     => 'Require login to access the revocation form',
+    'O3_REVOCATION_CONFIG_NOTIFY_LABEL'                           => 'Notify operator by email on each revocation',
+    'O3_REVOCATION_CONFIG_OPERATOR_EMAIL_LABEL'                   => 'Email recipient for revocation notifications',
+    'O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED'            => 'Please enter an email address for revocation notifications, or disable the notification.',
+    'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
+    'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Activation blocked — missing templates or translations',
+    'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'language',
+    'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Revocations',
+    'O3_REVOCATION_ADMIN_LIST_EMPTY'                              => 'No revocations recorded.',
+    'O3_REVOCATION_ADMIN_LIST_COL_SUBMITTED'                      => 'Received',
+    'O3_REVOCATION_ADMIN_LIST_COL_NAME'                           => 'Name',
+    'O3_REVOCATION_ADMIN_LIST_COL_EMAIL'                          => 'Email',
+    'O3_REVOCATION_ADMIN_LIST_COL_ORDER'                          => 'Order ID',
+    'O3_REVOCATION_ADMIN_LIST_COL_STATUS'                         => 'Status',
+    'O3_REVOCATION_ADMIN_FLAG_SENT'                               => 'Send succeeded',
+    'O3_REVOCATION_ADMIN_FLAG_SEND_FAILED'                        => 'Send failed',
+    'O3_REVOCATION_ADMIN_DETAIL_HEADING'                          => 'Revocation — details',
+    'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Submission ID',
+    'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Received at',
+    'O3_REVOCATION_ADMIN_FIELD_NAME'                              => 'Name',
+    'O3_REVOCATION_ADMIN_FIELD_ORDER_IDENT'                       => 'Order ID (as typed by the consumer)',
+    'O3_REVOCATION_ADMIN_FIELD_EMAIL'                             => 'Email address (as typed by the consumer)',
+    'O3_REVOCATION_ADMIN_FIELD_FREETEXT'                          => 'Free text / notes',
+    'O3_REVOCATION_ADMIN_FIELD_FREETEXT_EMPTY'                    => '(empty)',
+    'O3_REVOCATION_ADMIN_FIELD_STATUS'                            => 'Send status',
+    'O3_REVOCATION_ADMIN_ACTIONS_HEADING'                         => 'Actions',
+    'O3_REVOCATION_ADMIN_RESEND_BUTTON'                           => 'Resend confirmation',
+    'O3_REVOCATION_ADMIN_DELETE_BUTTON'                           => 'Delete record',
+    'O3_REVOCATION_ADMIN_DELETE_CONFIRM'                          => 'Permanently delete this revocation record? This action cannot be undone.',
 ];
 
 /*
