@@ -2,10 +2,23 @@
 
 [{* §356a BGB electronic revocation submission — admin detail view + actions *}]
 
+[{* OXID admin contract: every *_main.tpl ships a hidden transfer form *}]
+[{* that top.oxid.admin.editThis(sID) writes oxid+cl into and submits to *}]
+[{* navigate the edit frame to the selected row (out/admin/src/oxid.js).  *}]
+<form name="transfer" id="transfer" action="[{$oViewConf->getSelfLink()}]" method="post">
+    [{$oViewConf->getHiddenSid()}]
+    <input type="hidden" name="oxid" value="[{$oxid}]">
+    <input type="hidden" name="cl" value="revocation_main">
+</form>
+
 [{if $edit}]
+    [{* Sibling-template pattern: hidden fnc starts empty, the action *}]
+    [{* button's onClick sets it before submit. Buttons use input[type=submit] *}]
+    [{* with class=edittext so wave admin CSS picks them up. *}]
     <form name="myedit" id="myedit" action="[{$oViewConf->getSelfLink()}]" method="post">
         [{$oViewConf->getHiddenSid()}]
-        <input type="hidden" name="cl" value="revocation_main">
+        <input type="hidden" name="cl"   value="revocation_main">
+        <input type="hidden" name="fnc"  value="">
         <input type="hidden" name="oxid" value="[{$edit->getId()}]">
 
         <fieldset>
@@ -50,17 +63,20 @@
         <fieldset>
             <legend>[{oxmultilang ident="O3_REVOCATION_ADMIN_ACTIONS_HEADING"}]</legend>
 
-            <button type="submit" name="fnc" value="resend" class="edittext">
-                [{oxmultilang ident="O3_REVOCATION_ADMIN_RESEND_BUTTON"}]
-            </button>
+            <input type="submit"
+                   class="edittext"
+                   value="[{oxmultilang ident="O3_REVOCATION_ADMIN_RESEND_BUTTON"}]"
+                   onClick="Javascript:document.myedit.fnc.value='resend';">
 
-            <button type="submit"
-                    name="fnc"
-                    value="deleteEntry"
-                    class="edittext"
-                    onclick="return confirm('[{oxmultilang ident="O3_REVOCATION_ADMIN_DELETE_CONFIRM"}]');">
-                [{oxmultilang ident="O3_REVOCATION_ADMIN_DELETE_BUTTON"}]
-            </button>
+            [{* Delegate delete to OXID's canonical top.oxid.admin.deleteThis JS *}]
+            [{* (out/admin/src/oxid.js) — it submits the list-frame's search form *}]
+            [{* with fnc=deleteentry, which invokes RevocationList::deleteEntry() *}]
+            [{* and re-renders the LIST automatically. Submitting from the detail *}]
+            [{* form here would only re-render the detail and leave the list stale. *}]
+            <input type="button"
+                   class="edittext"
+                   value="[{oxmultilang ident="O3_REVOCATION_ADMIN_DELETE_BUTTON"}]"
+                   onClick="if(confirm('[{oxmultilang ident="O3_REVOCATION_ADMIN_DELETE_CONFIRM"}]')) top.oxid.admin.deleteThis('[{$edit->getId()}]');">
         </fieldset>
     </form>
 [{else}]

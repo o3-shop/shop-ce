@@ -2045,9 +2045,9 @@ $aLang = [
     'ADMIN_SETTINGS_LICENSE_VERSION_FETCH_INFO_ERROR' => 'Fehler beim Abrufen von Versionsinformationen!',
     'CURL_EXECUTE_ERROR' => 'Verbindungsfehler (%s). Bitte versuchen Sie es später noch einmal.',
 
-    // §356a BGB elektronischer Widerruf — Admin-Schlüssel (Issue #99).
-    // Storefront-Schlüssel (Formularbeschriftungen, Kunden-/Betreiber-E-Mail-
-    // Texte) liegen in source/Application/translations/{en,de}/lang.php.
+    // §356a BGB electronic revocation feature — admin keys (issue #99).
+    // Storefront-side keys (form labels, customer/operator email bodies)
+    // live in source/Application/translations/{en,de}/lang.php instead.
     'O3_REVOCATION_ADMIN_NAV_LABEL'                               => 'Widerrufe',
     'O3_REVOCATION_CONFIG_SHOW_LABEL'                             => 'Widerrufsformular im Footer anzeigen',
     'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL'                     => 'Login zum Aufruf des Widerrufsformulars erforderlich',
@@ -2058,6 +2058,8 @@ $aLang = [
     'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Aktivierung nicht möglich – fehlende Vorlagen oder Übersetzungen',
     'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'Sprache',
     'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Widerrufe',
+    'O3_REVOCATION_ADMIN_LIST_MENUITEM'                           => 'Kundeninformation',
+    'O3_REVOCATION_ADMIN_LIST_MENUSUBITEM'                        => 'Widerrufe',
     'O3_REVOCATION_ADMIN_LIST_EMPTY'                              => 'Keine Widerrufe vorhanden.',
     'O3_REVOCATION_ADMIN_LIST_COL_SUBMITTED'                      => 'Eingegangen',
     'O3_REVOCATION_ADMIN_LIST_COL_NAME'                           => 'Name',

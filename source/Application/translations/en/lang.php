@@ -753,6 +753,7 @@ $aLang = [
 'PAGE_TITLE_SUGGEST'                                          => 'Recommend product',
 'PAGE_TITLE_INVITE'                                           => 'Invite your friends',
 'PAGE_TITLE_REVIEW'                                           => 'Review',
+'PAGE_TITLE_REVOCATION'                                       => 'Cancel contract',
 
 'WISHLIST_PRODUCTS'                                           => 'These products are on the wish list of %s. If you want to please him/her, purchase one or more of these products.',
 
@@ -820,6 +821,13 @@ $aLang = [
 'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
 'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Your session has expired. Please submit the form again.',
 'O3_REVOCATION_VALIDATION_SPAM'                               => 'Your request could not be processed at this time. Please try again later.',
+
+// Email field labels — duplicated from admin lang (where the same labels live
+// for the admin detail view) so storefront-context email rendering can
+// resolve them. OXID's Language::translateString does not fall back across
+// domains.
+'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Submission ID',
+'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Received at',
 
 // Customer email (receipt of declaration per § 356a Abs. 4 BGB)
 'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'We have received your revocation declaration',

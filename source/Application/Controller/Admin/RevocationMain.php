@@ -109,31 +109,6 @@ class RevocationMain extends AdminDetailsController
         $submission->save();
     }
 
-    /**
-     * Manual single-row delete. Emits one NOTICE audit log line
-     * naming the submission OXID and the admin user OXID, then
-     * removes the row.
-     *
-     * @return void
-     */
-    public function deleteEntry(): void
-    {
-        $submission = $this->loadEditedSubmission();
-        if ($submission === null) {
-            return;
-        }
-
-        $adminUserId = (string) (Registry::getSession()->getVariable('auth') ?? 'unknown');
-        $submissionId = $submission->getId();
-
-        Registry::getLogger()->notice(
-            __METHOD__ . " - Admin user OXID '$adminUserId' manually deleted revocation submission OXID '"
-            . $submissionId . "'."
-        );
-
-        $submission->delete($submissionId);
-    }
-
     private function loadEditedSubmission(): ?O3Revocation
     {
         $oxid = $this->getEditObjectId();

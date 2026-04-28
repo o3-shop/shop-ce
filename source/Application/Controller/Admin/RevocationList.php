@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 use OxidEsales\Eshop\Application\Model\O3Revocation;
+use OxidEsales\Eshop\Core\Registry;
 
 /**
  * §356a BGB electronic revocation feature — admin list view.
@@ -44,4 +45,38 @@ class RevocationList extends AdminListController
 
     /** @var string */
     protected $_sThisTemplate = 'revocation_list.tpl';
+
+    /** @var string Default sort column (no table prefix). Newest revocations first. */
+    protected $_sDefSortField = 'oxsubmitted';
+
+    /** @var bool Sort descending by default. */
+    protected $_blDesc = true;
+
+    /**
+     * Override the canonical AdminListController delete to add a NOTICE
+     * audit-log line naming both the admin user OXID and the deleted
+     * submission OXID per the §356a admin-action audit requirement.
+     *
+     * The delete itself is delegated to the parent: that handles model
+     * deletion, oxid reset, content-cache reset, and re-init in one shot
+     * — ensuring the LIST frame re-renders without the deleted row.
+     *
+     * Triggered by `top.oxid.admin.deleteThis(sID)` from the detail
+     * template's delete button (out/admin/src/oxid.js submits the list
+     * frame's search form with `fnc=deleteentry`).
+     */
+    public function deleteEntry()
+    {
+        $oxidToDelete = (string) $this->getEditObjectId();
+        $adminUserId = (string) (Registry::getSession()->getVariable('auth') ?? 'unknown');
+
+        if ($oxidToDelete && $oxidToDelete !== '-1') {
+            Registry::getLogger()->notice(
+                __METHOD__ . " - Admin user OXID '$adminUserId' manually deleted revocation submission OXID '"
+                . $oxidToDelete . "'."
+            );
+        }
+
+        parent::deleteEntry();
+    }
 }
