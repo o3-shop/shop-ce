@@ -83,3 +83,4 @@ oxideshop.log
 /var/configuration-backup/shops/1.yaml
 /.claude/settings.local.json
 /.playwright-mcp/
+/openspec/changes/fix-underscore-method-inheritance/findings.json
