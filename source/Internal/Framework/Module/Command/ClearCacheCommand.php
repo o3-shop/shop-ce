@@ -24,7 +24,7 @@ class ClearCacheCommand extends Command
 
         $output->writeln('Cache cleared successfully.');
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     protected function deleteContents($path)
