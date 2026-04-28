@@ -81,6 +81,29 @@ if ($result->num_rows == 0) {
         }
         while ($mysqli->next_result()) { /* flush results */ }
     }
+
+    // Apply Doctrine migrations on top of the baseline schema.sql, mirroring
+    // what the customer Setup wizard does (Setup/Controller.php:632/641).
+    // database_schema.sql is a snapshot that lags current state — migrations
+    // bring it forward (e.g. oxactions.OXNODELETE, the o3revocation table).
+    //
+    // The wrapper takes only two positional args: $argv[1] = command,
+    // $argv[2] = optional edition filter. Do NOT pass `--no-interaction`
+    // here — it would be interpreted as an edition name and silently match
+    // nothing. The wrapper already injects `-n` into the underlying Doctrine
+    // input (Migrations::formDoctrineInput).
+    echo "Running database migrations...\n";
+    $migrationCommand = __DIR__ . '/../vendor/bin/oe-eshop-doctrine_migration';
+    if (file_exists($migrationCommand)) {
+        exec("cd " . __DIR__ . "/.. && php $migrationCommand migrations:migrate 2>&1", $migrationOutput, $migrationReturnCode);
+        if ($migrationReturnCode !== 0) {
+            die("Database migrations failed:\n" . implode("\n", $migrationOutput) . "\n");
+        }
+        echo "Database migrations completed successfully.\n";
+    } else {
+        echo "WARNING: Migration command not found at $migrationCommand\n";
+    }
+
     echo "Installing Demo Data...\n";
     $demodataCommand = __DIR__ . '/../vendor/bin/oe-eshop-demodata_install';
     if (file_exists($demodataCommand)) {
