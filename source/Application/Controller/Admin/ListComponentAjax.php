@@ -244,6 +244,16 @@ class ListComponentAjax extends Base
             $this->$function();
             $this->dispatchEvent(new AfterAdminAjaxRequestProcessedEvent());
         } else {
+            // Restored to the baseline form from ebe86dc (initial commit
+            // line 154: `$sQAdd = $this->_getQuery();`). #107 (commit
+            // 45e71ae) had moved the body INTO _getQuery() and made
+            // getQuery() a delegate-down — that inversion broke subclass
+            // overrides and test mocks of getQuery(). Per the BC-shim
+            // contract, _getQuery() is the deprecated wrapper that
+            // delegates UP to getQuery(); internal call sites must use
+            // _getQuery() so module overrides of either form continue to
+            // win. Broader audit of similar #107 inversions tracked in
+            // the reopened o3-shop/o3-shop#107.
             $sQAdd = $this->_getQuery();
 
             // formatting SQL queries
