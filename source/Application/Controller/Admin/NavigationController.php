@@ -222,31 +222,15 @@ class NavigationController extends AdminController
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $json = file_get_contents('https://api.github.com/repos/o3-shop/o3-shop/releases/latest', false, stream_context_create([
-            'http' => [
-                'header' => [
-                    'User-Agent: PHP', // GitHub requires a User-Agent header
-                    'Accept: application/vnd.github+json',
-                    'X-GitHub-Api-Version: 2022-11-28',
-                ],
-            ],
-        ]));
+        $result = $this->getUpdateCheckService()->check();
 
-        $data = json_decode($json, true);
-
-        $latestVersion = $data['name'] ?? null;
-
-        Registry::getLogger()->debug('Latest Release name: ' . $latestVersion);
-
-        if ($latestVersion) {
+        if ($result->isCoreUpdateAvailable()) {
             $currentVersion = oxNew(ShopVersion::class)->getVersion();
-            if (version_compare($currentVersion, $latestVersion, '<')) {
-                return sprintf(
-                    Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),
-                    $currentVersion,
-                    $latestVersion
-                );
-            }
+            return sprintf(
+                Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),
+                $currentVersion,
+                $result->getLatestCoreVersion()
+            );
         }
     }
 
@@ -263,6 +247,16 @@ class NavigationController extends AdminController
     protected function checkVersion()
     {
         return $this->_checkVersion();
+    }
+
+    /**
+     * @return UpdateCheckServiceInterface
+     */
+    protected function getUpdateCheckService(): UpdateCheckServiceInterface
+    {
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(UpdateCheckServiceInterface::class);
     }
 
     public function canHaveRestrictedView()
