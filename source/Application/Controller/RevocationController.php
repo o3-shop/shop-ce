@@ -191,12 +191,15 @@ class RevocationController extends FrontendController
      * Receipt page (step 3 of the §356a flow). Renders a generic
      * acknowledgement; safe to navigate to directly (no PII exposed).
      *
-     * @return string template name to render
+     * Action methods called via fnc= must NOT return a template path —
+     * the OXID dispatcher (BaseController::_executeNewAction) parses the
+     * return value as a "<class>?<params>" redirect target and would try
+     * to oxNew("page") here. Just set the active template; the normal
+     * render() pass picks it up.
      */
-    public function receipt()
+    public function receipt(): void
     {
         $this->_sThisTemplate = self::TEMPLATE_RECEIPT;
-        return parent::render();
     }
 
     public function getName(): string
