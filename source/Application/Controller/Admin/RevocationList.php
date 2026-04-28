@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
+use OxidEsales\Eshop\Application\Model\O3Revocation;
 
 /**
  * §356a BGB electronic revocation feature — admin list view.
@@ -36,7 +37,7 @@ use OxidEsales\Eshop\Application\Controller\Admin\AdminListController;
 class RevocationList extends AdminListController
 {
     /** @var string */
-    protected $_sListClass = 'oxidesales\\eshopcommunity\\application\\model\\o3revocation';
+    protected $_sListClass = O3Revocation::class;
 
     /** @var string */
     protected $_sListType = 'oxlist';

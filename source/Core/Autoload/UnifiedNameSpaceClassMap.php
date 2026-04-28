@@ -2063,6 +2063,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => true,
     ],
+    'OxidEsales\Eshop\Application\Model\O3Revocation'                            => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\O3Revocation::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Model\Object2Category'                         => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\Object2Category::class,
         'isAbstract'       => false,
