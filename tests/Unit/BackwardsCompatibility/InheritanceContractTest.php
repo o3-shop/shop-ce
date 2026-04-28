@@ -477,7 +477,14 @@ PHP;
         return $args;
     }
 
-    private function defaultValueForType(?ReflectionType $t, bool $allowsNull): mixed
+    /**
+     * PHP 7.4 doesn't have `mixed` as a return type — it would be parsed
+     * as a relative class name. Drop the declared return type; the
+     * `@return mixed` docblock keeps static analysers happy.
+     *
+     * @return mixed
+     */
+    private function defaultValueForType(?ReflectionType $t, bool $allowsNull)
     {
         if ($allowsNull || $t === null) {
             return null;
