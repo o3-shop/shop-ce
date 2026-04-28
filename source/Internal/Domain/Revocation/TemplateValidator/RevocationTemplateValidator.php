@@ -120,13 +120,31 @@ class RevocationTemplateValidator
         'O3_REVOCATION_ADMIN_LIST_HEADING',
     ];
 
-    private string $shopDir;
-    private Language $language;
+    private ?string $shopDir;
+    private ?Language $language;
 
     public function __construct(?string $shopDir = null, ?Language $language = null)
     {
-        $this->shopDir = $shopDir ?? (string) Registry::getConfig()->getConfigParam('sShopDir');
-        $this->language = $language ?? Registry::getLang();
+        // Resolve from Registry lazily — this service is constructed during
+        // console bootstrap, before the DB connection is available.
+        $this->shopDir = $shopDir;
+        $this->language = $language;
+    }
+
+    private function getShopDir(): string
+    {
+        if ($this->shopDir === null) {
+            $this->shopDir = (string) Registry::getConfig()->getConfigParam('sShopDir');
+        }
+        return $this->shopDir;
+    }
+
+    private function getLanguage(): Language
+    {
+        if ($this->language === null) {
+            $this->language = Registry::getLang();
+        }
+        return $this->language;
     }
 
     /**
@@ -195,19 +213,20 @@ class RevocationTemplateValidator
 
     private function resolveThemeRoot(string $themeId): string
     {
-        $base = rtrim($this->shopDir, '/');
+        $base = rtrim($this->getShopDir(), '/');
         return $base . '/Application/views/' . $themeId . '/';
     }
 
     private function translationExists(string $key, int $langId): bool
     {
-        $this->language->translateString($key, $langId, false);
-        if (!$this->language->isTranslated()) {
+        $language = $this->getLanguage();
+        $language->translateString($key, $langId, false);
+        if (!$language->isTranslated()) {
             return false;
         }
         // A key that resolves but to an empty string still counts as missing
         // — operators copying lang files often leave keys present-but-empty.
-        $value = $this->language->translateString($key, $langId, false);
+        $value = $language->translateString($key, $langId, false);
         return $value !== '' && $value !== $key;
     }
 }
