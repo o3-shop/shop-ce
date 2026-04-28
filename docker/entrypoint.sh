@@ -147,45 +147,80 @@ start_apache() {
 
 install_demodata() {
     local repo_url="https://github.com/o3-shop/shop-demodata-ce.git"
-    local target_dir="vendor/o3-shop/shop-demodata-ce"
+    local satellite_dir="shop-demodata-ce"
+    local symlink_path="vendor/o3-shop/shop-demodata-ce"
 
     log "${YELLOW}Installing shop-demodata-ce...${NC}"
 
-    if [ -d "$target_dir" ] && [ "$(ls -A "$target_dir")" ]; then
-        if [ ! -d "$target_dir/.git" ]; then
-            handle_error "$(cat <<EOF
+    # The satellite working tree lives at the project top level, not under
+    # vendor/, so PhpStorm's Composer integration doesn't auto-exclude it
+    # and developers see modified-file indicators inside it without per-IDE
+    # config. We then symlink vendor/o3-shop/shop-demodata-ce -> ../../<sat>
+    # so composer's autoloader and every code path that hardcodes the vendor
+    # location (bin/o3-setup, Setup/Utilities::getActiveEditionDemodataPackagePath)
+    # keeps working unchanged.
 
-Detected old detached snapshot at ${target_dir} (no .git/ subdirectory).
-This is the layout the previous bootstrap produced (clone to /tmp, drop
-.git, copy into vendor/). The entrypoint now expects a git working tree
-there so demodata tweaks can be committed and pushed back to ${repo_url}
-directly.
+    if [ -e "$symlink_path" ] && [ ! -L "$symlink_path" ]; then
+        handle_error "$(cat <<EOF
 
-If you have NO uncommitted edits in ${target_dir}, run:
+Detected an old non-symlink directory at ${symlink_path}.
+This is the previous layout (real working tree inside vendor/). The entrypoint
+now keeps the working tree at the project top level (./${satellite_dir}/) and
+symlinks ${symlink_path} -> ../../${satellite_dir} so PhpStorm sees the
+satellite outside vendor/.
+
+If you have NO uncommitted edits in ${symlink_path}, run:
 
     ./docker.sh stop
-    rm -rf ${target_dir}
+    rm -rf ${symlink_path}
     ./docker.sh start
 
-If you DO have uncommitted edits there — be careful: ${target_dir} is
+If you DO have uncommitted edits there — be careful: ${symlink_path} is
 gitignored, so nothing is version-controlled by anything. Steps:
 
-    1. Copy your edits somewhere safe OUTSIDE ${target_dir}.
+    1. Copy your edits somewhere safe OUTSIDE ${symlink_path}.
     2. Run the three commands above.
-    3. After ./docker.sh start, ${target_dir} is a real shop-demodata-ce
-       working tree. Replay your edits, commit, push to ${repo_url}.
+    3. After ./docker.sh start, ./${satellite_dir}/ is a real shop-demodata-ce
+       working tree. Replay your edits there, commit, push to ${repo_url}.
+
+Aborting so no work is destroyed.
+EOF
+        )"
+    fi
+
+    if [ -d "$satellite_dir" ] && [ "$(ls -A "$satellite_dir")" ]; then
+        if [ ! -d "$satellite_dir/.git" ]; then
+            handle_error "$(cat <<EOF
+
+Detected detached snapshot at ./${satellite_dir}/ (no .git/ subdirectory).
+The entrypoint expects a git working tree there so demodata tweaks can be
+committed and pushed back to ${repo_url} directly.
+
+Run:
+
+    ./docker.sh stop
+    rm -rf ${satellite_dir}
+    ./docker.sh start
+
+(Removing the symlink at ${symlink_path} too if it points to a stale target.)
 
 Aborting so no work is destroyed.
 EOF
             )"
         fi
-        log "shop-demodata-ce: working tree already present, skipping clone"
-        return 0
+        log "shop-demodata-ce: satellite working tree already present, skipping clone"
+    else
+        log "Cloning shop-demodata-ce from ${repo_url}..."
+        git clone --branch main "$repo_url" "$satellite_dir" \
+            || handle_error "Failed to clone shop-demodata-ce from ${repo_url}"
     fi
 
-    log "Cloning shop-demodata-ce from ${repo_url}..."
-    git clone --branch main "$repo_url" "$target_dir" \
-        || handle_error "Failed to clone shop-demodata-ce from ${repo_url}"
+    if [ ! -e "$symlink_path" ]; then
+        mkdir -p "$(dirname "$symlink_path")" \
+            || handle_error "Failed to create $(dirname "$symlink_path")"
+        ln -s "../../${satellite_dir}" "$symlink_path" \
+            || handle_error "Failed to symlink ${symlink_path} -> ../../${satellite_dir}"
+    fi
 
     log "${GREEN}shop-demodata-ce ready${NC}"
 }

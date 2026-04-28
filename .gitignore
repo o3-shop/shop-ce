@@ -51,6 +51,12 @@ composer.lock
 /.phpstorm.meta.php/oxid.meta.php
 /source/Application/views/wave
 /source/Application/views/o3-theme
+
+# Satellite working tree for shop-demodata-ce. Cloned at top level (not in
+# vendor/) so PhpStorm's Composer integration doesn't auto-exclude it; the
+# entrypoint then symlinks vendor/o3-shop/shop-demodata-ce -> here so
+# composer/code paths keep working unchanged.
+/shop-demodata-ce
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
 
