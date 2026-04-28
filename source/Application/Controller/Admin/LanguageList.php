@@ -113,20 +113,11 @@ class LanguageList extends AdminListController
      *
      * @return array
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLanguagesList" in next major
+     * @deprecated Use getLanguagesList() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getLanguagesList().
      */
     protected function _getLanguagesList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getLanguagesList();
-    }
-
-    /**
-     * Collects shop languages list.
-     *
-     * @return array
-     * @throws DatabaseConnectionException
-     */
-    protected function getLanguagesList()
     {
         $aLangParams = Registry::getConfig()->getConfigParam('aLanguageParams');
         $aLanguages = Registry::getLang()->getLanguageArray();
@@ -164,18 +155,18 @@ class LanguageList extends AdminListController
     }
 
     /**
-     * Callback function for sorting languages objects. Sorts array according
-     * 'sort' parameter
+     * Collects shop languages list.
      *
-     * @param object $oLang1 language object
-     * @param object $oLang2 language object
+     * @return array
+     * @throws DatabaseConnectionException
      *
-     * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "sortLanguagesCallback" in next major
+     * @internal If your override does not fully replace the behavior, call parent::getLanguagesList()
+     *           (not the deprecated _getLanguagesList()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _sortLanguagesCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getLanguagesList()
     {
-        return $this->sortLanguagesCallback($oLang1, $oLang2);
+        return $this->_getLanguagesList();
     }
 
     /**
@@ -186,8 +177,11 @@ class LanguageList extends AdminListController
      * @param object $oLang2 language object
      *
      * @return int
+     * @deprecated Use sortLanguagesCallback() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _sortLanguagesCallback().
      */
-    protected function sortLanguagesCallback($oLang1, $oLang2)
+    protected function _sortLanguagesCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sSortParam = $this->_sDefSortField;
         $sVal1 = is_string($oLang1->$sSortParam) ? strtolower($oLang1->$sSortParam) : $oLang1->$sSortParam;
@@ -201,17 +195,21 @@ class LanguageList extends AdminListController
     }
 
     /**
-     * Resets all multilanguage fields with specific language id
-     * to default value in all tables.
+     * Callback function for sorting languages objects. Sorts array according
+     * 'sort' parameter
      *
-     * @param string $iLangId language ID
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetMultiLangDbFields" in next major
+     * @param object $oLang1 language object
+     * @param object $oLang2 language object
+     *
+     * @return int
+     *
+     * @internal If your override does not fully replace the behavior, call parent::sortLanguagesCallback()
+     *           (not the deprecated _sortLanguagesCallback()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _resetMultiLangDbFields($iLangId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function sortLanguagesCallback($oLang1, $oLang2)
     {
-        $this->resetMultiLangDbFields($iLangId);
+        return $this->_sortLanguagesCallback($oLang1, $oLang2);
     }
 
     /**
@@ -221,8 +219,11 @@ class LanguageList extends AdminListController
      * @param string $iLangId language ID
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Use resetMultiLangDbFields() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _resetMultiLangDbFields().
      */
-    protected function resetMultiLangDbFields($iLangId)
+    protected function _resetMultiLangDbFields($iLangId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $iLangId = (int) $iLangId;
 
@@ -245,5 +246,22 @@ class LanguageList extends AdminListController
                 Registry::getUtilsView()->addErrorToDisplay($oEx);
             }
         }
+    }
+
+    /**
+     * Resets all multilanguage fields with specific language id
+     * to default value in all tables.
+     *
+     * @param string $iLangId language ID
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::resetMultiLangDbFields()
+     *           (not the deprecated _resetMultiLangDbFields()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function resetMultiLangDbFields($iLangId)
+    {
+        $this->_resetMultiLangDbFields($iLangId);
     }
 }

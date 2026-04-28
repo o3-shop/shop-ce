@@ -49,20 +49,11 @@ class CategoryUpdate extends AdminController
      *
      * @return CategoryList
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
+     * @deprecated Use getCategoryList() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getCategoryList().
      */
     protected function _getCategoryList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getCategoryList();
-    }
-
-    /**
-     * Returns category list object
-     *
-     * @return CategoryList
-     * @throws Exception
-     */
-    protected function getCategoryList()
     {
         if ($this->_oCatList == null) {
             $this->_oCatList = oxNew(CategoryList::class);
@@ -70,6 +61,21 @@ class CategoryUpdate extends AdminController
         }
 
         return $this->_oCatList;
+    }
+
+    /**
+     * Returns category list object
+     *
+     * @return CategoryList
+     * @throws Exception
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getCategoryList()
+     *           (not the deprecated _getCategoryList()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getCategoryList()
+    {
+        return $this->_getCategoryList();
     }
 
     /**

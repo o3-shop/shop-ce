@@ -261,24 +261,17 @@ class ArticleList extends AdminListController
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
+     * @deprecated Use buildSelectString() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _buildSelectString().
      */
     protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->buildSelectString($listObject);
-    }
-
-    /**
-     * Builds and returns SQL query string.
-     *
-     * @param null $listObject list main object
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function buildSelectString($listObject = null)
-    {
-        $sQ = parent::buildSelectString($listObject);
+        // NOTE: call parent::_buildSelectString() (not parent::buildSelectString()) to avoid
+        // infinite recursion through the parent's delegate. Restores baseline (ebe86dc0) call
+        // shape. See o3-shop/o3-shop#107 remediation.
+        $sQ = parent::_buildSelectString($listObject);
         if ($sQ) {
             $sTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles');
             $sQ .= " and $sTable.oxparentid = '' ";
@@ -312,6 +305,24 @@ class ArticleList extends AdminListController
         }
 
         return $sQ;
+    }
+
+    /**
+     * Builds and returns SQL query string.
+     *
+     * @param null $listObject list main object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::buildSelectString() (not the deprecated _buildSelectString()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function buildSelectString($listObject = null)
+    {
+        return $this->_buildSelectString($listObject);
     }
 
     /**

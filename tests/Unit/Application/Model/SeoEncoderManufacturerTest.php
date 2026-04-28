@@ -64,8 +64,7 @@ class SeoEncoderManufacturerTest extends \OxidTestCase
         oxTestModules::addFunction('oxmanufacturer', 'loadInLang', '{ return true; }');
 
         $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderManufacturer::class, ['getManufacturerUri']);
-        // _getAltUri calls getManufacturerUri once, then delegates to getAltUri which calls it again
-        $oEncoder->expects($this->exactly(2))->method('getManufacturerUri')->will($this->returnValue('manufacturerUri'));
+        $oEncoder->expects($this->once())->method('getManufacturerUri')->will($this->returnValue('manufacturerUri'));
 
         $this->assertEquals('manufacturerUri', $oEncoder->UNITgetAltUri('1126', 0));
     }

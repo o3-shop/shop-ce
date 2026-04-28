@@ -39,21 +39,27 @@ class SeoEncoderCategory extends SeoEncoder
      * Returns target "extension" (/)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Use getUrlExtension() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getUrlExtension().
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getUrlExtension();
+        return '/';
     }
 
     /**
      * Returns target "extension" (/)
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getUrlExtension()
+     *           (not the deprecated _getUrlExtension()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getUrlExtension()
     {
-        return '/';
+        return $this->_getUrlExtension();
     }
 
     /**
@@ -66,25 +72,11 @@ class SeoEncoderCategory extends SeoEncoder
      * @access protected
      *
      * @return boolean
-     * @deprecated underscore prefix violates PSR12, will be renamed to "categoryUrlLoader" in next major
+     * @deprecated Use categoryUrlLoader() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _categoryUrlLoader().
      */
     protected function _categoryUrlLoader($oCat, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->categoryUrlLoader($oCat, $iLang);
-    }
-
-    /**
-     * _categoryUrlLoader loads category from db
-     * returns false if cat needs to be encoded (load failed)
-     *
-     * @param Category $oCat  category object
-     * @param int                                          $iLang active language id
-     *
-     * @access protected
-     *
-     * @return boolean
-     */
-    protected function categoryUrlLoader($oCat, $iLang)
     {
         $sCacheId = $this->_getCategoryCacheId($oCat, $iLang);
         if (isset($this->_aCatCache[$sCacheId])) {
@@ -95,6 +87,26 @@ class SeoEncoderCategory extends SeoEncoder
         }
 
         return $sSeoUrl;
+    }
+
+    /**
+     * _categoryUrlLoader loads category from db
+     * returns false if cat needs to be encoded (load failed)
+     *
+     * @param Category $oCat  category object
+     * @param int                                          $iLang active language id
+     *
+     * @access protected
+     *
+     * @return boolean
+     *
+     * @internal If your override does not fully replace the behavior, call parent::categoryUrlLoader()
+     *           (not the deprecated _categoryUrlLoader()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function categoryUrlLoader($oCat, $iLang)
+    {
+        return $this->_categoryUrlLoader($oCat, $iLang);
     }
 
     /**
@@ -304,11 +316,19 @@ class SeoEncoderCategory extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Use getAltUri() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getAltUri().
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getAltUri($sObjectId, $iLang);
+        $sSeoUrl = null;
+        $oCat = oxNew(Category::class);
+        if ($oCat->loadInLang($iLang, $sObjectId)) {
+            $sSeoUrl = $this->getCategoryUri($oCat, $iLang);
+        }
+
+        return $sSeoUrl;
     }
 
     /**
@@ -319,16 +339,14 @@ class SeoEncoderCategory extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getAltUri()
+     *           (not the deprecated _getAltUri()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getAltUri($sObjectId, $iLang)
     {
-        $sSeoUrl = null;
-        $oCat = oxNew(Category::class);
-        if ($oCat->loadInLang($iLang, $sObjectId)) {
-            $sSeoUrl = $this->getCategoryUri($oCat, $iLang);
-        }
-
-        return $sSeoUrl;
+        return $this->_getAltUri($sObjectId, $iLang);
     }
 
     private function setRelatedToCategorySeoUrlsAsExpired(Category $category): void

@@ -2651,6 +2651,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Core\Exception\AccessDeniedException'                      => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\AccessDeniedException::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Core\Exception\ArticleException'                           => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\ArticleException::class,
         'isAbstract'       => false,
@@ -2707,6 +2713,12 @@ return [
     ],
     'OxidEsales\Eshop\Core\Exception\ExceptionToDisplay'                         => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\ExceptionToDisplay::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Core\Exception\ExitCalledException'                        => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\ExitCalledException::class,
         'isAbstract'       => false,
         'isInterface'      => false,
         'isDeprecated'     => false,
@@ -2793,6 +2805,18 @@ return [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Exception\NoResultException::class,
         'isAbstract'       => false,
         'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Core\ExitHandler'                                          => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\ExitHandler::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Core\ExitHandlerInterface'                                 => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\ExitHandlerInterface::class,
+        'isAbstract'       => false,
+        'isInterface'      => true,
         'isDeprecated'     => false,
     ],
     'OxidEsales\Eshop\Core\Field'                                                => [

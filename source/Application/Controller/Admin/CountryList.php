@@ -93,20 +93,26 @@ class CountryList extends AdminListController
      * Getter for the second sort field name (for getting the expected order out of the database).
      *
      * @return string The name of the field we want to be the second order by argument.
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSecondSortFieldName" in next major
+     * @deprecated Use getSecondSortFieldName() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getSecondSortFieldName().
      */
     protected function _getSecondSortFieldName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getSecondSortFieldName();
+        return $this->sSecondDefSortField;
     }
 
     /**
      * Getter for the second sort field name (for getting the expected order out of the database).
      *
      * @return string The name of the field we want to be the second order by argument.
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getSecondSortFieldName()
+     *           (not the deprecated _getSecondSortFieldName()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getSecondSortFieldName()
     {
-        return $this->sSecondDefSortField;
+        return $this->_getSecondSortFieldName();
     }
 }

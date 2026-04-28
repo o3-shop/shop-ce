@@ -187,22 +187,12 @@ class ArticleVariant extends AdminDetailsController
      * @param array                                       $aData    Data provided for check.
      *
      * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "isAnythingChanged" in next major
+     * @deprecated Use isAnythingChanged() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _isAnythingChanged().
      */
     protected function _isAnythingChanged($oProduct, $aData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->isAnythingChanged($oProduct, $aData);
-    }
-
-    /**
-     * Checks if anything is changed in given data compared with existing product values.
-     *
-     * @param Article $oProduct Product to be checked.
-     * @param array                                       $aData    Data provided for check.
-     *
-     * @return bool
-     */
-    protected function isAnythingChanged($oProduct, $aData)
     {
         if (!is_array($aData)) {
             return true;
@@ -217,17 +207,21 @@ class ArticleVariant extends AdminDetailsController
     }
 
     /**
-     * Returns variant parent object
+     * Checks if anything is changed in given data compared with existing product values.
      *
-     * @param string $sParentId parent product id
+     * @param Article $oProduct Product to be checked.
+     * @param array                                       $aData    Data provided for check.
      *
-     * @return Article
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getProductParent" in next major
+     * @return bool
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::isAnythingChanged() (not the deprecated _isAnythingChanged()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getProductParent($sParentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function isAnythingChanged($oProduct, $aData)
     {
-        return $this->getProductParent($sParentId);
+        return $this->_isAnythingChanged($oProduct, $aData);
     }
 
     /**
@@ -237,8 +231,12 @@ class ArticleVariant extends AdminDetailsController
      *
      * @return Article
      * @throws DatabaseConnectionException
+     * @deprecated Use getProductParent() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getProductParent().
      */
-    protected function getProductParent($sParentId)
+    protected function _getProductParent($sParentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (
             $this->_oProductParent === null ||
@@ -252,6 +250,24 @@ class ArticleVariant extends AdminDetailsController
         }
 
         return $this->_oProductParent;
+    }
+
+    /**
+     * Returns variant parent object
+     *
+     * @param string $sParentId parent product id
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getProductParent() (not the deprecated _getProductParent()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getProductParent($sParentId)
+    {
+        return $this->_getProductParent($sParentId);
     }
 
     /**

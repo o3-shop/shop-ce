@@ -76,18 +76,26 @@ class WidgetController extends FrontendController
     /**
      * In widgets, we do not need to parse seo and do any work related to that
      * Shop main control is responsible for that, and that has to be done once
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processRequest" in next major
+     * @deprecated Use processRequest() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processRequest().
      */
     protected function _processRequest() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->processRequest();
     }
 
     /**
      * In widgets, we do not need to parse seo and do any work related to that
      * Shop main control is responsible for that, and that has to be done once
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processRequest() (not the deprecated _processRequest()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     protected function processRequest()
     {
+        $this->_processRequest();
     }
 }

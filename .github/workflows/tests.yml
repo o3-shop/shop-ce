@@ -170,6 +170,9 @@ jobs:
       - name: 🗄️ Create Test Database
         run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
 
+      - name: 🔒 Check PHPUnit INI Safety (GHSA-qrr6-mg7r-m243)
+        run: php bin/check-phpunit-ini-safety.php
+
       - name: ✅ Run PHPUnit (with Coverage)
         id: phpunit
         continue-on-error: true

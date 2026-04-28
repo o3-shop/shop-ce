@@ -61,22 +61,12 @@ class AdminDetailsController extends AdminController
      * @param string                                 $sField  name of editable field
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEditValue" in next major
+     * @deprecated Use getEditValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getEditValue().
      */
     protected function _getEditValue($oObject, $sField) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getEditValue($oObject, $sField);
-    }
-
-    /**
-     * Returns string which must be edited by editor.
-     *
-     * @param BaseModel $oObject object used for editing
-     * @param string                                 $sField  name of editable field
-     *
-     * @return string
-     */
-    protected function getEditValue($oObject, $sField)
     {
         $sEditObjectValue = '';
         if ($oObject && $sField && isset($oObject->$sField)) {
@@ -94,16 +84,20 @@ class AdminDetailsController extends AdminController
     }
 
     /**
-     * Processes edit value.
+     * Returns string which must be edited by editor.
      *
-     * @param string $sValue string to process
+     * @param BaseModel $oObject object used for editing
+     * @param string                                 $sField  name of editable field
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processEditValue" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getEditValue()
+     *           (not the deprecated _getEditValue()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _processEditValue($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getEditValue($oObject, $sField)
     {
-        return $this->processEditValue($sValue);
+        return $this->_getEditValue($oObject, $sField);
     }
 
     /**
@@ -112,8 +106,12 @@ class AdminDetailsController extends AdminController
      * @param string $sValue string to process
      *
      * @return string
+     * @deprecated Use processEditValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _processEditValue().
      */
-    protected function processEditValue($sValue)
+    protected function _processEditValue($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // A. replace ONLY if long description is not processed by smarty, or users will not be able to
         // store smarty tags ([{$shop->currenthomedir}]/[{$oViewConf->getCurrentHomeDir()}]) in long
@@ -124,6 +122,23 @@ class AdminDetailsController extends AdminController
         }
 
         return $sValue;
+    }
+
+    /**
+     * Processes edit value.
+     *
+     * @param string $sValue string to process
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processEditValue() (not the deprecated _processEditValue()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function processEditValue($sValue)
+    {
+        return $this->_processEditValue($sValue);
     }
 
     /**
@@ -156,13 +171,21 @@ class AdminDetailsController extends AdminController
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
-     * @deprecated since v6.0 (2017-06-29); Please use generateTextEditor() method.
+     * @deprecated Use generateTextEditor() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it (originally deprecated v6.0, 2017-06-29); new code,
+     *             including new modules, MUST NOT call or override _generateTextEditor().
      *
      * @return string Editor output
      */
     protected function _generateTextEditor($width, $height, $object, $field, $stylesheet = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->generateTextEditor($width, $height, $object, $field, $stylesheet);
+        $objectValue = $this->getEditValue($object, $field);
+
+        $textEditorHandler = $this->createTextEditorHandler();
+        $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
+
+        return $textEditorHandler->renderTextEditor($width, $height, $objectValue, $field);
     }
 
     /**
@@ -174,16 +197,16 @@ class AdminDetailsController extends AdminController
      * @param string                                 $field      object field which content is passed to editor
      * @param string                                 $stylesheet stylesheet to use in editor
      *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::generateTextEditor() (not the deprecated _generateTextEditor()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     *
      * @return string Editor output
      */
     protected function generateTextEditor($width, $height, $object, $field, $stylesheet = null)
     {
-        $objectValue = $this->getEditValue($object, $field);
-
-        $textEditorHandler = $this->createTextEditorHandler();
-        $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
-
-        return $textEditorHandler->renderTextEditor($width, $height, $objectValue, $field);
+        return $this->_generateTextEditor($width, $height, $object, $field, $stylesheet);
     }
 
     /**
@@ -222,24 +245,12 @@ class AdminDetailsController extends AdminController
      * @param int    $iTreeShopId     tree shop id
      *
      * @return object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "createCategoryTree" in next major
+     * @deprecated Use createCategoryTree() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _createCategoryTree().
      */
     protected function _createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
-    }
-
-    /**
-     * Function creates category tree for select list used in "Category main", "Article extend" etc.
-     *
-     * @param string $sTplVarName     name of template variable where is stored category tree
-     * @param string $sEditCatId      ID of category witch we are editing
-     * @param bool   $blForceNonCache Set to true to disable caching
-     * @param int    $iTreeShopId     tree shop id
-     *
-     * @return object
-     */
-    protected function createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null)
     {
         // caching category tree, to load it once, not many times
         if (!isset($this->oCatTree) || $blForceNonCache) {
@@ -274,25 +285,22 @@ class AdminDetailsController extends AdminController
 
     /**
      * Function creates category tree for select list used in "Category main", "Article extend" etc.
-     * Returns ID of selected category if available.
      *
      * @param string $sTplVarName     name of template variable where is stored category tree
-     * @param string $sSelectedCatId  ID of category witch was selected in select list
      * @param string $sEditCatId      ID of category witch we are editing
      * @param bool   $blForceNonCache Set to true to disable caching
      * @param int    $iTreeShopId     tree shop id
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryTree" in next major
+     * @return object
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::createCategoryTree() (not the deprecated _createCategoryTree()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getCategoryTree(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-        $sTplVarName,
-        $sSelectedCatId,
-        $sEditCatId = '',
-        $blForceNonCache = false,
-        $iTreeShopId = null
-    ) {
-        return $this->getCategoryTree($sTplVarName, $sSelectedCatId, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    protected function createCategoryTree($sTplVarName, $sEditCatId = '', $blForceNonCache = false, $iTreeShopId = null)
+    {
+        return $this->_createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
     }
 
     /**
@@ -306,8 +314,12 @@ class AdminDetailsController extends AdminController
      * @param int    $iTreeShopId     tree shop id
      *
      * @return string
+     * @deprecated Use getCategoryTree() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _getCategoryTree().
      */
-    protected function getCategoryTree(
+    protected function _getCategoryTree(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         $sTplVarName,
         $sSelectedCatId,
         $sEditCatId = '',
@@ -341,6 +353,33 @@ class AdminDetailsController extends AdminController
     }
 
     /**
+     * Function creates category tree for select list used in "Category main", "Article extend" etc.
+     * Returns ID of selected category if available.
+     *
+     * @param string $sTplVarName     name of template variable where is stored category tree
+     * @param string $sSelectedCatId  ID of category witch was selected in select list
+     * @param string $sEditCatId      ID of category witch we are editing
+     * @param bool   $blForceNonCache Set to true to disable caching
+     * @param int    $iTreeShopId     tree shop id
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getCategoryTree() (not the deprecated _getCategoryTree()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getCategoryTree(
+        $sTplVarName,
+        $sSelectedCatId,
+        $sEditCatId = '',
+        $blForceNonCache = false,
+        $iTreeShopId = null
+    ) {
+        return $this->_getCategoryTree($sTplVarName, $sSelectedCatId, $sEditCatId, $blForceNonCache, $iTreeShopId);
+    }
+
+    /**
      * Updates object folder parameters.
      */
     public function changeFolder()
@@ -363,19 +402,12 @@ class AdminDetailsController extends AdminController
      * Sets-up navigation parameters.
      *
      * @param string $sNode active view id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Use setupNavigation() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _setupNavigation().
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setupNavigation($sNode);
-    }
-
-    /**
-     * Sets-up navigation parameters.
-     *
-     * @param string $sNode active view id
-     */
-    protected function setupNavigation($sNode)
     {
         // navigation according to class
         if ($sNode) {
@@ -390,22 +422,29 @@ class AdminDetailsController extends AdminController
     }
 
     /**
-     * Resets count of vendor/manufacturer category items.
+     * Sets-up navigation parameters.
      *
-     * @param array $aIds to reset type => id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetCounts" in next major
+     * @param string $sNode active view id
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setupNavigation() (not the deprecated _setupNavigation()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _resetCounts($aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function setupNavigation($sNode)
     {
-        $this->resetCounts($aIds);
+        $this->_setupNavigation($sNode);
     }
 
     /**
      * Resets count of vendor/manufacturer category items.
      *
      * @param array $aIds to reset type => id
+     * @deprecated Use resetCounts() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _resetCounts().
      */
-    protected function resetCounts($aIds)
+    protected function _resetCounts($aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         foreach ($aIds as $sType => $aResetInfo) {
             foreach ($aResetInfo as $sResetId => $iPos) {
@@ -419,6 +458,20 @@ class AdminDetailsController extends AdminController
                 }
             }
         }
+    }
+
+    /**
+     * Resets count of vendor/manufacturer category items.
+     *
+     * @param array $aIds to reset type => id
+     *
+     * @internal If your override does not fully replace the behavior, call parent::resetCounts()
+     *           (not the deprecated _resetCounts()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function resetCounts($aIds)
+    {
+        $this->_resetCounts($aIds);
     }
 
     /**

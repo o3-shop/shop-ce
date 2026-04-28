@@ -343,8 +343,8 @@ class AjaxListComponentTest extends \OxidTestCase
      */
     public function testAddFilter()
     {
-        $oComponent = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax::class, ['getFilter']);
-        $oComponent->expects($this->any())->method('getFilter')->will($this->returnValue('testfilter'));
+        $oComponent = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ListComponentAjax::class, ['_getFilter']);
+        $oComponent->expects($this->any())->method('_getFilter')->will($this->returnValue('testfilter'));
         $this->assertEquals('somethingwheretestfilter', $oComponent->UNITaddFilter('something'));
     }
 

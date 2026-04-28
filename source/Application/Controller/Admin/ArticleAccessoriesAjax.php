@@ -82,20 +82,11 @@ class ArticleAccessoriesAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getQuery().
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $myConfig = Registry::getConfig();
         $oxidId = Registry::getConfig()->getRequestEscapedParameter('oxid');
@@ -141,6 +132,21 @@ class ArticleAccessoriesAjax extends ListComponentAjax
 
         // creating AJAX component
         return $outputQuery;
+    }
+
+    /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getQuery()
+     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
     }
 
     /**

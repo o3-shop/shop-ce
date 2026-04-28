@@ -32,6 +32,7 @@ use oxTestModules;
  */
 class AdminViewTest extends \OxidTestCase
 {
+    use \OxidEsales\EshopCommunity\Tests\Unit\ExitHandlerTestTrait;
     /**
      * Tear down the fixture.
      *
@@ -133,6 +134,30 @@ class AdminViewTest extends \OxidTestCase
         $oAdminView->init();
 
         $this->assertEquals(oxRegistry::getSession()->getVariable('malladmin'), $oAdminView->getViewDataElement('malladmin'));
+    }
+
+    public function testInitRedirectsAndExitsWhenNotAuthorized()
+    {
+        $this->installFakeExitHandler();
+
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
+        $utils->expects($this->once())
+            ->method('redirect')
+            ->with('index.php?cl=login', true, 302);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
+
+        $adminView = $this->getMock(
+            \OxidEsales\Eshop\Application\Controller\Admin\AdminController::class,
+            ['authorize']
+        );
+        $adminView->expects($this->once())->method('authorize')->willReturn(false);
+
+        try {
+            $adminView->init();
+            $this->fail('Expected ExitCalledException');
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            $this->assertSame('Authorization error occurred!', $e->getExitMessage());
+        }
     }
 
     /**

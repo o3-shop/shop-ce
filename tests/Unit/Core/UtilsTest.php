@@ -58,6 +58,8 @@ class testOxUtils extends oxUtils
 
 class UtilsTest extends \OxidTestCase
 {
+    use \OxidEsales\EshopCommunity\Tests\Unit\ExitHandlerTestTrait;
+
     protected $_sTestLogFileName = null;
 
     /**
@@ -115,23 +117,27 @@ class UtilsTest extends \OxidTestCase
         $this->assertEquals('oxid-esales', $oUtils->extractDomain('oxid-esales'));
     }
 
-    public function testShowMessageAndExit()
+    public function testShowMessageAndExitRoutesThroughExitHandler()
     {
-        // This Exception is used to avoid exit() in method showMessageAndExit, which would stop running tests.
-        $this->expectException(
-            'Exception',
-            'Stop process before PHP exit() is called.'
-        );
+        $this->installFakeExitHandler();
+
         $oSession = $this->getMock(\OxidEsales\Eshop\Core\Session::class, ['freeze']);
         $oSession->expects($this->once())->method('freeze');
 
-        $oUtils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['getSession', 'commitFileCache']);
-        $oUtils->expects($this->once())->method('getSession')->will($this->returnValue($oSession));
-        $oUtils->expects($this->once())
-            ->method('commitFileCache')
-            ->will($this->throwException(new Exception('Stop process before PHP exit() is called.')));
+        $oUtils = $this->getMock(
+            \OxidEsales\Eshop\Core\Utils::class,
+            ['getSession', 'commitFileCache']
+        );
+        $oUtils->expects($this->atLeastOnce())->method('getSession')->willReturn($oSession);
+        $oUtils->expects($this->once())->method('commitFileCache');
 
-        $oUtils->showMessageAndExit('');
+        try {
+            $oUtils->showMessageAndExit('404 body');
+            $this->fail('Expected ExitCalledException');
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            $this->assertSame('404 body', $e->getExitMessage());
+            $this->assertSame(0, $e->getCode());
+        }
     }
 
     public function testSetLangCache()

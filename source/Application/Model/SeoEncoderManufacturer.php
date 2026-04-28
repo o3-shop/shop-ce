@@ -43,21 +43,27 @@ class SeoEncoderManufacturer extends SeoEncoder
      * Returns target "extension" (/)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Use getUrlExtension() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getUrlExtension().
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getUrlExtension();
+        return '/';
     }
 
     /**
      * Returns target "extension" (/)
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getUrlExtension()
+     *           (not the deprecated _getUrlExtension()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getUrlExtension()
     {
-        return '/';
+        return $this->_getUrlExtension();
     }
 
     /**
@@ -175,7 +181,9 @@ class SeoEncoderManufacturer extends SeoEncoder
      * @param int    $iLang     language id
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Use getAltUri() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getAltUri().
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -185,7 +193,7 @@ class SeoEncoderManufacturer extends SeoEncoder
             $sSeoUrl = $this->getManufacturerUri($oManufacturer, $iLang, true);
         }
 
-        return $this->getAltUri($sObjectId, $iLang);
+        return $sSeoUrl;
     }
 
     /**
@@ -195,15 +203,13 @@ class SeoEncoderManufacturer extends SeoEncoder
      * @param int    $iLang     language id
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getAltUri()
+     *           (not the deprecated _getAltUri()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getAltUri($sObjectId, $iLang)
     {
-        $sSeoUrl = null;
-        $oManufacturer = oxNew(Manufacturer::class);
-        if ($oManufacturer->loadInLang($iLang, $sObjectId)) {
-            $sSeoUrl = $this->getManufacturerUri($oManufacturer, $iLang, true);
-        }
-
-        return $sSeoUrl;
+        return $this->_getAltUri($sObjectId, $iLang);
     }
 }

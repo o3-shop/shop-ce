@@ -61,20 +61,11 @@ class ArticleExtendAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _getQuery().
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $categoriesTable = $this->getViewName('oxcategories');
         $objectToCategoryView = $this->getViewName('oxobject2category');
@@ -100,18 +91,18 @@ class ArticleExtendAjax extends ListComponentAjax
     }
 
     /**
-     * Returns array with DB records
+     * Returns SQL query for data to fetch
      *
-     * @param string $sQ SQL query
-     *
-     * @return array
+     * @return string
      * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getDataFields" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getQuery()
+     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getQuery()
     {
-        return $this->getDataFields($sQ);
+        return $this->_getQuery();
     }
 
     /**
@@ -122,10 +113,18 @@ class ArticleExtendAjax extends ListComponentAjax
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Use getDataFields() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getDataFields().
      */
-    protected function getDataFields($sQ)
+    protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $dataFields = parent::getDataFields($sQ);
+        // NOTE: call parent::_getDataFields() (not parent::getDataFields()) to future-proof
+        // against the parent's eventual inversion: once the parent's getDataFields() becomes
+        // a delegate, calling parent::getDataFields() here would loop back through virtual
+        // dispatch. Restores the baseline (ebe86dc0) call shape. See o3-shop/o3-shop#107.
+        $dataFields = parent::_getDataFields($sQ);
         if (Registry::getRequest()->getRequestEscapedParameter('oxid') && is_array($dataFields) && count($dataFields)) {
             // looking for smallest time value to mark record as main category ...
             $minimalPosition = null;
@@ -153,6 +152,25 @@ class ArticleExtendAjax extends ListComponentAjax
         }
 
         return $dataFields;
+    }
+
+    /**
+     * Returns array with DB records
+     *
+     * @param string $sQ SQL query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getDataFields() (not the deprecated _getDataFields()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getDataFields($sQ)
+    {
+        return $this->_getDataFields($sQ);
     }
 
     /**

@@ -240,22 +240,12 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @return Article
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getParentProduct" in next major
+     * @deprecated Use getParentProduct() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getParentProduct().
      */
     protected function _getParentProduct($sParentId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getParentProduct($sParentId);
-    }
-
-    /**
-     * Returns current product parent article object if it is available.
-     *
-     * @param string $sParentId parent product id
-     *
-     * @return Article
-     * @throws DatabaseConnectionException
-     */
-    protected function getParentProduct($sParentId)
     {
         if ($sParentId && $this->_oParentProd === null) {
             $this->_oParentProd = false;
@@ -270,22 +260,33 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     }
 
     /**
-     * In case list type is "search" returns search parameters which will be added to product details link.
+     * Returns current product parent article object if it is available.
      *
-     * @return string|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAddDynUrlParams" in next major
+     * @param string $sParentId parent product id
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getParentProduct() (not the deprecated _getParentProduct()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getAddUrlParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getParentProduct($sParentId)
     {
-        return $this->getAddUrlParams();
+        return $this->_getParentProduct($sParentId);
     }
 
     /**
      * In case list type is "search" returns search parameters which will be added to product details link.
      *
-     * @return string|void
+     * @return string|null
+     * @deprecated Use getAddUrlParams() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getAddUrlParams().
      */
-    public function getAddUrlParams()
+    protected function _getAddUrlParams() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->getListType() == 'search') {
             return $this->getDynUrlParams();
@@ -293,27 +294,50 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     }
 
     /**
-     * Processes product by setting link type and in case list type is search adds search parameters to details link.
+     * In case list type is "search" returns search parameters which will be added to product details link.
      *
-     * @param object $oProduct Product to process.
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processProduct" in next major
+     * @return string|void
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getAddUrlParams() (not the deprecated _getAddUrlParams()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _processProduct($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    public function getAddUrlParams()
     {
-        return $this->processProduct($oProduct);
+        return $this->_getAddUrlParams();
     }
 
     /**
      * Processes product by setting link type and in case list type is search adds search parameters to details link.
      *
      * @param object $oProduct Product to process.
+     * @deprecated Use processProduct() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processProduct().
      */
-    protected function processProduct($oProduct)
+    protected function _processProduct($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oProduct->setLinkType($this->getLinkType());
         if ($sAddParams = $this->getAddUrlParams()) {
             $oProduct->appendLink($sAddParams);
         }
+    }
+
+    /**
+     * Processes product by setting link type and in case list type is search adds search parameters to details link.
+     *
+     * @param object $oProduct Product to process.
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processProduct() (not the deprecated _processProduct()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function processProduct($oProduct)
+    {
+        $this->_processProduct($oProduct);
     }
 
     /**
@@ -777,11 +801,14 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @return object
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSubject" in next major
+     * @deprecated Use getSubject() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getSubject().
      */
     protected function _getSubject($languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getSubject($languageId);
+        return $this->getProduct();
     }
 
     /**
@@ -792,10 +819,14 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      *
      * @return object
      * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call parent::getSubject()
+     *           (not the deprecated _getSubject()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getSubject($iLang)
     {
-        return $this->getProduct();
+        return $this->_getSubject($iLang);
     }
 
     /**
@@ -1001,17 +1032,12 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
 
     /**
      * Set item sorting for widget based of retrieved parameters.
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setSortingParameters" in next major
+     * @deprecated Use setSortingParameters() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _setSortingParameters().
      */
     protected function _setSortingParameters() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->setSortingParameters();
-    }
-
-    /**
-     * Set item sorting for widget based of retrieved parameters.
-     */
-    protected function setSortingParameters()
     {
         $sSortingParameters = $this->getViewParameter('sorting');
         if ($sSortingParameters) {
@@ -1020,6 +1046,19 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
                 $this->setItemSorting($this->getSortIdent(), $sortBy, $sortOrder);
             }
         }
+    }
+
+    /**
+     * Set item sorting for widget based of retrieved parameters.
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setSortingParameters() (not the deprecated _setSortingParameters())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function setSortingParameters()
+    {
+        $this->_setSortingParameters();
     }
 
     /**
@@ -1083,21 +1122,12 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * @param Utils $myUtils General utils.
      * @param Config $myConfig Main shop configuration.
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "additionalChecksForArticle" in next major
+     * @deprecated Use additionalChecksForArticle() instead. This underscore-prefixed name
+     *             is retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call or
+     *             override _additionalChecksForArticle().
      */
     protected function _additionalChecksForArticle($myUtils, $myConfig) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->additionalChecksForArticle($myUtils, $myConfig);
-    }
-
-    /**
-     * Runs additional checks for article.
-     *
-     * @param Utils $myUtils General utils.
-     * @param Config $myConfig Main shop configuration.
-     * @throws DatabaseConnectionException
-     */
-    protected function additionalChecksForArticle($myUtils, $myConfig)
     {
         $blContinue = true;
         if (!$this->_oProduct->isVisible()) {
@@ -1116,6 +1146,23 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
 
         $this->processProduct($this->_oProduct);
         $this->_blIsInitialized = true;
+    }
+
+    /**
+     * Runs additional checks for article.
+     *
+     * @param Utils $myUtils General utils.
+     * @param Config $myConfig Main shop configuration.
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::additionalChecksForArticle() (not the deprecated
+     *           _additionalChecksForArticle()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function additionalChecksForArticle($myUtils, $myConfig)
+    {
+        $this->_additionalChecksForArticle($myUtils, $myConfig);
     }
 
     /**

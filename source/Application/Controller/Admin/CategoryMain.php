@@ -186,11 +186,14 @@ class CategoryMain extends AdminDetailsController
      * @param string $sValue value to fix
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processLongDesc" in next major
+     * @deprecated Use processLongDesc() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _processLongDesc().
      */
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->processLongDesc($sValue);
+        // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
+        return str_replace('&lang=', '&amp;lang=', $sValue);
     }
 
     /**
@@ -199,11 +202,14 @@ class CategoryMain extends AdminDetailsController
      * @param string $sValue value to fix
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call parent::processLongDesc()
+     *           (not the deprecated _processLongDesc()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
     protected function processLongDesc($sValue)
     {
-        // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
-        return str_replace('&lang=', '&amp;lang=', $sValue);
+        return $this->_processLongDesc($sValue);
     }
 
     /**
@@ -257,23 +263,11 @@ class CategoryMain extends AdminDetailsController
      *
      * @return void
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteCatPicture" in next major
+     * @deprecated Use deleteCatPicture() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _deleteCatPicture().
      */
     protected function _deleteCatPicture($item, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->deleteCatPicture($item, $field);
-    }
-
-    /**
-     * Delete category picture, specified in $sField parameter
-     *
-     * @param Category $item active category object
-     * @param string $field picture field name
-     *
-     * @return void
-     * @throws Exception
-     */
-    protected function deleteCatPicture($item, $field)
     {
         if ($item->isDerived()) {
             return;
@@ -314,16 +308,21 @@ class CategoryMain extends AdminDetailsController
     }
 
     /**
-     * Parse parameters prior to saving category.
+     * Delete category picture, specified in $sField parameter
      *
-     * @param array $aReqParams Request parameters.
+     * @param Category $item active category object
+     * @param string $field picture field name
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "parseRequestParametersForSave" in next major
+     * @return void
+     * @throws Exception
+     *
+     * @internal If your override does not fully replace the behavior, call parent::deleteCatPicture()
+     *           (not the deprecated _deleteCatPicture()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _parseRequestParametersForSave($aReqParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function deleteCatPicture($item, $field)
     {
-        return $this->parseRequestParametersForSave($aReqParams);
+        $this->_deleteCatPicture($item, $field);
     }
 
     /**
@@ -332,8 +331,11 @@ class CategoryMain extends AdminDetailsController
      * @param array $aReqParams Request parameters.
      *
      * @return array
+     * @deprecated Use parseRequestParametersForSave() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override _parseRequestParametersForSave().
      */
-    protected function parseRequestParametersForSave($aReqParams)
+    protected function _parseRequestParametersForSave($aReqParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // checkbox handling
         if (!isset($aReqParams['oxcategories__oxactive'])) {
@@ -370,6 +372,22 @@ class CategoryMain extends AdminDetailsController
         }
 
         return $aReqParams;
+    }
+
+    /**
+     * Parse parameters prior to saving category.
+     *
+     * @param array $aReqParams Request parameters.
+     *
+     * @return array
+     *
+     * @internal If your override does not fully replace the behavior, call parent::parseRequestParametersForSave()
+     *           (not the deprecated _parseRequestParametersForSave()) so downstream overrides in the class chain
+     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function parseRequestParametersForSave($aReqParams)
+    {
+        return $this->_parseRequestParametersForSave($aReqParams);
     }
 
     /**
