@@ -381,7 +381,7 @@ PHP;
                     }
                 }
                 $out .= ' = ' . var_export($p->getDefaultValue(), true);
-            } catch (Throwable) {
+            } catch (Throwable $e) {
                 $out .= ' = null';
             }
         } elseif (!$p->isVariadic() && $p->isOptional()) {
