@@ -2057,6 +2057,12 @@ $aLang = [
     'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Aktivierung nicht möglich – fehlende Vorlagen oder Übersetzungen',
     'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'Sprache',
+    // Per-asset hint lines surfaced via Registry::getUtilsView()->addErrorToDisplay()
+    // when the §356a activation gate rejects a save / language activation / theme switch.
+    // %1$s = absolute path (page/email template) or translation key; %2$d = language ID.
+    'O3_REVOCATION_ADMIN_GATE_HINT_PAGE_TEMPLATE'                 => 'Bitte fehlende Seitenvorlage im aktiven Theme anlegen: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_EMAIL_TEMPLATE'                => 'Bitte fehlende E-Mail-Vorlage im aktiven Theme anlegen: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_TRANSLATION_KEY'               => 'Bitte eine nicht-leere Übersetzung für „%1$s" in der Sprachdatei für Sprach-ID %2$d ergänzen.',
     'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Widerrufe',
     'O3_REVOCATION_ADMIN_LIST_MENUITEM'                           => 'Kundeninformation',
     'O3_REVOCATION_ADMIN_LIST_MENUSUBITEM'                        => 'Widerrufe',

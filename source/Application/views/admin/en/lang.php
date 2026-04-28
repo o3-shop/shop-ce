@@ -2055,6 +2055,12 @@ $aLang = [
     'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
     'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Activation blocked — missing templates or translations',
     'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'language',
+    // Per-asset hint lines surfaced via Registry::getUtilsView()->addErrorToDisplay()
+    // when the §356a activation gate rejects a save / language activation / theme switch.
+    // %1$s = absolute path (page/email template) or translation key; %2$d = language ID.
+    'O3_REVOCATION_ADMIN_GATE_HINT_PAGE_TEMPLATE'                 => 'Install the missing page template under the active theme: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_EMAIL_TEMPLATE'                => 'Install the missing email template under the active theme: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_TRANSLATION_KEY'               => 'Add a non-empty translation for "%1$s" in the language-%2$d lang file.',
     'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Revocations',
     'O3_REVOCATION_ADMIN_LIST_MENUITEM'                           => 'Customer Information',
     'O3_REVOCATION_ADMIN_LIST_MENUSUBITEM'                        => 'Revocations',

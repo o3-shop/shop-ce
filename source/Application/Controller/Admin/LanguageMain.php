@@ -33,6 +33,7 @@ use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAssetHintTranslator;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 use PDOException;
 
@@ -887,7 +888,7 @@ class LanguageMain extends AdminDetailsController
 
         foreach ($missing as $asset) {
             $oEx = oxNew(ExceptionToDisplay::class);
-            $oEx->setMessage('§356a — ' . $asset->getRemediationHint());
+            $oEx->setMessage('§356a — ' . MissingAssetHintTranslator::translate($asset, Registry::getLang()));
             Registry::getUtilsView()->addErrorToDisplay($oEx);
         }
         $this->_aViewData['revocationMissingAssets'] = array_map(

@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Theme;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAssetHintTranslator;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 
 /**
@@ -157,7 +158,7 @@ class ThemeMain extends AdminDetailsController
 
         foreach ($missing as $asset) {
             $oEx = oxNew(ExceptionToDisplay::class);
-            $oEx->setMessage('§356a — ' . $asset->getRemediationHint());
+            $oEx->setMessage('§356a — ' . MissingAssetHintTranslator::translate($asset, Registry::getLang()));
             Registry::getUtilsView()->addErrorToDisplay($oEx);
         }
         return false;

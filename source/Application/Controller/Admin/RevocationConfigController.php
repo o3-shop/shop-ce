@@ -27,6 +27,7 @@ use OxidEsales\Eshop\Core\DisplayError;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAssetHintTranslator;
 use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 
 /**
@@ -222,7 +223,7 @@ class RevocationConfigController extends AdminDetailsController
         // the full per-asset list with remediation hints.
         foreach ($this->missingAssets as $asset) {
             $error = oxNew(DisplayError::class);
-            $error->setMessage($asset->getRemediationHint());
+            $error->setMessage(MissingAssetHintTranslator::translate($asset, Registry::getLang()));
             Registry::getUtilsView()->addErrorToDisplay($error);
         }
         return false;
