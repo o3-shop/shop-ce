@@ -1229,6 +1229,24 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\RevocationConfigController'   => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationConfigController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\RevocationList'               => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationList::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\RevocationMain'               => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationMain::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\SelectListController'         => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\SelectListController::class,
         'isAbstract'       => false,
