@@ -883,6 +883,37 @@ class NavigationTreeTest extends \OxidTestCase
     }
 
     /**
+     * Regression: every `<SUBMENU id="…" list="…">` in `menu.xml` must declare at
+     * least one `<TAB>` child. `getDomXml()` runs `cleanEmptyParents('//SUBMENU
+     * [@id][@list]', 'TAB')` (NavigationTree.php:794), which silently strips any
+     * SUBMENU lacking a TAB — making the entry vanish from the rendered admin
+     * navigation. The empty-bodied `mxrevocationconfig` SUBMENU shipped that
+     * way, so "Widerruf-Einstellungen" never appeared in the menu until a
+     * `<TAB>` was added. Asserting the invariant guards every other SUBMENU
+     * against the same class of bug.
+     */
+    public function testEverySubmenuWithListHasAtLeastOneTab()
+    {
+        $oDom = $this->_getDomXml();
+        $oXPath = new DomXPath($oDom);
+
+        $offenders = [];
+        foreach ($oXPath->query('//SUBMENU[@id and @list]') as $submenu) {
+            if ($oXPath->query('./TAB', $submenu)->length === 0) {
+                $offenders[] = $submenu->getAttribute('id');
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offenders,
+            'Every SUBMENU with id+list must declare at least one TAB child, '
+            . 'otherwise NavigationTree::cleanEmptyParents() drops it from the '
+            . 'rendered admin menu. Offending ids: ' . implode(', ', $offenders)
+        );
+    }
+
+    /**
      * test if the right class id will read out from a node
      *
      * @return null

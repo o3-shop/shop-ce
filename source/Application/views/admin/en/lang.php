@@ -1709,6 +1709,7 @@ $aLang = [
     'tbclpricealarm_mail'      => 'Mail',
     //  revocation_list',
     'tbclrevocation_main'      => 'Main',
+    'tbclrevocation_config'    => 'Settings',
     //  selectlist_list',
     'tbclselectlist_main'      => 'Main',
     //  system requirements',
