@@ -43,20 +43,20 @@ export class CheckoutPaymentPage extends BaseStorefrontPage {
     );
     await this.page.goto('/index.php?cl=user', { waitUntil: 'domcontentloaded' });
 
-    // Click "Continue without registration" (option=3 form).
+    // Click "Without registration" / guest checkout. In o3-theme the
+    // option semantics are inverted from standard OXID: `option=3` is
+    // "Open Account" (full registration, password required) and
+    // `option=1` is the no-password guest flow that creates a passwordless
+    // account record. We want the latter.
     await this.page
-      .locator('form input[name="option"][value="3"]')
+      .locator('form input[name="option"][value="1"]')
       .first()
       .evaluate((input) => (input as HTMLInputElement).form?.submit());
     await this.page.waitForLoadState('domcontentloaded');
 
-    // Fill the minimal billing address. The o3-theme user step's
-    // "continue without registration" form (option=3) actually creates
-    // a customer account on submit, so a password + confirm is also
-    // required even though the wording suggests guest checkout.
+    // Fill the minimal billing address. No password fields render on the
+    // option=1 path — this is the guest checkout.
     await this.page.locator('input[name="lgn_usr"]').first().fill(address.email);
-    await this.page.locator('input[name="lgn_pwd"]').first().fill('TestPassword2026!');
-    await this.page.locator('input[name="lgn_pwd2"]').first().fill('TestPassword2026!');
     await this.page.locator('input[name="invadr[oxuser__oxfname]"]').fill(address.firstName);
     await this.page.locator('input[name="invadr[oxuser__oxlname]"]').fill(address.lastName);
     await this.page.locator('input[name="invadr[oxuser__oxstreet]"]').fill(address.street);
