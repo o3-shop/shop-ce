@@ -313,6 +313,16 @@ case "$1" in
     cs-fixer)
         run_php_cs_fixer || exit 127
         ;;
+    playwright)
+        shift
+        cd "$MY_DIR/tests/Acceptance/playwright" || exit 127
+        if [ ! -d node_modules ]; then
+            echo "Installing Playwright dependencies (one-time)..."
+            npm install || exit 127
+            npx playwright install chromium || exit 127
+        fi
+        npx playwright test "$@" || exit 127
+        ;;
     *)
         echo "Usage: $0 <command> [options]"
         echo ""
@@ -326,6 +336,7 @@ case "$1" in
         echo "  test-all-coverage  Run php-cs-fixer, then full test suite with coverage report"
         echo "  cs-fixer     Run php-cs-fixer on the entire codebase"
         echo "  quarantine   Run slow/special @group quarantine tests only"
+        echo "  playwright   Run the Playwright browser test suite (auto-installs deps on first run)"
         echo ""
         echo "Options for 'test':"
         echo "  --fast       Skip shop install, call phpunit directly"

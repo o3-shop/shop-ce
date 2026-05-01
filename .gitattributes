@@ -1,1 +1,2 @@
 AGENTS.md export-ignore
+tests/Acceptance/playwright/** export-ignore
