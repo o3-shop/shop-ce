@@ -4,3 +4,4 @@ CLAUDE.md export-ignore
 .claude/** export-ignore
 openspec/** export-ignore
 docs/superpowers/** export-ignore
+tests/Acceptance/playwright/** export-ignore
