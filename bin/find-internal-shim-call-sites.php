@@ -40,6 +40,14 @@
 
 declare(strict_types=1);
 
+// composer.json supports php ^7.4 || ^8.0; str_starts_with is PHP 8.0+.
+if (!function_exists('str_starts_with')) {
+    function str_starts_with(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strncmp($haystack, $needle, strlen($needle)) === 0;
+    }
+}
+
 exit(main($argv));
 
 function main(array $argv): int
