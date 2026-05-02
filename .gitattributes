@@ -5,3 +5,15 @@ CLAUDE.md export-ignore
 openspec/** export-ignore
 docs/superpowers/** export-ignore
 tests/Acceptance/playwright/** export-ignore
+
+# bin/ scripts that are dev-only — one-shot rewriters / verifiers / test
+# infra / dev-bootstrap / one-time migration helpers. Production needs
+# only oe-console (Symfony Console CLI) and find-internal-shim-call-sites.php
+# (used by the InternalShimCallSitesTest gate test, which ships with tests/).
+bin/apply-internal-shim-call-site-sweep.php export-ignore
+bin/apply-shim-phpdoc-transitional-rewrite.php export-ignore
+bin/apply-test-mock-name-sweep.php export-ignore
+bin/check-phpunit-ini-safety.php export-ignore
+bin/import-env export-ignore
+bin/o3-setup export-ignore
+bin/verify-underscore-method-body-equivalence.php export-ignore
