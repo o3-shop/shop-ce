@@ -95,7 +95,7 @@ class ArticleFiles extends AdminDetailsController
             foreach ($aArticleFiles as $sArticleFileId => $aArticleFileUpdate) {
                 $oArticleFile = oxNew(File::class);
                 $oArticleFile->load($sArticleFileId);
-                $aArticleFileUpdate = $this->processOptions($aArticleFileUpdate);
+                $aArticleFileUpdate = $this->_processOptions($aArticleFileUpdate);
                 $oArticleFile->assign($aArticleFileUpdate);
 
                 if ($oArticleFile->isUnderDownloadFolder()) {
@@ -149,7 +149,7 @@ class ArticleFiles extends AdminDetailsController
         $soxId = $this->getEditObjectId();
 
         $aParams = Registry::getRequest()->getRequestEscapedParameter('newfile');
-        $aParams = $this->processOptions($aParams);
+        $aParams = $this->_processOptions($aParams);
         $aNewFile = Registry::getConfig()->getUploadedFile('newArticleFile');
 
         //uploading and processing supplied file
@@ -260,9 +260,10 @@ class ArticleFiles extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::processOptions()
-     *           (not the deprecated _processOptions()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processOptions(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processOptions() the canonical override target.
      */
     protected function processOptions($aParams)
     {

@@ -428,9 +428,13 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * Used to collect user validation errors. This method is called from all of
      * the input checking functionality to report found error.
      *
-     * @deprecated Use addValidationError() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _addValidationError().
+     * @deprecated Transitional during #107. Modules SHOULD override _addValidationError()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addValidationError() to the canonical override
+      *             target and retires _addValidationError(); until then, _addValidationError() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      * @param StandardException $error     Exception.
      *
      * @return StandardException
@@ -449,9 +453,10 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      *
      * @return StandardException
      *
-     * @internal If your override does not fully replace the behavior, call parent::addValidationError()
-     *           (not the deprecated _addValidationError()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addValidationError(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addValidationError() the canonical override target.
      */
     public function addValidationError($fieldName, $error)
     {

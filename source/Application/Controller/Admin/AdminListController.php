@@ -267,7 +267,7 @@ class AdminListController extends AdminController
         $this->_aViewData['mylist'] = $this->getItemList();
 
         // set navigation parameters
-        $this->setListNavigationParams();
+        $this->_setListNavigationParams();
 
         return $return;
     }
@@ -353,7 +353,7 @@ class AdminListController extends AdminController
      */
     protected function _setCurrentListPosition($page = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $adminListSize = $this->getViewListSize();
+        $adminListSize = $this->_getViewListSize();
 
         $jumpToPage = (int)($page ? $page : (((int)Registry::getRequest()->getRequestEscapedParameter('lstrt')) / $adminListSize));
         $jumpToPage = ($page && $jumpToPage) ? ($jumpToPage - 1) : $jumpToPage;
@@ -515,9 +515,10 @@ class AdminListController extends AdminController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::processFilter()
-     *           (not the deprecated _processFilter()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processFilter() the canonical override target.
      */
     protected function processFilter($fieldValue)
     {
@@ -532,9 +533,13 @@ class AdminListController extends AdminController
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use buildFilter() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _buildFilter().
+     * @deprecated Transitional during #107. Modules SHOULD override _buildFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes buildFilter() to the canonical override
+      *             target and retires _buildFilter(); until then, _buildFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _buildFilter($value, $isSearchValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -558,9 +563,10 @@ class AdminListController extends AdminController
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::buildFilter()
-     *           (not the deprecated _buildFilter()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _buildFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make buildFilter() the canonical override target.
      */
     protected function buildFilter($value, $isSearchValue)
     {
@@ -590,9 +596,10 @@ class AdminListController extends AdminController
      *
      * @return bool
      *
-     * @internal If your override does not fully replace the behavior, call parent::isSearchValue()
-     *           (not the deprecated _isSearchValue()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _isSearchValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make isSearchValue() the canonical override target.
      */
     protected function isSearchValue($fieldValue)
     {
@@ -622,10 +629,10 @@ class AdminListController extends AdminController
                 $fieldValue = trim($fieldValue);
 
                 //check if this is search string (contains % sign at beginning and end of string)
-                $isSearchValue = $this->isSearchValue($fieldValue);
+                $isSearchValue = $this->_isSearchValue($fieldValue);
 
                 //removing % symbols
-                $fieldValue = $this->processFilter($fieldValue);
+                $fieldValue = $this->_processFilter($fieldValue);
 
                 if (strlen($fieldValue)) {
                     $values = explode(' ', $fieldValue);
@@ -647,12 +654,12 @@ class AdminListController extends AdminController
                         //for search in same field for different values using AND
                         $queryBoolAction = ' and ';
 
-                        $fullQuery .= $this->buildFilter($value, $isSearchValue);
+                        $fullQuery .= $this->_buildFilter($value, $isSearchValue);
 
                         if ($uml) {
                             $fullQuery .= " or {$quotedIdentifierName} ";
 
-                            $fullQuery .= $this->buildFilter($uml, $isSearchValue);
+                            $fullQuery .= $this->_buildFilter($uml, $isSearchValue);
                             $fullQuery .= ')'; // end of OR section
                         }
                     }
@@ -923,7 +930,7 @@ class AdminListController extends AdminController
     {
         // list navigation
         $showNavigation = false;
-        $adminListSize = $this->getViewListSize();
+        $adminListSize = $this->_getViewListSize();
         if ($this->_iListSize > $adminListSize) {
             // yes, we need to build the navigation object
             $pageNavigation = new stdClass();
@@ -988,7 +995,7 @@ class AdminListController extends AdminController
 
         // determine not used space in List
         $listSizeToShow = $this->_iListSize - $this->_iCurrListPos;
-        $adminListSize = $this->getViewListSize();
+        $adminListSize = $this->_getViewListSize();
         $notUsed = $adminListSize - min($listSizeToShow, $adminListSize);
         $space = $notUsed * 15;
 
@@ -1077,19 +1084,19 @@ class AdminListController extends AdminController
                 }
             }
 
-            $query = $this->buildSelectString($listObject);
-            $query = $this->prepareWhereQuery($where, $query);
-            $query = $this->prepareOrderByQuery($query);
+            $query = $this->_buildSelectString($listObject);
+            $query = $this->_prepareWhereQuery($where, $query);
+            $query = $this->_prepareOrderByQuery($query);
             $query = $this->changeselect($query);
 
             // calculates count of list items
-            $this->calcListItemsCount($query);
+            $this->_calcListItemsCount($query);
 
             // setting current list position (page)
-            $this->setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
+            $this->_setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
 
             // setting addition params for list: current list size
-            $this->_oList->setSqlLimit($this->_iCurrListPos, $this->getViewListSize());
+            $this->_oList->setSqlLimit($this->_iCurrListPos, $this->_getViewListSize());
 
             $this->_oList->selectString($query);
         }

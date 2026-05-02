@@ -75,9 +75,13 @@ class CategoryMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getQuery().
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -118,9 +122,10 @@ class CategoryMainAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getQuery()
-     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
     protected function getQuery()
     {
@@ -134,9 +139,13 @@ class CategoryMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use addFilter() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _addFilter().
+     * @deprecated Transitional during #107. Modules SHOULD override _addFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addFilter() to the canonical override
+      *             target and retires _addFilter(); until then, _addFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -159,9 +168,10 @@ class CategoryMainAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::addFilter()
-     *           (not the deprecated _addFilter()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addFilter() the canonical override target.
      */
     protected function addFilter($sQ)
     {
@@ -176,7 +186,7 @@ class CategoryMainAjax extends ListComponentAjax
      */
     public function addArticle()
     {
-        $aArticles = $this->getActionIds('oxarticles.oxid');
+        $aArticles = $this->_getActionIds('oxarticles.oxid');
         $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $sShopID = Registry::getConfig()->getShopId();
 
@@ -187,7 +197,7 @@ class CategoryMainAjax extends ListComponentAjax
 
             // adding
             if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-                $aArticles = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
+                $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->getQuery()));
             }
 
             if (is_array($aArticles)) {
@@ -218,7 +228,7 @@ class CategoryMainAjax extends ListComponentAjax
                 }
 
                 // updating oxtime values
-                $this->updateOxTime($sProdIds);
+                $this->_updateOxTime($sProdIds);
 
                 $this->resetArtSeoUrl($aArticles);
                 $this->resetCounter('catArticle', $sCategoryID);
@@ -297,13 +307,13 @@ class CategoryMainAjax extends ListComponentAjax
      */
     public function removeArticle()
     {
-        $aArticles = $this->getActionIds('oxarticles.oxid');
+        $aArticles = $this->_getActionIds('oxarticles.oxid');
         $sCategoryID = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArticleTable = $this->getViewName('oxarticles');
-            $aArticles = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
+            $aArticles = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->getQuery()));
         }
 
         // adding
@@ -340,7 +350,7 @@ class CategoryMainAjax extends ListComponentAjax
         $db->execute($sQ);
 
         // updating oxtime values
-        $this->updateOxTime($prodIds);
+        $this->_updateOxTime($prodIds);
     }
 
     /**

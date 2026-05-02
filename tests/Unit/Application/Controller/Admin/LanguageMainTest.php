@@ -68,9 +68,9 @@ class LanguageMainTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
-        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['validateInput', 'getLanguages'], [], '', false);
-        $oMainLang->expects($this->once())->method('getLanguages')->will($this->returnValue($aDefaultLangData));
-        $oMainLang->expects($this->once())->method('validateInput')->will($this->returnValue(true));
+        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_validateInput', '_getLanguages'], [], '', false);
+        $oMainLang->expects($this->once())->method('_getLanguages')->will($this->returnValue($aDefaultLangData));
+        $oMainLang->expects($this->once())->method('_validateInput')->will($this->returnValue(true));
 
         $oMainLang->save();
     }
@@ -101,11 +101,11 @@ class LanguageMainTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
-        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['validateInput', 'checkMultilangFieldsExistsInDb', 'addNewMultilangFieldsToDb', 'getLanguages'], [], '', false);
-        $oMainLang->expects($this->once())->method('getLanguages')->will($this->returnValue($aLangData));
-        $oMainLang->expects($this->once())->method('validateInput')->will($this->returnValue(true));
-        $oMainLang->expects($this->once())->method('checkMultilangFieldsExistsInDb')->with($this->equalTo('fr'))->will($this->returnValue(false));
-        $oMainLang->expects($this->once())->method('addNewMultilangFieldsToDb');
+        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_validateInput', '_checkMultilangFieldsExistsInDb', '_addNewMultilangFieldsToDb', '_getLanguages'], [], '', false);
+        $oMainLang->expects($this->once())->method('_getLanguages')->will($this->returnValue($aLangData));
+        $oMainLang->expects($this->once())->method('_validateInput')->will($this->returnValue(true));
+        $oMainLang->expects($this->once())->method('_checkMultilangFieldsExistsInDb')->with($this->equalTo('fr'))->will($this->returnValue(false));
+        $oMainLang->expects($this->once())->method('_addNewMultilangFieldsToDb');
 
         $oMainLang->save();
     }
@@ -407,8 +407,8 @@ class LanguageMainTest extends \OxidTestCase
         $this->setRequestParameter('oxid', '-1');
         $this->setRequestParameter('editval', ['abbr' => 'en']);
 
-        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['checkLangExists']);
-        $oMainLang->expects($this->once())->method('checkLangExists')->with($this->equalTo('en'))->will($this->returnValue(true));
+        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_checkLangExists']);
+        $oMainLang->expects($this->once())->method('_checkLangExists')->with($this->equalTo('en'))->will($this->returnValue(true));
 
         $this->assertFalse($oMainLang->UNITvalidateInput());
 
@@ -468,8 +468,8 @@ class LanguageMainTest extends \OxidTestCase
         $this->setRequestParameter('oxid', '-1');
         $this->setRequestParameter('editval', ['abbr' => 'ch-xx']);
 
-        $mainLanguage = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['checkLangExists']);
-        $mainLanguage->expects($this->once())->method('checkLangExists')->with($this->equalTo('ch-xx'))->will($this->returnValue(false));
+        $mainLanguage = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_checkLangExists']);
+        $mainLanguage->expects($this->once())->method('_checkLangExists')->with($this->equalTo('ch-xx'))->will($this->returnValue(false));
 
         $this->assertFalse($mainLanguage->UNITvalidateInput());
 

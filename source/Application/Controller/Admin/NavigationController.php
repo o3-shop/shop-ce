@@ -66,7 +66,7 @@ class NavigationController extends AdminController
             if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
-                    $this->_aViewData['aMessage'] = $this->doStartUpChecks();
+                    $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
                 }
             } else {
                 //removing reload param to force requirements checking next time
@@ -146,9 +146,13 @@ class NavigationController extends AdminController
      *
      * @return array
      * @throws Exception
-     * @deprecated Use doStartUpChecks() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _doStartUpChecks().
+     * @deprecated Transitional during #107. Modules SHOULD override _doStartUpChecks()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes doStartUpChecks() to the canonical override
+      *             target and retires _doStartUpChecks(); until then, _doStartUpChecks() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -202,9 +206,10 @@ class NavigationController extends AdminController
      * @return array
      * @throws Exception
      *
-     * @internal If your override does not fully replace the behavior, call parent::doStartUpChecks()
-     *           (not the deprecated _doStartUpChecks()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _doStartUpChecks(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make doStartUpChecks() the canonical override target.
      */
     protected function doStartUpChecks()
     {
@@ -216,9 +221,13 @@ class NavigationController extends AdminController
      *
      * @return string
      * @throws Exception
-     * @deprecated Use checkVersion() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkVersion().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkVersion()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkVersion() to the canonical override
+      *             target and retires _checkVersion(); until then, _checkVersion() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -240,9 +249,10 @@ class NavigationController extends AdminController
      * @return string|void
      * @throws Exception
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkVersion()
-     *           (not the deprecated _checkVersion()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkVersion(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkVersion() the canonical override target.
      */
     protected function checkVersion()
     {

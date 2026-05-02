@@ -44,9 +44,13 @@ class SeoEncoderVendor extends SeoEncoder
      * Returns target "extension" (/)
      *
      * @return string
-     * @deprecated Use getUrlExtension() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getUrlExtension().
+     * @deprecated Transitional during #107. Modules SHOULD override _getUrlExtension()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUrlExtension() to the canonical override
+      *             target and retires _getUrlExtension(); until then, _getUrlExtension() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -58,9 +62,10 @@ class SeoEncoderVendor extends SeoEncoder
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getUrlExtension()
-     *           (not the deprecated _getUrlExtension()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUrlExtension(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUrlExtension() the canonical override target.
      */
     protected function getUrlExtension()
     {
@@ -183,9 +188,13 @@ class SeoEncoderVendor extends SeoEncoder
      * @param int    $languageId Language id
      *
      * @return string
-     * @deprecated Use getAltUri() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getAltUri().
+     * @deprecated Transitional during #107. Modules SHOULD override _getAltUri()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAltUri() to the canonical override
+      *             target and retires _getAltUri(); until then, _getAltUri() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAltUri($vendorId, $languageId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -206,9 +215,10 @@ class SeoEncoderVendor extends SeoEncoder
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getAltUri()
-     *           (not the deprecated _getAltUri()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAltUri(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAltUri() the canonical override target.
      */
     protected function getAltUri($vendorId, $languageId)
     {

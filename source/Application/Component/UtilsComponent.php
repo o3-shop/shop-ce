@@ -139,7 +139,7 @@ class UtilsComponent extends BaseController
             return;
         }
 
-        $this->toList('noticelist', $sProductId, $dAmount, $aSel);
+        $this->_toList('noticelist', $sProductId, $dAmount, $aSel);
     }
 
     /**
@@ -159,7 +159,7 @@ class UtilsComponent extends BaseController
 
         // only if enabled
         if ($this->getViewConfig()->getShowWishlist()) {
-            $this->toList('wishlist', $sProductId, $dAmount, $aSel);
+            $this->_toList('wishlist', $sProductId, $dAmount, $aSel);
         }
     }
 
@@ -171,9 +171,13 @@ class UtilsComponent extends BaseController
      * @param double $dAmount product amount
      * @param array $aSel product selection list
      * @throws Exception
-     * @deprecated Use toList() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _toList().
+     * @deprecated Transitional during #107. Modules SHOULD override _toList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes toList() to the canonical override
+      *             target and retires _toList(); until then, _toList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -242,9 +246,10 @@ class UtilsComponent extends BaseController
      * @param array $aSel product selection list
      * @throws Exception
      *
-     * @internal If your override does not fully replace the behavior, call parent::toList()
-     *           (not the deprecated _toList()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _toList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make toList() the canonical override target.
      */
     protected function toList($sListType, $sProductId, $dAmount, $aSel)
     {

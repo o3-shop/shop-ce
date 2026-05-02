@@ -83,7 +83,7 @@ class CountryList extends AdminListController
         $aListSorting = parent::getListSorting();
 
         if (array_keys($aListSorting['oxcountry']) === ['oxactive']) {
-            $aListSorting['oxcountry'][$this->getSecondSortFieldName()] = 'asc';
+            $aListSorting['oxcountry'][$this->_getSecondSortFieldName()] = 'asc';
         }
 
         return $aListSorting;
@@ -93,9 +93,13 @@ class CountryList extends AdminListController
      * Getter for the second sort field name (for getting the expected order out of the database).
      *
      * @return string The name of the field we want to be the second order by argument.
-     * @deprecated Use getSecondSortFieldName() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getSecondSortFieldName().
+     * @deprecated Transitional during #107. Modules SHOULD override _getSecondSortFieldName()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSecondSortFieldName() to the canonical override
+      *             target and retires _getSecondSortFieldName(); until then, _getSecondSortFieldName() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getSecondSortFieldName() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -107,9 +111,10 @@ class CountryList extends AdminListController
      *
      * @return string The name of the field we want to be the second order by argument.
      *
-     * @internal If your override does not fully replace the behavior, call parent::getSecondSortFieldName()
-     *           (not the deprecated _getSecondSortFieldName()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSecondSortFieldName(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSecondSortFieldName() the canonical override target.
      */
     protected function getSecondSortFieldName()
     {

@@ -98,7 +98,7 @@ class ArticleVariant extends AdminDetailsController
             }
 
             if ($oArticle->oxarticles__oxparentid->value) {
-                $this->_aViewData['parentarticle'] = $this->getProductParent($oArticle->oxarticles__oxparentid->value);
+                $this->_aViewData['parentarticle'] = $this->_getProductParent($oArticle->oxarticles__oxparentid->value);
                 $this->_aViewData['oxparentid'] = $oArticle->oxarticles__oxparentid->value;
                 $this->_aViewData['issubvariant'] = 1;
                 // A. disable variant information editing for variant
@@ -157,7 +157,7 @@ class ArticleVariant extends AdminDetailsController
             $aParams['oxarticles__oxactive'] = 0;
         }
 
-        if (!$this->isAnythingChanged($oArticle, $aParams)) {
+        if (!$this->_isAnythingChanged($oArticle, $aParams)) {
             return;
         }
 
@@ -169,7 +169,7 @@ class ArticleVariant extends AdminDetailsController
         $oArticle->resetRemindStatus();
 
         if ($sOXID == '-1') {
-            if ($oParent = $this->getProductParent($oArticle->oxarticles__oxparentid->value)) {
+            if ($oParent = $this->_getProductParent($oArticle->oxarticles__oxparentid->value)) {
                 // assign field from parent for new variant
                 // #4406
                 $oArticle->oxarticles__oxisconfigurable = new Field($oParent->oxarticles__oxisconfigurable->value);

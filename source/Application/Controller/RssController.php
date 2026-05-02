@@ -88,9 +88,10 @@ class RssController extends FrontendController
      *
      * @return RssFeed
      *
-     * @internal If your override does not fully replace the behavior, call parent::getRssFeed()
-     *           (not the deprecated _getRssFeed()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getRssFeed(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getRssFeed() the canonical override target.
      */
     protected function getRssFeed()
     {
@@ -120,7 +121,7 @@ class RssController extends FrontendController
         $sCharset = Registry::getLang()->translateString('charset');
         Registry::getUtils()->setHeader('Content-Type: text/xml; charset=' . $sCharset);
         Registry::getUtils()->showMessageAndExit(
-            $this->processOutput(
+            $this->_processOutput(
                 $renderer->renderTemplate($this->_sThisTemplate, $this->_aViewData)
             )
         );
@@ -179,7 +180,7 @@ class RssController extends FrontendController
     public function topshop()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssTopShop')) {
-            $this->getRssFeed()->loadTopInShop();
+            $this->_getRssFeed()->loadTopInShop();
         } else {
             error_404_handler();
         }
@@ -193,7 +194,7 @@ class RssController extends FrontendController
     public function newarts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssNewest')) {
-            $this->getRssFeed()->loadNewestArticles();
+            $this->_getRssFeed()->loadNewestArticles();
         } else {
             error_404_handler();
         }
@@ -209,7 +210,7 @@ class RssController extends FrontendController
         if (Registry::getConfig()->getConfigParam('bl_rssCategories')) {
             $oCat = oxNew(Category::class);
             if ($oCat->load(Registry::getRequest()->getRequestEscapedParameter('cat'))) {
-                $this->getRssFeed()->loadCategoryArticles($oCat);
+                $this->_getRssFeed()->loadCategoryArticles($oCat);
             }
         } else {
             error_404_handler();
@@ -229,7 +230,7 @@ class RssController extends FrontendController
             $sVendorId = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
             $sManufacturerId = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
 
-            $this->getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
+            $this->_getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
         } else {
             error_404_handler();
         }
@@ -249,7 +250,7 @@ class RssController extends FrontendController
         if ($this->getViewConfig()->getShowListmania() && Registry::getConfig()->getConfigParam('bl_rssRecommLists')) {
             $oArticle = oxNew(Article::class);
             if ($oArticle->load(Registry::getRequest()->getRequestEscapedParameter('anid'))) {
-                $this->getRssFeed()->loadRecommLists($oArticle);
+                $this->_getRssFeed()->loadRecommLists($oArticle);
 
                 return;
             }
@@ -271,7 +272,7 @@ class RssController extends FrontendController
         if (Registry::getConfig()->getConfigParam('bl_rssRecommListArts')) {
             $oRecommList = oxNew(RecommendationList::class);
             if ($oRecommList->load(Registry::getRequest()->getRequestEscapedParameter('recommid'))) {
-                $this->getRssFeed()->loadRecommListArticles($oRecommList);
+                $this->_getRssFeed()->loadRecommListArticles($oRecommList);
 
                 return;
             }
@@ -287,7 +288,7 @@ class RssController extends FrontendController
     public function bargain()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssBargain')) {
-            $this->getRssFeed()->loadBargain();
+            $this->_getRssFeed()->loadBargain();
         } else {
             error_404_handler();
         }
@@ -301,7 +302,7 @@ class RssController extends FrontendController
     public function getChannel()
     {
         if ($this->_oChannel === null) {
-            $this->_oChannel = $this->getRssFeed()->getChannel();
+            $this->_oChannel = $this->_getRssFeed()->getChannel();
         }
 
         return $this->_oChannel;
@@ -314,6 +315,6 @@ class RssController extends FrontendController
      */
     public function getCacheLifeTime()
     {
-        return $this->getRssFeed()->getCacheTtl();
+        return $this->_getRssFeed()->getCacheTtl();
     }
 }

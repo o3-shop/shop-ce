@@ -119,8 +119,8 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
 
                 $sAddDynParams = $this->updateDynamicParameters($sAddDynParams);
 
-                $oArticle = $this->getArticleById($this->getViewParameter('anid'));
-                $this->addDynParamsToLink($sAddDynParams, $oArticle);
+                $oArticle = $this->_getArticleById($this->getViewParameter('anid'));
+                $this->_addDynParamsToLink($sAddDynParams, $oArticle);
             }
 
             $this->setProduct($oArticle);

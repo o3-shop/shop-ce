@@ -60,9 +60,13 @@ class ArticleSelectionAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getQuery().
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -105,9 +109,10 @@ class ArticleSelectionAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getQuery()
-     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
     protected function getQuery()
     {
@@ -119,9 +124,9 @@ class ArticleSelectionAjax extends ListComponentAjax
      */
     public function removeSel()
     {
-        $aChosenArt = $this->getActionIds('oxobject2selectlist.oxid');
+        $aChosenArt = $this->_getActionIds('oxobject2selectlist.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2selectlist.* ' . $this->getQuery());
+            $sQ = $this->_addFilter('delete oxobject2selectlist.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenArt)) {
             $sChosenArticles = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenArt));
@@ -141,13 +146,13 @@ class ArticleSelectionAjax extends ListComponentAjax
      */
     public function addSel()
     {
-        $aAddSel = $this->getActionIds('oxselectlist.oxid');
+        $aAddSel = $this->_getActionIds('oxselectlist.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sSLViewName = $this->getViewName('oxselectlist');
-            $aAddSel = $this->getAll($this->addFilter("select $sSLViewName.oxid " . $this->getQuery()));
+            $aAddSel = $this->_getAll($this->_addFilter("select $sSLViewName.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != '-1' && is_array($aAddSel)) {

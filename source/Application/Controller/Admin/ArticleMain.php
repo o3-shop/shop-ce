@@ -99,7 +99,7 @@ class ArticleMain extends AdminDetailsController
             }
 
             // #381A
-            $this->formJumpList($oArticle, $oParentArticle);
+            $this->_formJumpList($oArticle, $oParentArticle);
 
             //hook for modules
             $oArticle = $this->customizeArticleInformation($oArticle);
@@ -117,7 +117,7 @@ class ArticleMain extends AdminDetailsController
             }
         }
 
-        $this->_aViewData['editor'] = $this->generateTextEditor(
+        $this->_aViewData['editor'] = $this->_generateTextEditor(
             '100%',
             300,
             $oArticle,
@@ -146,7 +146,7 @@ class ArticleMain extends AdminDetailsController
         $sEditObjectValue = '';
         if ($oObject) {
             $oDescField = $oObject->getLongDescription();
-            $sEditObjectValue = $this->processEditValue($oDescField->getRawValue());
+            $sEditObjectValue = $this->_processEditValue($oDescField->getRawValue());
         }
 
         return $sEditObjectValue;
@@ -160,9 +160,10 @@ class ArticleMain extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getEditValue()
-     *           (not the deprecated _getEditValue()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEditValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEditValue() the canonical override target.
      */
     protected function getEditValue($oObject, $sField)
     {
@@ -236,7 +237,7 @@ class ArticleMain extends AdminDetailsController
         }
 
         $oArticle->assign($aParams);
-        $oArticle->setArticleLongDesc($this->processLongDesc($aParams['oxarticles__oxlongdesc']));
+        $oArticle->setArticleLongDesc($this->_processLongDesc($aParams['oxarticles__oxlongdesc']));
         $oArticle->setLanguage($this->_iEditLang);
         $oArticle = Registry::getUtilsFile()->processFiles($oArticle);
         $oArticle->save();
@@ -286,9 +287,10 @@ class ArticleMain extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::processLongDesc()
-     *           (not the deprecated _processLongDesc()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processLongDesc(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processLongDesc() the canonical override target.
      */
     protected function processLongDesc($sValue)
     {
@@ -400,28 +402,28 @@ class ArticleMain extends AdminDetailsController
             $oArticle->save();
 
             //copy categories
-            $this->copyCategories($sOldId, $sNewId);
+            $this->_copyCategories($sOldId, $sNewId);
 
             //attributes
-            $this->copyAttributes($sOldId, $sNewId);
+            $this->_copyAttributes($sOldId, $sNewId);
 
             //select-list
-            $this->copySelectlists($sOldId, $sNewId);
+            $this->_copySelectlists($sOldId, $sNewId);
 
             //cross-selling
-            $this->copyCrossseling($sOldId, $sNewId);
+            $this->_copyCrossseling($sOldId, $sNewId);
 
             //accessoire
-            $this->copyAccessoires($sOldId, $sNewId);
+            $this->_copyAccessoires($sOldId, $sNewId);
 
             // #983A copying staffelpreis info
-            $this->copyStaffelpreis($sOldId, $sNewId);
+            $this->_copyStaffelpreis($sOldId, $sNewId);
 
             //copy article extends (long-description)
-            $this->copyArtExtends($sOldId, $sNewId);
+            $this->_copyArtExtends($sOldId, $sNewId);
 
             //files
-            $this->copyFiles($sOldId, $sNewId);
+            $this->_copyFiles($sOldId, $sNewId);
 
             $this->resetContentCache();
 
@@ -505,9 +507,10 @@ class ArticleMain extends AdminDetailsController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      *
-     * @internal If your override does not fully replace the behavior, call parent::copyCategories()
-     *           (not the deprecated _copyCategories()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _copyCategories(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make copyCategories() the canonical override target.
      */
     protected function copyCategories($sOldId, $newArticleId)
     {

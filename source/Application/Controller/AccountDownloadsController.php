@@ -88,7 +88,7 @@ class AccountDownloadsController extends AccountController
         $oOrderFileList = oxNew(OrderFileList::class);
         $oOrderFileList->loadUserFiles($this->getUser()->getId());
 
-        $this->_oOrderFilesList = $this->prepareForTemplate($oOrderFileList);
+        $this->_oOrderFilesList = $this->_prepareForTemplate($oOrderFileList);
 
         return $this->_oOrderFilesList;
     }

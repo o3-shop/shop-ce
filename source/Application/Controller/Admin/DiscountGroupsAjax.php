@@ -60,9 +60,13 @@ class DiscountGroupsAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getQuery().
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -98,9 +102,10 @@ class DiscountGroupsAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getQuery()
-     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
     protected function getQuery()
     {
@@ -112,9 +117,9 @@ class DiscountGroupsAjax extends ListComponentAjax
      */
     public function removeDiscGroup()
     {
-        $groupIds = $this->getActionIds('oxobject2discount.oxid');
+        $groupIds = $this->_getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $query = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
+            $query = $this->_addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($query);
         } elseif ($groupIds && is_array($groupIds)) {
             $groupIdsQuoted = implode(', ', DatabaseProvider::getDb()->quoteArray($groupIds));
@@ -129,12 +134,12 @@ class DiscountGroupsAjax extends ListComponentAjax
     public function addDiscGroup()
     {
         $oRequest = Registry::getRequest();
-        $groupIds = $this->getActionIds('oxgroups.oxid');
+        $groupIds = $this->_getActionIds('oxgroups.oxid');
         $discountId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         if ($oRequest->getRequestEscapedParameter('all')) {
             $groupTable = $this->getViewName('oxgroups');
-            $groupIds = $this->getAll($this->addFilter("select $groupTable.oxid " . $this->getQuery()));
+            $groupIds = $this->_getAll($this->_addFilter("select $groupTable.oxid " . $this->getQuery()));
         }
         if ($discountId && $discountId != self::NEW_DISCOUNT_ID && is_array($groupIds)) {
             foreach ($groupIds as $groupId) {

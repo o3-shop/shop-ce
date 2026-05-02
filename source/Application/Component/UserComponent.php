@@ -120,9 +120,9 @@ class UserComponent extends BaseController
      */
     public function init()
     {
-        $this->saveDeliveryAddressState();
-        $this->loadSessionUser();
-        $this->saveInvitor();
+        $this->_saveDeliveryAddressState();
+        $this->_loadSessionUser();
+        $this->_saveInvitor();
 
         parent::init();
     }
@@ -136,7 +136,7 @@ class UserComponent extends BaseController
     public function render()
     {
         // checks if private sales allows further tasks
-        $this->checkPsState();
+        $this->_checkPsState();
 
         parent::render();
 
@@ -283,7 +283,7 @@ class UserComponent extends BaseController
         }
 
         // finalizing ..
-        return $this->afterLogin($oUser);
+        return $this->_afterLogin($oUser);
     }
 
     /**
@@ -342,9 +342,10 @@ class UserComponent extends BaseController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::afterLogin()
-     *           (not the deprecated _afterLogin()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _afterLogin(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make afterLogin() the canonical override target.
      */
     protected function afterLogin($oUser)
     {
@@ -417,9 +418,10 @@ class UserComponent extends BaseController
      * session parameters as user chosen payment id, delivery
      * address id, active delivery set.
      *
-     * @internal If your override does not fully replace the behavior, call parent::afterLogout()
-     *           (not the deprecated _afterLogout()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _afterLogout(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make afterLogout() the canonical override target.
      */
     protected function afterLogout()
     {
@@ -443,7 +445,7 @@ class UserComponent extends BaseController
             $this->setLoginStatus(USER_LOGOUT);
 
             // finalizing ..
-            $this->afterLogout();
+            $this->_afterLogout();
 
             $this->resetPermissions();
 
@@ -453,7 +455,7 @@ class UserComponent extends BaseController
 
             // redirecting if user logs out in SSL mode
             if (Registry::getRequest()->getRequestEscapedParameter('redirect') && $myConfig->getConfigParam('sSSLShopURL')) {
-                Registry::getUtils()->redirect($this->getLogoutLink());
+                Registry::getUtils()->redirect($this->_getLogoutLink());
             }
         }
     }
@@ -551,7 +553,7 @@ class UserComponent extends BaseController
         $aInvAddress = $this->cleanAddress($aInvAddress, oxNew(UserUpdatableFields::class));
         $aInvAddress = $this->trimAddress($aInvAddress);
 
-        $aDelAddress = $this->getDelAddressData();
+        $aDelAddress = $this->_getDelAddressData();
         $aDelAddress = $this->cleanAddress($aDelAddress, oxNew(UserShippingAddressUpdatableFields::class));
         $aDelAddress = $this->trimAddress($aDelAddress);
 
@@ -639,7 +641,7 @@ class UserComponent extends BaseController
 
         if (!$blActiveLogin) {
             Registry::getSession()->setVariable('usr', $oUser->getId());
-            $this->afterLogin($oUser);
+            $this->_afterLogin($oUser);
 
             // order remark
             //V #427: order remark for new users
@@ -754,9 +756,10 @@ class UserComponent extends BaseController
     /**
      * Saves invitor ID
      *
-     * @internal If your override does not fully replace the behavior, call parent::saveInvitor()
-     *           (not the deprecated _saveInvitor()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _saveInvitor(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make saveInvitor() the canonical override target.
      */
     protected function saveInvitor()
     {
@@ -841,7 +844,7 @@ class UserComponent extends BaseController
         }
 
         // collecting values to check
-        $aDelAddress = $this->getDelAddressData();
+        $aDelAddress = $this->_getDelAddressData();
         $aDelAddress = $this->cleanAddress($aDelAddress, oxNew(UserShippingAddressUpdatableFields::class));
         $aDelAddress = $this->trimAddress($aDelAddress);
 

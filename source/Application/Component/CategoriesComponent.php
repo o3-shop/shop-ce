@@ -91,16 +91,16 @@ class CategoriesComponent extends BaseController
             return;
         }
 
-        $sActCat = $this->getActCat();
+        $sActCat = $this->_getActCat();
 
         if ($myConfig->getConfigParam('bl_perfLoadManufacturerTree')) {
             // building Manufacturer tree
             $sActManufacturer = Registry::getRequest()->getRequestEscapedParameter('mnid');
-            $this->loadManufacturerTree($sActManufacturer);
+            $this->_loadManufacturerTree($sActManufacturer);
         }
 
         // building category tree for all purposes (nav, search and simple category trees)
-        $this->loadCategoryTree($sActCat);
+        $this->_loadCategoryTree($sActCat);
     }
 
     /**
@@ -134,9 +134,13 @@ class CategoriesComponent extends BaseController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws ObjectException
-     * @deprecated Use getActCat() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getActCat().
+     * @deprecated Transitional during #107. Modules SHOULD override _getActCat()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getActCat() to the canonical override
+      *             target and retires _getActCat(); until then, _getActCat() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getActCat() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -153,7 +157,7 @@ class CategoriesComponent extends BaseController
 
             $sActVendor = (Str::getStr()->preg_match('/^v_.?/i', $sActCat)) ? $sActCat : null;
 
-            $sActCat = $this->addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
+            $sActCat = $this->_addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
         }
 
         // Checking for the default category
@@ -177,9 +181,10 @@ class CategoriesComponent extends BaseController
      * @throws DatabaseErrorException
      * @throws ObjectException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getActCat()
-     *           (not the deprecated _getActCat()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getActCat(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getActCat() the canonical override target.
      */
     protected function getActCat()
     {
@@ -340,7 +345,7 @@ class CategoriesComponent extends BaseController
             } elseif ($sActCat && $oProduct->isAssignedToCategory($sActCat)) {
                 // category ?
             } else {
-                list($sListType, $sActCat) = $this->getDefaultParams($oProduct);
+                list($sListType, $sActCat) = $this->_getDefaultParams($oProduct);
             }
         }
 

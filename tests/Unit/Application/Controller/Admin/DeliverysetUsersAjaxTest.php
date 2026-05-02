@@ -176,8 +176,8 @@ class DeliverysetUsersAjaxTest extends \OxidTestCase
      */
     public function testRemoveUserFromSet()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testDeliveryUser1', '_testDeliveryUser2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDeliveryUser1', '_testDeliveryUser2']));
 
         $sSql = "select count(oxid) from oxobject2delivery where oxid in ('_testDeliveryUser1', '_testDeliveryUser2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -216,8 +216,8 @@ class DeliverysetUsersAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addUserToSet();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -240,8 +240,8 @@ class DeliverysetUsersAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetUsersAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addUserToSet();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

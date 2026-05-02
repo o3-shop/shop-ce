@@ -69,9 +69,13 @@ class NavigationTree extends Base
      * @param DOMDocument $dom         dom object
      * @param string $parentXPath parent xpath
      * @param string $childXPath  child xpath from parent
-     * @deprecated Use cleanEmptyParents() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _cleanEmptyParents().
+     * @deprecated Transitional during #107. Modules SHOULD override _cleanEmptyParents()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes cleanEmptyParents() to the canonical override
+      *             target and retires _cleanEmptyParents(); until then, _cleanEmptyParents() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _cleanEmptyParents($dom, $parentXPath, $childXPath) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -94,9 +98,10 @@ class NavigationTree extends Base
      * @param string $parentXPath parent xpath
      * @param string $childXPath  child xpath from parent
      *
-     * @internal If your override does not fully replace the behavior, call parent::cleanEmptyParents()
-     *           (not the deprecated _cleanEmptyParents()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _cleanEmptyParents(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make cleanEmptyParents() the canonical override target.
      */
     protected function cleanEmptyParents($dom, $parentXPath, $childXPath)
     {
@@ -184,7 +189,7 @@ class NavigationTree extends Base
         }
 
         if ($merge) {
-            $this->merge($domFile, $dom);
+            $this->_merge($domFile, $dom);
         }
     }
 
@@ -493,10 +498,10 @@ class NavigationTree extends Base
                     $curNode = $curNode->item(0);
 
                     // if found copy all attributes and check child-nodes
-                    $this->copyAttributes($curNode, $fromNode);
+                    $this->_copyAttributes($curNode, $fromNode);
 
                     if ($fromNode->childNodes->length) {
-                        $this->mergeNodes($curNode, $fromNode, $xPathTo, $domDocTo, $query);
+                        $this->_mergeNodes($curNode, $fromNode, $xPathTo, $domDocTo, $query);
                     }
                 }
             }
@@ -524,7 +529,7 @@ class NavigationTree extends Base
     protected function merge($domNew, $dom)
     {
         $xPath = new DOMXPath($dom);
-        $this->mergeNodes($dom->documentElement, $domNew->documentElement, $xPath, $dom, '/OX');
+        $this->_mergeNodes($dom->documentElement, $domNew->documentElement, $xPath, $dom, '/OX');
     }
 
     /**
@@ -741,11 +746,11 @@ class NavigationTree extends Base
                     $this->_oInitialDom->appendChild(new DOMElement('OX'));
 
                     foreach ($filesToLoad as $dynPath) {
-                        $this->loadFromFile($dynPath, $this->_oInitialDom);
+                        $this->_loadFromFile($dynPath, $this->_oInitialDom);
                     }
 
                     // adds links to menu items
-                    $this->addLinks($this->_oInitialDom);
+                    $this->_addLinks($this->_oInitialDom);
 
                     // @deprecated since v5.3 (2016-05-20); Dynpages will be removed.
                     // adds links to dynamic parts
@@ -762,7 +767,7 @@ class NavigationTree extends Base
                 }
 
                 // add session params
-                $this->sessionizeLocalUrls($this->_oInitialDom);
+                $this->_sessionizeLocalUrls($this->_oInitialDom);
             }
         }
 
@@ -780,19 +785,19 @@ class NavigationTree extends Base
             $this->_oDom = clone $this->getInitialDom();
 
             // removes items denied by user group
-            $this->checkGroups($this->_oDom);
+            $this->_checkGroups($this->_oDom);
 
             // removes items denied by user rights
-            $this->checkRights($this->_oDom);
+            $this->_checkRights($this->_oDom);
 
             // removes items marked as not visible
             $this->removeInvisibleMenuNodes($this->_oDom);
 
             // check config params
-            $this->checkDemoShopDenials($this->_oDom);
+            $this->_checkDemoShopDenials($this->_oDom);
             $this->onGettingDomXml();
-            $this->cleanEmptyParents($this->_oDom, '//SUBMENU[@id][@list]', 'TAB');
-            $this->cleanEmptyParents($this->_oDom, '//MAINMENU[@id]', 'SUBMENU');
+            $this->_cleanEmptyParents($this->_oDom, '//SUBMENU[@id][@list]', 'TAB');
+            $this->_cleanEmptyParents($this->_oDom, '//MAINMENU[@id]', 'SUBMENU');
         }
 
         return $this->_oDom;

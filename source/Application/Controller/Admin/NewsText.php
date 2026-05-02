@@ -70,7 +70,7 @@ class NewsText extends AdminDetailsController
 
             $this->_aViewData['edit'] = $oNews;
         }
-        $this->_aViewData['editor'] = $this->generateTextEditor('100%', 255, $oNews, 'oxnews__oxlongdesc', 'news.tpl.css');
+        $this->_aViewData['editor'] = $this->_generateTextEditor('100%', 255, $oNews, 'oxnews__oxlongdesc', 'news.tpl.css');
 
         return 'news_text.tpl';
     }

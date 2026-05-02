@@ -158,8 +158,8 @@ class DeliverysetGroupsAjaxTest extends \OxidTestCase
      */
     public function testRemoveGroupFromSet()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testDeliverysetGroup1', '_testDeliverysetGroup2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testDeliverysetGroup1', '_testDeliverysetGroup2']));
 
         $sSql = "select count(oxid) from oxobject2delivery where oxid in ('_testDeliverysetGroup1', '_testDeliverysetGroup2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -198,8 +198,8 @@ class DeliverysetGroupsAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addGroupToSet();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -222,8 +222,8 @@ class DeliverysetGroupsAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2delivery where oxdeliveryid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DeliverySetGroupsAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addGroupToSet();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

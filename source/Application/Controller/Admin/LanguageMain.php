@@ -87,12 +87,12 @@ class LanguageMain extends AdminDetailsController
 
         $sOxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         //loading languages info from config
-        $this->_aLangData = $this->getLanguages();
+        $this->_aLangData = $this->_getLanguages();
 
         if (isset($sOxId) && $sOxId != '-1') {
             //checking if translations files exists
-            $this->checkLangTranslations($sOxId);
-            $this->_aViewData['edit'] = $this->getLanguageInfo($sOxId);
+            $this->_checkLangTranslations($sOxId);
+            $this->_aViewData['edit'] = $this->_getLanguageInfo($sOxId);
         }
 
         return 'language_main.tpl';
@@ -125,9 +125,9 @@ class LanguageMain extends AdminDetailsController
         }
 
         //loading languages info from config
-        $this->_aLangData = $this->getLanguages();
+        $this->_aLangData = $this->_getLanguages();
         //checking input errors
-        if (!$this->validateInput()) {
+        if (!$this->_validateInput()) {
             return;
         }
 
@@ -163,7 +163,7 @@ class LanguageMain extends AdminDetailsController
         // if adding new language, setting lang id to abbreviation
         if ($blNewLanguage = ($sOxId == -1)) {
             $sOxId = $aParams['abbr'];
-            $this->_aLangData['params'][$sOxId]['baseId'] = $this->getAvailableLangBaseId();
+            $this->_aLangData['params'][$sOxId]['baseId'] = $this->_getAvailableLangBaseId();
             $this->setEditObjectId($sOxId);
         }
 
@@ -177,7 +177,7 @@ class LanguageMain extends AdminDetailsController
 
         //if setting lang as default
         if ($aParams['default'] == '1') {
-            $this->setDefaultLang($sOxId);
+            $this->_setDefaultLang($sOxId);
         }
 
         //updating language urls
@@ -186,7 +186,7 @@ class LanguageMain extends AdminDetailsController
         $this->_aLangData['sslUrls'][$iBaseId] = $aParams['basesslurl'];
 
         //sort parameters, urls and languages arrays by language base id
-        $this->sortLangArraysByBaseId();
+        $this->_sortLangArraysByBaseId();
 
         $this->_aViewData['updatelist'] = '1';
 
@@ -199,8 +199,8 @@ class LanguageMain extends AdminDetailsController
             //checking if added language already has created multilang fields
             //with new base ID - if not, creating new fields
             if ($blNewLanguage) {
-                if (!$this->checkMultilangFieldsExistsInDb($sOxId)) {
-                    $this->addNewMultilangFieldsToDb();
+                if (!$this->_checkMultilangFieldsExistsInDb($sOxId)) {
+                    $this->_addNewMultilangFieldsToDb();
                 } else {
                     $blViewError = true;
                 }
@@ -220,9 +220,13 @@ class LanguageMain extends AdminDetailsController
      * @param string $sOxId language abbreviation
      *
      * @return array
-     * @deprecated Use getLanguageInfo() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getLanguageInfo().
+     * @deprecated Transitional during #107. Modules SHOULD override _getLanguageInfo()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLanguageInfo() to the canonical override
+      *             target and retires _getLanguageInfo(); until then, _getLanguageInfo() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getLanguageInfo($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -245,9 +249,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::getLanguageInfo()
-     *           (not the deprecated _getLanguageInfo()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLanguageInfo(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLanguageInfo() the canonical override target.
      */
     protected function getLanguageInfo($sOxId)
     {
@@ -258,9 +263,13 @@ class LanguageMain extends AdminDetailsController
      * Languages array setter
      *
      * @param array $aLangData languages parameters array
-     * @deprecated Use setLanguages() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _setLanguages().
+     * @deprecated Transitional during #107. Modules SHOULD override _setLanguages()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setLanguages() to the canonical override
+      *             target and retires _setLanguages(); until then, _setLanguages() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _setLanguages($aLangData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -272,9 +281,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @param array $aLangData languages parameters array
      *
-     * @internal If your override does not fully replace the behavior, call parent::setLanguages()
-     *           (not the deprecated _setLanguages()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setLanguages(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setLanguages() the canonical override target.
      */
     protected function setLanguages($aLangData)
     {
@@ -287,9 +297,13 @@ class LanguageMain extends AdminDetailsController
      * Returns collected languages parameters array.
      *
      * @return array
-     * @deprecated Use getLanguages() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getLanguages().
+     * @deprecated Transitional during #107. Modules SHOULD override _getLanguages()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLanguages() to the canonical override
+      *             target and retires _getLanguages(); until then, _getLanguages() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -300,7 +314,7 @@ class LanguageMain extends AdminDetailsController
 
         // empty languages parameters array - creating new one with default values
         if (!is_array($aLangData['params'])) {
-            $aLangData['params'] = $this->assignDefaultLangParams($aLangData['lang']);
+            $aLangData['params'] = $this->_assignDefaultLangParams($aLangData['lang']);
         }
 
         return $aLangData;
@@ -313,9 +327,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::getLanguages()
-     *           (not the deprecated _getLanguages()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLanguages(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLanguages() the canonical override target.
      */
     protected function getLanguages()
     {
@@ -362,9 +377,13 @@ class LanguageMain extends AdminDetailsController
     /**
      * Sort languages, languages parameters, urls, ssl urls arrays according
      * base land ID
-     * @deprecated Use sortLangArraysByBaseId() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _sortLangArraysByBaseId().
+     * @deprecated Transitional during #107. Modules SHOULD override _sortLangArraysByBaseId()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes sortLangArraysByBaseId() to the canonical override
+      *             target and retires _sortLangArraysByBaseId(); until then, _sortLangArraysByBaseId() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _sortLangArraysByBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -390,9 +409,10 @@ class LanguageMain extends AdminDetailsController
      * Sort languages, languages parameters, urls, ssl urls arrays according
      * base land ID
      *
-     * @internal If your override does not fully replace the behavior, call parent::sortLangArraysByBaseId()
-     *           (not the deprecated _sortLangArraysByBaseId()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _sortLangArraysByBaseId(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make sortLangArraysByBaseId() the canonical override target.
      */
     protected function sortLangArraysByBaseId()
     {
@@ -405,9 +425,13 @@ class LanguageMain extends AdminDetailsController
      * @param array $aLanguages language array
      *
      * @return array
-     * @deprecated Use assignDefaultLangParams() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _assignDefaultLangParams().
+     * @deprecated Transitional during #107. Modules SHOULD override _assignDefaultLangParams()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes assignDefaultLangParams() to the canonical override
+      *             target and retires _assignDefaultLangParams(); until then, _assignDefaultLangParams() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _assignDefaultLangParams($aLanguages) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -432,9 +456,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::assignDefaultLangParams()
-     *           (not the deprecated _assignDefaultLangParams()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _assignDefaultLangParams(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make assignDefaultLangParams() the canonical override target.
      */
     protected function assignDefaultLangParams($aLanguages)
     {
@@ -445,9 +470,13 @@ class LanguageMain extends AdminDetailsController
      * Sets default language base ID to config var 'sDefaultLang'
      *
      * @param string $sOxId language abbreviation
-     * @deprecated Use setDefaultLang() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _setDefaultLang().
+     * @deprecated Transitional during #107. Modules SHOULD override _setDefaultLang()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setDefaultLang() to the canonical override
+      *             target and retires _setDefaultLang(); until then, _setDefaultLang() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _setDefaultLang($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -460,9 +489,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @param string $sOxId language abbreviation
      *
-     * @internal If your override does not fully replace the behavior, call parent::setDefaultLang()
-     *           (not the deprecated _setDefaultLang()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setDefaultLang(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setDefaultLang() the canonical override target.
      */
     protected function setDefaultLang($sOxId)
     {
@@ -473,9 +503,13 @@ class LanguageMain extends AdminDetailsController
      * Get available language base ID
      *
      * @return int
-     * @deprecated Use getAvailableLangBaseId() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getAvailableLangBaseId().
+     * @deprecated Transitional during #107. Modules SHOULD override _getAvailableLangBaseId()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAvailableLangBaseId() to the canonical override
+      *             target and retires _getAvailableLangBaseId(); until then, _getAvailableLangBaseId() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAvailableLangBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -504,9 +538,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return int
      *
-     * @internal If your override does not fully replace the behavior, call parent::getAvailableLangBaseId()
-     *           (not the deprecated _getAvailableLangBaseId()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAvailableLangBaseId(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAvailableLangBaseId() the canonical override target.
      */
     protected function getAvailableLangBaseId()
     {
@@ -518,9 +553,13 @@ class LanguageMain extends AdminDetailsController
      * If not - displays warning
      *
      * @param string $sOxId language abbreviation
-     * @deprecated Use checkLangTranslations() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkLangTranslations().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkLangTranslations()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkLangTranslations() to the canonical override
+      *             target and retires _checkLangTranslations(); until then, _checkLangTranslations() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkLangTranslations($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -541,9 +580,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @param string $sOxId language abbreviation
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkLangTranslations()
-     *           (not the deprecated _checkLangTranslations()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkLangTranslations(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkLangTranslations() the canonical override target.
      */
     protected function checkLangTranslations($sOxId)
     {
@@ -556,9 +596,13 @@ class LanguageMain extends AdminDetailsController
      * @param string $sOxId language abbreviation
      *
      * @return bool
-     * @deprecated Use checkMultilangFieldsExistsInDb() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkMultilangFieldsExistsInDb().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkMultilangFieldsExistsInDb()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkMultilangFieldsExistsInDb() to the canonical override
+      *             target and retires _checkMultilangFieldsExistsInDb(); until then, _checkMultilangFieldsExistsInDb() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkMultilangFieldsExistsInDb($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -578,9 +622,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return bool
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkMultilangFieldsExistsInDb()
-     *           (not the deprecated _checkMultilangFieldsExistsInDb()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkMultilangFieldsExistsInDb(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkMultilangFieldsExistsInDb() the canonical override target.
      */
     protected function checkMultilangFieldsExistsInDb($sOxId)
     {
@@ -594,9 +639,13 @@ class LanguageMain extends AdminDetailsController
      * @return void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated Use addNewMultilangFieldsToDb() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _addNewMultilangFieldsToDb().
+     * @deprecated Transitional during #107. Modules SHOULD override _addNewMultilangFieldsToDb()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addNewMultilangFieldsToDb() to the canonical override
+      *             target and retires _addNewMultilangFieldsToDb(); until then, _addNewMultilangFieldsToDb() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _addNewMultilangFieldsToDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -627,9 +676,10 @@ class LanguageMain extends AdminDetailsController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      *
-     * @internal If your override does not fully replace the behavior, call parent::addNewMultilangFieldsToDb()
-     *           (not the deprecated _addNewMultilangFieldsToDb()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addNewMultilangFieldsToDb(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addNewMultilangFieldsToDb() the canonical override target.
      */
     protected function addNewMultilangFieldsToDb()
     {
@@ -642,9 +692,13 @@ class LanguageMain extends AdminDetailsController
      * @param string $sAbbr language abbreviation
      *
      * @return bool
-     * @deprecated Use checkLangExists() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkLangExists().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkLangExists()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkLangExists() to the canonical override
+      *             target and retires _checkLangExists(); until then, _checkLangExists() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkLangExists($sAbbr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -660,9 +714,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return bool
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkLangExists()
-     *           (not the deprecated _checkLangExists()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkLangExists(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkLangExists() the canonical override target.
      */
     protected function checkLangExists($sAbbr)
     {
@@ -677,9 +732,13 @@ class LanguageMain extends AdminDetailsController
      * @param object $oLang2 language array
      *
      * @return int
-     * @deprecated Use sortLangParamsByBaseIdCallback() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _sortLangParamsByBaseIdCallback().
+     * @deprecated Transitional during #107. Modules SHOULD override _sortLangParamsByBaseIdCallback()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes sortLangParamsByBaseIdCallback() to the canonical override
+      *             target and retires _sortLangParamsByBaseIdCallback(); until then, _sortLangParamsByBaseIdCallback() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _sortLangParamsByBaseIdCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -695,9 +754,10 @@ class LanguageMain extends AdminDetailsController
      *
      * @return int
      *
-     * @internal If your override does not fully replace the behavior, call parent::sortLangParamsByBaseIdCallback()
-     *           (not the deprecated _sortLangParamsByBaseIdCallback()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _sortLangParamsByBaseIdCallback(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make sortLangParamsByBaseIdCallback() the canonical override target.
      */
     protected function sortLangParamsByBaseIdCallback($oLang1, $oLang2)
     {
@@ -709,9 +769,13 @@ class LanguageMain extends AdminDetailsController
      *
      * @return bool
      * @throws Exception
-     * @deprecated Use validateInput() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _validateInput().
+     * @deprecated Transitional during #107. Modules SHOULD override _validateInput()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes validateInput() to the canonical override
+      *             target and retires _validateInput(); until then, _validateInput() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _validateInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -722,7 +786,7 @@ class LanguageMain extends AdminDetailsController
 
         // if creating new language, checking if language already exists with
         // entered language abbreviation
-        if (($oxid == -1) && $this->checkLangExists($parameters['abbr'])) {
+        if (($oxid == -1) && $this->_checkLangExists($parameters['abbr'])) {
             $this->addDisplayException('LANGUAGE_ALREADYEXISTS_ERROR');
             $result = false;
         }
@@ -748,9 +812,10 @@ class LanguageMain extends AdminDetailsController
      * @return bool
      * @throws Exception
      *
-     * @internal If your override does not fully replace the behavior, call parent::validateInput()
-     *           (not the deprecated _validateInput()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _validateInput(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make validateInput() the canonical override target.
      */
     protected function validateInput()
     {
@@ -879,7 +944,7 @@ class LanguageMain extends AdminDetailsController
         $shopId = (int) $config->getShopId();
         $newBaseId = isset($this->_aLangData['params'][$sOxId]['baseId'])
             ? (int) $this->_aLangData['params'][$sOxId]['baseId']
-            : (int) $this->getAvailableLangBaseId();
+            : (int) $this->_getAvailableLangBaseId();
 
         $missing = $this->getRevocationTemplateValidator()->validate($shopId, $themeId, [$newBaseId]);
         if ($missing === []) {

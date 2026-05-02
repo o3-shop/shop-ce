@@ -148,7 +148,7 @@ class AccountController extends FrontendController
             !$user || !$user->$passwordField->value ||
             ($this->isEnabledPrivateSales() && (!$user->isTermsAccepted() || $this->confirmTerms()))
         ) {
-            $this->_sThisTemplate = $this->getLoginTemplate();
+            $this->_sThisTemplate = $this->_getLoginTemplate();
         }
 
         return $this->_sThisTemplate;

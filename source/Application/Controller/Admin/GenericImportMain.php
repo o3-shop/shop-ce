@@ -111,10 +111,10 @@ class GenericImportMain extends AdminDetailsController
             $navigationStep++;
         }
 
-        $navigationStep = $this->checkErrors($navigationStep);
+        $navigationStep = $this->_checkErrors($navigationStep);
 
         if ($navigationStep == 1) {
-            $this->_aViewData['sGiCsvFieldTerminator'] = Str::getStr()->htmlentities($this->getCsvFieldsTerminator());
+            $this->_aViewData['sGiCsvFieldTerminator'] = Str::getStr()->htmlentities($this->_getCsvFieldsTerminator());
             $this->_aViewData['sGiCsvFieldEncloser'] = Str::getStr()->htmlentities($this->getCsvFieldsEncloser());
         }
 
@@ -141,7 +141,7 @@ class GenericImportMain extends AdminDetailsController
             $importObject = $genericImport->getImportObject($type);
             $this->_aViewData['sType'] = $type;
             $this->_aViewData['sImportTable'] = $importObject->getBaseTableName();
-            $this->_aViewData['aCsvFieldsList'] = $this->getCsvFieldsNames();
+            $this->_aViewData['aCsvFieldsList'] = $this->_getCsvFieldsNames();
             $this->_aViewData['aDbFieldsList'] = $importObject->getFieldList();
         }
 
@@ -154,14 +154,14 @@ class GenericImportMain extends AdminDetailsController
             $genericImport->setCsvFileFieldsOrder($csvFields);
             $genericImport->setCsvContainsHeader(Registry::getSession()->getVariable('blCsvContainsHeader'));
 
-            $genericImport->importFile($this->getUploadedCsvFilePath());
+            $genericImport->importFile($this->_getUploadedCsvFilePath());
             $this->_aViewData['iTotalRows'] = $genericImport->getImportedRowCount();
 
             //checking if errors occurred during import
-            $this->checkImportErrors($genericImport);
+            $this->_checkImportErrors($genericImport);
 
             //deleting uploaded csv file from temp dir
-            $this->deleteCsvFile();
+            $this->_deleteCsvFile();
 
             //check if repeating import - then forcing first step
             if ($oRequest->getRequestEscapedParameter('iRepeatImport')) {
@@ -173,7 +173,7 @@ class GenericImportMain extends AdminDetailsController
         if ($navigationStep == 1) {
             $this->_aViewData['aImportTables'] = $genericImport->getImportObjectsList();
             asort($this->_aViewData['aImportTables']);
-            $this->resetUploadedCsvData();
+            $this->_resetUploadedCsvData();
         }
 
         $this->_aViewData['sNavStep'] = $navigationStep;
@@ -183,13 +183,17 @@ class GenericImportMain extends AdminDetailsController
 
     /**
      * Deletes uploaded csv file from temp directory
-     * @deprecated Use deleteCsvFile() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _deleteCsvFile().
+     * @deprecated Transitional during #107. Modules SHOULD override _deleteCsvFile()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes deleteCsvFile() to the canonical override
+      *             target and retires _deleteCsvFile(); until then, _deleteCsvFile() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _deleteCsvFile() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sPath = $this->getUploadedCsvFilePath();
+        $sPath = $this->_getUploadedCsvFilePath();
         if (is_file($sPath)) {
             @unlink($sPath);
         }
@@ -198,9 +202,10 @@ class GenericImportMain extends AdminDetailsController
     /**
      * Deletes uploaded csv file from temp directory
      *
-     * @internal If your override does not fully replace the behavior, call parent::deleteCsvFile()
-     *           (not the deprecated _deleteCsvFile()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteCsvFile(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteCsvFile() the canonical override target.
      */
     protected function deleteCsvFile()
     {
@@ -212,17 +217,21 @@ class GenericImportMain extends AdminDetailsController
      * returns default columns names Column 1, Column 2 ...
      *
      * @return array
-     * @deprecated Use getCsvFieldsNames() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getCsvFieldsNames().
+     * @deprecated Transitional during #107. Modules SHOULD override _getCsvFieldsNames()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCsvFieldsNames() to the canonical override
+      *             target and retires _getCsvFieldsNames(); until then, _getCsvFieldsNames() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCsvFieldsNames() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $blCsvContainsHeader = Registry::getRequest()->getRequestEscapedParameter('blContainsHeader');
         Registry::getSession()->setVariable('blCsvContainsHeader', $blCsvContainsHeader);
-        $this->getUploadedCsvFilePath();
+        $this->_getUploadedCsvFilePath();
 
-        $aFirstRow = $this->getCsvFirstRow();
+        $aFirstRow = $this->_getCsvFirstRow();
         $aCsvFields = [];
 
         if (!$blCsvContainsHeader) {
@@ -247,9 +256,10 @@ class GenericImportMain extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::getCsvFieldsNames()
-     *           (not the deprecated _getCsvFieldsNames()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCsvFieldsNames(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCsvFieldsNames() the canonical override target.
      */
     protected function getCsvFieldsNames()
     {
@@ -260,19 +270,23 @@ class GenericImportMain extends AdminDetailsController
      * Get first row from uploaded CSV file
      *
      * @return array
-     * @deprecated Use getCsvFirstRow() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getCsvFirstRow().
+     * @deprecated Transitional during #107. Modules SHOULD override _getCsvFirstRow()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCsvFirstRow() to the canonical override
+      *             target and retires _getCsvFirstRow(); until then, _getCsvFirstRow() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCsvFirstRow() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sPath = $this->getUploadedCsvFilePath();
+        $sPath = $this->_getUploadedCsvFilePath();
         $iMaxLineLength = 8192;
         $aRow = [];
 
         //getting first row
         if (($rFile = @fopen($sPath, 'r')) !== false) {
-            $aRow = fgetcsv($rFile, $iMaxLineLength, $this->getCsvFieldsTerminator(), $this->getCsvFieldsEncloser());
+            $aRow = fgetcsv($rFile, $iMaxLineLength, $this->_getCsvFieldsTerminator(), $this->getCsvFieldsEncloser());
             fclose($rFile);
         }
 
@@ -284,9 +298,10 @@ class GenericImportMain extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::getCsvFirstRow()
-     *           (not the deprecated _getCsvFirstRow()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCsvFirstRow(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCsvFirstRow() the canonical override target.
      */
     protected function getCsvFirstRow()
     {
@@ -295,9 +310,13 @@ class GenericImportMain extends AdminDetailsController
 
     /**
      * Resets CSV parameters stored in session
-     * @deprecated Use resetUploadedCsvData() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _resetUploadedCsvData().
+     * @deprecated Transitional during #107. Modules SHOULD override _resetUploadedCsvData()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes resetUploadedCsvData() to the canonical override
+      *             target and retires _resetUploadedCsvData(); until then, _resetUploadedCsvData() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _resetUploadedCsvData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -309,9 +328,10 @@ class GenericImportMain extends AdminDetailsController
     /**
      * Resets CSV parameters stored in session
      *
-     * @internal If your override does not fully replace the behavior, call parent::resetUploadedCsvData()
-     *           (not the deprecated _resetUploadedCsvData()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _resetUploadedCsvData(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make resetUploadedCsvData() the canonical override target.
      */
     protected function resetUploadedCsvData()
     {
@@ -325,14 +345,18 @@ class GenericImportMain extends AdminDetailsController
      * @param int $iNavStep Navigation step id
      *
      * @return int
-     * @deprecated Use checkErrors() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkErrors().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkErrors()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkErrors() to the canonical override
+      *             target and retires _checkErrors(); until then, _checkErrors() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkErrors($iNavStep) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($iNavStep == 2) {
-            if (!$this->getUploadedCsvFilePath()) {
+            if (!$this->_getUploadedCsvFilePath()) {
                 $oEx = oxNew(ExceptionToDisplay::class);
                 $oEx->setMessage('GENIMPORT_ERRORUPLOADINGFILE');
                 Registry::getUtilsView()->addErrorToDisplay($oEx, false, true, 'genimport');
@@ -371,9 +395,10 @@ class GenericImportMain extends AdminDetailsController
      *
      * @return int
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkErrors()
-     *           (not the deprecated _checkErrors()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkErrors(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkErrors() the canonical override target.
      */
     protected function checkErrors($iNavStep)
     {
@@ -385,9 +410,13 @@ class GenericImportMain extends AdminDetailsController
      * and stores path to file in session. Return path to uploaded file.
      *
      * @return string|null
-     * @deprecated Use getUploadedCsvFilePath() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getUploadedCsvFilePath().
+     * @deprecated Transitional during #107. Modules SHOULD override _getUploadedCsvFilePath()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUploadedCsvFilePath() to the canonical override
+      *             target and retires _getUploadedCsvFilePath(); until then, _getUploadedCsvFilePath() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUploadedCsvFilePath() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -415,9 +444,10 @@ class GenericImportMain extends AdminDetailsController
      *
      * @return string|null|void
      *
-     * @internal If your override does not fully replace the behavior, call parent::getUploadedCsvFilePath()
-     *           (not the deprecated _getUploadedCsvFilePath()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUploadedCsvFilePath(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUploadedCsvFilePath() the canonical override target.
      */
     protected function getUploadedCsvFilePath()
     {
@@ -428,9 +458,13 @@ class GenericImportMain extends AdminDetailsController
      * Checks if any error occurred during import and displays them
      *
      * @param object $oErpImport Import object
-     * @deprecated Use checkImportErrors() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkImportErrors().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkImportErrors()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkImportErrors() to the canonical override
+      *             target and retires _checkImportErrors(); until then, _checkImportErrors() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkImportErrors($oErpImport) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -448,9 +482,10 @@ class GenericImportMain extends AdminDetailsController
      *
      * @param object $oErpImport Import object
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkImportErrors()
-     *           (not the deprecated _checkImportErrors()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkImportErrors(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkImportErrors() the canonical override target.
      */
     protected function checkImportErrors($oErpImport)
     {
@@ -461,9 +496,13 @@ class GenericImportMain extends AdminDetailsController
      * Get csv field terminator symbol
      *
      * @return string
-     * @deprecated Use getCsvFieldsTerminator() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getCsvFieldsTerminator().
+     * @deprecated Transitional during #107. Modules SHOULD override _getCsvFieldsTerminator()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCsvFieldsTerminator() to the canonical override
+      *             target and retires _getCsvFieldsTerminator(); until then, _getCsvFieldsTerminator() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCsvFieldsTerminator() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -482,9 +521,10 @@ class GenericImportMain extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getCsvFieldsTerminator()
-     *           (not the deprecated _getCsvFieldsTerminator()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCsvFieldsTerminator(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCsvFieldsTerminator() the canonical override target.
      */
     protected function getCsvFieldsTerminator()
     {

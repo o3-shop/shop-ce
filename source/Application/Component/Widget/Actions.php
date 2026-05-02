@@ -52,7 +52,7 @@ class Actions extends \OxidEsales\Eshop\Application\Component\Widget\WidgetContr
     public function getAction()
     {
         $actionId = $this->getViewParameter('action');
-        if ($actionId && $this->getLoadActionsParam()) {
+        if ($actionId && $this->_getLoadActionsParam()) {
             $artList = oxNew(ArticleList::class);
             $artList->loadActionArticles($actionId);
             if ($artList->count()) {

@@ -174,8 +174,8 @@ class BasketComponent extends BaseController
         }
 
         // adding articles
-        if ($aProducts = $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
-            $this->setLastCallFnc('tobasket');
+        if ($aProducts = $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
+            $this->_setLastCallFnc('tobasket');
 
             $database = DatabaseProvider::getDb();
             $database->startTransaction();
@@ -206,7 +206,7 @@ class BasketComponent extends BaseController
             }
 
             // redirect to basket
-            $redirectUrl = $this->getRedirectUrl();
+            $redirectUrl = $this->_getRedirectUrl();
             $this->dispatchEvent(new BasketChangedEvent($this));
 
             return $redirectUrl;
@@ -268,11 +268,11 @@ class BasketComponent extends BaseController
         $aPersParam = $aPersParam ?: Registry::getRequest()->getRequestEscapedParameter('persparam');
 
         // adding articles
-        if ($aProducts = $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
+        if ($aProducts = $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
             // information that last call was changebasket
             $oBasket = Registry::getSession()->getBasket();
             $oBasket->onUpdate();
-            $this->setLastCallFnc('changebasket');
+            $this->_setLastCallFnc('changebasket');
 
             $database = DatabaseProvider::getDb();
             $database->startTransaction();
@@ -378,9 +378,13 @@ class BasketComponent extends BaseController
      * @param bool   $blOverride amount override status
      *
      * @return array|bool
-     * @deprecated Use getItems() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getItems().
+     * @deprecated Transitional during #107. Modules SHOULD override _getItems()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getItems() to the canonical override
+      *             target and retires _getItems(); until then, _getItems() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getItems(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
         $sProductId = null,
@@ -446,9 +450,10 @@ class BasketComponent extends BaseController
      *
      * @return array|bool
      *
-     * @internal If your override does not fully replace the behavior, call parent::getItems()
-     *           (not the deprecated _getItems()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getItems(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getItems() the canonical override target.
      */
     protected function getItems(
         $sProductId = null,
@@ -522,7 +527,7 @@ class BasketComponent extends BaseController
         }
 
         // information that last call was tobasket
-        $this->setLastCall($this->getLastCallFnc(), $products, $basketInfo);
+        $this->_setLastCall($this->_getLastCallFnc(), $products, $basketInfo);
 
         return $basketItem;
     }
@@ -549,9 +554,10 @@ class BasketComponent extends BaseController
      * @param array  $aProductInfo data which comes from request when you press button "to basket"
      * @param array  $aBasketInfo  array returned by \OxidEsales\Eshop\Application\Model\Basket::getBasketSummary()
      *
-     * @internal If your override does not fully replace the behavior, call parent::setLastCall()
-     *           (not the deprecated _setLastCall()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setLastCall(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setLastCall() the canonical override target.
      */
     protected function setLastCall($sCallName, $aProductInfo, $aBasketInfo)
     {
