@@ -127,6 +127,17 @@ if ($result->num_rows == 0) {
         echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
     }
 
+    // Backfill initial_data.sql with INSERT IGNORE so it covers gaps in
+    // demodata.sql (notably the full theme:o3-theme block, which demodata
+    // does not seed) while demodata's existing rows win on shared OXIDs.
+    // The web Setup wizard runs either initial_data.sql OR demodata.sql,
+    // never both — but in dev we want demo content AND complete config.
+    echo "Backfilling initial_data.sql (theme defaults & gaps)...\n";
+    $initialDataFile = __DIR__ . '/../source/Setup/Sql/initial_data.sql';
+    $backfillCommand = "sed 's/INSERT INTO/INSERT IGNORE INTO/g' " . escapeshellarg($initialDataFile)
+        . " | mysql --default-character-set=utf8mb4 --user=" . $dbUser . " --password='" . $dbPwd . "' -h " . $dbHost . " -D " . $dbName;
+    shell_exec($backfillCommand);
+
     // Get actual oxshops table structure
     echo "Checking oxshops table structure...\n";
     $result = $mysqli->query("DESCRIBE oxshops");
