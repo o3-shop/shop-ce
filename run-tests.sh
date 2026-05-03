@@ -3,20 +3,28 @@
 # Script to run tests with timing
 #
 # Usage:
-#   run-tests.sh [--fast] [--coverage] [test targets...]
+#   run-tests.sh [--fast] [--coverage] [--all-failures] [test targets...]
 #
 # Options:
-#   --fast      Skip shop install and UNC regeneration in runtests wrapper,
-#               call phpunit directly. ~3x faster for iterative development.
-#               Requires that the UNC classes and DB views were generated at
-#               least once before (e.g. by a prior full run or composer install).
-#   --coverage  Generate coverage reports (clover, html, junit). Without this
-#               flag, coverage is skipped for faster execution.
+#   --fast          Skip shop install and UNC regeneration in runtests wrapper,
+#                   call phpunit directly. ~3x faster for iterative development.
+#                   Requires that the UNC classes and DB views were generated at
+#                   least once before (e.g. by a prior full run or composer install).
+#   --coverage      Generate coverage reports (clover, html, junit). Without this
+#                   flag, coverage is skipped for faster execution.
+#   --all-failures  Don't stop at first failure — run the full suite and collect
+#                   every failure in one pass. Useful when one fix domino-effects
+#                   into many test updates (seed data changes, fixture renames)
+#                   so you can see the full damage list before iterating. The
+#                   default tests/phpunit.xml has stopOnError/stopOnFailure="true"
+#                   for fast CI feedback; this flag generates a temp config with
+#                   those flipped off, then passes it via -c.
 #
 # Examples:
 #   run-tests.sh                                        # full run, all unit tests, no coverage
 #   run-tests.sh --fast tests/Unit/Core/ConfigTest.php  # fast single-file run
 #   run-tests.sh --coverage tests/Unit                  # full run with coverage
+#   run-tests.sh --all-failures                         # full suite, every failure reported
 
 # Define colors for output
 GREEN='\033[0;32m'
@@ -28,6 +36,7 @@ NC='\033[0m' # No Color
 FAST_MODE=false
 COVERAGE_MODE=false
 QUARANTINE_MODE=false
+ALL_FAILURES_MODE=false
 PASSTHROUGH_ARGS=()
 
 # Parse arguments
@@ -42,6 +51,9 @@ for arg in "$@"; do
         --quarantine)
             QUARANTINE_MODE=true
             FAST_MODE=true
+            ;;
+        --all-failures)
+            ALL_FAILURES_MODE=true
             ;;
         *)
             PASSTHROUGH_ARGS+=("$arg")
@@ -107,6 +119,23 @@ else
     GROUP_FLAGS="--exclude-group quarantine"
 fi
 
+# Build config flag for --all-failures mode. The default tests/phpunit.xml has
+# stopOnError/stopOnFailure="true" (fast CI feedback); we generate a sibling
+# config with those flipped off so the suite runs to completion. The temp
+# config lives in tests/ so the relative bootstrap="bootstrap.php" still
+# resolves; trap cleans it up no matter how we exit.
+CONFIG_FLAG=""
+TMP_CONFIG=""
+if [ "$ALL_FAILURES_MODE" = true ]; then
+    TMP_CONFIG=$(mktemp /var/www/html/tests/phpunit-all-failures-XXXXXX.xml)
+    sed -e 's/stopOnError="true"/stopOnError="false"/g' \
+        -e 's/stopOnFailure="true"/stopOnFailure="false"/g' \
+        /var/www/html/tests/phpunit.xml > "$TMP_CONFIG"
+    CONFIG_FLAG="-c $TMP_CONFIG"
+    trap '[ -n "$TMP_CONFIG" ] && rm -f "$TMP_CONFIG"' EXIT
+    echo -e "${YELLOW}Mode: --all-failures (continue past first failure)${NC}"
+fi
+
 # Run the tests and store exit code
 if [ "$FAST_MODE" = true ]; then
     # Fast mode: call phpunit directly, skipping the runtests wrapper's
@@ -114,11 +143,12 @@ if [ "$FAST_MODE" = true ]; then
     php vendor/bin/phpunit \
         --bootstrap vendor/o3-shop/testing-library/bootstrap.php \
         --colors=always \
+        $CONFIG_FLAG \
         $GROUP_FLAGS \
         $COVERAGE_FLAGS \
         $TEST_TARGETS
 else
-    runtests $TEST_TARGETS --colors=always $GROUP_FLAGS $COVERAGE_FLAGS
+    runtests $TEST_TARGETS --colors=always $CONFIG_FLAG $GROUP_FLAGS $COVERAGE_FLAGS
 fi
 TEST_EXIT_CODE=$?
 
