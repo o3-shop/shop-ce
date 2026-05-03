@@ -796,7 +796,6 @@ $aLang = [
     'NAVIGATION_NEW_VERSION_AVAILABLE'               => 'You are using version %s, version %s is now available. Please update now.',
     'UPDATECHECK_TITLE'                              => 'Update Check',
     'UPDATECHECK_CORE_NOTICE'                        => 'A new shop version %s is available.',
-    'UPDATECHECK_CORE_LINK'                          => 'Download update',
     'UPDATECHECK_MODULE_ID'                          => 'Module',
     'UPDATECHECK_MODULE_INSTALLED'                   => 'Installed',
     'UPDATECHECK_MODULE_LATEST'                      => 'Available',

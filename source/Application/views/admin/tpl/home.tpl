@@ -42,9 +42,6 @@
         [{if $updateCheckResult->isCoreUpdateAvailable()}]
             <p style="color:#e67e22; margin:0 0 5px 0">
                 [{oxmultilang ident="UPDATECHECK_CORE_NOTICE" args=$updateCheckResult->getLatestCoreVersion()}]
-                [{if $updateCheckResult->getUpdateLink()}]
-                    <a href="[{$updateCheckResult->getUpdateLink()}]" target="_blank">[{oxmultilang ident="UPDATECHECK_CORE_LINK"}]</a>
-                [{/if}]
             </p>
         [{/if}]
         [{if $updateCheckResult->getOutdatedModules()}]
