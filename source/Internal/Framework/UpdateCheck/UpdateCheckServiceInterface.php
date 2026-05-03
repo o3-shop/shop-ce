@@ -30,4 +30,14 @@ interface UpdateCheckServiceInterface
      * @return UpdateCheckResult
      */
     public function check(bool $forceRefresh = false): UpdateCheckResult;
+
+    /**
+     * Read-only access to the most recent cached result, if any. Does not
+     * trigger network I/O. Returns null when nothing is cached yet or the
+     * cache has expired. Used by render paths (e.g. header.tpl) that need
+     * the last known state without paying the cost of a fresh check.
+     *
+     * @return UpdateCheckResult|null
+     */
+    public function getCachedResult(): ?UpdateCheckResult;
 }

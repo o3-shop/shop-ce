@@ -36,22 +36,28 @@ class UpdateCheckResult
     /** @var array */
     private $outdatedModules;
 
+    /** @var bool */
+    private $providersReachable;
+
     /**
      * @param bool   $coreUpdateAvailable
      * @param string $latestCoreVersion
      * @param string $updateLink
      * @param array  $outdatedModules Each item: ['id' => string, 'installed_version' => string, 'latest_version' => string, 'url' => string]
+     * @param bool   $providersReachable false iff both the upstream update endpoint and the GitHub fallback failed
      */
     public function __construct(
         bool $coreUpdateAvailable = false,
         string $latestCoreVersion = '',
         string $updateLink = '',
-        array $outdatedModules = []
+        array $outdatedModules = [],
+        bool $providersReachable = true
     ) {
         $this->coreUpdateAvailable = $coreUpdateAvailable;
         $this->latestCoreVersion = $latestCoreVersion;
         $this->updateLink = $updateLink;
         $this->outdatedModules = $outdatedModules;
+        $this->providersReachable = $providersReachable;
     }
 
     /**
@@ -60,6 +66,19 @@ class UpdateCheckResult
     public static function empty(): self
     {
         return new self();
+    }
+
+    /**
+     * Marker result for "we tried, both providers failed" — distinct from
+     * `empty()`, which means "providers reached, no update available".
+     * Used by the admin header to suppress the manual re-check icon when
+     * retrying right now would only fail again.
+     *
+     * @return self
+     */
+    public static function unreachable(): self
+    {
+        return new self(false, '', '', [], false);
     }
 
     public function isCoreUpdateAvailable(): bool
@@ -83,5 +102,10 @@ class UpdateCheckResult
     public function getOutdatedModules(): array
     {
         return $this->outdatedModules;
+    }
+
+    public function areProvidersReachable(): bool
+    {
+        return $this->providersReachable;
     }
 }

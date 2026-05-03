@@ -1861,7 +1861,7 @@
     },
     {
         "file": "source/Application/Controller/Admin/NavigationController.php",
-        "line": 123,
+        "line": 135,
         "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationController",
         "method": "resetContentCache"
     },

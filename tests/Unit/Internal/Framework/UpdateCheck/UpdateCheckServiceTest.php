@@ -100,6 +100,22 @@ class UpdateCheckServiceTest extends TestCase
         $this->assertSame([], $result->getOutdatedModules());
     }
 
+    public function testCheckReportsProvidersUnreachableOnException(): void
+    {
+        $shopConfigBridge = $this->createMock(ShopConfigurationDaoBridgeInterface::class);
+        $shopConfigBridge->method('get')->willThrowException(new \RuntimeException('DB down'));
+
+        $moduleActivationBridge = $this->createMock(ModuleActivationBridgeInterface::class);
+
+        $service = new UpdateCheckService($shopConfigBridge, $moduleActivationBridge);
+        $result = $service->check();
+
+        $this->assertFalse(
+            $result->areProvidersReachable(),
+            'When the check throws and falls back to the catch-all, the result must mark providers as unreachable so the admin header hides the re-check icon.'
+        );
+    }
+
     /**
      * @param string $id
      * @param string $version

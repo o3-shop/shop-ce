@@ -2175,7 +2175,7 @@
         },
         {
             "file": "source/Application/Controller/Admin/NavigationController.php",
-            "line": 123,
+            "line": 135,
             "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationController",
             "method": "resetContentCache",
             "reason": "baseline (ebe86dc) had no \\$this->_resetContentCache( call in this file; not a rename to revert"

@@ -74,7 +74,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
                 __METHOD__ . " - Update check failed with exception: '" . $e->getMessage() . "'.",
                 ['exception' => $e]
             );
-            return UpdateCheckResult::empty();
+            return UpdateCheckResult::unreachable();
         }
     }
 
@@ -222,7 +222,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
             Registry::getLogger()->warning(
                 __METHOD__ . " - GitHub API also unreachable. HTTP code: '" . $httpCode . "'."
             );
-            return UpdateCheckResult::empty();
+            return UpdateCheckResult::unreachable();
         }
 
         $data = json_decode($response, true);
@@ -230,7 +230,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
             Registry::getLogger()->error(
                 __METHOD__ . " - GitHub API returned HTTP '200' but response is not valid JSON."
             );
-            return UpdateCheckResult::empty();
+            return UpdateCheckResult::unreachable();
         }
 
         $latestVersion = $data['name'] ?? '';
@@ -250,7 +250,7 @@ class UpdateCheckService implements UpdateCheckServiceInterface
     /**
      * @return UpdateCheckResult|null
      */
-    private function getCachedResult(): ?UpdateCheckResult
+    public function getCachedResult(): ?UpdateCheckResult
     {
         $session = Registry::getSession();
         $cached = $session->getVariable(self::CACHE_SESSION_KEY);

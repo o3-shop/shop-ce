@@ -37,6 +37,27 @@ class UpdateCheckResultTest extends TestCase
         $this->assertSame([], $result->getOutdatedModules());
     }
 
+    public function testEmptyMarksProvidersReachable(): void
+    {
+        $this->assertTrue(UpdateCheckResult::empty()->areProvidersReachable());
+    }
+
+    public function testUnreachableMarksProvidersUnreachable(): void
+    {
+        $result = UpdateCheckResult::unreachable();
+
+        $this->assertFalse($result->areProvidersReachable());
+        $this->assertFalse($result->isCoreUpdateAvailable());
+        $this->assertSame('', $result->getLatestCoreVersion());
+        $this->assertSame('', $result->getUpdateLink());
+        $this->assertSame([], $result->getOutdatedModules());
+    }
+
+    public function testConstructorDefaultsToProvidersReachable(): void
+    {
+        $this->assertTrue((new UpdateCheckResult())->areProvidersReachable());
+    }
+
     public function testConstructorSetsAllFields(): void
     {
         $modules = [

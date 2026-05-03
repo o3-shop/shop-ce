@@ -49,6 +49,18 @@ class NavigationController extends AdminController
     {
         parent::render();
 
+        // Make the most recent cached UpdateCheckResult available to all
+        // NavigationController renders — including header.tpl, which has no
+        // path of its own to UpdateCheckService and needs to know whether
+        // the providers were reachable last time we ran a check (to decide
+        // whether to render the manual re-check icon). _doStartUpChecks()
+        // (called below for home.tpl) may overwrite this with a freshly
+        // fetched result.
+        $cachedUpdateCheckResult = $this->getUpdateCheckService()->getCachedResult();
+        if ($cachedUpdateCheckResult !== null) {
+            $this->_aViewData['updateCheckResult'] = $cachedUpdateCheckResult;
+        }
+
         $sItem = Registry::getRequest()->getRequestEscapedParameter('item');
         $sItem = $sItem ? basename($sItem) : false;
         if (!$sItem) {
