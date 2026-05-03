@@ -1181,7 +1181,7 @@ class ConfigTest extends OxidTestCase
         $oGbp = clone $oEur;
         $oGbp->id = 1;
         $oGbp->name = 'GBP';
-        $oGbp->rate = '0.8565';
+        $oGbp->rate = '0.8663';
         $oGbp->dec = '.';
         $oGbp->thousand = '';
         $oGbp->sign = '£';
@@ -1191,7 +1191,7 @@ class ConfigTest extends OxidTestCase
         $oChf = clone $oEur;
         $oChf->id = 2;
         $oChf->name = 'CHF';
-        $oChf->rate = '1.4326';
+        $oChf->rate = '0.9190';
         $oChf->dec = ',';
         $oChf->thousand = '.';
         $oChf->sign = '<small>CHF</small>';
@@ -1201,7 +1201,7 @@ class ConfigTest extends OxidTestCase
         $oUsd = clone $oEur;
         $oUsd->id = 3;
         $oUsd->name = 'USD';
-        $oUsd->rate = '1.2994';
+        $oUsd->rate = '1.1702';
         $oUsd->dec = '.';
         $oUsd->thousand = '';
         $oUsd->sign = '$';
@@ -1858,7 +1858,7 @@ class ConfigTest extends OxidTestCase
         $oGbp = new stdClass();
         $oGbp->id = 1;
         $oGbp->name = 'GBP';
-        $oGbp->rate = '0.8565';
+        $oGbp->rate = '0.8663';
         $oGbp->dec = '.';
         $oGbp->thousand = '';
         $oGbp->sign = '£';

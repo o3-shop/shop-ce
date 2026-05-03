@@ -987,7 +987,7 @@ class DiscountTest extends \OxidTestCase
         $oDiscount->expects($this->once())->method('isForAmount')->will($this->returnValue(true));
 
         //making sure article price is calculated in pounds, and is not equal to eur34
-        $this->assertEquals(29.12, $oArticle->getPrice()->getBruttoPrice());
+        $this->assertEquals(29.45, $oArticle->getPrice()->getBruttoPrice());
 
         $oDiscount->isForBasketAmount($oBasket);
     }
