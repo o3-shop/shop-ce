@@ -87,14 +87,40 @@ class UpdateCheckService implements UpdateCheckServiceInterface
         $shopConfiguration = $this->shopConfigurationDaoBridge->get();
 
         foreach ($shopConfiguration->getModuleConfigurations() as $moduleConfiguration) {
-            $modules[$moduleConfiguration->getId()] = $moduleConfiguration->getVersion();
+            $version = (string) $moduleConfiguration->getVersion();
+            // The OpenAPI contract for the o3-shop/update server requires
+            // every module version to be a non-empty string (1-255 chars);
+            // any empty value rejects the whole payload with HTTP 400 and
+            // breaks the check for the entire shop. OXID modules may ship
+            // without a version in metadata.php, so drop those entries —
+            // the server "silently ignores modules it does not know about"
+            // anyway, so an unversioned module simply has no upgrade
+            // candidate to compare against.
+            if ($version === '') {
+                continue;
+            }
+            $modules[$moduleConfiguration->getId()] = $version;
         }
 
         return [
-            'shop_version' => ShopVersion::getVersion(),
+            // Strip the optional leading `v` so the wire format matches the
+            // O3 update endpoint contract (OpenAPI examples use `1.5.4`, the
+            // server catalogue stores `1.6.0`, comparison uses PHP
+            // version_compare which is unreliable across mixed prefixes).
+            // ShopVersion::getVersion() keeps its `v` prefix for human
+            // display elsewhere in the admin.
+            'shop_version' => self::normalizeVersion(ShopVersion::getVersion()),
             'domain' => Registry::getConfig()->getShopUrl(),
             'modules' => $modules,
         ];
+    }
+
+    private static function normalizeVersion(string $version): string
+    {
+        if ($version !== '' && ($version[0] === 'v' || $version[0] === 'V')) {
+            return substr($version, 1);
+        }
+        return $version;
     }
 
     /**
@@ -139,9 +165,14 @@ class UpdateCheckService implements UpdateCheckServiceInterface
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        $curlErrno = curl_errno($ch);
         curl_close($ch);
 
         if ($response === false || $httpCode !== 200) {
+            Registry::getLogger()->warning(
+                __METHOD__ . " - Update endpoint call failed: HTTP '$httpCode', curl errno '$curlErrno', curl error '$curlError', body '" . substr((string)$response, 0, 500) . "'."
+            );
             return null;
         }
 
@@ -233,8 +264,12 @@ class UpdateCheckService implements UpdateCheckServiceInterface
             return UpdateCheckResult::unreachable();
         }
 
-        $latestVersion = $data['name'] ?? '';
-        $currentVersion = ShopVersion::getVersion();
+        // Prefer `tag_name` (the immutable git tag, e.g. `v1.6.0`) over
+        // `name` (release title, freeform). Normalize both sides so the
+        // comparison is robust regardless of whether either string carries
+        // the `v` prefix the o3-shop release tagging convention uses.
+        $latestVersion = self::normalizeVersion((string) ($data['tag_name'] ?? $data['name'] ?? ''));
+        $currentVersion = self::normalizeVersion(ShopVersion::getVersion());
 
         if ($latestVersion !== '' && version_compare($currentVersion, $latestVersion, '<')) {
             return new UpdateCheckResult(

@@ -68,6 +68,65 @@ class UpdateCheckServiceTest extends TestCase
         $this->assertSame('2.3.1', $payload['modules']['mod-b']);
     }
 
+    public function testBuildPayloadOmitsModulesWithEmptyVersion(): void
+    {
+        // The OpenAPI contract for the o3-shop/update server requires every
+        // module version to be a non-empty string (1-255 chars). OXID lets
+        // modules ship without a version in metadata.php, in which case
+        // ModuleConfiguration::getVersion() returns an empty string. Sending
+        // those would make the server reject the entire payload with
+        // HTTP 400 invalid_request and break the check for the whole shop.
+        $versioned = $this->createModuleConfiguration('versioned-mod', '1.0.0');
+        $unversioned = $this->createModuleConfiguration('unversioned-mod', '');
+
+        $shopConfiguration = $this->createMock(ShopConfiguration::class);
+        $shopConfiguration->method('getModuleConfigurations')
+            ->willReturn([$versioned, $unversioned]);
+
+        $shopConfigBridge = $this->createMock(ShopConfigurationDaoBridgeInterface::class);
+        $shopConfigBridge->method('get')->willReturn($shopConfiguration);
+
+        $moduleActivationBridge = $this->createMock(ModuleActivationBridgeInterface::class);
+
+        $service = new UpdateCheckService($shopConfigBridge, $moduleActivationBridge);
+        $payload = $service->buildPayload();
+
+        $this->assertArrayHasKey('versioned-mod', $payload['modules']);
+        $this->assertSame('1.0.0', $payload['modules']['versioned-mod']);
+        $this->assertArrayNotHasKey(
+            'unversioned-mod',
+            $payload['modules'],
+            'Modules without a declared version must be omitted from the payload to avoid the server returning HTTP 400 invalid_request.'
+        );
+    }
+
+    public function testBuildPayloadStripsVPrefixFromShopVersion(): void
+    {
+        $shopConfiguration = $this->createMock(ShopConfiguration::class);
+        $shopConfiguration->method('getModuleConfigurations')->willReturn([]);
+
+        $shopConfigBridge = $this->createMock(ShopConfigurationDaoBridgeInterface::class);
+        $shopConfigBridge->method('get')->willReturn($shopConfiguration);
+
+        $moduleActivationBridge = $this->createMock(ModuleActivationBridgeInterface::class);
+
+        $service = new UpdateCheckService($shopConfigBridge, $moduleActivationBridge);
+        $payload = $service->buildPayload();
+
+        $this->assertIsString($payload['shop_version']);
+        $this->assertNotSame(
+            '',
+            $payload['shop_version'],
+            'shop_version must always be present on the wire'
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/^[vV]/',
+            $payload['shop_version'],
+            'shop_version must be sent without the leading `v` so it matches the OpenAPI contract '
+            . '(`1.5.4` not `v1.5.4`) the o3-shop/update server enforces.'
+        );
+    }
+
     public function testBuildPayloadWithNoModules(): void
     {
         $shopConfiguration = $this->createMock(ShopConfiguration::class);
