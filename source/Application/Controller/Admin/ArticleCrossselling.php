@@ -51,10 +51,10 @@ class ArticleCrossselling extends AdminDetailsController
         $this->_aViewData['edit'] = $oArticle = oxNew(Article::class);
 
         // cross-selling
-        $this->createCategoryTree('artcattree');
+        $this->_createCategoryTree('artcattree');
 
         // accessoires
-        $this->createCategoryTree('artcattree2');
+        $this->_createCategoryTree('artcattree2');
 
         $soxId = $this->getEditObjectId();
         if (isset($soxId) && $soxId != '-1') {

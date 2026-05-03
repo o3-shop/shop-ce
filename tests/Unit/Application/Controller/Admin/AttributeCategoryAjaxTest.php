@@ -108,8 +108,8 @@ class AttributeCategoryAjaxTest extends \OxidTestCase
     {
         $oDb = oxDb::getDb();
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testOxid1', '_testOxid2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testOxid1', '_testOxid2']));
 
         $this->assertEquals(2, $oDb->getOne("select count(oxid) from oxcategory2attribute where oxobjectid='_testRemove'"));
         $oView->removeCatFromAttr();
@@ -141,11 +141,11 @@ class AttributeCategoryAjaxTest extends \OxidTestCase
      */
     public function testAddCatToAttr()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class, ['getActionIds']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AttributeCategoryAjax::class, ['_getActionIds']);
         $sSynchoxid = '_testAttribute';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
 
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testAdd1', '_testAdd2']));
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testAdd1', '_testAdd2']));
 
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxcategory2attribute where oxattrid='$sSynchoxid'"));
         $oView->addCatToAttr();

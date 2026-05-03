@@ -54,8 +54,8 @@ class AdminDetailsTest extends \OxidTestCase
         $sEditorHtml = "<textarea  id='editor_sField' name='sField' style='width:100px; height:100px;'>sEditObjectValue</textarea>";
 
         // Production calls getEditValue() (without underscore)
-        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['getEditValue']);
-        $oAdminDetails->expects($this->once())->method('getEditValue')->with($this->equalTo($oObject), $this->equalTo('sField'))->will($this->returnValue('sEditObjectValue'));
+        $oAdminDetails = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController::class, ['_getEditValue']);
+        $oAdminDetails->expects($this->once())->method('_getEditValue')->with($this->equalTo($oObject), $this->equalTo('sField'))->will($this->returnValue('sEditObjectValue'));
         $this->assertEquals($sEditorHtml, $oAdminDetails->UNITgetPlainEditor(100, 100, $oObject, 'sField'));
     }
 

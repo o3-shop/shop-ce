@@ -38,21 +38,32 @@ class SeoEncoderContent extends SeoEncoder
      * Returns target "extension" (/)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getUrlExtension()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUrlExtension() to the canonical override
+      *             target and retires _getUrlExtension(); until then, _getUrlExtension() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getUrlExtension();
+        return '/';
     }
 
     /**
      * Returns target "extension" (/)
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUrlExtension(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUrlExtension() the canonical override target.
      */
     protected function getUrlExtension()
     {
-        return '/';
+        return $this->_getUrlExtension();
     }
 
     /**
@@ -149,11 +160,23 @@ class SeoEncoderContent extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getAltUri()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAltUri() to the canonical override
+      *             target and retires _getAltUri(); until then, _getAltUri() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getAltUri($sObjectId, $iLang);
+        $sSeoUrl = null;
+        $oCont = oxNew(Content::class);
+        if ($oCont->loadInLang($iLang, $sObjectId)) {
+            $sSeoUrl = $this->getContentUri($oCont, $iLang, true);
+        }
+
+        return $sSeoUrl;
     }
 
     /**
@@ -164,15 +187,14 @@ class SeoEncoderContent extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAltUri(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAltUri() the canonical override target.
      */
     protected function getAltUri($sObjectId, $iLang)
     {
-        $sSeoUrl = null;
-        $oCont = oxNew(Content::class);
-        if ($oCont->loadInLang($iLang, $sObjectId)) {
-            $sSeoUrl = $this->getContentUri($oCont, $iLang, true);
-        }
-
-        return $sSeoUrl;
+        return $this->_getAltUri($sObjectId, $iLang);
     }
 }

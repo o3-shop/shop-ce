@@ -29,7 +29,7 @@ use OxidEsales\Eshop\Core\Theme;
 
 /**
  * Admin article main deliveryset manager.
- * There is possibility to change deliveryset name, article, user etc.
+ * There is a possibility to change deliveryset name, article, user, etc.
  * Admin Menu: Shop settings -> Shipping & Handling -> Main Sets.
  */
 class ThemeConfiguration extends ShopConfiguration
@@ -38,7 +38,7 @@ class ThemeConfiguration extends ShopConfiguration
 
     /**
      * Executes parent method parent::render(), creates deliveryset category tree,
-     * passes data to Smarty engine and returns name of template file "deliveryset_main.tpl".
+     * passes data to Smarty engine, and returns the name of the template file "deliveryset_main.tpl".
      *
      * @return string
      */
@@ -79,7 +79,7 @@ class ThemeConfiguration extends ShopConfiguration
      * return theme filter for config variables
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getModuleForConfigVars" in next major
+     * @deprecated the underscore prefix violates PSR12, will be renamed to "getModuleForConfigVars" in the next major
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -117,5 +117,30 @@ class ThemeConfiguration extends ShopConfiguration
                 }
             }
         }
+    }
+
+    /**
+     * Override `ShopConfiguration::save()` to skip the parent's oxshops
+     * write path. The parent does:
+     *
+     *     $shop = oxNew(Shop::class);
+     *     if ($shop->load($this->getEditObjectId())) { ... $shop->save(); }
+     *
+     * On a regular shop-config screen `getEditObjectId()` returns a numeric
+     * shop OXID and `Shop::load()` matches an oxshops row. On THIS screen
+     * (`ThemeConfiguration`) `getEditObjectId()` returns the theme name
+     * (e.g. `'wave'`, `'flow'`, `'o3-theme'`) — the Shop model can't
+     * resolve that against `oxshops.OXID`, but still ends up writing to
+     * `oxshops` with `OXID=0`/the theme name and triggers an INSERT
+     * exception when saving theme settings.
+     *
+     * Theme config variables go through `saveConfVars()` (oxconfig only),
+     * which is correct on its own. We override `save()` to call exactly
+     * that and stop. Bug report from @egate-media-Frank; verified against the
+     * parent at ShopConfiguration.php:207-219.
+     */
+    public function save()
+    {
+        $this->saveConfVars();
     }
 }

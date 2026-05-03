@@ -160,8 +160,8 @@ class LoginTest extends \OxidTestCase
 
         $aLanguages[] = $oLang;
 
-        $oLogin = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['getBrowserLanguage']);
-        $oLogin->expects($this->once())->method('getBrowserLanguage')->will($this->returnValue('de'));
+        $oLogin = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['_getBrowserLanguage']);
+        $oLogin->expects($this->once())->method('_getBrowserLanguage')->will($this->returnValue('de'));
 
         $this->assertEquals($aLanguages, $oLogin->UNITgetAvailableLanguages());
     }
@@ -193,8 +193,8 @@ class LoginTest extends \OxidTestCase
 
         $aLanguages[] = $oLang;
 
-        $oLogin = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['getBrowserLanguage']);
-        $oLogin->expects($this->once())->method('getBrowserLanguage')->will($this->returnValue('en'));
+        $oLogin = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['_getBrowserLanguage']);
+        $oLogin->expects($this->once())->method('_getBrowserLanguage')->will($this->returnValue('en'));
 
         $this->assertEquals($aLanguages, $oLogin->UNITgetAvailableLanguages());
     }
@@ -227,8 +227,8 @@ class LoginTest extends \OxidTestCase
         $aLanguages[] = $oLang;
 
         // browser lang does not affect selected lang when cookie is set
-        $oLogin = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['getBrowserLanguage']);
-        $oLogin->expects($this->once())->method('getBrowserLanguage')->will($this->returnValue('en'));
+        $oLogin = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['_getBrowserLanguage']);
+        $oLogin->expects($this->once())->method('_getBrowserLanguage')->will($this->returnValue('en'));
 
         // DE lang id
         $_COOKIE['oxidadminlanguage'] = 0;
@@ -340,10 +340,10 @@ class LoginTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blDemoShop', true);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['getViewConfig', 'addTplParam', 'getAvailableLanguages'], [], '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LoginController::class, ['getViewConfig', 'addTplParam', '_getAvailableLanguages'], [], '', false);
         $oView->expects($this->atLeastOnce())->method('getViewConfig')->will($this->returnValue($oViewConfig));
         $oView->expects($this->atLeastOnce())->method('addTplParam');
-        $oView->expects($this->once())->method('getAvailableLanguages')->will($this->returnValue($aLanguages));
+        $oView->expects($this->once())->method('_getAvailableLanguages')->will($this->returnValue($aLanguages));
 
         $this->assertEquals('login.tpl', $oView->render());
     }

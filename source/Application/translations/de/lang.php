@@ -757,6 +757,7 @@ $aLang = [
 'PAGE_TITLE_SUGGEST'                                          => 'Artikel weiterempfehlen',
 'PAGE_TITLE_INVITE'                                           => 'Freunde einladen',
 'PAGE_TITLE_REVIEW'                                           => 'Bewerten',
+'PAGE_TITLE_REVOCATION'                                       => 'Vertrag widerrufen',
 
 'WISHLIST_PRODUCTS'                                           => 'Diese Artikel hat sich %s gewünscht. Wenn Sie ihr/ihm eine Freude machen wollen, dann kaufen Sie einen oder mehrere von diesen Artikeln.',
 
@@ -806,4 +807,39 @@ $aLang = [
 'PARTNERS'                                                    => 'Partner',
 
 'MY_REVIEWS'                                                  => 'Meine Bewertungen',
+
+// §356a BGB electronic revocation feature (issue #99) — admin and email
+// texts plus storefront defaults. Theme-specific storefront texts can be
+// overridden in wave / o3-theme. All keys share the `O3_REVOCATION_` prefix.
+
+// Storefront — defaults (overridable by wave / o3-theme)
+'O3_REVOCATION_FOOTER_LINK'                                   => 'Vertrag widerrufen',
+'O3_REVOCATION_FORM_HEADING'                                  => 'Vertrag widerrufen',
+'O3_REVOCATION_FIELD_NAME_LABEL'                              => 'Vor- und Nachname',
+'O3_REVOCATION_FIELD_ORDERNUMBER_LABEL'                       => 'Bestellnummer',
+'O3_REVOCATION_FIELD_EMAIL_LABEL'                             => 'E-Mail-Adresse',
+'O3_REVOCATION_FIELD_FREETEXT_LABEL'                          => 'Anmerkungen (optional)',
+'O3_REVOCATION_CONFIRM_BUTTON'                                => 'Widerruf bestätigen',
+'O3_REVOCATION_CONFIRMATION_PAGE_HEADING'                     => 'Widerruf eingegangen',
+'O3_REVOCATION_VALIDATION_REQUIRED'                           => 'Bitte ausfüllen.',
+'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Ihre Sitzung ist abgelaufen. Bitte senden Sie das Formular erneut.',
+'O3_REVOCATION_VALIDATION_SPAM'                               => 'Ihre Anfrage konnte derzeit nicht entgegengenommen werden. Bitte versuchen Sie es später erneut.',
+
+// Email field labels — duplicated from admin lang (where the same labels live
+// for the admin detail view) so storefront-context email rendering can
+// resolve them. OXID's Language::translateString does not fall back across
+// domains.
+'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Vorgangs-ID',
+'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Eingegangen am',
+
+// Customer email (receipt of declaration per § 356a Abs. 4 BGB)
+'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'Wir haben Ihre Widerrufserklärung erhalten',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_INTRO'                     => 'hiermit bestätigen wir den Eingang Ihrer Widerrufserklärung.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_RECEIPT_NOTE'              => 'Bitte beachten Sie, dass es sich hierbei ausschließlich um die Bestätigung des Eingangs Ihrer Widerrufserklärung handelt. Eine Prüfung der Wirksamkeit und des Umfangs Ihrer Widerrufserklärung erfolgt gesondert. Wir werden uns hierzu zeitnah bei Ihnen melden.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_FOOTER'                    => 'Mit freundlichen Grüßen',
+
+// Operator email (notification — operational, not legally required)
+'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'Neuer Widerruf eingegangen',
+'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'Im Shop ist ein neuer Widerruf gemäß § 356a BGB eingegangen. Den Datensatz finden Sie im Admin-Bereich unter „Kundeninformationen → Widerrufe“.',
 ];

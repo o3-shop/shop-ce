@@ -74,20 +74,15 @@ class AttributeMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $myConfig = Registry::getConfig();
         $oDb = DatabaseProvider::getDb();
@@ -129,17 +124,19 @@ class AttributeMainAjax extends ListComponentAjax
     }
 
     /**
-     * Adds filter SQL to current query
-     *
-     * @param string $sQ query to add filter condition
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
-    protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getQuery()
     {
-        return $this->addFilter($sQ);
+        return $this->_getQuery();
     }
 
     /**
@@ -149,10 +146,17 @@ class AttributeMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _addFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addFilter() to the canonical override
+      *             target and retires _addFilter(); until then, _addFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function addFilter($sQ)
+    protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sQ = parent::addFilter($sQ);
+        $sQ = parent::_addFilter($sQ);
 
         // display variants or not ?
         if (Registry::getConfig()->getConfigParam('blVariantsSelection')) {
@@ -168,11 +172,29 @@ class AttributeMainAjax extends ListComponentAjax
     }
 
     /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addFilter() the canonical override target.
+     */
+    protected function addFilter($sQ)
+    {
+        return $this->_addFilter($sQ);
+    }
+
+    /**
      * Removes article from Attribute list
      */
     public function removeAttrArticle()
     {
-        $aChosenCat = $this->getActionIds('oxobject2attribute.oxid');
+        $aChosenCat = $this->_getActionIds('oxobject2attribute.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sO2AttributeView = $this->getViewName('oxobject2attribute');
@@ -191,13 +213,13 @@ class AttributeMainAjax extends ListComponentAjax
      */
     public function addAttrArticle()
     {
-        $aAddArticle = $this->getActionIds('oxarticles.oxid');
+        $aAddArticle = $this->_getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArticleTable = $this->getViewName('oxarticles');
-            $aAddArticle = $this->getAll($this->addFilter("select $sArticleTable.oxid " . $this->getQuery()));
+            $aAddArticle = $this->_getAll($this->_addFilter("select $sArticleTable.oxid " . $this->getQuery()));
         }
 
         $oAttribute = oxNew(Attribute::class);

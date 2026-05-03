@@ -139,7 +139,7 @@ class UtilsComponent extends BaseController
             return;
         }
 
-        $this->toList('noticelist', $sProductId, $dAmount, $aSel);
+        $this->_toList('noticelist', $sProductId, $dAmount, $aSel);
     }
 
     /**
@@ -159,7 +159,7 @@ class UtilsComponent extends BaseController
 
         // only if enabled
         if ($this->getViewConfig()->getShowWishlist()) {
-            $this->toList('wishlist', $sProductId, $dAmount, $aSel);
+            $this->_toList('wishlist', $sProductId, $dAmount, $aSel);
         }
     }
 
@@ -171,23 +171,15 @@ class UtilsComponent extends BaseController
      * @param double $dAmount product amount
      * @param array $aSel product selection list
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "toList" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _toList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes toList() to the canonical override
+      *             target and retires _toList(); until then, _toList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->toList($sListType, $sProductId, $dAmount, $aSel);
-    }
-
-    /**
-     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
-     *
-     * @param string $sListType user product list type
-     * @param string $sProductId product id
-     * @param double $dAmount product amount
-     * @param array $aSel product selection list
-     * @throws Exception
-     */
-    protected function toList($sListType, $sProductId, $dAmount, $aSel)
     {
         // only if user is logged in
         if ($oUser = $this->getUser()) {
@@ -243,6 +235,25 @@ class UtilsComponent extends BaseController
                 }
             }
         }
+    }
+
+    /**
+     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
+     *
+     * @param string $sListType user product list type
+     * @param string $sProductId product id
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _toList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make toList() the canonical override target.
+     */
+    protected function toList($sListType, $sProductId, $dAmount, $aSel)
+    {
+        return $this->_toList($sListType, $sProductId, $dAmount, $aSel);
     }
 
     /**

@@ -66,7 +66,7 @@ class NavigationController extends AdminController
             if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
-                    $this->_aViewData['aMessage'] = $this->doStartUpChecks();
+                    $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
                 }
             } else {
                 //removing reload param to force requirements checking next time
@@ -146,21 +146,15 @@ class NavigationController extends AdminController
      *
      * @return array
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "doStartUpChecks" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _doStartUpChecks()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes doStartUpChecks() to the canonical override
+      *             target and retires _doStartUpChecks(); until then, _doStartUpChecks() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->doStartUpChecks();
-    }
-
-    /**
-     * Every Time Admin starts we perform these checks
-     * returns some messages if there is something to display
-     *
-     * @return array
-     * @throws Exception
-     */
-    protected function doStartUpChecks()
     {
         $messages = [];
 
@@ -206,26 +200,36 @@ class NavigationController extends AdminController
     }
 
     /**
-     * Checks if newer shop version available. If true - returns message
+     * Every Time Admin starts we perform these checks
+     * returns some messages if there is something to display
      *
-     * @return string
+     * @return array
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkVersion" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _doStartUpChecks(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make doStartUpChecks() the canonical override target.
      */
-    protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function doStartUpChecks()
     {
-        return $this->checkVersion();
+        return $this->_doStartUpChecks();
     }
 
     /**
      * Checks if newer shop version available. If true - returns message
      *
-     * @deprecated Use UpdateCheckService::check() instead.
-     *
-     * @return string|void
+     * @return string
      * @throws Exception
+     * @deprecated Transitional during #107. Modules SHOULD override _checkVersion()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkVersion() to the canonical override
+      *             target and retires _checkVersion(); until then, _checkVersion() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function checkVersion()
+    protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $result = $this->getUpdateCheckService()->check();
 
@@ -237,6 +241,22 @@ class NavigationController extends AdminController
                 $result->getLatestCoreVersion()
             );
         }
+    }
+
+    /**
+     * Checks if newer shop version available. If true - returns message
+     *
+     * @return string|void
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkVersion(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkVersion() the canonical override target.
+     */
+    protected function checkVersion()
+    {
+        return $this->_checkVersion();
     }
 
     /**

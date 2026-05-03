@@ -92,9 +92,9 @@ class NavigationTest extends \OxidTestCase
         $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue('testNodes'));
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, ['getNavigation', 'doStartUpChecks']);
+        $oView = $this->getMock(NavigationController::class, ['getNavigation', '_doStartUpChecks']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
-        $oView->expects($this->once())->method('doStartUpChecks')->will($this->returnValue('check'));
+        $oView->expects($this->once())->method('_doStartUpChecks')->will($this->returnValue('check'));
         $this->assertEquals('home.tpl', $oView->render());
 
         // checking vew data
@@ -128,9 +128,9 @@ class NavigationTest extends \OxidTestCase
         $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue('testNodes'));
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, ['getNavigation', 'doStartUpChecks']);
+        $oView = $this->getMock(NavigationController::class, ['getNavigation', '_doStartUpChecks']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
-        $oView->expects($this->never())->method('doStartUpChecks')->will($this->returnValue('check'));
+        $oView->expects($this->never())->method('_doStartUpChecks')->will($this->returnValue('check'));
         $this->assertEquals('home.tpl', $oView->render());
 
         // checking vew data

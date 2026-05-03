@@ -1,0 +1,2144 @@
+[
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 116,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "setListLocatorData"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 132,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "loadIdsInList"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 135,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "findActPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 139,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getProductPos"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 146,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 146,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 151,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 152,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 176,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "setVendorLocatorData"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 201,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "findActPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 210,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getProductPos"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 215,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 215,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 220,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 221,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 237,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "setManufacturerLocatorData"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 262,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "findActPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 271,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getProductPos"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 278,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 278,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 283,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 284,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 308,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "setSearchLocatorData"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 342,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "findActPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 361,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getProductPos"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 363,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 365,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 368,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 369,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 398,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "findActPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 411,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getProductPos"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 419,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 419,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 421,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 430,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 431,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 457,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "loadIdsInList"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 505,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "makeLink"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 538,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "findActPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 579,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getPageNumber"
+    },
+    {
+        "file": "source/Application/Component/Locator.php",
+        "line": 610,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Component\\Locator",
+        "method": "getProductPos"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsArticleAjax.php",
+        "line": 78,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsArticleAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsArticleAjax.php",
+        "line": 79,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsArticleAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsArticleAjax.php",
+        "line": 143,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsArticleAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsGroupsAjax.php",
+        "line": 72,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsGroupsAjax.php",
+        "line": 120,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsGroupsAjax.php",
+        "line": 142,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsGroupsAjax.php",
+        "line": 143,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 93,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 94,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 167,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 245,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getOxRssFeed"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 248,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 270,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getOxRssFeed"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 273,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 274,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 279,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 317,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 361,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 366,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getData"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsMainAjax.php",
+        "line": 377,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsMainAjax",
+        "method": "getOxRssFeed"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsOrderAjax.php",
+        "line": 65,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsOrderAjax.php",
+        "line": 165,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsOrderAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ActionsOrderAjax.php",
+        "line": 170,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ActionsOrderAjax",
+        "method": "getData"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 201,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "authorize"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 342,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "setupNavigation"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 408,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "getMaxUploadFileInfo"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 429,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "getMaxUploadFileInfo"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 477,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 543,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "allowAdminEdit"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 570,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "getCountryByCode"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminController.php",
+        "line": 621,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminController",
+        "method": "authorize"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminDetailsController.php",
+        "line": 219,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminDetailsController.php",
+        "line": 228,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminDetailsController.php",
+        "line": 237,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminDetailsController",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 296,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 707,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "changeselect"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 750,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertToDBDate"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 775,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertToDBDate"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 795,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertTime"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 797,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertDate"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 804,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertDate"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 821,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertDate"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 872,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "convertTime"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 923,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "setListNavigationParams"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 1017,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "setupNavigation"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminListController.php",
+        "line": 1090,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminListController",
+        "method": "changeselect"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 77,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 125,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "getActionIds"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 128,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "addFilter"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 128,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 141,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "getActionIds"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 146,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "getAll"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 146,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "addFilter"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AdminRightsMainAjax.php",
+        "line": 146,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AdminRightsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAccessoriesAjax.php",
+        "line": 165,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAccessoriesAjax",
+        "method": "getSorting"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 76,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 77,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 117,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 118,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 138,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 139,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 164,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleAttributeAjax.php",
+        "line": 179,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleAttributeAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleBundleAjax.php",
+        "line": 76,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleBundleAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleBundleAjax.php",
+        "line": 77,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleBundleAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleBundleAjax.php",
+        "line": 142,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleBundleAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleCrosssellingAjax.php",
+        "line": 87,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleCrosssellingAjax.php",
+        "line": 88,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleCrosssellingAjax.php",
+        "line": 172,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleCrosssellingAjax.php",
+        "line": 191,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleCrosssellingAjax.php",
+        "line": 192,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleCrosssellingAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 74,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 75,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 193,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 194,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 211,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 227,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 231,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 232,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 261,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 276,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "updateOxTime"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 289,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleExtendAjax.php",
+        "line": 327,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleExtendAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 428,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 531,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copyAttributes"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 576,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copyFiles"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 622,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copySelectlists"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 669,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copyCrossseling"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 716,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copyAccessoires"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 761,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copyStaffelpreis"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 800,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "copyArtExtends"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 849,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "formJumpList"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 864,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "getTitle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 869,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "getTitle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 874,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "getTitle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 881,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "getTitle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 886,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "getTitle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleMain.php",
+        "line": 905,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleMain",
+        "method": "getTitle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleReview.php",
+        "line": 177,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleReview",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSelectionAjax.php",
+        "line": 73,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSelectionAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSelectionAjax.php",
+        "line": 74,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSelectionAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSelectionAjax.php",
+        "line": 129,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSelectionAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSelectionAjax.php",
+        "line": 154,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSelectionAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSelectionAjax.php",
+        "line": 155,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSelectionAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 154,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getVendorList"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 158,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getManufacturerList"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 249,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getVendorList"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 283,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getManufacturerList"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 385,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getAltSeoEntryId"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 406,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getType"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 441,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getEncoder"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleSeo.php",
+        "line": 466,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleSeo",
+        "method": "getEncoder"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleStock.php",
+        "line": 156,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleStock",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleStock.php",
+        "line": 250,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleStock",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleVariant.php",
+        "line": 285,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleVariant",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleVariant.php",
+        "line": 303,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleVariant",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleVariant.php",
+        "line": 318,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleVariant",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ArticleVariant.php",
+        "line": 347,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ArticleVariant",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeCategoryAjax.php",
+        "line": 83,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeCategoryAjax.php",
+        "line": 135,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeCategoryAjax.php",
+        "line": 143,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeCategoryAjax.php",
+        "line": 159,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeCategoryAjax.php",
+        "line": 160,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeCategoryAjax.php",
+        "line": 185,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeCategoryAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 90,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 91,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 92,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 163,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 200,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 202,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 221,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeMainAjax.php",
+        "line": 222,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeOrderAjax.php",
+        "line": 63,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeOrderAjax.php",
+        "line": 160,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeOrderAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/AttributeOrderAjax.php",
+        "line": 165,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\AttributeOrderAjax",
+        "method": "getData"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 88,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 89,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 152,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 196,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 200,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 204,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 254,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "updateOxTime"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 267,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 315,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryMainAjax.php",
+        "line": 316,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 82,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 83,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 144,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 189,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 190,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 230,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 231,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 262,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategoryOrderAjax.php",
+        "line": 266,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategoryOrderAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategorySeo.php",
+        "line": 53,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategorySeo",
+        "method": "getEncoder"
+    },
+    {
+        "file": "source/Application/Controller/Admin/CategorySeo.php",
+        "line": 157,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\CategorySeo",
+        "method": "getEncoder"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ContentSeo.php",
+        "line": 109,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ContentSeo",
+        "method": "getEncoder"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryArticlesAjax.php",
+        "line": 89,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticlesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryArticlesAjax.php",
+        "line": 90,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticlesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryArticlesAjax.php",
+        "line": 162,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticlesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryArticlesAjax.php",
+        "line": 180,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticlesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryArticlesAjax.php",
+        "line": 181,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryArticlesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryCategoriesAjax.php",
+        "line": 74,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryCategoriesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryCategoriesAjax.php",
+        "line": 131,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryCategoriesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryCategoriesAjax.php",
+        "line": 150,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryCategoriesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryCategoriesAjax.php",
+        "line": 151,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryCategoriesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryGroupsAjax.php",
+        "line": 74,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryGroupsAjax.php",
+        "line": 123,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryGroupsAjax.php",
+        "line": 142,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryGroupsAjax.php",
+        "line": 143,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryMainAjax.php",
+        "line": 74,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryMainAjax.php",
+        "line": 123,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryMainAjax.php",
+        "line": 141,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryMainAjax.php",
+        "line": 142,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetCountryAjax.php",
+        "line": 78,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetCountryAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetCountryAjax.php",
+        "line": 125,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetCountryAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetCountryAjax.php",
+        "line": 144,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetCountryAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetCountryAjax.php",
+        "line": 145,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetCountryAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetGroupsAjax.php",
+        "line": 74,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetGroupsAjax.php",
+        "line": 120,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetGroupsAjax.php",
+        "line": 139,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetGroupsAjax.php",
+        "line": 140,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetMainAjax.php",
+        "line": 77,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetMainAjax.php",
+        "line": 118,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetMainAjax.php",
+        "line": 138,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetMainAjax.php",
+        "line": 139,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetPaymentAjax.php",
+        "line": 77,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetPaymentAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetPaymentAjax.php",
+        "line": 118,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetPaymentAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetPaymentAjax.php",
+        "line": 138,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetPaymentAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetPaymentAjax.php",
+        "line": 139,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetPaymentAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetUsersAjax.php",
+        "line": 91,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetUsersAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetUsersAjax.php",
+        "line": 145,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetUsersAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetUsersAjax.php",
+        "line": 163,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetUsersAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliverySetUsersAjax.php",
+        "line": 164,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliverySetUsersAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryUsersAjax.php",
+        "line": 87,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryUsersAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryUsersAjax.php",
+        "line": 141,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryUsersAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryUsersAjax.php",
+        "line": 159,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryUsersAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DeliveryUsersAjax.php",
+        "line": 160,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DeliveryUsersAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountArticlesAjax.php",
+        "line": 92,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticlesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountArticlesAjax.php",
+        "line": 93,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticlesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountArticlesAjax.php",
+        "line": 155,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticlesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountArticlesAjax.php",
+        "line": 174,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticlesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountArticlesAjax.php",
+        "line": 175,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountArticlesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountCategoriesAjax.php",
+        "line": 82,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountCategoriesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountCategoriesAjax.php",
+        "line": 135,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountCategoriesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountCategoriesAjax.php",
+        "line": 154,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountCategoriesAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountCategoriesAjax.php",
+        "line": 155,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountCategoriesAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountGroupsAjax.php",
+        "line": 75,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountGroupsAjax.php",
+        "line": 122,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountGroupsAjax.php",
+        "line": 141,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountGroupsAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountGroupsAjax.php",
+        "line": 142,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountGroupsAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountItemAjax.php",
+        "line": 79,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountItemAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountItemAjax.php",
+        "line": 80,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountItemAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountItemAjax.php",
+        "line": 81,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountItemAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountItemAjax.php",
+        "line": 220,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountItemAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountItemAjax.php",
+        "line": 241,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountItemAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountMainAjax.php",
+        "line": 73,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountMainAjax.php",
+        "line": 117,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountMainAjax.php",
+        "line": 135,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountMainAjax.php",
+        "line": 136,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountUsersAjax.php",
+        "line": 87,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountUsersAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountUsersAjax.php",
+        "line": 142,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountUsersAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountUsersAjax.php",
+        "line": 160,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountUsersAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DiscountUsersAjax.php",
+        "line": 161,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DiscountUsersAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 223,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "getHeapTableName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 485,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "findDeepestCatPath"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 498,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "getHeapTableName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 503,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "generateTableCharSet"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 506,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "createHeapTable"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 511,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "getCatAdd"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 512,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "insertArticles"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 543,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "getHeapTableName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 545,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "setCampaignDetailLink"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 587,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "unHtmlEntities"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 613,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "getHeapTableName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 639,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "generateTableCharSet"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 683,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "createHeapTable"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 720,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "getCatAdd"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 764,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "insertArticles"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 833,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "removeParentArticles"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 877,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "setSessionParams"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 936,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "loadRootCats"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 1002,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "findDeepestCatPath"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 1021,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "loadRootCats"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 1061,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "initArticle"
+    },
+    {
+        "file": "source/Application/Controller/Admin/DynamicExportBaseController.php",
+        "line": 1113,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\DynamicExportBaseController",
+        "method": "setCampaignDetailLink"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 283,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getData"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 529,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 659,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getSortDir"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 756,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 880,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getSortDir"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 906,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getStartIndex"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 930,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getTotalCount"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 996,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "outputResponse"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 1017,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "output"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 1040,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 1068,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getData"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 1086,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getStartIndex"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 1088,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getSortDir"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ListComponentAjax.php",
+        "line": 1098,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ListComponentAjax",
+        "method": "getTotalCount"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 87,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 88,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 147,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 183,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 184,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 222,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerMainAjax.php",
+        "line": 223,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ManufacturerSeo.php",
+        "line": 153,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ManufacturerSeo",
+        "method": "getEncoder"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ModuleConfiguration.php",
+        "line": 197,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ModuleConfiguration",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationController.php",
+        "line": 123,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationController",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 119,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "addLinks"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 157,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "loadFromFile"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 275,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "sessionizeLocalUrls"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 285,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getAdminUrl"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 307,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "checkRights"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 325,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "hasRights"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 333,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "hasRights"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 349,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "checkGroups"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 367,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "hasGroup"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 375,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "hasGroup"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 393,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "checkDemoShopDenials"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 444,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "copyAttributes"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 471,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "mergeNodes"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 520,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "merge"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 612,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getMenuFiles"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 688,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "processCachedFile"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 711,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getInitialDom"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 724,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getMenuFiles"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 763,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "processCachedFile"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 785,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getInitialDom"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 899,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getAdminUrl"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 930,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "hasRights"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 955,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "hasGroup"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NavigationTree.php",
+        "line": 979,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NavigationTree",
+        "method": "getInitialDom"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsMainAjax.php",
+        "line": 72,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsMainAjax.php",
+        "line": 116,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsMainAjax.php",
+        "line": 133,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsMainAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsMainAjax.php",
+        "line": 134,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsMainAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsletterSelectionAjax.php",
+        "line": 70,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSelectionAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsletterSelectionAjax.php",
+        "line": 116,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSelectionAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsletterSelectionAjax.php",
+        "line": 133,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSelectionAjax",
+        "method": "getViewName"
+    },
+    {
+        "file": "source/Application/Controller/Admin/NewsletterSelectionAjax.php",
+        "line": 134,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\NewsletterSelectionAjax",
+        "method": "getQuery"
+    },
+    {
+        "file": "source/Application/Controller/Admin/OrderList.php",
+        "line": 111,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\OrderList",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ShopConfiguration.php",
+        "line": 185,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ShopConfiguration",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Controller/Admin/ThemeMain.php",
+        "line": 114,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Controller\\Admin\\ThemeMain",
+        "method": "resetContentCache"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 996,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 1037,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getVarMinPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 1735,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 2069,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 2114,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getVarMinPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 2117,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 3187,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 3219,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getPrice"
+    },
+    {
+        "file": "source/Application/Model/Article.php",
+        "line": 4526,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
+        "method": "getAmountPriceList"
+    },
+    {
+        "file": "source/Application/Model/Basket.php",
+        "line": 3039,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Basket",
+        "method": "addedNewItem"
+    },
+    {
+        "file": "source/Application/Model/Content.php",
+        "line": 513,
+        "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Content",
+        "method": "getFieldData"
+    }
+]

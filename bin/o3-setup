@@ -81,6 +81,29 @@ if ($result->num_rows == 0) {
         }
         while ($mysqli->next_result()) { /* flush results */ }
     }
+
+    // Apply Doctrine migrations on top of the baseline schema.sql, mirroring
+    // what the customer Setup wizard does (Setup/Controller.php:632/641).
+    // database_schema.sql is a snapshot that lags current state — migrations
+    // bring it forward (e.g. oxactions.OXNODELETE, the o3revocation table).
+    //
+    // The wrapper takes only two positional args: $argv[1] = command,
+    // $argv[2] = optional edition filter. Do NOT pass `--no-interaction`
+    // here — it would be interpreted as an edition name and silently match
+    // nothing. The wrapper already injects `-n` into the underlying Doctrine
+    // input (Migrations::formDoctrineInput).
+    echo "Running database migrations...\n";
+    $migrationCommand = __DIR__ . '/../vendor/bin/oe-eshop-doctrine_migration';
+    if (file_exists($migrationCommand)) {
+        exec("cd " . __DIR__ . "/.. && php $migrationCommand migrations:migrate 2>&1", $migrationOutput, $migrationReturnCode);
+        if ($migrationReturnCode !== 0) {
+            die("Database migrations failed:\n" . implode("\n", $migrationOutput) . "\n");
+        }
+        echo "Database migrations completed successfully.\n";
+    } else {
+        echo "WARNING: Migration command not found at $migrationCommand\n";
+    }
+
     echo "Installing Demo Data...\n";
     $demodataCommand = __DIR__ . '/../vendor/bin/oe-eshop-demodata_install';
     if (file_exists($demodataCommand)) {
@@ -103,6 +126,17 @@ if ($result->num_rows == 0) {
         echo "If you want to have the demo data you need to run these commands:\n";
         echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
     }
+
+    // Backfill initial_data.sql with INSERT IGNORE so it covers gaps in
+    // demodata.sql (notably the full theme:o3-theme block, which demodata
+    // does not seed) while demodata's existing rows win on shared OXIDs.
+    // The web Setup wizard runs either initial_data.sql OR demodata.sql,
+    // never both — but in dev we want demo content AND complete config.
+    echo "Backfilling initial_data.sql (theme defaults & gaps)...\n";
+    $initialDataFile = __DIR__ . '/../source/Setup/Sql/initial_data.sql';
+    $backfillCommand = "sed 's/INSERT INTO/INSERT IGNORE INTO/g' " . escapeshellarg($initialDataFile)
+        . " | mysql --default-character-set=utf8mb4 --user=" . $dbUser . " --password='" . $dbPwd . "' -h " . $dbHost . " -D " . $dbName;
+    shell_exec($backfillCommand);
 
     // Get actual oxshops table structure
     echo "Checking oxshops table structure...\n";

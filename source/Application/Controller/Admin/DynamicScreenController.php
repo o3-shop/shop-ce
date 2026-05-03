@@ -49,19 +49,15 @@ class DynamicScreenController extends AdminListController
      * Sets up navigation for current view
      *
      * @param string $sNode None name
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _setupNavigation()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setupNavigation() to the canonical override
+      *             target and retires _setupNavigation(); until then, _setupNavigation() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setupNavigation($sNode);
-    }
-
-    /**
-     * Sets up navigation for current view
-     *
-     * @param string $sNode None name
-     */
-    protected function setupNavigation($sNode)
     {
         $myAdminNavig = $this->getNavigation();
         $sNode = Registry::getRequest()->getRequestEscapedParameter('menu');
@@ -101,6 +97,21 @@ class DynamicScreenController extends AdminListController
 
         // buttons
         $this->_aViewData['bottom_buttons'] = $myAdminNavig->getBtn($sNode);
+    }
+
+    /**
+     * Sets up navigation for current view
+     *
+     * @param string $sNode None name
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setupNavigation(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setupNavigation() the canonical override target.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
     }
 
     /**

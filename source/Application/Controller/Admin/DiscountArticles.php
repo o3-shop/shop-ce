@@ -55,7 +55,7 @@ class DiscountArticles extends AdminDetailsController
             }
 
             // generating category tree for artikel choose select list
-            $this->createCategoryTree('artcattree');
+            $this->_createCategoryTree('artcattree');
         }
 
         $iAoc = Registry::getRequest()->getRequestEscapedParameter('aoc');

@@ -32,6 +32,7 @@ use oxTestModules;
  */
 class AdminViewTest extends \OxidTestCase
 {
+    use \OxidEsales\EshopCommunity\Tests\Unit\ExitHandlerTestTrait;
     /**
      * Tear down the fixture.
      *
@@ -84,14 +85,15 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetServiceUrl()
     {
-        // getServiceUrl() calls getServiceProtocol() (without underscore) and ShopVersion::getVersion().
-        // Mock getServiceProtocol on the view, and use the real ShopVersion.
+        // getServiceUrl() calls _getServiceProtocol() (the underscore form post-#107
+        // call-site sweep) and ShopVersion::getVersion(). Mock _getServiceProtocol on
+        // the view, and use the real ShopVersion.
         $sPref = $this->getConfig()->getEdition();
         $sVersion = \OxidEsales\Eshop\Core\ShopVersion::getVersion();
 
         $this->getProxyClass(AdminController::class);
-        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['getServiceProtocol'], [], '', false);
-        $oAdminView->expects($this->any())->method('getServiceProtocol')->will($this->returnValue('testprotocol'));
+        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['_getServiceProtocol'], [], '', false);
+        $oAdminView->expects($this->any())->method('_getServiceProtocol')->will($this->returnValue('testprotocol'));
 
         $this->getSession()->setVariable('tpllanguage', 'de');
 
@@ -133,6 +135,30 @@ class AdminViewTest extends \OxidTestCase
         $oAdminView->init();
 
         $this->assertEquals(oxRegistry::getSession()->getVariable('malladmin'), $oAdminView->getViewDataElement('malladmin'));
+    }
+
+    public function testInitRedirectsAndExitsWhenNotAuthorized()
+    {
+        $this->installFakeExitHandler();
+
+        $utils = $this->getMock(\OxidEsales\Eshop\Core\Utils::class, ['redirect']);
+        $utils->expects($this->once())
+            ->method('redirect')
+            ->with('index.php?cl=login', true, 302);
+        \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Utils::class, $utils);
+
+        $adminView = $this->getMock(
+            \OxidEsales\Eshop\Application\Controller\Admin\AdminController::class,
+            ['authorize']
+        );
+        $adminView->expects($this->once())->method('authorize')->willReturn(false);
+
+        try {
+            $adminView->init();
+            $this->fail('Expected ExitCalledException');
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            $this->assertSame('Authorization error occurred!', $e->getExitMessage());
+        }
     }
 
     /**

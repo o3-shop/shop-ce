@@ -177,19 +177,12 @@ class AdminListController extends AdminController
      * Viewable list size getter
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, use "getViewListSize" instead
+     * @deprecated Use getViewListSize() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getViewListSize().
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getViewListSize();
-    }
-
-    /**
-     * Viewable list size getter
-     *
-     * @return int
-     */
-    public function getViewListSize()
     {
         if (!$this->_iViewListSize) {
             $config = Registry::getConfig();
@@ -210,22 +203,30 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Viewable list size getter (used in list_*.php views)
+     * Viewable list size getter
      *
      * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUserDefListSize" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getViewListSize() (not the deprecated _getViewListSize()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getUserDefListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    public function getViewListSize()
     {
-        return $this->getUserDefListSize();
+        return $this->_getViewListSize();
     }
 
     /**
      * Viewable list size getter (used in list_*.php views)
      *
      * @return int
+     * @deprecated Use getUserDefListSize() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getUserDefListSize().
      */
-    protected function getUserDefListSize()
+    protected function _getUserDefListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (!$this->_iViewListSize) {
             if (!($viewListSize = (int)Registry::getRequest()->getRequestEscapedParameter('viewListSize'))) {
@@ -235,6 +236,21 @@ class AdminListController extends AdminController
         }
 
         return $this->_iViewListSize;
+    }
+
+    /**
+     * Viewable list size getter (used in list_*.php views)
+     *
+     * @return int
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getUserDefListSize() (not the deprecated _getUserDefListSize()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getUserDefListSize()
+    {
+        return $this->_getUserDefListSize();
     }
 
     /**
@@ -251,7 +267,7 @@ class AdminListController extends AdminController
         $this->_aViewData['mylist'] = $this->getItemList();
 
         // set navigation parameters
-        $this->setListNavigationParams();
+        $this->_setListNavigationParams();
 
         return $return;
     }
@@ -287,20 +303,12 @@ class AdminListController extends AdminController
      *
      * @param string $sql SQL query used co select list items
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "calcListItemsCount" in next major
+     * @deprecated Use calcListItemsCount() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _calcListItemsCount().
      */
     protected function _calcListItemsCount($sql) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->calcListItemsCount($sql);
-    }
-
-    /**
-     * Calculates list items count
-     *
-     * @param string $sql SQL query used co select list items
-     * @throws DatabaseConnectionException
-     */
-    protected function calcListItemsCount($sql)
     {
         $stringModifier = Str::getStr();
 
@@ -319,24 +327,33 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Set current list position
+     * Calculates list items count
      *
-     * @param string $page jump page string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setCurrentListPosition" in next major
+     * @param string $sql SQL query used co select list items
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::calcListItemsCount() (not the deprecated _calcListItemsCount()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _setCurrentListPosition($page = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function calcListItemsCount($sql)
     {
-        $this->setCurrentListPosition($page);
+        $this->_calcListItemsCount($sql);
     }
 
     /**
      * Set current list position
      *
      * @param string $page jump page string
+     * @deprecated Use setCurrentListPosition() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _setCurrentListPosition().
      */
-    protected function setCurrentListPosition($page = null)
+    protected function _setCurrentListPosition($page = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $adminListSize = $this->getViewListSize();
+        $adminListSize = $this->_getViewListSize();
 
         $jumpToPage = (int)($page ? $page : (((int)Registry::getRequest()->getRequestEscapedParameter('lstrt')) / $adminListSize));
         $jumpToPage = ($page && $jumpToPage) ? ($jumpToPage - 1) : $jumpToPage;
@@ -352,17 +369,18 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Adds order by to SQL query string.
+     * Set current list position
      *
-     * @param null $query sql string
+     * @param string $page jump page string
      *
-     * @return string
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareOrderByQuery" in next major
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setCurrentListPosition() (not the deprecated _setCurrentListPosition())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _prepareOrderByQuery($query = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function setCurrentListPosition($page = null)
     {
-        return $this->prepareOrderByQuery($query);
+        $this->_setCurrentListPosition($page);
     }
 
     /**
@@ -372,8 +390,12 @@ class AdminListController extends AdminController
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Use prepareOrderByQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareOrderByQuery().
      */
-    protected function prepareOrderByQuery($query = null)
+    protected function _prepareOrderByQuery($query = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // sorting
         $sortFields = $this->getListSorting();
@@ -411,16 +433,21 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Builds and returns SQL query string.
+     * Adds order by to SQL query string.
      *
-     * @param object $listObject list main object
+     * @param null $query sql string
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildSelectString" in next major
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareOrderByQuery() (not the deprecated _prepareOrderByQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function prepareOrderByQuery($query = null)
     {
-        return $this->buildSelectString($listObject);
+        return $this->_prepareOrderByQuery($query);
     }
 
     /**
@@ -429,25 +456,31 @@ class AdminListController extends AdminController
      * @param object $listObject list main object
      *
      * @return string
+     * @deprecated Use buildSelectString() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _buildSelectString().
      */
-    protected function buildSelectString($listObject = null)
+    protected function _buildSelectString($listObject = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return $listObject !== null ? $listObject->buildSelectString(null) : '';
     }
 
     /**
-     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
-     * For each search value if german umlauts exist, adds them
-     * and replaced by spec. char to query
+     * Builds and returns SQL query string.
      *
-     * @param string $fieldValue Filters
+     * @param object $listObject list main object
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processFilter" in next major
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::buildSelectString() (not the deprecated _buildSelectString()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _processFilter($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function buildSelectString($listObject = null)
     {
-        return $this->processFilter($fieldValue);
+        return $this->_buildSelectString($listObject);
     }
 
     /**
@@ -458,8 +491,12 @@ class AdminListController extends AdminController
      * @param string $fieldValue Filters
      *
      * @return string
+     * @deprecated Use processFilter() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processFilter().
      */
-    protected function processFilter($fieldValue)
+    protected function _processFilter($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $stringModifier = Str::getStr();
 
@@ -470,18 +507,22 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Builds part of SQL query
+     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
+     * For each search value if german umlauts exist, adds them
+     * and replaced by spec. char to query
      *
-     * @param string $value filter value
-     * @param bool $isSearchValue filter value type, true means surround search key with '%'
+     * @param string $fieldValue Filters
      *
      * @return string
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "buildFilter" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processFilter() the canonical override target.
      */
-    protected function _buildFilter($value, $isSearchValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function processFilter($fieldValue)
     {
-        return $this->buildFilter($value, $isSearchValue);
+        return $this->_processFilter($fieldValue);
     }
 
     /**
@@ -492,8 +533,15 @@ class AdminListController extends AdminController
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _buildFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes buildFilter() to the canonical override
+      *             target and retires _buildFilter(); until then, _buildFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function buildFilter($value, $isSearchValue)
+    protected function _buildFilter($value, $isSearchValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($isSearchValue) {
             //is search string, using LIKE
@@ -507,16 +555,22 @@ class AdminListController extends AdminController
     }
 
     /**
-     * Checks if filter contains wildcards like %
+     * Builds part of SQL query
      *
-     * @param string $fieldValue filter value
+     * @param string $value filter value
+     * @param bool $isSearchValue filter value type, true means surround search key with '%'
      *
-     * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "isSearchValue" in next major
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _buildFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make buildFilter() the canonical override target.
      */
-    protected function _isSearchValue($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function buildFilter($value, $isSearchValue)
     {
-        return $this->isSearchValue($fieldValue);
+        return $this->_buildFilter($value, $isSearchValue);
     }
 
     /**
@@ -525,27 +579,31 @@ class AdminListController extends AdminController
      * @param string $fieldValue filter value
      *
      * @return bool
+     * @deprecated Use isSearchValue() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _isSearchValue().
      */
-    protected function isSearchValue($fieldValue)
+    protected function _isSearchValue($fieldValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return (Str::getStr()->preg_match('/^%/', $fieldValue) && Str::getStr()->preg_match('/%$/', $fieldValue));
     }
 
     /**
-     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
-     * For each search value if german umlauts exist, adds them
-     * and replaced by spec. char to query
+     * Checks if filter contains wildcards like %
      *
-     * @param array $whereQuery SQL condition array
-     * @param string $fullQuery SQL query string
+     * @param string $fieldValue filter value
      *
-     * @return string
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareWhereQuery" in next major
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _isSearchValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make isSearchValue() the canonical override target.
      */
-    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function isSearchValue($fieldValue)
     {
-        return $this->prepareWhereQuery($whereQuery, $fullQuery);
+        return $this->_isSearchValue($fieldValue);
     }
 
     /**
@@ -558,8 +616,12 @@ class AdminListController extends AdminController
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Use prepareWhereQuery() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _prepareWhereQuery().
      */
-    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    protected function _prepareWhereQuery($whereQuery, $fullQuery) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($whereQuery) && count($whereQuery)) {
             $myUtilsString = Registry::getUtilsString();
@@ -567,10 +629,10 @@ class AdminListController extends AdminController
                 $fieldValue = trim($fieldValue);
 
                 //check if this is search string (contains % sign at beginning and end of string)
-                $isSearchValue = $this->isSearchValue($fieldValue);
+                $isSearchValue = $this->_isSearchValue($fieldValue);
 
                 //removing % symbols
-                $fieldValue = $this->processFilter($fieldValue);
+                $fieldValue = $this->_processFilter($fieldValue);
 
                 if (strlen($fieldValue)) {
                     $values = explode(' ', $fieldValue);
@@ -592,12 +654,12 @@ class AdminListController extends AdminController
                         //for search in same field for different values using AND
                         $queryBoolAction = ' and ';
 
-                        $fullQuery .= $this->buildFilter($value, $isSearchValue);
+                        $fullQuery .= $this->_buildFilter($value, $isSearchValue);
 
                         if ($uml) {
                             $fullQuery .= " or {$quotedIdentifierName} ";
 
-                            $fullQuery .= $this->buildFilter($uml, $isSearchValue);
+                            $fullQuery .= $this->_buildFilter($uml, $isSearchValue);
                             $fullQuery .= ')'; // end of OR section
                         }
                     }
@@ -609,6 +671,27 @@ class AdminListController extends AdminController
         }
 
         return $fullQuery;
+    }
+
+    /**
+     * Prepares SQL where query according SQL condition array and attaches it to SQL end.
+     * For each search value if german umlauts exist, adds them
+     * and replaced by spec. char to query
+     *
+     * @param array $whereQuery SQL condition array
+     * @param string $fullQuery SQL query string
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::prepareWhereQuery() (not the deprecated _prepareWhereQuery()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function prepareWhereQuery($whereQuery, $fullQuery)
+    {
+        return $this->_prepareWhereQuery($whereQuery, $fullQuery);
     }
 
     /**
@@ -847,7 +930,7 @@ class AdminListController extends AdminController
     {
         // list navigation
         $showNavigation = false;
-        $adminListSize = $this->getViewListSize();
+        $adminListSize = $this->_getViewListSize();
         if ($this->_iListSize > $adminListSize) {
             // yes, we need to build the navigation object
             $pageNavigation = new stdClass();
@@ -912,7 +995,7 @@ class AdminListController extends AdminController
 
         // determine not used space in List
         $listSizeToShow = $this->_iListSize - $this->_iCurrListPos;
-        $adminListSize = $this->getViewListSize();
+        $adminListSize = $this->_getViewListSize();
         $notUsed = $adminListSize - min($listSizeToShow, $adminListSize);
         $space = $notUsed * 15;
 
@@ -1001,19 +1084,19 @@ class AdminListController extends AdminController
                 }
             }
 
-            $query = $this->buildSelectString($listObject);
-            $query = $this->prepareWhereQuery($where, $query);
-            $query = $this->prepareOrderByQuery($query);
+            $query = $this->_buildSelectString($listObject);
+            $query = $this->_prepareWhereQuery($where, $query);
+            $query = $this->_prepareOrderByQuery($query);
             $query = $this->changeselect($query);
 
             // calculates count of list items
-            $this->calcListItemsCount($query);
+            $this->_calcListItemsCount($query);
 
             // setting current list position (page)
-            $this->setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
+            $this->_setCurrentListPosition(Registry::getRequest()->getRequestEscapedParameter('jumppage'));
 
             // setting addition params for list: current list size
-            $this->_oList->setSqlLimit($this->_iCurrListPos, $this->getViewListSize());
+            $this->_oList->setSqlLimit($this->_iCurrListPos, $this->_getViewListSize());
 
             $this->_oList->selectString($query);
         }

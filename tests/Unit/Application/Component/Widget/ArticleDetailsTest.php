@@ -861,9 +861,9 @@ class ArticleDetailsTest extends \OxidTestCase
         $oProduct->expects($this->once())->method('getVariantSelections')->will($this->returnValue('varselections'));
 
         // no parent — production calls getParentProduct (without underscore)
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', 'getParentProduct']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', '_getParentProduct']);
         $oView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
-        $oView->expects($this->once())->method('getParentProduct')->will($this->returnValue(false));
+        $oView->expects($this->once())->method('_getParentProduct')->will($this->returnValue(false));
 
         $this->assertEquals('varselections', $oView->getVariantSelections());
 
@@ -874,9 +874,9 @@ class ArticleDetailsTest extends \OxidTestCase
         $oParent->expects($this->once())->method('getVariantSelections')->will($this->returnValue('parentselections'));
 
         // has parent
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', 'getParentProduct']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getProduct', '_getParentProduct']);
         $oView->expects($this->once())->method('getProduct')->will($this->returnValue($oProduct));
-        $oView->expects($this->once())->method('getParentProduct')->will($this->returnValue($oParent));
+        $oView->expects($this->once())->method('_getParentProduct')->will($this->returnValue($oParent));
 
         $this->assertEquals('parentselections', $oView->getVariantSelections());
     }

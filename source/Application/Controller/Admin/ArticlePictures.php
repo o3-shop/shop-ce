@@ -135,15 +135,15 @@ class ArticlePictures extends AdminDetailsController
 
         if ($iIndex == 'ICO') {
             // deleting main icon
-            $this->deleteMainIcon($oArticle);
+            $this->_deleteMainIcon($oArticle);
         } elseif ($iIndex == 'TH') {
             // deleting thumbnail
-            $this->deleteThumbnail($oArticle);
+            $this->_deleteThumbnail($oArticle);
         } else {
             $iIndex = (int) $iIndex;
             if ($iIndex > 0) {
                 // deleting master picture
-                $this->resetMasterPicture($oArticle, $iIndex, true);
+                $this->_resetMasterPicture($oArticle, $iIndex, true);
             }
         }
 
@@ -157,22 +157,12 @@ class ArticlePictures extends AdminDetailsController
      * @param Article $oArticle       article object
      * @param int                                         $iIndex         master picture index
      * @param bool                                        $blDeleteMaster if TRUE - deletes and unsets master image file
-     * @deprecated underscore prefix violates PSR12, will be renamed to "resetMasterPicture" in next major
+     * @deprecated Use resetMasterPicture() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _resetMasterPicture().
      */
     protected function _resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->resetMasterPicture($oArticle, $iIndex, $blDeleteMaster);
-    }
-
-    /**
-     * Deletes selected master picture and all pictures generated
-     * from master picture
-     *
-     * @param Article $oArticle       article object
-     * @param int                                         $iIndex         master picture index
-     * @param bool                                        $blDeleteMaster if TRUE - deletes and unsets master image file
-     */
-    protected function resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false)
     {
         if ($this->canResetMasterPicture($oArticle, $iIndex)) {
             if (!$oArticle->isDerived()) {
@@ -191,28 +181,39 @@ class ArticlePictures extends AdminDetailsController
             }
 
             if ($iIndex == 1) {
-                $this->cleanupCustomFields($oArticle);
+                $this->_cleanupCustomFields($oArticle);
             }
         }
     }
 
     /**
-     * Deletes main icon file
+     * Deletes selected master picture and all pictures generated
+     * from master picture
      *
-     * @param Article $oArticle article object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteMainIcon" in next major
+     * @param Article $oArticle       article object
+     * @param int                                         $iIndex         master picture index
+     * @param bool                                        $blDeleteMaster if TRUE - deletes and unsets master image file
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::resetMasterPicture() (not the deprecated _resetMasterPicture()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _deleteMainIcon($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function resetMasterPicture($oArticle, $iIndex, $blDeleteMaster = false)
     {
-        $this->deleteMainIcon($oArticle);
+        $this->_resetMasterPicture($oArticle, $iIndex, $blDeleteMaster);
     }
 
     /**
      * Deletes main icon file
      *
      * @param Article $oArticle article object
+     * @deprecated Use deleteMainIcon() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _deleteMainIcon().
      */
-    protected function deleteMainIcon($oArticle)
+    protected function _deleteMainIcon($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->canDeleteMainIcon($oArticle)) {
             if (!$oArticle->isDerived()) {
@@ -226,22 +227,30 @@ class ArticlePictures extends AdminDetailsController
     }
 
     /**
-     * Deletes thumbnail file
+     * Deletes main icon file
      *
      * @param Article $oArticle article object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteThumbnail" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteMainIcon(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteMainIcon() the canonical override target.
      */
-    protected function _deleteThumbnail($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function deleteMainIcon($oArticle)
     {
-        $this->deleteThumbnail($oArticle);
+        $this->_deleteMainIcon($oArticle);
     }
 
     /**
      * Deletes thumbnail file
      *
      * @param Article $oArticle article object
+     * @deprecated Use deleteThumbnail() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _deleteThumbnail().
      */
-    protected function deleteThumbnail($oArticle)
+    protected function _deleteThumbnail($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if ($this->canDeleteThumbnail($oArticle)) {
             if (!$oArticle->isDerived()) {
@@ -255,15 +264,18 @@ class ArticlePictures extends AdminDetailsController
     }
 
     /**
-     * Cleans up article custom fields oxicon and oxthumb. If there is custom
-     * icon or thumb picture, leaves records untouched.
+     * Deletes thumbnail file
      *
      * @param Article $oArticle article object
-     * @deprecated underscore prefix violates PSR12, will be renamed to "cleanupCustomFields" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteThumbnail(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteThumbnail() the canonical override target.
      */
-    protected function _cleanupCustomFields($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function deleteThumbnail($oArticle)
     {
-        $this->cleanupCustomFields($oArticle);
+        $this->_deleteThumbnail($oArticle);
     }
 
     /**
@@ -271,8 +283,12 @@ class ArticlePictures extends AdminDetailsController
      * icon or thumb picture, leaves records untouched.
      *
      * @param Article $oArticle article object
+     * @deprecated Use cleanupCustomFields() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _cleanupCustomFields().
      */
-    protected function cleanupCustomFields($oArticle)
+    protected function _cleanupCustomFields($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sIcon = $oArticle->oxarticles__oxicon->value;
         $sThumb = $oArticle->oxarticles__oxthumb->value;
@@ -284,6 +300,22 @@ class ArticlePictures extends AdminDetailsController
         if ($sThumb == 'nopic.jpg') {
             $oArticle->oxarticles__oxthumb = new Field();
         }
+    }
+
+    /**
+     * Cleans up article custom fields oxicon and oxthumb. If there is custom
+     * icon or thumb picture, leaves records untouched.
+     *
+     * @param Article $oArticle article object
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::cleanupCustomFields() (not the deprecated _cleanupCustomFields())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function cleanupCustomFields($oArticle)
+    {
+        $this->_cleanupCustomFields($oArticle);
     }
 
     /**

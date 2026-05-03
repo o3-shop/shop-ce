@@ -19,6 +19,10 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
+// NOTE: the die() calls below cannot use the ExitHandler abstraction — they fire
+// before bootstrap.php is included (bootstrap is loaded transitively via
+// require 'index.php' at the bottom of this file). Registry is not populated at
+// this point. See tasks/2026-04-21-exit-handler.md for context.
 // mod_rewrite check
 if (isset($_REQUEST['mod_rewrite_module_is'])) {
     $sMode = $_REQUEST['mod_rewrite_module_is'];

@@ -370,8 +370,8 @@ class InputValidatorTest extends UnitTestCase
         ];
         $aDelAdress = ['oxaddress__oxlname' => 'yyy'];
 
-        $validator = $this->getMock(InputValidator::class, ['addValidationError']);
-        $validator->expects($this->never())->method('addValidationError');
+        $validator = $this->getMock(InputValidator::class, ['_addValidationError']);
+        $validator->expects($this->never())->method('_addValidationError');
 
         $validator->checkRequiredFields(new oxUser(), $invAdress, $aDelAdress);
     }
@@ -381,8 +381,8 @@ class InputValidatorTest extends UnitTestCase
         $user = oxNew('oxuser');
         $user->setId('testlalaa_');
 
-        $validator = $this->getMock(InputValidator::class, ['addValidationError']);
-        $validator->expects($this->never())->method('addValidationError');
+        $validator = $this->getMock(InputValidator::class, ['_addValidationError']);
+        $validator->expects($this->never())->method('_addValidationError');
 
         $validator->checkPassword($user, '1234567', '1234567', true);
     }
@@ -394,8 +394,8 @@ class InputValidatorTest extends UnitTestCase
 
         $this->setConfigParam('iPasswordLength', 7);
 
-        $validator = $this->getMock(InputValidator::class, ['addValidationError']);
-        $validator->expects($this->never())->method('addValidationError');
+        $validator = $this->getMock(InputValidator::class, ['_addValidationError']);
+        $validator->expects($this->never())->method('_addValidationError');
 
         $validator->checkPassword($user, '1234567', '1234567', true);
     }
@@ -407,16 +407,16 @@ class InputValidatorTest extends UnitTestCase
 
         $this->setConfigParam('iPasswordLength', 8);
 
-        $validator = $this->getMock(InputValidator::class, ['addValidationError']);
-        $validator->expects($this->atLeastOnce())->method('addValidationError');
+        $validator = $this->getMock(InputValidator::class, ['_addValidationError']);
+        $validator->expects($this->atLeastOnce())->method('_addValidationError');
 
         $validator->checkPassword($user, '1234567', '1234567', true);
     }
 
     public function testCheckPasswordUserWithoutPasswordNothingMustHappen()
     {
-        $validator = $this->getMock(InputValidator::class, ['addValidationError']);
-        $validator->expects($this->never())->method('addValidationError');
+        $validator = $this->getMock(InputValidator::class, ['_addValidationError']);
+        $validator->expects($this->never())->method('_addValidationError');
 
         $validator->checkPassword(new oxuser(), '', '');
     }

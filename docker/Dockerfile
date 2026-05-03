@@ -45,6 +45,15 @@ RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=coverage,debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+# Node.js 20 LTS + global gulp-cli (o3-theme build pipeline) and grunt-cli
+# (wave-theme build pipeline). Themes ship their own local gulp/grunt versions
+# via node_modules; the *-cli globals just give us `gulp` / `grunt` on PATH so
+# `npm run build` style commands and direct invocations both work.
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g gulp-cli grunt-cli \
+    && node --version && npm --version
+
 RUN echo "date.timezone = Europe/Berlin" > /usr/local/etc/php/conf.d/timezone.ini \
     && echo "memory_limit = 11000M" > /usr/local/etc/php/conf.d/memory-limit.ini \
     && echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/upload-size.ini \

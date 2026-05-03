@@ -64,7 +64,7 @@ class CategoryMain extends AdminDetailsController
 
         if (isset($categoryId) && $categoryId != self::NEW_CATEGORY_ID) {
             // generating category tree for select list
-            $this->createCategoryTree('artcattree', $categoryId);
+            $this->_createCategoryTree('artcattree', $categoryId);
 
             // load object
             $oCategory->loadInLang($this->_iEditLang, $categoryId);
@@ -97,11 +97,11 @@ class CategoryMain extends AdminDetailsController
                 $oCategory->oxcategories__oxparentid->setValue('');
             }
 
-            $this->getCategoryTree('cattree', $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
+            $this->_getCategoryTree('cattree', $oCategory->oxcategories__oxparentid->value, $oCategory->oxcategories__oxid->value, true, $oCategory->oxcategories__oxshopid->value);
 
             $this->_aViewData['defsort'] = $oCategory->oxcategories__oxdefsort->value;
         } else {
-            $this->createCategoryTree('cattree', '', true, $myConfig->getShopId());
+            $this->_createCategoryTree('cattree', '', true, $myConfig->getShopId());
         }
 
         $this->_aViewData['sortableFields'] = $this->getSortableFields();
@@ -157,7 +157,7 @@ class CategoryMain extends AdminDetailsController
 
         $soxId = $this->getEditObjectId();
 
-        $aParams = $this->parseRequestParametersForSave(
+        $aParams = $this->_parseRequestParametersForSave(
             Registry::getRequest()->getRequestEscapedParameter('editval')
         );
 
@@ -186,11 +186,18 @@ class CategoryMain extends AdminDetailsController
      * @param string $sValue value to fix
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processLongDesc" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _processLongDesc()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes processLongDesc() to the canonical override
+      *             target and retires _processLongDesc(); until then, _processLongDesc() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _processLongDesc($sValue) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->processLongDesc($sValue);
+        // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
+        return str_replace('&lang=', '&amp;lang=', $sValue);
     }
 
     /**
@@ -199,11 +206,15 @@ class CategoryMain extends AdminDetailsController
      * @param string $sValue value to fix
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processLongDesc(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processLongDesc() the canonical override target.
      */
     protected function processLongDesc($sValue)
     {
-        // workaround for firefox showing &lang= as &9001;= entity, mantis#0001272
-        return str_replace('&lang=', '&amp;lang=', $sValue);
+        return $this->_processLongDesc($sValue);
     }
 
     /**
@@ -246,7 +257,7 @@ class CategoryMain extends AdminDetailsController
         /** @var Category $oItem */
         $oItem = oxNew(Category::class);
         $oItem->load($sOxId);
-        $this->deleteCatPicture($oItem, $sField);
+        $this->_deleteCatPicture($oItem, $sField);
     }
 
     /**
@@ -257,23 +268,15 @@ class CategoryMain extends AdminDetailsController
      *
      * @return void
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "deleteCatPicture" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _deleteCatPicture()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes deleteCatPicture() to the canonical override
+      *             target and retires _deleteCatPicture(); until then, _deleteCatPicture() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _deleteCatPicture($item, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->deleteCatPicture($item, $field);
-    }
-
-    /**
-     * Delete category picture, specified in $sField parameter
-     *
-     * @param Category $item active category object
-     * @param string $field picture field name
-     *
-     * @return void
-     * @throws Exception
-     */
-    protected function deleteCatPicture($item, $field)
     {
         if ($item->isDerived()) {
             return;
@@ -314,16 +317,22 @@ class CategoryMain extends AdminDetailsController
     }
 
     /**
-     * Parse parameters prior to saving category.
+     * Delete category picture, specified in $sField parameter
      *
-     * @param array $aReqParams Request parameters.
+     * @param Category $item active category object
+     * @param string $field picture field name
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "parseRequestParametersForSave" in next major
+     * @return void
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteCatPicture(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteCatPicture() the canonical override target.
      */
-    protected function _parseRequestParametersForSave($aReqParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function deleteCatPicture($item, $field)
     {
-        return $this->parseRequestParametersForSave($aReqParams);
+        $this->_deleteCatPicture($item, $field);
     }
 
     /**
@@ -332,8 +341,15 @@ class CategoryMain extends AdminDetailsController
      * @param array $aReqParams Request parameters.
      *
      * @return array
+     * @deprecated Transitional during #107. Modules SHOULD override _parseRequestParametersForSave()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes parseRequestParametersForSave() to the canonical override
+      *             target and retires _parseRequestParametersForSave(); until then, _parseRequestParametersForSave() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function parseRequestParametersForSave($aReqParams)
+    protected function _parseRequestParametersForSave($aReqParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         // checkbox handling
         if (!isset($aReqParams['oxcategories__oxactive'])) {
@@ -359,7 +375,7 @@ class CategoryMain extends AdminDetailsController
         }
 
         if (isset($aReqParams['oxcategories__oxlongdesc'])) {
-            $aReqParams['oxcategories__oxlongdesc'] = $this->processLongDesc($aReqParams['oxcategories__oxlongdesc']);
+            $aReqParams['oxcategories__oxlongdesc'] = $this->_processLongDesc($aReqParams['oxcategories__oxlongdesc']);
         }
 
         if (empty($aReqParams['oxcategories__oxpricefrom'])) {
@@ -370,6 +386,23 @@ class CategoryMain extends AdminDetailsController
         }
 
         return $aReqParams;
+    }
+
+    /**
+     * Parse parameters prior to saving category.
+     *
+     * @param array $aReqParams Request parameters.
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _parseRequestParametersForSave(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make parseRequestParametersForSave() the canonical override target.
+     */
+    protected function parseRequestParametersForSave($aReqParams)
+    {
+        return $this->_parseRequestParametersForSave($aReqParams);
     }
 
     /**

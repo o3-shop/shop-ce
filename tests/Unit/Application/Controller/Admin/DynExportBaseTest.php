@@ -417,8 +417,8 @@ class DynExportBaseTest extends \OxidTestCase
     public function testGetOneArticle()
     {
         $blContinue = null;
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController::class, ['initArticle', 'getHeapTableName', 'setCampaignDetailLink']);
-        $oView->expects($this->once())->method('initArticle')->with($this->equalTo('oxarticles'), $this->equalTo(0))->will($this->returnValue(oxNew('oxarticle')));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicExportBaseController::class, ['_initArticle', 'getHeapTableName', 'setCampaignDetailLink']);
+        $oView->expects($this->once())->method('_initArticle')->with($this->equalTo('oxarticles'), $this->equalTo(0))->will($this->returnValue(oxNew('oxarticle')));
         $oView->expects($this->once())->method('getHeapTableName')->will($this->returnValue('oxarticles'));
         $oView->expects($this->once())->method('setCampaignDetailLink')->with($this->isInstanceOf('\OxidEsales\EshopCommunity\Application\Model\Article'))->will($this->returnValue(oxNew('oxarticle')));
 

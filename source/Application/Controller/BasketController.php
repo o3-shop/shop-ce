@@ -392,7 +392,7 @@ class BasketController extends FrontendController
         if ($this->getViewConfig()->getShowGiftWrapping()) {
             $oBasket = Registry::getSession()->getBasket();
 
-            $this->setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
+            $this->_setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
 
             $oBasket->setCardMessage($oRequest->getRequestEscapedParameter('giftmessage'));
             $oBasket->setCardId($oRequest->getRequestEscapedParameter('chosencard'));
@@ -434,20 +434,12 @@ class BasketController extends FrontendController
      *
      * @param Basket $oBasket
      * @param array                                      $aWrapping
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setWrappingInfo" in next major
+     * @deprecated Use setWrappingInfo() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _setWrappingInfo().
      */
     protected function _setWrappingInfo($oBasket, $aWrapping) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setWrappingInfo($oBasket, $aWrapping);
-    }
-
-    /**
-     * Sets basket wrapping
-     *
-     * @param Basket $oBasket
-     * @param array $aWrapping
-     */
-    protected function setWrappingInfo($oBasket, $aWrapping)
     {
         if (is_array($aWrapping) && count($aWrapping)) {
             foreach ($oBasket->getContents() as $sKey => $oBasketItem) {
@@ -456,5 +448,21 @@ class BasketController extends FrontendController
                 }
             }
         }
+    }
+
+    /**
+     * Sets basket wrapping
+     *
+     * @param Basket $oBasket
+     * @param array $aWrapping
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setWrappingInfo() (not the deprecated _setWrappingInfo()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function setWrappingInfo($oBasket, $aWrapping)
+    {
+        $this->_setWrappingInfo($oBasket, $aWrapping);
     }
 }

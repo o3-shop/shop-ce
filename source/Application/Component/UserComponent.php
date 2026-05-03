@@ -120,9 +120,9 @@ class UserComponent extends BaseController
      */
     public function init()
     {
-        $this->saveDeliveryAddressState();
-        $this->loadSessionUser();
-        $this->saveInvitor();
+        $this->_saveDeliveryAddressState();
+        $this->_loadSessionUser();
+        $this->_saveInvitor();
 
         parent::init();
     }
@@ -136,7 +136,7 @@ class UserComponent extends BaseController
     public function render()
     {
         // checks if private sales allows further tasks
-        $this->checkPsState();
+        $this->_checkPsState();
 
         parent::render();
 
@@ -150,22 +150,11 @@ class UserComponent extends BaseController
      * In case any condition is not satisfied redirects user to:
      *  (1) login page;
      *  (2) terms agreement page;
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkPsState" in next major
+     * @deprecated Use checkPsState() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _checkPsState().
      */
     protected function _checkPsState() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->checkPsState();
-    }
-
-    /**
-     * If private sales enabled, checks:
-     *  (1) if no session user and view can be accessed;
-     *  (2) session user is available and accepted terms version matches actual version.
-     * In case any condition is not satisfied redirects user to:
-     *  (1) login page;
-     *  (2) terms agreement page;
-     */
-    protected function checkPsState()
     {
         $oConfig = Registry::getConfig();
         if ($this->getParent()->isEnabledPrivateSales()) {
@@ -185,26 +174,35 @@ class UserComponent extends BaseController
     }
 
     /**
-     * Tries to load user ID from session.
+     * If private sales enabled, checks:
+     *  (1) if no session user and view can be accessed;
+     *  (2) session user is available and accepted terms version matches actual version.
+     * In case any condition is not satisfied redirects user to:
+     *  (1) login page;
+     *  (2) terms agreement page;
      *
-     * @return null
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "loadSessionUser" in next major
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::checkPsState() (not the deprecated _checkPsState()) so downstream
+     *           overrides in the class chain are preserved. Template-method refactor tracked
+     *           in o3-shop/o3-shop#108.
      */
-    protected function _loadSessionUser() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function checkPsState()
     {
-        return $this->loadSessionUser();
+        $this->_checkPsState();
     }
 
     /**
      * Tries to load user ID from session.
      *
-     * @return void
+     * @return null
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Use loadSessionUser() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _loadSessionUser().
      */
-    protected function loadSessionUser()
+    protected function _loadSessionUser() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
         $oUser = $this->getUser();
@@ -227,6 +225,23 @@ class UserComponent extends BaseController
                 $oBasket->onUpdate();
             }
         }
+    }
+
+    /**
+     * Tries to load user ID from session.
+     *
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::loadSessionUser() (not the deprecated _loadSessionUser()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function loadSessionUser()
+    {
+        $this->_loadSessionUser();
     }
 
     /**
@@ -268,7 +283,7 @@ class UserComponent extends BaseController
         }
 
         // finalizing ..
-        return $this->afterLogin($oUser);
+        return $this->_afterLogin($oUser);
     }
 
     /**
@@ -286,30 +301,11 @@ class UserComponent extends BaseController
      * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "afterLogin" in next major
+     * @deprecated Use afterLogin() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _afterLogin().
      */
     protected function _afterLogin($oUser) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->afterLogin($oUser);
-    }
-
-    /**
-     * Special functionality which is performed after user logs in (or user is created without pass).
-     * Performs additional checking if user is not BLOCKED
-     * (\OxidEsales\Eshop\Application\Model\User::InGroup("oxidblocked")) - if yes - redirects to blocked user
-     * page ("cl=content&tpl=user_blocked.tpl").
-     * Stores cookie info if user confirmed in login screen.
-     * Then loads delivery info and forces basket to recalculate
-     * (\OxidEsales\Eshop\Core\Session::getBasket() + oBasket::blCalcNeeded = true). Returns
-     * "payment" to redirect to payment screen. If problems occurred loading
-     * user - sets error code according problem, and returns "user" to redirect
-     * to user info screen.
-     *
-     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
-     *
-     * @return string
-     */
-    protected function afterLogin($oUser)
     {
         $oSession = Registry::getSession();
         if ($oSession->isSessionStarted()) {
@@ -328,6 +324,32 @@ class UserComponent extends BaseController
         }
 
         return 'payment';
+    }
+
+    /**
+     * Special functionality which is performed after user logs in (or user is created without pass).
+     * Performs additional checking if user is not BLOCKED
+     * (\OxidEsales\Eshop\Application\Model\User::InGroup("oxidblocked")) - if yes - redirects to blocked user
+     * page ("cl=content&tpl=user_blocked.tpl").
+     * Stores cookie info if user confirmed in login screen.
+     * Then loads delivery info and forces basket to recalculate
+     * (\OxidEsales\Eshop\Core\Session::getBasket() + oBasket::blCalcNeeded = true). Returns
+     * "payment" to redirect to payment screen. If problems occurred loading
+     * user - sets error code according problem, and returns "user" to redirect
+     * to user info screen.
+     *
+     * @param \OxidEsales\Eshop\Application\Model\User $oUser user object
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _afterLogin(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make afterLogin() the canonical override target.
+     */
+    protected function afterLogin($oUser)
+    {
+        return $this->_afterLogin($oUser);
     }
 
     /**
@@ -363,20 +385,11 @@ class UserComponent extends BaseController
      * oxcmp_user::logout is called. Currently, it unsets such
      * session parameters as user chosen payment id, delivery
      * address id, active delivery set.
-     * @deprecated underscore prefix violates PSR12, will be renamed to "afterLogout" in next major
+     * @deprecated Use afterLogout() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _afterLogout().
      */
     protected function _afterLogout() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->afterLogout();
-    }
-
-    /**
-     * Special utility function which is executed right after
-     * oxcmp_user::logout is called. Currently, it unsets such
-     * session parameters as user chosen payment id, delivery
-     * address id, active delivery set.
-     */
-    protected function afterLogout()
     {
         Registry::getSession()->deleteVariable('paymentid');
         Registry::getSession()->deleteVariable('sShipSet');
@@ -400,6 +413,22 @@ class UserComponent extends BaseController
     }
 
     /**
+     * Special utility function which is executed right after
+     * oxcmp_user::logout is called. Currently, it unsets such
+     * session parameters as user chosen payment id, delivery
+     * address id, active delivery set.
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _afterLogout(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make afterLogout() the canonical override target.
+     */
+    protected function afterLogout()
+    {
+        $this->_afterLogout();
+    }
+
+    /**
      * Deletes user information from session:<br>
      * "usr", "dynvalue", "paymentid"<br>
      * also deletes cookie, unsets \OxidEsales\Eshop\Core\Config::oUser,
@@ -416,7 +445,7 @@ class UserComponent extends BaseController
             $this->setLoginStatus(USER_LOGOUT);
 
             // finalizing ..
-            $this->afterLogout();
+            $this->_afterLogout();
 
             $this->resetPermissions();
 
@@ -426,7 +455,7 @@ class UserComponent extends BaseController
 
             // redirecting if user logs out in SSL mode
             if (Registry::getRequest()->getRequestEscapedParameter('redirect') && $myConfig->getConfigParam('sSSLShopURL')) {
-                Registry::getUtils()->redirect($this->getLogoutLink());
+                Registry::getUtils()->redirect($this->_getLogoutLink());
             }
         }
     }
@@ -524,7 +553,7 @@ class UserComponent extends BaseController
         $aInvAddress = $this->cleanAddress($aInvAddress, oxNew(UserUpdatableFields::class));
         $aInvAddress = $this->trimAddress($aInvAddress);
 
-        $aDelAddress = $this->getDelAddressData();
+        $aDelAddress = $this->_getDelAddressData();
         $aDelAddress = $this->cleanAddress($aDelAddress, oxNew(UserShippingAddressUpdatableFields::class));
         $aDelAddress = $this->trimAddress($aDelAddress);
 
@@ -612,7 +641,7 @@ class UserComponent extends BaseController
 
         if (!$blActiveLogin) {
             Registry::getSession()->setVariable('usr', $oUser->getId());
-            $this->afterLogin($oUser);
+            $this->_afterLogin($oUser);
 
             // order remark
             //V #427: order remark for new users
@@ -712,17 +741,11 @@ class UserComponent extends BaseController
 
     /**
      * Saves invitor ID
-     * @deprecated underscore prefix violates PSR12, will be renamed to "saveInvitor" in next major
+     * @deprecated Use saveInvitor() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _saveInvitor().
      */
     protected function _saveInvitor() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->saveInvitor();
-    }
-
-    /**
-     * Saves invitor ID
-     */
-    protected function saveInvitor()
     {
         if (Registry::getConfig()->getConfigParam('blInvitationsEnabled')) {
             $this->getInvitor();
@@ -731,18 +754,26 @@ class UserComponent extends BaseController
     }
 
     /**
-     * Saving show/hide delivery address state
-     * @deprecated underscore prefix violates PSR12, will be renamed to "saveDeliveryAddressState" in next major
+     * Saves invitor ID
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _saveInvitor(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make saveInvitor() the canonical override target.
      */
-    protected function _saveDeliveryAddressState() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function saveInvitor()
     {
-        return $this->saveDeliveryAddressState();
+        $this->_saveInvitor();
     }
 
     /**
      * Saving show/hide delivery address state
+     * @deprecated Use saveDeliveryAddressState() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _saveDeliveryAddressState().
      */
-    protected function saveDeliveryAddressState()
+    protected function _saveDeliveryAddressState() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oSession = Registry::getSession();
 
@@ -752,6 +783,19 @@ class UserComponent extends BaseController
         }
 
         $oSession->setVariable('blshowshipaddress', $blShow);
+    }
+
+    /**
+     * Saving show/hide delivery address state
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::saveDeliveryAddressState() (not the deprecated
+     *           _saveDeliveryAddressState()) so downstream overrides in the class chain are
+     *           preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function saveDeliveryAddressState()
+    {
+        $this->_saveDeliveryAddressState();
     }
 
     /**
@@ -800,7 +844,7 @@ class UserComponent extends BaseController
         }
 
         // collecting values to check
-        $aDelAddress = $this->getDelAddressData();
+        $aDelAddress = $this->_getDelAddressData();
         $aDelAddress = $this->cleanAddress($aDelAddress, oxNew(UserShippingAddressUpdatableFields::class));
         $aDelAddress = $this->trimAddress($aDelAddress);
 
@@ -874,20 +918,12 @@ class UserComponent extends BaseController
      * all needed data is there
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getDelAddressData" in next major
+     * @deprecated Use getDelAddressData() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _getDelAddressData().
      */
     protected function _getDelAddressData() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getDelAddressData();
-    }
-
-    /**
-     * Returns delivery address from request. Before returning array is checked if
-     * all needed data is there
-     *
-     * @return array
-     */
-    protected function getDelAddressData()
     {
         // if user company name, username and additional info has special chars
         $blShowShipAddressParameter = Registry::getRequest()->getRequestEscapedParameter('blshowshipaddress');
@@ -911,22 +947,30 @@ class UserComponent extends BaseController
     }
 
     /**
-     * Returns logout link with additional params
+     * Returns delivery address from request. Before returning array is checked if
+     * all needed data is there
      *
-     * @return string $sLogoutLink
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLogoutLink" in next major
+     * @return array
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getDelAddressData() (not the deprecated _getDelAddressData()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getLogoutLink() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getDelAddressData()
     {
-        return $this->getLogoutLink();
+        return $this->_getDelAddressData();
     }
 
     /**
      * Returns logout link with additional params
      *
      * @return string $sLogoutLink
+     * @deprecated Use getLogoutLink() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _getLogoutLink().
      */
-    protected function getLogoutLink()
+    protected function _getLogoutLink() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
@@ -955,6 +999,21 @@ class UserComponent extends BaseController
         // END deprecated
 
         return $sLogoutLink . '&amp;fnc=logout';
+    }
+
+    /**
+     * Returns logout link with additional params
+     *
+     * @return string $sLogoutLink
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getLogoutLink() (not the deprecated _getLogoutLink()) so downstream
+     *           overrides in the class chain are preserved. Template-method refactor tracked
+     *           in o3-shop/o3-shop#108.
+     */
+    protected function getLogoutLink()
+    {
+        return $this->_getLogoutLink();
     }
 
     /**

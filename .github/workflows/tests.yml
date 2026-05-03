@@ -170,6 +170,9 @@ jobs:
       - name: 🗄️ Create Test Database
         run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
 
+      - name: 🔒 Check PHPUnit INI Safety (GHSA-qrr6-mg7r-m243)
+        run: php bin/check-phpunit-ini-safety.php
+
       - name: ✅ Run PHPUnit (with Coverage)
         id: phpunit
         continue-on-error: true
@@ -196,9 +199,9 @@ jobs:
         id: parse_failed_tests
         run: |
           if [ -f junit.xml ]; then
-            FAILURES=$(xmllint --xpath "count(//testcase[failure])" junit.xml 2>/dev/null || echo "0")
+            FAILURES=$(xmllint --xpath "count(//testcase[failure or error])" junit.xml 2>/dev/null || echo "0")
             ERROR_OUTPUT=$(
-              xmllint --xpath '//testcase[failure]' junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
+              xmllint --xpath '//testcase[failure or error]' junit.xml 2>/dev/null | tr '\n' ' ' | perl -ne '
               while (/<testcase\b([^>]*)>/g) {
                 my $attr = $1;
                 my ($class) = $attr =~ /\bclass="([^"]*)"/;

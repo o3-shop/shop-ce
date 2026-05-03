@@ -85,4 +85,49 @@ class ThemeConfigTest extends \OxidTestCase
 
         $oTheme_Config->saveConfVars();
     }
+
+    /**
+     * ThemeConfiguration::save() must NOT execute the parent
+     * ShopConfiguration::save() oxshops branch. On the theme-config screen
+     * `getEditObjectId()` returns the theme name (e.g. 'wave'), not a shop
+     * OXID — letting the parent run causes an erroneous oxshops write
+     * (INSERT on OXID=0 / theme name) that throws when saving theme
+     * settings.
+     *
+     * Verify behaviorally:
+     *  - save() invokes saveConfVars() exactly once.
+     *  - oxNew(Shop::class) is not called from save() — proven by
+     *    routing the oxNew via UtilsObject::setClassInstance to a mock
+     *    whose load()/save() are forbidden expectations.
+     */
+    public function testSaveSkipsParentShopBranch()
+    {
+        $sThemeName = 'wave';
+
+        // Forbid Shop::load() / Shop::save() — these would fire if the
+        // parent ShopConfiguration::save() body executed.
+        $shopMock = $this->getMock(\OxidEsales\Eshop\Application\Model\Shop::class, ['load', 'save', 'assign']);
+        $shopMock->expects($this->never())->method('load');
+        $shopMock->expects($this->never())->method('save');
+        $shopMock->expects($this->never())->method('assign');
+        \OxidEsales\Eshop\Core\UtilsObject::setClassInstance(
+            \OxidEsales\Eshop\Application\Model\Shop::class,
+            $shopMock
+        );
+
+        /** @var \OxidEsales\Eshop\Application\Controller\Admin\ThemeConfiguration|\PHPUnit\Framework\MockObject\MockObject $oTheme_Config */
+        $oTheme_Config = $this->getMock(
+            \OxidEsales\Eshop\Application\Controller\Admin\ThemeConfiguration::class,
+            ['saveConfVars', 'getEditObjectId'],
+            [],
+            '',
+            false
+        );
+        $oTheme_Config->expects($this->once())->method('saveConfVars');
+        $oTheme_Config->expects($this->any())->method('getEditObjectId')->will($this->returnValue($sThemeName));
+
+        $oTheme_Config->save();
+
+        \OxidEsales\Eshop\Core\UtilsObject::resetClassInstances();
+    }
 }

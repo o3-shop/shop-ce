@@ -49,8 +49,14 @@ composer.lock
 
 .env
 /.phpstorm.meta.php/oxid.meta.php
-/source/Application/views/wave/*
-/source/Application/views/o3-theme/*
+/source/Application/views/wave
+/source/Application/views/o3-theme
+
+# Satellite working tree for shop-demodata-ce. Cloned at top level (not in
+# vendor/) so PhpStorm's Composer integration doesn't auto-exclude it; the
+# entrypoint then symlinks vendor/o3-shop/shop-demodata-ce -> here so
+# composer/code paths keep working unchanged.
+/shop-demodata-ce
 /source/out/pictures/generated/*
 /source/out/pictures/master/category/*
 
@@ -58,8 +64,8 @@ composer.lock
 /source/out/pictures/master/product/*
 /source/out/pictures/master/wrapping/img_ecard_03_wp.jpg
 /source/out/pictures/promo/*
-/source/out/wave/*
-/source/out/o3-theme/*
+/source/out/wave
+/source/out/o3-theme
 /var/configuration/shops/1.yaml
 /var/generated/generated_services.yaml
 docker/database/data
@@ -75,3 +81,6 @@ dir.txt
 oxideshop.log
 /source/modules/testmodule/metadata.php
 /var/configuration-backup/shops/1.yaml
+/.claude/settings.local.json
+/.playwright-mcp/
+/openspec/changes/fix-underscore-method-inheritance/findings.json

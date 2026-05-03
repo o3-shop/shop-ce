@@ -428,16 +428,20 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * Used to collect user validation errors. This method is called from all of
      * the input checking functionality to report found error.
      *
-     * @deprecated since v6.0.0(2017-12-22); Use addValidationError.
-     *
-     * @param string            $fieldName Field name.
+     * @deprecated Transitional during #107. Modules SHOULD override _addValidationError()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addValidationError() to the canonical override
+      *             target and retires _addValidationError(); until then, _addValidationError() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      * @param StandardException $error     Exception.
      *
      * @return StandardException
      */
     protected function _addValidationError($fieldName, $error) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->addValidationError($fieldName, $error);
+        return $this->_aInputValidationErrors[$fieldName][] = $error;
     }
 
     /**
@@ -448,10 +452,15 @@ class InputValidator extends \OxidEsales\Eshop\Core\Base
      * @param StandardException $error
      *
      * @return StandardException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addValidationError(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addValidationError() the canonical override target.
      */
     public function addValidationError($fieldName, $error)
     {
-        return $this->_aInputValidationErrors[$fieldName][] = $error;
+        return $this->_addValidationError($fieldName, $error);
     }
 
     /**

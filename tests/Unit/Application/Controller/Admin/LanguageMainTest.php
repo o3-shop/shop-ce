@@ -68,9 +68,9 @@ class LanguageMainTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
-        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['validateInput', 'getLanguages'], [], '', false);
-        $oMainLang->expects($this->once())->method('getLanguages')->will($this->returnValue($aDefaultLangData));
-        $oMainLang->expects($this->once())->method('validateInput')->will($this->returnValue(true));
+        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_validateInput', '_getLanguages'], [], '', false);
+        $oMainLang->expects($this->once())->method('_getLanguages')->will($this->returnValue($aDefaultLangData));
+        $oMainLang->expects($this->once())->method('_validateInput')->will($this->returnValue(true));
 
         $oMainLang->save();
     }
@@ -101,11 +101,11 @@ class LanguageMainTest extends \OxidTestCase
 
         $this->getConfig()->setConfigParam('blAllowSharedEdit', true);
 
-        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['validateInput', 'checkMultilangFieldsExistsInDb', 'addNewMultilangFieldsToDb', 'getLanguages'], [], '', false);
-        $oMainLang->expects($this->once())->method('getLanguages')->will($this->returnValue($aLangData));
-        $oMainLang->expects($this->once())->method('validateInput')->will($this->returnValue(true));
-        $oMainLang->expects($this->once())->method('checkMultilangFieldsExistsInDb')->with($this->equalTo('fr'))->will($this->returnValue(false));
-        $oMainLang->expects($this->once())->method('addNewMultilangFieldsToDb');
+        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_validateInput', '_checkMultilangFieldsExistsInDb', '_addNewMultilangFieldsToDb', '_getLanguages'], [], '', false);
+        $oMainLang->expects($this->once())->method('_getLanguages')->will($this->returnValue($aLangData));
+        $oMainLang->expects($this->once())->method('_validateInput')->will($this->returnValue(true));
+        $oMainLang->expects($this->once())->method('_checkMultilangFieldsExistsInDb')->with($this->equalTo('fr'))->will($this->returnValue(false));
+        $oMainLang->expects($this->once())->method('_addNewMultilangFieldsToDb');
 
         $oMainLang->save();
     }
@@ -407,8 +407,8 @@ class LanguageMainTest extends \OxidTestCase
         $this->setRequestParameter('oxid', '-1');
         $this->setRequestParameter('editval', ['abbr' => 'en']);
 
-        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['checkLangExists']);
-        $oMainLang->expects($this->once())->method('checkLangExists')->with($this->equalTo('en'))->will($this->returnValue(true));
+        $oMainLang = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_checkLangExists']);
+        $oMainLang->expects($this->once())->method('_checkLangExists')->with($this->equalTo('en'))->will($this->returnValue(true));
 
         $this->assertFalse($oMainLang->UNITvalidateInput());
 
@@ -468,8 +468,8 @@ class LanguageMainTest extends \OxidTestCase
         $this->setRequestParameter('oxid', '-1');
         $this->setRequestParameter('editval', ['abbr' => 'ch-xx']);
 
-        $mainLanguage = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['checkLangExists']);
-        $mainLanguage->expects($this->once())->method('checkLangExists')->with($this->equalTo('ch-xx'))->will($this->returnValue(false));
+        $mainLanguage = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, ['_checkLangExists']);
+        $mainLanguage->expects($this->once())->method('_checkLangExists')->with($this->equalTo('ch-xx'))->will($this->returnValue(false));
 
         $this->assertFalse($mainLanguage->UNITvalidateInput());
 
@@ -478,5 +478,115 @@ class LanguageMainTest extends \OxidTestCase
         $errorMessage = oxRegistry::getLang()->translateString('LANGUAGE_ABBREVIATION_INVALID_ERROR');
 
         $this->assertEquals($errorMessage, $exception->getOxMessage());
+    }
+
+    /**
+     * Helper: invoke the protected gate via reflection so tests don't depend
+     * on the OXID UNIT* proxy (which routes to underscore-prefixed methods).
+     */
+    private function invokeGate($controller, string $sOxId, array $aParams): bool
+    {
+        $r = new \ReflectionMethod(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class, 'revocationActivationGatePasses');
+        $r->setAccessible(true);
+        return (bool) $r->invoke($controller, $sOxId, $aParams);
+    }
+
+    /**
+     * The §356a `blShowRevocationForm` row is seeded into oxconfig by
+     * `initial_data.sql` (task 1.7). Reset it to `false` for each test in
+     * this class so the language-admin `save()` flow is not gated by the
+     * unrelated revocation feature — gate-specific behaviour is asserted
+     * by the four `testRevocationGate*` tests below.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->getConfig()->setConfigParam('blShowRevocationForm', false);
+    }
+
+    /**
+     * §356a template-presence gate (phase 8.2): when the revocation form
+     * is OFF, the gate always passes — even if the validator would have
+     * found missing assets. Validator must NOT be consulted.
+     */
+    public function testRevocationGateFeatureOffPasses()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', false);
+
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->never())->method('validate');
+
+        $controller = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $this->assertTrue($this->invokeGate($controller, '-1', ['active' => 1]));
+    }
+
+    /**
+     * §356a gate: feature on, language being saved as inactive — gate passes,
+     * validator not consulted (no template requirement when language is off).
+     */
+    public function testRevocationGateInactiveLanguagePasses()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', true);
+
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->never())->method('validate');
+
+        $controller = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $this->assertTrue($this->invokeGate($controller, '-1', ['active' => 0]));
+    }
+
+    /**
+     * §356a gate: feature on, validator returns no missing assets — gate
+     * passes; the save proceeds.
+     */
+    public function testRevocationGateNoMissingAssetsPasses()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', true);
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
+
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->once())->method('validate')->willReturn([]);
+
+        $controller = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $this->assertTrue($this->invokeGate($controller, '-1', ['active' => 1]));
+    }
+
+    /**
+     * §356a gate: feature on, validator reports a missing asset — gate
+     * rejects. The remediation hint is pushed to the admin error display
+     * and the raw missing-asset list is exposed for the template re-render.
+     */
+    public function testRevocationGateMissingAssetsRejects()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', true);
+        $this->getConfig()->setConfigParam('sTheme', 'wave');
+
+        $missing = new \OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset(
+            'translation_key',
+            'O3_REVOCATION_FORM_HEADING',
+            7,
+            'Add the missing translation key to language id 7.'
+        );
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->once())->method('validate')->willReturn([$missing]);
+
+        $controller = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\LanguageMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $this->assertFalse($this->invokeGate($controller, '-1', ['active' => 1]));
+
+        $viewData = $controller->getViewData();
+        $this->assertArrayHasKey('revocationMissingAssets', $viewData);
+        $this->assertCount(1, $viewData['revocationMissingAssets']);
+        $this->assertSame(
+            'Add the missing translation key to language id 7.',
+            $viewData['revocationMissingAssets'][0]['hint']
+        );
     }
 }

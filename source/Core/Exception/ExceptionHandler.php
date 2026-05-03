@@ -268,6 +268,8 @@ class ExceptionHandler
      */
     protected function exitApplication()
     {
-        exit(1);
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(1);
     }
 }

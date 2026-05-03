@@ -69,25 +69,33 @@ class RssController extends FrontendController
      * get RssFeed
      *
      * @return RssFeed
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getRssFeed" in next major
+     * @deprecated Use getRssFeed() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getRssFeed().
      */
     protected function _getRssFeed() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getRssFeed();
-    }
-
-    /**
-     * get RssFeed
-     *
-     * @return RssFeed
-     */
-    protected function getRssFeed()
     {
         if (!$this->_oRss) {
             $this->_oRss = oxNew(RssFeed::class);
         }
 
         return $this->_oRss;
+    }
+
+    /**
+     * get RssFeed
+     *
+     * @return RssFeed
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getRssFeed(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getRssFeed() the canonical override target.
+     */
+    protected function getRssFeed()
+    {
+        return $this->_getRssFeed();
     }
 
     /**
@@ -113,7 +121,7 @@ class RssController extends FrontendController
         $sCharset = Registry::getLang()->translateString('charset');
         Registry::getUtils()->setHeader('Content-Type: text/xml; charset=' . $sCharset);
         Registry::getUtils()->showMessageAndExit(
-            $this->processOutput(
+            $this->_processOutput(
                 $renderer->renderTemplate($this->_sThisTemplate, $this->_aViewData)
             )
         );
@@ -137,11 +145,14 @@ class RssController extends FrontendController
      * @param string $sInput input to process
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processOutput" in next major
+     * @deprecated Use processOutput() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processOutput().
      */
     protected function _processOutput($sInput) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->processOutput($sInput);
+        return Str::getStr()->recodeEntities($sInput);
     }
 
     /**
@@ -150,10 +161,15 @@ class RssController extends FrontendController
      * @param string $sInput input to process
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::processOutput() (not the deprecated _processOutput()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     protected function processOutput($sInput)
     {
-        return Str::getStr()->recodeEntities($sInput);
+        return $this->_processOutput($sInput);
     }
 
     /**
@@ -164,7 +180,7 @@ class RssController extends FrontendController
     public function topshop()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssTopShop')) {
-            $this->getRssFeed()->loadTopInShop();
+            $this->_getRssFeed()->loadTopInShop();
         } else {
             error_404_handler();
         }
@@ -178,7 +194,7 @@ class RssController extends FrontendController
     public function newarts()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssNewest')) {
-            $this->getRssFeed()->loadNewestArticles();
+            $this->_getRssFeed()->loadNewestArticles();
         } else {
             error_404_handler();
         }
@@ -194,7 +210,7 @@ class RssController extends FrontendController
         if (Registry::getConfig()->getConfigParam('bl_rssCategories')) {
             $oCat = oxNew(Category::class);
             if ($oCat->load(Registry::getRequest()->getRequestEscapedParameter('cat'))) {
-                $this->getRssFeed()->loadCategoryArticles($oCat);
+                $this->_getRssFeed()->loadCategoryArticles($oCat);
             }
         } else {
             error_404_handler();
@@ -214,7 +230,7 @@ class RssController extends FrontendController
             $sVendorId = Registry::getRequest()->getRequestEscapedParameter('searchvendor');
             $sManufacturerId = Registry::getRequest()->getRequestEscapedParameter('searchmanufacturer');
 
-            $this->getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
+            $this->_getRssFeed()->loadSearchArticles($sSearchParameter, $sCatId, $sVendorId, $sManufacturerId);
         } else {
             error_404_handler();
         }
@@ -234,7 +250,7 @@ class RssController extends FrontendController
         if ($this->getViewConfig()->getShowListmania() && Registry::getConfig()->getConfigParam('bl_rssRecommLists')) {
             $oArticle = oxNew(Article::class);
             if ($oArticle->load(Registry::getRequest()->getRequestEscapedParameter('anid'))) {
-                $this->getRssFeed()->loadRecommLists($oArticle);
+                $this->_getRssFeed()->loadRecommLists($oArticle);
 
                 return;
             }
@@ -256,7 +272,7 @@ class RssController extends FrontendController
         if (Registry::getConfig()->getConfigParam('bl_rssRecommListArts')) {
             $oRecommList = oxNew(RecommendationList::class);
             if ($oRecommList->load(Registry::getRequest()->getRequestEscapedParameter('recommid'))) {
-                $this->getRssFeed()->loadRecommListArticles($oRecommList);
+                $this->_getRssFeed()->loadRecommListArticles($oRecommList);
 
                 return;
             }
@@ -272,7 +288,7 @@ class RssController extends FrontendController
     public function bargain()
     {
         if (Registry::getConfig()->getConfigParam('bl_rssBargain')) {
-            $this->getRssFeed()->loadBargain();
+            $this->_getRssFeed()->loadBargain();
         } else {
             error_404_handler();
         }
@@ -286,7 +302,7 @@ class RssController extends FrontendController
     public function getChannel()
     {
         if ($this->_oChannel === null) {
-            $this->_oChannel = $this->getRssFeed()->getChannel();
+            $this->_oChannel = $this->_getRssFeed()->getChannel();
         }
 
         return $this->_oChannel;
@@ -299,6 +315,6 @@ class RssController extends FrontendController
      */
     public function getCacheLifeTime()
     {
-        return $this->getRssFeed()->getCacheTtl();
+        return $this->_getRssFeed()->getCacheTtl();
     }
 }

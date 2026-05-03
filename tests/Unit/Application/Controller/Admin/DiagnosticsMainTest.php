@@ -26,6 +26,7 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
  */
 class DiagnosticsMainTest extends \OxidTestCase
 {
+    use \OxidEsales\EshopCommunity\Tests\Unit\ExitHandlerTestTrait;
     /**
      * sysreq_main::Render() test case
      *
@@ -36,5 +37,32 @@ class DiagnosticsMainTest extends \OxidTestCase
         // testing..
         $oView = oxNew('Diagnostics_Main');
         $this->assertEquals('diagnostics_form.tpl', $oView->render());
+    }
+
+    public function testDownloadResultFileExitsWithZero()
+    {
+        $this->installFakeExitHandler();
+
+        $output = $this->getMock(
+            \OxidEsales\Eshop\Application\Model\DiagnosticsOutput::class,
+            ['downloadResultFile']
+        );
+        $output->expects($this->once())->method('downloadResultFile');
+
+        $controller = oxNew(\OxidEsales\Eshop\Application\Controller\Admin\DiagnosticsMain::class);
+
+        $refProp = new \ReflectionProperty(
+            \OxidEsales\EshopCommunity\Application\Controller\Admin\DiagnosticsMain::class,
+            '_oOutput'
+        );
+        $refProp->setAccessible(true);
+        $refProp->setValue($controller, $output);
+
+        try {
+            $controller->downloadResultFile();
+            $this->fail('Expected ExitCalledException');
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            $this->assertSame(0, $e->getCode());
+        }
     }
 }
