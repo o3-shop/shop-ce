@@ -163,4 +163,38 @@ class InsertNewBasketItemLogicTest extends \OxidTestCase
         $method->setAccessible(true);
         $this->assertSame('Smarty rendered', $method->invoke($logic, 'foo.tpl', $smarty));
     }
+
+    public function testSmartyLoadArticleObjectLoadsAssignsAndClearsSession(): void
+    {
+        $article = new class () extends \OxidEsales\EshopCommunity\Application\Model\Article {
+            public ?string $loadedWith = null;
+            public function __construct()
+            {
+            }
+            public function load($oxId)
+            {
+                $this->loadedWith = (string) $oxId;
+                return true;
+            }
+        };
+        \oxTestModules::addModuleObject('oxarticle', $article);
+        Registry::getSession()->setVariable('_newitem', (object) ['sId' => 'art-1']);
+
+        $smarty = $this->getMockBuilder(Smarty::class)
+            ->onlyMethods(['assign'])
+            ->getMock();
+        $smarty->expects($this->once())
+            ->method('assign')
+            ->with('_newitem', $this->isInstanceOf(\stdClass::class));
+
+        $newItem = (object) ['sId' => 'art-1'];
+        $logic = new InsertNewBasketItemLogicSmarty();
+        $method = new \ReflectionMethod($logic, 'loadArticleObject');
+        $method->setAccessible(true);
+        $method->invoke($logic, $newItem, $smarty);
+
+        $this->assertSame('art-1', $article->loadedWith);
+        $this->assertSame($article, $newItem->oArticle);
+        $this->assertNull(Registry::getSession()->getVariable('_newitem'));
+    }
 }

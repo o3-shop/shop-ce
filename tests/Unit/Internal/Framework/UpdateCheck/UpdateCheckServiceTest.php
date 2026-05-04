@@ -175,6 +175,193 @@ class UpdateCheckServiceTest extends TestCase
         );
     }
 
+    public function testGetCachedResultReturnsNullWhenSessionEmpty(): void
+    {
+        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable(UpdateCheckService::CACHE_SESSION_KEY);
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $this->assertNull($service->getCachedResult());
+    }
+
+    public function testGetCachedResultReturnsNullForExpiredEntry(): void
+    {
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable(
+            UpdateCheckService::CACHE_SESSION_KEY,
+            [
+                // older than CACHE_TTL_SECONDS (86400)
+                'timestamp' => time() - UpdateCheckService::CACHE_TTL_SECONDS - 1,
+                'result'    => \OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckResult::empty(),
+            ]
+        );
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $this->assertNull($service->getCachedResult());
+    }
+
+    public function testGetCachedResultReturnsNullWhenResultPayloadIsWrongType(): void
+    {
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable(
+            UpdateCheckService::CACHE_SESSION_KEY,
+            [
+                'timestamp' => time(),
+                'result'    => 'not-a-result-object',
+            ]
+        );
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $this->assertNull($service->getCachedResult());
+    }
+
+    public function testGetCachedResultReturnsCachedFreshResult(): void
+    {
+        $cached = \OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckResult::empty();
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable(
+            UpdateCheckService::CACHE_SESSION_KEY,
+            [
+                'timestamp' => time(),
+                'result'    => $cached,
+            ]
+        );
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $this->assertSame($cached, $service->getCachedResult());
+    }
+
+    public function testCheckUsesCachedResultWhenAvailable(): void
+    {
+        $cached = \OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckResult::empty();
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable(
+            UpdateCheckService::CACHE_SESSION_KEY,
+            ['timestamp' => time(), 'result' => $cached]
+        );
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $this->assertSame($cached, $service->check(false));
+    }
+
+    public function testCheckBypassesCacheWhenForceRefreshIsTrue(): void
+    {
+        $cached = \OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckResult::empty();
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable(
+            UpdateCheckService::CACHE_SESSION_KEY,
+            ['timestamp' => time(), 'result' => $cached]
+        );
+        // forceRefresh skips cache → falls through to network calls. In the
+        // unit-test environment those fail and the catch-all returns
+        // unreachable(). Verify that a different (unreachable) result comes
+        // back rather than the cached one.
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $result = $service->check(true);
+        // The returned object must NOT be the cached instance.
+        $this->assertNotSame($cached, $result);
+    }
+
+    public function testCacheResultRoundTripsThroughSession(): void
+    {
+        \OxidEsales\Eshop\Core\Registry::getSession()->deleteVariable(UpdateCheckService::CACHE_SESSION_KEY);
+        $service = $this->makeServiceWithEmptyShopConfig();
+
+        $result = new \OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckResult(
+            true,
+            '1.6.0',
+            'https://example.com/release'
+        );
+        $method = new \ReflectionMethod($service, 'cacheResult');
+        $method->setAccessible(true);
+        $method->invoke($service, $result);
+
+        $cached = $service->getCachedResult();
+        $this->assertNotNull($cached);
+        $this->assertTrue($cached->isCoreUpdateAvailable());
+        $this->assertSame('1.6.0', $cached->getLatestCoreVersion());
+    }
+
+    public function testParseEndpointResponseExtractsCoreVersionAndUpdateLink(): void
+    {
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $method = new \ReflectionMethod($service, 'parseEndpointResponse');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($service, [
+            'core_not_actual' => true,
+            'actual_version'  => '1.6.0',
+            'update_link'     => 'https://example.com/download',
+            'plugins'         => [],
+        ], []);
+
+        $this->assertTrue($result->isCoreUpdateAvailable());
+        $this->assertSame('1.6.0', $result->getLatestCoreVersion());
+        $this->assertSame('https://example.com/download', $result->getUpdateLink());
+        $this->assertSame([], $result->getOutdatedModules());
+    }
+
+    public function testParseEndpointResponseFiltersInactiveModulesFromOutdatedList(): void
+    {
+        $bridge = $this->createMock(ModuleActivationBridgeInterface::class);
+        $bridge->method('isActive')->willReturnCallback(static fn ($id) => $id === 'mod-active');
+
+        $shopConfig = $this->createMock(ShopConfiguration::class);
+        $shopConfig->method('getModuleConfigurations')->willReturn([]);
+        $bridgeShop = $this->createMock(ShopConfigurationDaoBridgeInterface::class);
+        $bridgeShop->method('get')->willReturn($shopConfig);
+
+        $service = new UpdateCheckService($bridgeShop, $bridge);
+        $method = new \ReflectionMethod($service, 'parseEndpointResponse');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($service, [
+            'core_not_actual' => false,
+            'plugins' => [
+                ['code' => 'mod-active',   'version' => '2.0.0', 'url' => 'https://x/active'],
+                ['code' => 'mod-inactive', 'version' => '3.0.0', 'url' => 'https://x/inactive'],
+                ['code' => '',             'version' => '1.0.0'], // empty code → skip
+            ],
+        ], ['mod-active' => '1.0.0']);
+
+        $outdated = $result->getOutdatedModules();
+        $this->assertCount(1, $outdated, 'Inactive and empty-code modules must be filtered out.');
+        $this->assertSame('mod-active', $outdated[0]['id']);
+        $this->assertSame('1.0.0', $outdated[0]['installed_version']);
+        $this->assertSame('2.0.0', $outdated[0]['latest_version']);
+    }
+
+    public function testParseEndpointResponseHandlesMissingPluginsKey(): void
+    {
+        $service = $this->makeServiceWithEmptyShopConfig();
+        $method = new \ReflectionMethod($service, 'parseEndpointResponse');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($service, ['core_not_actual' => false], []);
+        $this->assertSame([], $result->getOutdatedModules());
+    }
+
+    public function testNormalizeVersionStripsLeadingV(): void
+    {
+        $reflection = new \ReflectionMethod(UpdateCheckService::class, 'normalizeVersion');
+        $reflection->setAccessible(true);
+
+        $this->assertSame('1.6.0', $reflection->invoke(null, 'v1.6.0'));
+        $this->assertSame('1.6.0', $reflection->invoke(null, 'V1.6.0')); // capital V too
+        $this->assertSame('1.6.0', $reflection->invoke(null, '1.6.0'));  // already bare
+        $this->assertSame('', $reflection->invoke(null, ''));            // empty string passthrough
+    }
+
+    public function testEndpointAndConstantsHaveExpectedValues(): void
+    {
+        $this->assertSame('https://updates.o3-shop.com/check/v1', UpdateCheckService::ENDPOINT);
+        $this->assertSame('updateCheckResult', UpdateCheckService::CACHE_SESSION_KEY);
+        $this->assertSame(86400, UpdateCheckService::CACHE_TTL_SECONDS);
+        $this->assertSame(5, UpdateCheckService::CURL_TIMEOUT);
+    }
+
+    private function makeServiceWithEmptyShopConfig(): UpdateCheckService
+    {
+        $shopConfig = $this->createMock(ShopConfiguration::class);
+        $shopConfig->method('getModuleConfigurations')->willReturn([]);
+
+        $bridgeShop = $this->createMock(ShopConfigurationDaoBridgeInterface::class);
+        $bridgeShop->method('get')->willReturn($shopConfig);
+
+        $bridge = $this->createMock(ModuleActivationBridgeInterface::class);
+
+        return new UpdateCheckService($bridgeShop, $bridge);
+    }
+
     /**
      * @param string $id
      * @param string $version
