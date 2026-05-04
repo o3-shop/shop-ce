@@ -57,7 +57,8 @@ class ApplicationServerDaoTest extends \OxidTestCase
             ->method('execute')
             ->with(
                 $this->stringContains('DELETE FROM oxconfig'),
-                $this->callback(static fn ($params) =>
+                $this->callback(
+                    static fn ($params) =>
                     isset($params[':oxvarname'], $params[':oxshopid'])
                     && $params[':oxvarname'] === 'aServersData_srv-7'
                     && $params[':oxshopid'] === 1
