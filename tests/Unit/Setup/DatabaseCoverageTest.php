@@ -104,6 +104,88 @@ class DatabaseCoverageTest extends \OxidTestCase
     }
 
     /**
+     * Regression test for issue #136. parseQuery used to recognise `--`
+     * comments only at column 0; an indented `--` comment inside an
+     * INSERT VALUES list survived the line-join and, on a single-line
+     * MySQL parse, swallowed the rest of the statement. Result: the
+     * whole o3-theme settings block in initial_data.sql was silently
+     * dropped at install time.
+     *
+     * @covers \OxidEsales\EshopCommunity\Setup\Database::parseQuery
+     */
+    public function testParseQueryStripsDoubleDashCommentEvenWithLeadingWhitespace(): void
+    {
+        $database = new Database();
+        $sql = "INSERT INTO t VALUES (1),\n"
+            . "       -- skip me, leading-whitespace comment\n"
+            . '       (2);';
+        $statements = $database->parseQuery($sql);
+
+        $this->assertCount(1, $statements);
+        $this->assertStringNotContainsString('skip me', $statements[0]);
+        // The two values rows must still concatenate cleanly into one INSERT.
+        $this->assertStringContainsString('VALUES (1),', $statements[0]);
+        $this->assertStringContainsString('(2);', $statements[0]);
+    }
+
+    /**
+     * Per the MySQL spec, `--` only opens a comment when followed by
+     * whitespace (or EOL). A bare `--` between values must be left intact
+     * — if a future row ever needed `'--something'` as a literal value,
+     * we don't want parseQuery eating it.
+     *
+     * @covers \OxidEsales\EshopCommunity\Setup\Database::parseQuery
+     */
+    public function testParseQueryDoesNotTreatDoubleDashWithoutWhitespaceAsComment(): void
+    {
+        $database = new Database();
+        $sql = "SELECT '--keep' FROM t;";
+        $statements = $database->parseQuery($sql);
+
+        $this->assertSame(["SELECT '--keep' FROM t;"], $statements);
+    }
+
+    /**
+     * `#` and `--` inside quoted strings must not trigger comment mode.
+     *
+     * @covers \OxidEsales\EshopCommunity\Setup\Database::parseQuery
+     */
+    public function testParseQueryKeepsHashAndDoubleDashInsideQuotes(): void
+    {
+        $database = new Database();
+        $sql = "INSERT INTO t VALUES ('#ABC123', '-- not a comment');";
+        $statements = $database->parseQuery($sql);
+
+        $this->assertCount(1, $statements);
+        $this->assertStringContainsString('#ABC123', $statements[0]);
+        $this->assertStringContainsString('-- not a comment', $statements[0]);
+    }
+
+    /**
+     * A `;` inside a comment must NOT terminate the surrounding statement.
+     * Companion to issue #136 — the same fix discovered that the
+     * end-of-statement check used to ignore comment mode entirely, so a
+     * `;` inside a `-- …` comment line silently chopped the next INSERT
+     * row off the previous one.
+     *
+     * @covers \OxidEsales\EshopCommunity\Setup\Database::parseQuery
+     */
+    public function testParseQueryIgnoresSemicolonInsideComment(): void
+    {
+        $database = new Database();
+        $sql = "INSERT INTO t VALUES (1),\n"
+            . "-- explanatory note; with embedded semicolon\n"
+            . "       (2);\n"
+            . 'INSERT INTO t VALUES (3);';
+        $statements = $database->parseQuery($sql);
+
+        $this->assertCount(2, $statements);
+        $this->assertStringContainsString('VALUES (1),', $statements[0]);
+        $this->assertStringContainsString('(2);', $statements[0]);
+        $this->assertStringContainsString('VALUES (3);', $statements[1]);
+    }
+
+    /**
      * @covers \OxidEsales\EshopCommunity\Setup\Database::parseQuery
      */
     public function testParseQueryReturnsEmptyArrayForEmptyOrCommentOnlyInput(): void

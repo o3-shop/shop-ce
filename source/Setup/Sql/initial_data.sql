@@ -394,12 +394,14 @@ VALUES ('0038ea008e74fdef4a0b0438ec2e4de6', 1, 'theme:o3-theme', 'sGATrackingId'
        ('f0138a6c6476ad469fdece47080d2e63', 1, 'theme:o3-theme', 'sDeliveryDaysOnStock', 'str', '6'),
        ('fd57bffe01b3ffbc77975bcc985df591', 1, 'theme:o3-theme', 'blPrimaryColor', 'str', '#82BA00'),
        ('fefe216a7bba565b54c92183ac5d2199', 1, 'theme:o3-theme', 'sShoppingCountry', 'str', 'DE'),
-       -- issue #118: settings present in theme.php but previously missing from initial_data.sql
+-- issue #118: settings present in theme.php but previously missing from initial_data.sql.
+-- iPasswordLength deliberately NOT seeded — see issue #125 (Config::reinitialize() caching
+-- leak). InputValidator falls back to 6 when unset, which the unit tests rely on.
+-- (Comments must stay at column 0; indented `--` inside an INSERT VALUES list silently
+-- swallowed the rest of this block before #136.)
        ('96839442ce96de4e558377d77da64c9b', 1, 'theme:o3-theme', 'sShowMode', 'bool', ''),
        ('9dc20d91df5914750245cf5ed5b0bdf4', 1, 'theme:o3-theme', 'sShowModePosition', 'select', 'topleft'),
        ('9cd18f45054c3dc812b2d9b64df3f014', 1, 'theme:o3-theme', 'blShowFiltersSearch', 'str', '10'),
-       -- iPasswordLength deliberately NOT seeded — see issue #125 (Config::reinitialize()
-       -- caching leak). InputValidator falls back to 6 when unset, which the unit tests rely on.
        ('ceb7d00c057007c2c3ba0d1737761d74', 1, 'theme:o3-theme', 'bInputCompany', 'bool', ''),
        ('3cd2cfb0758c0421346434007c133384', 1, 'theme:o3-theme', 'bInputUstid', 'bool', ''),
        ('eb96d79eb736a81b35270761622fa146', 1, 'theme:o3-theme', 'bInputState', 'bool', ''),
@@ -627,11 +629,12 @@ VALUES ('091fa9cc622351c270d5522741a21695', 'theme:o3-theme', 'sYouTubeUrl', 'fo
        ('f0463f97d4bcdf07c4fa49c5e86a713a', 'theme:o3-theme', 'bl_showWishlist', 'features', '', 1),
        ('f2ebd34a35aba9ff51a3b19dcfd7d268', 'theme:o3-theme', 'blFooterShowLinks', 'footer', '', 1),
        ('f3fbf3a218543967d2db45d9eda4bb7c', 'theme:o3-theme', 'sEmailLogo', 'logo', '', 1),
-       -- issue #118: settings present in theme.php but previously missing from initial_data.sql
+-- issue #118: display rows for settings previously missing from initial_data.sql.
+-- iPasswordLength display row also omitted — see issue #125.
+-- (Comments must stay at column 0 — see #136.)
        ('516c5d0284c8901295508fe5f2724014', 'theme:o3-theme', 'sShowMode', 'mode', '', 1),
        ('dbee9d7d717f78f309386792e483a214', 'theme:o3-theme', 'sShowModePosition', 'mode', 'topleft|topright|bottomleft|bottomright', 1),
        ('7cc228989a29ae584492ff08ab56cd92', 'theme:o3-theme', 'blShowFiltersSearch', 'display', '', 1),
-       -- iPasswordLength display row also omitted — see issue #125.
        ('1cc73e0e9c17e4d9ed1253196d463208', 'theme:o3-theme', 'bInputCompany', 'form', '', 1),
        ('6c692dddcddddd2c7ec3b33241833f1d', 'theme:o3-theme', 'bInputUstid', 'form', '', 1),
        ('dbfa6de4df36e0cd377f110a42a4eb19', 'theme:o3-theme', 'bInputState', 'form', '', 1),
