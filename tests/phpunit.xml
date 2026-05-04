@@ -23,6 +23,7 @@
       <directory suffix=".php">../source/Application/translations</directory>
       <directory suffix=".php">../source/Core/Smarty</directory>
       <directory suffix=".php">../source/migration/data</directory>
+      <directory suffix=".php">../source/bin</directory>
       <file>../source/Core/Autoload/UnifiedNameSpaceClassMap.php</file>
       <file>../source/Setup/De/lang.php</file>
       <file>../source/Setup/En/lang.php</file>
