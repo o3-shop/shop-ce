@@ -84,7 +84,7 @@ class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     }
 
     /**
-     * @covers \OxidEsales\Eshop\Core\Exception\ExceptionHandler::handleDatabaseException()
+     * @covers \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::handleDatabaseException()
      */
     public function testHandleDatabaseExceptionDelegatesToHandleUncaughtException()
     {
@@ -130,7 +130,7 @@ class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     }
 
     /**
-     * @covers \OxidEsales\Eshop\Core\Exception\ExceptionHandler::getLogFileName()
+     * @covers \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::getLogFileName()
      */
     public function testGetLogFileNameReturnsBaseNameOfLogeFile()
     {

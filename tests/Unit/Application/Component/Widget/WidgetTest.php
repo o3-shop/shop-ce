@@ -27,7 +27,7 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Widget;
 class WidgetTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
     /**
-     * @covers \OxidEsales\Eshop\Application\Component\Widget\WidgetController::init()
+     * @covers \OxidEsales\EshopCommunity\Application\Component\Widget\WidgetController::init()
      */
     public function testInitComponentNotSet()
     {
@@ -40,7 +40,7 @@ class WidgetTest extends \OxidEsales\TestingLibrary\UnitTestCase
     }
 
     /**
-     * @covers \OxidEsales\Eshop\Application\Component\Widget\WidgetController::init()
+     * @covers \OxidEsales\EshopCommunity\Application\Component\Widget\WidgetController::init()
      */
     public function testInitComponentIsSet()
     {
