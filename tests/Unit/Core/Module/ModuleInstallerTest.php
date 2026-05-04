@@ -64,4 +64,81 @@ class ModuleInstallerTest extends \OxidTestCase
         $aModulesArray = ['oxtest' => ['test/mytest', 'test1/mytest1']];
         $this->assertEquals($aModules, $oModuleInstaller->buildModuleChains($aModulesArray));
     }
+
+    public function testBuildModuleChainsTreatsNonArrayAsEmpty(): void
+    {
+        $oModuleInstaller = oxNew('oxModuleInstaller');
+        $this->assertSame([], $oModuleInstaller->buildModuleChains(null));
+        $this->assertSame([], $oModuleInstaller->buildModuleChains('not-an-array'));
+    }
+
+    public function testGetModuleCacheReturnsConstructorInjection(): void
+    {
+        $cache = $this->getMockBuilder(\OxidEsales\Eshop\Core\Module\ModuleCache::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $installer = oxNew('oxModuleInstaller', $cache);
+        $this->assertSame($cache, $installer->getModuleCache());
+    }
+
+    public function testDiffModuleArraysRemovesMatchingEntriesFromChain(): void
+    {
+        $installer = oxNew('oxModuleInstaller');
+
+        $all = [
+            'oxarticle' => ['vendor/foo/Article', 'vendor/bar/Article'],
+            'oxorder'   => ['vendor/foo/Order'],
+        ];
+        $remove = [
+            'oxarticle' => ['vendor/foo/Article'],
+        ];
+
+        $diffed = $installer->diffModuleArrays($all, $remove);
+        $this->assertSame(['vendor/bar/Article'], array_values($diffed['oxarticle']));
+        $this->assertSame(['vendor/foo/Order'], $diffed['oxorder'], 'Untouched class should pass through.');
+    }
+
+    public function testDiffModuleArraysCollapsesClassWithEmptyChain(): void
+    {
+        $installer = oxNew('oxModuleInstaller');
+        $all = ['oxarticle' => ['vendor/foo/Article']];
+        $remove = ['oxarticle' => 'vendor/foo/Article']; // scalar form
+
+        $diffed = $installer->diffModuleArrays($all, $remove);
+        $this->assertArrayNotHasKey('oxarticle', $diffed, 'Empty chain after diff drops the entry.');
+    }
+
+    public function testDiffModuleArraysAcceptsScalarChainsOnBothSides(): void
+    {
+        $installer = oxNew('oxModuleInstaller');
+        $all = ['oxorder' => 'vendor/foo/Order'];
+        $remove = ['oxorder' => 'vendor/foo/Order'];
+
+        $diffed = $installer->diffModuleArrays($all, $remove);
+        $this->assertArrayNotHasKey('oxorder', $diffed);
+    }
+
+    public function testDiffModuleArraysReturnsAllWhenRemoveIsEmpty(): void
+    {
+        $installer = oxNew('oxModuleInstaller');
+        $all = ['oxorder' => ['vendor/foo/Order']];
+
+        $diffed = $installer->diffModuleArrays($all, []);
+        $this->assertSame(['vendor/foo/Order'], $diffed['oxorder']);
+    }
+
+    public function testDiffModuleArraysReturnsAllAsIsWhenAllOrRemoveIsNonArray(): void
+    {
+        $installer = oxNew('oxModuleInstaller');
+        $this->assertSame('passthrough', $installer->diffModuleArrays('passthrough', []));
+        $this->assertSame(
+            ['oxorder' => 'vendor/foo/Order'],
+            $installer->diffModuleArrays(['oxorder' => 'vendor/foo/Order'], 'not-an-array')
+        );
+    }
+
+    // Note: activate() / deactivate() reach into the container via a
+    // PRIVATE accessor (getModuleActivationBridge) that subclasses cannot
+    // override — coverage of those two methods is left to the integration
+    // tests under tests/Integration/Internal/Framework/Module/Setup.
 }
