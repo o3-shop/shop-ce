@@ -83,4 +83,8 @@ oxideshop.log
 /var/configuration-backup/shops/1.yaml
 /.claude/settings.local.json
 /.playwright-mcp/
+# Ad-hoc screenshots from the Playwright MCP browser tool — always saved
+# at repo root with arbitrary names. Real test screenshots land in
+# tests/Acceptance/playwright/test-results/ and stay tracked there.
+/*.png
 /openspec/changes/fix-underscore-method-inheritance/findings.json
