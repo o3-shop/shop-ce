@@ -60,8 +60,16 @@ test.describe('storefront / 2nd-level menu (#141)', () => {
     });
 
     test.afterAll(async ({ db }) => {
+        // Leaf-first: Category::delete() does not cascade, so a parent
+        // can't be removed while its child still exists. Sub-Sub-Category
+        // → Sub-Category → Unter-Einhörner.
+        const orderedTitles = [
+            SEED_TITLES.L3_PINGUINE,
+            SEED_TITLES.L2_PINGUINE,
+            SEED_TITLES.L2_EINHOERNER,
+        ];
         const ids = (
-            await Promise.all(Object.values(SEED_TITLES).map((t) => db.findCategoryByTitle(t)))
+            await Promise.all(orderedTitles.map((t) => db.findCategoryByTitle(t)))
         ).filter((id): id is string => !!id);
         if (ids.length > 0) {
             await deleteCategoriesViaModel(ids);
