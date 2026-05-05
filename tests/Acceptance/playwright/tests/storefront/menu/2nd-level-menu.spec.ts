@@ -1,22 +1,74 @@
 import { test, expect } from '../../../fixtures';
 import { StorefrontCategoryPage } from '../../../pages/storefront/CategoryPage';
+import {
+    clearShopRuntimeCache,
+    deleteCategoriesViaModel,
+    seedCategoryViaModel,
+} from '../../../helpers/config';
 
 /**
  * Issue #141 — 2nd-level menu polish.
  *
- * These specs run against **existing demo data** so they're the cheapest
- * smoke tests of the megamenu / inline sub-category strip. The composed
- * E2E spec (see ../menu-e2e/...) creates its own categories before
- * asserting; the tests here just validate what's already shipped.
+ * These specs validate the megamenu / inline sub-category strip against
+ * a **fixture tree the spec seeds itself** (see beforeAll). They used to
+ * lean on hand-added demo categories, which broke any time the maintainer
+ * wiped the docker volume — the suite now creates the same shape of
+ * tree on the fly and removes it in afterAll.
  *
- * Demo categories the specs depend on:
- *   • Einhörner       → has sub-cat `Unter-Einhörner` (left-anchored case)
- *   • Party-Pinguine  → has sub-cat `Unter-Party-Pinguine` plus level-3
- *                       (right-edge case — must flip the dropdown anchor)
- *   • Pandas          → no sub-cats (negative test — no megamenu rendered)
+ * Fixture tree:
+ *   Einhörner (top-cat from initial_data.sql)
+ *     └─ Unter-Einhörner       — left-anchored megamenu case
+ *   Party-Pinguine (top-cat)
+ *     └─ Sub-Category          — right-anchored megamenu case
+ *          └─ Sub-Sub-Category — depth-consistency check (must NOT
+ *                                appear in the megamenu)
+ *   Pandas (top-cat) — left untouched: negative test for no-children
  */
 
+const EINHOERNER_OXID = '0ab8dc7f345c3da293988a706d85643a';
+const PARTY_PINGUINE_OXID = '93ff2bf29071afef17c57beb3fcc9d71';
+
+const SEED_TITLES = {
+    L2_EINHOERNER: 'Unter-Einhörner',
+    L2_PINGUINE: 'Sub-Category',
+    L3_PINGUINE: 'Sub-Sub-Category',
+} as const;
+
 test.describe('storefront / 2nd-level menu (#141)', () => {
+    test.beforeAll(async ({ db }) => {
+        // Belt-and-braces: drop any leftover from a previous failed run
+        // before recreating, so a re-run starts from a known state.
+        const stale = (
+            await Promise.all(Object.values(SEED_TITLES).map((t) => db.findCategoryByTitle(t)))
+        ).filter((id): id is string => !!id);
+        if (stale.length > 0) {
+            await deleteCategoriesViaModel(stale);
+        }
+
+        // Create level-2 first (Einhörner branch and Party-Pinguine branch),
+        // then the level-3 under Sub-Category.
+        await seedCategoryViaModel(SEED_TITLES.L2_EINHOERNER, EINHOERNER_OXID);
+        const subCategoryOxid = await seedCategoryViaModel(
+            SEED_TITLES.L2_PINGUINE,
+            PARTY_PINGUINE_OXID,
+        );
+        await seedCategoryViaModel(SEED_TITLES.L3_PINGUINE, subCategoryOxid);
+
+        // Bust the storefront category-tree cache so the next page request
+        // sees the new fixture tree instead of the pre-seed snapshot.
+        await clearShopRuntimeCache();
+    });
+
+    test.afterAll(async ({ db }) => {
+        const ids = (
+            await Promise.all(Object.values(SEED_TITLES).map((t) => db.findCategoryByTitle(t)))
+        ).filter((id): id is string => !!id);
+        if (ids.length > 0) {
+            await deleteCategoriesViaModel(ids);
+        }
+        await clearShopRuntimeCache();
+    });
+
     test('PLP renders the labelled sub-category strip with chip-styled links', async ({
         storefrontPage,
     }) => {
@@ -30,10 +82,10 @@ test.describe('storefront / 2nd-level menu (#141)', () => {
         // ARIA label echoes the same string for screen-reader users
         await expect(plp.inlineSubcatNav).toHaveAttribute('aria-label', 'In dieser Kategorie');
 
-        // Demo data: Einhörner has at least the user-created `Unter-Einhörner`
+        // Fixture: Einhörner has Unter-Einhörner as its level-2.
         const chips = await plp.inlineSubcatChips();
         expect(chips.length).toBeGreaterThan(0);
-        expect(chips).toContain('Unter-Einhörner');
+        expect(chips).toContain(SEED_TITLES.L2_EINHOERNER);
 
         // Chips are pill-shaped (border-radius >= 24 → effectively 999px clamped)
         const radius = await plp.inlineSubcatNav

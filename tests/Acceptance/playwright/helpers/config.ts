@@ -109,6 +109,42 @@ export async function deleteCategoriesViaModel(oxids: string[]): Promise<string>
   return stdout;
 }
 
+/**
+ * Create a single category through `Category::save()` and return its OXID.
+ *
+ * Used by the issue #141 frontend specs to seed Unter-Einhörner /
+ * Sub-Category / Sub-Sub-Category at test start so the suite is
+ * self-contained — i.e. survives a `docker.sh stop / remove volume /
+ * start` cycle that wipes any manually-added demo data.
+ *
+ * Why the model save, not a raw INSERT? It updates the parent's
+ * oxleft/oxright nested-set range, generates a real 32-char OXID, and
+ * runs the same SEO/cache hooks an admin form save would. The frontend
+ * megamenu won't show direct DB inserts because the parent's OXRIGHT
+ * stays at the pre-insert value.
+ */
+export async function seedCategoryViaModel(
+  title: string,
+  parentOxid: string,
+): Promise<string> {
+  const scriptPath = '/var/www/html/tests/Acceptance/playwright/helpers/category-seed.php';
+  const { stdout } = await execFileP('docker', [
+    'exec',
+    SHOP_CONTAINER,
+    'php',
+    scriptPath,
+    title,
+    parentOxid,
+  ]);
+  const oxid = stdout.trim();
+  if (!oxid) {
+    throw new Error(
+      `seedCategoryViaModel: empty OXID for title='${title}' parent='${parentOxid}'`,
+    );
+  }
+  return oxid;
+}
+
 // oxconfig.OXSHOPID is INT — owning shop ID. Single-shop CE uses 1.
 const OXSHOPID = 1;
 
