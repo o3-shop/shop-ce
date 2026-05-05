@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests-only helper: create a single category via OXID's
  * `Category::save()` so the oxleft/oxright nested-set ranges in the

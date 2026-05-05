@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests-only helper: delete a category by OXID using OXID's
  * Category::delete() so the oxleft/oxright nested-set ranges in the
