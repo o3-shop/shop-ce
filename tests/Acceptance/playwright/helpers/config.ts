@@ -1,6 +1,16 @@
+import { execFile } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { promisify } from 'node:util';
 import type { DbClient } from '../fixtures/db';
+
+const execFileP = promisify(execFile);
+
+/**
+ * Container name for the running shop. Override via SHOP_CONTAINER if
+ * the local stack uses a non-default name.
+ */
+const SHOP_CONTAINER = process.env.SHOP_CONTAINER ?? 'o3shop-app';
 
 /**
  * Path to the host-mounted OXID file cache (matches the docker-compose
@@ -32,6 +42,71 @@ export async function clearRevocationAntiSpamCache(): Promise<void> {
       .filter((name) => /^oxc_o3rev_antispam_/.test(name))
       .map((name) => fs.rm(path.join(dir, name), { force: true })),
   );
+}
+
+/**
+ * Wipe OXID's data caches under `source/tmp/` — `oxc_*` files only.
+ *
+ * Tests that mutate persistent state the storefront then renders
+ * against — the category tree above all (`oxc_oxcategories_*` plus the
+ * SEO caches) — must call this after the mutation, otherwise the
+ * storefront serves stale HTML.
+ *
+ * What we DELIBERATELY DO NOT touch:
+ *   - `container_cache.php`  the compiled Symfony DI container. Wiping
+ *                            this leaves the shop unable to bootstrap;
+ *                            a fresh page request returns blank-white
+ *                            until the container is rebuilt.
+ *   - `smarty/`              Smarty compiled templates. Wiping forces a
+ *                            full recompile on the next request which
+ *                            adds 5–10 s — enough to blow past the test
+ *                            navigation timeout. Templates compile from
+ *                            `.tpl` files which the test never touches,
+ *                            so the cache here can never be stale.
+ *
+ * Why `docker exec` instead of host `fs.rm`?
+ *   The bind mount between Docker-Desktop on macOS and the container
+ *   has a sync window where host writes (here: deletions) are not yet
+ *   visible to PHP processes running in the container. Removing files
+ *   *inside* the container guarantees the next storefront request sees
+ *   the empty cache.
+ */
+export async function clearShopRuntimeCache(): Promise<void> {
+  // sh -c so the glob expands inside the container.
+  await execFileP('docker', [
+    'exec',
+    SHOP_CONTAINER,
+    'sh',
+    '-c',
+    'rm -f /var/www/html/source/tmp/oxc_*',
+  ]).catch(() => undefined); // tmp absent or container down — ignore
+}
+
+/**
+ * Delete one or more categories using OXID's `Category::delete()` so
+ * the oxleft / oxright nested-set ranges in the surrounding tree are
+ * kept consistent. A plain `DELETE FROM oxcategories` (as `db.deleteCategory`
+ * does) is fine for stand-alone rows but corrupts the parent's right-edge
+ * once a subtree is removed — symptom: `Category::getSubCatList()` returns
+ * empty for an apparently-populated parent on the next test run.
+ *
+ * Implementation: shells out to `php` inside the shop container and runs
+ * the `category-cleanup.php` helper. Idempotent — unknown OXIDs are
+ * reported but don't fail the call.
+ *
+ * Returns the helper's stdout for diagnostics; non-zero exit codes throw.
+ */
+export async function deleteCategoriesViaModel(oxids: string[]): Promise<string> {
+  if (oxids.length === 0) return '';
+  const scriptPath = '/var/www/html/tests/Acceptance/playwright/helpers/category-cleanup.php';
+  const { stdout } = await execFileP('docker', [
+    'exec',
+    SHOP_CONTAINER,
+    'php',
+    scriptPath,
+    ...oxids,
+  ]);
+  return stdout;
 }
 
 // oxconfig.OXSHOPID is INT — owning shop ID. Single-shop CE uses 1.

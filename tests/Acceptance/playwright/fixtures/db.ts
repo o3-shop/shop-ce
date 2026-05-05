@@ -106,6 +106,74 @@ export class DbClient {
     );
     return (rows[0]?.c ?? 0) > 0;
   }
+
+  // ───────────────────────────────────────────────────────────────────────
+  // oxcategories — used by the issue #141 menu specs.
+  //
+  // We only need the cleanup side (DELETE) here: tests create categories
+  // through the admin form (CategoryAdminPage) so the create path
+  // exercises the real oxleft/oxright/oxrootid bookkeeping. Cleanup,
+  // however, is a chore that should not depend on the admin GUI — the
+  // post-test DELETE just removes the row by OXID.
+  // ───────────────────────────────────────────────────────────────────────
+
+  async findCategoryByTitle(title: string): Promise<string | null> {
+    const rows = await this.query<{ OXID: string }>(
+      `SELECT OXID FROM oxcategories WHERE OXTITLE = ? AND OXSHOPID = 1 LIMIT 1`,
+      [title],
+    );
+    return rows[0]?.OXID ?? null;
+  }
+
+  async categoryExists(oxid: string): Promise<boolean> {
+    const rows = await this.query<{ c: number }>(
+      `SELECT COUNT(*) AS c FROM oxcategories WHERE OXID = ?`,
+      [oxid],
+    );
+    return (rows[0]?.c ?? 0) > 0;
+  }
+
+  /**
+   * Delete a category by OXID. Use `cascade: true` to also remove every
+   * descendant (oxleft/oxright nested-set range) — useful for cleaning up
+   * a 2-level + 3-level tree the test created.
+   *
+   * Caveat: we do NOT call OXID's `Category::delete()` (which would also
+   * tidy oxobject2category, oxseo, etc.). For test categories that have
+   * no products / SEO entries, a plain DELETE is sufficient; if that
+   * stops being true, swap this for an admin-fnc=delete invocation.
+   */
+  async deleteCategory(oxid: string, opts: { cascade?: boolean } = {}): Promise<number> {
+    if (opts.cascade) {
+      const rows = await this.query<{ OXLEFT: number; OXRIGHT: number; OXROOTID: string }>(
+        `SELECT OXLEFT, OXRIGHT, OXROOTID FROM oxcategories WHERE OXID = ? LIMIT 1`,
+        [oxid],
+      );
+      const root = rows[0];
+      if (!root) return 0;
+      const [result] = await this.pool.query<import('mysql2').ResultSetHeader>(
+        `DELETE FROM oxcategories
+         WHERE OXROOTID = ? AND OXLEFT >= ? AND OXRIGHT <= ?`,
+        [root.OXROOTID, root.OXLEFT, root.OXRIGHT],
+      );
+      return result.affectedRows ?? 0;
+    }
+    const [result] = await this.pool.query<import('mysql2').ResultSetHeader>(
+      `DELETE FROM oxcategories WHERE OXID = ?`,
+      [oxid],
+    );
+    return result.affectedRows ?? 0;
+  }
+
+  /**
+   * Delete a category by title. Returns the number of rows removed
+   * (0 if the title was not present — cleanup helpers shouldn't throw).
+   */
+  async deleteCategoryByTitle(title: string, opts: { cascade?: boolean } = {}): Promise<number> {
+    const oxid = await this.findCategoryByTitle(title);
+    if (!oxid) return 0;
+    return this.deleteCategory(oxid, opts);
+  }
 }
 
 function cryptoRandom(): string {
