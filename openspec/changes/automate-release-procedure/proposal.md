@@ -228,11 +228,12 @@ release.
   order:
   1. `source/Core/version.generated.php` (created by a composer post-install
      hook from the release artifact)
-  2. `vendor/composer/installed.json` lookup of `o3-shop/shop-ce`
-  3. `git describe --tags --always` for dev checkouts
-  4. Hard-coded `dev` fallback
+  2. `Composer\InstalledVersions::getPrettyVersion('o3-shop/shop-ce')`
+     (Composer's runtime API)
+  3. Hard-coded `dev` fallback
   The committed file no longer carries the literal version string. The
-  `Update ShopVersion to v...` commits stop happening.
+  `Update ShopVersion to v...` commits stop happening. No process forks
+  or `git` binary dependency.
 - **BREAKING** for downstream tooling that scrapes `ShopVersion.php` for a
   literal — none known internally; admins still see the right version in the
   admin UI because `getVersion()` returns the same string at runtime.
@@ -292,7 +293,7 @@ release.
   unchanged repos.
 - `shop-version-resolution`: the runtime resolution chain replacing the
   hardcoded literal in `ShopVersion::getVersion()` (generated file →
-  installed.json → git describe → fallback).
+  `Composer\InstalledVersions` → `"dev"` fallback).
 - `metapackage-fold-in`: the one-time prerequisite migration (see the
   Prerequisite section) of `shop-metapackage-ce`'s `require` list and
   `replace` clause into `o3-shop/composer.json`, plus archival of the
@@ -349,7 +350,8 @@ release.
   constraint-already-satisfies vs. needs-update),
   for release-notes aggregation (changed-repo / unchanged-repo /
   multi-repo summary), and for the three-step `ShopVersion` resolution
-  chain. No existing tests
+  chain (generated-file present, InstalledVersions present, both absent
+  yields "dev"; no process forks asserted). No existing tests
   should change behaviour beyond the version-string source. The metapackage
   fold-in is composer-metadata-only and exercised by an integration test that
   resolves `composer install` against the rewritten `o3-shop/composer.json`.

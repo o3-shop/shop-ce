@@ -237,30 +237,37 @@ ready.
    `vendor/composer/installed.json`/`installed.php` and locates the
    project root via the autoloader, so the call works whether shop-ce
    is the project root or a vendor dep of an `o3-shop` project.
-3. `git describe --tags --always` — for dev checkouts of shop-ce
-   itself, where neither (1) nor (2) exists.
-4. Hard-coded `dev` literal — last-resort fallback.
+3. Hard-coded `dev` literal — for fresh git clones that haven't run
+   `composer install` yet.
 
-**Rationale:** each step covers a distinct deployment shape (release
-zip, composer install, dev checkout, broken environment) without
-requiring any of the others. The committed `ShopVersion.php` no longer
-carries a literal version string, so the per-release commit
-(`Update ShopVersion to v...`) goes away.
+**Rationale:** the committed `ShopVersion.php` no longer carries a
+literal version string, so the per-release commit (`Update ShopVersion
+to v...`) goes away. The two real-world deployment shapes — release
+zip / `composer install` deploy — are both covered by Step 1 (the
+post-install hook fires) or Step 2 (Composer-aware checkout). Step 3
+is honest output for a not-yet-installed checkout. No process forks,
+no binary dependencies, no fragile path-walking.
 
 **Alternatives considered:**
 
-- Inject from environment variable: rejected — admins viewing the shop
-  shouldn't need OPS-managed env vars to see a version number.
+- Inject from environment variable: rejected — admins viewing the
+  shop shouldn't need OPS-managed env vars to see a version number.
 - Single source via composer post-install only: rejected — breaks
-  pure git-clone dev workflows that never run `composer install --no-dev`.
-- Single source via git describe: rejected — fails inside release
-  zips, which lack `.git`.
+  composer-aware checkouts where the hook didn't fire (`--no-scripts`,
+  hook errors).
+- `git describe --tags --always` as a 3rd-step fallback: rejected —
+  hits a fresh-clone-with-no-composer-install case that's
+  not-quite-deployed anyway, while costing a process fork, a hard
+  dependency on the `git` binary being present (some hardened
+  production containers strip it), and a non-standard output format
+  (`v1.6.0-3-gabc123`) that doesn't fit normal version-string
+  consumers. `"dev"` is the more honest answer for that state.
 - Read `composer.lock` instead of `installed.json`: rejected —
   `composer.lock` lives at the project root only, so the lookup from
-  inside `vendor/o3-shop/shop-ce/` would have to path-walk for it (`../../`
-  when shop-ce is a vendor dep, `./` when it's the project root —
-  fragile). `installed.json` and the `Composer\InstalledVersions` API
-  are the canonical Composer-runtime answer to "what version is
+  inside `vendor/o3-shop/shop-ce/` would have to path-walk for it
+  (`../../` when shop-ce is a vendor dep, `./` when it's the project
+  root — fragile). `installed.json` and the `Composer\InstalledVersions`
+  API are the canonical Composer-runtime answer to "what version is
   installed?" — purpose-built, autoloader-resolved, and reflect the
   loaded code rather than the lockfile's intent.
 
