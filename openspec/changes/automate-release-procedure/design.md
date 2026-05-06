@@ -232,9 +232,11 @@ ready.
 
 1. `source/Core/version.generated.php` — written by a composer
    post-install hook from the release artifact metadata.
-2. `vendor/composer/installed.json` — lookup of `o3-shop/shop-ce`'s
-   `version` field. Works for downstream consumers (project roots) and
-   for shop-ce itself when installed as a vendor dep.
+2. `Composer\InstalledVersions::getPrettyVersion('o3-shop/shop-ce')`
+   — Composer's runtime API. Reads from
+   `vendor/composer/installed.json`/`installed.php` and locates the
+   project root via the autoloader, so the call works whether shop-ce
+   is the project root or a vendor dep of an `o3-shop` project.
 3. `git describe --tags --always` — for dev checkouts of shop-ce
    itself, where neither (1) nor (2) exists.
 4. Hard-coded `dev` literal — last-resort fallback.
@@ -253,6 +255,14 @@ carries a literal version string, so the per-release commit
   pure git-clone dev workflows that never run `composer install --no-dev`.
 - Single source via git describe: rejected — fails inside release
   zips, which lack `.git`.
+- Read `composer.lock` instead of `installed.json`: rejected —
+  `composer.lock` lives at the project root only, so the lookup from
+  inside `vendor/o3-shop/shop-ce/` would have to path-walk for it (`../../`
+  when shop-ce is a vendor dep, `./` when it's the project root —
+  fragile). `installed.json` and the `Composer\InstalledVersions` API
+  are the canonical Composer-runtime answer to "what version is
+  installed?" — purpose-built, autoloader-resolved, and reflect the
+  loaded code rather than the lockfile's intent.
 
 ### Constraint-update parsimony
 
