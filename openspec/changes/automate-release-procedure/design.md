@@ -44,9 +44,10 @@ The audience is the future maintainer reading the code and wondering
   guessing introduces ambiguity and is not worth the marginal convenience.
 - Releasing non-bundled modules (captcha, amazon-pay, country-vat, …).
   These ship on independent cadences as opt-in installs.
-- (no exclusion for the metapackage fold-in boundary — see the
-  "Pre-fold-in `--from` fallback" decision below; backwards-looking
-  releases across the boundary are supported.)
+- Backwards-looking releases that span the metapackage fold-in
+  boundary. v1.6.0 is cut manually as part of the fold-in transition;
+  the CLI is used from v1.6.0 onwards. Both `--from` and `--to`
+  snapshots passed to the CLI are post-fold-in.
 - Conventional-commits parsing. Bump level is explicit per repo via
   `--bump` flags; commit-message inference is a future possibility.
 
@@ -81,7 +82,7 @@ otherwise.
 
 **Rationale:** auto-detecting "the previous shop release" requires
 heuristics (final-only? same minor line? exclude RCs?) that quietly
-disagree across maintainers. An explicit `--from v1.5.4 --to v1.6.0`
+disagree across maintainers. An explicit `--from v1.6.0 --to v1.6.1`
 removes the guesswork, gives release notes a stable anchor, and makes
 release transcripts self-documenting in shell history.
 
@@ -169,33 +170,25 @@ but the next release hasn't run yet.
 - File-only (no flag): rejected — emergency overrides shouldn't
   require a commit-and-push round trip on the affected repo.
 
-### Pre-fold-in `--from` fallback
+### Pre-fold-in `--from` aborts
 
-When the `--from` tag predates the metapackage fold-in,
-`o3-shop/composer.json` requires only `o3-shop/shop-metapackage-ce`
-and the actual per-repo pins live one level deeper. Step 1 detects
-this and transparently reads `shop-metapackage-ce/composer.json` at
-the pinned metapackage tag, building `from_pin[]` from there instead.
+If `o3-shop/composer.json` at the `--from` tag still requires
+`o3-shop/shop-metapackage-ce`, Step 1 aborts with a clear error.
+The CLI does not look across the fold-in boundary.
 
-**Rationale:** the canonical first CLI-driven release is
-`--from v1.5.4 --to v1.6.0` — exactly the boundary case. Without the
-fallback, that release would either need a hand-built `from_pin[]`
-(defeating the one-command goal) or have to wait until v1.6.0 → v1.6.1
-to use the CLI (deferring the most-watched release notes). The
-fallback is ~30 LOC + one fixture and never touches Steps 2–6.
-
-The metapackage repo is archived after the fold-in, but archival
-preserves git history including tags — `git ls-remote --tags` and raw
-`composer.json` fetches against archived repos work normally.
+**Rationale:** v1.6.0 is cut manually as part of the fold-in
+transition, so the canonical first CLI-driven release is
+`--from v1.6.0 --to <next>`. There is no operational need to ever
+run `bin/release` with a v1.5.x `--from`. Adding a one-shot fallback
+for a case that won't occur is dead code waiting to rot; aborting
+loudly is the safer default.
 
 **Alternatives considered:**
 
-- Abort with a clear error and require the maintainer to hand-build
-  the from-pin map: rejected — the algorithm is mechanical; making
-  the maintainer do it manually for one release defeats the goal.
-- Hardcode v1.5.4 → v1.6.0 specifically: rejected — case-pattern, not
-  case-specific; same logic also helps if any future restructure
-  introduces a similar boundary (none planned).
+- Read the metapackage's composer.json as a fallback when --from
+  predates the fold-in: rejected — solves a problem we don't
+  actually have, since we won't run the CLI across the boundary.
+  The v1.5.4 → v1.6.0 transition is a manual one-time step.
 
 ### `from_pin[]` as the per-repo anchor
 
@@ -450,19 +443,18 @@ state we want to require resolved.
 
 3. **Build and unit-test `bin/release`** against synthetic composer.json
    fixtures (linear chain, diamond, missing dep, cycle, skip-unchanged
-   reuse, RC/final stability cases, pre-fold-in metapackage fallback in
-   Step 1). No live repos needed.
+   reuse, RC/final stability cases, pre-fold-in --from snapshot aborts
+   in Step 1). No live repos needed.
 
 4. **Dry-run against the v1.6.0 → v1.6.1 (or v1.7.0-RC1) path.** The
    `--dry-run` output is the integration test — every planned tag,
    commit, and release listed. Maintainer reviews; iterate until clean.
 
-5. **First live release** with the CLI: `bin/release --from v1.5.4
-   --to v1.6.0`, exercising the pre-fold-in fallback in Step 1. The
-   resulting cross-repo release notes span the fold-in boundary
-   exactly once. Maintainer publishes the resulting drafts manually.
-   Subsequent releases use post-fold-in tags as `--from` and never
-   trigger the fallback again.
+5. **First live release** with the CLI:
+   `bin/release --from v1.6.0 --to <next>`. v1.6.0 is the first
+   post-fold-in tag (cut manually in step 2) and becomes the
+   canonical `--from` for the first machine-driven release.
+   Maintainer publishes the resulting drafts manually.
 
 6. **Wiki rewrite** — replace
    https://github.com/o3-shop/o3-shop/wiki/Create-a-Release with the

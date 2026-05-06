@@ -82,7 +82,7 @@ release.
 - **NEW** `bin/release` CLI in `shop-ce` that drives a tier-by-tier release
   across the o3-shop repo network. Invocation:
   ```
-  bin/release --from v1.5.4 --to v1.6.0 [--bump testing-library=minor ...] [--dry-run]
+  bin/release --from v1.6.0 --to v1.6.1 [--bump testing-library=minor ...] [--dry-run]
   ```
   - `--to` — **required**. The shop version being cut (final or
     pre-release: `v1.6.0`, `v1.6.0-RC4`, etc.).
@@ -99,17 +99,10 @@ release.
     `o3-shop` and read its `composer.json`. For each `o3-shop/*` entry,
     record `from_pin[repo]` — the exact version that shipped in `--from`.
     This map is the per-repo anchor for "did anything change?" and the
-    starting point for release notes.
-
-    **Pre-fold-in fallback** — if `o3-shop/composer.json` at `--from`
-    still requires `o3-shop/shop-metapackage-ce` (i.e. the from-snapshot
-    predates the fold-in), the CLI transparently reads
-    `shop-metapackage-ce/composer.json` at the pinned metapackage tag
-    and builds `from_pin[]` from there instead. The metapackage repo is
-    archived but its tagged history remains readable, so this lookup is
-    reliable. This makes the first CLI-driven release
-    (`--from v1.5.4 --to v1.6.0`) work without special-case handling by
-    the maintainer.
+    starting point for release notes. If `o3-shop/composer.json` at
+    `--from` still requires `o3-shop/shop-metapackage-ce` (i.e. the
+    snapshot predates the fold-in), the CLI aborts with a clear error;
+    pre-fold-in `--from` tags are not supported.
   - **Step 2 — Walk the dep tree** from `o3-shop/composer.json` on the
     target release branch, recursively through `require` and `require-dev`.
     Collect every `o3-shop/*` package and remember each spot where it's
@@ -348,7 +341,7 @@ release.
   changed-without-tag-CLI-cuts, RC-target-accepts-final-dep,
   final-target-rejects-RC-dep, CLI-cut patch / minor / major / exact,
   missing-from-flag-errors, missing-to-flag-errors,
-  pre-fold-in-from-snapshot-falls-back-to-metapackage,
+  pre-fold-in-from-snapshot-aborts,
   next-bump-file-honored, next-bump-file-consumed-on-release,
   flag-overrides-next-bump-file, neither-flag-nor-file-defaults-patch,
   unmerged-merge-back-PR-aborts-release,
