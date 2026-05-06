@@ -329,12 +329,15 @@ is currently only knowable by clicking through 12 release pages.
 
 ### Bundled modules in scope; non-bundled modules out of scope
 
-The fold-in keeps `gdpr-optin-module`, `paypal-module` (the o3-shop
-fork), `usercentrics`, `tinymce-editor` — they ship with the shop and
-participate in the release walk like any other tier-0 dep.
-Non-bundled modules (captcha, amazon-pay, country-vat) are opt-in
-installs via the existing `oe:module:install:*` composer scripts and
-never enter the dep tree.
+The fold-in keeps `gdpr-optin-module`, `usercentrics`, `tinymce-editor`
+— they ship with the shop and participate in the release walk like
+any other tier-0 dep. The o3-shop fork of `paypal-module` was in the
+metapackage from 2022 to early 2026 but has already been removed from
+every v1.6.0 RC tag; the fold-in just makes that removal permanent.
+Non-bundled modules (captcha, amazon-pay, country-vat, and the
+upstream `oxid-solution-catalysts/paypal-module`) are opt-in installs
+via the existing `oe:module:install:*` composer scripts and never
+enter the dep tree.
 
 **Rationale:** "what we ship" is decided by what's in
 `o3-shop/composer.json`'s `require` list. Modules in the require list

@@ -34,13 +34,19 @@ The fold-in is mechanical — composer-metadata only, no code:
 
 1. Move the metapackage's `require` list into `o3-shop/composer.json`,
    with two deletions on the way:
-   - **Drop deprecated entries** (`flow-theme`, `vortex-theme`, and any
-     `tests-deprecated-ce`-style references). They no longer ship by
-     default; users who still want them can `composer require` them
-     explicitly.
-   - **Keep bundled modules** (`gdpr-optin-module`, the o3-shop
-     `paypal-module`, `usercentrics`, `tinymce-editor`) — these ship with
-     the shop and become candidates for the release-graph walk.
+   - **Drop deprecated entries** (`flow-theme`, `vortex-theme`, the
+     o3-shop `paypal-module`, and any `tests-deprecated-ce`-style
+     references). `flow-theme` and `paypal-module` are already absent
+     from the v1.6.0-RC tags of the metapackage and have been removed
+     from the upcoming release line; the fold-in just makes their
+     removal permanent. `vortex-theme` was not in the metapackage. Users
+     who still want any of these MAY `composer require` them
+     explicitly — paypal in particular has the
+     `oxid-solution-catalysts/paypal-module` opt-in install path
+     already wired in `o3-shop/composer.json`'s scripts.
+   - **Keep bundled modules** (`gdpr-optin-module`, `usercentrics`,
+     `tinymce-editor`) — these are still in v1.6.0-RC4 and ship with
+     the shop, so they become candidates for the release-graph walk.
 2. Move the `replace: oxid-esales/oxideshop-metapackage-ce` clause to
    `o3-shop/composer.json` (preserving the OXID-lineage marker that blocks
    hybrid OXID + o3-shop installs).
@@ -64,14 +70,12 @@ Two acceptable sequencings:
    path if you'd rather keep the two concerns reviewable independently or
    if the fold-in needs to ship on a different cadence.
 
-Pre-fold-in `--from` tags (e.g. `--from v1.5.4 --to v1.6.0` for the very
-first machine-driven release) are supported via a one-shot fallback in
-Step 1: when `o3-shop/composer.json` at `--from` still requires
-`o3-shop/shop-metapackage-ce`, the CLI transparently reads
-`shop-metapackage-ce/composer.json` at the pinned tag and builds
-`from_pin[]` from there. The metapackage repo is archived after the
-fold-in but its tagged history remains readable, so this lookup is
-reliable. All `--to` snapshots must be post-fold-in.
+Both `--from` and `--to` snapshots passed to `bin/release` MUST be
+post-fold-in. The first machine-driven release is therefore
+`--from v1.6.0 --to <next>`, where v1.6.0 itself is cut manually as
+part of the fold-in transition. The CLI does not look across the
+fold-in boundary; that one-time transition is a separate, manual
+release.
 
 ## What Changes
 
@@ -110,12 +114,13 @@ reliable. All `--to` snapshots must be post-fold-in.
     target release branch, recursively through `require` and `require-dev`.
     Collect every `o3-shop/*` package and remember each spot where it's
     pinned (so Step 4 knows where to write). The walk includes runtime
-    deps (shop-ce, themes, demodata, bundled modules like
-    `gdpr-optin-module` / `paypal-module` / `usercentrics` /
-    `tinymce-editor`) and dev-tooling deps (`testing-library`,
-    `shop-ide-helper`, `codeception-modules`, …) — anything we ship.
-    Non-bundled modules (captcha, amazon-pay, country-vat, …) are
-    opt-in installs via composer scripts and never appear in this tree.
+    deps (shop-ce, themes, demodata, bundled modules
+    `gdpr-optin-module` / `usercentrics` / `tinymce-editor`) and
+    dev-tooling deps (`testing-library`, `shop-ide-helper`,
+    `codeception-modules`, …) — anything we ship. Non-bundled modules
+    (captcha, amazon-pay, country-vat, the upstream
+    `oxid-solution-catalysts/paypal-module`, …) are opt-in installs
+    via composer scripts and never appear in this tree.
   - **Step 3 — Pick a version per candidate.** For each repo in the walk,
     using `from_pin[repo]` as anchor:
     1. **Unchanged since `from`** — no commits or new tags on the
@@ -192,8 +197,8 @@ reliable. All `--to` snapshots must be post-fold-in.
   - tier 0 — leaf libs / asset packages / bundled modules / dev-tooling
     leaves: `smarty`, `shop-composer-plugin`, `shop-facts`,
     `shop-unified-namespace-generator`, `o3-Theme`, `wave-theme`,
-    `shop-demodata-ce`, `gdpr-optin-module`, `paypal-module` (the o3-shop
-    fork), `usercentrics`, `tinymce-editor`, `shop-ide-helper`,
+    `shop-demodata-ce`, `gdpr-optin-module`, `usercentrics`,
+    `tinymce-editor`, `shop-ide-helper`,
     `developer-tools`, `codeception-modules`, `codeception-page-objects`,
     `MinkSeleniumDriver`
   - tier 1 — `shop-ce` and `testing-library` (each pins various tier-0 deps)
@@ -250,8 +255,8 @@ reliable. All `--to` snapshots must be post-fold-in.
   they don't appear in `o3-shop/composer.json`'s require list (or are being
   dropped from it during the fold-in), so the dep walk never sees them and
   `bin/release` doesn't touch them. Bundled modules (`gdpr-optin-module`,
-  `paypal-module`, `usercentrics`, `tinymce-editor`) **are** in scope and
-  are processed by the same algorithm as every other tier-0 dep.
+  `usercentrics`, `tinymce-editor`) **are** in scope and are processed
+  by the same algorithm as every other tier-0 dep.
 - **OUT OF SCOPE** Currency-rate freshness — remains a separate manual
   pre-release check by the maintainer (per the existing wiki).
   `bin/release` does not touch it.

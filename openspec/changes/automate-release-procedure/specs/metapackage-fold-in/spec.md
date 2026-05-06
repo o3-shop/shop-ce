@@ -15,12 +15,14 @@ the next two requirements.
   that was previously in
   `shop-metapackage-ce/composer.json` `require`
 
-### Requirement: Deprecated entries dropped during fold-in
+### Requirement: Deprecated and removed entries dropped during fold-in
 
-The fold-in SHALL NOT carry `flow-theme`, `vortex-theme`, or any
-`tests-deprecated-ce`-style entries from the metapackage's `require`
-list into `o3-shop/composer.json`. Users who still want them MAY
-install them via `composer require` explicitly.
+The fold-in SHALL NOT carry `flow-theme`, `vortex-theme`, the o3-shop
+fork of `paypal-module`, or any `tests-deprecated-ce`-style entries
+into `o3-shop/composer.json`. `flow-theme` and `paypal-module` were
+already removed from every v1.6.0 RC tag of the metapackage; the
+fold-in makes the removal permanent. Users who still want any of
+these MAY install them via `composer require` explicitly.
 
 #### Scenario: flow-theme dropped
 
@@ -33,11 +35,17 @@ install them via `composer require` explicitly.
 - **THEN** `o3-shop/composer.json` does not require
   `o3-shop/vortex-theme`
 
+#### Scenario: o3-shop paypal-module dropped
+
+- **WHEN** the fold-in is applied
+- **THEN** `o3-shop/composer.json` does not require the o3-shop fork
+  of `paypal-module`
+
 ### Requirement: Bundled modules preserved during fold-in
 
-The fold-in SHALL preserve `o3-shop/gdpr-optin-module`, the o3-shop
-fork of `paypal-module`, `o3-shop/usercentrics`, and
-`o3-shop/tinymce-editor` from the metapackage's `require` list into
+The fold-in SHALL preserve `o3-shop/gdpr-optin-module`,
+`o3-shop/usercentrics`, and `o3-shop/tinymce-editor` from the v1.6.0-RC
+state of `shop-metapackage-ce/composer.json` `require` into
 `o3-shop/composer.json` `require`. They become candidates for the
 release-graph walk like any other tier-0 dep.
 
@@ -46,7 +54,7 @@ release-graph walk like any other tier-0 dep.
 - **WHEN** the fold-in is applied
 - **THEN** `o3-shop/composer.json` requires
   `o3-shop/gdpr-optin-module` with the version that was pinned in
-  the metapackage
+  the metapackage's v1.6.0-RC4 tag
 
 ### Requirement: Replace clause moves to o3-shop
 
