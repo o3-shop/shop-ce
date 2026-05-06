@@ -64,11 +64,14 @@ Two acceptable sequencings:
    path if you'd rather keep the two concerns reviewable independently or
    if the fold-in needs to ship on a different cadence.
 
-Either way: every `--from` reference passed to `bin/release` must point at
-a snapshot where the fold-in already happened. Backwards-looking notes
-(e.g. `--from v1.5.4 --to v1.6.0`) where the from-snapshot predates the
-fold-in are out of scope; the first machine-generated release notes start
-from the first post-fold-in tag.
+Pre-fold-in `--from` tags (e.g. `--from v1.5.4 --to v1.6.0` for the very
+first machine-driven release) are supported via a one-shot fallback in
+Step 1: when `o3-shop/composer.json` at `--from` still requires
+`o3-shop/shop-metapackage-ce`, the CLI transparently reads
+`shop-metapackage-ce/composer.json` at the pinned tag and builds
+`from_pin[]` from there. The metapackage repo is archived after the
+fold-in but its tagged history remains readable, so this lookup is
+reliable. All `--to` snapshots must be post-fold-in.
 
 ## What Changes
 
@@ -92,10 +95,17 @@ from the first post-fold-in tag.
     `o3-shop` and read its `composer.json`. For each `o3-shop/*` entry,
     record `from_pin[repo]` — the exact version that shipped in `--from`.
     This map is the per-repo anchor for "did anything change?" and the
-    starting point for release notes. **Assumes the fold-in is already
-    in place at the `--from` tag** (see "Prerequisite" above); the CLI
-    aborts with a clear error if `o3-shop/composer.json` at `--from` still
-    requires `o3-shop/shop-metapackage-ce`.
+    starting point for release notes.
+
+    **Pre-fold-in fallback** — if `o3-shop/composer.json` at `--from`
+    still requires `o3-shop/shop-metapackage-ce` (i.e. the from-snapshot
+    predates the fold-in), the CLI transparently reads
+    `shop-metapackage-ce/composer.json` at the pinned metapackage tag
+    and builds `from_pin[]` from there instead. The metapackage repo is
+    archived but its tagged history remains readable, so this lookup is
+    reliable. This makes the first CLI-driven release
+    (`--from v1.5.4 --to v1.6.0`) work without special-case handling by
+    the maintainer.
   - **Step 2 — Walk the dep tree** from `o3-shop/composer.json` on the
     target release branch, recursively through `require` and `require-dev`.
     Collect every `o3-shop/*` package and remember each spot where it's
@@ -124,24 +134,58 @@ from the first post-fold-in tag.
   - **Step 4 — What tag does the CLI cut?** Hybrid scheme (Q1 = c):
     - **shop-ce** uses `--to` verbatim. The shop's release tag *is* the
       shop's version.
-    - **Every other repo** stays on its own version line. Default: patch
-      bump on its current latest tag (e.g. `testing-library v1.2.5` →
-      `v1.2.6`, `gdpr-optin-module v1.0.1` → `v1.0.2`). Override per repo
-      with `--bump <repo>=<minor|major|exact-version>` at invocation. Patch
-      is the safe default — never accidentally signals an API break.
+    - **Every other repo** stays on its own version line. The bump level
+      is resolved with this precedence (first match wins):
+      1. **`--bump <repo>=<level>` flag** at invocation (ad-hoc override
+         for this run only).
+      2. **`.next-bump` file** committed at the repo root on the release
+         branch (maintainer-declared; persists in git history). Single
+         line, same vocabulary as the flag:
+         `patch` / `minor` / `major` / `v<exact-version>`.
+      3. **Default: patch.** Never accidentally signals an API break.
+
+      The `.next-bump` file is **consumed by the release**: if used, the
+      CLI deletes it in the same commit it cuts the new tag from, so the
+      released tag never points at a state containing the file, and the
+      next release defaults back to patch unless the maintainer commits
+      a fresh marker. The flag, being invocation-scoped, leaves the file
+      (if any) untouched.
+
+      For belt-and-suspenders coverage of dev/branch installs (e.g.
+      `composer require <pkg>:dev-b-1.6`), every release-eligible repo's
+      `composer.json` gains
+      `"archive": { "exclude": [".next-bump"] }`. This is a one-line
+      one-time addition per repo and ensures the marker never reaches
+      a consumer's vendor directory regardless of install path.
+
+      Examples:
+      - `testing-library v1.2.5` → `v1.2.6` (default patch).
+      - `gdpr-optin-module v1.0.1` with `.next-bump: minor` committed →
+        `v1.1.0` (file wins; file deleted post-release).
+      - `shop-facts v1.0.4` with `--bump shop-facts=v2.0.0` →
+        `v2.0.0` (flag wins; any committed `.next-bump` left alone).
   - **Step 5 — Update dependent constraints** at every spot recorded in
     Step 2, but only when the existing constraint doesn't already satisfy
     the chosen version. Caret constraints in `require-dev` typically still
     satisfy minor-version bumps and need no touching. Exact pins get
     replaced with the chosen tag verbatim; flexible constraints get widened
     only when needed.
-  - **Step 6 — Aggregate release notes.** For every repo where the chosen
-    version differs from `from_pin[repo]`, the CLI generates a per-repo
-    section using the `from_pin..chosen` commit range (titles, GitHub PR
-    refs, contributor list). The aggregated markdown is attached to the
-    o3-shop draft GitHub release as the cross-repo changelog —
-    "Releasing v1.6.0 over v1.5.4" with one section per changed repo, and
-    a list of repos that were unchanged.
+  - **Step 6 — Aggregate release notes** by delegating per-repo notes to
+    GitHub's built-in generator. For every repo where the chosen version
+    differs from `from_pin[repo]`, the CLI calls
+    `POST /repos/<owner>/<repo>/releases/generate-notes` with
+    `tag_name=<chosen>` and `previous_tag_name=<from_pin>` (equivalent to
+    `gh release create --generate-notes`). PR labels drive categorization
+    per each repo's own `.github/release.yml`; contributor lists are
+    included automatically. The CLI does no commit parsing or
+    categorization itself.
+
+    The returned markdown bodies are stitched together under one `## <repo>`
+    heading each, plus a final `## Unchanged in this release` section
+    listing repos where `chosen == from_pin`. The aggregated markdown is
+    attached as the body of the **o3-shop** draft GitHub release —
+    one cross-repo changelog per shop release, alongside the per-repo
+    drafts that GitHub already auto-generates per tag.
   - Tiers fall out of the topological sort of the resulting DAG. Cycles are
     a fatal error.
 - **NEW** Three release tiers, derived from the DAG:
@@ -161,7 +205,8 @@ from the first post-fold-in tag.
   Nothing else.
 - **NEW** Per-repo release flow:
   1. Pre-flight gates (clean tree, on release branch, deps resolved to release
-     versions, tests green, currency rates fresh)
+     versions, tests green, **previous release's merge-back PR is merged**
+     — see below)
   2. Composer-constraint bump (downstream tiers only) committed and pushed
      **directly** to the release branch — no PRs for the bumps
   3. Tag created + GitHub release published as **draft** (maintainer clicks
@@ -169,8 +214,16 @@ from the first post-fold-in tag.
   4. Pre-release flag matches the tag suffix (`-rc`, `-beta`, `-alpha`)
   5. For final releases only, an auto-opened PR `Merge v<x>.<y>.<z> release
      into main` per repo (existing wiki rule, kept identical)
-- **NEW** Open-PR detection — the CLI warns (does not abort) when a repo has
-  open PRs against the release branch.
+- **NEW** Open-PR detection, two rules:
+  - **Warn (does not abort)** when a repo has open PRs *targeting* its
+    release branch (incoming feature work). The maintainer chose to cut
+    the release with that work pending; surface it but don't block.
+  - **Abort (hard gate)** when a repo has an unmerged merge-back PR from
+    a previous release — i.e. an open PR from the release branch into
+    `main` matching the `Merge v<x>.<y>.<z> release into main` title
+    pattern. The next release cannot run until the previous release has
+    been merged back. Prevents `main` from drifting arbitrarily far
+    behind the release line.
 - **NEW** Dry-run mode (`--dry-run`) prints the planned tag/commit/release
   for every repo without touching anything.
 - **MODIFIED** `source/Core/ShopVersion.php` resolves at runtime in this
@@ -199,6 +252,9 @@ from the first post-fold-in tag.
   `bin/release` doesn't touch them. Bundled modules (`gdpr-optin-module`,
   `paypal-module`, `usercentrics`, `tinymce-editor`) **are** in scope and
   are processed by the same algorithm as every other tier-0 dep.
+- **OUT OF SCOPE** Currency-rate freshness — remains a separate manual
+  pre-release check by the maintainer (per the existing wiki).
+  `bin/release` does not touch it.
 - **OUT OF SCOPE** Further consolidation (e.g. folding `shop-ce` into
   `o3-shop`, merging tier-0 leaf libs). The metapackage fold-in (see
   Prerequisite) is the only consolidation included here because (a) the
@@ -225,11 +281,12 @@ from the first post-fold-in tag.
   (unchanged-since-from → reuse / changed-with-usable-tag → use-latest /
   changed-without-usable-tag → CLI-cuts), the hybrid tag-cutting policy
   (shop-ce uses `--to`; every other repo bumps its own version line,
-  default patch, overridable per-repo via
-  `--bump <repo>=<minor|major|exact>`), the stability check
-  (final shop releases reject pre-release dep tags; RC shop releases
-  accept either), and the constraint-update logic (only touch a dependent's
-  constraint when the existing one doesn't already satisfy the chosen tag).
+  default patch, with two-tier override: `--bump <repo>=<level>` flag
+  beats committed `.next-bump` file beats default; the file is consumed
+  on use), the stability check (final shop releases reject pre-release
+  dep tags; RC shop releases accept either), and the constraint-update
+  logic (only touch a dependent's constraint when the existing one
+  doesn't already satisfy the chosen tag).
 - `release-notes-aggregation`: per-repo changelog generation using the
   `from_pin..chosen` commit range as anchor, aggregated into a single
   cross-repo markdown attached to the o3-shop draft GitHub release. Lists
@@ -268,6 +325,8 @@ from the first post-fold-in tag.
     to `o3-shop/o3-shop`. No further releases.
 - **Every release-eligible repo** (everything reached by the dep-tree walk)
   - composer.json constraint bumps happen directly on the release branch
+  - composer.json gains `"archive": { "exclude": [".next-bump"] }` so the
+    marker file (if used) never ships in dist archives
 - **Wiki**
   - https://github.com/o3-shop/o3-shop/wiki/Create-a-Release rewritten to
     "run `bin/release <tag>` and publish the resulting drafts" plus a manual
@@ -284,7 +343,11 @@ from the first post-fold-in tag.
   changed-without-tag-CLI-cuts, RC-target-accepts-final-dep,
   final-target-rejects-RC-dep, CLI-cut patch / minor / major / exact,
   missing-from-flag-errors, missing-to-flag-errors,
-  pre-fold-in-from-snapshot-aborts,
+  pre-fold-in-from-snapshot-falls-back-to-metapackage,
+  next-bump-file-honored, next-bump-file-consumed-on-release,
+  flag-overrides-next-bump-file, neither-flag-nor-file-defaults-patch,
+  unmerged-merge-back-PR-aborts-release,
+  incoming-PR-warns-but-proceeds,
   constraint-already-satisfies vs. needs-update),
   for release-notes aggregation (changed-repo / unchanged-repo /
   multi-repo summary), and for the three-step `ShopVersion` resolution
