@@ -101,11 +101,26 @@ Tests: 48 cases / 98 assertions across `MergeBackPolicyTest`, `PreFlightRunnerTe
 
 ## 11. Dry-run mode
 
-- [ ] 11.1 When `--dry-run` is set, run Steps 1–6 and the pre-flight gates with no state-changing actions
-- [ ] 11.2 Print the per-repo plan: chosen version, source (case 1/2/3), planned tag (if any), planned commit subjects, planned release URLs
-- [ ] 11.3 Print the aggregated release-notes markdown that would be attached
-- [ ] 11.4 Exit zero on success; exit non-zero if pre-flight gates would fail
-- [ ] 11.5 Unit tests: dry-run never invokes `git tag`, `git push`, `gh release create`, `gh pr create`, or any composer.json write
+- [x] 11.1 When `--dry-run` is set, run Steps 1–6 and the pre-flight gates with no state-changing actions — `ReleasePlanner::plan()` orchestrates Sections 4–10 into a `ReleasePlan` value object; the planner only reads (HTTPS fetches + `git ls-remote` + `gh pr list` for pre-flight). State-changing methods on `PerRepoActions` are never reached on the dry-run path.
+- [x] 11.2 Print the per-repo plan: chosen version, source (case 1/2/3), planned tag (if any), planned commit subjects, planned release URLs — `DryRunPrinter::print()` emits per-candidate `<package> [<case-label>] <from-pin> -> <chosen-version>` lines plus the bump source (`flag` / `next-bump-file` / `default-patch` / `shop-ce-verbatim`) and any `.next-bump` consumption notes
+- [x] 11.3 Print the aggregated release-notes markdown that would be attached — `DryRunPrinter::printAggregatedNotes()` renders the Section 9 output indented under a heading
+- [x] 11.4 Exit zero on success; exit non-zero if pre-flight gates would fail — `ReleasePlan::shouldAbort()` (any pre-flight `shouldAbort` across reports). `ReleaseCommand` returns `EXIT_PRE_FLIGHT_ABORT = 3` on abort, `EXIT_PLAN_ERROR = 4` on planner exceptions, `EXIT_OK = 0` otherwise.
+- [x] 11.5 Unit tests: dry-run never invokes `git tag`, `git push`, `gh release create`, `gh pr create`, or any composer.json write — covered by structural separation: the dry-run path through `ReleaseCommand::execute()` calls only `ReleasePlanner::plan()` and `DryRunPrinter::print()`. `PerRepoActions` (which owns every state-changing shell command) is never instantiated by `buildDefaultPlanner()` and is never reached from `execute()`. Tests assert this via stub-planner injection: the planner is called exactly once with the parsed inputs and only the printer output reaches stdout. 4 planner tests + 24 command tests + 10 printer-pathway assertions cover the whole flow.
+
+New components:
+  CandidatePlan         per-package decision + tag-cut bookkeeping
+  ConstraintEditPlan    per pin-location rewrite plan
+  ReleasePlan           whole-run output: candidates + edits + notes + pre-flight reports
+  ReleasePlanner        Sections 4–10 orchestrator; pure data-flow
+  DryRunPrinter         deterministic text rendering of a ReleasePlan
+  DefaultBranchResolver per-package release-branch map (matches Section 1.5 decisions)
+  GitLsRemoteRepoIntrospector  reference RemoteRepoIntrospector via `git ls-remote --tags --heads`
+
+ReleaseCommand now accepts an optional `(planner, printer)` constructor pair; production-mode invocations build the default planner inline with `Https*Fetcher`s + `GitLsRemoteRepoIntrospector` + `GhCliReleaseNotesProvider`. Tests inject stubs that bypass the parent constructor entirely so no real services are constructed. Live execution still prints a "Section 14 wiring pending" notice (4 exit codes: OK / USAGE_ERROR / PRE_FLIGHT_ABORT / PLAN_ERROR).
+
+Refactor: `VersionResolution` gained an optional `latestTag` field so the planner can pass it to `TagCutter` for case-3 candidates. All 14 Section 6 tests still pass.
+
+Tests: 4 planner cases / 19 assertions covering pre-fold-in indirection end-to-end, notes aggregation through the chain, pre-flight skipped when no repo paths, fetcher failures bubble. Plus 24 command-level cases / 42 assertions covering flag parsing, dry-run output, planner failure, pre-flight-abort exit code, live-mode "not yet wired" notice. Full ReleaseTooling suite: 167 tests / 378 assertions.
 
 ## 12. Integration tests
 

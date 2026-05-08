@@ -22,17 +22,32 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\HttpsRawComposerJsonFetcher;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\HttpsRawRepoFileFetcher;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Constraint\ConstraintUpdater;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\SymfonyProcessExecutor;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\GhCliReleaseNotesProvider;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\ReleaseNotesAggregator;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DefaultBranchResolver;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DryRunPrinter;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlanner;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot\FromSnapshotBuilder;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Tag\TagCutter;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\CandidateVersionResolver;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\GitLsRemoteRepoIntrospector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 /**
  * Drives a tier-by-tier release across the o3-shop repo network.
  *
- * Section 3 (this file): CLI scaffold — flag parsing and validation.
- * Sections 4–9 add the actual algorithm; Section 10 the per-repo flow;
- * Section 11 the dry-run plan.
+ * Section 11 (this iteration): wires the algorithm chain (Sections
+ * 4-9) and the pre-flight gates (Section 10) into a single
+ * `--dry-run` plan printout. Live execution lands with Section 14.
  *
  * See: openspec/changes/automate-release-procedure/specs/release-orchestration/spec.md
  */
@@ -54,9 +69,25 @@ class ReleaseCommand extends Command
 
     public const EXIT_OK = 0;
     public const EXIT_USAGE_ERROR = 2;
+    public const EXIT_PRE_FLIGHT_ABORT = 3;
+    public const EXIT_PLAN_ERROR = 4;
 
     /** @var string|null */
     protected static $defaultName = 'release';
+
+    private ?ReleasePlanner $planner;
+    private DryRunPrinter $printer;
+
+    /**
+     * Both arguments are optional so production invocations build
+     * defaults inline; tests inject fakes via the constructor.
+     */
+    public function __construct(?ReleasePlanner $planner = null, ?DryRunPrinter $printer = null)
+    {
+        parent::__construct();
+        $this->planner = $planner;
+        $this->printer = $printer ?? new DryRunPrinter();
+    }
 
     protected function configure(): void
     {
@@ -117,27 +148,43 @@ class ReleaseCommand extends Command
             return self::EXIT_USAGE_ERROR;
         }
 
+        $bumpFlags = [];
         foreach ($bumps as $bump) {
             $error = $this->validateBumpValue($bump);
             if ($error !== null) {
                 $this->writeUsageError($output, $error);
                 return self::EXIT_USAGE_ERROR;
             }
+            [$slug, $level] = explode('=', $bump, 2);
+            $bumpFlags[$slug] = $level;
         }
 
-        $output->writeln(sprintf(
-            '<info>Section 3 scaffold — parsed inputs:</info>'
-            . ' --from=%s --to=%s --dry-run=%s --bump=%s',
-            $from,
-            $to,
-            $dryRun ? 'true' : 'false',
-            $bumps === [] ? '(none)' : implode(',', $bumps)
-        ));
-        $output->writeln(
-            '<comment>Algorithm (Sections 4-9), per-repo flow (Section 10), '
-            . 'dry-run plan (Section 11) not yet implemented.</comment>'
-        );
+        $planner = $this->planner ?? $this->buildDefaultPlanner();
 
+        try {
+            $plan = $planner->plan($from, $to, $bumpFlags);
+        } catch (Throwable $e) {
+            $output->writeln(sprintf('<error>Plan failed: %s</error>', $e->getMessage()));
+            return self::EXIT_PLAN_ERROR;
+        }
+
+        $this->printer->print($plan, $output);
+
+        if ($plan->shouldAbort()) {
+            return self::EXIT_PRE_FLIGHT_ABORT;
+        }
+
+        if ($dryRun) {
+            $output->writeln('<info>Dry-run complete. No state-changing actions performed.</info>');
+            return self::EXIT_OK;
+        }
+
+        $output->writeln(
+            '<comment>Live execution (commit constraint changes, cut tags, '
+            . 'create draft GitHub releases, open merge-back PRs) is not yet '
+            . 'wired — Section 14 in openspec/changes/automate-release-procedure/'
+            . 'tasks.md adds it. Re-run with --dry-run to preview.</comment>'
+        );
         return self::EXIT_OK;
     }
 
@@ -173,6 +220,33 @@ class ReleaseCommand extends Command
             );
         }
         return null;
+    }
+
+    private function buildDefaultPlanner(): ReleasePlanner
+    {
+        $exec = new SymfonyProcessExecutor();
+        $composerJsonFetcher = new HttpsRawComposerJsonFetcher();
+        $fileFetcher = new HttpsRawRepoFileFetcher();
+        $branchResolver = new DefaultBranchResolver();
+
+        $snapshotBuilder = new FromSnapshotBuilder($composerJsonFetcher);
+        $walker = new DepTreeWalker($composerJsonFetcher, $branchResolver);
+        $repos = new GitLsRemoteRepoIntrospector($exec);
+        $versionResolver = new CandidateVersionResolver($repos);
+        $tagCutter = new TagCutter($fileFetcher);
+        $constraintUpdater = new ConstraintUpdater();
+        $notesAggregator = new ReleaseNotesAggregator(new GhCliReleaseNotesProvider());
+
+        return new ReleasePlanner(
+            $snapshotBuilder,
+            $walker,
+            $versionResolver,
+            $tagCutter,
+            $constraintUpdater,
+            $notesAggregator,
+            $branchResolver,
+            null // pre-flight runner skipped for dry-run unless wired explicitly
+        );
     }
 
     private function writeUsageError(OutputInterface $output, string $message): void

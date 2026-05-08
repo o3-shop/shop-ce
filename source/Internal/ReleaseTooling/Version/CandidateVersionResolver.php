@@ -73,7 +73,8 @@ class CandidateVersionResolver
                 $package,
                 VersionResolution::CASE_NEEDS_NEW_TAG,
                 null,
-                ['no semver tags found; Step 4 cuts the first tag']
+                ['no semver tags found; Step 4 cuts the first tag'],
+                null
             );
         }
 
@@ -91,7 +92,8 @@ class CandidateVersionResolver
                 $package,
                 VersionResolution::CASE_UNCHANGED,
                 $fromPin,
-                ['latest_tag = ' . $latestTag . ', from_pin = ' . $fromPin . '; no new commits.']
+                ['latest_tag = ' . $latestTag . ', from_pin = ' . $fromPin . '; no new commits.'],
+                $latestTag
             );
         }
 
@@ -104,7 +106,8 @@ class CandidateVersionResolver
                     'commits exist on %s beyond %s; Step 4 cuts a new tag.',
                     $packageRef,
                     $latestTag
-                )]
+                )],
+                $latestTag
             );
         }
 
@@ -117,7 +120,8 @@ class CandidateVersionResolver
                     'latest_tag %s is pre-release; --to %s is final. Step 4 cuts a final tag.',
                     $latestTag,
                     $shopTo
-                )]
+                )],
+                $latestTag
             );
         }
 
@@ -130,7 +134,8 @@ class CandidateVersionResolver
                 $latestTag,
                 $fromPin,
                 $shopTo
-            )]
+            )],
+            $latestTag
         );
     }
 

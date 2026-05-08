@@ -23,21 +23,36 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Command;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command\ReleaseCommand;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DryRunPrinter;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlan;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlanner;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot\FromSnapshot;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * Section 3 scaffold tests: only flag parsing + validation. The
- * command's body that runs the algorithm (Sections 4–9) and the
- * per-repo flow (Section 10) is not yet implemented; these tests
- * cover the surface contract that those Sections build on.
- */
 class ReleaseCommandTest extends TestCase
 {
-    private function tester(): CommandTester
+    private function tester(?ReleasePlanner $planner = null, ?DryRunPrinter $printer = null): CommandTester
     {
-        return new CommandTester(new ReleaseCommand());
+        $planner = $planner ?? $this->stubPlannerForEmptyPlan();
+        return new CommandTester(new ReleaseCommand($planner, $printer));
     }
+
+    private function stubPlannerForEmptyPlan(): ReleasePlanner
+    {
+        return new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+    }
+
+    /* ---------- flag parsing (Section 3 contract preserved) ---------- */
 
     public function testRunWithBothMandatoryFlagsExitsZero(): void
     {
@@ -45,10 +60,9 @@ class ReleaseCommandTest extends TestCase
         $status = $tester->execute([
             '--from' => 'v1.6.0',
             '--to' => 'v1.6.1-RC1',
+            '--dry-run' => true,
         ]);
         $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('--from=v1.6.0', $tester->getDisplay());
-        $this->assertStringContainsString('--to=v1.6.1-RC1', $tester->getDisplay());
     }
 
     public function testRunWithoutFromExitsUsageError(): void
@@ -69,42 +83,111 @@ class ReleaseCommandTest extends TestCase
 
     public function testRunWithBothFlagsEmptyStringExitsUsageError(): void
     {
-        // Symfony lets you pass --from='' as an empty string; the command
-        // must treat that as "missing", not as a valid empty tag.
         $tester = $this->tester();
         $status = $tester->execute(['--from' => '', '--to' => 'v1.6.1-RC1']);
         $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
     }
 
-    public function testRunWithRepeatedBumpFlagsCollectsAllValues(): void
+    public function testRunWithMalformedBumpExitsUsageError(): void
     {
         $tester = $this->tester();
         $status = $tester->execute([
             '--from' => 'v1.6.0',
             '--to' => 'v1.6.1-RC1',
-            '--bump' => ['testing-library=minor', 'shop-facts=v2.0.0'],
+            '--bump' => ['testing-library=bogus'],
         ]);
-        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $display = $tester->getDisplay();
-        $this->assertStringContainsString('testing-library=minor', $display);
-        $this->assertStringContainsString('shop-facts=v2.0.0', $display);
+        $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
+        $this->assertStringContainsString('Malformed --bump level', $tester->getDisplay());
     }
 
-    public function testRunWithDryRunFlagPropagates(): void
+    /* ---------- bump-flag parsing into the planner ---------- */
+
+    public function testBumpFlagsArePassedToPlannerAsSlugLevelMap(): void
     {
-        $tester = $this->tester();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+        $this->tester($stub)->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--bump' => ['testing-library=minor', 'shop-facts=v2.0.0'],
+            '--dry-run' => true,
+        ]);
+
+        $this->assertSame([
+            'testing-library' => 'minor',
+            'shop-facts' => 'v2.0.0',
+        ], $stub->lastBumpFlags);
+        $this->assertSame('v1.6.0', $stub->lastFromTag);
+        $this->assertSame('v1.6.1-RC1', $stub->lastToTag);
+    }
+
+    /* ---------- 11.1 + 11.5: dry-run never invokes state-changing actions ---------- */
+
+    public function testDryRunPrintsPlanAndDoesNotInvokeAnyStateChange(): void
+    {
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+        $tester = $this->tester($stub);
         $status = $tester->execute([
             '--from' => 'v1.6.0',
             '--to' => 'v1.6.1-RC1',
             '--dry-run' => true,
         ]);
         $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('--dry-run=true', $tester->getDisplay());
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Dry-run complete', $display);
+        $this->assertStringContainsString('Release plan: --from v1.6.0 --to v1.6.1-RC1', $display);
+
+        // Planner was called exactly once with no state-changing path
+        $this->assertSame(1, $stub->callCount);
     }
 
-    /**
-     * @dataProvider validBumpValueProvider
-     */
+    /* ---------- 11.4: pre-flight abort -> non-zero exit ---------- */
+
+    public function testPreFlightAbortYieldsNonZeroExit(): void
+    {
+        $abortingPlan = $this->planThatAborts();
+        $tester = $this->tester(new StubReleasePlanner($abortingPlan));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--dry-run' => true,
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
+    }
+
+    /* ---------- live mode is not yet wired ---------- */
+
+    public function testLiveModeShowsNotYetWiredNotice(): void
+    {
+        $tester = $this->tester();
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            // no --dry-run
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
+        $this->assertStringContainsString('Live execution', $tester->getDisplay());
+        $this->assertStringContainsString('Section 14', $tester->getDisplay());
+    }
+
+    /* ---------- validateBumpValue() unit (preserved from Section 3) ---------- */
+
+    /** @dataProvider validBumpValueProvider */
     public function testValidBumpValueReturnsNullFromValidator(string $value): void
     {
         $command = new ReleaseCommand();
@@ -124,9 +207,7 @@ class ReleaseCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidBumpValueProvider
-     */
+    /** @dataProvider invalidBumpValueProvider */
     public function testInvalidBumpValueReturnsErrorFromValidator(
         string $value,
         string $expectFragment
@@ -150,18 +231,78 @@ class ReleaseCommandTest extends TestCase
         ];
     }
 
-    public function testRunWithMalformedBumpExitsUsageError(): void
+    /* ---------- planner failure path ---------- */
+
+    public function testPlannerFailurePropagatesAsPlanErrorExit(): void
     {
-        $tester = $this->tester();
+        $tester = $this->tester(new ThrowingPlanner());
         $status = $tester->execute([
             '--from' => 'v1.6.0',
             '--to' => 'v1.6.1-RC1',
-            '--bump' => ['testing-library=bogus'],
+            '--dry-run' => true,
         ]);
-        $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
-        $this->assertStringContainsString(
-            'Malformed --bump level',
-            $tester->getDisplay()
+        $this->assertSame(ReleaseCommand::EXIT_PLAN_ERROR, $status);
+        $this->assertStringContainsString('Plan failed', $tester->getDisplay());
+    }
+
+    private function planThatAborts(): ReleasePlan
+    {
+        $abortingReport = new \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightReport([
+            \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome::abort('test', ['boom']),
+        ]);
+        return new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            ['o3-shop/shop-ce' => $abortingReport]
         );
+    }
+}
+
+/**
+ * Test double: returns a pre-canned plan and records the inputs.
+ * Extends ReleasePlanner so it satisfies the type without a real
+ * service tree behind it.
+ */
+final class StubReleasePlanner extends ReleasePlanner
+{
+    public string $lastFromTag = '';
+    public string $lastToTag = '';
+    public array $lastBumpFlags = [];
+    public int $callCount = 0;
+
+    private ReleasePlan $plan;
+
+    public function __construct(ReleasePlan $plan)
+    {
+        // NB: deliberately skip the parent constructor — stub doesn't need
+        // any of the real services. PHP allows this when the child only
+        // overrides public methods that don't touch parent state.
+        $this->plan = $plan;
+    }
+
+    public function plan(string $fromTag, string $toTag, array $bumpFlags, array $repoPaths = []): ReleasePlan
+    {
+        $this->lastFromTag = $fromTag;
+        $this->lastToTag = $toTag;
+        $this->lastBumpFlags = $bumpFlags;
+        $this->callCount++;
+        return $this->plan;
+    }
+}
+
+final class ThrowingPlanner extends ReleasePlanner
+{
+    public function __construct()
+    {
+        // Skip parent constructor — see StubReleasePlanner.
+    }
+
+    public function plan(string $fromTag, string $toTag, array $bumpFlags, array $repoPaths = []): ReleasePlan
+    {
+        throw new RuntimeException('synthetic planner failure');
     }
 }

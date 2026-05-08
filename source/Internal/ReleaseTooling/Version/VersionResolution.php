@@ -42,14 +42,20 @@ final class VersionResolution
     private string $package;
     private int $case;
     private ?string $chosenVersion;
+    private ?string $latestTag;
     /** @var array<int,string> human-readable diagnostic notes */
     private array $notes;
 
     /**
      * @param array<int,string> $notes
      */
-    public function __construct(string $package, int $case, ?string $chosenVersion, array $notes = [])
-    {
+    public function __construct(
+        string $package,
+        int $case,
+        ?string $chosenVersion,
+        array $notes = [],
+        ?string $latestTag = null
+    ) {
         if (!in_array($case, [self::CASE_UNCHANGED, self::CASE_USABLE_TAG, self::CASE_NEEDS_NEW_TAG], true)) {
             throw new \InvalidArgumentException("Unknown VersionResolution case '{$case}'");
         }
@@ -67,6 +73,12 @@ final class VersionResolution
         $this->case = $case;
         $this->chosenVersion = $chosenVersion;
         $this->notes = $notes;
+        $this->latestTag = $latestTag;
+    }
+
+    public function latestTag(): ?string
+    {
+        return $this->latestTag;
     }
 
     public function package(): string
