@@ -64,11 +64,11 @@ Refactor: renamed `RawComposerJsonFetchException` → `RawRepoFetchException` so
 
 ## 8. Algorithm Step 5 — Constraint update
 
-- [ ] 8.1 Implement constraint-satisfies check: given a Composer constraint string and a version string, return whether the version satisfies the constraint (use `composer/semver` package)
-- [ ] 8.2 For each pin location recorded in Step 2: skip if existing constraint already satisfies the chosen version
-- [ ] 8.3 Replace exact pins (e.g. `"v1.5.4"`) with the chosen version verbatim
-- [ ] 8.4 Widen flexible constraints (caret, tilde, range) only when the chosen version doesn't satisfy them
-- [ ] 8.5 Unit tests: caret already satisfies (no edit), exact pin needs replacement, caret needs widening to next major
+- [x] 8.1 Implement constraint-satisfies check: given a Composer constraint string and a version string, return whether the version satisfies the constraint (use `composer/semver` package) — `ConstraintUpdater::satisfies()` wraps `Composer\Semver\Semver::satisfies` and treats unparseable constraints as "does-not-satisfy" so they fall into the rewrite branch
+- [x] 8.2 For each pin location recorded in Step 2: skip if existing constraint already satisfies the chosen version — `ConstraintUpdate::shape() === SHAPE_UNCHANGED` when the existing covers chosen
+- [x] 8.3 Replace exact pins (e.g. `"v1.5.4"`) with the chosen version verbatim — `SHAPE_EXACT_REPLACED`; matches `v?N.N.N(-suffix)?`
+- [x] 8.4 Widen flexible constraints (caret, tilde, range) only when the chosen version doesn't satisfy them — `SHAPE_CARET_WIDENED` re-anchors caret at chosen; `SHAPE_TILDE_WIDENED` does the same for tilde; ranges/ORs without leading caret fall to `SHAPE_FALLBACK_REPLACED`
+- [x] 8.5 Unit tests: caret already satisfies (no edit), exact pin needs replacement, caret needs widening to next major — covered plus tilde-already-satisfies, exact-without-v-prefix replacement, tilde widening across minor boundary, range-satisfies (no edit), or-of-carets satisfied (no edit), or-of-carets miss (re-anchored), range-miss (fallback replacement), pre-release-vs-stable-caret (behavior pinned to composer/semver default), whitespace tolerance — 18 tests / 36 assertions in `ConstraintUpdaterTest`. Full ReleaseTooling suite: 103 / 225.
 
 ## 9. Algorithm Step 6 — Release notes aggregation
 
