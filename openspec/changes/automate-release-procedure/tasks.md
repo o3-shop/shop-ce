@@ -42,13 +42,13 @@
 
 ## 6. Algorithm Step 3 — Version resolution per candidate
 
-- [ ] 6.1 For each candidate, fetch its tag list via `git ls-remote --tags`
-- [ ] 6.2 Implement `latest_tag(repo)` = the highest semver tag on the candidate's release branch (matches `b-X.Y.Z` or `b-X.Y` per the proposal's branch convention)
-- [ ] 6.3 Case 1 — Unchanged-since-from: when no commits/tags newer than `from_pin[repo]` exist, reuse `from_pin[repo]`
-- [ ] 6.4 Case 2 — Changed-with-usable-tag: when `latest_tag > from_pin[repo]` and stability matches, use `latest_tag`
-- [ ] 6.5 Case 3 — Changed-without-usable-tag: when commits exist beyond the latest tag, fall through to Step 4 to compute a new tag
-- [ ] 6.6 Stability check: a final `--to` rejects pre-release dep tags; an RC `--to` accepts either
-- [ ] 6.7 Unit tests: all three cases, stability check both directions (final rejects RC, RC accepts final)
+- [x] 6.1 For each candidate, fetch its tag list via `git ls-remote --tags` — abstracted behind `RemoteRepoIntrospector` interface (concrete `git ls-remote` implementation lands with Section 11 wiring; tests use `InMemoryRepoIntrospector`)
+- [x] 6.2 Implement `latest_tag(repo)` = the highest semver tag on the candidate's release branch — `CandidateVersionResolver::highestSemverTag()` filters non-semver tags via `SEMVER_TAG_PATTERN` and picks the max via `composer/semver Comparator`
+- [x] 6.3 Case 1 — Unchanged-since-from: when no commits/tags newer than `from_pin[repo]` exist, reuse `from_pin[repo]`
+- [x] 6.4 Case 2 — Changed-with-usable-tag: when `latest_tag > from_pin[repo]` and stability matches, use `latest_tag`
+- [x] 6.5 Case 3 — Changed-without-usable-tag: when commits exist beyond the latest tag (branch SHA differs from latest-tag SHA), or when no semver tags exist yet, fall through to Step 4 to compute a new tag
+- [x] 6.6 Stability check: a final `--to` rejects pre-release dep tags; an RC `--to` accepts either — `CandidateVersionResolver::stabilityCompatible()` (uses composer/semver `VersionParser::parseStability`)
+- [x] 6.7 Unit tests: all three cases, stability check both directions (final rejects RC, RC accepts final), plus highest-tag selection across out-of-order tag lists, no-tags-yet path, caret-from-pin, non-semver-tag filtering — 14 tests / 32 assertions, all pass via local PHPUnit (full ReleaseTooling suite: 51 / 116)
 
 ## 7. Algorithm Step 4 — Tag-cutting policy
 
