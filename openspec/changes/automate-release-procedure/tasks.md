@@ -34,11 +34,11 @@
 
 ## 5. Algorithm Step 2 — Walk dep tree
 
-- [ ] 5.1 Recursive walker: for every `o3-shop/*` package in current composer.json, fetch its composer.json at the release branch and recurse into its `require` + `require-dev`
-- [ ] 5.2 Track each pin location (which repo's composer.json, which key in require/require-dev) so Step 5 knows where to write
-- [ ] 5.3 Cycle detection: maintain a visit-state map; abort with a diagnostic listing the cycle participants on detection
-- [ ] 5.4 Topological sort: order candidates so leaves come first; expose a `tier(repo)` function for ordering the per-repo release flow
-- [ ] 5.5 Unit tests: linear chain, diamond, missing dep, cycle (two-package, three-package), require-dev-only candidate, tier assignment
+- [x] 5.1 Recursive walker: for every `o3-shop/*` package in current composer.json, fetch its composer.json at the release branch and recurse into its `require` + `require-dev` — `DepTreeWalker::walk()` with DFS coloring; non-`o3-shop/*` deps are filtered out
+- [x] 5.2 Track each pin location (which repo's composer.json, which key in require/require-dev) so Step 5 knows where to write — `PinLocation` value object; `WalkResult::pinLocations($package)` returns all spots
+- [x] 5.3 Cycle detection: maintain a visit-state map; abort with a diagnostic listing the cycle participants on detection — `CycleDetectedException` carries the ordered cycle path closing on the first node
+- [x] 5.4 Topological sort: order candidates so leaves come first; expose a `tier(repo)` function for ordering the per-repo release flow — post-order DFS gives leaves-first ordering; `tier(leaf)=0`, `tier(node)=max(tier(dep))+1`
+- [x] 5.5 Unit tests: linear chain, diamond, missing dep, cycle (two-package, three-package), require-dev-only candidate, tier assignment (9 tests / 31 assertions, all pass via local PHPUnit; full ReleaseTooling suite 37 tests / 84 assertions)
 
 ## 6. Algorithm Step 3 — Version resolution per candidate
 
