@@ -27,10 +27,10 @@
 
 ## 4. Algorithm Step 1 — Snapshot `from`
 
-- [ ] 4.1 Implement HTTPS fetcher for `raw.githubusercontent.com/o3-shop/<repo>/<ref>/composer.json` (returns parsed JSON, errors with clear "could not fetch <url>" on failure)
-- [ ] 4.2 Read `o3-shop/composer.json` at `--from`; build `from_pin[repo]` map for every `o3-shop/*` entry in `require` and `require-dev`
-- [ ] 4.3 Detect pre-fold-in `--from` (composer.json still requires `o3-shop/shop-metapackage-ce`); recurse one level into `shop-metapackage-ce/composer.json` at the version pinned by `--from` and merge its tier-0 pins into `from_pin[]`. Log a single info line stating that pre-fold-in indirection was applied.
-- [ ] 4.4 Unit tests: post-fold-in snapshot builds correct `from_pin[]`; pre-fold-in snapshot triggers metapackage indirection and produces correct merged `from_pin[]`; require-dev-only entries appear in `from_pin[]`
+- [x] 4.1 Implement HTTPS fetcher for `raw.githubusercontent.com/o3-shop/<repo>/<ref>/composer.json` (returns parsed JSON, errors with clear "could not fetch <url>" on failure) — `HttpsRawComposerJsonFetcher` (concrete) + `RawComposerJsonFetcher` (interface) + `RawComposerJsonFetchException`
+- [x] 4.2 Read `o3-shop/composer.json` at `--from`; build `from_pin[repo]` map for every `o3-shop/*` entry in `require` and `require-dev` — `FromSnapshotBuilder::build()`
+- [x] 4.3 Detect pre-fold-in `--from` (composer.json still requires `o3-shop/shop-metapackage-ce`); recurse one level into `shop-metapackage-ce/composer.json` at the version pinned by `--from` and merge its tier-0 pins into `from_pin[]`. (Indirection flag + metapackage version exposed on `FromSnapshot`; the CLI layer emits the info line based on that flag — pure-data builder.)
+- [x] 4.4 Unit tests: post-fold-in snapshot builds correct `from_pin[]`; pre-fold-in snapshot triggers metapackage indirection and produces correct merged `from_pin[]`; require-dev-only entries appear in `from_pin[]` (7 tests, 17 assertions, all pass via local PHPUnit). Wiring of `FromSnapshotBuilder` into `ReleaseCommand::execute()` is deferred to Section 11 (dry-run) so each section ships an independently-testable component.
 
 ## 5. Algorithm Step 2 — Walk dep tree
 
