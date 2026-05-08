@@ -8,13 +8,13 @@
 
 ## 2. ShopVersion runtime resolution (in shop-ce)
 
-- [ ] 2.1 Rewrite `source/Core/ShopVersion.php`'s `getVersion()` to walk the 3-step resolution chain (no version literal in committed source)
-- [ ] 2.2 Step 1: read `source/Core/version.generated.php` if present and return its non-empty value
-- [ ] 2.3 Step 2: call `Composer\InstalledVersions::getPrettyVersion('o3-shop/shop-ce')` (handle `OutOfBoundsException` and class-missing cases)
-- [ ] 2.4 Step 3: return the literal `"dev"` when both prior steps produce nothing
-- [ ] 2.5 Add a composer post-install hook that writes `source/Core/version.generated.php` from the installed shop-ce version
-- [ ] 2.6 Add `source/Core/version.generated.php` to `.gitignore`
-- [ ] 2.7 Unit tests: each of the three resolution steps fires correctly; assert no `git`/`shell_exec`/`proc_open` calls in `getVersion()`
+- [x] 2.1 Rewrite `source/Core/ShopVersion.php`'s `getVersion()` to walk the 3-step resolution chain (no version literal in committed source)
+- [x] 2.2 Step 1: read `source/Core/version.generated.php` if present and return its non-empty value
+- [x] 2.3 Step 2: call `Composer\InstalledVersions::getPrettyVersion('o3-shop/shop-ce')` (handle `OutOfBoundsException` and class-missing cases)
+- [x] 2.4 Step 3: return the literal `"dev"` when both prior steps produce nothing
+- [x] 2.5 Add a composer post-install hook that writes `source/Core/version.generated.php` from the installed shop-ce version (wired in both shop-ce/composer.json for dev and o3-shop/composer.json for production install)
+- [x] 2.6 Add `source/Core/version.generated.php` to `.gitignore`
+- [x] 2.7 Unit tests: each of the three resolution steps fires correctly; assert no `git`/`shell_exec`/`proc_open` calls in `getVersion()` (10 tests, 19 assertions, all pass via local PHPUnit; full suite verification deferred to /finish when docker is available)
 
 ## 3. Verification of the v1.6.1-RC1 cut (after Section 15 runs)
 

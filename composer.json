@@ -71,10 +71,12 @@
     "bin": ["bin/oe-console"],
     "scripts": {
         "post-install-cmd": [
+            "OxidEsales\\EshopCommunity\\Core\\ShopVersionGenerator::generate",
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "@oe:ide-helper:generate"
         ],
         "post-update-cmd": [
+            "OxidEsales\\EshopCommunity\\Core\\ShopVersionGenerator::generate",
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "@oe:ide-helper:generate"
         ],
