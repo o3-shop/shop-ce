@@ -1,11 +1,10 @@
 ## 1. Metapackage fold-in (Prerequisite)
 
-- [ ] 1.1 In `o3-shop/composer.json`: copy the v1.6.0 metapackage `require` entries (framework deps + bundled core: shop-ce, o3-theme, wave-theme, shop-demodata-ce, shop-facts, gdpr-optin-module, usercentrics, tinymce-editor) and drop deprecated entries (`flow-theme`, `vortex-theme`, the o3-shop `paypal-module`, `tests-deprecated-ce`)
-- [ ] 1.2 Move `replace: oxid-esales/oxideshop-metapackage-ce` clause from metapackage into `o3-shop/composer.json`
-- [ ] 1.3 Run `composer install` against the rewritten `o3-shop/composer.json` and verify resolution succeeds
-- [ ] 1.4 Verify Composer's resolver still rejects a hybrid install requiring both `o3-shop/o3-shop` and `oxid-esales/oxideshop-metapackage-ce`
-- [ ] 1.5 Add `"archive": { "exclude": [".next-bump"] }` to every release-eligible repo's `composer.json` (shop-ce, testing-library, themes, demodata, asset packages, bundled modules, dev-tooling leaves)
-- [ ] 1.6 (Deferred until after v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed.
+- [x] 1.1 In `o3-shop/composer.json`: copy the v1.6.0 metapackage `require` entries (framework deps + bundled core: shop-ce, o3-theme, wave-theme, shop-demodata-ce, shop-facts, gdpr-optin-module, usercentrics, tinymce-editor) and drop deprecated entries (`flow-theme`, `vortex-theme`, the o3-shop `paypal-module`, `tests-deprecated-ce`)
+- [x] 1.2 Move `replace: oxid-esales/oxideshop-metapackage-ce` clause from metapackage into `o3-shop/composer.json`
+- [x] 1.3 Run `composer install` against the rewritten `o3-shop/composer.json` and verify resolution succeeds
+- [x] 1.4 Verify Composer's resolver still rejects a hybrid install requiring both `o3-shop/o3-shop` and `oxid-esales/oxideshop-metapackage-ce`
+- [x] 1.5 Add `"archive": { "exclude": [".next-bump"] }` to every release-eligible repo's `composer.json` (shop-ce, testing-library, themes, demodata, asset packages, bundled modules, dev-tooling leaves)
 
 ## 2. ShopVersion runtime resolution (in shop-ce)
 
@@ -132,3 +131,7 @@
 - [ ] 15.5 No merge-back PRs are auto-opened (RC1 is pre-release); merge-back PRs land with the eventual v1.6.1 final cut
 - [ ] 15.6 Run Section 3 verification on the produced v1.6.1-RC1 artifact
 - [ ] 15.7 Capture lessons learned in `.claude/memory/` (per the repo's finish protocol)
+
+## 16. Post-v1.6.1-final cleanup
+
+- [ ] 16.1 (After v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed.

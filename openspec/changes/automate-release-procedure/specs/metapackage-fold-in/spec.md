@@ -71,12 +71,23 @@ OXID + o3-shop installs.
 - **THEN** `o3-shop/composer.json` contains a `replace` block with
   the key `oxid-esales/oxideshop-metapackage-ce`
 
-#### Scenario: Hybrid install still rejected
+#### Scenario: Hybrid install at the replaced version installs only o3-shop
 
 - **WHEN** a project requires both `o3-shop/o3-shop` and
-  `oxid-esales/oxideshop-metapackage-ce`
-- **THEN** Composer's resolver rejects the install (the `replace`
-  marker still does its job)
+  `oxid-esales/oxideshop-metapackage-ce: 6.4.3` (the version named
+  by the replace clause)
+- **THEN** Composer satisfies the `oxid-esales` requirement via
+  o3-shop's `replace`; only `o3-shop/o3-shop` is installed; no
+  actual `oxid-esales/oxideshop-metapackage-ce` package is downloaded
+
+#### Scenario: Hybrid install at a divergent version is rejected
+
+- **WHEN** a project requires both `o3-shop/o3-shop` and
+  `oxid-esales/oxideshop-metapackage-ce` at a version other than
+  `6.4.3` (e.g. `^7.0`)
+- **THEN** Composer's resolver rejects the install with a "replaces
+  X and thus cannot coexist with it" diagnostic and a non-zero exit
+  code
 
 ### Requirement: shop-metapackage-ce repo archived after fold-in
 

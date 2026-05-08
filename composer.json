@@ -111,6 +111,9 @@
             "dev-b-1.5": "1.5-dev"
         }
     },
+    "archive": {
+        "exclude": [".next-bump"]
+    },
     "config": {
         "allow-plugins": {
             "o3-shop/shop-composer-plugin": true,
