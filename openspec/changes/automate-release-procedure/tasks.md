@@ -72,11 +72,13 @@ Refactor: renamed `RawComposerJsonFetchException` → `RawRepoFetchException` so
 
 ## 9. Algorithm Step 6 — Release notes aggregation
 
-- [ ] 9.1 For each candidate where `chosen != from_pin[repo]`, call `POST /repos/o3-shop/<repo>/releases/generate-notes` via `gh api` with `tag_name=<chosen>` and `previous_tag_name=<from_pin[repo]>`
-- [ ] 9.2 Stitch the returned markdown bodies under one `## <repo>` heading each
-- [ ] 9.3 Append a `## Unchanged in this release` section listing every candidate where `chosen == from_pin[repo]` with its continued version
-- [ ] 9.4 Use the aggregated markdown as the body of the `o3-shop` draft GitHub release
-- [ ] 9.5 Unit tests: changed-repo / unchanged-repo / multi-repo summary, GitHub API call shape
+- [x] 9.1 For each candidate where `chosen != from_pin[repo]`, call `POST /repos/o3-shop/<repo>/releases/generate-notes` via `gh api` with `tag_name=<chosen>` and `previous_tag_name=<from_pin[repo]>` — `GhCliReleaseNotesProvider::notesFor()` shells out via `Symfony\Component\Process\Process` and uses `--jq .body` to extract the markdown
+- [x] 9.2 Stitch the returned markdown bodies under one `## <repo>` heading each — `ReleaseNotesAggregator::aggregate()` emits `## <package>\n\n<body>` per changed repo
+- [x] 9.3 Append a `## Unchanged in this release` section listing every candidate where `chosen == from_pin[repo]` with its continued version — section appears after all changed-repo blocks; one bullet per unchanged candidate `- \`<package>\` continues at \`<from-pin>\``
+- [x] 9.4 Use the aggregated markdown as the body of the `o3-shop` draft GitHub release — wiring lives in Section 11 (per-repo flow); aggregator returns the body string for that consumer
+- [x] 9.5 Unit tests: changed-repo / unchanged-repo / multi-repo summary, GitHub API call shape — 9 tests / 30 assertions: single-changed-repo, call-shape captures `(package, previous, new)`, unchanged-repo skips API call, mixed multi-repo with deduplicated provider calls (only changed repos), changed-precede-unchanged ordering, all-unchanged yields only summary section, empty-candidate-list yields empty string, body trimming, `CandidateState::isChanged()` predicate. Full ReleaseTooling suite: 112 tests / 255 assertions.
+
+GhCliReleaseNotesProvider returns stub markdown on gh-api failure (with stderr captured in the stub) so the aggregated body still ships and the maintainer can edit the draft GitHub release before publishing.
 
 ## 10. Per-repo release flow — gates and actions
 
