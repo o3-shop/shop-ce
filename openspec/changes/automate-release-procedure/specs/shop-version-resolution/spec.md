@@ -24,8 +24,8 @@ metadata.
 #### Scenario: version.generated.php present
 
 - **WHEN** `source/Core/version.generated.php` exists and returns
-  the string `"v1.6.0"`
-- **THEN** `ShopVersion::getVersion()` returns `"v1.6.0"`
+  the string `"v1.6.1"`
+- **THEN** `ShopVersion::getVersion()` returns `"v1.6.1"`
 
 #### Scenario: Composer post-install creates the file
 
@@ -47,9 +47,9 @@ shop-ce is the project root or a vendor dep of an o3-shop project.
 #### Scenario: shop-ce installed as a vendor dep
 
 - **WHEN** Composer's `installed.json` records
-  `o3-shop/shop-ce` at `v1.6.0` and Step 1 does not apply
+  `o3-shop/shop-ce` at `v1.6.1` and Step 1 does not apply
 - **THEN** `Composer\InstalledVersions::getPrettyVersion('o3-shop/shop-ce')`
-  returns `"v1.6.0"` and `ShopVersion::getVersion()` returns `"v1.6.0"`
+  returns `"v1.6.1"` and `ShopVersion::getVersion()` returns `"v1.6.1"`
 
 #### Scenario: shop-ce not registered with Composer
 

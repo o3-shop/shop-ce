@@ -44,10 +44,10 @@ The audience is the future maintainer reading the code and wondering
   guessing introduces ambiguity and is not worth the marginal convenience.
 - Releasing non-bundled modules (captcha, amazon-pay, country-vat, …).
   These ship on independent cadences as opt-in installs.
-- Backwards-looking releases that span the metapackage fold-in
-  boundary. v1.6.0 is cut manually as part of the fold-in transition;
-  the CLI is used from v1.6.0 onwards. Both `--from` and `--to`
-  snapshots passed to the CLI are post-fold-in.
+- Persistent backwards-looking releases that span arbitrary
+  pre-fold-in `--from` tags. The CLI handles exactly one transitional
+  pre-fold-in path (v1.6.0 → v1.6.1-RC1) via metapackage indirection
+  in Step 1; no support for pre-1.6.0 `--from` tags.
 - Conventional-commits parsing. Bump level is explicit per repo via
   `--bump` flags; commit-message inference is a future possibility.
 
@@ -82,7 +82,7 @@ otherwise.
 
 **Rationale:** auto-detecting "the previous shop release" requires
 heuristics (final-only? same minor line? exclude RCs?) that quietly
-disagree across maintainers. An explicit `--from v1.6.0 --to v1.6.1`
+disagree across maintainers. An explicit `--from v1.6.0 --to v1.6.1-RC1`
 removes the guesswork, gives release notes a stable anchor, and makes
 release transcripts self-documenting in shell history.
 
@@ -170,25 +170,41 @@ but the next release hasn't run yet.
 - File-only (no flag): rejected — emergency overrides shouldn't
   require a commit-and-push round trip on the affected repo.
 
-### Pre-fold-in `--from` aborts
+### Pre-fold-in `--from` supported via metapackage indirection
 
 If `o3-shop/composer.json` at the `--from` tag still requires
-`o3-shop/shop-metapackage-ce`, Step 1 aborts with a clear error.
-The CLI does not look across the fold-in boundary.
+`o3-shop/shop-metapackage-ce`, Step 1 recurses one level into the
+metapackage's `composer.json` at the version pinned by `--from` and
+harvests the per-tier-0 pins from there. The merged map becomes
+`from_pin[]`.
 
-**Rationale:** v1.6.0 is cut manually as part of the fold-in
-transition, so the canonical first CLI-driven release is
-`--from v1.6.0 --to <next>`. There is no operational need to ever
-run `bin/release` with a v1.5.x `--from`. Adding a one-shot fallback
-for a case that won't occur is dead code waiting to rot; aborting
-loudly is the safer default.
+**Rationale:** v1.6.0 shipped pre-fold-in (the original plan to
+land the fold-in in v1.6.0 slipped). The first machine-driven
+release is `--from v1.6.0 --to v1.6.1-RC1` — that run cuts RC1 from
+a pre-fold-in `--from`. Aborting on pre-fold-in `--from` would
+require a separate manual v1.6.1 release path, doubling the
+release-tooling work. Reading the metapackage one level deeper is
+~10 lines of additional code in Step 1 and reuses the existing
+HTTPS fetcher. After v1.6.1-RC1 ships, every subsequent `--from` is
+post-fold-in and the indirection branch is bypassed; the code stays
+to handle the rare hypothetical of someone replaying the v1.6.0
+transition (e.g. for forensics).
 
 **Alternatives considered:**
 
-- Read the metapackage's composer.json as a fallback when --from
-  predates the fold-in: rejected — solves a problem we don't
-  actually have, since we won't run the CLI across the boundary.
-  The v1.5.4 → v1.6.0 transition is a manual one-time step.
+- Abort on pre-fold-in `--from`: rejected — would force a separate
+  manual v1.6.1 release path just to set up a post-fold-in `--from`
+  for the first CLI-driven cut. Net cost (extra manual release flow,
+  doubled release effort, more places for mistakes) exceeds the cost
+  of the indirection branch.
+- Special-case the indirection only for `v1.6.0` literal: rejected —
+  more brittle than detecting "pre-fold-in" structurally
+  (composer.json still requires the metapackage). The structural
+  detection cleanly handles any pre-fold-in tag without hardcoding
+  a version.
+- Persistent backwards-looking releases for pre-1.6.0 tags: out of
+  scope — the v1.5 → v1.6 boundary is a separate manual transition
+  the CLI never crossed and never will.
 
 ### `from_pin[]` as the per-repo anchor
 
@@ -343,7 +359,8 @@ The fold-in keeps `gdpr-optin-module`, `usercentrics`, `tinymce-editor`
 — they ship with the shop and participate in the release walk like
 any other tier-0 dep. The o3-shop fork of `paypal-module` was in the
 metapackage from 2022 to early 2026 but has already been removed from
-every v1.6.0 RC tag; the fold-in just makes that removal permanent.
+every v1.6.0 RC tag and the v1.6.0 final tag; the fold-in just makes
+that removal permanent.
 Non-bundled modules (captcha, amazon-pay, country-vat, and the
 upstream `oxid-solution-catalysts/paypal-module`) are opt-in installs
 via the existing `oe:module:install:*` composer scripts and never
@@ -453,25 +470,32 @@ state we want to require resolved.
    change applied first. Result: `o3-shop/composer.json` directly pins
    shop-ce + tier-0 deps; `shop-metapackage-ce` is archived.
 
-2. **Cut shop-ce v1.6.0 manually** with the new
-   `ShopVersion.php` runtime resolver in place. This release is the
-   first post-fold-in tag and becomes the canonical `--from` for the
-   first CLI-driven release.
-
-3. **Build and unit-test `bin/release`** against synthetic composer.json
+2. **Build and unit-test `bin/release`** against synthetic composer.json
    fixtures (linear chain, diamond, missing dep, cycle, skip-unchanged
-   reuse, RC/final stability cases, pre-fold-in --from snapshot aborts
-   in Step 1). No live repos needed.
+   reuse, RC/final stability cases, pre-fold-in `--from` snapshot
+   triggers metapackage indirection in Step 1). No live repos needed.
 
-4. **Dry-run against the v1.6.0 → v1.6.1 (or v1.7.0-RC1) path.** The
+3. **Apply the fold-in edits** to o3-shop's release branch by hand:
+   move metapackage `require` entries inline, drop deprecated entries,
+   add `replace: oxid-esales/oxideshop-metapackage-ce`. Add
+   `archive.exclude` for `.next-bump` to every release-eligible repo's
+   composer.json. Commit and push to the release branches.
+
+4. **Dry-run against `--from v1.6.0 --to v1.6.1-RC1`.** The
    `--dry-run` output is the integration test — every planned tag,
-   commit, and release listed. Maintainer reviews; iterate until clean.
+   commit, and release listed. Step 1 must apply the metapackage
+   indirection. Maintainer reviews; iterate until clean.
 
 5. **First live release** with the CLI:
-   `bin/release --from v1.6.0 --to <next>`. v1.6.0 is the first
-   post-fold-in tag (cut manually in step 2) and becomes the
-   canonical `--from` for the first machine-driven release.
-   Maintainer publishes the resulting drafts manually.
+   `bin/release --from v1.6.0 --to v1.6.1-RC1`. This run ships the
+   entire change (bin/release itself, the runtime ShopVersion, the
+   fold-in edits) as part of v1.6.1-RC1. Maintainer publishes the
+   resulting drafts manually. No merge-back PRs (RC1 is pre-release).
+
+5a. **shop-metapackage-ce archival** happens after v1.6.1 stabilizes
+   (typically alongside the v1.6.1 final cut, not RC1): cut a final
+   tag pinning the v1.6.0 state, flag the GitHub repo archived, and
+   update the README to point at `o3-shop/o3-shop`.
 
 6. **Wiki rewrite** — replace
    https://github.com/o3-shop/o3-shop/wiki/Create-a-Release with the

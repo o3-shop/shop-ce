@@ -8,18 +8,18 @@ exit non-zero with a usage message when either flag is omitted or empty.
 
 #### Scenario: Both flags provided
 
-- **WHEN** the maintainer runs `bin/release --from v1.6.0 --to v1.6.1`
+- **WHEN** the maintainer runs `bin/release --from v1.6.1 --to v1.6.2`
 - **THEN** the CLI proceeds to Step 1 (snapshot resolution)
 
 #### Scenario: --from omitted
 
-- **WHEN** the maintainer runs `bin/release --to v1.6.1`
+- **WHEN** the maintainer runs `bin/release --to v1.6.2`
 - **THEN** the CLI exits with non-zero status and prints a usage message
   identifying `--from` as a required flag
 
 #### Scenario: --to omitted
 
-- **WHEN** the maintainer runs `bin/release --from v1.6.0`
+- **WHEN** the maintainer runs `bin/release --from v1.6.1`
 - **THEN** the CLI exits with non-zero status and prints a usage message
   identifying `--to` as a required flag
 
@@ -90,7 +90,7 @@ real run; the only difference is the absence of side effects.
 
 #### Scenario: Dry-run with full release planned
 
-- **WHEN** the maintainer runs `bin/release --from v1.6.0 --to v1.6.1
+- **WHEN** the maintainer runs `bin/release --from v1.6.1 --to v1.6.2
   --dry-run`
 - **THEN** the CLI prints the planned tag, planned commit, and
   planned GitHub release for every release-eligible repo, and exits
@@ -143,7 +143,7 @@ and version.
 #### Scenario: Constraint bump for shop-ce
 
 - **WHEN** the CLI updates `o3-shop/composer.json` to pin `shop-ce` to
-  `v1.6.0`
+  `v1.6.1`
 - **THEN** the change is committed with a message identifying
   `o3-shop/shop-ce` as the bumped package, and pushed to the release
   branch without opening a PR
@@ -156,11 +156,11 @@ titled `Merge v<x>.<y>.<z> release into main`, with `head` = the
 release branch and `base` = `main`. For pre-release shop targets, no
 merge-back PR is opened.
 
-#### Scenario: Final release of v1.6.1
+#### Scenario: Final release of v1.6.2
 
-- **WHEN** the CLI completes a release with `--to v1.6.1`
+- **WHEN** the CLI completes a release with `--to v1.6.2`
 - **THEN** every release-eligible repo has a new open PR titled
-  `Merge v1.6.1 release into main` from the release branch into `main`
+  `Merge v1.6.2 release into main` from the release branch into `main`
 
 #### Scenario: RC release of v1.7.0-RC1
 

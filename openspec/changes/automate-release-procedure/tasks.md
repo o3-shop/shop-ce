@@ -1,11 +1,11 @@
 ## 1. Metapackage fold-in (Prerequisite)
 
-- [ ] 1.1 In `o3-shop/composer.json`: copy the v1.6.0-RC4 metapackage `require` entries (framework deps + bundled core: shop-ce, o3-theme, wave-theme, shop-demodata-ce, shop-facts, gdpr-optin-module, usercentrics, tinymce-editor) and drop deprecated entries (`flow-theme`, `vortex-theme`, the o3-shop `paypal-module`, `tests-deprecated-ce`)
+- [ ] 1.1 In `o3-shop/composer.json`: copy the v1.6.0 metapackage `require` entries (framework deps + bundled core: shop-ce, o3-theme, wave-theme, shop-demodata-ce, shop-facts, gdpr-optin-module, usercentrics, tinymce-editor) and drop deprecated entries (`flow-theme`, `vortex-theme`, the o3-shop `paypal-module`, `tests-deprecated-ce`)
 - [ ] 1.2 Move `replace: oxid-esales/oxideshop-metapackage-ce` clause from metapackage into `o3-shop/composer.json`
 - [ ] 1.3 Run `composer install` against the rewritten `o3-shop/composer.json` and verify resolution succeeds
 - [ ] 1.4 Verify Composer's resolver still rejects a hybrid install requiring both `o3-shop/o3-shop` and `oxid-esales/oxideshop-metapackage-ce`
 - [ ] 1.5 Add `"archive": { "exclude": [".next-bump"] }` to every release-eligible repo's `composer.json` (shop-ce, testing-library, themes, demodata, asset packages, bundled modules, dev-tooling leaves)
-- [ ] 1.6 Cut a final release on `shop-metapackage-ce` pinning the current state, archive the GitHub repo, and update its README to point at `o3-shop/o3-shop`
+- [ ] 1.6 (Deferred until after v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed.
 
 ## 2. ShopVersion runtime resolution (in shop-ce)
 
@@ -17,12 +17,14 @@
 - [ ] 2.6 Add `source/Core/version.generated.php` to `.gitignore`
 - [ ] 2.7 Unit tests: each of the three resolution steps fires correctly; assert no `git`/`shell_exec`/`proc_open` calls in `getVersion()`
 
-## 3. Manual v1.6.0 release (first post-fold-in tag)
+## 3. Verification of the v1.6.1-RC1 cut (after Section 15 runs)
 
-- [ ] 3.1 Cut `shop-ce v1.6.0` manually with the new `ShopVersion.php` in place
-- [ ] 3.2 Cut `o3-shop v1.6.0` manually pointing at the post-fold-in `composer.json`
-- [ ] 3.3 Verify a fresh `composer install` of `o3-shop v1.6.0` produces a working shop with `ShopVersion::getVersion() === "v1.6.0"`
-- [ ] 3.4 Smoke-test the admin UI: confirm the version display shows `v1.6.0`
+> Note: v1.6.0 shipped pre-fold-in (with the old hardcoded `ShopVersion.php`). There is no separate manual v1.6.1 release — `bin/release` cuts v1.6.1-RC1 directly from `--from v1.6.0` (Section 15) using the pre-fold-in metapackage indirection in Step 1. These tasks verify the result of that run.
+
+- [ ] 3.1 Verify a fresh `composer install` of `o3-shop v1.6.1-RC1` produces a working shop with `ShopVersion::getVersion() === "v1.6.1-RC1"`
+- [ ] 3.2 Smoke-test the admin UI: confirm the version display shows `v1.6.1-RC1`
+- [ ] 3.3 Verify `o3-shop/composer.json` at `v1.6.1-RC1` is post-fold-in (no `o3-shop/shop-metapackage-ce` in `require`, `replace: oxid-esales/oxideshop-metapackage-ce` present)
+- [ ] 3.4 Verify the v1.6.1-RC1 dist archive does not contain `.next-bump` (archive.exclude works end-to-end)
 
 ## 4. bin/release CLI scaffold
 
@@ -37,8 +39,8 @@
 
 - [ ] 5.1 Implement HTTPS fetcher for `raw.githubusercontent.com/o3-shop/<repo>/<ref>/composer.json` (returns parsed JSON, errors with clear "could not fetch <url>" on failure)
 - [ ] 5.2 Read `o3-shop/composer.json` at `--from`; build `from_pin[repo]` map for every `o3-shop/*` entry in `require` and `require-dev`
-- [ ] 5.3 Detect pre-fold-in `--from` (composer.json still requires `o3-shop/shop-metapackage-ce`); abort with a clear error identifying `--from` as pre-fold-in
-- [ ] 5.4 Unit tests: post-fold-in snapshot builds correct `from_pin[]`; pre-fold-in snapshot aborts; require-dev-only entries appear in `from_pin[]`
+- [ ] 5.3 Detect pre-fold-in `--from` (composer.json still requires `o3-shop/shop-metapackage-ce`); recurse one level into `shop-metapackage-ce/composer.json` at the version pinned by `--from` and merge its tier-0 pins into `from_pin[]`. Log a single info line stating that pre-fold-in indirection was applied.
+- [ ] 5.4 Unit tests: post-fold-in snapshot builds correct `from_pin[]`; pre-fold-in snapshot triggers metapackage indirection and produces correct merged `from_pin[]`; require-dev-only entries appear in `from_pin[]`
 
 ## 6. Algorithm Step 2 — Walk dep tree
 
@@ -123,9 +125,10 @@
 
 ## 15. First live release with bin/release
 
-- [ ] 15.1 Run `bin/release --from v1.6.0 --to <next> --dry-run` and review the plan
+- [ ] 15.1 Run `bin/release --from v1.6.0 --to v1.6.1-RC1 --dry-run` and review the plan (Step 1 must use the pre-fold-in metapackage indirection)
 - [ ] 15.2 Resolve any issues uncovered by the dry-run (missing release branches, malformed `.next-bump` files, etc.)
-- [ ] 15.3 Run `bin/release --from v1.6.0 --to <next>` for real
+- [ ] 15.3 Run `bin/release --from v1.6.0 --to v1.6.1-RC1` for real — this is the first machine-driven release and ships this entire change
 - [ ] 15.4 Manually publish the draft GitHub releases per repo and the aggregated o3-shop draft
-- [ ] 15.5 Merge the auto-opened `Merge v<next> release into main` PRs per repo (final releases only)
-- [ ] 15.6 Capture lessons learned in `.claude/memory/` (per the repo's finish protocol)
+- [ ] 15.5 No merge-back PRs are auto-opened (RC1 is pre-release); merge-back PRs land with the eventual v1.6.1 final cut
+- [ ] 15.6 Run Section 3 verification on the produced v1.6.1-RC1 artifact
+- [ ] 15.7 Capture lessons learned in `.claude/memory/` (per the repo's finish protocol)

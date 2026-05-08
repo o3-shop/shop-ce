@@ -15,22 +15,35 @@ release notes.
 - **THEN** `from_pin[]` contains an entry for each pinned `o3-shop/*`
   package mapping to its exact version string
 
-### Requirement: Pre-fold-in --from aborts
+### Requirement: Pre-fold-in `--from` triggers metapackage indirection
 
 If `o3-shop/composer.json` at the `--from` tag still requires
-`o3-shop/shop-metapackage-ce` (i.e. the snapshot predates the
-metapackage fold-in), the CLI SHALL abort with a clear error
-identifying the offending `--from` tag. The CLI SHALL NOT attempt
-to read the metapackage's composer.json as a fallback.
+`o3-shop/shop-metapackage-ce` (the snapshot predates the metapackage
+fold-in), the CLI SHALL recurse one level into the metapackage's
+`composer.json` at the version pinned by `--from` and harvest the
+per-tier-0 pins from there. The resulting per-tier-0 pins SHALL be
+merged into `from_pin[]` and used identically to a post-fold-in
+`from_pin[]` for every downstream step. The CLI SHALL log a single
+informational line stating that pre-fold-in indirection was applied,
+naming the metapackage tag consulted.
 
-#### Scenario: Pre-fold-in --from snapshot
+#### Scenario: Pre-fold-in --from at the v1.6.0 transition
 
-- **WHEN** the maintainer runs `bin/release --from v1.5.4 --to v1.6.1`
-  and `o3-shop@v1.5.4/composer.json` requires
-  `o3-shop/shop-metapackage-ce`
-- **THEN** the CLI exits non-zero with an error message identifying
-  `v1.5.4` as a pre-fold-in tag and instructing the maintainer to use
-  a post-fold-in `--from` tag
+- **WHEN** the maintainer runs
+  `bin/release --from v1.6.0 --to v1.6.1-RC1`
+  and `o3-shop@v1.6.0/composer.json` requires
+  `o3-shop/shop-metapackage-ce: vX.Y.Z`
+- **THEN** the CLI fetches `shop-metapackage-ce@vX.Y.Z/composer.json`,
+  builds `from_pin[shop-ce]`, `from_pin[wave-theme]`,
+  `from_pin[shop-demodata-ce]`, etc. from its `require` entries, and
+  proceeds to Step 2 with the merged map
+
+#### Scenario: Pre-fold-in indirection is logged
+
+- **WHEN** Step 1 applies the metapackage indirection
+- **THEN** the CLI emits a single informational log line identifying
+  the metapackage tag consulted (e.g. "Step 1: pre-fold-in --from
+  detected; harvested tier-0 pins from shop-metapackage-ce@vX.Y.Z")
 
 ### Requirement: Dependency walk includes require and require-dev
 
@@ -124,7 +137,7 @@ is a pre-release, the CLI SHALL accept either.
 
 - **WHEN** `--to` is `v1.7.0` (final), candidate's latest tag is
   `v1.7.0-RC3`, and `from_pin[repo]` is `v1.6.0`
-- **THEN** the CLI does not select `v1.6.0-RC3`; it falls through to
+- **THEN** the CLI does not select `v1.7.0-RC3`; it falls through to
   case 3 and cuts a new final tag
 
 #### Scenario: RC shop release with final dep tag available
@@ -138,11 +151,11 @@ is a pre-release, the CLI SHALL accept either.
 When the CLI cuts a new tag on `shop-ce` (case 3), the new tag SHALL
 be exactly the `--to` value.
 
-#### Scenario: Cutting shop-ce v1.6.1
+#### Scenario: Cutting shop-ce v1.6.2
 
 - **WHEN** the CLI cuts a new tag on `shop-ce` during a release with
-  `--to v1.6.1`
-- **THEN** the new shop-ce tag is `v1.6.1`
+  `--to v1.6.2`
+- **THEN** the new shop-ce tag is `v1.6.2`
 
 ### Requirement: Tag-cutting policy — every other repo bumps own line
 
@@ -216,8 +229,8 @@ satisfy them.
 #### Scenario: Exact pin needs replacement
 
 - **WHEN** a `require` entry is
-  `o3-shop/shop-ce: v1.6.0` and the chosen version is `v1.6.1`
-- **THEN** the constraint is replaced with `v1.6.1`
+  `o3-shop/shop-ce: v1.6.1` and the chosen version is `v1.6.2`
+- **THEN** the constraint is replaced with `v1.6.2`
 
 #### Scenario: Caret needs widening
 

@@ -12,11 +12,11 @@ text itself.
 
 #### Scenario: Per-repo API call
 
-- **WHEN** the CLI computes that `shop-ce` ships at `v1.6.1` over
-  `from_pin[shop-ce] = v1.6.0`
+- **WHEN** the CLI computes that `shop-ce` ships at `v1.6.2` over
+  `from_pin[shop-ce] = v1.6.1`
 - **THEN** the CLI calls
   `POST /repos/o3-shop/shop-ce/releases/generate-notes` with
-  `tag_name=v1.6.1` and `previous_tag_name=v1.6.0` and uses the
+  `tag_name=v1.6.2` and `previous_tag_name=v1.6.1` and uses the
   returned markdown body verbatim for that repo's section
 
 ### Requirement: Per-repo notes use that repo's release.yml configuration
@@ -74,14 +74,14 @@ notes; the aggregation is additive, not a replacement.
 
 #### Scenario: o3-shop draft release body
 
-- **WHEN** the CLI creates the o3-shop draft release for `--to v1.6.1`
+- **WHEN** the CLI creates the o3-shop draft release for `--to v1.6.2`
 - **THEN** the release body contains the aggregated markdown
   (one section per changed repo plus the Unchanged section)
 
 #### Scenario: Per-repo notes still exist
 
 - **WHEN** the CLI creates a draft release on `shop-ce` for
-  `v1.6.1`
+  `v1.6.2`
 - **THEN** that release has its own GitHub-generated body produced
   by the same generate-notes API for the shop-ce repo, independent
   of the o3-shop aggregated body
