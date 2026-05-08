@@ -18,12 +18,12 @@
 
 ## 3. bin/release CLI scaffold
 
-- [ ] 3.1 Add `bin/release` entry point as a Symfony Console command in shop-ce
-- [ ] 3.2 Define CLI signature with `--from <tag>`, `--to <tag>`, `--bump <repo>=<level>` (repeatable), `--dry-run` flags
-- [ ] 3.3 Validate `--from` and `--to` are present; exit non-zero with a usage message if either is missing
-- [ ] 3.4 Validate `--bump` values match `patch|minor|major|v<semver>`; exit non-zero on malformed input
-- [ ] 3.5 Add `bin/release` to shop-ce's composer.json `bin` array
-- [ ] 3.6 Unit tests: CLI flag parsing (both flags present, missing --from, missing --to, repeated --bump, malformed --bump)
+- [x] 3.1 Add `bin/release` entry point as a Symfony Console command in shop-ce
+- [x] 3.2 Define CLI signature with `--from <tag>`, `--to <tag>`, `--bump <repo>=<level>` (repeatable), `--dry-run` flags
+- [x] 3.3 Validate `--from` and `--to` are present; exit non-zero with a usage message if either is missing (exit code 2)
+- [x] 3.4 Validate `--bump` values match `patch|minor|major|v<semver>`; exit non-zero on malformed input
+- [x] 3.5 Add `bin/release` to shop-ce's composer.json `bin` array
+- [x] 3.6 Unit tests: CLI flag parsing (both flags present, missing --from, missing --to, empty --from, repeated --bump, malformed --bump, dry-run propagation, plus 7×2 valid/invalid bump-level provider cases) — 21 tests, 36 assertions, all pass
 
 ## 4. Algorithm Step 1 — Snapshot `from`
 

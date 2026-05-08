@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * This file is part of O3-Shop.
+ *
+ * O3-Shop is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * O3-Shop is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with O3-Shop.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @copyright  Copyright (c) 2026 O3-Shop (https://www.o3-shop.com)
+ * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
+ */
+
+$autoloadCandidates = [
+    __DIR__ . '/../vendor/autoload.php',          // shop-ce as project root
+    __DIR__ . '/../../../autoload.php',           // shop-ce inside vendor/
+];
+$autoloadFound = false;
+foreach ($autoloadCandidates as $candidate) {
+    if (file_exists($candidate)) {
+        require_once $candidate;
+        $autoloadFound = true;
+        break;
+    }
+}
+if (!$autoloadFound) {
+    fwrite(STDERR, "bin/release: composer autoload.php not found.\n");
+    exit(1);
+}
+
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command\ReleaseCommand;
+use Symfony\Component\Console\Application;
+
+$command = new ReleaseCommand();
+$application = new Application('o3-shop release CLI', 'dev');
+$application->add($command);
+$application->setDefaultCommand($command->getName(), true);
+exit($application->run());

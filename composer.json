@@ -68,7 +68,7 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["bin/oe-console"],
+    "bin": ["bin/oe-console", "bin/release"],
     "scripts": {
         "post-install-cmd": [
             "OxidEsales\\EshopCommunity\\Core\\ShopVersionGenerator::generate",
