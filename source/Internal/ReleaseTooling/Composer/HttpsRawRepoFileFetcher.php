@@ -23,31 +23,31 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer;
 
 /**
- * HTTPS implementation: GETs
- * https://raw.githubusercontent.com/<package>/<ref>/composer.json
- * and parses the body as JSON.
- *
- * Trusts GitHub's CDN — no auth required for public repos. The CLI
- * runs locally with the maintainer's network access.
+ * GETs https://raw.githubusercontent.com/<package>/<ref>/<path>.
+ * Returns null on 404, raises RawRepoFetchException on any other
+ * non-2xx response or transport failure.
  */
-class HttpsRawComposerJsonFetcher implements RawComposerJsonFetcher
+class HttpsRawRepoFileFetcher implements RawRepoFileFetcher
 {
     public const RAW_GITHUB_BASE = 'https://raw.githubusercontent.com';
     public const TIMEOUT_SECONDS = 30;
 
-    public function fetch(string $packageName, string $ref): array
+    public function fetchFile(string $packageName, string $ref, string $path): ?string
     {
-        $url = sprintf('%s/%s/%s/composer.json', self::RAW_GITHUB_BASE, $packageName, $ref);
+        $url = sprintf('%s/%s/%s/%s', self::RAW_GITHUB_BASE, $packageName, $ref, ltrim($path, '/'));
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',
                 'timeout' => self::TIMEOUT_SECONDS,
-                'header' => "User-Agent: o3-shop/release-cli\r\nAccept: application/json\r\n",
+                'header' => "User-Agent: o3-shop/release-cli\r\n",
                 'ignore_errors' => true,
             ],
         ]);
         $body = @file_get_contents($url, false, $context);
         $statusLine = $http_response_header[0] ?? '';
+        if (strpos($statusLine, ' 404 ') !== false) {
+            return null;
+        }
         if ($body === false || strpos($statusLine, ' 200 ') === false) {
             throw new RawRepoFetchException(sprintf(
                 'could not fetch %s (%s)',
@@ -55,14 +55,6 @@ class HttpsRawComposerJsonFetcher implements RawComposerJsonFetcher
                 $statusLine !== '' ? trim($statusLine) : 'no response'
             ));
         }
-        $parsed = json_decode($body, true);
-        if (!is_array($parsed)) {
-            throw new RawRepoFetchException(sprintf(
-                'could not parse %s: %s',
-                $url,
-                json_last_error_msg()
-            ));
-        }
-        return $parsed;
+        return $body;
     }
 }

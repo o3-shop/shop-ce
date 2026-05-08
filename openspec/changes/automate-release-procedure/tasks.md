@@ -52,13 +52,15 @@
 
 ## 7. Algorithm Step 4 — Tag-cutting policy
 
-- [ ] 7.1 Special case: when the candidate is `shop-ce`, the new tag equals `--to` verbatim
-- [ ] 7.2 For other candidates, resolve the bump level with precedence: `--bump <repo>=<level>` flag → `.next-bump` file at the repo's release-branch root → default `patch`
-- [ ] 7.3 Read `.next-bump` from the release branch via HTTPS fetch; trim whitespace; validate the value matches `patch|minor|major|v<semver>`; ignore the file with a warning if malformed
-- [ ] 7.4 Compute the new tag from `latest_tag(repo)` + bump level (e.g. `v1.2.5` + `minor` = `v1.3.0`; `v1.0.1` + exact `v2.0.0` = `v2.0.0`)
-- [ ] 7.5 When `.next-bump` was the chosen source, plan a delete of the file in the same commit the tag is cut from
-- [ ] 7.6 When the `--bump` flag was the chosen source, leave any `.next-bump` file untouched
-- [ ] 7.7 Unit tests: default patch, .next-bump honored, flag overrides .next-bump, file consumed on use, file untouched on flag override, exact-version path, invalid .next-bump value
+- [x] 7.1 Special case: when the candidate is `shop-ce`, the new tag equals `--to` verbatim — `TagCutter::cut('o3-shop/shop-ce', …)` short-circuits to `--to` ahead of the flag/file/default chain
+- [x] 7.2 For other candidates, resolve the bump level with precedence: `--bump <repo>=<level>` flag → `.next-bump` file at the repo's release-branch root → default `patch`
+- [x] 7.3 Read `.next-bump` from the release branch via HTTPS fetch; trim whitespace; validate the value matches `patch|minor|major|v<semver>`; ignore the file with a warning if malformed — new `RawRepoFileFetcher` interface + `HttpsRawRepoFileFetcher` impl; `TagCutter::readNextBumpFile()` records warnings via `TagCutResult::notes()`
+- [x] 7.4 Compute the new tag from `latest_tag(repo)` + bump level — `TagCutter::applyBump()` clears subordinate segments on minor/major; exact returns the literal; pre-release suffix on `latest_tag` drops on bump
+- [x] 7.5 When `.next-bump` was the chosen source, plan a delete of the file in the same commit the tag is cut from — `TagCutResult::deleteNextBumpFile()` is true only for source `next-bump-file`
+- [x] 7.6 When the `--bump` flag was the chosen source, leave any `.next-bump` file untouched — `TagCutResult::deleteNextBumpFile()` returns false for source `flag`
+- [x] 7.7 Unit tests: default patch, .next-bump honored (newline-trimmed, exact-version, all kinds), flag overrides .next-bump, file consumed on use, file untouched on flag override, exact-version path, invalid `.next-bump` value (warning + fallthrough), empty file, no-latest-tag for patch (throws), no-latest-tag for exact (succeeds), bump arithmetic (patch/minor/major segment clearing, pre-release suffix drop) — 34 tests / 73 assertions across `BumpLevelTest` and `TagCutterTest`. Full ReleaseTooling suite: 85 tests / 189 assertions.
+
+Refactor: renamed `RawComposerJsonFetchException` → `RawRepoFetchException` so both fetchers (composer.json and arbitrary file) share one boundary exception. All 51 prior tests still pass with the rename.
 
 ## 8. Algorithm Step 5 — Constraint update
 

@@ -23,22 +23,26 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer;
 
 /**
- * Fetches composer.json files for o3-shop packages at specific git refs.
+ * Fetches an arbitrary raw file from an o3-shop repo at a given ref.
+ * Used for `.next-bump` (Step 4 / Section 7) and any other small
+ * configuration files that travel alongside composer.json.
  *
- * The reference implementation reads from
- * `raw.githubusercontent.com/<package>/<ref>/composer.json`. Tests
- * inject a fake to avoid live HTTP.
+ * Distinguishes "file not present" (returns null, normal) from
+ * transport/protocol failure (throws RawRepoFetchException) so callers
+ * can differentiate "no .next-bump committed" from "GitHub is
+ * unreachable".
  */
-interface RawComposerJsonFetcher
+interface RawRepoFileFetcher
 {
     /**
-     * @param string $packageName e.g. "o3-shop/o3-shop"
+     * @param string $packageName e.g. "o3-shop/shop-facts"
      * @param string $ref         a git tag, branch, or commit SHA
+     * @param string $path        repo-relative path, e.g. ".next-bump"
      *
-     * @return array<string,mixed> parsed composer.json
+     * @return string|null raw file contents (without trimming), or
+     *     null when the file does not exist (HTTP 404)
      *
-     * @throws RawRepoFetchException when the URL cannot be
-     *     fetched or the body is not valid JSON
+     * @throws RawRepoFetchException on transport failure or non-404 HTTP error
      */
-    public function fetch(string $packageName, string $ref): array;
+    public function fetchFile(string $packageName, string $ref, string $path): ?string;
 }

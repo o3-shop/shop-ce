@@ -24,6 +24,11 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer;
 
 use RuntimeException;
 
-class RawComposerJsonFetchException extends RuntimeException
+/**
+ * Shared boundary exception for raw GitHub fetcher implementations.
+ * Used by both RawComposerJsonFetcher and RawRepoFileFetcher when
+ * the URL cannot be retrieved or the body cannot be decoded.
+ */
+class RawRepoFetchException extends RuntimeException
 {
 }

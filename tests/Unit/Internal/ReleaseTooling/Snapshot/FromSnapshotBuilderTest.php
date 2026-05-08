@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Snapshot;
 
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetchException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetcher;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFetchException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot\FromSnapshotBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -199,7 +199,7 @@ class FromSnapshotBuilderTest extends TestCase
     public function testFetcherFailurePropagates(): void
     {
         $fetcher = new FakeRawComposerJsonFetcher([]);  // no fixtures
-        $this->expectException(RawComposerJsonFetchException::class);
+        $this->expectException(RawRepoFetchException::class);
         (new FromSnapshotBuilder($fetcher))->build('v9.9.9');
     }
 }
@@ -229,7 +229,7 @@ final class FakeRawComposerJsonFetcher implements RawComposerJsonFetcher
         $key = $packageName . '|' . $ref;
         $this->calls[] = $key;
         if (!isset($this->fixtures[$key])) {
-            throw new RawComposerJsonFetchException("no fixture for {$key}");
+            throw new RawRepoFetchException("no fixture for {$key}");
         }
         return $this->fixtures[$key];
     }

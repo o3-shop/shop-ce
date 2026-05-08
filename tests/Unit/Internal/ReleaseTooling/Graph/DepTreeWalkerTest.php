@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Graph;
 
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetchException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetcher;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFetchException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\CycleDetectedException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\PinLocation;
@@ -152,7 +152,7 @@ class DepTreeWalkerTest extends TestCase
             'o3-shop/o3-shop|main' => ['require' => ['o3-shop/never-existed' => '*']],
             // never-existed has no fixture
         ]);
-        $this->expectException(RawComposerJsonFetchException::class);
+        $this->expectException(RawRepoFetchException::class);
         $walker->walk();
     }
 
@@ -248,7 +248,7 @@ final class ManifestArrayFetcher implements RawComposerJsonFetcher
         $key = $packageName . '|' . $ref;
         $this->calls[] = $key;
         if (!isset($this->fixtures[$key])) {
-            throw new RawComposerJsonFetchException("no fixture for {$key}");
+            throw new RawRepoFetchException("no fixture for {$key}");
         }
         return $this->fixtures[$key];
     }
