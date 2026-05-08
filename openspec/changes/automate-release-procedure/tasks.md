@@ -82,18 +82,22 @@ GhCliReleaseNotesProvider returns stub markdown on gh-api failure (with stderr c
 
 ## 10. Per-repo release flow — gates and actions
 
-- [ ] 10.1 Pre-flight: clean working tree (no uncommitted changes) per repo
-- [ ] 10.2 Pre-flight: on the expected release branch per repo
-- [ ] 10.3 Pre-flight: deps resolved to release versions (composer install passes)
-- [ ] 10.4 Pre-flight: per-repo test suite passes
-- [ ] 10.5 Pre-flight: detect open PRs targeting the release branch (incoming) — log a warning identifying URLs, proceed
-- [ ] 10.6 Pre-flight: detect open PRs from release branch into `main` matching `Merge v<x>.<y>.<z> release into main` — abort with a list of unmerged URLs
-- [ ] 10.7 If any pre-flight gate fails for any repo, abort before any state-changing action and report the failing gate(s)
-- [ ] 10.8 Per repo: commit constraint changes (Step 5) and `.next-bump` deletions (Step 8) to the release branch in a single commit per repo, push directly (no PR)
-- [ ] 10.9 Per repo: create the tag at the new commit
-- [ ] 10.10 Per repo: create a draft GitHub release at that tag via `gh release create --draft` (let GitHub auto-generate the body)
-- [ ] 10.11 For final shop releases (`--to` has no `-rc`/`-alpha`/`-beta` suffix): auto-open a `Merge v<x>.<y>.<z> release into main` PR per repo via `gh pr create --base main --head <release-branch>`
-- [ ] 10.12 For pre-release shop releases: do not open merge-back PRs
+- [x] 10.1 Pre-flight: clean working tree (no uncommitted changes) per repo — `WorkingTreeGate` (git status --porcelain; aborts on any output)
+- [x] 10.2 Pre-flight: on the expected release branch per repo — `BranchGate` (git rev-parse --abbrev-ref HEAD; aborts on mismatch)
+- [x] 10.3 Pre-flight: deps resolved to release versions (composer install passes) — `ComposerInstallGate` (--dry-run --no-scripts --no-interaction; aborts on non-zero)
+- [x] 10.4 Pre-flight: per-repo test suite passes — `TestSuiteGate` with maintainer-supplied per-repo command resolver (returns null to skip; tail of output included on failure)
+- [x] 10.5 Pre-flight: detect open PRs targeting the release branch (incoming) — log a warning identifying URLs, proceed — `IncomingPrGate` (gh pr list; STATUS_WARNING; lists each PR's #/title/url)
+- [x] 10.6 Pre-flight: detect open PRs from release branch into `main` matching `Merge v<x>.<y>.<z> release into main` — abort with a list of unmerged URLs — `MergeBackPrGate` filtering by `MergeBackPrTitlePattern`
+- [x] 10.7 If any pre-flight gate fails for any repo, abort before any state-changing action and report the failing gate(s) — `PreFlightRunner` runs all gates and returns a `PreFlightReport` with `shouldAbort()`, `hasWarnings()`, and `allMessages()` (combined `[gate-name] message` lines). All gates run even after an abort so the operator gets one combined diagnostic.
+- [x] 10.8 Per repo: commit constraint changes (Step 5) and `.next-bump` deletions (Step 8) to the release branch in a single commit per repo, push directly (no PR) — `PerRepoActions::commitChangesAndPush()` (optional `git rm --ignore-unmatch .next-bump` + `git add` + `git commit -m` + `git push origin <branch>`)
+- [x] 10.9 Per repo: create the tag at the new commit — `PerRepoActions::createTag()` (annotated tag + push)
+- [x] 10.10 Per repo: create a draft GitHub release at that tag via `gh release create --draft` — `PerRepoActions::createDraftRelease()`; uses `--generate-notes` by default; accepts a `--notes <body>` override for the o3-shop aggregated body (Section 9 output)
+- [x] 10.11 For final shop releases: auto-open a `Merge v<x>.<y>.<z> release into main` PR per repo — `PerRepoActions::openMergeBackPr()` calls `gh pr create --base main --head <branch>` with the canonical title via `MergeBackPrTitlePattern::buildTitle()`
+- [x] 10.12 For pre-release shop releases: do not open merge-back PRs — `MergeBackPolicy::shouldOpenForShopTo()` returns false for any `-rc`/`-alpha`/`-beta`/`-dev`/`-preview`/`-pre`/`-p` suffix; the Section 11 orchestrator gates the call to `openMergeBackPr()` on this predicate.
+
+New components: `ProcessExecutor` (interface) + `SymfonyProcessExecutor` + `ProcessOutcome`; `PreFlightGate` (interface) + 6 concrete gates; `GateOutcome`/`PreFlightReport`/`PreFlightRunner`; `MergeBackPrTitlePattern` (pure regex helper); `MergeBackPolicy` (pure predicate); `PerRepoActions` (state-changing actions, all bubble RuntimeException on shell failure).
+
+Tests: 48 cases / 98 assertions across `MergeBackPolicyTest`, `PreFlightRunnerTest`, `GateBehaviorTest` (one happy + one failure per gate), and `PerRepoActionsTest` (sequence + error path per action). Plain PHPUnit\TestCase. `FakeProcessExecutor` test double records every invocation. Full ReleaseTooling suite: 160 tests / 353 assertions.
 
 ## 11. Dry-run mode
 
