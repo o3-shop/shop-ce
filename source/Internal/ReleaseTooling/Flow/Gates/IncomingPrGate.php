@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
@@ -56,7 +57,7 @@ class IncomingPrGate implements PreFlightGate
         $outcome = $this->exec->execute(
             [
                 $this->ghBin, 'pr', 'list',
-                '--repo', $packageName,
+                '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
                 '--state', 'open',
                 '--base', $expectedBranch,
                 '--json', 'number,title,url',

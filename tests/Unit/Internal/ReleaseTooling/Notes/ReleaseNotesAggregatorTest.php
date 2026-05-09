@@ -63,6 +63,50 @@ class ReleaseNotesAggregatorTest extends TestCase
         $this->assertSame('v1.0.5', $provider->calls[0]['newTag']);
     }
 
+    public function testCaretFromPinIsNormalizedToTagBeforeProviderCall(): void
+    {
+        // GitHub's generate-notes API rejects caret/tilde constraints
+        // with HTTP 400. The aggregator normalizes from_pin to the
+        // canonical o3-shop tag form (v-prefixed) before passing it
+        // along.
+        $provider = new RecordingProvider([
+            'o3-shop/shop-ide-helper|v1.0.0|v1.0.1' => 'normalized-body',
+        ]);
+        $aggregator = new ReleaseNotesAggregator($provider);
+
+        $body = $aggregator->aggregate([
+            new CandidateState('o3-shop/shop-ide-helper', '^1.0.0', 'v1.0.1'),
+        ]);
+
+        $this->assertCount(1, $provider->calls);
+        $this->assertSame('v1.0.0', $provider->calls[0]['previousTag']);
+        $this->assertStringContainsString('normalized-body', $body);
+    }
+
+    public function testTildeFromPinIsAlsoNormalized(): void
+    {
+        $provider = new RecordingProvider([]);
+        $aggregator = new ReleaseNotesAggregator($provider);
+        $aggregator->aggregate([
+            new CandidateState('o3-shop/smarty', '~2.6.34', 'v2.6.35'),
+        ]);
+        $this->assertSame('v2.6.34', $provider->calls[0]['previousTag']);
+    }
+
+    public function testUnresolvableFromPinIsPassedThroughUntouched(): void
+    {
+        // dev-master / wildcards / empty strings can't be normalized.
+        // The aggregator passes them through as-is so the provider
+        // can decide how to handle (typically: stub markdown on
+        // GitHub error).
+        $provider = new RecordingProvider([]);
+        $aggregator = new ReleaseNotesAggregator($provider);
+        $aggregator->aggregate([
+            new CandidateState('o3-shop/some-pkg', 'dev-master', 'v1.0.0'),
+        ]);
+        $this->assertSame('dev-master', $provider->calls[0]['previousTag']);
+    }
+
     public function testUnchangedRepoSkipsApiCallAndAppearsInSummary(): void
     {
         $provider = new RecordingProvider([]);
@@ -81,7 +125,7 @@ class ReleaseNotesAggregatorTest extends TestCase
     {
         $provider = new RecordingProvider([
             'o3-shop/shop-ce|v1.6.0|v1.6.1-RC1' => "## What's Changed\n* shop-ce change\n",
-            'o3-shop/testing-library|^1.2.0|v1.2.6' => "## What's Changed\n* testing-library change\n",
+            'o3-shop/testing-library|v1.2.0|v1.2.6' => "## What's Changed\n* testing-library change\n",
         ]);
         $aggregator = new ReleaseNotesAggregator($provider);
 

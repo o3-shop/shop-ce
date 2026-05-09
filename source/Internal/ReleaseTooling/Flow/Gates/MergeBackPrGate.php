@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\MergeBackPrTitlePattern;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
@@ -58,7 +59,7 @@ class MergeBackPrGate implements PreFlightGate
         $outcome = $this->exec->execute(
             [
                 $this->ghBin, 'pr', 'list',
-                '--repo', $packageName,
+                '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
                 '--state', 'open',
                 '--base', 'main',
                 '--head', $expectedBranch,
