@@ -43,22 +43,28 @@ final class WalkResult
     /** @var array<string,int> package => tier (0 = leaf, increases up the chain) */
     private array $tiers;
 
+    /** @var array<int,array{from:string,to:string}> back-edges to ancestor nodes encountered during DFS */
+    private array $backEdges;
+
     /**
-     * @param array<string,array<int,string>>       $edges
-     * @param array<string,array<int,PinLocation>>  $pinLocations
-     * @param array<int,string>                     $topologicalOrder
-     * @param array<string,int>                     $tiers
+     * @param array<string,array<int,string>>          $edges
+     * @param array<string,array<int,PinLocation>>     $pinLocations
+     * @param array<int,string>                        $topologicalOrder
+     * @param array<string,int>                        $tiers
+     * @param array<int,array{from:string,to:string}>  $backEdges
      */
     public function __construct(
         array $edges,
         array $pinLocations,
         array $topologicalOrder,
-        array $tiers
+        array $tiers,
+        array $backEdges = []
     ) {
         $this->edges = $edges;
         $this->pinLocations = $pinLocations;
         $this->topologicalOrder = $topologicalOrder;
         $this->tiers = $tiers;
+        $this->backEdges = $backEdges;
     }
 
     /** @return array<int,string> */
@@ -97,5 +103,16 @@ final class WalkResult
     public function tiers(): array
     {
         return $this->tiers;
+    }
+
+    /** @return array<int,array{from:string,to:string}> */
+    public function backEdges(): array
+    {
+        return $this->backEdges;
+    }
+
+    public function hasBackEdges(): bool
+    {
+        return $this->backEdges !== [];
     }
 }

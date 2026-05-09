@@ -34,7 +34,8 @@ class HttpsRawRepoFileFetcher implements RawRepoFileFetcher
 
     public function fetchFile(string $packageName, string $ref, string $path): ?string
     {
-        $url = sprintf('%s/%s/%s/%s', self::RAW_GITHUB_BASE, $packageName, $ref, ltrim($path, '/'));
+        $slug = PackageRepoSlug::resolve($packageName);
+        $url = sprintf('%s/%s/%s/%s', self::RAW_GITHUB_BASE, $slug, $ref, ltrim($path, '/'));
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',

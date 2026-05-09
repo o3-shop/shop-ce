@@ -188,7 +188,8 @@ class ReleasePlanner
             $candidates,
             $constraintEdits,
             $aggregatedNotes,
-            $preFlightReports
+            $preFlightReports,
+            $walkResult->backEdges()
         );
     }
 

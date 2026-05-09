@@ -42,11 +42,14 @@ final class ReleasePlan
     private string $aggregatedNotes;
     /** @var array<string,PreFlightReport> package => report (empty when no local repo paths supplied) */
     private array $preFlightReports;
+    /** @var array<int,array{from:string,to:string}> back-edges from `DepTreeWalker` (informational) */
+    private array $backEdges;
 
     /**
-     * @param array<int,CandidatePlan>          $candidates
-     * @param array<int,ConstraintEditPlan>     $constraintEdits
-     * @param array<string,PreFlightReport>     $preFlightReports
+     * @param array<int,CandidatePlan>                  $candidates
+     * @param array<int,ConstraintEditPlan>             $constraintEdits
+     * @param array<string,PreFlightReport>             $preFlightReports
+     * @param array<int,array{from:string,to:string}>   $backEdges
      */
     public function __construct(
         string $fromTag,
@@ -55,7 +58,8 @@ final class ReleasePlan
         array $candidates,
         array $constraintEdits,
         string $aggregatedNotes,
-        array $preFlightReports
+        array $preFlightReports,
+        array $backEdges = []
     ) {
         $this->fromTag = $fromTag;
         $this->toTag = $toTag;
@@ -64,6 +68,7 @@ final class ReleasePlan
         $this->constraintEdits = $constraintEdits;
         $this->aggregatedNotes = $aggregatedNotes;
         $this->preFlightReports = $preFlightReports;
+        $this->backEdges = $backEdges;
     }
 
     public function fromTag(): string
@@ -102,6 +107,12 @@ final class ReleasePlan
     public function preFlightReports(): array
     {
         return $this->preFlightReports;
+    }
+
+    /** @return array<int,array{from:string,to:string}> */
+    public function backEdges(): array
+    {
+        return $this->backEdges;
     }
 
     public function shouldAbort(): bool

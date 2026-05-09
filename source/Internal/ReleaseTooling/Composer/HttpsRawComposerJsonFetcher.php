@@ -37,7 +37,8 @@ class HttpsRawComposerJsonFetcher implements RawComposerJsonFetcher
 
     public function fetch(string $packageName, string $ref): array
     {
-        $url = sprintf('%s/%s/%s/composer.json', self::RAW_GITHUB_BASE, $packageName, $ref);
+        $slug = PackageRepoSlug::resolve($packageName);
+        $url = sprintf('%s/%s/%s/composer.json', self::RAW_GITHUB_BASE, $slug, $ref);
         $context = stream_context_create([
             'http' => [
                 'method' => 'GET',

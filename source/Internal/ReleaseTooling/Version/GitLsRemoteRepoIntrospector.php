@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 use RuntimeException;
 
@@ -71,7 +72,7 @@ class GitLsRemoteRepoIntrospector implements RemoteRepoIntrospector
         if (isset($this->cache[$package])) {
             return $this->cache[$package];
         }
-        $url = self::GITHUB_BASE . '/' . $package;
+        $url = self::GITHUB_BASE . '/' . PackageRepoSlug::resolve($package);
         $outcome = $this->exec->execute(['git', 'ls-remote', '--tags', '--heads', $url], null, 60);
         if (!$outcome->isSuccess()) {
             throw new RuntimeException(sprintf(

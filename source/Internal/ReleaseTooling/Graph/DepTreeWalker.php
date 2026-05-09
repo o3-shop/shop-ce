@@ -60,8 +60,11 @@ class DepTreeWalker
     /** @var array<string,int> */
     private array $color = [];
 
-    /** @var array<int,string> DFS stack for cycle reporting */
+    /** @var array<int,string> DFS stack used to identify which package is making a back-edge */
     private array $visiting = [];
+
+    /** @var array<int,array{from:string,to:string}> back-edges recorded during the walk */
+    private array $backEdges = [];
 
     /**
      * @param callable(string):string $refResolver maps a package name to the git ref to fetch its composer.json from
@@ -78,20 +81,39 @@ class DepTreeWalker
         $this->pinLocations = [];
         $this->color = [];
         $this->visiting = [];
+        $this->backEdges = [];
 
         $this->dfs($startingPackage);
 
         $topologicalOrder = $this->topologicalSort();
         $tiers = $this->computeTiers($topologicalOrder);
 
-        return new WalkResult($this->edges, $this->pinLocations, $topologicalOrder, $tiers);
+        return new WalkResult(
+            $this->edges,
+            $this->pinLocations,
+            $topologicalOrder,
+            $tiers,
+            $this->backEdges
+        );
     }
 
     private function dfs(string $package): void
     {
         if (isset($this->color[$package])) {
             if ($this->color[$package] === self::COLOR_GRAY) {
-                $this->reportCycle($package);
+                // Back-edge to an ancestor in the DFS stack. This is
+                // structurally common in the o3-shop network: themes,
+                // tooling and test-libs declare `require: o3-shop/shop-ce`
+                // even though shop-ce is the parent that pulled them in.
+                // Such back-edges encode peer/compatibility constraints,
+                // not topological dependencies — record the edge for
+                // diagnostics (Section 8 still updates the constraint via
+                // pin-locations recorded at the call site) and continue
+                // without recursing.
+                $from = end($this->visiting);
+                if (is_string($from) && $from !== $package) {
+                    $this->backEdges[] = ['from' => $from, 'to' => $package];
+                }
             }
             return;
         }
@@ -129,17 +151,6 @@ class DepTreeWalker
 
         $this->color[$package] = self::COLOR_BLACK;
         array_pop($this->visiting);
-    }
-
-    private function reportCycle(string $closingNode): void
-    {
-        $startIndex = array_search($closingNode, $this->visiting, true);
-        $cycle = array_values(array_slice(
-            $this->visiting,
-            $startIndex === false ? 0 : (int) $startIndex
-        ));
-        $cycle[] = $closingNode;
-        throw new CycleDetectedException($cycle);
     }
 
     private function isO3Shop(string $name): bool

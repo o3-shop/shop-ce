@@ -35,6 +35,10 @@ final class DefaultBranchResolver
     public const PACKAGE_TO_BRANCH = [
         'o3-shop/o3-shop' => 'b-1.6',
         'o3-shop/shop-ce' => 'b-1.6',
+        // Hit during pre-fold-in snapshots until Section 1 lands on origin.
+        // After v1.6.1-RC1 ships, the metapackage entry disappears from the
+        // walk and this row becomes inert.
+        'o3-shop/shop-metapackage-ce' => 'b-1.6',
         'o3-shop/testing-library' => 'b-1.6',
         'o3-shop/shop-facts' => 'b-1.6',
         'o3-shop/shop-ide-helper' => 'b-1.6',

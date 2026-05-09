@@ -24,7 +24,6 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Graph;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetcher;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFetchException;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\CycleDetectedException;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\PinLocation;
 use PHPUnit\Framework\TestCase;
@@ -156,41 +155,61 @@ class DepTreeWalkerTest extends TestCase
         $walker->walk();
     }
 
-    public function testTwoPackageCycleIsDetected(): void
+    public function testTwoPackageBackEdgeIsRecordedNotThrown(): void
     {
-        $walker = $this->walker([
+        // Simulates testing-library's "require: shop-ce" while shop-ce
+        // pulls testing-library via require-dev — a structural reality
+        // of the o3-shop network. The walker must tolerate this and
+        // record the back-edge so Section 8 can still update the
+        // constraint at the back-edge pin location.
+        $result = $this->walker([
             'o3-shop/o3-shop|main' => ['require' => ['o3-shop/a' => '*']],
             'o3-shop/a|main' => ['require' => ['o3-shop/b' => '*']],
             'o3-shop/b|main' => ['require' => ['o3-shop/a' => '*']],
-        ]);
-        try {
-            $walker->walk();
-            $this->fail('Expected CycleDetectedException');
-        } catch (CycleDetectedException $e) {
-            // Cycle is between a and b
-            $this->assertContains('o3-shop/a', $e->cyclePath());
-            $this->assertContains('o3-shop/b', $e->cyclePath());
-            $this->assertSame($e->cyclePath()[0], $e->cyclePath()[count($e->cyclePath()) - 1]);
-        }
+        ])->walk();
+
+        $this->assertTrue($result->hasBackEdges());
+        $backEdges = $result->backEdges();
+        $this->assertCount(1, $backEdges);
+        $this->assertSame(['from' => 'o3-shop/b', 'to' => 'o3-shop/a'], $backEdges[0]);
+
+        // Pin location is still recorded so Step 5 (constraint update)
+        // can rewrite a's constraint in b's composer.json if needed.
+        $aPins = $result->pinLocations('o3-shop/a');
+        $this->assertCount(2, $aPins);
+        $parents = array_map(static fn (PinLocation $p): string => $p->parentPackage(), $aPins);
+        $this->assertEqualsCanonicalizing(['o3-shop/o3-shop', 'o3-shop/b'], $parents);
+
+        // Topological order still produced; back-edge does not break sort.
+        $this->assertContains('o3-shop/a', $result->topologicalOrder());
+        $this->assertContains('o3-shop/b', $result->topologicalOrder());
     }
 
-    public function testThreePackageCycleIsDetected(): void
+    public function testThreePackageBackEdgeIsRecordedNotThrown(): void
     {
-        $walker = $this->walker([
+        $result = $this->walker([
             'o3-shop/o3-shop|main' => ['require' => ['o3-shop/a' => '*']],
             'o3-shop/a|main' => ['require' => ['o3-shop/b' => '*']],
             'o3-shop/b|main' => ['require' => ['o3-shop/c' => '*']],
             'o3-shop/c|main' => ['require' => ['o3-shop/a' => '*']],
-        ]);
-        try {
-            $walker->walk();
-            $this->fail('Expected CycleDetectedException');
-        } catch (CycleDetectedException $e) {
-            $cycle = $e->cyclePath();
-            $this->assertContains('o3-shop/a', $cycle);
-            $this->assertContains('o3-shop/b', $cycle);
-            $this->assertContains('o3-shop/c', $cycle);
-        }
+        ])->walk();
+
+        $this->assertTrue($result->hasBackEdges());
+        $backEdges = $result->backEdges();
+        $this->assertCount(1, $backEdges);
+        $this->assertSame(['from' => 'o3-shop/c', 'to' => 'o3-shop/a'], $backEdges[0]);
+    }
+
+    public function testNoBackEdgesWhenGraphIsAcyclic(): void
+    {
+        $result = $this->walker([
+            'o3-shop/o3-shop|main' => ['require' => ['o3-shop/a' => '*']],
+            'o3-shop/a|main' => ['require' => ['o3-shop/b' => '*']],
+            'o3-shop/b|main' => ['require' => []],
+        ])->walk();
+
+        $this->assertFalse($result->hasBackEdges());
+        $this->assertSame([], $result->backEdges());
     }
 
     public function testRefResolverIsCalledPerPackage(): void

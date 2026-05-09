@@ -49,10 +49,24 @@ class DryRunPrinter
         }
         $output->writeln('');
 
+        $this->printBackEdges($plan, $output);
         $this->printCandidates($plan, $output);
         $this->printConstraintEdits($plan, $output);
         $this->printAggregatedNotes($plan, $output);
         $this->printPreFlight($plan, $output);
+    }
+
+    private function printBackEdges(ReleasePlan $plan, OutputInterface $output): void
+    {
+        $backEdges = $plan->backEdges();
+        if ($backEdges === []) {
+            return;
+        }
+        $output->writeln('<comment>Back-edges (informational; treated as peer-constraint pins, not ordering deps):</comment>');
+        foreach ($backEdges as $edge) {
+            $output->writeln(sprintf('  %s -> %s', $edge['from'], $edge['to']));
+        }
+        $output->writeln('');
     }
 
     private function printCandidates(ReleasePlan $plan, OutputInterface $output): void
