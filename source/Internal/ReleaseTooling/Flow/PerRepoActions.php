@@ -127,7 +127,7 @@ class PerRepoActions
         $body = sprintf(
             "Auto-opened by bin/release after cutting %s.\n\n"
             . "Merge the release-branch state back to main so subsequent\n"
-            . "releases see the same code path.",
+            . 'releases see the same code path.',
             $shopVersion
         );
         $args = [

@@ -34,7 +34,6 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot\FromSnapshotBuild
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Tag\TagCutter;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\CandidateVersionResolver;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\RemoteRepoIntrospector;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\VersionResolution;
 use PHPUnit\Framework\TestCase;
 
 class ReleasePlannerTest extends TestCase

@@ -84,8 +84,11 @@ class DryRunPrinter
                 $candidate->fromPin() === '' ? '(new)' : $candidate->fromPin(),
                 $candidate->chosenVersion(),
                 $candidate->tagCut() !== null
-                    ? sprintf('  (cut via %s%s)', $candidate->tagCut()->source(),
-                        $candidate->tagCut()->deleteNextBumpFile() ? '; .next-bump consumed' : '')
+                    ? sprintf(
+                        '  (cut via %s%s)',
+                        $candidate->tagCut()->source(),
+                        $candidate->tagCut()->deleteNextBumpFile() ? '; .next-bump consumed' : ''
+                    )
                     : ''
             ));
             foreach ($candidate->resolution()->notes() as $note) {

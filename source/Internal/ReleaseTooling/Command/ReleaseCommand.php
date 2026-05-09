@@ -103,7 +103,7 @@ class ReleaseCommand extends Command
                 . "Override per-repo bump levels via repeatable --bump <repo>=<level>\n"
                 . "where <level> is patch | minor | major | v<exact-semver>.\n\n"
                 . "--dry-run prints the plan without performing any state-changing\n"
-                . "action (no commits, no tags, no GitHub releases)."
+                . 'action (no commits, no tags, no GitHub releases).'
             )
             ->addOption(
                 'from',

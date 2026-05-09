@@ -67,7 +67,8 @@ class IncomingPrGate implements PreFlightGate
         );
         if (!$outcome->isSuccess()) {
             return GateOutcome::warning(self::NAME, [
-                sprintf('gh pr list failed for %s; could not check incoming PRs: %s',
+                sprintf(
+                    'gh pr list failed for %s; could not check incoming PRs: %s',
                     $packageName,
                     trim($outcome->stderr())
                 ),

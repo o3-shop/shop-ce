@@ -22,13 +22,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Flow\Gates;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\BranchGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\ComposerInstallGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\IncomingPrGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\MergeBackPrGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\TestSuiteGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\WorkingTreeGate;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessOutcome;
 use OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Flow\FakeProcessExecutor;
 use PHPUnit\Framework\TestCase;

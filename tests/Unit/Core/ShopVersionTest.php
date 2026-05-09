@@ -91,7 +91,7 @@ class ShopVersionTest extends TestCase
 
     public function testGetVersionFallsBackToDevWhenBothStepsYieldNull(): void
     {
-        $stub = new class extends ShopVersion {
+        $stub = new class () extends ShopVersion {
             public static function tryGeneratedFile($path = null)
             {
                 return null;
