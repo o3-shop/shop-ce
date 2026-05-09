@@ -216,6 +216,173 @@ final class RepoPathDiscoveryTest extends TestCase
         $this->assertStringContainsString('auto-cloning', $allMessages);
     }
 
+    /* ---------- nested-clone scan (set up by docker.sh) ---------- */
+
+    public function testNestedCloneInsideShopCePreferredOverSibling(): void
+    {
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        // Sibling exists too — but the nested clone (from ./docker.sh)
+        // should win.
+        $this->mkGitWorkingTree($base . '/o3-Theme');
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/source/Application/views/o3-theme',
+            'https://github.com/o3-shop/o3-Theme.git'
+        );
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/o3-theme']);
+
+        $this->assertSame(
+            $shopCe . '/source/Application/views/o3-theme',
+            $resolved['o3-shop/o3-theme']
+        );
+        // No clone command invoked
+        $this->assertSame([], $exec->commands());
+    }
+
+    public function testNestedCloneAtShopCeRoot(): void
+    {
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        // Demodata satellite at the shop-ce root
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/shop-demodata-ce',
+            'git@github.com:o3-shop/shop-demodata-ce.git' // SSH origin works too
+        );
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/shop-demodata-ce']);
+
+        $this->assertSame(
+            $shopCe . '/shop-demodata-ce',
+            $resolved['o3-shop/shop-demodata-ce']
+        );
+    }
+
+    public function testNestedScanReverseMapsCaseRenamedPackages(): void
+    {
+        // o3-Theme is a PackageRepoSlug rename: composer name is
+        // "o3-shop/o3-theme" but GitHub slug is "o3-shop/o3-Theme".
+        // The scanner must reverse-map back to the composer name.
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/source/Application/views/o3-theme',
+            'https://github.com/o3-shop/o3-Theme.git'
+        );
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/o3-theme']);
+
+        $this->assertArrayHasKey('o3-shop/o3-theme', $resolved);
+        $this->assertSame(
+            $shopCe . '/source/Application/views/o3-theme',
+            $resolved['o3-shop/o3-theme']
+        );
+    }
+
+    public function testNestedDirWithoutGitFallsThroughToSibling(): void
+    {
+        // Path that LOOKS like a nested clone target exists, but it's
+        // a composer-plugin install artifact (no .git/). Scanner must
+        // skip it; resolution falls through to sibling layout.
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        $strayPath = $shopCe . '/source/Application/views/o3-theme';
+        mkdir($strayPath, 0755, true);
+        $this->tmpDirs[] = $strayPath;
+        $this->tmpDirs[] = dirname($strayPath);
+        $this->tmpDirs[] = dirname(dirname($strayPath));
+        $this->mkGitWorkingTree($base . '/o3-Theme'); // sibling fallback
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/o3-theme']);
+
+        // Falls back to sibling path
+        $this->assertSame($base . '/o3-Theme', $resolved['o3-shop/o3-theme']);
+    }
+
+    public function testNestedScanIgnoresNonO3ShopOrigins(): void
+    {
+        // Maintainer has some unrelated repo checked out inside
+        // shop-ce. Scanner ignores it (origin not under o3-shop).
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/some-private-thing',
+            'git@github.com:other-org/other-repo.git'
+        );
+        // Sibling for o3-theme exists and should be picked
+        $this->mkGitWorkingTree($base . '/o3-Theme');
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/o3-theme']);
+
+        $this->assertSame($base . '/o3-Theme', $resolved['o3-shop/o3-theme']);
+    }
+
+    public function testNestedScanSkipsVendorAndNodeModules(): void
+    {
+        // composer's vendor/ tree may contain .git references for
+        // some install configs; node_modules is similar. The scan
+        // must not descend into either, even if we drop a fake
+        // git-tree there to assert the skip.
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/vendor/o3-shop/o3-theme',
+            'https://github.com/o3-shop/o3-Theme.git'
+        );
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/node_modules/foo',
+            'https://github.com/o3-shop/o3-Theme.git'
+        );
+
+        $exec = new FakeProcessExecutor([], new ProcessOutcome(0, '', ''));
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/o3-theme']);
+
+        // Should NOT pick up the vendor or node_modules nested tree;
+        // falls through to auto-clone into <base>/o3-Theme
+        $this->assertSame($base . '/o3-Theme', $resolved['o3-shop/o3-theme']);
+        // And a clone command was invoked
+        $cloneCalls = array_filter(
+            $exec->commands(),
+            static fn (array $cmd): bool => isset($cmd[1]) && $cmd[1] === 'clone'
+        );
+        $this->assertCount(1, $cloneCalls);
+    }
+
     private function mkdir(): string
     {
         $dir = sys_get_temp_dir() . '/repo-discovery-test-' . bin2hex(random_bytes(4));
@@ -228,6 +395,26 @@ final class RepoPathDiscoveryTest extends TestCase
     {
         mkdir($path);
         mkdir($path . '/.git');
+        $this->tmpDirs[] = $path;
+    }
+
+    /**
+     * Create a nested git working tree at $path (recursively making
+     * parent dirs if needed) with a `.git/config` whose origin URL
+     * points at $originUrl. Used by the nested-scan tests.
+     */
+    private function mkNestedGitWorkingTree(string $path, string $originUrl): void
+    {
+        if (!is_dir($path)) {
+            mkdir($path, 0755, true);
+        }
+        if (!is_dir($path . '/.git')) {
+            mkdir($path . '/.git');
+        }
+        file_put_contents($path . '/.git/config', sprintf(
+            "[core]\n\trepositoryformatversion = 0\n[remote \"origin\"]\n\turl = %s\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n",
+            $originUrl
+        ));
         $this->tmpDirs[] = $path;
     }
 

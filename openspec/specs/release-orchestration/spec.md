@@ -177,3 +177,57 @@ maintainer's invocation.
 - **WHEN** the change ships
 - **THEN** no `.github/workflows/release*.yml` is added to any
   release-eligible repo for the purpose of running `bin/release`
+
+### Requirement: Auto-detect nested working trees inside shop-ce
+
+The CLI's `RepoPathDiscovery` SHALL scan the running shop-ce working tree for nested git working trees and prefer them over the conventional sibling layout when resolving a package's local clone path. The scan SHALL read each found tree's `.git/config` `[remote "origin"]` URL, reverse-map the GitHub slug to a composer package name (honoring the `PackageRepoSlug::RENAMES` case-rename map), and use that path for any release-eligible package in the discovered map. Origins outside the `o3-shop` GitHub owner SHALL be ignored. The scan SHALL skip noise directories (`vendor/`, `node_modules/`, `cache/`, `tmp/`, `log/`, `logs/`, `out/`, `coverage/`, `tools/`, `docs/`, hidden directories) and SHALL bound recursion at depth 4 from shop-ce's root. A directory that exists at a known nested location but does NOT contain `.git/` (typical for composer-plugin install artifacts) SHALL fall through to the sibling-or-auto-clone path; it SHALL NOT abort discovery.
+
+#### Scenario: ./docker.sh start creates nested theme clones
+
+- **WHEN** the maintainer has run `./docker.sh start`, which clones
+  `o3-Theme` into `<shop-ce>/source/Application/views/o3-theme` and
+  `wave-theme` into `<shop-ce>/source/Application/views/wave`
+- **AND** the maintainer runs `bin/release --from v1.6.1 --to v1.6.2`
+- **THEN** discovery uses the nested clones for both themes,
+  emitting `using nested clone (set up by ./docker.sh) at <path>`
+- **AND** discovery does NOT auto-clone duplicate sibling copies
+
+#### Scenario: Demodata satellite at shop-ce root
+
+- **WHEN** `<shop-ce>/shop-demodata-ce/.git/config` has
+  `url = https://github.com/o3-shop/shop-demodata-ce.git`
+- **THEN** discovery resolves `o3-shop/shop-demodata-ce` to
+  `<shop-ce>/shop-demodata-ce`
+
+#### Scenario: Case-renamed package origin
+
+- **WHEN** the nested clone's `.git/config` has
+  `url = https://github.com/o3-shop/o3-Theme.git` (mixed-case
+  GitHub repo name)
+- **THEN** the scanner reverse-maps the slug to the composer
+  package name `o3-shop/o3-theme` (lowercase) and records the
+  nested path under that name
+
+#### Scenario: Composer-plugin install artifact (no .git/)
+
+- **WHEN** `<shop-ce>/source/Application/views/o3-theme` exists
+  but contains no `.git/` directory (typical state when composer
+  plugin has installed theme files but the maintainer has not run
+  `./docker.sh start`)
+- **THEN** discovery does NOT treat this path as a nested clone
+- **AND** discovery falls through to sibling-layout resolution
+
+#### Scenario: Non-o3-shop origin ignored
+
+- **WHEN** a nested git tree's origin is
+  `git@github.com:other-org/other-repo.git`
+- **THEN** the scanner discards it (not under the `o3-shop` GitHub
+  owner) and the path is NOT added to the discovered map
+
+#### Scenario: vendor/ tree skipped
+
+- **WHEN** a nested git tree exists at
+  `<shop-ce>/vendor/o3-shop/o3-theme/.git`
+- **THEN** the scanner does NOT descend into `vendor/` and the
+  path is NOT added to the discovered map; resolution falls
+  through to sibling layout / auto-clone
