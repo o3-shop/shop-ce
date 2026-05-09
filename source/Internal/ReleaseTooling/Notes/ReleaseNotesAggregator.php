@@ -56,9 +56,17 @@ class ReleaseNotesAggregator
 
     private ReleaseNotesProvider $provider;
 
-    public function __construct(ReleaseNotesProvider $provider)
+    /** @var callable(string):void */
+    private $progress;
+
+    /**
+     * @param callable(string):void|null $progress invoked once per per-repo notes fetch
+     */
+    public function __construct(ReleaseNotesProvider $provider, ?callable $progress = null)
     {
         $this->provider = $provider;
+        $this->progress = $progress ?? static function (string $message): void {
+        };
     }
 
     /**
@@ -87,6 +95,12 @@ class ReleaseNotesAggregator
             // carries constraint strings instead of exact tags.
             $previousTag = TagFromConstraint::resolve($state->fromPin())
                 ?? $state->fromPin();
+            ($this->progress)(sprintf(
+                '  generating release notes for %s (%s..%s)',
+                $state->package(),
+                $previousTag,
+                $state->chosenVersion()
+            ));
             $body = $this->provider->notesFor(
                 $state->package(),
                 $previousTag,

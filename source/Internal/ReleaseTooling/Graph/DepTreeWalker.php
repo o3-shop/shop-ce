@@ -66,13 +66,22 @@ class DepTreeWalker
     /** @var array<int,array{from:string,to:string}> back-edges recorded during the walk */
     private array $backEdges = [];
 
+    /** @var callable(string):void */
+    private $progress;
+
     /**
-     * @param callable(string):string $refResolver maps a package name to the git ref to fetch its composer.json from
+     * @param callable(string):string    $refResolver maps a package name to the git ref to fetch its composer.json from
+     * @param callable(string):void|null $progress    invoked once per visited package (and once per back-edge)
      */
-    public function __construct(RawComposerJsonFetcher $fetcher, callable $refResolver)
-    {
+    public function __construct(
+        RawComposerJsonFetcher $fetcher,
+        callable $refResolver,
+        ?callable $progress = null
+    ) {
         $this->fetcher = $fetcher;
         $this->refResolver = $refResolver;
+        $this->progress = $progress ?? static function (string $message): void {
+        };
     }
 
     public function walk(string $startingPackage = self::O3_SHOP_PROJECT): WalkResult
@@ -113,6 +122,11 @@ class DepTreeWalker
                 $from = end($this->visiting);
                 if (is_string($from) && $from !== $package) {
                     $this->backEdges[] = ['from' => $from, 'to' => $package];
+                    ($this->progress)(sprintf(
+                        '  back-edge: %s -> %s (peer-constraint pin, recorded but not recursed)',
+                        $from,
+                        $package
+                    ));
                 }
             }
             return;
@@ -125,6 +139,7 @@ class DepTreeWalker
         }
 
         $ref = ($this->refResolver)($package);
+        ($this->progress)(sprintf('  walking %s@%s', $package, $ref));
         $manifest = $this->fetcher->fetch($package, $ref);
 
         foreach ([PinLocation::KEY_REQUIRE, PinLocation::KEY_REQUIRE_DEV] as $key) {

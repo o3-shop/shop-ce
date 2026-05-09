@@ -60,13 +60,22 @@ class FromSnapshotBuilder
 
     private RawComposerJsonFetcher $fetcher;
 
-    public function __construct(RawComposerJsonFetcher $fetcher)
+    /** @var callable(string):void */
+    private $progress;
+
+    /**
+     * @param callable(string):void|null $progress invoked once per fetched manifest
+     */
+    public function __construct(RawComposerJsonFetcher $fetcher, ?callable $progress = null)
     {
         $this->fetcher = $fetcher;
+        $this->progress = $progress ?? static function (string $message): void {
+        };
     }
 
     public function build(string $fromTag): FromSnapshot
     {
+        ($this->progress)(sprintf('  fetching o3-shop/o3-shop@%s', $fromTag));
         // Root fetch — failure here propagates (the CLI cannot continue
         // without the snapshot's anchor).
         $rootManifest = $this->fetcher->fetch(self::O3_SHOP_PROJECT, $fromTag);
@@ -93,6 +102,11 @@ class FromSnapshotBuilder
         $visited = [self::O3_SHOP_PROJECT => true];
         if ($usedIndirection && $metapackageVersion !== null) {
             $visited[self::METAPACKAGE_PACKAGE] = true;
+            ($this->progress)(sprintf(
+                '  fetching %s@%s (pre-fold-in indirection)',
+                self::METAPACKAGE_PACKAGE,
+                $metapackageVersion
+            ));
             try {
                 $metaManifest = $this->fetcher->fetch(
                     self::METAPACKAGE_PACKAGE,
@@ -138,6 +152,7 @@ class FromSnapshotBuilder
             }
             $visited[$package] = true;
 
+            ($this->progress)(sprintf('  fetching %s@%s', $package, $ref));
             try {
                 $manifest = $this->fetcher->fetch($package, $ref);
             } catch (RawRepoFetchException $e) {
