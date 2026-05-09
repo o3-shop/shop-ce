@@ -144,7 +144,7 @@ No `bin/release` code changes — the merge-back machinery already targets `main
     - `testing-library` → `b-1.6`
     - `gdpr-optin-module` → `b-1.0`
     - `usercentrics` → `b-1.0`
-    - `shop-ide-helper` → `b-1.6` (1.x line; `b-7.0.x` is next-major pre-release)
+    - `shop-ide-helper` → `b-1.6`
     - `shop-unified-namespace-generator` → `b-1.6`
     - `developer-tools` → `b-7.0.x` (only line)
     - `codeception-modules` → `b-1.0`
