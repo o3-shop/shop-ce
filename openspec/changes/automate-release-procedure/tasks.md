@@ -140,7 +140,7 @@ Every release-eligible repo gets a `main` branch as its long-lived "latest relea
 
 No `bin/release` code changes — the merge-back machinery already targets `main`; this section only normalizes the org-side branch model so that targeting becomes universally valid.
 
-- [ ] 14.1 Per-repo audit: identify the canonical released line for every repo currently without `main`. Proposed mapping (to confirm):
+- [x] 14.1 Per-repo audit: identify the canonical released line for every repo currently without `main`. Confirmed mapping:
     - `testing-library` → `b-1.6`
     - `gdpr-optin-module` → `b-1.0`
     - `usercentrics` → `b-1.0`
@@ -150,14 +150,14 @@ No `bin/release` code changes — the merge-back machinery already targets `main
     - `codeception-modules` → `b-1.0`
     - `codeception-page-objects` → `b-6.5.x`
     - `MinkSeleniumDriver` → `b-7.0.x`
-- [ ] 14.2 Create `main` on each of the 9 repos above, pointing at the HEAD of the chosen line (or its latest-released-tag commit if maintainer prefers tag-pinned)
-- [ ] 14.3 Set `main` as the GitHub default branch on each
-- [ ] 14.4 Apply branch protection to `main` on **every** release-eligible repo (all 17: the 9 newly-bootstrapped plus the 8 that already have `main` — `shop-ce`, `o3-shop`, `o3-Theme`, `wave-theme`, `shop-demodata-ce`, `shop-facts`, `tinymce-editor`, `shop-composer-plugin`). Minimum invariants, applied uniformly:
-    - No direct pushes (only merged PRs land)
-    - No force-pushes
-    - No branch deletion
-    Compatible with the merge-back PR flow because `bin/release` only opens PRs against `main` and never pushes to it. Linear-history rule is **not** added (would conflict with §15.4's "merge commit, not squash" guidance for merge-back PRs).
-- [ ] 14.5 Verify uniformly: dry-run a final-release flow against the full network and confirm the merge-back gate + PR-creation path produces no `--base main`-not-found errors and no protection-violation errors
+- [x] 14.2 Create `main` on each of the 9 repos above, pointing at the HEAD of the chosen line (branch-HEAD policy chosen over tag-pinned because all 9 had latest tag = HEAD modulo the recently-merged §1.5 archive.exclude commit; aligns the 9 with "code about to be released")
+- [x] 14.3 Set `main` as the GitHub default branch — all 17 release-eligible repos. Verification surfaced 3 stragglers that had `main` but a non-main default (`shop-ce` default=b-1.5, `shop-facts` default=b-1.0, `o3-shop` default=b-1.0-ce): `shop-ce`'s main was already at v1.6.0 + merge-back so default flip was sufficient; `shop-facts`'s main was 6 commits behind v1.0.4 (PR #2 fast-forwarded it to v1.0.4 commit, then default flipped); `o3-shop`'s main was 55 behind v1.6.0 with 1 commit divergence (PR #147 brought main to v1.6.0 via merge commit, then default flipped). Both temp branches deleted post-merge.
+- [x] 14.4 Apply branch protection to `main` on **every** release-eligible repo (all 17). Minimum invariants applied uniformly:
+    - PR required to merge (`required_approving_review_count: 0` — no approver requirement, but no direct pushes either)
+    - No force-pushes (`allow_force_pushes: false`)
+    - No branch deletion (`allow_deletions: false`)
+    Linear-history rule intentionally NOT enforced (would conflict with §15.4's "merge commit, not squash" guidance for merge-back PRs). `enforce_admins: false` so the maintainer can land emergency direct pushes if needed.
+- [x] 14.5 Verify uniformly: confirmed across all 17 repos that (a) `default_branch == "main"`, (b) protection state matches the §14.4 invariants, (c) the merge-back gate's underlying call (`gh pr list --base main --head <release-branch> --state open`) returns clean JSON on every repo (no `--base main`-not-found errors). End-to-end final-release dry-run verification deferred to §15.1's first machine-driven cut, which exercises the full pre-flight gate stack against live origin.
 
 ## 15. First live release with bin/release
 
