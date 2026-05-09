@@ -125,8 +125,6 @@ Tests: 4 planner cases / 19 assertions covering pre-fold-in indirection end-to-e
 ## 12. Integration tests
 
 - [x] 12.1 End-to-end test: run `bin/release --from <fixture-from> --to <fixture-to> --dry-run` against a fixture repo network and assert the printed plan — covered two ways: (a) `ReleasePlannerTest` runs the full algorithm chain against in-memory fake fetchers (the fixture-network equivalent) and asserts plan structure; (b) live verification against origin via `bin/release --from v1.6.0 --to v1.6.1-RC1 --dry-run` — surfaced and fixed 4 real-world bugs (constraint-update wrap, from_pin shallow recursion, metapackage-precedence ordering, gh-cli case-rename), all with regression tests. Full ReleaseTooling suite: 198 tests / 433 assertions.
-- [ ] 12.2 Composer-install integration test: resolve `composer install` against the post-fold-in `o3-shop/composer.json` and confirm a working shop
-- [ ] 12.3 Archive-exclude test: build a dist archive for shop-ce on a branch with a committed `.next-bump`; assert the archive does not contain `.next-bump`
 
 ## 13. Wiki rewrite
 
@@ -150,10 +148,10 @@ Tests: 4 planner cases / 19 assertions covering pre-fold-in indirection end-to-e
 
 > Note: v1.6.0 shipped pre-fold-in (with the old hardcoded `ShopVersion.php`). There is no separate manual v1.6.1 release — `bin/release` cuts v1.6.1-RC1 directly from `--from v1.6.0` (Section 14) using the pre-fold-in metapackage indirection in Step 1. These tasks verify the result of that run and run after Section 14.
 
-- [ ] 15.1 Verify a fresh `composer install` of `o3-shop v1.6.1-RC1` produces a working shop with `ShopVersion::getVersion() === "v1.6.1-RC1"`
+- [ ] 15.1 Verify a fresh `composer install` of `o3-shop v1.6.1-RC1` produces a working shop with `ShopVersion::getVersion() === "v1.6.1-RC1"` (folds in former §12.2 — composer-install integration check against the post-fold-in `o3-shop/composer.json`)
 - [ ] 15.2 Smoke-test the admin UI: confirm the version display shows `v1.6.1-RC1`
 - [ ] 15.3 Verify `o3-shop/composer.json` at `v1.6.1-RC1` is post-fold-in (no `o3-shop/shop-metapackage-ce` in `require`, `replace: oxid-esales/oxideshop-metapackage-ce` present)
-- [ ] 15.4 Verify the v1.6.1-RC1 dist archive does not contain `.next-bump` (archive.exclude works end-to-end)
+- [ ] 15.4 Verify the v1.6.1-RC1 dist archive does not contain `.next-bump` (archive.exclude works end-to-end) (folds in former §12.3 — `.next-bump` archive-exclude check, exercised end-to-end against the real cut)
 
 ## 16. Post-v1.6.1-final cleanup
 
