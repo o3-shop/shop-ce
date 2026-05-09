@@ -59,7 +59,7 @@ class MergeBackPrGate implements PreFlightGate
         $outcome = $this->exec->execute(
             [
                 $this->ghBin, 'pr', 'list',
-                '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
+                '--repo', PackageRepoSlug::resolve($packageName),
                 '--state', 'open',
                 '--base', 'main',
                 '--head', $expectedBranch,

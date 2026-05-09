@@ -95,7 +95,7 @@ class PerRepoActions
     {
         $args = [
             $this->ghBin, 'release', 'create', $tag,
-            '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
+            '--repo', PackageRepoSlug::resolve($packageName),
             '--draft',
             '--title', $tag,
         ];
@@ -133,7 +133,7 @@ class PerRepoActions
         );
         $args = [
             $this->ghBin, 'pr', 'create',
-            '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
+            '--repo', PackageRepoSlug::resolve($packageName),
             '--base', 'main',
             '--head', $releaseBranch,
             '--title', $title,
