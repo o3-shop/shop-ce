@@ -47,7 +47,7 @@ use Throwable;
  *
  * Section 11 (this iteration): wires the algorithm chain (Sections
  * 4-9) and the pre-flight gates (Section 10) into a single
- * `--dry-run` plan printout. Live execution lands with Section 14.
+ * `--dry-run` plan printout. Live execution lands with Section 15.
  *
  * See: openspec/changes/automate-release-procedure/specs/release-orchestration/spec.md
  */
@@ -192,7 +192,7 @@ class ReleaseCommand extends Command
         $output->writeln(
             '<comment>Live execution (commit constraint changes, cut tags, '
             . 'create draft GitHub releases, open merge-back PRs) is not yet '
-            . 'wired — Section 14 in openspec/changes/automate-release-procedure/'
+            . 'wired — Section 15 in openspec/changes/automate-release-procedure/'
             . 'tasks.md adds it. Re-run with --dry-run to preview.</comment>'
         );
         return self::EXIT_OK;

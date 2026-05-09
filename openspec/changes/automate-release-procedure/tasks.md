@@ -134,25 +134,45 @@ Tests: 4 planner cases / 19 assertions covering pre-fold-in indirection end-to-e
 - [ ] 13.4 Keep a manual fallback section for the case where `bin/release` is unavailable
 - [ ] 13.5 Note that currency-rate freshness remains a separate manual maintainer check
 
-## 14. First live release with bin/release
+## 14. Branch-model normalization (before any machine-driven release)
 
-- [ ] 14.1 Run `bin/release --from v1.6.0 --to v1.6.1-RC1 --dry-run` and review the plan (Step 1 must use the pre-fold-in metapackage indirection)
-- [ ] 14.2 Resolve any issues uncovered by the dry-run (missing release branches, malformed `.next-bump` files, etc.)
-- [ ] 14.3 Run `bin/release --from v1.6.0 --to v1.6.1-RC1` for real — this is the first machine-driven release and ships this entire change
-- [ ] 14.4 Manually publish the draft GitHub releases per repo and the aggregated o3-shop draft
-- [ ] 14.5 No merge-back PRs are auto-opened (RC1 is pre-release); merge-back PRs land with the eventual v1.6.1 final cut
-- [ ] 14.6 Run Section 15 verification on the produced v1.6.1-RC1 artifact
-- [ ] 14.7 Capture lessons learned in `.claude/memory/` (per the repo's finish protocol)
+Every release-eligible repo gets a `main` branch as its long-lived "latest released code" line. Eliminates the per-repo special case in `bin/release`'s merge-back-PR flow — `MergeBackPrGate` and `PerRepoActions::openMergeBackPr` both target `main` already; this makes that uniformly correct across the network. Lands **before §15** so every machine-driven release (RC1 onward) runs against a uniform branch model. Possible stepping stone toward trunk-based development later, but does not commit to it.
 
-## 15. Verification of the v1.6.1-RC1 cut
+No `bin/release` code changes — the merge-back machinery already targets `main`; this section only normalizes the org-side branch model so that targeting becomes universally valid.
 
-> Note: v1.6.0 shipped pre-fold-in (with the old hardcoded `ShopVersion.php`). There is no separate manual v1.6.1 release — `bin/release` cuts v1.6.1-RC1 directly from `--from v1.6.0` (Section 14) using the pre-fold-in metapackage indirection in Step 1. These tasks verify the result of that run and run after Section 14.
+- [ ] 14.1 Per-repo audit: identify the canonical released line for every repo currently without `main`. Proposed mapping (to confirm):
+    - `testing-library` → `b-1.6`
+    - `gdpr-optin-module` → `b-1.0`
+    - `usercentrics` → `b-1.0`
+    - `shop-ide-helper` → `b-1.6` (1.x line; `b-7.0.x` is next-major pre-release)
+    - `shop-unified-namespace-generator` → `b-1.6`
+    - `developer-tools` → `b-7.0.x` (only line)
+    - `codeception-modules` → `b-1.0`
+    - `codeception-page-objects` → `b-6.5.x`
+    - `MinkSeleniumDriver` → `b-7.0.x`
+- [ ] 14.2 Create `main` on each of the 9 repos above, pointing at the HEAD of the chosen line (or its latest-released-tag commit if maintainer prefers tag-pinned)
+- [ ] 14.3 Set `main` as the GitHub default branch on each
+- [ ] 14.4 Verify uniformly: dry-run a final-release flow against the full network and confirm the merge-back gate + PR-creation path produces no `--base main`-not-found errors
 
-- [ ] 15.1 Verify a fresh `composer install` of `o3-shop v1.6.1-RC1` produces a working shop with `ShopVersion::getVersion() === "v1.6.1-RC1"` (folds in former §12.2 — composer-install integration check against the post-fold-in `o3-shop/composer.json`)
-- [ ] 15.2 Smoke-test the admin UI: confirm the version display shows `v1.6.1-RC1`
-- [ ] 15.3 Verify `o3-shop/composer.json` at `v1.6.1-RC1` is post-fold-in (no `o3-shop/shop-metapackage-ce` in `require`, `replace: oxid-esales/oxideshop-metapackage-ce` present)
-- [ ] 15.4 Verify the v1.6.1-RC1 dist archive does not contain `.next-bump` (archive.exclude works end-to-end) (folds in former §12.3 — `.next-bump` archive-exclude check, exercised end-to-end against the real cut)
+## 15. First live release with bin/release
 
-## 16. Post-v1.6.1-final cleanup
+- [ ] 15.1 Run `bin/release --from v1.6.0 --to v1.6.1-RC1 --dry-run` and review the plan (Step 1 must use the pre-fold-in metapackage indirection)
+- [ ] 15.2 Resolve any issues uncovered by the dry-run (missing release branches, malformed `.next-bump` files, etc.)
+- [ ] 15.3 Run `bin/release --from v1.6.0 --to v1.6.1-RC1` for real — this is the first machine-driven release and ships this entire change
+- [ ] 15.4 Manually publish the draft GitHub releases per repo and the aggregated o3-shop draft
+- [ ] 15.5 No merge-back PRs are auto-opened (RC1 is pre-release); merge-back PRs land with the eventual v1.6.1 final cut
+- [ ] 15.6 Run Section 16 verification on the produced v1.6.1-RC1 artifact
+- [ ] 15.7 Capture lessons learned in `.claude/memory/` (per the repo's finish protocol)
 
-- [ ] 16.1 (After v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed.
+## 16. Verification of the v1.6.1-RC1 cut
+
+> Note: v1.6.0 shipped pre-fold-in (with the old hardcoded `ShopVersion.php`). There is no separate manual v1.6.1 release — `bin/release` cuts v1.6.1-RC1 directly from `--from v1.6.0` (Section 15) using the pre-fold-in metapackage indirection in Step 1. These tasks verify the result of that run and run after Section 15.
+
+- [ ] 16.1 Verify a fresh `composer install` of `o3-shop v1.6.1-RC1` produces a working shop with `ShopVersion::getVersion() === "v1.6.1-RC1"` (folds in former §12.2 — composer-install integration check against the post-fold-in `o3-shop/composer.json`)
+- [ ] 16.2 Smoke-test the admin UI: confirm the version display shows `v1.6.1-RC1`
+- [ ] 16.3 Verify `o3-shop/composer.json` at `v1.6.1-RC1` is post-fold-in (no `o3-shop/shop-metapackage-ce` in `require`, `replace: oxid-esales/oxideshop-metapackage-ce` present)
+- [ ] 16.4 Verify the v1.6.1-RC1 dist archive does not contain `.next-bump` (archive.exclude works end-to-end) (folds in former §12.3 — `.next-bump` archive-exclude check, exercised end-to-end against the real cut)
+
+## 17. Post-v1.6.1-final cleanup
+
+- [ ] 17.1 (After v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed.
