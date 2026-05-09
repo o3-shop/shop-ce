@@ -128,11 +128,11 @@ Tests: 4 planner cases / 19 assertions covering pre-fold-in indirection end-to-e
 
 ## 13. Wiki rewrite
 
-- [ ] 13.1 Replace https://github.com/o3-shop/o3-shop/wiki/Create-a-Release with the `bin/release` workflow (one command per release, draft publish click)
-- [ ] 13.2 Document the 3-tier graph (no metapackage tier)
-- [ ] 13.3 Document `.next-bump` file convention and `--bump` flag for non-patch bumps
-- [ ] 13.4 Keep a manual fallback section for the case where `bin/release` is unavailable
-- [ ] 13.5 Note that currency-rate freshness remains a separate manual maintainer check
+- [x] 13.1 Replace https://github.com/o3-shop/o3-shop/wiki/Create-a-Release with the `bin/release` workflow (one command per release, draft publish click) — landed in wiki commit `ba5669e`
+- [x] 13.2 Document the 3-tier graph (no metapackage tier) — "The release graph" section covers tiers 0/1/2 and the post-fold-in metapackage absence
+- [x] 13.3 Document `.next-bump` file convention and `--bump` flag for non-patch bumps — "Bump levels for new tags" section covers precedence, file consumption, and `archive.exclude` belt-and-suspenders
+- [x] 13.4 Keep a manual fallback section for the case where `bin/release` is unavailable — "Manual fallback" appendix retains the per-repo recipe, post-fold-in (no metapackage step)
+- [x] 13.5 Note that currency-rate freshness remains a separate manual maintainer check — "Pre-release housekeeping → Refresh currency exchange rates" section calls this out explicitly as not automated by `bin/release`
 
 ## 14. Branch-model normalization (before any machine-driven release)
 
