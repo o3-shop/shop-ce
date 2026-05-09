@@ -159,14 +159,24 @@ class ReleaseCommand extends Command
             $bumpFlags[$slug] = $level;
         }
 
-        $planner = $this->planner ?? $this->buildDefaultPlanner();
+        $progress = static function (string $message) use ($output): void {
+            $output->writeln('<comment>' . $message . '</comment>');
+        };
+        $planner = $this->planner ?? $this->buildDefaultPlanner($progress);
 
+        $output->writeln(sprintf(
+            '<info>Planning release: --from %s --to %s%s</info>',
+            $from,
+            $to,
+            $dryRun ? ' (dry-run)' : ''
+        ));
         try {
             $plan = $planner->plan($from, $to, $bumpFlags);
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>Plan failed: %s</error>', $e->getMessage()));
             return self::EXIT_PLAN_ERROR;
         }
+        $output->writeln('');
 
         $this->printer->print($plan, $output);
 
@@ -222,20 +232,20 @@ class ReleaseCommand extends Command
         return null;
     }
 
-    private function buildDefaultPlanner(): ReleasePlanner
+    private function buildDefaultPlanner(?callable $progress = null): ReleasePlanner
     {
         $exec = new SymfonyProcessExecutor();
         $composerJsonFetcher = new HttpsRawComposerJsonFetcher();
         $fileFetcher = new HttpsRawRepoFileFetcher();
         $branchResolver = new DefaultBranchResolver();
 
-        $snapshotBuilder = new FromSnapshotBuilder($composerJsonFetcher);
-        $walker = new DepTreeWalker($composerJsonFetcher, $branchResolver);
+        $snapshotBuilder = new FromSnapshotBuilder($composerJsonFetcher, $progress);
+        $walker = new DepTreeWalker($composerJsonFetcher, $branchResolver, $progress);
         $repos = new GitLsRemoteRepoIntrospector($exec);
         $versionResolver = new CandidateVersionResolver($repos);
         $tagCutter = new TagCutter($fileFetcher);
         $constraintUpdater = new ConstraintUpdater();
-        $notesAggregator = new ReleaseNotesAggregator(new GhCliReleaseNotesProvider());
+        $notesAggregator = new ReleaseNotesAggregator(new GhCliReleaseNotesProvider(), $progress);
 
         return new ReleasePlanner(
             $snapshotBuilder,
@@ -245,7 +255,8 @@ class ReleaseCommand extends Command
             $constraintUpdater,
             $notesAggregator,
             $branchResolver,
-            null // pre-flight runner skipped for dry-run unless wired explicitly
+            null, // pre-flight runner skipped for dry-run unless wired explicitly
+            $progress
         );
     }
 

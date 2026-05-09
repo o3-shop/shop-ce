@@ -56,8 +56,12 @@ class ReleasePlanner
     /** @var callable(string):string */
     private $branchResolver;
 
+    /** @var callable(string):void */
+    private $progress;
+
     /**
-     * @param callable(string):string $branchResolver maps a package to the release branch its composer.json lives on
+     * @param callable(string):string    $branchResolver maps a package to the release branch its composer.json lives on
+     * @param callable(string):void|null $progress       invoked once per phase boundary
      */
     public function __construct(
         FromSnapshotBuilder $snapshotBuilder,
@@ -67,7 +71,8 @@ class ReleasePlanner
         ConstraintUpdater $constraintUpdater,
         ReleaseNotesAggregator $notesAggregator,
         callable $branchResolver,
-        ?PreFlightRunner $preFlightRunner = null
+        ?PreFlightRunner $preFlightRunner = null,
+        ?callable $progress = null
     ) {
         $this->snapshotBuilder = $snapshotBuilder;
         $this->walker = $walker;
@@ -77,6 +82,8 @@ class ReleasePlanner
         $this->notesAggregator = $notesAggregator;
         $this->branchResolver = $branchResolver;
         $this->preFlightRunner = $preFlightRunner;
+        $this->progress = $progress ?? static function (string $message): void {
+        };
     }
 
     /**
@@ -85,12 +92,19 @@ class ReleasePlanner
      */
     public function plan(string $fromTag, string $toTag, array $bumpFlags, array $repoPaths = []): ReleasePlan
     {
-        // Step 1
+        ($this->progress)(sprintf('Step 1: building from-snapshot at %s', $fromTag));
         $fromSnapshot = $this->snapshotBuilder->build($fromTag);
 
-        // Step 2
+        ($this->progress)(sprintf(
+            'Step 2: walking dep tree on release branches (from %s)',
+            self::O3_SHOP_PROJECT
+        ));
         $walkResult = $this->walker->walk(self::O3_SHOP_PROJECT);
 
+        ($this->progress)(sprintf(
+            'Steps 3 + 4: resolving versions for %d candidates',
+            count($walkResult->topologicalOrder()) - 1
+        ));
         // Steps 3 + 4 — per candidate (skip the o3-shop project root; it is the orchestrator, not a candidate)
         $candidates = [];
         foreach ($walkResult->topologicalOrder() as $package) {
@@ -126,6 +140,7 @@ class ReleasePlanner
             }
         }
 
+        ($this->progress)('Step 5: checking constraint updates per pin location');
         // Step 5 — constraint updates per pin location.
         //
         // Skip unchanged candidates entirely: their `chosenVersion` is the
@@ -157,6 +172,7 @@ class ReleasePlanner
             }
         }
 
+        ($this->progress)('Step 6: aggregating cross-repo release notes');
         // Step 6 — aggregated notes
         $candidateStates = [];
         foreach ($candidates as $candidate) {
@@ -171,6 +187,7 @@ class ReleasePlanner
         // Pre-flight (optional)
         $preFlightReports = [];
         if ($this->preFlightRunner !== null && $repoPaths !== []) {
+            ($this->progress)('Pre-flight: running gates per repo');
             foreach ($candidates as $candidate) {
                 $package = $candidate->package();
                 if (!isset($repoPaths[$package])) {
