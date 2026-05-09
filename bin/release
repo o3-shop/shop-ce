@@ -19,6 +19,12 @@
  * @license    https://www.gnu.org/licenses/gpl-3.0  GNU General Public License 3 (GPLv3)
  */
 
+// Silence E_DEPRECATED noise from the vendored Symfony Console 3.4 +
+// react/promise on PHP 8.4+. The constraints are pinned by the shop's
+// composer.json; bumping them is out of scope for this CLI. Other
+// error levels stay visible.
+error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 $autoloadCandidates = [
     __DIR__ . '/../vendor/autoload.php',          // shop-ce as project root
     __DIR__ . '/../../../autoload.php',           // shop-ce inside vendor/
