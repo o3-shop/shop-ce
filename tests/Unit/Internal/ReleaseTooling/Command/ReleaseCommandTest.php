@@ -182,7 +182,7 @@ class ReleaseCommandTest extends TestCase
         ]);
         $this->assertSame(ReleaseCommand::EXIT_OK, $status);
         $this->assertStringContainsString('Live execution', $tester->getDisplay());
-        $this->assertStringContainsString('Section 14', $tester->getDisplay());
+        $this->assertStringContainsString('Section 15', $tester->getDisplay());
     }
 
     /* ---------- validateBumpValue() unit (preserved from Section 3) ---------- */
