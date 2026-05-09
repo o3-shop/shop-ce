@@ -236,7 +236,7 @@ class FromSnapshotBuilderTest extends TestCase
             'o3-shop/shop-db-views-generator|v1.0.0' => ['require' => []],
             'o3-shop/shop-ide-helper|v1.0.0' => ['require' => []],
             'o3-shop/shop-facts|v1.0.4' => ['require' => []],
-            'o3-shop/testing-library|1.2.0' => ['require' => []],
+            'o3-shop/testing-library|v1.2.0' => ['require' => []],
         ]);
 
         $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.0');

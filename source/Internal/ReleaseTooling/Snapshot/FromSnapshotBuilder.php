@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetcher;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFetchException;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\TagFromConstraint;
 
 /**
  * Algorithm Step 1: read `o3-shop/composer.json` at `--from` and
@@ -76,27 +77,55 @@ class FromSnapshotBuilder
 
         $usedIndirection = isset($fromPin['shop-metapackage-ce']);
         $metapackageVersion = $usedIndirection ? $fromPin['shop-metapackage-ce'] : null;
-        // The metapackage is itself recursed into (below), but we drop it
-        // from the final `from_pin[]` regardless — it is the indirection
+        // The metapackage is harvested synchronously (below) but never
+        // appears in the final `from_pin[]` — it is the indirection
         // anchor, not a release-eligible candidate.
         unset($fromPin['shop-metapackage-ce']);
 
-        // Recursive harvest: for every o3-shop/* slug currently in
-        // fromPin (plus the metapackage when pre-fold-in), fetch its
-        // composer.json at the constraint's resolved ref and add its
-        // o3-shop/* deps. Keeps walking until the queue is empty.
+        // Pre-fold-in: harvest the metapackage's pins SYNCHRONOUSLY before
+        // any further recursion. The metapackage's tier-0 require list
+        // is the authoritative "what shipped at --from" set; if recursion
+        // through root's require-dev (e.g. testing-library) ran first
+        // and learned a looser constraint for shop-ce (testing-library
+        // declares `require: shop-ce: ^1.2`), first-write-wins would
+        // lock in that loose constraint and the metapackage's exact
+        // `shop-ce: v1.6.0` would never get recorded.
         $visited = [self::O3_SHOP_PROJECT => true];
+        if ($usedIndirection && $metapackageVersion !== null) {
+            $visited[self::METAPACKAGE_PACKAGE] = true;
+            try {
+                $metaManifest = $this->fetcher->fetch(
+                    self::METAPACKAGE_PACKAGE,
+                    $metapackageVersion
+                );
+                $metaPins = array_merge(
+                    $this->extractO3ShopPins($metaManifest['require'] ?? []),
+                    $this->extractO3ShopPins($metaManifest['require-dev'] ?? [])
+                );
+                foreach ($metaPins as $slug => $constraint) {
+                    if ($slug === 'shop-metapackage-ce') {
+                        continue;
+                    }
+                    if (!isset($fromPin[$slug])) {
+                        $fromPin[$slug] = $constraint;
+                    }
+                }
+            } catch (RawRepoFetchException $e) {
+                // Metapackage unfetchable — recursion below still runs;
+                // the snapshot will be missing tier-0 pins the metapackage
+                // would have provided.
+            }
+        }
+
+        // Recursive harvest: for every o3-shop/* slug currently in
+        // fromPin, fetch its composer.json at the constraint's resolved
+        // ref and add its o3-shop/* deps. Keeps walking until the queue
+        // is empty.
         $queue = [];
         foreach ($fromPin as $slug => $constraint) {
             $ref = $this->constraintToRef($constraint);
             if ($ref !== null) {
                 $queue[] = ['package' => self::O3_SHOP_PREFIX . $slug, 'ref' => $ref];
-            }
-        }
-        if ($metapackageVersion !== null) {
-            $ref = $this->constraintToRef($metapackageVersion);
-            if ($ref !== null) {
-                $queue[] = ['package' => self::METAPACKAGE_PACKAGE, 'ref' => $ref];
             }
         }
 
@@ -171,17 +200,11 @@ class FromSnapshotBuilder
     }
 
     /**
-     * Reduces a composer constraint to the bare tag form so the
-     * fetcher can use it as a git ref. Returns null when the
-     * constraint isn't a recognizable semver shape (wildcards,
-     * dev-foo, ranges, ORs) — the recursion skips those subtrees.
+     * Delegates to the shared `TagFromConstraint` helper so the
+     * constraint→tag mapping is consistent across the algorithm.
      */
     private function constraintToRef(string $constraint): ?string
     {
-        $trimmed = ltrim(trim($constraint), '^~');
-        if (preg_match('/^v?\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/', $trimmed) === 1) {
-            return $trimmed;
-        }
-        return null;
+        return TagFromConstraint::resolve($constraint);
     }
 }

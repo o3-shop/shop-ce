@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use RuntimeException;
 
 /**
@@ -94,7 +95,7 @@ class PerRepoActions
     {
         $args = [
             $this->ghBin, 'release', 'create', $tag,
-            '--repo', $packageName,
+            '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
             '--draft',
             '--title', $tag,
         ];
@@ -132,7 +133,7 @@ class PerRepoActions
         );
         $args = [
             $this->ghBin, 'pr', 'create',
-            '--repo', $packageName,
+            '--repo', \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug::resolve($packageName),
             '--base', 'main',
             '--head', $releaseBranch,
             '--title', $title,

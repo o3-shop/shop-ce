@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes;
 
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use Symfony\Component\Process\Process;
 
 /**
@@ -44,7 +45,7 @@ class GhCliReleaseNotesProvider implements ReleaseNotesProvider
             self::GH_BIN,
             'api',
             '-X', 'POST',
-            sprintf('/repos/%s/releases/generate-notes', $package),
+            sprintf('/repos/%s/releases/generate-notes', PackageRepoSlug::resolve($package)),
             '-f', 'tag_name=' . $newTag,
             '-f', 'previous_tag_name=' . $previousTag,
             '--jq', '.body',
