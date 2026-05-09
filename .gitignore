@@ -91,3 +91,8 @@ oxideshop.log
 # tests/Acceptance/playwright/test-results/ and stay tracked there.
 /*.png
 /openspec/changes/fix-underscore-method-inheritance/findings.json
+
+# Test side-effect: InternalShimCallSitesTest regenerates findings to its
+# pre-archive path (now archived to openspec/changes/archive/...).
+# Tracked in archive; not in active openspec/changes.
+/openspec/changes/fix-internal-shim-call-sites/
