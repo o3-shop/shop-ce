@@ -15,3 +15,6 @@ type: feedback
 
 ## php-cs-fixer Cache
 - `.php-cs-fixer.cache` is gitignored but speeds up repeated runs significantly. If fixer seems to miss files, delete the cache and re-run.
+
+## String-renames break paired tests silently
+- When you change a user-facing string literal in production code (error messages, log messages, "wiring pending" notices, etc.), grep the test suite for any `assertStringContainsString` / `assertSame` that still asserts on the old value. cs-fixer and static analysis don't catch this — only CI does. Common after section/task renumbers, version-string edits, copy-paste fixups.
