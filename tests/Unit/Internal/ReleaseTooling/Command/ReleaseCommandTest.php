@@ -330,6 +330,152 @@ class ReleaseCommandTest extends TestCase
         $this->assertStringContainsString('Plan failed', $tester->getDisplay());
     }
 
+    /* ---------- pre-flight abort prints diagnostic ---------- */
+
+    public function testPreFlightAbortInDryRunPrintsDiagnostic(): void
+    {
+        $tester = $this->tester(new StubReleasePlanner($this->planThatAborts()));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--dry-run' => true,
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
+        $this->assertStringContainsString('Pre-flight gates aborted', $tester->getDisplay());
+    }
+
+    /* ---------- partial-state printing on live success ---------- */
+
+    public function testLiveSuccessPrintsCapturedReleaseAndMergeBackUrls(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+        $executor = new RecordingLiveExecutor(
+            false,
+            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1'],
+            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/pull/200']
+        );
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
+        ]);
+
+        $display = $tester->getDisplay();
+        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
+        $this->assertStringContainsString('Draft GitHub releases created:', $display);
+        $this->assertStringContainsString('o3-shop/shop-ce -> https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1', $display);
+        $this->assertStringContainsString('Merge-back PRs opened:', $display);
+        $this->assertStringContainsString('o3-shop/shop-ce -> https://github.com/o3-shop/shop-ce/pull/200', $display);
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    public function testLiveFailureStillPrintsPartialState(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+        $executor = new RecordingLiveExecutor(
+            true,
+            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1'],
+            []
+        );
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
+        ]);
+
+        $this->assertSame(ReleaseCommand::EXIT_PLAN_ERROR, $status);
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Live execution failed', $display);
+        $this->assertStringContainsString('Draft GitHub releases created:', $display);
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    /* ---------- --repo-path malformed-input branches ---------- */
+
+    /** @dataProvider malformedRepoPathProvider */
+    public function testMalformedRepoPathExitsUsageErrorWithExpectedFragment(
+        string $argValue,
+        string $expectedFragment,
+        bool $createDir = false,
+        bool $createGit = false
+    ): void {
+        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        if ($createDir) {
+            mkdir($tmp);
+            if ($createGit) {
+                mkdir($tmp . '/.git');
+            }
+            $argValue = str_replace('__TMP__', $tmp, $argValue);
+        }
+        $tester = $this->tester();
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--repo-path' => [$argValue],
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
+        $this->assertStringContainsString($expectedFragment, $tester->getDisplay());
+
+        if ($createDir) {
+            @rmdir($tmp . '/.git');
+            @rmdir($tmp);
+        }
+    }
+
+    public function malformedRepoPathProvider(): array
+    {
+        return [
+            'no equals sign' => ['no-equals', 'Malformed --repo-path'],
+            'leading equals' => ['=/abs/path', 'Malformed --repo-path'],
+            'trailing equals' => ['o3-shop/shop-ce=', 'Malformed --repo-path'],
+            'package without slash' => ['shopce=/abs/path', 'Malformed --repo-path package'],
+            'relative path' => ['o3-shop/shop-ce=relative/path', 'Malformed --repo-path absolute path'],
+            'non-existent path' => ['o3-shop/shop-ce=/definitely/does/not/exist', 'is not a directory'],
+            'existing dir but not a git tree' => ['o3-shop/shop-ce=__TMP__', 'does not look like a git working tree', true, false],
+        ];
+    }
+
+    /* ---------- production-mode builders smoke test (reflection) ---------- */
+
+    public function testProductionModeBuildersConstructWithoutErrors(): void
+    {
+        $command = new ReleaseCommand();
+        $reflector = new \ReflectionClass(ReleaseCommand::class);
+
+        $buildPlanner = $reflector->getMethod('buildDefaultPlanner');
+        $buildPlanner->setAccessible(true);
+        $planner = $buildPlanner->invoke($command, null, true);
+        $this->assertInstanceOf(ReleasePlanner::class, $planner);
+
+        $buildPlannerNoPreFlight = $buildPlanner->invoke($command, null, false);
+        $this->assertInstanceOf(ReleasePlanner::class, $buildPlannerNoPreFlight);
+
+        $buildLiveExecutor = $reflector->getMethod('buildDefaultLiveExecutor');
+        $buildLiveExecutor->setAccessible(true);
+        $live = $buildLiveExecutor->invoke($command, null);
+        $this->assertInstanceOf(LiveExecutor::class, $live);
+    }
+
     private function planThatAborts(): ReleasePlan
     {
         $abortingReport = new \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightReport([
@@ -386,11 +532,24 @@ final class RecordingLiveExecutor extends LiveExecutor
     public int $callCount = 0;
     public array $lastRepoPaths = [];
     private bool $shouldThrow;
+    /** @var array<string,string> */
+    private array $cannedReleaseUrls;
+    /** @var array<string,string> */
+    private array $cannedMergeBackUrls;
 
-    public function __construct(bool $shouldThrow = false)
-    {
+    /**
+     * @param array<string,string> $cannedReleaseUrls
+     * @param array<string,string> $cannedMergeBackUrls
+     */
+    public function __construct(
+        bool $shouldThrow = false,
+        array $cannedReleaseUrls = [],
+        array $cannedMergeBackUrls = []
+    ) {
         // Skip parent constructor — see StubReleasePlanner.
         $this->shouldThrow = $shouldThrow;
+        $this->cannedReleaseUrls = $cannedReleaseUrls;
+        $this->cannedMergeBackUrls = $cannedMergeBackUrls;
     }
 
     public function execute(ReleasePlan $plan, array $repoPaths): void
@@ -404,12 +563,12 @@ final class RecordingLiveExecutor extends LiveExecutor
 
     public function releaseUrls(): array
     {
-        return [];
+        return $this->cannedReleaseUrls;
     }
 
     public function mergeBackUrls(): array
     {
-        return [];
+        return $this->cannedMergeBackUrls;
     }
 }
 

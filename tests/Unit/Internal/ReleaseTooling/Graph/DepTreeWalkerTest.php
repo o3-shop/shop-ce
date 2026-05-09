@@ -53,6 +53,26 @@ class DepTreeWalkerTest extends TestCase
             ['o3-shop/smarty', 'o3-shop/shop-ce', 'o3-shop/o3-shop'],
             $result->topologicalOrder()
         );
+        // tiers() getter — bulk view that mirrors per-package tier()
+        $tiers = $result->tiers();
+        ksort($tiers);
+        $this->assertSame([
+            'o3-shop/o3-shop' => 2,
+            'o3-shop/shop-ce' => 1,
+            'o3-shop/smarty' => 0,
+        ], $tiers);
+    }
+
+    public function testTierThrowsWhenPackageNeverVisited(): void
+    {
+        $result = $this->walker([
+            'o3-shop/o3-shop|main' => ['require' => ['o3-shop/shop-ce' => 'v1.6.1']],
+            'o3-shop/shop-ce|main' => ['require' => []],
+        ])->walk();
+
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage("Package 'o3-shop/never-visited' was not visited by the walker");
+        $result->tier('o3-shop/never-visited');
     }
 
     public function testDiamondVisitsSharedLeafExactlyOnce(): void

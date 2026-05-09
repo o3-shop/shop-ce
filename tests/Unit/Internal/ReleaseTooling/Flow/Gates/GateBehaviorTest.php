@@ -56,6 +56,17 @@ class GateBehaviorTest extends TestCase
         $this->assertStringContainsString('uncommitted changes', $outcome->messages()[0]);
     }
 
+    public function testWorkingTreeGateAbortsWhenGitStatusFails(): void
+    {
+        $exec = new FakeProcessExecutor([
+            'git status --porcelain' => new ProcessOutcome(128, '', "fatal: not a git repository\n"),
+        ]);
+        $outcome = (new WorkingTreeGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
+        $this->assertTrue($outcome->aborts());
+        $this->assertStringContainsString('git status failed', $outcome->messages()[0]);
+        $this->assertSame(WorkingTreeGate::NAME, (new WorkingTreeGate($exec))->name());
+    }
+
     /* ---------- 10.2 — BranchGate ---------- */
 
     public function testBranchGatePassesWhenOnExpectedBranch(): void
@@ -65,6 +76,18 @@ class GateBehaviorTest extends TestCase
         ]);
         $outcome = (new BranchGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
         $this->assertTrue($outcome->isPassed());
+    }
+
+    public function testBranchGateAbortsWhenGitRevParseFails(): void
+    {
+        $exec = new FakeProcessExecutor([
+            'git rev-parse --abbrev-ref HEAD' => new ProcessOutcome(128, '', "fatal: Not a git repository\n"),
+        ]);
+        $gate = new \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\BranchGate($exec);
+        $outcome = $gate->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
+        $this->assertTrue($outcome->aborts());
+        $this->assertStringContainsString('git rev-parse failed', $outcome->messages()[0]);
+        $this->assertSame('on-release-branch', $gate->name());
     }
 
     public function testBranchGateAbortsWhenOnDifferentBranch(): void
@@ -122,6 +145,23 @@ class GateBehaviorTest extends TestCase
         $this->assertTrue($outcome->isPassed());
     }
 
+    public function testTestSuiteGateTailTruncatesOver20Lines(): void
+    {
+        $longOut = implode("\n", array_map(static fn (int $i): string => "out-$i", range(1, 30)));
+        $exec = new FakeProcessExecutor([], new ProcessOutcome(1, $longOut, ''));
+        $gate = new TestSuiteGate(
+            $exec,
+            static fn (string $_p, string $_r): array => ['phpunit']
+        );
+        $outcome = $gate->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
+        $this->assertTrue($outcome->aborts());
+        $tail = $outcome->messages()[1];
+        $this->assertStringContainsString('out-30', $tail, 'last line preserved');
+        $this->assertStringNotContainsString('out-1' . "\n", $tail, 'first line dropped');
+        $this->assertSame(20, substr_count($tail, "\n") + 1, 'exactly 20 lines retained');
+        $this->assertSame('tests-pass', $gate->name());
+    }
+
     public function testTestSuiteGateAbortsAndIncludesTailOnFailure(): void
     {
         $tail = "FAILURES!\nERROR: 1 failed\n";
@@ -145,6 +185,16 @@ class GateBehaviorTest extends TestCase
         ]);
         $outcome = (new IncomingPrGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
         $this->assertTrue($outcome->isPassed());
+    }
+
+    public function testIncomingPrGateWarnsButProceedsWhenGhFails(): void
+    {
+        $exec = new FakeProcessExecutor([], new ProcessOutcome(1, '', "could not authenticate\n"));
+        $gate = new \OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\IncomingPrGate($exec);
+        $outcome = $gate->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
+        $this->assertSame(\OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome::STATUS_WARNING, $outcome->status());
+        $this->assertStringContainsString('gh pr list failed', $outcome->messages()[0]);
+        $this->assertSame('incoming-prs', $gate->name());
     }
 
     public function testIncomingPrGateWarnsButProceedsWhenPrsExist(): void
