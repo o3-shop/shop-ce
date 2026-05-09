@@ -152,7 +152,12 @@ No `bin/release` code changes — the merge-back machinery already targets `main
     - `MinkSeleniumDriver` → `b-7.0.x`
 - [ ] 14.2 Create `main` on each of the 9 repos above, pointing at the HEAD of the chosen line (or its latest-released-tag commit if maintainer prefers tag-pinned)
 - [ ] 14.3 Set `main` as the GitHub default branch on each
-- [ ] 14.4 Verify uniformly: dry-run a final-release flow against the full network and confirm the merge-back gate + PR-creation path produces no `--base main`-not-found errors
+- [ ] 14.4 Apply branch protection to `main` on **every** release-eligible repo (all 17: the 9 newly-bootstrapped plus the 8 that already have `main` — `shop-ce`, `o3-shop`, `o3-Theme`, `wave-theme`, `shop-demodata-ce`, `shop-facts`, `tinymce-editor`, `shop-composer-plugin`). Minimum invariants, applied uniformly:
+    - No direct pushes (only merged PRs land)
+    - No force-pushes
+    - No branch deletion
+    Compatible with the merge-back PR flow because `bin/release` only opens PRs against `main` and never pushes to it. Linear-history rule is **not** added (would conflict with §15.4's "merge commit, not squash" guidance for merge-back PRs).
+- [ ] 14.5 Verify uniformly: dry-run a final-release flow against the full network and confirm the merge-back gate + PR-creation path produces no `--base main`-not-found errors and no protection-violation errors
 
 ## 15. First live release with bin/release
 
