@@ -41,12 +41,19 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
  *     installs, so the gate stays out of the way.
  *
  * Audit:
- *   - Modern composer runs a security audit by default and aborts on
- *     anything in the public advisories DB. That's noisy for legacy
- *     deps that the org chooses to keep on a known version. The
+ *   - Composer 2.7+ runs a security audit during install. The
  *     `$skipAudit` constructor flag (wired to the `--no-audit` CLI
- *     flag) lets the maintainer opt out per release. Default: audit
- *     stays on.
+ *     flag on `bin/release`) appends `--no-audit` to the install
+ *     command, suppressing the post-install advisory report.
+ *     Default: audit stays on.
+ *
+ * Composer binary:
+ *   - The default `$composerBin` is just `'composer'` (PATH lookup),
+ *     but `ReleaseCommand` resolves shop-ce's bundled
+ *     `vendor/bin/composer` (composer 2.2.x via the transitive
+ *     `o3-shop/shop-composer-plugin` dep) and passes that here.
+ *     Using the bundled composer avoids host-PATH version skew —
+ *     production o3-shop installs run the same 2.2.x.
  */
 class ComposerInstallGate implements PreFlightGate
 {

@@ -359,11 +359,30 @@ class ReleaseCommand extends Command
             new WorkingTreeGate($exec),
             new BranchGate($exec),
             new UpToDateGate($exec),
-            new ComposerInstallGate($exec, 'composer', $skipAudit),
+            new ComposerInstallGate($exec, $this->resolveBundledComposer(), $skipAudit),
             new TestSuiteGate($exec, $skipTestsResolver),
             new IncomingPrGate($exec),
             new MergeBackPrGate($exec),
         ]);
+    }
+
+    /**
+     * Returns the path to shop-ce's bundled composer
+     * (`vendor/bin/composer`, composer 2.2.x via the transitive
+     * `o3-shop/shop-composer-plugin` dep) when present, otherwise
+     * falls back to `composer` from PATH. Using the bundled binary
+     * makes the pre-flight gate's composer behavior consistent
+     * across maintainer machines and identical to production
+     * `o3-shop` installs.
+     */
+    private function resolveBundledComposer(): string
+    {
+        // From source/Internal/ReleaseTooling/Command/ → shop-ce root.
+        $candidate = realpath(__DIR__ . '/../../../../vendor/bin/composer');
+        if ($candidate !== false && is_executable($candidate)) {
+            return $candidate;
+        }
+        return 'composer';
     }
 
     private function buildDefaultLiveExecutor(?callable $progress = null): LiveExecutor
