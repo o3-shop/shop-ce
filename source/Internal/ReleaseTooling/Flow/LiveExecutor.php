@@ -51,7 +51,7 @@ use Throwable;
  * does not roll back; the runbook in the wiki describes how to clean
  * up partial state by hand.
  */
-final class LiveExecutor
+class LiveExecutor
 {
     public const O3_SHOP_PROJECT = 'o3-shop/o3-shop';
 

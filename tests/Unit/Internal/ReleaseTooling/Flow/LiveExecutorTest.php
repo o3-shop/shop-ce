@@ -108,9 +108,12 @@ final class LiveExecutorTest extends TestCase
         $shopCeReleaseCall = $this->callAt($exec, $shopCeReleaseIdx);
         $this->assertContains('--generate-notes', $shopCeReleaseCall['command']);
 
-        // composer.json constraint actually got rewritten on disk
-        $this->assertStringContainsString('"o3-shop/shop-doctrine-migration-wrapper": "v1.0.3"', file_get_contents($shopCePath . '/composer.json'));
-        $this->assertStringContainsString('"o3-shop/shop-ce": "v1.6.1-RC1"', file_get_contents($o3ShopPath . '/composer.json'));
+        // composer.json constraint actually got rewritten on disk.
+        // Fixtures use compact JSON ("key":"val") and the writer
+        // preserves whatever whitespace is around the colon, so we
+        // assert without leading space to match the fixture format.
+        $this->assertStringContainsString('"o3-shop/shop-doctrine-migration-wrapper":"v1.0.3"', file_get_contents($shopCePath . '/composer.json'));
+        $this->assertStringContainsString('"o3-shop/shop-ce":"v1.6.1-RC1"', file_get_contents($o3ShopPath . '/composer.json'));
 
         // Release URLs captured for partial-state recovery
         $this->assertSame([
