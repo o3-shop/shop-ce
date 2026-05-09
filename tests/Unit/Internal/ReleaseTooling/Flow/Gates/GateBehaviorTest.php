@@ -105,23 +105,82 @@ class GateBehaviorTest extends TestCase
 
     public function testComposerInstallGatePassesOnZeroExit(): void
     {
-        $exec = new FakeProcessExecutor([
-            'composer install --dry-run --no-scripts --no-interaction'
-                => new ProcessOutcome(0, 'all good', ''),
-        ]);
-        $outcome = (new ComposerInstallGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
-        $this->assertTrue($outcome->isPassed());
+        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        mkdir($tmp);
+        file_put_contents($tmp . '/composer.lock', '{}');
+        try {
+            $exec = new FakeProcessExecutor([], new ProcessOutcome(0, 'all good', ''));
+            $outcome = (new ComposerInstallGate($exec))->evaluate($tmp, 'b-1.6', 'o3-shop/shop-ce');
+            $this->assertTrue($outcome->isPassed());
+        } finally {
+            @unlink($tmp . '/composer.lock');
+            @rmdir($tmp);
+        }
+    }
+
+    public function testComposerInstallGateSkipsWhenLockfileMissing(): void
+    {
+        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        mkdir($tmp);
+        try {
+            $exec = new FakeProcessExecutor();
+            $outcome = (new ComposerInstallGate($exec))->evaluate($tmp, 'b-1.6', 'o3-shop/lib-only');
+            $this->assertTrue($outcome->isPassed());
+            // No composer command was even invoked
+            $this->assertSame([], $exec->commands());
+        } finally {
+            @rmdir($tmp);
+        }
+    }
+
+    public function testComposerInstallGateAddsNoAuditFlagWhenSkipAuditTrue(): void
+    {
+        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        mkdir($tmp);
+        file_put_contents($tmp . '/composer.lock', '{}');
+        try {
+            $exec = new FakeProcessExecutor([], new ProcessOutcome(0, '', ''));
+            $gate = new ComposerInstallGate($exec, 'composer', true);
+            $outcome = $gate->evaluate($tmp, 'b-1.6', 'o3-shop/shop-ce');
+            $this->assertTrue($outcome->isPassed());
+            $cmd = implode(' ', $exec->commands()[0]);
+            $this->assertStringContainsString('--no-audit', $cmd);
+        } finally {
+            @unlink($tmp . '/composer.lock');
+            @rmdir($tmp);
+        }
+    }
+
+    public function testComposerInstallGateDoesNotAddNoAuditByDefault(): void
+    {
+        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        mkdir($tmp);
+        file_put_contents($tmp . '/composer.lock', '{}');
+        try {
+            $exec = new FakeProcessExecutor([], new ProcessOutcome(0, '', ''));
+            (new ComposerInstallGate($exec))->evaluate($tmp, 'b-1.6', 'o3-shop/shop-ce');
+            $cmd = implode(' ', $exec->commands()[0]);
+            $this->assertStringNotContainsString('--no-audit', $cmd);
+        } finally {
+            @unlink($tmp . '/composer.lock');
+            @rmdir($tmp);
+        }
     }
 
     public function testComposerInstallGateAbortsOnNonZeroExit(): void
     {
-        $exec = new FakeProcessExecutor([
-            'composer install --dry-run --no-scripts --no-interaction'
-                => new ProcessOutcome(2, '', 'Could not resolve constraints'),
-        ]);
-        $outcome = (new ComposerInstallGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
-        $this->assertTrue($outcome->aborts());
-        $this->assertStringContainsString('Could not resolve', $outcome->messages()[0]);
+        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        mkdir($tmp);
+        file_put_contents($tmp . '/composer.lock', '{}');
+        try {
+            $exec = new FakeProcessExecutor([], new ProcessOutcome(2, '', 'Could not resolve constraints'));
+            $outcome = (new ComposerInstallGate($exec))->evaluate($tmp, 'b-1.6', 'o3-shop/shop-ce');
+            $this->assertTrue($outcome->aborts());
+            $this->assertStringContainsString('Could not resolve', $outcome->messages()[0]);
+        } finally {
+            @unlink($tmp . '/composer.lock');
+            @rmdir($tmp);
+        }
     }
 
     /* ---------- 10.4 — TestSuiteGate ---------- */

@@ -28,8 +28,25 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 
 /**
  * Gate 10.3: deps resolve.
+ *
  * Runs `composer install --dry-run --no-scripts --no-interaction` so
  * the working tree is left untouched. Aborts on resolution failure.
+ *
+ * Skip rules:
+ *   - **No `composer.lock`** → skipped (passed, no-op). Libraries in
+ *     this org don't ship a lock file; their installable shape is
+ *     verified through their consumers (shop-ce, o3-shop). Running
+ *     `composer install` standalone on a library puts it in
+ *     "resolve from scratch" mode which doesn't reflect production
+ *     installs, so the gate stays out of the way.
+ *
+ * Audit:
+ *   - Modern composer runs a security audit by default and aborts on
+ *     anything in the public advisories DB. That's noisy for legacy
+ *     deps that the org chooses to keep on a known version. The
+ *     `$skipAudit` constructor flag (wired to the `--no-audit` CLI
+ *     flag) lets the maintainer opt out per release. Default: audit
+ *     stays on.
  */
 class ComposerInstallGate implements PreFlightGate
 {
@@ -37,11 +54,16 @@ class ComposerInstallGate implements PreFlightGate
 
     private ProcessExecutor $exec;
     private string $composerBin;
+    private bool $skipAudit;
 
-    public function __construct(ProcessExecutor $exec, string $composerBin = 'composer')
-    {
+    public function __construct(
+        ProcessExecutor $exec,
+        string $composerBin = 'composer',
+        bool $skipAudit = false
+    ) {
         $this->exec = $exec;
         $this->composerBin = $composerBin;
+        $this->skipAudit = $skipAudit;
     }
 
     public function name(): string
@@ -51,11 +73,17 @@ class ComposerInstallGate implements PreFlightGate
 
     public function evaluate(string $repoPath, string $expectedBranch, string $packageName): GateOutcome
     {
-        $outcome = $this->exec->execute(
-            [$this->composerBin, 'install', '--dry-run', '--no-scripts', '--no-interaction'],
-            $repoPath,
-            300
-        );
+        if (!is_file($repoPath . '/composer.lock')) {
+            // Library / lock-less repo — installable shape is verified
+            // through consumers (shop-ce, o3-shop), not standalone.
+            return GateOutcome::passed(self::NAME);
+        }
+
+        $args = [$this->composerBin, 'install', '--dry-run', '--no-scripts', '--no-interaction'];
+        if ($this->skipAudit) {
+            $args[] = '--no-audit';
+        }
+        $outcome = $this->exec->execute($args, $repoPath, 300);
         if ($outcome->isSuccess()) {
             return GateOutcome::passed(self::NAME);
         }

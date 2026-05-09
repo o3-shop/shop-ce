@@ -165,6 +165,15 @@ class ReleaseCommand extends Command
                 . 'when a clone lives outside the conventional layout.'
             )
             ->addOption(
+                'no-audit',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip the composer security audit during the '
+                . 'composer-resolution pre-flight gate. Use sparingly: '
+                . 'opts out of the public-advisories block. Default '
+                . 'leaves audit enabled.'
+            )
+            ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
@@ -178,6 +187,7 @@ class ReleaseCommand extends Command
         $to = $input->getOption('to');
         $bumps = $input->getOption('bump') ?: [];
         $dryRun = (bool) $input->getOption('dry-run');
+        $noAudit = (bool) $input->getOption('no-audit');
 
         if (!is_string($from) || $from === '') {
             $this->writeUsageError($output, '--from is required.');
@@ -225,7 +235,7 @@ class ReleaseCommand extends Command
             return self::EXIT_USAGE_ERROR;
         }
 
-        $planner = $this->planner ?? $this->buildDefaultPlanner($progress, $repoPaths !== []);
+        $planner = $this->planner ?? $this->buildDefaultPlanner($progress, $repoPaths !== [], $noAudit);
 
         $output->writeln(sprintf(
             '<info>Planning release: --from %s --to %s%s</info>',
@@ -303,8 +313,11 @@ class ReleaseCommand extends Command
         return null;
     }
 
-    private function buildDefaultPlanner(?callable $progress = null, bool $withPreFlight = false): ReleasePlanner
-    {
+    private function buildDefaultPlanner(
+        ?callable $progress = null,
+        bool $withPreFlight = false,
+        bool $skipAudit = false
+    ): ReleasePlanner {
         $exec = new SymfonyProcessExecutor();
         $composerJsonFetcher = new HttpsRawComposerJsonFetcher();
         $fileFetcher = new HttpsRawRepoFileFetcher();
@@ -318,7 +331,7 @@ class ReleaseCommand extends Command
         $constraintUpdater = new ConstraintUpdater();
         $notesAggregator = new ReleaseNotesAggregator(new GhCliReleaseNotesProvider(), $progress);
 
-        $preFlight = $withPreFlight ? $this->buildDefaultPreFlightRunner($exec) : null;
+        $preFlight = $withPreFlight ? $this->buildDefaultPreFlightRunner($exec, $skipAudit) : null;
 
         return new ReleasePlanner(
             $snapshotBuilder,
@@ -333,7 +346,7 @@ class ReleaseCommand extends Command
         );
     }
 
-    private function buildDefaultPreFlightRunner(SymfonyProcessExecutor $exec): PreFlightRunner
+    private function buildDefaultPreFlightRunner(SymfonyProcessExecutor $exec, bool $skipAudit = false): PreFlightRunner
     {
         // No per-repo test command resolver yet; TestSuiteGate is
         // registered with a resolver that always returns null (= skip
@@ -346,7 +359,7 @@ class ReleaseCommand extends Command
             new WorkingTreeGate($exec),
             new BranchGate($exec),
             new UpToDateGate($exec),
-            new ComposerInstallGate($exec),
+            new ComposerInstallGate($exec, 'composer', $skipAudit),
             new TestSuiteGate($exec, $skipTestsResolver),
             new IncomingPrGate($exec),
             new MergeBackPrGate($exec),
