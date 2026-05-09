@@ -23,15 +23,26 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawComposerJsonFetcher;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFetchException;
 
 /**
  * Algorithm Step 1: read `o3-shop/composer.json` at `--from` and
  * build the `from_pin[]` map of tier-0 dependencies.
  *
+ * The walk is recursive across the o3-shop subset of the dep tree
+ * so tier-0 leaves of shop-ce (shop-doctrine-migration-wrapper,
+ * shop-db-views-generator, etc.) appear in `from_pin[]` even though
+ * they're not direct deps of o3-shop or the metapackage. Each
+ * child is fetched at the constraint's bare-version form (e.g.
+ * `^v1.3.0` → `v1.3.0`); when a constraint can't be resolved to
+ * a fetchable ref (wildcards, dev-* etc.) or when a child fetch
+ * 404s, the recursion silently skips that subtree — the caller
+ * still gets every pin it COULD harvest.
+ *
  * Pre-fold-in `--from` (composer.json still requires
- * `o3-shop/shop-metapackage-ce`): recurse one level into the
- * metapackage's composer.json at the version pinned by `--from`
- * and merge its tier-0 pins. One-time transitional path covering the
+ * `o3-shop/shop-metapackage-ce`): the metapackage is included in
+ * the recursive walk and its entry is dropped from the final
+ * `from_pin[]`. One-time transitional path covering the
  * v1.6.0 → v1.6.1-RC1 cut; bypassed for any post-fold-in `--from`.
  *
  * The output `FromSnapshot` is pure data — the CLI layer is responsible
@@ -55,34 +66,82 @@ class FromSnapshotBuilder
 
     public function build(string $fromTag): FromSnapshot
     {
+        // Root fetch — failure here propagates (the CLI cannot continue
+        // without the snapshot's anchor).
         $rootManifest = $this->fetcher->fetch(self::O3_SHOP_PROJECT, $fromTag);
 
         $rootRequire = $this->extractO3ShopPins($rootManifest['require'] ?? []);
         $rootRequireDev = $this->extractO3ShopPins($rootManifest['require-dev'] ?? []);
+        $fromPin = array_merge($rootRequire, $rootRequireDev);
 
-        $usedIndirection = false;
-        $metapackageVersion = null;
+        $usedIndirection = isset($fromPin['shop-metapackage-ce']);
+        $metapackageVersion = $usedIndirection ? $fromPin['shop-metapackage-ce'] : null;
+        // The metapackage is itself recursed into (below), but we drop it
+        // from the final `from_pin[]` regardless — it is the indirection
+        // anchor, not a release-eligible candidate.
+        unset($fromPin['shop-metapackage-ce']);
 
-        $rootDeclares = array_merge($rootRequire, $rootRequireDev);
-
-        if (isset($rootDeclares['shop-metapackage-ce'])) {
-            $metapackageVersion = $rootDeclares['shop-metapackage-ce'];
-            $metaManifest = $this->fetcher->fetch(self::METAPACKAGE_PACKAGE, $metapackageVersion);
-            $metaRequire = $this->extractO3ShopPins($metaManifest['require'] ?? []);
-            $metaRequireDev = $this->extractO3ShopPins($metaManifest['require-dev'] ?? []);
-
-            // Order matters: metapackage's pins land first, then the
-            // root's own pins overwrite (root is more direct). The
-            // metapackage entry itself is dropped — it does not appear
-            // in from_pin[].
-            $merged = array_merge($metaRequire, $metaRequireDev, $rootRequire, $rootRequireDev);
-            unset($merged['shop-metapackage-ce']);
-            $usedIndirection = true;
-        } else {
-            $merged = $rootDeclares;
+        // Recursive harvest: for every o3-shop/* slug currently in
+        // fromPin (plus the metapackage when pre-fold-in), fetch its
+        // composer.json at the constraint's resolved ref and add its
+        // o3-shop/* deps. Keeps walking until the queue is empty.
+        $visited = [self::O3_SHOP_PROJECT => true];
+        $queue = [];
+        foreach ($fromPin as $slug => $constraint) {
+            $ref = $this->constraintToRef($constraint);
+            if ($ref !== null) {
+                $queue[] = ['package' => self::O3_SHOP_PREFIX . $slug, 'ref' => $ref];
+            }
+        }
+        if ($metapackageVersion !== null) {
+            $ref = $this->constraintToRef($metapackageVersion);
+            if ($ref !== null) {
+                $queue[] = ['package' => self::METAPACKAGE_PACKAGE, 'ref' => $ref];
+            }
         }
 
-        return new FromSnapshot($merged, $usedIndirection, $metapackageVersion);
+        while ($queue !== []) {
+            $current = array_shift($queue);
+            $package = $current['package'];
+            $ref = $current['ref'];
+            if (isset($visited[$package])) {
+                continue;
+            }
+            $visited[$package] = true;
+
+            try {
+                $manifest = $this->fetcher->fetch($package, $ref);
+            } catch (RawRepoFetchException $e) {
+                // 404 / transport failure: skip this subtree silently.
+                // We've still harvested whatever we could from earlier
+                // levels; missing a leaf doesn't invalidate the snapshot.
+                continue;
+            }
+
+            $require = $this->extractO3ShopPins($manifest['require'] ?? []);
+            $requireDev = $this->extractO3ShopPins($manifest['require-dev'] ?? []);
+
+            foreach (array_merge($require, $requireDev) as $childSlug => $childConstraint) {
+                if ($childSlug === 'shop-metapackage-ce') {
+                    // Never re-introduce the metapackage to from_pin even
+                    // if some downstream package still references it.
+                    continue;
+                }
+                // First-write wins: parent pins (visited earlier in the
+                // queue) take precedence over deeper-level pins.
+                if (!isset($fromPin[$childSlug])) {
+                    $fromPin[$childSlug] = $childConstraint;
+                }
+                if (!isset($visited[self::O3_SHOP_PREFIX . $childSlug])) {
+                    $childRef = $this->constraintToRef($childConstraint);
+                    if ($childRef !== null) {
+                        $queue[] = ['package' => self::O3_SHOP_PREFIX . $childSlug, 'ref' => $childRef];
+                    }
+                }
+            }
+        }
+
+        return new FromSnapshot($fromPin, $usedIndirection, $metapackageVersion);
     }
 
     /**
@@ -109,5 +168,20 @@ class FromSnapshotBuilder
             $pins[$slug] = $constraint;
         }
         return $pins;
+    }
+
+    /**
+     * Reduces a composer constraint to the bare tag form so the
+     * fetcher can use it as a git ref. Returns null when the
+     * constraint isn't a recognizable semver shape (wildcards,
+     * dev-foo, ranges, ORs) — the recursion skips those subtrees.
+     */
+    private function constraintToRef(string $constraint): ?string
+    {
+        $trimmed = ltrim(trim($constraint), '^~');
+        if (preg_match('/^v?\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/', $trimmed) === 1) {
+            return $trimmed;
+        }
+        return null;
     }
 }

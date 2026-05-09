@@ -174,6 +174,53 @@ class ReleasePlannerTest extends TestCase
     }
 
     /**
+     * Regression for the "^^v1.2.0" garbage constraint output. Before the
+     * fix, an unchanged candidate's chosenVersion (which is the existing
+     * constraint string, not a version) was passed through
+     * ConstraintUpdater::update(), which detected non-satisfaction (because
+     * Semver::satisfies expects a version on the left) and wrapped the
+     * existing caret in another caret. The fix: the planner skips the
+     * constraint-edit loop entirely for unchanged candidates.
+     */
+    public function testPlannerSkipsConstraintEditsForUnchangedCandidates(): void
+    {
+        // o3-shop's require-dev pins testing-library at "^1.2.0".
+        // testing-library has v1.2.0 as latest tag, branch HEAD == tag SHA.
+        // Resolution: case 1 (unchanged) → chosenVersion = fromPin = "^1.2.0".
+        // No constraint edit should be emitted.
+        $manifests = [
+            'o3-shop/o3-shop|v1.6.1' => [
+                'require-dev' => ['o3-shop/testing-library' => '^1.2.0'],
+            ],
+            'o3-shop/o3-shop|b-1.6' => [
+                'require-dev' => ['o3-shop/testing-library' => '^1.2.0'],
+            ],
+            'o3-shop/testing-library|b-1.6' => ['require' => []],
+        ];
+        $planner = $this->wirePlanner(
+            $manifests,
+            tagsByPackage: [
+                'o3-shop/testing-library' => ['v1.2.0' => 'sha-tagged'],
+            ],
+            branchHeads: [
+                'o3-shop/testing-library' => ['b-1.6' => 'sha-tagged'],  // unchanged
+            ]
+        );
+
+        $plan = $planner->plan('v1.6.1', 'v1.6.1-RC2', []);
+
+        // The candidate is unchanged
+        $candidates = $plan->candidates();
+        $this->assertCount(1, $candidates);
+        $this->assertFalse($candidates[0]->isChanged());
+        $this->assertSame('^1.2.0', $candidates[0]->fromPin());
+        $this->assertSame('^1.2.0', $candidates[0]->chosenVersion());
+
+        // No constraint edits emitted — the existing "^1.2.0" stays untouched.
+        $this->assertSame([], $plan->constraintEdits());
+    }
+
+    /**
      * Wires a `ReleasePlanner` from an in-memory fixture set so tests
      * never touch the network or shell out.
      *

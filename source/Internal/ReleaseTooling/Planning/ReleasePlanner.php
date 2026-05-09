@@ -126,9 +126,20 @@ class ReleasePlanner
             }
         }
 
-        // Step 5 — constraint updates per pin location
+        // Step 5 — constraint updates per pin location.
+        //
+        // Skip unchanged candidates entirely: their `chosenVersion` is the
+        // existing constraint string (e.g. `^v1.2.0`), not a version, so
+        // running it through `ConstraintUpdater::update()` would falsely
+        // detect a non-satisfaction (Semver::satisfies expects a version
+        // on the left) and wrap the existing caret in another caret —
+        // producing nonsense like `^^v1.2.0`. The candidate is unchanged
+        // by definition, so no pin-location's constraint needs rewriting.
         $constraintEdits = [];
         foreach ($candidates as $candidate) {
+            if (!$candidate->isChanged()) {
+                continue;
+            }
             foreach ($walkResult->pinLocations($candidate->package()) as $pin) {
                 $update = $this->constraintUpdater->update(
                     $pin->constraint(),

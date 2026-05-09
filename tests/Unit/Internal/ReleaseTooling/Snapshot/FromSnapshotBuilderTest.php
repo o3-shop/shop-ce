@@ -202,6 +202,131 @@ class FromSnapshotBuilderTest extends TestCase
         $this->expectException(RawRepoFetchException::class);
         (new FromSnapshotBuilder($fetcher))->build('v9.9.9');
     }
+
+    /* ---------- Recursive harvesting (Bug 2 fix) ---------- */
+
+    public function testRecursiveHarvestPullsTier0LeavesOfShopCe(): void
+    {
+        // Pre-fold-in: o3-shop@v1.6.0 → metapackage@v1.6.0 → shop-ce@v1.6.0.
+        // shop-ce's own require contains shop-doctrine-migration-wrapper
+        // and shop-db-views-generator (tier-0 leaves) which neither the
+        // root nor the metapackage mention. These MUST end up in
+        // from_pin so Section 6's case-1 detector recognizes them.
+        $fetcher = new FakeRawComposerJsonFetcher([
+            'o3-shop/o3-shop|v1.6.0' => [
+                'require' => ['o3-shop/shop-metapackage-ce' => 'v1.6.0'],
+                'require-dev' => ['o3-shop/testing-library' => '^1.2.0'],
+            ],
+            'o3-shop/shop-metapackage-ce|v1.6.0' => [
+                'require' => [
+                    'o3-shop/shop-ce' => 'v1.6.0',
+                    'o3-shop/shop-facts' => 'v1.0.4',
+                ],
+            ],
+            'o3-shop/shop-ce|v1.6.0' => [
+                'require' => [
+                    'o3-shop/shop-doctrine-migration-wrapper' => 'v1.0.2',
+                    'o3-shop/shop-db-views-generator' => '^v1.0.0',
+                ],
+                'require-dev' => [
+                    'o3-shop/shop-ide-helper' => '^v1.0.0',
+                ],
+            ],
+            'o3-shop/shop-doctrine-migration-wrapper|v1.0.2' => ['require' => []],
+            'o3-shop/shop-db-views-generator|v1.0.0' => ['require' => []],
+            'o3-shop/shop-ide-helper|v1.0.0' => ['require' => []],
+            'o3-shop/shop-facts|v1.0.4' => ['require' => []],
+            'o3-shop/testing-library|1.2.0' => ['require' => []],
+        ]);
+
+        $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.0');
+
+        $pin = $snapshot->fromPin();
+        // Direct pins from root + metapackage
+        $this->assertSame('v1.6.0', $pin['shop-ce']);
+        $this->assertSame('v1.6.0', $pin['shop-ce']);
+        $this->assertSame('v1.0.4', $pin['shop-facts']);
+        $this->assertSame('^1.2.0', $pin['testing-library']);
+        // Recursive pins via shop-ce's own require
+        $this->assertArrayHasKey('shop-doctrine-migration-wrapper', $pin);
+        $this->assertSame('v1.0.2', $pin['shop-doctrine-migration-wrapper']);
+        $this->assertArrayHasKey('shop-db-views-generator', $pin);
+        $this->assertSame('^v1.0.0', $pin['shop-db-views-generator']);
+        $this->assertArrayHasKey('shop-ide-helper', $pin);
+        $this->assertSame('^v1.0.0', $pin['shop-ide-helper']);
+        // Metapackage entry never appears in from_pin
+        $this->assertArrayNotHasKey('shop-metapackage-ce', $pin);
+    }
+
+    public function testRecursiveHarvestSkipsSubtreeOnFetcherFailure(): void
+    {
+        // Root + shop-ce fixtures present; shop-doctrine-migration-wrapper's
+        // composer.json is missing (404). Recursion should silently skip
+        // the subtree but still record the wrapper itself in from_pin
+        // (we know about it from shop-ce's require list).
+        $fetcher = new FakeRawComposerJsonFetcher([
+            'o3-shop/o3-shop|v1.6.1' => [
+                'require' => ['o3-shop/shop-ce' => 'v1.6.1'],
+            ],
+            'o3-shop/shop-ce|v1.6.1' => [
+                'require' => ['o3-shop/shop-doctrine-migration-wrapper' => 'v1.0.2'],
+            ],
+            // wrapper's manifest is intentionally missing
+        ]);
+
+        $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.1');
+
+        $this->assertSame('v1.6.1', $snapshot->fromPin()['shop-ce']);
+        $this->assertSame('v1.0.2', $snapshot->fromPin()['shop-doctrine-migration-wrapper']);
+    }
+
+    public function testRecursiveHarvestSkipsConstraintsItCannotResolveToARef(): void
+    {
+        // dev-master / wildcards can't be turned into a fetchable ref.
+        // The constraint is still recorded in from_pin (we know the
+        // package exists at that constraint at --from time), but no
+        // recursion happens through it.
+        $fetcher = new FakeRawComposerJsonFetcher([
+            'o3-shop/o3-shop|v1.6.1' => [
+                'require' => [
+                    'o3-shop/shop-ce' => 'dev-master',
+                    'o3-shop/shop-facts' => '*',
+                ],
+            ],
+            // No fixtures for shop-ce or shop-facts, but recursion shouldn't
+            // even try to fetch them (constraints unresolvable).
+        ]);
+
+        $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.1');
+
+        $this->assertSame('dev-master', $snapshot->fromPin()['shop-ce']);
+        $this->assertSame('*', $snapshot->fromPin()['shop-facts']);
+    }
+
+    public function testRecursiveHarvestSurvivesBackEdgeBetweenChildren(): void
+    {
+        // shop-ce → wrapper → shop-ce (same back-edge pattern as the
+        // walker tolerates). The from-snapshot recursion should also
+        // tolerate it via the visited-set deduplication.
+        $fetcher = new FakeRawComposerJsonFetcher([
+            'o3-shop/o3-shop|v1.6.1' => [
+                'require' => ['o3-shop/shop-ce' => 'v1.6.1'],
+            ],
+            'o3-shop/shop-ce|v1.6.1' => [
+                'require' => ['o3-shop/wrapper' => 'v1.0.0'],
+            ],
+            'o3-shop/wrapper|v1.0.0' => [
+                'require' => ['o3-shop/shop-ce' => '^1.0.0'],
+            ],
+        ]);
+
+        $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.1');
+
+        // First-write wins: shop-ce keeps its initial pin from root,
+        // not the looser back-edge constraint from wrapper.
+        $this->assertSame('v1.6.1', $snapshot->fromPin()['shop-ce']);
+        $this->assertSame('v1.0.0', $snapshot->fromPin()['wrapper']);
+    }
 }
 
 /**
