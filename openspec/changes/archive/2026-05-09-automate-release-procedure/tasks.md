@@ -216,4 +216,4 @@ Lands **before §17** so the first machine-driven release runs against the zero-
 
 ## 19. Post-v1.6.1-final cleanup
 
-- [ ] 19.1 (After v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed.
+- [ ] 19.1 (After v1.6.1 final stabilizes — not blocking the v1.6.1-RC1 cut.) Archive the `shop-metapackage-ce` GitHub repo and update its README to point at `o3-shop/o3-shop`. Its v1.6.0 tag already pins the final pre-archival state; no new tag is needed. **Tracked as follow-up after archival of #140:** [o3-shop/o3-shop#149](https://github.com/o3-shop/o3-shop/issues/149).
