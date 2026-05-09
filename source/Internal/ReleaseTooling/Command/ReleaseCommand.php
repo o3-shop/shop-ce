@@ -25,6 +25,16 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\HttpsRawComposerJsonFetcher;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\HttpsRawRepoFileFetcher;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Constraint\ConstraintUpdater;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ComposerJsonConstraintWriter;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\BranchGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\ComposerInstallGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\IncomingPrGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\MergeBackPrGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\TestSuiteGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\WorkingTreeGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\LiveExecutor;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PerRepoActions;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightRunner;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\SymfonyProcessExecutor;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\GhCliReleaseNotesProvider;
@@ -45,9 +55,13 @@ use Throwable;
 /**
  * Drives a tier-by-tier release across the o3-shop repo network.
  *
- * Section 11 (this iteration): wires the algorithm chain (Sections
- * 4-9) and the pre-flight gates (Section 10) into a single
- * `--dry-run` plan printout. Live execution lands with Section 15.
+ * §11 wired the dry-run path; §15 wires live execution via
+ * `LiveExecutor` (commit constraint changes, cut tags, create
+ * draft releases, optionally open merge-back PRs).
+ *
+ * Pre-flight gates fire whenever any `--repo-path` is supplied. With
+ * no paths, pre-flight is skipped and dry-run output is the same as
+ * before.
  *
  * See: openspec/changes/automate-release-procedure/specs/release-orchestration/spec.md
  */
@@ -77,16 +91,21 @@ class ReleaseCommand extends Command
 
     private ?ReleasePlanner $planner;
     private DryRunPrinter $printer;
+    private ?LiveExecutor $liveExecutor;
 
     /**
-     * Both arguments are optional so production invocations build
+     * All three arguments are optional so production invocations build
      * defaults inline; tests inject fakes via the constructor.
      */
-    public function __construct(?ReleasePlanner $planner = null, ?DryRunPrinter $printer = null)
-    {
+    public function __construct(
+        ?ReleasePlanner $planner = null,
+        ?DryRunPrinter $printer = null,
+        ?LiveExecutor $liveExecutor = null
+    ) {
         parent::__construct();
         $this->planner = $planner;
         $this->printer = $printer ?? new DryRunPrinter();
+        $this->liveExecutor = $liveExecutor;
     }
 
     protected function configure(): void
@@ -125,6 +144,15 @@ class ReleaseCommand extends Command
                 . 'level is patch | minor | major | v<semver>. Repeatable.'
             )
             ->addOption(
+                'repo-path',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Local clone path for a release-eligible repo. '
+                . 'Format: <package>=/abs/path. Repeatable. Required for '
+                . 'live execution (commits/tags/releases) and to fire '
+                . 'the pre-flight gates. Empty = dry-run-only.'
+            )
+            ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
@@ -159,10 +187,29 @@ class ReleaseCommand extends Command
             $bumpFlags[$slug] = $level;
         }
 
+        $repoPaths = [];
+        foreach ($input->getOption('repo-path') ?: [] as $arg) {
+            $error = $this->parseRepoPath($arg, $repoPaths);
+            if ($error !== null) {
+                $this->writeUsageError($output, $error);
+                return self::EXIT_USAGE_ERROR;
+            }
+        }
+
+        if (!$dryRun && $repoPaths === []) {
+            $this->writeUsageError(
+                $output,
+                'Live execution requires at least one --repo-path '
+                . '<package>=/abs/path. Re-run with --dry-run if you only '
+                . 'wanted to preview the plan.'
+            );
+            return self::EXIT_USAGE_ERROR;
+        }
+
         $progress = static function (string $message) use ($output): void {
             $output->writeln('<comment>' . $message . '</comment>');
         };
-        $planner = $this->planner ?? $this->buildDefaultPlanner($progress);
+        $planner = $this->planner ?? $this->buildDefaultPlanner($progress, $repoPaths !== []);
 
         $output->writeln(sprintf(
             '<info>Planning release: --from %s --to %s%s</info>',
@@ -171,7 +218,7 @@ class ReleaseCommand extends Command
             $dryRun ? ' (dry-run)' : ''
         ));
         try {
-            $plan = $planner->plan($from, $to, $bumpFlags);
+            $plan = $planner->plan($from, $to, $bumpFlags, $repoPaths);
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>Plan failed: %s</error>', $e->getMessage()));
             return self::EXIT_PLAN_ERROR;
@@ -181,6 +228,10 @@ class ReleaseCommand extends Command
         $this->printer->print($plan, $output);
 
         if ($plan->shouldAbort()) {
+            $output->writeln(
+                '<error>Pre-flight gates aborted the release. '
+                . 'Resolve the issues above and re-run.</error>'
+            );
             return self::EXIT_PRE_FLIGHT_ABORT;
         }
 
@@ -189,12 +240,16 @@ class ReleaseCommand extends Command
             return self::EXIT_OK;
         }
 
-        $output->writeln(
-            '<comment>Live execution (commit constraint changes, cut tags, '
-            . 'create draft GitHub releases, open merge-back PRs) is not yet '
-            . 'wired — Section 15 in openspec/changes/automate-release-procedure/'
-            . 'tasks.md adds it. Re-run with --dry-run to preview.</comment>'
-        );
+        $executor = $this->liveExecutor ?? $this->buildDefaultLiveExecutor($progress);
+        try {
+            $executor->execute($plan, $repoPaths);
+        } catch (Throwable $e) {
+            $output->writeln(sprintf('<error>Live execution failed: %s</error>', $e->getMessage()));
+            $this->printPartialState($executor, $output);
+            return self::EXIT_PLAN_ERROR;
+        }
+        $this->printPartialState($executor, $output);
+        $output->writeln('<info>Live execution complete. Publish the draft GitHub releases manually.</info>');
         return self::EXIT_OK;
     }
 
@@ -232,7 +287,7 @@ class ReleaseCommand extends Command
         return null;
     }
 
-    private function buildDefaultPlanner(?callable $progress = null): ReleasePlanner
+    private function buildDefaultPlanner(?callable $progress = null, bool $withPreFlight = false): ReleasePlanner
     {
         $exec = new SymfonyProcessExecutor();
         $composerJsonFetcher = new HttpsRawComposerJsonFetcher();
@@ -247,6 +302,8 @@ class ReleaseCommand extends Command
         $constraintUpdater = new ConstraintUpdater();
         $notesAggregator = new ReleaseNotesAggregator(new GhCliReleaseNotesProvider(), $progress);
 
+        $preFlight = $withPreFlight ? $this->buildDefaultPreFlightRunner($exec) : null;
+
         return new ReleasePlanner(
             $snapshotBuilder,
             $walker,
@@ -255,9 +312,102 @@ class ReleaseCommand extends Command
             $constraintUpdater,
             $notesAggregator,
             $branchResolver,
-            null, // pre-flight runner skipped for dry-run unless wired explicitly
+            $preFlight,
             $progress
         );
+    }
+
+    private function buildDefaultPreFlightRunner(SymfonyProcessExecutor $exec): PreFlightRunner
+    {
+        // No per-repo test command resolver yet; TestSuiteGate is
+        // registered with a resolver that always returns null (= skip
+        // the gate without warning) so the default flow doesn't block
+        // on tests when the maintainer has run them out-of-band.
+        $skipTestsResolver = static function (string $_packageName, string $_repoPath): ?array {
+            return null;
+        };
+        return new PreFlightRunner([
+            new WorkingTreeGate($exec),
+            new BranchGate($exec),
+            new ComposerInstallGate($exec),
+            new TestSuiteGate($exec, $skipTestsResolver),
+            new IncomingPrGate($exec),
+            new MergeBackPrGate($exec),
+        ]);
+    }
+
+    private function buildDefaultLiveExecutor(?callable $progress = null): LiveExecutor
+    {
+        $exec = new SymfonyProcessExecutor();
+        return new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver(),
+            $progress
+        );
+    }
+
+    /**
+     * @param array<string,string> &$repoPaths package => abs path; populated on success
+     */
+    private function parseRepoPath(string $arg, array &$repoPaths): ?string
+    {
+        $eq = strpos($arg, '=');
+        if ($eq === false || $eq === 0 || $eq === strlen($arg) - 1) {
+            return sprintf(
+                'Malformed --repo-path %s. Expected <package>=/abs/path '
+                . '(e.g. o3-shop/shop-ce=/Users/me/clones/shop-ce).',
+                self::quote($arg)
+            );
+        }
+        $package = substr($arg, 0, $eq);
+        $path = substr($arg, $eq + 1);
+        if ($package === '' || strpos($package, '/') === false) {
+            return sprintf(
+                'Malformed --repo-path package %s. Expected <vendor>/<repo> '
+                . '(e.g. o3-shop/shop-ce).',
+                self::quote($package)
+            );
+        }
+        if ($path === '' || $path[0] !== '/') {
+            return sprintf(
+                'Malformed --repo-path absolute path %s. Use an absolute path '
+                . 'so the orchestrator does not depend on shell cwd.',
+                self::quote($path)
+            );
+        }
+        if (!is_dir($path)) {
+            return sprintf('--repo-path %s is not a directory.', self::quote($path));
+        }
+        if (!is_dir($path . '/.git')) {
+            return sprintf(
+                '--repo-path %s does not look like a git working tree '
+                . '(no .git/ found).',
+                self::quote($path)
+            );
+        }
+        $repoPaths[$package] = $path;
+        return null;
+    }
+
+    private function printPartialState(LiveExecutor $executor, OutputInterface $output): void
+    {
+        $releases = $executor->releaseUrls();
+        if ($releases !== []) {
+            $output->writeln('');
+            $output->writeln('<info>Draft GitHub releases created:</info>');
+            foreach ($releases as $package => $url) {
+                $output->writeln(sprintf('  %s -> %s', $package, $url));
+            }
+        }
+        $mergeBacks = $executor->mergeBackUrls();
+        if ($mergeBacks !== []) {
+            $output->writeln('');
+            $output->writeln('<info>Merge-back PRs opened:</info>');
+            foreach ($mergeBacks as $package => $url) {
+                $output->writeln(sprintf('  %s -> %s', $package, $url));
+            }
+        }
     }
 
     private function writeUsageError(OutputInterface $output, string $message): void

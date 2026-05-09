@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Command;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command\ReleaseCommand;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\LiveExecutor;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DryRunPrinter;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlan;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlanner;
@@ -170,19 +171,115 @@ class ReleaseCommandTest extends TestCase
         $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
     }
 
-    /* ---------- live mode is not yet wired ---------- */
+    /* ---------- live mode (§15) ---------- */
 
-    public function testLiveModeShowsNotYetWiredNotice(): void
+    public function testLiveModeWithoutRepoPathExitsUsageError(): void
     {
         $tester = $this->tester();
         $status = $tester->execute([
             '--from' => 'v1.6.0',
             '--to' => 'v1.6.1-RC1',
-            // no --dry-run
+            // no --dry-run, no --repo-path
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
+        $this->assertStringContainsString('--repo-path', $tester->getDisplay());
+    }
+
+    public function testMalformedRepoPathExitsUsageError(): void
+    {
+        $tester = $this->tester();
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--repo-path' => ['no-equals-sign'],
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
+        $this->assertStringContainsString('Malformed --repo-path', $tester->getDisplay());
+    }
+
+    public function testLiveModeWithRepoPathInvokesExecutorAndExitsZero(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+        $executor = new RecordingLiveExecutor();
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
         ]);
         $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('Live execution', $tester->getDisplay());
-        $this->assertStringContainsString('Section 15', $tester->getDisplay());
+        $this->assertSame(1, $executor->callCount);
+        $this->assertSame(['o3-shop/shop-ce' => $tmpRepoPath], $executor->lastRepoPaths);
+        $this->assertSame('v1.6.0', $stub->lastFromTag);
+        $this->assertSame(['o3-shop/shop-ce' => $tmpRepoPath], $stub->lastRepoPaths);
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    public function testLiveModePreFlightAbortShortCircuitsBeforeExecutor(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $abortingPlan = $this->planThatAborts();
+        $executor = new RecordingLiveExecutor();
+        $tester = new CommandTester(new ReleaseCommand(
+            new StubReleasePlanner($abortingPlan),
+            null,
+            $executor
+        ));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
+        $this->assertSame(0, $executor->callCount, 'executor must not run on pre-flight abort');
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    public function testLiveExecutorFailureSurfacedAsPlanErrorExit(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([], false, null),
+            [],
+            [],
+            '',
+            []
+        ));
+        $executor = new RecordingLiveExecutor(true);
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
+        ]);
+        $this->assertSame(ReleaseCommand::EXIT_PLAN_ERROR, $status);
+        $this->assertStringContainsString('Live execution failed', $tester->getDisplay());
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    private function makeFakeGitRepo(): string
+    {
+        $dir = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        mkdir($dir . '/.git');
+        return $dir;
+    }
+
+    private function cleanupFakeGitRepo(string $dir): void
+    {
+        @rmdir($dir . '/.git');
+        @rmdir($dir);
     }
 
     /* ---------- validateBumpValue() unit (preserved from Section 3) ---------- */
@@ -272,6 +369,7 @@ final class StubReleasePlanner extends ReleasePlanner
     public string $lastFromTag = '';
     public string $lastToTag = '';
     public array $lastBumpFlags = [];
+    public array $lastRepoPaths = [];
     public int $callCount = 0;
 
     private ReleasePlan $plan;
@@ -289,8 +387,41 @@ final class StubReleasePlanner extends ReleasePlanner
         $this->lastFromTag = $fromTag;
         $this->lastToTag = $toTag;
         $this->lastBumpFlags = $bumpFlags;
+        $this->lastRepoPaths = $repoPaths;
         $this->callCount++;
         return $this->plan;
+    }
+}
+
+final class RecordingLiveExecutor extends LiveExecutor
+{
+    public int $callCount = 0;
+    public array $lastRepoPaths = [];
+    private bool $shouldThrow;
+
+    public function __construct(bool $shouldThrow = false)
+    {
+        // Skip parent constructor — see StubReleasePlanner.
+        $this->shouldThrow = $shouldThrow;
+    }
+
+    public function execute(ReleasePlan $plan, array $repoPaths): void
+    {
+        $this->callCount++;
+        $this->lastRepoPaths = $repoPaths;
+        if ($this->shouldThrow) {
+            throw new RuntimeException('synthetic live executor failure');
+        }
+    }
+
+    public function releaseUrls(): array
+    {
+        return [];
+    }
+
+    public function mergeBackUrls(): array
+    {
+        return [];
     }
 }
 

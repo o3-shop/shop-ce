@@ -116,7 +116,7 @@ New components:
   DefaultBranchResolver per-package release-branch map (matches Section 1.5 decisions)
   GitLsRemoteRepoIntrospector  reference RemoteRepoIntrospector via `git ls-remote --tags --heads`
 
-ReleaseCommand now accepts an optional `(planner, printer)` constructor pair; production-mode invocations build the default planner inline with `Https*Fetcher`s + `GitLsRemoteRepoIntrospector` + `GhCliReleaseNotesProvider`. Tests inject stubs that bypass the parent constructor entirely so no real services are constructed. Live execution still prints a "Section 15 wiring pending" notice (4 exit codes: OK / USAGE_ERROR / PRE_FLIGHT_ABORT / PLAN_ERROR) — see §15 for the open work to land it.
+ReleaseCommand now accepts an optional `(planner, printer, liveExecutor)` constructor triple; production-mode invocations build the default planner inline with `Https*Fetcher`s + `GitLsRemoteRepoIntrospector` + `GhCliReleaseNotesProvider`, and the default `LiveExecutor` with `SymfonyProcessExecutor` + `PerRepoActions` + `ComposerJsonConstraintWriter`. Tests inject stubs that bypass the parent constructor entirely so no real services are constructed. Exit codes: OK / USAGE_ERROR / PRE_FLIGHT_ABORT / PLAN_ERROR. (Live-mode wiring landed in §15.)
 
 Refactor: `VersionResolution` gained an optional `latestTag` field so the planner can pass it to `TagCutter` for case-3 candidates. All 14 Section 6 tests still pass.
 
@@ -171,18 +171,14 @@ The required components already exist and are unit-tested in isolation:
 
 The work is purely orchestration in the CLI layer.
 
-- [ ] 15.1 Add a CLI flag for local repo paths — `--repo-path o3-shop/<package>=/abs/path` (repeatable). Validate that each path exists and is a Git working tree. Empty / unsupplied = pre-flight skipped (current dry-run behavior).
-- [ ] 15.2 In the default-planner factory, instantiate a `PreFlightRunner` with all 6 gates from §10, and a `PerRepoActions` (with `SymfonyProcessExecutor`). Wire both into the planner constructor (`PreFlightRunner` is already accepted; `PerRepoActions` will need a new constructor slot or a separate orchestrator class).
-- [ ] 15.3 Pass the parsed repo paths into `ReleasePlanner::plan()` so pre-flight gates fire.
-- [ ] 15.4 Live-mode entry path: after planning, if `ReleasePlan::shouldAbort()` is true, print the combined gate diagnostic and return `EXIT_PRE_FLIGHT_ABORT (3)` without touching state.
-- [ ] 15.5 Walk candidates in topological order (leaves first, per `WalkResult::topologicalOrder()`) and for each that needs a new tag invoke, in order:
-    - `PerRepoActions::commitChangesAndPush()` — applies constraint edits + `.next-bump` deletion, single commit per repo, pushed directly to the release branch
-    - `PerRepoActions::createTag()` — annotated tag at the new commit, pushed
-    - `PerRepoActions::createDraftRelease()` — `--generate-notes` for tier-0 / tier-1; for `o3-shop` pass the aggregated cross-repo body via `--notes`
-    - `PerRepoActions::openMergeBackPr()` — only when `MergeBackPolicy::shouldOpenForShopTo($toTag)` returns true (i.e. final shop releases, not RC/alpha/beta)
-- [ ] 15.6 Stream progress to `OutputInterface` per repo (mirrors the dry-run progress style introduced in §11). Print the resulting GitHub release URLs as the run progresses so a partial-failure state is recoverable from the log.
-- [ ] 15.7 Unit tests: live path with a fake `ProcessExecutor` and stubbed planner — assert (a) pre-flight abort short-circuits before any state-changing call, (b) RC `--to` does **not** trigger `openMergeBackPr`, (c) final `--to` does, (d) the orchestration walks candidates in topological order, (e) on a `PerRepoActions` failure mid-walk, the run aborts with a meaningful exit code and the partial state is printed.
-- [ ] 15.8 Update `ReleaseCommand` doc-comment and the live-mode notice in `ReleaseCommand::execute()` once wiring lands (remove the "wiring pending" branch).
+- [x] 15.1 Add a CLI flag for local repo paths — `--repo-path <package>=/abs/path` (repeatable). Validates that each path exists and is a Git working tree (`.git/` present); rejects relative paths and missing `vendor/repo` slugs.
+- [x] 15.2 Default-planner factory builds a `PreFlightRunner` with all 6 gates (`WorkingTreeGate`, `BranchGate`, `ComposerInstallGate`, `TestSuiteGate` with a no-op resolver, `IncomingPrGate`, `MergeBackPrGate`) when any `--repo-path` is supplied. New `LiveExecutor` orchestrator wires `PerRepoActions` (with `SymfonyProcessExecutor`) and a new `ComposerJsonConstraintWriter` (regex-based, formatting-preserving) plus `DefaultBranchResolver`.
+- [x] 15.3 Parsed repo paths are threaded through `ReleasePlanner::plan($from, $to, $bumpFlags, $repoPaths)`; pre-flight reports populate `ReleasePlan::preFlightReports()`.
+- [x] 15.4 Live-mode entry path checks `ReleasePlan::shouldAbort()` after planning; on abort the printer renders the combined gate diagnostic, the command prints a one-liner, and exits `EXIT_PRE_FLIGHT_ABORT (3)` before instantiating the executor.
+- [x] 15.5 `LiveExecutor::execute()` walks candidates in topological order (leaves-first, per `ReleasePlan::candidates()`) and for each that needs a new tag invokes commit/push, tag/push, and draft-release (`--generate-notes`). After all candidates the orchestrator then processes `o3-shop/o3-shop` itself (never a candidate, always tagged with `--to`, draft body = aggregated §9 markdown via `--notes`). After every tag is cut, merge-back PRs are opened iff `MergeBackPolicy::shouldOpenForShopTo($toTag)` returns true. Constraint edits applied to local `composer.json` files via `ComposerJsonConstraintWriter` before each commit. `.next-bump` deletion driven by `TagCutResult::deleteNextBumpFile()`.
+- [x] 15.6 Progress mirrors the dry-run callable style (`<comment>...</comment>` per major step). After each candidate, the released-URL is captured into `LiveExecutor::releaseUrls()`. On success or failure, `ReleaseCommand::execute()` calls `printPartialState()` to dump the captured URLs (`Draft GitHub releases created:` + `Merge-back PRs opened:`) so a partial-failure state is recoverable from the log.
+- [x] 15.7 Unit tests added: `ComposerJsonConstraintWriterTest` (replace exact pin / multiple edits / missing pattern / format preservation / missing file), `LiveExecutorTest` (candidate-then-orchestrator order, `--notes` vs `--generate-notes` per repo, RC `--to` skips merge-back, final `--to` opens merge-back for candidates + orchestrator, missing repo path throws, `.next-bump` deletion fires when `TagCutResult` says so), and updated `ReleaseCommandTest` (live mode without `--repo-path` returns USAGE_ERROR; malformed `--repo-path` returns USAGE_ERROR; live mode with valid path invokes executor and exits OK; pre-flight abort short-circuits before executor; executor failure surfaces as PLAN_ERROR with partial state).
+- [x] 15.8 Removed the "Section 15 wiring pending" notice from `ReleaseCommand::execute()`. Doc-comment updated to reflect that §15 wiring landed.
 
 ## 16. First live release with bin/release
 
