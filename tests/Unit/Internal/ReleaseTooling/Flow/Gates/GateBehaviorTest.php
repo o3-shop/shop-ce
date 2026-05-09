@@ -133,26 +133,12 @@ class GateBehaviorTest extends TestCase
         }
     }
 
-    public function testComposerInstallGateAddsNoAuditFlagWhenSkipAuditTrue(): void
+    public function testComposerInstallGateNeverPassesAuditSkipFlag(): void
     {
-        $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
-        mkdir($tmp);
-        file_put_contents($tmp . '/composer.lock', '{}');
-        try {
-            $exec = new FakeProcessExecutor([], new ProcessOutcome(0, '', ''));
-            $gate = new ComposerInstallGate($exec, 'composer', true);
-            $outcome = $gate->evaluate($tmp, 'b-1.6', 'o3-shop/shop-ce');
-            $this->assertTrue($outcome->isPassed());
-            $cmd = implode(' ', $exec->commands()[0]);
-            $this->assertStringContainsString('--no-audit', $cmd);
-        } finally {
-            @unlink($tmp . '/composer.lock');
-            @rmdir($tmp);
-        }
-    }
-
-    public function testComposerInstallGateDoesNotAddNoAuditByDefault(): void
-    {
+        // The bundled composer (2.2.x via shop-composer-plugin's
+        // transitive dep) predates the audit feature, so the gate
+        // never passes any `--no-audit` / `--no-security-blocking`
+        // flag — composer would reject the unknown option.
         $tmp = sys_get_temp_dir() . '/release-cmd-test-' . bin2hex(random_bytes(4));
         mkdir($tmp);
         file_put_contents($tmp . '/composer.lock', '{}');
@@ -161,6 +147,7 @@ class GateBehaviorTest extends TestCase
             (new ComposerInstallGate($exec))->evaluate($tmp, 'b-1.6', 'o3-shop/shop-ce');
             $cmd = implode(' ', $exec->commands()[0]);
             $this->assertStringNotContainsString('--no-audit', $cmd);
+            $this->assertStringNotContainsString('--no-security-blocking', $cmd);
         } finally {
             @unlink($tmp . '/composer.lock');
             @rmdir($tmp);

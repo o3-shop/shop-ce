@@ -40,20 +40,18 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
  *     "resolve from scratch" mode which doesn't reflect production
  *     installs, so the gate stays out of the way.
  *
- * Audit:
- *   - Composer 2.7+ runs a security audit during install. The
- *     `$skipAudit` constructor flag (wired to the `--no-audit` CLI
- *     flag on `bin/release`) appends `--no-audit` to the install
- *     command, suppressing the post-install advisory report.
- *     Default: audit stays on.
- *
- * Composer binary:
- *   - The default `$composerBin` is just `'composer'` (PATH lookup),
- *     but `ReleaseCommand` resolves shop-ce's bundled
+ * Composer binary + audit:
+ *   - The default `$composerBin` is `'composer'` (PATH lookup), but
+ *     `ReleaseCommand` resolves shop-ce's bundled
  *     `vendor/bin/composer` (composer 2.2.x via the transitive
  *     `o3-shop/shop-composer-plugin` dep) and passes that here.
  *     Using the bundled composer avoids host-PATH version skew —
  *     production o3-shop installs run the same 2.2.x.
+ *   - Composer 2.2.x predates the audit feature (added in 2.6+),
+ *     so no audit-skip flag is passed. If the bundled composer is
+ *     ever upgraded past 2.6, the gate will need a version-aware
+ *     audit-skip flag (`--no-audit` for 2.7-2.8, `--no-security-
+ *     blocking` for 2.9+).
  */
 class ComposerInstallGate implements PreFlightGate
 {
@@ -61,16 +59,13 @@ class ComposerInstallGate implements PreFlightGate
 
     private ProcessExecutor $exec;
     private string $composerBin;
-    private bool $skipAudit;
 
     public function __construct(
         ProcessExecutor $exec,
-        string $composerBin = 'composer',
-        bool $skipAudit = false
+        string $composerBin = 'composer'
     ) {
         $this->exec = $exec;
         $this->composerBin = $composerBin;
-        $this->skipAudit = $skipAudit;
     }
 
     public function name(): string
@@ -87,9 +82,6 @@ class ComposerInstallGate implements PreFlightGate
         }
 
         $args = [$this->composerBin, 'install', '--dry-run', '--no-scripts', '--no-interaction'];
-        if ($this->skipAudit) {
-            $args[] = '--no-audit';
-        }
         $outcome = $this->exec->execute($args, $repoPath, 300);
         if ($outcome->isSuccess()) {
             return GateOutcome::passed(self::NAME);
