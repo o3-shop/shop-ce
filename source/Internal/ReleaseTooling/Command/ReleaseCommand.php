@@ -31,10 +31,13 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\ComposerInstall
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\IncomingPrGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\MergeBackPrGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\TestSuiteGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\UpToDateGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\WorkingTreeGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\LiveExecutor;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PerRepoActions;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightRunner;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\RepoCloneUrlResolver;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\RepoPathDiscovery;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\SymfonyProcessExecutor;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\GhCliReleaseNotesProvider;
@@ -144,13 +147,22 @@ class ReleaseCommand extends Command
                 . 'level is patch | minor | major | v<semver>. Repeatable.'
             )
             ->addOption(
+                'repo-base',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Base directory containing local clones of every '
+                . 'release-eligible repo. Defaults to the parent of '
+                . 'the running shop-ce checkout (the conventional '
+                . 'sibling layout). Existing clones are reused; '
+                . 'missing ones are auto-cloned into <base>/<repo>.'
+            )
+            ->addOption(
                 'repo-path',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Local clone path for a release-eligible repo. '
-                . 'Format: <package>=/abs/path. Repeatable. Required for '
-                . 'live execution (commits/tags/releases) and to fire '
-                . 'the pre-flight gates. Empty = dry-run-only.'
+                'Override discovery for a specific package. '
+                . 'Format: <package>=/abs/path. Repeatable. Useful '
+                . 'when a clone lives outside the conventional layout.'
             )
             ->addOption(
                 'dry-run',
@@ -187,28 +199,32 @@ class ReleaseCommand extends Command
             $bumpFlags[$slug] = $level;
         }
 
-        $repoPaths = [];
+        $explicitPaths = [];
         foreach ($input->getOption('repo-path') ?: [] as $arg) {
-            $error = $this->parseRepoPath($arg, $repoPaths);
+            $error = $this->parseRepoPath($arg, $explicitPaths);
             if ($error !== null) {
                 $this->writeUsageError($output, $error);
                 return self::EXIT_USAGE_ERROR;
             }
         }
 
-        if (!$dryRun && $repoPaths === []) {
-            $this->writeUsageError(
-                $output,
-                'Live execution requires at least one --repo-path '
-                . '<package>=/abs/path. Re-run with --dry-run if you only '
-                . 'wanted to preview the plan.'
-            );
-            return self::EXIT_USAGE_ERROR;
-        }
-
+        $repoBaseOpt = $input->getOption('repo-base');
         $progress = static function (string $message) use ($output): void {
             $output->writeln('<comment>' . $message . '</comment>');
         };
+
+        try {
+            $repoPaths = $this->resolveRepoPaths(
+                $explicitPaths,
+                is_string($repoBaseOpt) ? $repoBaseOpt : null,
+                $dryRun,
+                $progress
+            );
+        } catch (Throwable $e) {
+            $this->writeUsageError($output, $e->getMessage());
+            return self::EXIT_USAGE_ERROR;
+        }
+
         $planner = $this->planner ?? $this->buildDefaultPlanner($progress, $repoPaths !== []);
 
         $output->writeln(sprintf(
@@ -329,6 +345,7 @@ class ReleaseCommand extends Command
         return new PreFlightRunner([
             new WorkingTreeGate($exec),
             new BranchGate($exec),
+            new UpToDateGate($exec),
             new ComposerInstallGate($exec),
             new TestSuiteGate($exec, $skipTestsResolver),
             new IncomingPrGate($exec),
@@ -345,6 +362,64 @@ class ReleaseCommand extends Command
             new DefaultBranchResolver(),
             $progress
         );
+    }
+
+    /**
+     * Returns the per-package map of local clone paths.
+     *
+     * - When explicit `--repo-path` values are supplied, they are honored
+     *   verbatim; no auto-discovery happens (this is the "I have a
+     *   non-conventional layout" escape hatch).
+     * - In dry-run mode without explicit paths, the result is an empty
+     *   array — pre-flight skipped, current behavior preserved.
+     * - In live mode without explicit paths, `RepoPathDiscovery` runs:
+     *   shop-ce maps to the running clone; sibling repos map to
+     *   `<repo-base>/<github-repo-name>` (existing) or get auto-cloned
+     *   into that path (missing).
+     *
+     * @param  array<string,string> $explicitPaths package => abs path from --repo-path
+     * @return array<string,string>                package => abs path (final)
+     */
+    private function resolveRepoPaths(
+        array $explicitPaths,
+        ?string $repoBaseOpt,
+        bool $dryRun,
+        callable $progress
+    ): array {
+        if ($explicitPaths !== []) {
+            return $explicitPaths;
+        }
+        if ($dryRun) {
+            // Dry-run with no explicit paths = skip pre-flight, no
+            // discovery needed. Preserves the cheap remote-only
+            // preview path.
+            return [];
+        }
+        $shopCePath = realpath(__DIR__ . '/../../../..');
+        if ($shopCePath === false) {
+            throw new \RuntimeException(
+                'could not resolve running shop-ce path '
+                . '(realpath of bin/release origin returned false)'
+            );
+        }
+        $baseDir = $repoBaseOpt !== null
+            ? $repoBaseOpt
+            : dirname($shopCePath);
+
+        $exec = new SymfonyProcessExecutor();
+        $urlResolver = RepoCloneUrlResolver::fromRepoOrigin($exec, $shopCePath);
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            $urlResolver,
+            new DefaultBranchResolver(),
+            $progress
+        );
+        $progress(sprintf(
+            'Discovering release-eligible repos under %s (clone scheme: %s)',
+            $baseDir,
+            $urlResolver->scheme()
+        ));
+        return $discovery->discoverAll($baseDir, $shopCePath);
     }
 
     /**

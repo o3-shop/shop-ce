@@ -171,19 +171,7 @@ class ReleaseCommandTest extends TestCase
         $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
     }
 
-    /* ---------- live mode (§15) ---------- */
-
-    public function testLiveModeWithoutRepoPathExitsUsageError(): void
-    {
-        $tester = $this->tester();
-        $status = $tester->execute([
-            '--from' => 'v1.6.0',
-            '--to' => 'v1.6.1-RC1',
-            // no --dry-run, no --repo-path
-        ]);
-        $this->assertSame(ReleaseCommand::EXIT_USAGE_ERROR, $status);
-        $this->assertStringContainsString('--repo-path', $tester->getDisplay());
-    }
+    /* ---------- live mode (§15 wiring + §16 discovery) ---------- */
 
     public function testMalformedRepoPathExitsUsageError(): void
     {
