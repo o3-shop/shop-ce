@@ -248,6 +248,11 @@ jobs:
             echo "No coverage file found"
           fi
 
+      - name: 🛑 Enforce Coverage Threshold (≥ 90%)
+        id: coverage_gate
+        if: env.TESTS_FAILED == 'false'
+        run: php bin/check-coverage-threshold.php --clover coverage.xml --threshold 90
+
       - name: 💡 Add failed test summary if not PR
         if: env.TESTS_FAILED == 'true' && github.event_name != 'pull_request'
         run: |

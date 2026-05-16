@@ -68,11 +68,11 @@ class ReleasePlannerTest extends TestCase
 
         $planner = $this->wirePlanner(
             $manifests,
-            tagsByPackage: [
+            [
                 'o3-shop/shop-ce' => ['v1.6.0' => 'sha-shop-ce'],
                 'o3-shop/shop-facts' => ['v1.0.4' => 'sha-facts'],
             ],
-            branchHeads: [
+            [
                 'o3-shop/shop-ce' => ['b-1.6' => 'sha-shop-ce-newer'], // commits beyond tag
                 'o3-shop/shop-facts' => ['b-1.6' => 'sha-facts'],       // unchanged
             ]
@@ -124,13 +124,13 @@ class ReleasePlannerTest extends TestCase
 
         $planner = $this->wirePlanner(
             $manifests,
-            tagsByPackage: [
+            [
                 'o3-shop/shop-ce' => ['v1.6.1' => 'sha'],
             ],
-            branchHeads: [
+            [
                 'o3-shop/shop-ce' => ['b-1.6' => 'sha-newer'], // forces case 3 -> v1.6.2-RC1
             ],
-            cannedNotes: [
+            [
                 'o3-shop/shop-ce|v1.6.1|v1.6.2-RC1' => "## Changes\n* shop-ce update\n",
             ]
         );
@@ -149,8 +149,8 @@ class ReleasePlannerTest extends TestCase
         ];
         $planner = $this->wirePlanner(
             $manifests,
-            tagsByPackage: ['o3-shop/shop-ce' => ['v1.6.1' => 'sha']],
-            branchHeads: ['o3-shop/shop-ce' => ['b-1.6' => 'sha']]
+            ['o3-shop/shop-ce' => ['v1.6.1' => 'sha']],
+            ['o3-shop/shop-ce' => ['b-1.6' => 'sha']]
         );
 
         $plan = $planner->plan('v1.6.1', 'v1.6.1-RC1', []);
@@ -162,11 +162,11 @@ class ReleasePlannerTest extends TestCase
     public function testPlannerPropagatesFetcherFailures(): void
     {
         $planner = $this->wirePlanner(
-            manifests: [
+            [
                 // no fixtures at all → fetcher throws on first call
             ],
-            tagsByPackage: [],
-            branchHeads: []
+            [],
+            []
         );
         $this->expectException(RawRepoFetchException::class);
         $planner->plan('v9.9.9', 'v10.0.0-RC1', []);
@@ -198,10 +198,10 @@ class ReleasePlannerTest extends TestCase
         ];
         $planner = $this->wirePlanner(
             $manifests,
-            tagsByPackage: [
+            [
                 'o3-shop/testing-library' => ['v1.2.0' => 'sha-tagged'],
             ],
-            branchHeads: [
+            [
                 'o3-shop/testing-library' => ['b-1.6' => 'sha-tagged'],  // unchanged
             ]
         );

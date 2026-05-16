@@ -45,8 +45,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testCaseUnchangedWhenLatestTagEqualsFromPinAndBranchPointsAtThatTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-pinned'],
-            branchHead: 'sha-pinned',
+            ['v1.0.4' => 'sha-pinned'],
+            'sha-pinned',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.6.1-RC1', 'b-1.6');
 
@@ -57,8 +57,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testCaseUnchangedWhenFromPinIsCaretAndLatestSatisfiesNoNewCommits(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.4.0' => 'sha'],
-            branchHead: 'sha',
+            ['v1.4.0' => 'sha'],
+            'sha',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', '^v1.4.0', 'v1.6.1-RC1', 'b-1.6');
 
@@ -71,8 +71,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testCaseUsableTagWhenLatestTagIsNewerThanFromPinAndBranchAtThatTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-old', 'v1.0.5' => 'sha-new'],
-            branchHead: 'sha-new',
+            ['v1.0.4' => 'sha-old', 'v1.0.5' => 'sha-new'],
+            'sha-new',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.6.1-RC1', 'b-1.6');
 
@@ -83,12 +83,12 @@ class CandidateVersionResolverTest extends TestCase
     public function testCaseUsableTagPicksHighestSemverTagAcrossOutOfOrderListing(): void
     {
         $resolver = $this->resolverWith(
-            tags: [
+            [
                 'v1.0.4' => 'sha-old',
                 'v1.1.0' => 'sha-newer',
                 'v1.0.5' => 'sha-mid',
             ],
-            branchHead: 'sha-newer',
+            'sha-newer',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.6.1-RC1', 'b-1.6');
 
@@ -101,8 +101,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testCaseNeedsNewTagWhenCommitsExistBeyondLatestTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-tagged'],
-            branchHead: 'sha-newer-than-tag',
+            ['v1.0.4' => 'sha-tagged'],
+            'sha-newer-than-tag',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.6.1-RC1', 'b-1.6');
 
@@ -113,8 +113,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testCaseNeedsNewTagWhenRepoHasNoSemverTagsYet(): void
     {
         $resolver = $this->resolverWith(
-            tags: [],
-            branchHead: 'sha-initial',
+            [],
+            'sha-initial',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.6.1-RC1', 'b-1.6');
 
@@ -127,8 +127,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testFinalShopReleaseRejectsPreReleaseDepTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-old', 'v1.1.0-RC3' => 'sha-rc'],
-            branchHead: 'sha-rc',
+            ['v1.0.4' => 'sha-old', 'v1.1.0-RC3' => 'sha-rc'],
+            'sha-rc',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.7.0', 'b-1.6');
 
@@ -138,8 +138,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testRcShopReleaseAcceptsPreReleaseDepTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-old', 'v1.1.0-RC3' => 'sha-rc'],
-            branchHead: 'sha-rc',
+            ['v1.0.4' => 'sha-old', 'v1.1.0-RC3' => 'sha-rc'],
+            'sha-rc',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.7.0-RC4', 'b-1.6');
 
@@ -150,8 +150,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testRcShopReleaseAcceptsFinalDepTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-old', 'v1.1.0' => 'sha-final'],
-            branchHead: 'sha-final',
+            ['v1.0.4' => 'sha-old', 'v1.1.0' => 'sha-final'],
+            'sha-final',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.7.0-RC4', 'b-1.6');
 
@@ -162,8 +162,8 @@ class CandidateVersionResolverTest extends TestCase
     public function testFinalShopReleaseAcceptsFinalDepTag(): void
     {
         $resolver = $this->resolverWith(
-            tags: ['v1.0.4' => 'sha-old', 'v1.1.0' => 'sha-final'],
-            branchHead: 'sha-final',
+            ['v1.0.4' => 'sha-old', 'v1.1.0' => 'sha-final'],
+            'sha-final',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.7.0', 'b-1.6');
 
@@ -214,12 +214,12 @@ class CandidateVersionResolverTest extends TestCase
         // Repos sometimes have non-semver tags (e.g. CI markers, lightweight tags).
         // The walker should pick the highest *semver-shaped* tag and ignore the rest.
         $resolver = $this->resolverWith(
-            tags: [
+            [
                 'release-2025-01' => 'sha-noise',
                 'v1.0.4' => 'sha-pinned',
                 'tip' => 'sha-noise2',
             ],
-            branchHead: 'sha-pinned',
+            'sha-pinned',
         );
         $resolution = $resolver->resolve('o3-shop/shop-facts', 'v1.0.4', 'v1.6.1-RC1', 'b-1.6');
 
