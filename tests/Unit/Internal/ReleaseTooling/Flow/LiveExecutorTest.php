@@ -254,6 +254,85 @@ final class LiveExecutorTest extends TestCase
         $this->assertTrue($hasRm, 'expected `git rm --ignore-unmatch .next-bump` for shop-facts');
     }
 
+    public function testThemeRepoGetsThemePhpVersionLineRewrittenAndStagedAlongsideComposerJson(): void
+    {
+        $themePath = $this->mkRepo('{"require":{}}');
+        file_put_contents($themePath . '/theme.php', "<?php\n\$aTheme = ['id' => 'o3-theme', 'version' => '1.0.0'];");
+        $o3ShopPath = $this->mkRepo('{"require":{}}');
+        $exec = new FakeProcessExecutor([], new ProcessOutcome(0, 'https://example.invalid/url', ''));
+
+        $plan = $this->buildPlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            [$this->cuttingCandidate('o3-shop/o3-theme', 'v1.3.0', 'v1.3.1')],
+            [],
+            ''
+        );
+
+        $executor = new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver()
+        );
+        $executor->execute($plan, [
+            'o3-shop/o3-theme' => $themePath,
+            'o3-shop/o3-shop' => $o3ShopPath,
+        ]);
+
+        // theme.php was rewritten on disk: leading 'v' stripped, line updated
+        $this->assertStringContainsString(
+            "'version' => '1.3.1'",
+            file_get_contents($themePath . '/theme.php')
+        );
+        // ... and was staged in the same per-repo commit (git add args include theme.php)
+        $addCalls = array_values(array_filter(
+            $exec->commands(),
+            static fn (array $cmd): bool => isset($cmd[0], $cmd[1]) && $cmd[0] === 'git' && $cmd[1] === 'add'
+        ));
+        $themeAddSeen = false;
+        foreach ($addCalls as $cmd) {
+            if (in_array('theme.php', $cmd, true)) {
+                $themeAddSeen = true;
+                break;
+            }
+        }
+        $this->assertTrue($themeAddSeen, 'expected `git add` to include theme.php for the theme repo');
+    }
+
+    public function testNonThemeRepoDoesNotStageThemeFile(): void
+    {
+        $shopCePath = $this->mkRepo('{"require":{}}'); // no theme.php
+        $o3ShopPath = $this->mkRepo('{"require":{}}');
+        $exec = new FakeProcessExecutor([], new ProcessOutcome(0, 'https://example.invalid/url', ''));
+
+        $plan = $this->buildPlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            [$this->cuttingCandidate('o3-shop/shop-ce', 'v1.6.0', 'v1.6.1-RC1')],
+            [],
+            ''
+        );
+
+        $executor = new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver()
+        );
+        $executor->execute($plan, [
+            'o3-shop/shop-ce' => $shopCePath,
+            'o3-shop/o3-shop' => $o3ShopPath,
+        ]);
+
+        $allStagedArgs = [];
+        foreach ($exec->commands() as $cmd) {
+            if (isset($cmd[0], $cmd[1]) && $cmd[0] === 'git' && $cmd[1] === 'add') {
+                $allStagedArgs = array_merge($allStagedArgs, array_slice($cmd, 2));
+            }
+        }
+        $this->assertNotContains('theme.php', $allStagedArgs, 'non-theme repo must not stage theme.php');
+        $this->assertFalse(is_file($shopCePath . '/theme.php'), 'sanity: no theme.php fixture');
+    }
+
     /* -------- helpers -------- */
 
     /**

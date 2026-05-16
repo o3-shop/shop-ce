@@ -39,6 +39,7 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightRunner;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\RepoCloneUrlResolver;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\RepoPathDiscovery;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\SymfonyProcessExecutor;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ThemeFileVersionWriter;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\GhCliReleaseNotesProvider;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\ReleaseNotesAggregator;
@@ -381,6 +382,7 @@ class ReleaseCommand extends Command
             new PerRepoActions($exec),
             new ComposerJsonConstraintWriter(),
             new DefaultBranchResolver(),
+            new ThemeFileVersionWriter(),
             $progress
         );
     }

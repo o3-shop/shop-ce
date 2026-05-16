@@ -57,6 +57,7 @@ class LiveExecutor
 
     private PerRepoActions $actions;
     private ComposerJsonConstraintWriter $writer;
+    private ThemeFileVersionWriter $themeWriter;
     private DefaultBranchResolver $branchResolver;
     /** @var callable(string):void */
     private $progress;
@@ -71,10 +72,12 @@ class LiveExecutor
         PerRepoActions $actions,
         ComposerJsonConstraintWriter $writer,
         DefaultBranchResolver $branchResolver,
+        ?ThemeFileVersionWriter $themeWriter = null,
         ?callable $progress = null
     ) {
         $this->actions = $actions;
         $this->writer = $writer;
+        $this->themeWriter = $themeWriter ?? new ThemeFileVersionWriter();
         $this->branchResolver = $branchResolver;
         $this->progress = $progress ?? static function (string $_msg): void {
         };
@@ -179,6 +182,12 @@ class LiveExecutor
 
         $this->log(sprintf('[%s] applying %d constraint edit(s)', $package, count($edits)));
         $stagePaths = $this->writer->apply($repoPath . '/composer.json', $edits);
+
+        $themePaths = $this->themeWriter->apply($repoPath, $chosenVersion);
+        if ($themePaths !== []) {
+            $this->log(sprintf('[%s] bumped theme.php version to %s', $package, $chosenVersion));
+            $stagePaths = array_merge($stagePaths, $themePaths);
+        }
 
         $commitMessage = $this->buildCommitMessage($package, $chosenVersion, $shopTo, count($edits));
 
