@@ -269,6 +269,18 @@ run_full_test_with_coverage() {
   echo "Now running tests with coverage:"
   echo "---------------------------"
   run_tests --coverage
+  TEST_EXIT_CODE=$?
+  if [ $TEST_EXIT_CODE -ne 0 ]; then
+    return $TEST_EXIT_CODE
+  fi
+
+  echo ""
+  echo "---------------------------"
+  echo "Checking coverage threshold:"
+  echo "---------------------------"
+  docker exec -i o3shop-app php /var/www/html/bin/check-coverage-threshold.php \
+    --clover /var/www/html/coverage/coverage.xml \
+    --threshold "${COVERAGE_THRESHOLD:-90}"
 }
 
 MY_DIR=$(getMyPath)
