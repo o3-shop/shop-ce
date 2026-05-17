@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\Domain\Authentication\Command;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateAdminCommand;
+use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateCommand;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Repository\AdminUserRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -31,24 +31,24 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
-final class UserCreateAdminCommandTest extends TestCase
+final class UserCreateCommandTest extends TestCase
 {
     private function makeCommand(
         AdminUserRepositoryInterface $repo,
         PasswordServiceBridgeInterface $service
-    ): UserCreateAdminCommand {
-        $command = new UserCreateAdminCommand($repo, $service);
+    ): UserCreateCommand {
+        $command = new UserCreateCommand($repo, $service);
         $command->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
         return $command;
     }
 
-    public function testCreatesNewAdminUserAndReportsOxid(): void
+    public function testCreatesAdminUserByDefaultRoleAndReportsOxid(): void
     {
         $repo = $this->createMock(AdminUserRepositoryInterface::class);
         $repo->method('findIdByUsername')->with('newadmin')->willReturn(null);
         $repo->expects($this->once())
-            ->method('insertAdmin')
-            ->with('newadmin', 'hashed-value')
+            ->method('insertUser')
+            ->with('newadmin', 'hashed-value', 'malladmin')
             ->willReturn('generated-oxid-abc');
 
         $service = $this->createMock(PasswordServiceBridgeInterface::class);
@@ -57,17 +57,62 @@ final class UserCreateAdminCommandTest extends TestCase
         $tester = new CommandTester($this->makeCommand($repo, $service));
         $exit = $tester->execute(['username' => 'newadmin', '--password' => 'plain-pw']);
 
-        $this->assertSame(UserCreateAdminCommand::EXIT_OK, $exit);
+        $this->assertSame(UserCreateCommand::EXIT_OK, $exit);
         $display = $tester->getDisplay();
-        $this->assertStringContainsString('Admin user "newadmin" created', $display);
+        $this->assertStringContainsString('User "newadmin" created with role "admin"', $display);
         $this->assertStringContainsString('generated-oxid-abc', $display);
+    }
+
+    public function testCreatesCustomerUserWhenRoleIsCustomer(): void
+    {
+        $repo = $this->createMock(AdminUserRepositoryInterface::class);
+        $repo->method('findIdByUsername')->willReturn(null);
+        $repo->expects($this->once())
+            ->method('insertUser')
+            ->with('shopper@example.com', 'hashed-value', '')
+            ->willReturn('cust-oxid');
+
+        $service = $this->createMock(PasswordServiceBridgeInterface::class);
+        $service->method('hash')->willReturn('hashed-value');
+
+        $tester = new CommandTester($this->makeCommand($repo, $service));
+        $exit = $tester->execute([
+            'username' => 'shopper@example.com',
+            '--password' => 'plain-pw',
+            '--role' => 'customer',
+        ]);
+
+        $this->assertSame(UserCreateCommand::EXIT_OK, $exit);
+        $this->assertStringContainsString('role "customer"', $tester->getDisplay());
+    }
+
+    public function testExitsUnknownRoleWhenRoleValueIsInvalid(): void
+    {
+        $repo = $this->createMock(AdminUserRepositoryInterface::class);
+        $repo->expects($this->never())->method('findIdByUsername');
+        $repo->expects($this->never())->method('insertUser');
+
+        $service = $this->createMock(PasswordServiceBridgeInterface::class);
+        $service->expects($this->never())->method('hash');
+
+        $tester = new CommandTester($this->makeCommand($repo, $service));
+        $exit = $tester->execute([
+            'username' => 'whatever',
+            '--password' => 'plain-pw',
+            '--role' => 'superuser',
+        ]);
+
+        $this->assertSame(UserCreateCommand::EXIT_UNKNOWN_ROLE, $exit);
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Unknown role "superuser"', $display);
+        $this->assertStringContainsString('admin, customer', $display);
     }
 
     public function testExitsUsernameExistsWhenUserAlreadyPresent(): void
     {
         $repo = $this->createMock(AdminUserRepositoryInterface::class);
         $repo->method('findIdByUsername')->willReturn('existing-oxid');
-        $repo->expects($this->never())->method('insertAdmin');
+        $repo->expects($this->never())->method('insertUser');
 
         $service = $this->createMock(PasswordServiceBridgeInterface::class);
         $service->expects($this->never())->method('hash');
@@ -75,7 +120,7 @@ final class UserCreateAdminCommandTest extends TestCase
         $tester = new CommandTester($this->makeCommand($repo, $service));
         $exit = $tester->execute(['username' => 'admin', '--password' => 'anything']);
 
-        $this->assertSame(UserCreateAdminCommand::EXIT_USERNAME_EXISTS, $exit);
+        $this->assertSame(UserCreateCommand::EXIT_USERNAME_EXISTS, $exit);
         $display = $tester->getDisplay();
         $this->assertStringContainsString('already exists', $display);
         $this->assertStringContainsString('oe:user:change-password', $display);
@@ -85,14 +130,14 @@ final class UserCreateAdminCommandTest extends TestCase
     {
         $repo = $this->createMock(AdminUserRepositoryInterface::class);
         $repo->expects($this->never())->method('findIdByUsername');
-        $repo->expects($this->never())->method('insertAdmin');
+        $repo->expects($this->never())->method('insertUser');
 
         $service = $this->createMock(PasswordServiceBridgeInterface::class);
 
         $tester = new CommandTester($this->makeCommand($repo, $service));
         $exit = $tester->execute(['username' => 'newadmin', '--password' => '']);
 
-        $this->assertSame(UserCreateAdminCommand::EXIT_EMPTY_PASSWORD, $exit);
+        $this->assertSame(UserCreateCommand::EXIT_EMPTY_PASSWORD, $exit);
         $this->assertStringContainsString('Password must not be empty', $tester->getDisplay());
     }
 
@@ -100,7 +145,7 @@ final class UserCreateAdminCommandTest extends TestCase
     {
         $repo = $this->createMock(AdminUserRepositoryInterface::class);
         $repo->method('findIdByUsername')->willReturn(null);
-        $repo->method('insertAdmin')->willThrowException(new RuntimeException('DB exploded'));
+        $repo->method('insertUser')->willThrowException(new RuntimeException('DB exploded'));
 
         $service = $this->createMock(PasswordServiceBridgeInterface::class);
         $service->method('hash')->willReturn('hashed-value');
@@ -108,7 +153,7 @@ final class UserCreateAdminCommandTest extends TestCase
         $tester = new CommandTester($this->makeCommand($repo, $service));
         $exit = $tester->execute(['username' => 'newadmin', '--password' => 'plain-pw']);
 
-        $this->assertSame(UserCreateAdminCommand::EXIT_INSERT_FAILED, $exit);
+        $this->assertSame(UserCreateCommand::EXIT_INSERT_FAILED, $exit);
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Failed to create user', $display);
         $this->assertStringContainsString('DB exploded', $display);

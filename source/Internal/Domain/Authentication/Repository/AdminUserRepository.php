@@ -62,13 +62,13 @@ final class AdminUserRepository implements AdminUserRepositoryInterface
         );
     }
 
-    public function insertAdmin(string $username, string $hashedPassword): string
+    public function insertUser(string $username, string $hashedPassword, string $oxrights): string
     {
         $oxid = $this->generateOxid();
         $this->connection->insert('oxuser', [
             'OXID'       => $oxid,
             'OXACTIVE'   => 1,
-            'OXRIGHTS'   => 'malladmin',
+            'OXRIGHTS'   => $oxrights,
             'OXSHOPID'   => self::SHOP_ID,
             'OXUSERNAME' => $username,
             'OXPASSWORD' => $hashedPassword,

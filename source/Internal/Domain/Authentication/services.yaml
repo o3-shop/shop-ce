@@ -33,7 +33,7 @@ services:
     tags:
       - { name: 'console.command', command: 'oe:user:change-password' }
 
-  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateAdminCommand:
-    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateAdminCommand
+  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateCommand:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateCommand
     tags:
-      - { name: 'console.command', command: 'oe:user:create-admin' }
+      - { name: 'console.command', command: 'oe:user:create' }

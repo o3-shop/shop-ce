@@ -47,12 +47,14 @@ interface AdminUserRepositoryInterface
     public function updatePassword(string $oxid, string $hashedPassword): void;
 
     /**
-     * Inserts a fresh `oxuser` row with `OXRIGHTS = 'malladmin'` and
-     * `OXACTIVE = 1`. Caller supplies an already-hashed password and
-     * gets the generated OXID back. Other profile columns (name,
-     * address, phone, etc.) are left at table defaults.
+     * Inserts a fresh `oxuser` row with `OXACTIVE = 1` and the
+     * supplied `OXRIGHTS` value ('malladmin' for an admin, '' for a
+     * storefront customer — matches the two options the admin panel
+     * exposes). Caller supplies an already-hashed password and gets
+     * the generated OXID back. Other profile columns (name, address,
+     * phone, etc.) are left at table defaults.
      *
      * @return string The OXID assigned to the new row.
      */
-    public function insertAdmin(string $username, string $hashedPassword): string;
+    public function insertUser(string $username, string $hashedPassword, string $oxrights): string;
 }

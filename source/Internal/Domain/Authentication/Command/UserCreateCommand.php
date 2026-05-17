@@ -34,35 +34,50 @@ use Symfony\Component\Console\Question\Question;
 use Throwable;
 
 /**
- * Create a fresh admin (`malladmin`) user from the CLI. Companion to
- * `oe:user:change-password` — together they cover the "I am locked out
- * of the admin panel and there's no one to reset my password" scenario
- * filed at o3-shop/o3-shop#143.
+ * Create a fresh oxuser from the CLI. Mirrors the two-option role
+ * selector the admin panel exposes ("Kunde" / "Admin") via the
+ * `--role={admin|customer}` flag — `admin` writes `OXRIGHTS='malladmin'`,
+ * `customer` writes the empty-string rights value the storefront uses.
+ *
+ * The lockout-recovery path filed at o3-shop/o3-shop#143 (no admin
+ * left, need a new one from the shell) is the default: omit `--role`
+ * and you get a malladmin in one line. The `--role=customer` form
+ * matches the admin panel's "Rechte = Kunde" choice — note that a
+ * storefront customer created via CLI carries empty profile fields
+ * (name, address, etc.); use the storefront registration flow when
+ * those matter.
  *
  * Usage:
- *   bin/oe-console oe:user:create-admin <username>
- *   bin/oe-console oe:user:create-admin <username> --password=<plaintext>
+ *   bin/oe-console oe:user:create <username> [--password=...]
+ *   bin/oe-console oe:user:create <username> --role=customer --password=...
  *
- * Inserts the minimum rows required by `oxuser`'s NOT-NULL constraints;
- * everything else (name, address, phone, etc.) is left at the column
- * defaults — those are storefront niceties, not authentication. The new
- * user has `OXRIGHTS = 'malladmin'` and `OXACTIVE = 1`, so they can log
- * into the admin panel immediately. The hash goes through
- * PasswordServiceBridge — same code path as the admin panel.
- *
- * For regular (storefront) user creation, use the storefront
- * registration flow — that path collects the additional profile fields
- * a real customer needs.
+ * Omitting `--password` triggers a hidden prompt (no echo, with a
+ * non-TTY fallback for CI / piped-input use). Hash goes through
+ * PasswordServiceBridge — same code path the admin panel uses.
  */
-final class UserCreateAdminCommand extends Command
+final class UserCreateCommand extends Command
 {
     public const EXIT_OK = 0;
     public const EXIT_USERNAME_EXISTS = 1;
     public const EXIT_EMPTY_PASSWORD = 2;
     public const EXIT_INSERT_FAILED = 3;
+    public const EXIT_UNKNOWN_ROLE = 4;
+
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_CUSTOMER = 'customer';
+
+    /**
+     * Map from CLI-facing role name to the OXRIGHTS value stored in
+     * oxuser. Matches the two-option dropdown the admin panel exposes
+     * ("Admin" → 'malladmin', "Kunde" → '').
+     */
+    private const ROLE_TO_OXRIGHTS = [
+        self::ROLE_ADMIN    => 'malladmin',
+        self::ROLE_CUSTOMER => '',
+    ];
 
     /** @var string|null */
-    protected static $defaultName = 'oe:user:create-admin';
+    protected static $defaultName = 'oe:user:create';
 
     private AdminUserRepositoryInterface $repository;
     private PasswordServiceBridgeInterface $passwordService;
@@ -79,24 +94,37 @@ final class UserCreateAdminCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Create a new admin (malladmin) user.')
+            ->setDescription('Create a new oxuser (admin or storefront customer).')
             ->setHelp(
-                "Inserts a new oxuser row with OXRIGHTS = 'malladmin' and OXACTIVE = 1,\n"
-                . "so the user can log into the admin panel immediately. If --password is\n"
-                . "omitted, the value is prompted for interactively (input is hidden).\n\n"
+                "Inserts a new oxuser row with OXACTIVE = 1. The --role flag selects\n"
+                . "the OXRIGHTS value, mirroring the two-option dropdown in admin → Users:\n"
+                . "  --role=admin    (default)  OXRIGHTS = 'malladmin'   (logs into admin)\n"
+                . "  --role=customer            OXRIGHTS = ''            (storefront customer)\n\n"
+                . "If --password is omitted, the value is prompted for interactively\n"
+                . "(input is hidden, with a visible-input fallback for non-TTY contexts).\n\n"
                 . "Aborts if a user with that username already exists. Use\n"
-                . 'oe:user:change-password to reset an existing user\'s password instead.'
+                . "oe:user:change-password to reset an existing user's password instead.\n\n"
+                . "Note: a storefront customer created via this command has empty profile\n"
+                . "fields (name, address, etc.). Use the storefront registration flow when\n"
+                . 'those matter.'
             )
             ->addArgument(
                 'username',
                 InputArgument::REQUIRED,
-                'Login name (oxusername) for the new admin.'
+                'Login name (oxusername) for the new user.'
             )
             ->addOption(
                 'password',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Password for the new admin. If omitted, you will be prompted (hidden input).'
+                'Password for the new user. If omitted, you will be prompted (hidden input).'
+            )
+            ->addOption(
+                'role',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Role: "admin" (malladmin, default) or "customer" (storefront).',
+                self::ROLE_ADMIN
             );
     }
 
@@ -104,6 +132,16 @@ final class UserCreateAdminCommand extends Command
     {
         $username = (string) $input->getArgument('username');
         $password = $input->getOption('password');
+        $role = (string) $input->getOption('role');
+
+        if (!isset(self::ROLE_TO_OXRIGHTS[$role])) {
+            $output->writeln(sprintf(
+                '<error>Unknown role "%s". Expected one of: %s.</error>',
+                $role,
+                implode(', ', array_keys(self::ROLE_TO_OXRIGHTS))
+            ));
+            return self::EXIT_UNKNOWN_ROLE;
+        }
 
         if ($password === null) {
             $password = $this->promptForPassword($input, $output);
@@ -122,16 +160,18 @@ final class UserCreateAdminCommand extends Command
         }
 
         $hash = $this->passwordService->hash($password);
+        $oxrights = self::ROLE_TO_OXRIGHTS[$role];
         try {
-            $oxid = $this->repository->insertAdmin($username, $hash);
+            $oxid = $this->repository->insertUser($username, $hash, $oxrights);
         } catch (Throwable $e) {
             $output->writeln(sprintf('<error>Failed to create user: %s</error>', $e->getMessage()));
             return self::EXIT_INSERT_FAILED;
         }
 
         $output->writeln(sprintf(
-            '<info>Admin user "%s" created (OXID %s).</info>',
+            '<info>User "%s" created with role "%s" (OXID %s).</info>',
             $username,
+            $role,
             $oxid
         ));
         return self::EXIT_OK;
@@ -141,7 +181,7 @@ final class UserCreateAdminCommand extends Command
     {
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
-        $question = new Question('Password for the new admin: ');
+        $question = new Question('Password for the new user: ');
         $question->setHidden(true);
         // Allow visible-input fallback when stty isn't available (CI, piped
         // input, test runners). At a real interactive terminal stty works
