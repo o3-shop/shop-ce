@@ -2803,6 +2803,67 @@ class ConfigTest extends OxidTestCase
     }
 
     /**
+     * Regression for o3-shop/o3-shop#125: a value set in memory via
+     * setConfigParam() (no DB row backing it) must be cleared by
+     * reinitialize() — reinitialize is a full reset, not a merge with
+     * the prior in-memory state.
+     */
+    public function testReinitializeClearsInMemoryConfigParamsWithoutDbBacking()
+    {
+        $config = oxNew('oxConfig');
+        $config->init();
+        $config->setConfigParam('o3IssueOneTwoFiveLeakedKey', 'leaked-value');
+        $this->assertSame('leaked-value', $config->getConfigParam('o3IssueOneTwoFiveLeakedKey'));
+
+        $config->reinitialize();
+
+        $this->assertNull(
+            $config->getConfigParam('o3IssueOneTwoFiveLeakedKey'),
+            'reinitialize() must clear in-memory params; otherwise values from '
+            . 'an earlier init/setConfigParam survive a fresh init — see '
+            . 'o3-shop/o3-shop#125 (the testing-library bootstrap calls '
+            . 'initializeConfig() twice with different active themes).'
+        );
+    }
+
+    /**
+     * Regression for o3-shop/o3-shop#125: a value loaded from DB during
+     * the FIRST init() — whose DB row is then deleted before the SECOND
+     * init() — must NOT survive into the second init.
+     */
+    public function testReinitializeDropsValuesWhoseDbRowDisappeared()
+    {
+        $sShopId = $this->getConfig()->getShopId();
+        $db = \OxidEsales\Eshop\Core\DatabaseProvider::getDb();
+        // oxconfig.oxvarvalue was migrated to plaintext text in
+        // Version20230322213324 — no ENCODE() wrapper needed.
+        $insertSql = "INSERT INTO oxconfig (oxid, oxshopid, oxmodule, oxvarname, oxvartype, oxvarvalue)
+                      VALUES ('o3-125-leak-test', '$sShopId', '', 'o3IssueOneTwoFiveDbKey', 'str',
+                              'first-init-value')";
+        $db->execute($insertSql);
+
+        try {
+            $config = oxNew('oxConfig');
+            $config->init();
+            $this->assertSame('first-init-value', $config->getConfigParam('o3IssueOneTwoFiveDbKey'));
+
+            // Drop the row that backed the value, then reinitialize.
+            $db->execute("DELETE FROM oxconfig WHERE oxid = 'o3-125-leak-test'");
+            $config->reinitialize();
+
+            $this->assertNull(
+                $config->getConfigParam('o3IssueOneTwoFiveDbKey'),
+                'reinitialize() must drop values whose DB row no longer exists; '
+                . 'otherwise the testing-library theme-swap bootstrap (and any '
+                . 'production code that toggles config + reinits) reads stale '
+                . 'values — see o3-shop/o3-shop#125.'
+            );
+        } finally {
+            $db->execute("DELETE FROM oxconfig WHERE oxid = 'o3-125-leak-test'");
+        }
+    }
+
+    /**
      * Test method getRequestControllerId
      */
     public function testGetRequestControllerId()
