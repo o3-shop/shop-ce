@@ -69,7 +69,7 @@ final class UserCreateCommandTest extends TestCase
         $repo->method('findIdByUsername')->willReturn(null);
         $repo->expects($this->once())
             ->method('insertUser')
-            ->with('shopper@example.com', 'hashed-value', '')
+            ->with('shopper@example.com', 'hashed-value', 'user')
             ->willReturn('cust-oxid');
 
         $service = $this->createMock(PasswordServiceBridgeInterface::class);

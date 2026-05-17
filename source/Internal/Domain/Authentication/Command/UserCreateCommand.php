@@ -68,12 +68,17 @@ final class UserCreateCommand extends Command
 
     /**
      * Map from CLI-facing role name to the OXRIGHTS value stored in
-     * oxuser. Matches the two-option dropdown the admin panel exposes
-     * ("Admin" → 'malladmin', "Kunde" → '').
+     * oxuser. The two named values OXID accepts in the rights column
+     * are 'malladmin' (admin-panel login) and 'user' (storefront
+     * login) — the storefront query explicitly filters
+     * `AND ( oxrights = 'user' )` (User::formQueryPartForAdminView),
+     * so empty rights does NOT yield a loginable storefront customer.
+     * Confirmed by the registration path (User.php:1766), which also
+     * writes the literal 'user'.
      */
     private const ROLE_TO_OXRIGHTS = [
         self::ROLE_ADMIN    => 'malladmin',
-        self::ROLE_CUSTOMER => '',
+        self::ROLE_CUSTOMER => 'user',
     ];
 
     /** @var string|null */
@@ -99,7 +104,7 @@ final class UserCreateCommand extends Command
                 "Inserts a new oxuser row with OXACTIVE = 1. The --role flag selects\n"
                 . "the OXRIGHTS value, mirroring the two-option dropdown in admin → Users:\n"
                 . "  --role=admin    (default)  OXRIGHTS = 'malladmin'   (logs into admin)\n"
-                . "  --role=customer            OXRIGHTS = ''            (storefront customer)\n\n"
+                . "  --role=customer            OXRIGHTS = 'user'        (storefront customer)\n\n"
                 . "If --password is omitted, the value is prompted for interactively\n"
                 . "(input is hidden, with a visible-input fallback for non-TTY contexts).\n\n"
                 . "Aborts if a user with that username already exists. Use\n"

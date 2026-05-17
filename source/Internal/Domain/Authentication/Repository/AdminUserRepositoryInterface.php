@@ -48,11 +48,12 @@ interface AdminUserRepositoryInterface
 
     /**
      * Inserts a fresh `oxuser` row with `OXACTIVE = 1` and the
-     * supplied `OXRIGHTS` value ('malladmin' for an admin, '' for a
-     * storefront customer — matches the two options the admin panel
-     * exposes). Caller supplies an already-hashed password and gets
-     * the generated OXID back. Other profile columns (name, address,
-     * phone, etc.) are left at table defaults.
+     * supplied `OXRIGHTS` value. The two values OXID's auth queries
+     * accept are 'malladmin' (admin-panel login) and 'user'
+     * (storefront login) — empty rights yields a row that's not
+     * loginable from either side. Caller supplies an already-hashed
+     * password and gets the generated OXID back. Other profile
+     * columns (name, address, phone, etc.) are left at table defaults.
      *
      * @return string The OXID assigned to the new row.
      */
