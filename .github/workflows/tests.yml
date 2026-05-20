@@ -92,7 +92,7 @@ jobs:
         run: |
           echo "::group::Install Composer"
           php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-          php composer-setup.php --version=2.2.21
+          php composer-setup.php --version=2.2.28
           php -r "unlink('composer-setup.php');"
           sudo mv composer.phar /usr/local/bin/composer
           composer --version
