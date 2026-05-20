@@ -145,7 +145,7 @@ class InheritanceContractTest extends TestCase
         $concreteClass = (string) $entry['class'];
         $underscoreMethod = (string) $entry['method'];
 
-        if (!str_starts_with($concreteClass, self::CONCRETE_PREFIX)) {
+        if (strpos($concreteClass, self::CONCRETE_PREFIX) !== 0) {
             self::fail("unexpected class prefix in inventory: {$concreteClass}");
         }
 
@@ -381,7 +381,7 @@ PHP;
                     }
                 }
                 $out .= ' = ' . var_export($p->getDefaultValue(), true);
-            } catch (Throwable) {
+            } catch (Throwable $e) {
                 $out .= ' = null';
             }
         } elseif (!$p->isVariadic() && $p->isOptional()) {
@@ -441,15 +441,25 @@ PHP;
         if ($t->allowsNull()) {
             return 'return null;';
         }
-        return match ($name) {
-            'int' => 'return 0;',
-            'float' => 'return 0.0;',
-            'bool' => 'return false;',
-            'string' => 'return "";',
-            'array', 'iterable' => 'return [];',
-            'self', 'static' => 'return $this;',
-            default => 'return null;',
-        };
+        // PHP 7.4 compatibility: use switch instead of match (PHP 8+).
+        switch ($name) {
+            case 'int':
+                return 'return 0;';
+            case 'float':
+                return 'return 0.0;';
+            case 'bool':
+                return 'return false;';
+            case 'string':
+                return 'return "";';
+            case 'array':
+            case 'iterable':
+                return 'return [];';
+            case 'self':
+            case 'static':
+                return 'return $this;';
+            default:
+                return 'return null;';
+        }
     }
 
     /**
@@ -467,7 +477,14 @@ PHP;
         return $args;
     }
 
-    private function defaultValueForType(?ReflectionType $t, bool $allowsNull): mixed
+    /**
+     * PHP 7.4 doesn't have `mixed` as a return type — it would be parsed
+     * as a relative class name. Drop the declared return type; the
+     * `@return mixed` docblock keeps static analysers happy.
+     *
+     * @return mixed
+     */
+    private function defaultValueForType(?ReflectionType $t, bool $allowsNull)
     {
         if ($allowsNull || $t === null) {
             return null;
@@ -478,14 +495,22 @@ PHP;
         if (!$t instanceof ReflectionNamedType) {
             return null;
         }
-        return match ($t->getName()) {
-            'int' => 0,
-            'float' => 0.0,
-            'bool' => false,
-            'string' => '',
-            'array', 'iterable' => [],
-            default => null,
-        };
+        // PHP 7.4 compatibility: use switch instead of match (PHP 8+).
+        switch ($t->getName()) {
+            case 'int':
+                return 0;
+            case 'float':
+                return 0.0;
+            case 'bool':
+                return false;
+            case 'string':
+                return '';
+            case 'array':
+            case 'iterable':
+                return [];
+            default:
+                return null;
+        }
     }
 
     private function resolveCurrentFile(ReflectionMethod $m): string
@@ -495,7 +520,7 @@ PHP;
             return '';
         }
         $repoRoot = realpath(__DIR__ . '/../../../');
-        if ($repoRoot !== false && str_starts_with($file, $repoRoot . '/')) {
+        if ($repoRoot !== false && strpos($file, $repoRoot . '/') === 0) {
             return substr($file, strlen($repoRoot) + 1);
         }
         return $file;

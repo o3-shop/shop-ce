@@ -405,9 +405,9 @@ class ArticleSeoTest extends \OxidTestCase
         $product = oxNew('oxArticle');
         $product->load($productId);
 
-        $view = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSeo::class, ['getEditObjectId', 'getCategoryList', 'getVendorList', 'getManufacturerList', 'getTagList']);
+        $view = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSeo::class, ['getEditObjectId', '_getCategoryList', 'getVendorList', 'getManufacturerList', 'getTagList']);
         $view->expects($this->any())->method('getEditObjectId')->will($this->returnValue($productId));
-        $view->expects($this->any())->method('getCategoryList')->will($this->returnValue('CategoryList'));
+        $view->expects($this->any())->method('_getCategoryList')->will($this->returnValue('CategoryList'));
         $view->expects($this->any())->method('getVendorList')->will($this->returnValue('VendorList'));
         $view->expects($this->any())->method('getManufacturerList')->will($this->returnValue('ManufacturerList'));
         $view->expects($this->any())->method('getTagList')->will($this->returnValue('TagList'));

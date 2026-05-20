@@ -77,9 +77,13 @@ class ActionsMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getQuery().
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -129,9 +133,10 @@ class ActionsMainAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getQuery()
-     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
     protected function getQuery()
     {
@@ -145,9 +150,13 @@ class ActionsMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use addFilter() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _addFilter().
+     * @deprecated Transitional during #107. Modules SHOULD override _addFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addFilter() to the canonical override
+      *             target and retires _addFilter(); until then, _addFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -174,9 +183,10 @@ class ActionsMainAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::addFilter()
-     *           (not the deprecated _addFilter()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addFilter() the canonical override target.
      */
     protected function addFilter($sQ)
     {
@@ -187,9 +197,13 @@ class ActionsMainAjax extends ListComponentAjax
      * Returns SQL query addon for sorting
      *
      * @return string
-     * @deprecated Use getSorting() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getSorting().
+     * @deprecated Transitional during #107. Modules SHOULD override _getSorting()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSorting() to the canonical override
+      *             target and retires _getSorting(); until then, _getSorting() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -210,9 +224,10 @@ class ActionsMainAjax extends ListComponentAjax
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getSorting()
-     *           (not the deprecated _getSorting()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSorting(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSorting() the canonical override target.
      */
     protected function getSorting()
     {
@@ -224,7 +239,7 @@ class ActionsMainAjax extends ListComponentAjax
      */
     public function removeArtFromAct()
     {
-        $aChosenArt = $this->getActionIds('oxactions2article.oxid');
+        $aChosenArt = $this->_getActionIds('oxactions2article.oxid');
         $sOxid = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         $this->getOxRssFeed()->removeCacheFile($sOxid);
@@ -249,14 +264,14 @@ class ActionsMainAjax extends ListComponentAjax
     public function addArtToAct()
     {
         $myConfig = Registry::getConfig();
-        $aArticles = $this->getActionIds('oxarticles.oxid');
+        $aArticles = $this->_getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $this->getOxRssFeed()->removeCacheFile($soxId);
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArtTable = $this->getViewName('oxarticles');
-            $aArticles = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
+            $aArticles = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).
@@ -303,7 +318,7 @@ class ActionsMainAjax extends ListComponentAjax
         $sSelId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSelect = "select * from $sArtTable left join oxactions2article on $sArtTable.oxid=oxactions2article.oxartid ";
         $sSelect .= 'where oxactions2article.oxactionid = :oxactionid ' .
-                    'and oxactions2article.oxshopid = :oxshopid ' . $this->getSorting();
+                    'and oxactions2article.oxshopid = :oxshopid ' . $this->_getSorting();
 
         $oList = oxNew(ListModel::class);
         $oList->init('oxbase', 'oxactions2article');
@@ -345,10 +360,10 @@ class ActionsMainAjax extends ListComponentAjax
 
         $sQAdd = $this->getQuery();
 
-        $sQ = 'select ' . $this->getQueryCols() . $sQAdd;
+        $sQ = 'select ' . $this->_getQueryCols() . $sQAdd;
         $sCountQ = 'select count( * ) ' . $sQAdd;
 
-        $this->outputResponse($this->getData($sCountQ, $sQ));
+        $this->_outputResponse($this->getData($sCountQ, $sQ));
     }
 
     /**

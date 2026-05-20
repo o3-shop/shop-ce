@@ -794,6 +794,13 @@ $aLang = [
     'NAVIGATION_NEWVERSIONAVAILABLE'                 => 'Version %s is available.',
     // END deprecated
     'NAVIGATION_NEW_VERSION_AVAILABLE'               => 'You are using version %s, version %s is now available. Please update now.',
+    'UPDATECHECK_TITLE'                              => 'Update Check',
+    'UPDATECHECK_CORE_NOTICE'                        => 'A new shop version %s is available.',
+    'UPDATECHECK_MODULE_ID'                          => 'Module',
+    'UPDATECHECK_MODULE_INSTALLED'                   => 'Installed',
+    'UPDATECHECK_MODULE_LATEST'                      => 'Available',
+    'UPDATECHECK_MODULE_LINK'                        => 'Details',
+    'UPDATECHECK_BUTTON'                             => 'Check for updates',
     // @deprecated 6.5.6 "News" feature will be removed completely
     'NEWS_LIST_TITLE'                                => '[OXID News Administration]',
     'NEWS_LIST_SHORTTEXT'                            => 'Title',
@@ -804,7 +811,7 @@ $aLang = [
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Invisible for User Group',
     // END deprecated
     'NAVIGATION_SYSREQ_MESSAGE'                      => 'System health check shows setup/server setup of this O3-Shop might be broken. Probably this O3-Shop behaves strange in some cases. Please fix this as soon as possible. Support for fixing find in ',
-    'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>system health check</b>.',
+    'NAVIGATION_SYSREQ_MESSAGE2'                     => 'system health check.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'The permanent system health check has been deactivated. You can re-activate it in the Perform. tab at Master settings -> Core settings. To check it anyway, please click on this link: ',
     'NAVIGATION_SHOPFRONT'                           => "Shop's start page",
     'NAVIGATION_FULLVIEW'                            => 'show expert menu',
@@ -1569,6 +1576,8 @@ $aLang = [
     'mxpaymeth'                => 'Payment Methods',
     'mxpricealarm'             => 'Wished Price',
     'mxremlist'                => 'List All Reviews',
+    'mxrevocationconfig'       => 'Revocation Settings',
+    'mxrevocations'            => 'Revocations',
     'mxsellist'                => 'Selection Lists',
     'mxservice'                => 'Service',
     'mxservicearea'            => 'e-commerce Services',
@@ -1697,6 +1706,9 @@ $aLang = [
     //  Pricealarm',
     'tbclpricealarm_main'      => 'Main',
     'tbclpricealarm_mail'      => 'Mail',
+    //  revocation_list',
+    'tbclrevocation_main'      => 'Main',
+    'tbclrevocation_config'    => 'Settings',
     //  selectlist_list',
     'tbclselectlist_main'      => 'Main',
     //  system requirements',
@@ -2030,6 +2042,49 @@ $aLang = [
     'MESSAGE'                        => 'Message',
     'ADMIN_SETTINGS_LICENSE_VERSION_FETCH_INFO_ERROR' => 'Error when fetching version information',
     'CURL_EXECUTE_ERROR' => 'Connection error (%s). Please try again later',
+
+    // §356a BGB electronic revocation feature — admin keys (issue #99).
+    // Storefront-side keys (form labels, customer/operator email bodies)
+    // live in source/Application/translations/{en,de}/lang.php instead.
+    'O3_REVOCATION_ADMIN_NAV_LABEL'                               => 'Revocations',
+    'O3_REVOCATION_CONFIG_SHOW_LABEL'                             => 'Show revocation form in the footer',
+    'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL'                     => 'Require login to access the revocation form',
+    'O3_REVOCATION_CONFIG_NOTIFY_LABEL'                           => 'Notify operator by email on each revocation',
+    'O3_REVOCATION_CONFIG_OPERATOR_EMAIL_LABEL'                   => 'Email recipient for revocation notifications',
+    'O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED'            => 'Please enter an email address for revocation notifications, or disable the notification.',
+    'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
+    'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Activation blocked — missing templates or translations',
+    'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'language',
+    // Per-asset hint lines surfaced via Registry::getUtilsView()->addErrorToDisplay()
+    // when the §356a activation gate rejects a save / language activation / theme switch.
+    // %1$s = absolute path (page/email template) or translation key; %2$d = language ID.
+    'O3_REVOCATION_ADMIN_GATE_HINT_PAGE_TEMPLATE'                 => 'Install the missing page template under the active theme: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_EMAIL_TEMPLATE'                => 'Install the missing email template under the active theme: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_TRANSLATION_KEY'               => 'Add a non-empty translation for "%1$s" in the language-%2$d lang file.',
+    'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Revocations',
+    'O3_REVOCATION_ADMIN_LIST_MENUITEM'                           => 'Customer Information',
+    'O3_REVOCATION_ADMIN_LIST_MENUSUBITEM'                        => 'Revocations',
+    'O3_REVOCATION_ADMIN_LIST_EMPTY'                              => 'No revocations recorded.',
+    'O3_REVOCATION_ADMIN_LIST_COL_SUBMITTED'                      => 'Received',
+    'O3_REVOCATION_ADMIN_LIST_COL_NAME'                           => 'Name',
+    'O3_REVOCATION_ADMIN_LIST_COL_EMAIL'                          => 'Email',
+    'O3_REVOCATION_ADMIN_LIST_COL_ORDER'                          => 'Order ID',
+    'O3_REVOCATION_ADMIN_LIST_COL_STATUS'                         => 'Status',
+    'O3_REVOCATION_ADMIN_FLAG_SENT'                               => 'Send succeeded',
+    'O3_REVOCATION_ADMIN_FLAG_SEND_FAILED'                        => 'Send failed',
+    'O3_REVOCATION_ADMIN_DETAIL_HEADING'                          => 'Revocation — details',
+    'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Submission ID',
+    'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Received at',
+    'O3_REVOCATION_ADMIN_FIELD_NAME'                              => 'Name',
+    'O3_REVOCATION_ADMIN_FIELD_ORDER_IDENT'                       => 'Order ID (as typed by the consumer)',
+    'O3_REVOCATION_ADMIN_FIELD_EMAIL'                             => 'Email address (as typed by the consumer)',
+    'O3_REVOCATION_ADMIN_FIELD_FREETEXT'                          => 'Free text / notes',
+    'O3_REVOCATION_ADMIN_FIELD_FREETEXT_EMPTY'                    => '(empty)',
+    'O3_REVOCATION_ADMIN_FIELD_STATUS'                            => 'Send status',
+    'O3_REVOCATION_ADMIN_ACTIONS_HEADING'                         => 'Actions',
+    'O3_REVOCATION_ADMIN_RESEND_BUTTON'                           => 'Resend confirmation',
+    'O3_REVOCATION_ADMIN_DELETE_BUTTON'                           => 'Delete record',
+    'O3_REVOCATION_ADMIN_DELETE_CONFIRM'                          => 'Permanently delete this revocation record? This action cannot be undone.',
 ];
 
 /*

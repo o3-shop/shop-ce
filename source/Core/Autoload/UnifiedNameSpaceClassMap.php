@@ -353,6 +353,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\AdminRevocation'              => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRevocation::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\AdminRights'              => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\AdminRights::class,
         'isAbstract'       => false,
@@ -1229,6 +1235,24 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\RevocationConfigController'   => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationConfigController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\RevocationList'               => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationList::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
+    'OxidEsales\Eshop\Application\Controller\Admin\RevocationMain'               => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationMain::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\SelectListController'         => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\SelectListController::class,
         'isAbstract'       => false,
@@ -1709,6 +1733,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\RevocationController'               => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\RevocationController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\RssController'                      => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\RssController::class,
         'isAbstract'       => false,
@@ -2044,6 +2074,12 @@ return [
         'isAbstract'       => false,
         'isInterface'      => false,
         'isDeprecated'     => true,
+    ],
+    'OxidEsales\Eshop\Application\Model\O3Revocation'                            => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\O3Revocation::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
     ],
     'OxidEsales\Eshop\Application\Model\Object2Category'                         => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Model\Object2Category::class,

@@ -139,8 +139,8 @@ class NewsletterSelectionAjaxTest extends \OxidTestCase
      */
     public function testRemoveGroupFromNewsletter()
     {
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupRemove1', '_testGroupRemove2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupRemove1', '_testGroupRemove2']));
 
         $sSql = "select count(oxid) from oxobject2group where oxid in ('_testGroupRemove1', '_testGroupRemove2')";
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -179,8 +179,8 @@ class NewsletterSelectionAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2group where oxobjectid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $oView->addGroupToNewsletter();
         $this->assertEquals(2, oxDb::getDb()->getOne($sSql));
@@ -203,8 +203,8 @@ class NewsletterSelectionAjaxTest extends \OxidTestCase
         $sSql = "select count(oxid) from oxobject2group where oxobjectid='$sSynchoxid'";
         $this->assertEquals(0, oxDb::getDb()->getOne($sSql));
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSelectionAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testGroupAdd1', '_testGroupAdd2']));
 
         $oView->addGroupToNewsletter();
         $this->assertEquals($iCount, oxDb::getDb()->getOne($sSql));

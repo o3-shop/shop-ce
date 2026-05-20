@@ -82,7 +82,7 @@ class LoginController extends AdminController
         //#533 user profile
         $this->addTplParam('profiles', Registry::getUtils()->loadAdminProfile($myConfig->getConfigParam('aInterfaceProfiles')));
 
-        $aLanguages = $this->getAvailableLanguages();
+        $aLanguages = $this->_getAvailableLanguages();
         $this->addTplParam('aLanguages', $aLanguages);
 
         // setting templates language to selected language id
@@ -192,9 +192,13 @@ class LoginController extends AdminController
      * Rewrites authorization method.
      *
      * @return boolean
-     * @deprecated Use authorize() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _authorize().
+     * @deprecated Transitional during #107. Modules SHOULD override _authorize()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes authorize() to the canonical override
+      *             target and retires _authorize(); until then, _authorize() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _authorize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -207,9 +211,10 @@ class LoginController extends AdminController
      *
      * @return boolean
      *
-     * @internal If your override does not fully replace the behavior, call parent::authorize()
-     *           (not the deprecated _authorize()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _authorize(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make authorize() the canonical override target.
      */
     protected function authorize()
     {
@@ -230,14 +235,18 @@ class LoginController extends AdminController
      * Get available admin interface languages
      *
      * @return array
-     * @deprecated Use getAvailableLanguages() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getAvailableLanguages().
+     * @deprecated Transitional during #107. Modules SHOULD override _getAvailableLanguages()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAvailableLanguages() to the canonical override
+      *             target and retires _getAvailableLanguages(); until then, _getAvailableLanguages() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAvailableLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sDefLang = Registry::getUtilsServer()->getOxCookie('oxidadminlanguage');
-        $sDefLang = $sDefLang ? $sDefLang : $this->getBrowserLanguage();
+        $sDefLang = $sDefLang ? $sDefLang : $this->_getBrowserLanguage();
 
         $aLanguages = Registry::getLang()->getAdminTplLanguageArray();
         foreach ($aLanguages as $oLang) {
@@ -252,9 +261,10 @@ class LoginController extends AdminController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::getAvailableLanguages()
-     *           (not the deprecated _getAvailableLanguages()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAvailableLanguages(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAvailableLanguages() the canonical override target.
      */
     protected function getAvailableLanguages()
     {
@@ -265,9 +275,13 @@ class LoginController extends AdminController
      * Get detected user browser language abbreviation
      *
      * @return string
-     * @deprecated Use getBrowserLanguage() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getBrowserLanguage().
+     * @deprecated Transitional during #107. Modules SHOULD override _getBrowserLanguage()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getBrowserLanguage() to the canonical override
+      *             target and retires _getBrowserLanguage(); until then, _getBrowserLanguage() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getBrowserLanguage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -279,9 +293,10 @@ class LoginController extends AdminController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getBrowserLanguage()
-     *           (not the deprecated _getBrowserLanguage()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getBrowserLanguage(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getBrowserLanguage() the canonical override target.
      */
     protected function getBrowserLanguage()
     {

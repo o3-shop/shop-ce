@@ -85,14 +85,15 @@ class AdminViewTest extends \OxidTestCase
      */
     public function testGetServiceUrl()
     {
-        // getServiceUrl() calls getServiceProtocol() (without underscore) and ShopVersion::getVersion().
-        // Mock getServiceProtocol on the view, and use the real ShopVersion.
+        // getServiceUrl() calls _getServiceProtocol() (the underscore form post-#107
+        // call-site sweep) and ShopVersion::getVersion(). Mock _getServiceProtocol on
+        // the view, and use the real ShopVersion.
         $sPref = $this->getConfig()->getEdition();
         $sVersion = \OxidEsales\Eshop\Core\ShopVersion::getVersion();
 
         $this->getProxyClass(AdminController::class);
-        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['getServiceProtocol'], [], '', false);
-        $oAdminView->expects($this->any())->method('getServiceProtocol')->will($this->returnValue('testprotocol'));
+        $oAdminView = $this->getMock('OxidEsales_Eshop_Application_Controller_Admin_AdminControllerProxy', ['_getServiceProtocol'], [], '', false);
+        $oAdminView->expects($this->any())->method('_getServiceProtocol')->will($this->returnValue('testprotocol'));
 
         $this->getSession()->setVariable('tpllanguage', 'de');
 

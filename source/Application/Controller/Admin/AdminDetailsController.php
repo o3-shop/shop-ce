@@ -76,7 +76,7 @@ class AdminDetailsController extends AdminController
                 $sEditObjectValue = $oObject->$sField->value;
             }
 
-            $sEditObjectValue = $this->processEditValue($sEditObjectValue);
+            $sEditObjectValue = $this->_processEditValue($sEditObjectValue);
             $oObject->$sField = new Field($sEditObjectValue, Field::T_RAW);
         }
 
@@ -91,9 +91,10 @@ class AdminDetailsController extends AdminController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getEditValue()
-     *           (not the deprecated _getEditValue()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEditValue(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEditValue() the canonical override target.
      */
     protected function getEditValue($oObject, $sField)
     {
@@ -155,7 +156,7 @@ class AdminDetailsController extends AdminController
      */
     protected function _getPlainEditor($width, $height, $object, $field) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $objectValue = $this->getEditValue($object, $field);
+        $objectValue = $this->_getEditValue($object, $field);
 
         $textEditor = oxNew(TextEditorHandler::class);
 
@@ -180,7 +181,7 @@ class AdminDetailsController extends AdminController
      */
     protected function _generateTextEditor($width, $height, $object, $field, $stylesheet = null) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $objectValue = $this->getEditValue($object, $field);
+        $objectValue = $this->_getEditValue($object, $field);
 
         $textEditorHandler = $this->createTextEditorHandler();
         $this->configureTextEditorHandler($textEditorHandler, $object, $field, $stylesheet);
@@ -326,7 +327,7 @@ class AdminDetailsController extends AdminController
         $blForceNonCache = false,
         $iTreeShopId = null
     ) {
-        $oCatTree = $this->createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
+        $oCatTree = $this->_createCategoryTree($sTplVarName, $sEditCatId, $blForceNonCache, $iTreeShopId);
 
         // mark selected
         if ($sSelectedCatId) {
@@ -440,9 +441,13 @@ class AdminDetailsController extends AdminController
      * Resets count of vendor/manufacturer category items.
      *
      * @param array $aIds to reset type => id
-     * @deprecated Use resetCounts() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _resetCounts().
+     * @deprecated Transitional during #107. Modules SHOULD override _resetCounts()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes resetCounts() to the canonical override
+      *             target and retires _resetCounts(); until then, _resetCounts() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _resetCounts($aIds) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -465,9 +470,10 @@ class AdminDetailsController extends AdminController
      *
      * @param array $aIds to reset type => id
      *
-     * @internal If your override does not fully replace the behavior, call parent::resetCounts()
-     *           (not the deprecated _resetCounts()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _resetCounts(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make resetCounts() the canonical override target.
      */
     protected function resetCounts($aIds)
     {

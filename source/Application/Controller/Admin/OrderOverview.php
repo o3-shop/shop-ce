@@ -69,15 +69,23 @@ class OrderOverview extends AdminDetailsController
             }
         }
 
-        // orders today
-        $dSum = $oOrder->getOrderSum(true);
-        $this->_aViewData['ordersum'] = $oLang->formatCurrency($dSum, $oCur);
-        $this->_aViewData['ordercnt'] = $oOrder->getOrderCnt(true);
+        // Per-shop order aggregates (today + all-time): only needed for the
+        // "General Review" panel on the overview page, which the template
+        // hides when a single order is being viewed (`[{if !$edit}]`).
+        // Skipping the 4 aggregate queries on the single-order view is where
+        // the actual perf win for o3-shop/o3-shop#112 comes from — the
+        // template-only wrap would still leave the queries running.
+        if (!isset($this->_aViewData['edit'])) {
+            // orders today
+            $dSum = $oOrder->getOrderSum(true);
+            $this->_aViewData['ordersum'] = $oLang->formatCurrency($dSum, $oCur);
+            $this->_aViewData['ordercnt'] = $oOrder->getOrderCnt(true);
 
-        // ALL orders
-        $dSum = $oOrder->getOrderSum();
-        $this->_aViewData['ordertotalsum'] = $oLang->formatCurrency($dSum, $oCur);
-        $this->_aViewData['ordertotalcnt'] = $oOrder->getOrderCnt();
+            // ALL orders
+            $dSum = $oOrder->getOrderSum();
+            $this->_aViewData['ordertotalsum'] = $oLang->formatCurrency($dSum, $oCur);
+            $this->_aViewData['ordertotalcnt'] = $oOrder->getOrderCnt();
+        }
         $this->_aViewData['afolder'] = $myConfig->getConfigParam('aOrderfolder');
         $this->_aViewData['alangs'] = $oLang->getLanguageNames();
 

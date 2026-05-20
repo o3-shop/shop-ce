@@ -147,7 +147,7 @@ class ArticleSeo extends ObjectSeo
             $oProduct = oxNew(Article::class);
             $oProduct->load($this->getEditObjectId());
 
-            if ($oCatList = $this->getCategoryList($oProduct)) {
+            if ($oCatList = $this->_getCategoryList($oProduct)) {
                 $this->_aSelectionList['oxcategory'][$this->_iEditLang] = $oCatList;
             }
 

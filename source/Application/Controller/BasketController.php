@@ -392,7 +392,7 @@ class BasketController extends FrontendController
         if ($this->getViewConfig()->getShowGiftWrapping()) {
             $oBasket = Registry::getSession()->getBasket();
 
-            $this->setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
+            $this->_setWrappingInfo($oBasket, $oRequest->getRequestEscapedParameter('wrapping'));
 
             $oBasket->setCardMessage($oRequest->getRequestEscapedParameter('giftmessage'));
             $oBasket->setCardId($oRequest->getRequestEscapedParameter('chosencard'));

@@ -65,7 +65,7 @@ class ArticleReview extends AdminDetailsController
                 $this->_aViewData['readonly'] = true;
             }
 
-            $reviewList = $this->getReviewList($article);
+            $reviewList = $this->_getReviewList($article);
 
             foreach ($reviewList as $review) {
                 if ($review->oxreviews__oxid->value == $reviewId) {
@@ -140,9 +140,10 @@ class ArticleReview extends AdminDetailsController
      * @return ListModel
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getReviewList()
-     *           (not the deprecated _getReviewList()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getReviewList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getReviewList() the canonical override target.
      */
     protected function getReviewList($article)
     {

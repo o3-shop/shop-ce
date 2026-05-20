@@ -89,9 +89,13 @@ class DiagnosticsMain extends AdminDetailsController
      * Error status getter
      *
      * @return bool
-     * @deprecated Use hasError() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _hasError().
+     * @deprecated Transitional during #107. Modules SHOULD override _hasError()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes hasError() to the canonical override
+      *             target and retires _hasError(); until then, _hasError() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _hasError() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -103,9 +107,10 @@ class DiagnosticsMain extends AdminDetailsController
      *
      * @return bool
      *
-     * @internal If your override does not fully replace the behavior, call parent::hasError()
-     *           (not the deprecated _hasError()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _hasError(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make hasError() the canonical override target.
      */
     protected function hasError()
     {
@@ -116,9 +121,13 @@ class DiagnosticsMain extends AdminDetailsController
      * Error status getter
      *
      * @return string
-     * @deprecated Use getErrorMessage() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getErrorMessage().
+     * @deprecated Transitional during #107. Modules SHOULD override _getErrorMessage()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getErrorMessage() to the canonical override
+      *             target and retires _getErrorMessage(); until then, _getErrorMessage() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -130,9 +139,10 @@ class DiagnosticsMain extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getErrorMessage()
-     *           (not the deprecated _getErrorMessage()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getErrorMessage(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getErrorMessage() the canonical override target.
      */
     protected function getErrorMessage()
     {
@@ -161,8 +171,8 @@ class DiagnosticsMain extends AdminDetailsController
     {
         parent::render();
 
-        if ($this->hasError()) {
-            $this->_aViewData['sErrorMessage'] = $this->getErrorMessage();
+        if ($this->_hasError()) {
+            $this->_aViewData['sErrorMessage'] = $this->_getErrorMessage();
         }
 
         return 'diagnostics_form.tpl';
@@ -267,7 +277,7 @@ class DiagnosticsMain extends AdminDetailsController
     {
         $sReport = '';
 
-        $aDiagnosticsResult = $this->runBasicDiagnostics();
+        $aDiagnosticsResult = $this->_runBasicDiagnostics();
         $sReport .= $this->_oRenderer->renderTemplate('diagnostics_main.tpl', $aDiagnosticsResult);
 
         /**
@@ -277,7 +287,7 @@ class DiagnosticsMain extends AdminDetailsController
             $aFileList = $this->_getFilesToCheck();
             $oFileCheckerResult = $this->_checkOxidFiles($aFileList);
 
-            if ($this->hasError()) {
+            if ($this->_hasError()) {
                 return;
             }
 
@@ -297,9 +307,13 @@ class DiagnosticsMain extends AdminDetailsController
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated Use runBasicDiagnostics() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _runBasicDiagnostics().
+     * @deprecated Transitional during #107. Modules SHOULD override _runBasicDiagnostics()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes runBasicDiagnostics() to the canonical override
+      *             target and retires _runBasicDiagnostics(); until then, _runBasicDiagnostics() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _runBasicDiagnostics() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -374,9 +388,10 @@ class DiagnosticsMain extends AdminDetailsController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      *
-     * @internal If your override does not fully replace the behavior, call parent::runBasicDiagnostics()
-     *           (not the deprecated _runBasicDiagnostics()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _runBasicDiagnostics(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make runBasicDiagnostics() the canonical override target.
      */
     protected function runBasicDiagnostics()
     {

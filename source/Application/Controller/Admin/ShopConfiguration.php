@@ -147,9 +147,13 @@ class ShopConfiguration extends AdminDetailsController
      * return theme filter for config variables
      *
      * @return string
-     * @deprecated Use getModuleForConfigVars() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getModuleForConfigVars().
+     * @deprecated Transitional during #107. Modules SHOULD override _getModuleForConfigVars()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getModuleForConfigVars() to the canonical override
+      *             target and retires _getModuleForConfigVars(); until then, _getModuleForConfigVars() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -161,9 +165,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getModuleForConfigVars()
-     *           (not the deprecated _getModuleForConfigVars()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getModuleForConfigVars(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getModuleForConfigVars() the canonical override target.
      */
     protected function getModuleForConfigVars()
     {
@@ -292,9 +297,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $constraint serialized constraint
      *
      * @return array|null
-     * @deprecated Use parseConstraint() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _parseConstraint().
+     * @deprecated Transitional during #107. Modules SHOULD override _parseConstraint()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes parseConstraint() to the canonical override
+      *             target and retires _parseConstraint(); until then, _parseConstraint() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _parseConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -312,9 +321,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return array|null
      *
-     * @internal If your override does not fully replace the behavior, call parent::parseConstraint()
-     *           (not the deprecated _parseConstraint()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _parseConstraint(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make parseConstraint() the canonical override target.
      */
     protected function parseConstraint($type, $constraint)
     {
@@ -328,9 +338,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param mixed  $constraint constraint value
      *
      * @return string
-     * @deprecated Use serializeConstraint() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _serializeConstraint().
+     * @deprecated Transitional during #107. Modules SHOULD override _serializeConstraint()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes serializeConstraint() to the canonical override
+      *             target and retires _serializeConstraint(); until then, _serializeConstraint() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _serializeConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -348,9 +362,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::serializeConstraint()
-     *           (not the deprecated _serializeConstraint()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _serializeConstraint(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make serializeConstraint() the canonical override target.
      */
     protected function serializeConstraint($type, $constraint)
     {
@@ -454,9 +469,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array with text
      *
      * @return string
-     * @deprecated Use arrayToMultiline() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _arrayToMultiline().
+     * @deprecated Transitional during #107. Modules SHOULD override _arrayToMultiline()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes arrayToMultiline() to the canonical override
+      *             target and retires _arrayToMultiline(); until then, _arrayToMultiline() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _arrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -470,9 +489,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::arrayToMultiline()
-     *           (not the deprecated _arrayToMultiline()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _arrayToMultiline(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make arrayToMultiline() the canonical override target.
      */
     protected function arrayToMultiline($input)
     {
@@ -485,9 +505,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $multiline Multiline text
      *
      * @return array|void
-     * @deprecated Use multilineToArray() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _multilineToArray().
+     * @deprecated Transitional during #107. Modules SHOULD override _multilineToArray()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes multilineToArray() to the canonical override
+      *             target and retires _multilineToArray(); until then, _multilineToArray() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -511,9 +535,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return array|void
      *
-     * @internal If your override does not fully replace the behavior, call parent::multilineToArray()
-     *           (not the deprecated _multilineToArray()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _multilineToArray(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make multilineToArray() the canonical override target.
      */
     protected function multilineToArray($multiline)
     {
@@ -526,9 +551,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array to convert
      *
      * @return string|void
-     * @deprecated Use aarrayToMultiline() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _aarrayToMultiline().
+     * @deprecated Transitional during #107. Modules SHOULD override _aarrayToMultiline()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes aarrayToMultiline() to the canonical override
+      *             target and retires _aarrayToMultiline(); until then, _aarrayToMultiline() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -552,9 +581,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return string|void
      *
-     * @internal If your override does not fully replace the behavior, call parent::aarrayToMultiline()
-     *           (not the deprecated _aarrayToMultiline()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _aarrayToMultiline(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make aarrayToMultiline() the canonical override target.
      */
     protected function aarrayToMultiline($input)
     {
@@ -567,9 +597,13 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $multiline Multiline text
      *
      * @return array
-     * @deprecated Use multilineToAarray() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _multilineToAarray().
+     * @deprecated Transitional during #107. Modules SHOULD override _multilineToAarray()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes multilineToAarray() to the canonical override
+      *             target and retires _multilineToAarray(); until then, _multilineToAarray() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -597,9 +631,10 @@ class ShopConfiguration extends AdminDetailsController
      *
      * @return array
      *
-     * @internal If your override does not fully replace the behavior, call parent::multilineToAarray()
-     *           (not the deprecated _multilineToAarray()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _multilineToAarray(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make multilineToAarray() the canonical override target.
      */
     protected function multilineToAarray($multiline)
     {

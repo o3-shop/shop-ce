@@ -135,15 +135,15 @@ class ArticlePictures extends AdminDetailsController
 
         if ($iIndex == 'ICO') {
             // deleting main icon
-            $this->deleteMainIcon($oArticle);
+            $this->_deleteMainIcon($oArticle);
         } elseif ($iIndex == 'TH') {
             // deleting thumbnail
-            $this->deleteThumbnail($oArticle);
+            $this->_deleteThumbnail($oArticle);
         } else {
             $iIndex = (int) $iIndex;
             if ($iIndex > 0) {
                 // deleting master picture
-                $this->resetMasterPicture($oArticle, $iIndex, true);
+                $this->_resetMasterPicture($oArticle, $iIndex, true);
             }
         }
 
@@ -181,7 +181,7 @@ class ArticlePictures extends AdminDetailsController
             }
 
             if ($iIndex == 1) {
-                $this->cleanupCustomFields($oArticle);
+                $this->_cleanupCustomFields($oArticle);
             }
         }
     }
@@ -231,9 +231,10 @@ class ArticlePictures extends AdminDetailsController
      *
      * @param Article $oArticle article object
      *
-     * @internal If your override does not fully replace the behavior, call parent::deleteMainIcon()
-     *           (not the deprecated _deleteMainIcon()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteMainIcon(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteMainIcon() the canonical override target.
      */
     protected function deleteMainIcon($oArticle)
     {
@@ -267,9 +268,10 @@ class ArticlePictures extends AdminDetailsController
      *
      * @param Article $oArticle article object
      *
-     * @internal If your override does not fully replace the behavior, call parent::deleteThumbnail()
-     *           (not the deprecated _deleteThumbnail()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _deleteThumbnail(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make deleteThumbnail() the canonical override target.
      */
     protected function deleteThumbnail($oArticle)
     {

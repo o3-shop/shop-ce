@@ -27,10 +27,21 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\DataObject\ShopConfiguration;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Setup\Bridge\ModuleActivationBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckService;
+use OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper;
 use PHPUnit\Framework\TestCase;
 
 class UpdateCheckServiceTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        // Clear log file to prevent ERROR entries from testCheckReturnsEmptyResultOnException
+        // bleeding into the next test class (see issue #103)
+        if (defined('OX_LOG_FILE') && is_file(OX_LOG_FILE)) {
+            (new ExceptionLogFileHelper(OX_LOG_FILE))->clearExceptionLogFile();
+        }
+        parent::tearDown();
+    }
+
     public function testBuildPayloadContainsRequiredKeys(): void
     {
         $moduleConfigA = $this->createModuleConfiguration('mod-a', '1.0.0');

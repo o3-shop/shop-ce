@@ -60,9 +60,13 @@ class DeliverySetPaymentAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated Use getQuery() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getQuery().
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -94,9 +98,10 @@ class DeliverySetPaymentAjax extends ListComponentAjax
      * @return string
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getQuery()
-     *           (not the deprecated _getQuery()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
     protected function getQuery()
     {
@@ -108,9 +113,9 @@ class DeliverySetPaymentAjax extends ListComponentAjax
      */
     public function removePayFromSet()
     {
-        $aChosenCntr = $this->getActionIds('oxobject2payment.oxid');
+        $aChosenCntr = $this->_getActionIds('oxobject2payment.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2payment.* ' . $this->getQuery());
+            $sQ = $this->_addFilter('delete oxobject2payment.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
             $sQ = 'delete from oxobject2payment where oxobject2payment.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr)) . ') ';
@@ -125,13 +130,13 @@ class DeliverySetPaymentAjax extends ListComponentAjax
      */
     public function addPayToSet()
     {
-        $aChosenSets = $this->getActionIds('oxpayments.oxid');
+        $aChosenSets = $this->_getActionIds('oxpayments.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sPayTable = $this->getViewName('oxpayments');
-            $aChosenSets = $this->getAll($this->addFilter("select $sPayTable.oxid " . $this->getQuery()));
+            $aChosenSets = $this->_getAll($this->_addFilter("select $sPayTable.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != '-1' && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).

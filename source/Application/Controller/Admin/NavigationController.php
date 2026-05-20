@@ -30,6 +30,8 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\ShopVersion;
 use OxidEsales\EshopCommunity\Core\AdminNaviRights;
 use OxidEsales\EshopCommunity\Core\AdminViewSetting;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckServiceInterface;
 
 /**
  * Administrator GUI navigation manager class.
@@ -46,6 +48,18 @@ class NavigationController extends AdminController
     public function render()
     {
         parent::render();
+
+        // Make the most recent cached UpdateCheckResult available to all
+        // NavigationController renders — including header.tpl, which has no
+        // path of its own to UpdateCheckService and needs to know whether
+        // the providers were reachable last time we ran a check (to decide
+        // whether to render the manual re-check icon). _doStartUpChecks()
+        // (called below for home.tpl) may overwrite this with a freshly
+        // fetched result.
+        $cachedUpdateCheckResult = $this->getUpdateCheckService()->getCachedResult();
+        if ($cachedUpdateCheckResult !== null) {
+            $this->_aViewData['updateCheckResult'] = $cachedUpdateCheckResult;
+        }
 
         $sItem = Registry::getRequest()->getRequestEscapedParameter('item');
         $sItem = $sItem ? basename($sItem) : false;
@@ -64,7 +78,7 @@ class NavigationController extends AdminController
             if (!Registry::getRequest()->getRequestEscapedParameter('navReload')) {
                 // #661 execute stuff we run each time when we start admin once
                 if ('home.tpl' == $sItem) {
-                    $this->_aViewData['aMessage'] = $this->doStartUpChecks();
+                    $this->_aViewData['aMessage'] = $this->_doStartUpChecks();
                 }
             } else {
                 //removing reload param to force requirements checking next time
@@ -144,9 +158,13 @@ class NavigationController extends AdminController
      *
      * @return array
      * @throws Exception
-     * @deprecated Use doStartUpChecks() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _doStartUpChecks().
+     * @deprecated Transitional during #107. Modules SHOULD override _doStartUpChecks()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes doStartUpChecks() to the canonical override
+      *             target and retires _doStartUpChecks(); until then, _doStartUpChecks() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _doStartUpChecks() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -166,11 +184,11 @@ class NavigationController extends AdminController
             $messages['message'] .= Registry::getLang()->translateString('NAVIGATION_SYSREQ_MESSAGE2') . '</a>';
         }
 
-        // version check
-        if (Registry::getConfig()->getConfigParam('blCheckForUpdates')) {
-            if ($sVersionNotice = $this->checkVersion()) {
-                $messages['message'] .= $sVersionNotice;
-            }
+        // version check via UpdateCheckService
+        $forceUpdateCheck = (bool) Registry::getRequest()->getRequestEscapedParameter('forceUpdateCheck');
+        if ($forceUpdateCheck || Registry::getConfig()->getConfigParam('blCheckForUpdates')) {
+            $updateCheckResult = $this->getUpdateCheckService()->check($forceUpdateCheck);
+            $this->_aViewData['updateCheckResult'] = $updateCheckResult;
         }
 
         // check if setup dir is deleted
@@ -200,9 +218,10 @@ class NavigationController extends AdminController
      * @return array
      * @throws Exception
      *
-     * @internal If your override does not fully replace the behavior, call parent::doStartUpChecks()
-     *           (not the deprecated _doStartUpChecks()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _doStartUpChecks(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make doStartUpChecks() the canonical override target.
      */
     protected function doStartUpChecks()
     {
@@ -214,37 +233,25 @@ class NavigationController extends AdminController
      *
      * @return string
      * @throws Exception
-     * @deprecated Use checkVersion() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _checkVersion().
+     * @deprecated Transitional during #107. Modules SHOULD override _checkVersion()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkVersion() to the canonical override
+      *             target and retires _checkVersion(); until then, _checkVersion() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkVersion() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $json = file_get_contents('https://api.github.com/repos/o3-shop/o3-shop/releases/latest', false, stream_context_create([
-            'http' => [
-                'header' => [
-                    'User-Agent: PHP', // GitHub requires a User-Agent header
-                    'Accept: application/vnd.github+json',
-                    'X-GitHub-Api-Version: 2022-11-28',
-                ],
-            ],
-        ]));
+        $result = $this->getUpdateCheckService()->check();
 
-        $data = json_decode($json, true);
-
-        $latestVersion = $data['name'] ?? null;
-
-        Registry::getLogger()->debug('Latest Release name: ' . $latestVersion);
-
-        if ($latestVersion) {
+        if ($result->isCoreUpdateAvailable()) {
             $currentVersion = oxNew(ShopVersion::class)->getVersion();
-            if (version_compare($currentVersion, $latestVersion, '<')) {
-                return sprintf(
-                    Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),
-                    $currentVersion,
-                    $latestVersion
-                );
-            }
+            return sprintf(
+                Registry::getLang()->translateString('NAVIGATION_NEW_VERSION_AVAILABLE'),
+                $currentVersion,
+                $result->getLatestCoreVersion()
+            );
         }
     }
 
@@ -254,13 +261,24 @@ class NavigationController extends AdminController
      * @return string|void
      * @throws Exception
      *
-     * @internal If your override does not fully replace the behavior, call parent::checkVersion()
-     *           (not the deprecated _checkVersion()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkVersion(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkVersion() the canonical override target.
      */
     protected function checkVersion()
     {
         return $this->_checkVersion();
+    }
+
+    /**
+     * @return UpdateCheckServiceInterface
+     */
+    protected function getUpdateCheckService(): UpdateCheckServiceInterface
+    {
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(UpdateCheckServiceInterface::class);
     }
 
     public function canHaveRestrictedView()

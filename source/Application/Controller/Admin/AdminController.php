@@ -140,7 +140,7 @@ class AdminController extends BaseController
         $myConfig->setConfigParam('blAdmin', true);
         $this->setAdminMode(true);
 
-        if ($oShop = $this->getEditShop($myConfig->getShopId())) {
+        if ($oShop = $this->_getEditShop($myConfig->getShopId())) {
             // passing shop info
             $this->_sShopTitle = $oShop->oxshops__oxname->getRawValue();
             $this->_sShopVersion = oxNew(ShopVersion::class)->getVersion();
@@ -180,9 +180,10 @@ class AdminController extends BaseController
      *
      * @return Shop
      *
-     * @internal If your override does not fully replace the behavior, call parent::getEditShop()
-     *           (not the deprecated _getEditShop()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEditShop(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEditShop() the canonical override target.
      */
     protected function getEditShop($sShopId)
     {
@@ -296,7 +297,7 @@ class AdminController extends BaseController
     public function getServiceUrl($sLangAbbr = null)
     {
         if ($this->_sServiceUrl === null) {
-            $sProtocol = $this->getServiceProtocol();
+            $sProtocol = $this->_getServiceProtocol();
 
             $oFacts = new Facts();
             $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $oFacts->getEdition() . '/';
@@ -380,7 +381,7 @@ class AdminController extends BaseController
         $oLang = Registry::getLang();
 
         // sets up navigation data
-        $this->setupNavigation(Registry::getConfig()->getRequestControllerId());
+        $this->_setupNavigation(Registry::getConfig()->getRequestControllerId());
 
         // active object id
         $sOxId = $this->getEditObjectId();
@@ -395,7 +396,7 @@ class AdminController extends BaseController
         // loading active shop
         if ($sActShopId = Registry::getSession()->getVariable('actshop')) {
             // load object
-            $this->_aViewData['actshopobj'] = $this->getEditShop($sActShopId);
+            $this->_aViewData['actshopobj'] = $this->_getEditShop($sActShopId);
         }
 
         // add language data to all templates
@@ -516,7 +517,7 @@ class AdminController extends BaseController
                     $myUtilsCount->resetManufacturerArticleCount($sValue);
                     break;
             }
-            $this->resetContentCache();
+            $this->_resetContentCache();
         }
     }
 

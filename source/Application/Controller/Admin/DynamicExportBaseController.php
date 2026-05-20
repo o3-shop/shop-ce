@@ -513,8 +513,8 @@ class DynamicExportBaseController extends AdminDetailsController
             Registry::getUtils()->showMessageAndExit("Could not insert Articles in Table {$sHeapTable}\n<br>");
         }
 
-        $this->removeParentArticles($sHeapTable);
-        $this->setSessionParams();
+        $this->_removeParentArticles($sHeapTable);
+        $this->_setSessionParams();
 
         // get total cnt
         return $oDB->getOne("select count(*) from {$sHeapTable}");
@@ -540,7 +540,7 @@ class DynamicExportBaseController extends AdminDetailsController
         $myConfig->setConfigParam('blExport', true);
         $blContinue = false;
 
-        if (($oArticle = $this->initArticle($this->getHeapTableName(), $iCnt, $blContinue))) {
+        if (($oArticle = $this->_initArticle($this->getHeapTableName(), $iCnt, $blContinue))) {
             $blContinue = true;
             $oArticle = $this->setCampaignDetailLink($oArticle);
         }

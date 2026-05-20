@@ -22,7 +22,7 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Service;
 
 /**
- * @covers \OxidEsales\Eshop\Core\Service\ApplicationServerService
+ * @covers \OxidEsales\EshopCommunity\Core\Service\ApplicationServerService
  */
 class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
@@ -175,6 +175,166 @@ class ApplicationServerServiceTest extends \OxidEsales\TestingLibrary\UnitTestCa
 
         $currentTime = \OxidEsales\Eshop\Core\Registry::getUtilsDate()->getTime();
         $service = oxNew(\OxidEsales\Eshop\Core\Service\ApplicationServerService::class, $appServerDao, $utilsServer, $currentTime);
+        $service->updateAppServerInformationInFrontend();
+    }
+
+    public function testUpdateAppServerInformationInAdminWritesAdminUsage(): void
+    {
+        $appServerDao = $this->getMockBuilder(\OxidEsales\Eshop\Core\Dao\ApplicationServerDao::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $appServerDao->expects($this->once())->method('findAppServer')->willReturn(null);
+        $appServerDao->expects($this->once())->method('findAll')->willReturn([]);
+        $captured = null;
+        $appServerDao->expects($this->once())
+            ->method('save')
+            ->willReturnCallback(function ($appServer) use (&$captured) {
+                $captured = $appServer;
+            });
+
+        $utilsServer = $this->getMockBuilder(\OxidEsales\Eshop\Core\UtilsServer::class)
+            ->setMethods(['getServerNodeId', 'getServerIp'])
+            ->getMock();
+        $utilsServer->method('getServerNodeId')->willReturn('admin-node');
+        $utilsServer->method('getServerIp')->willReturn('10.0.0.1');
+
+        $currentTime = 17_000_000_00;
+        $service = new \OxidEsales\EshopCommunity\Core\Service\ApplicationServerService(
+            $appServerDao,
+            $utilsServer,
+            $currentTime
+        );
+        $service->updateAppServerInformationInAdmin();
+
+        $this->assertNotNull($captured);
+        $this->assertSame('admin-node', $captured->getId());
+        $this->assertSame('10.0.0.1', $captured->getIp());
+        $this->assertSame($currentTime, $captured->getLastAdminUsage());
+        // Frontend timestamp must NOT have been touched by the admin path.
+        $this->assertEmpty($captured->getLastFrontendUsage() ?? '');
+    }
+
+    public function testUpdateAppServerInformationUpdatesExistingServerOnAdminCall(): void
+    {
+        $existingServer = oxNew(\OxidEsales\Eshop\Core\DataObject\ApplicationServer::class);
+        $existingServer->setId('node-7');
+        $existingServer->setIp('10.0.0.7');
+        $existingServer->setTimestamp(0); // forces needToUpdate() to return true
+
+        $appServerDao = $this->getMockBuilder(\OxidEsales\Eshop\Core\Dao\ApplicationServerDao::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $appServerDao->method('findAppServer')->willReturn($existingServer);
+        $appServerDao->method('findAll')->willReturn([]);
+        $captured = null;
+        $appServerDao->expects($this->once())
+            ->method('save')
+            ->willReturnCallback(function ($appServer) use (&$captured) {
+                $captured = $appServer;
+            });
+
+        $utilsServer = $this->getMockBuilder(\OxidEsales\Eshop\Core\UtilsServer::class)
+            ->setMethods(['getServerNodeId', 'getServerIp'])
+            ->getMock();
+        $utilsServer->method('getServerNodeId')->willReturn('node-7');
+        $utilsServer->method('getServerIp')->willReturn('10.0.0.7');
+
+        $currentTime = 17_000_000_00;
+        $service = new \OxidEsales\EshopCommunity\Core\Service\ApplicationServerService(
+            $appServerDao,
+            $utilsServer,
+            $currentTime
+        );
+        $service->updateAppServerInformationInAdmin();
+
+        $this->assertSame($existingServer, $captured, 'Update branch must save the existing server, not a fresh one.');
+        $this->assertSame($currentTime, $existingServer->getLastAdminUsage());
+        $this->assertSame($currentTime, $existingServer->getTimestamp());
+    }
+
+    public function testUpdateAppServerInformationRollsBackOnException(): void
+    {
+        $appServerDao = $this->getMockBuilder(\OxidEsales\Eshop\Core\Dao\ApplicationServerDao::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $appServerDao->expects($this->once())->method('startTransaction');
+        $appServerDao->expects($this->once())->method('rollbackTransaction');
+        $appServerDao->expects($this->never())->method('commitTransaction');
+        $appServerDao->method('findAppServer')->willThrowException(new \RuntimeException('DB unreachable'));
+
+        $utilsServer = $this->getMockBuilder(\OxidEsales\Eshop\Core\UtilsServer::class)
+            ->setMethods(['getServerNodeId', 'getServerIp'])
+            ->getMock();
+        $utilsServer->method('getServerNodeId')->willReturn('node-x');
+        $utilsServer->method('getServerIp')->willReturn('10.0.0.99');
+
+        $service = new \OxidEsales\EshopCommunity\Core\Service\ApplicationServerService(
+            $appServerDao,
+            $utilsServer,
+            17_000_000_00
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $service->updateAppServerInformation(false);
+    }
+
+    public function testUpdateAppServerInformationCommitsOnSuccess(): void
+    {
+        $appServerDao = $this->getMockBuilder(\OxidEsales\Eshop\Core\Dao\ApplicationServerDao::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $appServerDao->expects($this->once())->method('startTransaction');
+        $appServerDao->expects($this->once())->method('commitTransaction');
+        $appServerDao->expects($this->never())->method('rollbackTransaction');
+        // Existing server that doesn't need updating → straight to commit.
+        $existingServer = oxNew(\OxidEsales\Eshop\Core\DataObject\ApplicationServer::class);
+        $existingServer->setId('node-fresh');
+        $existingServer->setTimestamp(time()); // very recent → needToUpdate() false
+        $appServerDao->method('findAppServer')->willReturn($existingServer);
+
+        $utilsServer = $this->getMockBuilder(\OxidEsales\Eshop\Core\UtilsServer::class)
+            ->setMethods(['getServerNodeId', 'getServerIp'])
+            ->getMock();
+        $utilsServer->method('getServerNodeId')->willReturn('node-fresh');
+
+        $service = new \OxidEsales\EshopCommunity\Core\Service\ApplicationServerService(
+            $appServerDao,
+            $utilsServer,
+            time()
+        );
+        $service->updateAppServerInformation(true);
+    }
+
+    public function testUpdateAppServerInformationCleansUpStaleServers(): void
+    {
+        // A second server is stale and should be deleted during cleanup.
+        $staleServer = oxNew(\OxidEsales\Eshop\Core\DataObject\ApplicationServer::class);
+        $staleServer->setId('stale-server');
+        $staleServer->setTimestamp(0); // way too old → needToDelete() true
+        $staleServer->setLastAdminUsage(0);
+        $staleServer->setLastFrontendUsage(0);
+
+        $appServerDao = $this->getMockBuilder(\OxidEsales\Eshop\Core\Dao\ApplicationServerDao::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $appServerDao->method('findAppServer')->willReturn(null);
+        $appServerDao->method('findAll')->willReturn(['stale-server' => $staleServer]);
+        $appServerDao->expects($this->once())
+            ->method('delete')
+            ->with('stale-server');
+
+        $utilsServer = $this->getMockBuilder(\OxidEsales\Eshop\Core\UtilsServer::class)
+            ->setMethods(['getServerNodeId', 'getServerIp'])
+            ->getMock();
+        $utilsServer->method('getServerNodeId')->willReturn('node-new');
+        $utilsServer->method('getServerIp')->willReturn('10.0.0.1');
+
+        $currentTime = time();
+        $service = new \OxidEsales\EshopCommunity\Core\Service\ApplicationServerService(
+            $appServerDao,
+            $utilsServer,
+            $currentTime
+        );
         $service->updateAppServerInformationInFrontend();
     }
 

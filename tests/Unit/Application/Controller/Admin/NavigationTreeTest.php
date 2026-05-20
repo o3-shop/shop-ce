@@ -160,15 +160,20 @@ class NavigationTreeTest extends \OxidTestCase
      */
     public function testGetDomXml()
     {
-        $aTestMethods = ['getInitialDom', 'checkGroups', 'checkRights', 'checkDemoShopDenials', 'cleanEmptyParents', 'removeInvisibleMenuNodes'];
+        // Post-#107 call-site sweep: getDomXml() now calls the underscore form
+        // for helper methods on correctly-directioned shim pairs
+        // (_checkGroups / _checkRights / _checkDemoShopDenials / _cleanEmptyParents
+        // / _removeInvisibleMenuNodes). getInitialDom is preserved as bare form
+        // because its shim pair is inverted (impl on the public name).
+        $aTestMethods = ['getInitialDom', '_checkGroups', '_checkRights', '_checkDemoShopDenials', '_cleanEmptyParents', 'removeInvisibleMenuNodes'];
 
         $oNavTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, $aTestMethods);
         $oNavTree->expects($this->once())->method('getInitialDom')->will($this->returnValue(new stdClass()));
-        $oNavTree->expects($this->once())->method('checkGroups');
-        $oNavTree->expects($this->once())->method('checkRights');
-        $oNavTree->expects($this->once())->method('checkDemoShopDenials');
+        $oNavTree->expects($this->once())->method('_checkGroups');
+        $oNavTree->expects($this->once())->method('_checkRights');
+        $oNavTree->expects($this->once())->method('_checkDemoShopDenials');
         $oNavTree->expects($this->once())->method('removeInvisibleMenuNodes');
-        $oNavTree->expects($this->exactly(2))->method('cleanEmptyParents');
+        $oNavTree->expects($this->exactly(2))->method('_cleanEmptyParents');
 
         $oNavTree->getDomXml();
     }
@@ -883,6 +888,37 @@ class NavigationTreeTest extends \OxidTestCase
     }
 
     /**
+     * Regression: every `<SUBMENU id="…" list="…">` in `menu.xml` must declare at
+     * least one `<TAB>` child. `getDomXml()` runs `cleanEmptyParents('//SUBMENU
+     * [@id][@list]', 'TAB')` (NavigationTree.php:794), which silently strips any
+     * SUBMENU lacking a TAB — making the entry vanish from the rendered admin
+     * navigation. The empty-bodied `mxrevocationconfig` SUBMENU shipped that
+     * way, so "Widerruf-Einstellungen" never appeared in the menu until a
+     * `<TAB>` was added. Asserting the invariant guards every other SUBMENU
+     * against the same class of bug.
+     */
+    public function testEverySubmenuWithListHasAtLeastOneTab()
+    {
+        $oDom = $this->_getDomXml();
+        $oXPath = new DomXPath($oDom);
+
+        $offenders = [];
+        foreach ($oXPath->query('//SUBMENU[@id and @list]') as $submenu) {
+            if ($oXPath->query('./TAB', $submenu)->length === 0) {
+                $offenders[] = $submenu->getAttribute('id');
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $offenders,
+            'Every SUBMENU with id+list must declare at least one TAB child, '
+            . 'otherwise NavigationTree::cleanEmptyParents() drops it from the '
+            . 'rendered admin menu. Offending ids: ' . implode(', ', $offenders)
+        );
+    }
+
+    /**
      * test if the right class id will read out from a node
      *
      * @return null
@@ -1030,8 +1066,8 @@ class NavigationTreeTest extends \OxidTestCase
         $oDomElemFrom = new stdClass();
         $oDomElemFrom->childNodes = [$oNode1, $oNode2];
 
-        $oTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['copyAttributes']);
-        $oTree->expects($this->once())->method('copyAttributes');
+        $oTree = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NavigationTree::class, ['_copyAttributes']);
+        $oTree->expects($this->once())->method('_copyAttributes');
         $oTree->UNITmergeNodes($oDomElemTo, $oDomElemFrom, $oXPathTo, $oDomDocTo, $sQueryStart);
     }
 

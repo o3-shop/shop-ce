@@ -103,7 +103,7 @@ class LanguageList extends AdminListController
     public function render()
     {
         parent::render();
-        $this->_aViewData['mylist'] = $this->getLanguagesList();
+        $this->_aViewData['mylist'] = $this->_getLanguagesList();
 
         return 'language_list.tpl';
     }
@@ -113,9 +113,13 @@ class LanguageList extends AdminListController
      *
      * @return array
      * @throws DatabaseConnectionException
-     * @deprecated Use getLanguagesList() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getLanguagesList().
+     * @deprecated Transitional during #107. Modules SHOULD override _getLanguagesList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLanguagesList() to the canonical override
+      *             target and retires _getLanguagesList(); until then, _getLanguagesList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getLanguagesList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -160,9 +164,10 @@ class LanguageList extends AdminListController
      * @return array
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getLanguagesList()
-     *           (not the deprecated _getLanguagesList()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLanguagesList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLanguagesList() the canonical override target.
      */
     protected function getLanguagesList()
     {
@@ -177,9 +182,13 @@ class LanguageList extends AdminListController
      * @param object $oLang2 language object
      *
      * @return int
-     * @deprecated Use sortLanguagesCallback() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _sortLanguagesCallback().
+     * @deprecated Transitional during #107. Modules SHOULD override _sortLanguagesCallback()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes sortLanguagesCallback() to the canonical override
+      *             target and retires _sortLanguagesCallback(); until then, _sortLanguagesCallback() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _sortLanguagesCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -203,9 +212,10 @@ class LanguageList extends AdminListController
      *
      * @return int
      *
-     * @internal If your override does not fully replace the behavior, call parent::sortLanguagesCallback()
-     *           (not the deprecated _sortLanguagesCallback()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _sortLanguagesCallback(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make sortLanguagesCallback() the canonical override target.
      */
     protected function sortLanguagesCallback($oLang1, $oLang2)
     {
@@ -219,9 +229,13 @@ class LanguageList extends AdminListController
      * @param string $iLangId language ID
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated Use resetMultiLangDbFields() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _resetMultiLangDbFields().
+     * @deprecated Transitional during #107. Modules SHOULD override _resetMultiLangDbFields()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes resetMultiLangDbFields() to the canonical override
+      *             target and retires _resetMultiLangDbFields(); until then, _resetMultiLangDbFields() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _resetMultiLangDbFields($iLangId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -256,9 +270,10 @@ class LanguageList extends AdminListController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      *
-     * @internal If your override does not fully replace the behavior, call parent::resetMultiLangDbFields()
-     *           (not the deprecated _resetMultiLangDbFields()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _resetMultiLangDbFields(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make resetMultiLangDbFields() the canonical override target.
      */
     protected function resetMultiLangDbFields($iLangId)
     {

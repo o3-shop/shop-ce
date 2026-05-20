@@ -603,7 +603,7 @@ class UtfTest extends \OxidTestCase
         $oCurr2 = new stdClass();
         $oCurr2->id = '1';
         $oCurr2->name = 'GBP';
-        $oCurr2->rate = '0.8565';
+        $oCurr2->rate = '0.8663';
         $oCurr2->dec = '.';
         $oCurr2->thousand = '';
         $oCurr2->sign = '£';
@@ -613,7 +613,7 @@ class UtfTest extends \OxidTestCase
         $oCurr3 = new stdClass();
         $oCurr3->id = '2';
         $oCurr3->name = 'CHF';
-        $oCurr3->rate = '1.4326';
+        $oCurr3->rate = '0.9190';
         $oCurr3->dec = ',';
         $oCurr3->thousand = '.';
         $oCurr3->sign = '<small>CHF</small>';
@@ -623,7 +623,7 @@ class UtfTest extends \OxidTestCase
         $oCurr4 = new stdClass();
         $oCurr4->id = '3';
         $oCurr4->name = 'USD';
-        $oCurr4->rate = '1.2994';
+        $oCurr4->rate = '1.1702';
         $oCurr4->dec = '.';
         $oCurr4->thousand = '';
         $oCurr4->sign = '$';

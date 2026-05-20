@@ -112,9 +112,9 @@ class ActionsMainTest extends \OxidTestCase
         $oPromotion->load($sPromotion);
 
         // testing.. Production calls createCategoryTree (without underscore)
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', 'createCategoryTree']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', '_createCategoryTree']);
         $oView->expects($this->once())->method('getViewDataElement')->will($this->returnValue($oPromotion));
-        $oView->expects($this->once())->method('createCategoryTree');
+        $oView->expects($this->once())->method('_createCategoryTree');
         $sTplName = $oView->render();
 
         $this->assertEquals('popups/actions_article.tpl', $sTplName);
@@ -170,9 +170,9 @@ class ActionsMainTest extends \OxidTestCase
         $oPromotion->load($sPromotion);
 
         // testing.. Production calls generateTextEditor (without underscore)
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', 'generateTextEditor']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', '_generateTextEditor']);
         $oView->expects($this->once())->method('getViewDataElement')->will($this->returnValue($oPromotion));
-        $oView->expects($this->once())->method('generateTextEditor')->will($this->returnValue('sHtmlEditor'));
+        $oView->expects($this->once())->method('_generateTextEditor')->will($this->returnValue('sHtmlEditor'));
         $sTplName = $oView->render();
 
         $this->assertEquals('actions_main.tpl', $sTplName);
@@ -231,9 +231,9 @@ class ActionsMainTest extends \OxidTestCase
         $oPromotion->oxactions__oxtype = new oxField(2);
 
         // testing.. Production calls generateTextEditor (without underscore)
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', 'generateTextEditor']);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMain::class, ['getViewDataElement', '_generateTextEditor']);
         $oView->expects($this->once())->method('getViewDataElement')->with($this->equalTo('edit'))->will($this->returnValue($oPromotion));
-        $oView->expects($this->once())->method('generateTextEditor')->with($this->equalTo('100%'), $this->equalTo(300), $this->equalTo($oPromotion), $this->equalTo('oxactions__oxlongdesc'), $this->equalTo('details.tpl.css'));
+        $oView->expects($this->once())->method('_generateTextEditor')->with($this->equalTo('100%'), $this->equalTo(300), $this->equalTo($oPromotion), $this->equalTo('oxactions__oxlongdesc'), $this->equalTo('details.tpl.css'));
 
         $sTplName = $oView->render();
 

@@ -164,8 +164,8 @@ class ArticlePicturesTest extends \OxidTestCase
         $this->setRequestParameter('oxid', '_testArtId');
         $this->setRequestParameter('masterPicIndex', '2');
 
-        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['resetMasterPicture']);
-        $oArtPic->expects($this->once())->method('resetMasterPicture');
+        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['_resetMasterPicture']);
+        $oArtPic->expects($this->once())->method('_resetMasterPicture');
 
         $this->_oArticle->save();
 
@@ -254,12 +254,12 @@ class ArticlePicturesTest extends \OxidTestCase
 
         oxTestModules::addModuleObject('oxPictureHandler', $oPicHandler);
 
-        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['cleanupCustomFields']);
-        $oArtPic->expects($this->never())->method('cleanupCustomFields');
+        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['_cleanupCustomFields']);
+        $oArtPic->expects($this->never())->method('_cleanupCustomFields');
         $oArtPic->UNITresetMasterPicture($oArticle, 2);
 
-        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['cleanupCustomFields']);
-        $oArtPic->expects($this->once())->method('cleanupCustomFields');
+        $oArtPic = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticlePictures::class, ['_cleanupCustomFields']);
+        $oArtPic->expects($this->once())->method('_cleanupCustomFields');
         $oArtPic->UNITresetMasterPicture($oArticle, 1);
     }
 

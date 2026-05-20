@@ -233,4 +233,100 @@ class OnlineVatIdCheckTest extends \OxidTestCase
         $this->assertFalse($oOnlineVatCheck->validate($oVatIn));
         $this->assertSame('ID_NOT_VALID', $oOnlineVatCheck->getError());
     }
+
+    public function testCatchWarningLogsAndReturnsTrue(): void
+    {
+        // Capture the logger to verify the warning gets routed there.
+        $captured = null;
+        $logger = new class ($captured) extends \Psr\Log\AbstractLogger {
+            public function __construct(&$captured)
+            {
+                $this->captured = &$captured;
+            }
+            public $captured;
+            public function log($level, $message, array $context = []): void
+            {
+                $this->captured = ['level' => $level, 'message' => $message, 'context' => $context];
+            }
+        };
+        \OxidEsales\Eshop\Core\Registry::set('logger', $logger);
+
+        $check = oxNew('oxOnlineVatIdCheck');
+        $this->assertTrue($check->catchWarning(8, 'soap fault', '/path/to/file.php', 42));
+
+        $this->assertNotNull($logger->captured);
+        $this->assertSame('warning', $logger->captured['level']);
+        $this->assertSame('soap fault', $logger->captured['message']);
+        $this->assertSame('/path/to/file.php', $logger->captured['context']['file']);
+        $this->assertSame(42, $logger->captured['context']['line']);
+        $this->assertSame(8, $logger->captured['context']['code']);
+    }
+
+    public function testRetryConstantsHaveSensibleValues(): void
+    {
+        $this->assertSame(1, \OxidEsales\EshopCommunity\Core\OnlineVatIdCheck::BUSY_RETRY_CNT);
+        $this->assertSame(500000, \OxidEsales\EshopCommunity\Core\OnlineVatIdCheck::BUSY_RETRY_WAITUSEC);
+    }
+
+    public function testCheckOnlineRetriesOnRetriableSoapFault(): void
+    {
+        // The testable subclass exposes the retry/break logic; here we
+        // verify it actually retries up to BUSY_RETRY_CNT+1 times before
+        // bailing on a retriable error.
+        $oCheckVat = new stdClass();
+        $oCheckVat->countryCode = 'DE';
+        $oCheckVat->vatNumber = '231450866';
+
+        $mockSoapClient = $this->getMockBuilder(stdClass::class)
+            ->addMethods(['checkVat'])
+            ->getMock();
+        // BUSY_RETRY_CNT=1 → loop runs at most twice (once + one retry).
+        $mockSoapClient->expects($this->exactly(2))
+            ->method('checkVat')
+            ->willThrowException(new SoapFault('soap:Server', 'SERVER_BUSY'));
+
+        $oOnlineVatCheck = new OnlineVatIdCheckTestable();
+        $oOnlineVatCheck->mockSoapClient = $mockSoapClient;
+
+        $this->assertFalse(@$oOnlineVatCheck->_checkOnline($oCheckVat));
+        $this->assertSame('SERVER_BUSY', $oOnlineVatCheck->getError());
+    }
+
+    public function testCheckOnlineDoesNotRetryOnNonRetriableSoapFault(): void
+    {
+        $oCheckVat = new stdClass();
+        $oCheckVat->countryCode = 'DE';
+        $oCheckVat->vatNumber = '231450866';
+
+        $mockSoapClient = $this->getMockBuilder(stdClass::class)
+            ->addMethods(['checkVat'])
+            ->getMock();
+        // INVALID_INPUT is non-retriable → loop must exit immediately.
+        $mockSoapClient->expects($this->once())
+            ->method('checkVat')
+            ->willThrowException(new SoapFault('soap:Server', 'INVALID_INPUT'));
+
+        $oOnlineVatCheck = new OnlineVatIdCheckTestable();
+        $oOnlineVatCheck->mockSoapClient = $mockSoapClient;
+
+        $this->assertFalse(@$oOnlineVatCheck->_checkOnline($oCheckVat));
+        $this->assertSame('INVALID_INPUT', $oOnlineVatCheck->getError());
+    }
+
+    public function testIsServiceAvailableShortCircuitsToCachedResult(): void
+    {
+        $check = oxNew('oxOnlineVatIdCheck');
+        // Pre-set the cached state so _isServiceAvailable() short-circuits
+        // without doing any network/file IO.
+        $ref = new \ReflectionProperty(\OxidEsales\EshopCommunity\Core\OnlineVatIdCheck::class, '_blServiceIsOn');
+        $ref->setAccessible(true);
+        $ref->setValue($check, true);
+
+        $method = new \ReflectionMethod($check, '_isServiceAvailable');
+        $method->setAccessible(true);
+        $this->assertTrue($method->invoke($check));
+
+        $ref->setValue($check, false);
+        $this->assertFalse($method->invoke($check));
+    }
 }

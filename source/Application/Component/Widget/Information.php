@@ -48,7 +48,7 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
      */
     public function getServicesKeys()
     {
-        $oContentList = $this->getContentList();
+        $oContentList = $this->_getContentList();
 
         return $oContentList->getServiceKeys();
     }
@@ -60,7 +60,7 @@ class Information extends \OxidEsales\Eshop\Application\Component\Widget\WidgetC
      */
     public function getServicesList()
     {
-        $oContentList = $this->getContentList();
+        $oContentList = $this->_getContentList();
         $oContentList->loadServices();
 
         return $oContentList;

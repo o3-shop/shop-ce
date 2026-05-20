@@ -146,24 +146,83 @@ start_apache() {
 }
 
 install_demodata() {
-    if [ -d "vendor/o3-shop/shop-demodata-ce" ] && [ "$(ls -A vendor/o3-shop/shop-demodata-ce)" ]; then
-      log "${GREEN}Demodata is already downloaded. Skipping download."
-      return 0
+    local repo_url="https://github.com/o3-shop/shop-demodata-ce.git"
+    local satellite_dir="shop-demodata-ce"
+    local symlink_path="vendor/o3-shop/shop-demodata-ce"
+
+    log "${YELLOW}Installing shop-demodata-ce...${NC}"
+
+    # The satellite working tree lives at the project top level, not under
+    # vendor/, so PhpStorm's Composer integration doesn't auto-exclude it
+    # and developers see modified-file indicators inside it without per-IDE
+    # config. We then symlink vendor/o3-shop/shop-demodata-ce -> ../../<sat>
+    # so composer's autoloader and every code path that hardcodes the vendor
+    # location (bin/o3-setup, Setup/Utilities::getActiveEditionDemodataPackagePath)
+    # keeps working unchanged.
+
+    if [ -e "$symlink_path" ] && [ ! -L "$symlink_path" ]; then
+        handle_error "$(cat <<EOF
+
+Detected an old non-symlink directory at ${symlink_path}.
+This is the previous layout (real working tree inside vendor/). The entrypoint
+now keeps the working tree at the project top level (./${satellite_dir}/) and
+symlinks ${symlink_path} -> ../../${satellite_dir} so PhpStorm sees the
+satellite outside vendor/.
+
+If you have NO uncommitted edits in ${symlink_path}, run:
+
+    ./docker.sh stop
+    rm -rf ${symlink_path}
+    ./docker.sh start
+
+If you DO have uncommitted edits there — be careful: ${symlink_path} is
+gitignored, so nothing is version-controlled by anything. Steps:
+
+    1. Copy your edits somewhere safe OUTSIDE ${symlink_path}.
+    2. Run the three commands above.
+    3. After ./docker.sh start, ./${satellite_dir}/ is a real shop-demodata-ce
+       working tree. Replay your edits there, commit, push to ${repo_url}.
+
+Aborting so no work is destroyed.
+EOF
+        )"
     fi
 
-    log "${YELLOW}Downloading demo data"
+    if [ -d "$satellite_dir" ] && [ "$(ls -A "$satellite_dir")" ]; then
+        if [ ! -d "$satellite_dir/.git" ]; then
+            handle_error "$(cat <<EOF
 
-    cd /tmp
-    git clone https://github.com/o3-shop/shop-demodata-ce
-    rm -rf shop-demodata-ce/.git
+Detected detached snapshot at ./${satellite_dir}/ (no .git/ subdirectory).
+The entrypoint expects a git working tree there so demodata tweaks can be
+committed and pushed back to ${repo_url} directly.
 
-    log "Moving demo data into target directory 'vendor/o3-shop'"
-    cp -r shop-demodata-ce /var/www/html/vendor/o3-shop
+Run:
 
-    # rm -rf shop-demodata-ce
-    log "${GREEN}Installed demo data package"
+    ./docker.sh stop
+    rm -rf ${satellite_dir}
+    ./docker.sh start
 
-    cd /var/www/html
+(Removing the symlink at ${symlink_path} too if it points to a stale target.)
+
+Aborting so no work is destroyed.
+EOF
+            )"
+        fi
+        log "shop-demodata-ce: satellite working tree already present, skipping clone"
+    else
+        log "Cloning shop-demodata-ce from ${repo_url}..."
+        git clone --branch main "$repo_url" "$satellite_dir" \
+            || handle_error "Failed to clone shop-demodata-ce from ${repo_url}"
+    fi
+
+    if [ ! -e "$symlink_path" ]; then
+        mkdir -p "$(dirname "$symlink_path")" \
+            || handle_error "Failed to create $(dirname "$symlink_path")"
+        ln -s "../../${satellite_dir}" "$symlink_path" \
+            || handle_error "Failed to symlink ${symlink_path} -> ../../${satellite_dir}"
+    fi
+
+    log "${GREEN}shop-demodata-ce ready${NC}"
 }
 
 setup_db() {

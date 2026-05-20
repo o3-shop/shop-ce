@@ -60,9 +60,13 @@ class CategorySeo extends ObjectSeo
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderCategory
-     * @deprecated Use getEncoder() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getEncoder().
+     * @deprecated Transitional during #107. Modules SHOULD override _getEncoder()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getEncoder() to the canonical override
+      *             target and retires _getEncoder(); until then, _getEncoder() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -74,9 +78,10 @@ class CategorySeo extends ObjectSeo
      *
      * @return SeoEncoderCategory
      *
-     * @internal If your override does not fully replace the behavior, call parent::getEncoder()
-     *           (not the deprecated _getEncoder()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEncoder(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEncoder() the canonical override target.
      */
     protected function getEncoder()
     {
@@ -97,9 +102,13 @@ class CategorySeo extends ObjectSeo
      * Returns url type
      *
      * @return string
-     * @deprecated Use getType() instead. This underscore-prefixed name is retained only
-     *             for backward compatibility with module subclasses that already override
-     *             it; new code, including new modules, MUST NOT call or override _getType().
+     * @deprecated Transitional during #107. Modules SHOULD override _getType()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getType() to the canonical override
+      *             target and retires _getType(); until then, _getType() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
@@ -111,9 +120,10 @@ class CategorySeo extends ObjectSeo
      *
      * @return string
      *
-     * @internal If your override does not fully replace the behavior, call parent::getType()
-     *           (not the deprecated _getType()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getType(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getType() the canonical override target.
      */
     protected function getType()
     {

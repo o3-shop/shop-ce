@@ -34,7 +34,7 @@ use ReflectionClass;
  * Class DbTest
  *
  * @group   database-adapter
- * @covers  \OxidEsales\Eshop\Core\DatabaseProvider
+ * @covers  \OxidEsales\EshopCommunity\Core\DatabaseProvider
  * @package Unit\Core
  */
 class DatabaseTest extends UnitTestCase

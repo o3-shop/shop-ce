@@ -251,7 +251,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             $this->_oParentProd = false;
             $oProduct = oxNew(Article::class);
             if (($oProduct->load($sParentId))) {
-                $this->processProduct($oProduct);
+                $this->_processProduct($oProduct);
                 $this->_oParentProd = $oProduct;
             }
         }
@@ -320,7 +320,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
     protected function _processProduct($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oProduct->setLinkType($this->getLinkType());
-        if ($sAddParams = $this->getAddUrlParams()) {
+        if ($sAddParams = $this->_getAddUrlParams()) {
             $oProduct->appendLink($sAddParams);
         }
     }
@@ -484,7 +484,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
 
             // setting link type for variants ..
             foreach ($this->_aVariantList as $oVariant) {
-                $this->processProduct($oVariant);
+                $this->_processProduct($oVariant);
             }
         }
 
@@ -820,9 +820,10 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
      * @return object
      * @throws DatabaseConnectionException
      *
-     * @internal If your override does not fully replace the behavior, call parent::getSubject()
-     *           (not the deprecated _getSubject()) so downstream overrides in the class chain
-     *           are preserved. Template-method refactor tracked in o3-shop/o3-shop#108.
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSubject(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSubject() the canonical override target.
      */
     protected function getSubject($iLang)
     {
@@ -962,7 +963,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         // finding parent
         $oProduct = $this->getProduct();
         $sParentIdField = 'oxarticles__oxparentid';
-        if (($oParent = $this->getParentProduct($oProduct->$sParentIdField->value))) {
+        if (($oParent = $this->_getParentProduct($oProduct->$sParentIdField->value))) {
             $sVarSelId = Registry::getRequest()->getRequestEscapedParameter('varselid');
 
             return $oParent->getVariantSelections($sVarSelId, $oProduct->getId());
@@ -1024,7 +1025,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             }
         }
         if (!$this->_blIsInitialized) {
-            $this->additionalChecksForArticle($myUtils, $myConfig);
+            $this->_additionalChecksForArticle($myUtils, $myConfig);
         }
 
         return $this->_oProduct;
@@ -1084,7 +1085,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         } else {
             $oCategory->load($sCatId);
         }
-        $this->setSortingParameters();
+        $this->_setSortingParameters();
 
         $this->setActiveCategory($oCategory);
 
@@ -1133,7 +1134,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
         if (!$this->_oProduct->isVisible()) {
             $blContinue = false;
         } elseif ($this->_oProduct->oxarticles__oxparentid->value) {
-            $oParent = $this->getParentProduct($this->_oProduct->oxarticles__oxparentid->value);
+            $oParent = $this->_getParentProduct($this->_oProduct->oxarticles__oxparentid->value);
             if (!$oParent || !$oParent->isVisible()) {
                 $blContinue = false;
             }
@@ -1144,7 +1145,7 @@ class ArticleDetails extends \OxidEsales\Eshop\Application\Component\Widget\Widg
             $myUtils->showMessageAndExit('');
         }
 
-        $this->processProduct($this->_oProduct);
+        $this->_processProduct($this->_oProduct);
         $this->_blIsInitialized = true;
     }
 
