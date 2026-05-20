@@ -182,19 +182,51 @@ run_full_test_with_cs_fixer() {
 
 MY_DIR=$(getMyPath)
 
-if [ ! -f "$MY_DIR/.env" ]; then
-    cp .env.example .env || handle_error "Failed to copy .env.example to .env"
-    echo "Created .env file from example"
+# Detect whether we are running inside a git worktree
+IS_WORKTREE=false
+[[ "$MY_DIR" == *".claude/worktrees/"* ]] && IS_WORKTREE=true
+
+# Compose project name: unique per checkout directory
+COMPOSE_PROJECT_NAME="o3shop-$(basename "$MY_DIR")"
+
+# Port block: deterministic hash of directory name for worktrees
+if $IS_WORKTREE; then
+    HASH=$(echo -n "$(basename "$MY_DIR")" | cksum | cut -d' ' -f1)
+    BLOCK=$(( HASH % 90 ))
+    O3SHOP_PORT_HTTP=$(( 9000 + BLOCK * 10 ))
+    O3SHOP_PORT_ADMINER=$(( O3SHOP_PORT_HTTP + 1 ))
+    O3SHOP_PORT_MAILPIT=$(( O3SHOP_PORT_HTTP + 2 ))
+    O3SHOP_PORT_SMTP=$(( O3SHOP_PORT_HTTP + 3 ))
+    O3SHOP_CONF_DBNAME="o3shop_${O3SHOP_PORT_HTTP}"
 else
-    echo ".env file already exists"
+    O3SHOP_PORT_HTTP=8080
+    O3SHOP_PORT_ADMINER=8081
+    O3SHOP_PORT_MAILPIT=8025
+    O3SHOP_PORT_SMTP=1025
 fi
 
-if [ ! -f "$MY_DIR/docker/.env" ]; then
-    DOCKER_VARS=("O3SHOP_CONF_DBUSER" "O3SHOP_CONF_DBPWD" "O3SHOP_CONF_DBROOT" "O3SHOP_CONF_DBNAME")
-    for var in "${DOCKER_VARS[@]}"; do
-        grep "^$var=" "$MY_DIR/.env.example" >> "$MY_DIR/docker/.env"
-    done
+# Bootstrap .env if missing
+if [ ! -f "$MY_DIR/.env" ]; then
+    cp "$MY_DIR/.env.example" "$MY_DIR/.env" || { echo "Failed to copy .env.example to .env"; exit 1; }
+    echo "Created .env file from example"
 fi
+
+# Always regenerate docker/.env so port vars and project name are current
+{
+    grep "^O3SHOP_CONF_DBUSER=" "$MY_DIR/.env.example"
+    grep "^O3SHOP_CONF_DBPWD=" "$MY_DIR/.env.example"
+    grep "^O3SHOP_CONF_DBROOT=" "$MY_DIR/.env.example"
+    if $IS_WORKTREE; then
+        echo "O3SHOP_CONF_DBNAME=${O3SHOP_CONF_DBNAME}"
+    else
+        grep "^O3SHOP_CONF_DBNAME=" "$MY_DIR/.env.example"
+    fi
+    echo "O3SHOP_PORT_HTTP=${O3SHOP_PORT_HTTP}"
+    echo "O3SHOP_PORT_ADMINER=${O3SHOP_PORT_ADMINER}"
+    echo "O3SHOP_PORT_MAILPIT=${O3SHOP_PORT_MAILPIT}"
+    echo "O3SHOP_PORT_SMTP=${O3SHOP_PORT_SMTP}"
+    echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}"
+} > "$MY_DIR/docker/.env"
 
 case "$1" in
     start)
