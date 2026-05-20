@@ -33,13 +33,13 @@ class ThemeTest extends \OxidTestCase
     public function testLoadAndGetInfo()
     {
         $oTheme = $this->getProxyClass('oxTheme');
-        $this->assertTrue($oTheme->load('wave'));
+        $this->assertTrue($oTheme->load('o3-theme'));
 
         foreach (['id', 'title', 'description', 'thumbnail', 'version', 'author', 'active', 'settings'] as $key) {
             $this->assertNotNull($oTheme->getInfo($key));
         }
         $this->assertNull($oTheme->getInfo('asdasdasd'));
-        $this->assertEquals('wave', $oTheme->getInfo('id'));
+        $this->assertEquals('o3-theme', $oTheme->getInfo('id'));
     }
 
     public function testGetList()
@@ -169,10 +169,10 @@ class ThemeTest extends \OxidTestCase
     public function testGetParent()
     {
         $oTheme = $this->getMock(\OxidEsales\Eshop\Core\Theme::class, ['getInfo']);
-        $oTheme->expects($this->any())->method('getInfo')->with($this->equalTo('parentTheme'))->will($this->returnValue('wave'));
+        $oTheme->expects($this->any())->method('getInfo')->with($this->equalTo('parentTheme'))->will($this->returnValue('o3-theme'));
         $oParent = $oTheme->getParent();
         $this->assertTrue($oParent instanceof \OxidEsales\EshopCommunity\Core\Theme);
-        $this->assertEquals('wave', $oParent->getInfo('id'));
+        $this->assertEquals('o3-theme', $oParent->getInfo('id'));
     }
 
     public function testGetSettingsFromActivatedTheme()
@@ -378,9 +378,9 @@ class ThemeTest extends \OxidTestCase
     public function testGetId()
     {
         $oTheme = oxNew('oxTheme');
-        $oTheme->load('wave');
+        $oTheme->load('o3-theme');
 
-        $this->assertEquals('wave', $oTheme->getId());
+        $this->assertEquals('o3-theme', $oTheme->getId());
     }
 
     /**

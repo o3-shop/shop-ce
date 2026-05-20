@@ -762,7 +762,7 @@ class UtilsTest extends \OxidTestCase
     public function testResetTemplateCache()
     {
         $config = $this->getConfig();
-        $config->setConfigParam('sTheme', 'wave');
+        $config->setConfigParam('sTheme', 'o3-theme');
 
         $utils = oxRegistry::getUtils();
         $smarty = \OxidEsales\Eshop\Core\Registry::getUtilsView()->getSmarty(true);
@@ -824,7 +824,7 @@ class UtilsTest extends \OxidTestCase
         $this->assertEquals($tempFile, oxRegistry::getUtils()->GetRemoteCachePath('http://www.blafoo.null', $tempFile));
 
         //ensure that file is older than 24h
-        $this->activateTheme('wave');
+        $this->activateTheme('o3-theme');
         $file->lastModified(time() - 90000);
         $this->assertEquals($tempFile, oxRegistry::getUtils()->GetRemoteCachePath($this->getConfig()->getShopURL(), $tempFile));
 

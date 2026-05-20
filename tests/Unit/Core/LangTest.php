@@ -43,7 +43,7 @@ class LangTest extends \OxidTestCase
         parent::setUpBeforeClass();
 
         $theme = oxNew(Theme::class);
-        $theme->load('wave');
+        $theme->load('o3-theme');
         $theme->activate();
     }
 
@@ -65,7 +65,7 @@ class LangTest extends \OxidTestCase
         // cleanup
         oxRegistry::getUtils()->oxResetFileCache();
 
-        $sFileName = getShopBasePath() . '/out/wave/de/my_lang.php';
+        $sFileName = getShopBasePath() . '/out/o3-theme/de/my_lang.php';
         if (file_exists($sFileName)) {
             unlink($sFileName);
         }
@@ -157,8 +157,8 @@ class LangTest extends \OxidTestCase
         $aPathArray = [
             $sPath . 'translations/de/lang.php',
             $sPath . 'translations/de/translit_lang.php',
-            $sPath . 'views/wave/de/lang.php',
-            $sPath . 'views/wave/de/cust_lang.php',
+            $sPath . 'views/o3-theme/de/lang.php',
+            $sPath . 'views/o3-theme/de/cust_lang.php',
         ];
 
         $oLang = oxNew('oxLang');
@@ -171,7 +171,7 @@ class LangTest extends \OxidTestCase
     {
         $sPath = $this->getConfig()->getAppDir();
 
-        $customLangPath = $sPath . 'views/wave/de/cust_lang.php';
+        $customLangPath = $sPath . 'views/o3-theme/de/cust_lang.php';
 
         $oLang = oxNew('oxLang');
         $this->assertContains($customLangPath, $oLang->UNITgetLangFilesPathArray(0));
@@ -209,9 +209,9 @@ class LangTest extends \OxidTestCase
         $aPathArray = [
             $sPath . 'translations/de/lang.php',
             $sPath . 'translations/de/translit_lang.php',
-            $sPath . 'views/wave/de/lang.php',
+            $sPath . 'views/o3-theme/de/lang.php',
             $sShopPath . 'modules/oxlangTestModule/translations/de/test_lang.php',
-            $sPath . 'views/wave/de/cust_lang.php',
+            $sPath . 'views/o3-theme/de/cust_lang.php',
         ];
 
         $aInfo = ['oxlangTestModule' => 'oxlangTestModule'];
@@ -242,9 +242,9 @@ class LangTest extends \OxidTestCase
         $aPathArray = [
             $sPath . 'translations/de/lang.php',
             $sPath . 'translations/de/translit_lang.php',
-            $sPath . 'views/wave/de/lang.php',
+            $sPath . 'views/o3-theme/de/lang.php',
             $sShopPath . 'modules/oxlangTestModule/Application/translations/de/test_lang.php',
-            $sPath . 'views/wave/de/cust_lang.php',
+            $sPath . 'views/o3-theme/de/cust_lang.php',
         ];
 
         $aInfo = ['oxlangTestModule' => 'oxlangTestModule'];
@@ -277,7 +277,7 @@ class LangTest extends \OxidTestCase
             $sPath . 'views/admin/de/lang.php',
             $sPath . 'translations/de/translit_lang.php',
             $sPath . 'views/admin/de/help_lang.php',
-            $sPath . 'views/wave/de/theme_options.php',
+            $sPath . 'views/o3-theme/de/theme_options.php',
             $sShopPath . 'modules/oxlangTestModule/views/admin/de/test1_lang.php',
             $sShopPath . 'modules/oxlangTestModule/views/admin/de/module_options.php',
             $sPath . 'views/admin/de/cust_lang.php',
@@ -1293,7 +1293,7 @@ class LangTest extends \OxidTestCase
 
         //writing a test file
         $sFileContents = '<?php $aLang = array( "charset" => "UTF-8", "TESTKEY" => "testVal");';
-        $sFileName = getShopBasePath() . '/Application/views/wave/de/my_lang.php';
+        $sFileName = getShopBasePath() . '/Application/views/o3-theme/de/my_lang.php';
         $sShopId = $this->getConfig()->getShopId();
         $sCacheKey = "languagefiles__0_$sShopId";
         oxRegistry::getUtils()->toFileCache($sCacheKey, null);

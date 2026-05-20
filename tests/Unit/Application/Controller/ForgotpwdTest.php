@@ -124,9 +124,9 @@ class ForgotpwdTest extends \OxidTestCase
         }
         $this->assertTrue($blExcp);
 
-        // pass does not match
-        $this->setRequestParameter('password_new', 'aaaaaa');
-        $this->setRequestParameter('password_new_confirm', 'bbbbbb');
+        // pass does not match — passwords are long enough (≥ iPasswordLength) so only the mismatch fires
+        $this->setRequestParameter('password_new', 'aaaaaaaaaaaa');
+        $this->setRequestParameter('password_new_confirm', 'bbbbbbbbbbbb');
         try {
             $blExcp = false;
             $oView->updatePassword();
@@ -159,8 +159,8 @@ class ForgotpwdTest extends \OxidTestCase
         oxTestModules::addFunction('oxUtilsView', 'addErrorToDisplay', '{ throw new Exception( $aA[0] ); }');
 
         $this->setRequestParameter('uid', 'aaaaaa');
-        $this->setRequestParameter('password_new', 'aaaaaa');
-        $this->setRequestParameter('password_new_confirm', 'aaaaaa');
+        $this->setRequestParameter('password_new', 'aaaaaaaaaaaa');
+        $this->setRequestParameter('password_new_confirm', 'aaaaaaaaaaaa');
 
         $oView = oxNew('forgotpwd');
 
@@ -184,13 +184,13 @@ class ForgotpwdTest extends \OxidTestCase
         $oUser = oxNew('oxuser');
         $oUser->setId('_testArt');
         $oUser->oxuser__oxshopid = new oxfield($this->getConfig()->getShopId());
-        $oUser->setPassword('xxxxxx');
+        $oUser->setPassword('xxxxxxxxxxxx');
         $oUser->setUpdateKey();
 
         // overriding utility function
         $this->setRequestParameter('uid', $oUser->getUpdateId());
-        $this->setRequestParameter('password_new', 'aaaaaa');
-        $this->setRequestParameter('password_new_confirm', 'aaaaaa');
+        $this->setRequestParameter('password_new', 'aaaaaaaaaaaa');
+        $this->setRequestParameter('password_new_confirm', 'aaaaaaaaaaaa');
 
         $oView = oxNew('forgotpwd');
         $this->assertEquals('forgotpwd?success=1', $oView->updatePassword());

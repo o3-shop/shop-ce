@@ -65,6 +65,7 @@ class UBaseTest extends \OxidTestCase
         // backup
         $this->_sRequestMethod = $_SERVER['REQUEST_METHOD'] ?? null;
         $this->_sRequestUri = $_SERVER['REQUEST_URI'] ?? null;
+
     }
 
     /**
@@ -420,7 +421,7 @@ class UBaseTest extends \OxidTestCase
     {
         $myConfig = $this->getConfig();
         $myConfig->setConfigParam('iNrofCatArticles', 10);
-        $myConfig->setConfigParam('aNrofCatArticles', 'xxx');
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', 'xxx');
 
         $myConfig->setConfigParam('iNrofSearchArticles', 15);
         $myConfig->setConfigParam('aNrofSearchArticles', 'xxx');
@@ -448,9 +449,9 @@ class UBaseTest extends \OxidTestCase
         $iCnt = $this->getSessionParam('_artperpage');
 
         $oViewConf = $oView->getViewConfig();
-        $this->assertEquals(10, $oViewConf->getViewConfigParam('iartPerPage'));
-        $this->assertEquals(10, $myConfig->getConfigParam('iNrofCatArticles'));
-        $this->assertEquals(10, $iCnt);
+        $this->assertEquals(12, $oViewConf->getViewConfigParam('iartPerPage'));
+        $this->assertEquals(12, $myConfig->getConfigParam('iNrofCatArticles'));
+        $this->assertEquals(12, $iCnt);
     }
 
     /*
@@ -461,6 +462,7 @@ class UBaseTest extends \OxidTestCase
         $config = $this->getConfig();
         $config->setConfigParam('iNrofCatArticles', 10);
         $config->setConfigParam('aNrofCatArticles', null);
+        $config->setConfigParam('aNrofCatArticlesInGrid', null);
         $this->setSessionParam('_artperpage', 20);
 
         $oView = oxNew('oxubase');
@@ -476,7 +478,7 @@ class UBaseTest extends \OxidTestCase
     public function testSetNrOfArtPerPageToSession()
     {
         $myConfig = $this->getConfig();
-        $myConfig->setConfigParam('aNrofCatArticles', [0 => 30]);
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', [0 => 30]);
         $this->setRequestParameter('_artperpage', 30);
 
         $oView = oxNew('oxubase');
@@ -496,7 +498,7 @@ class UBaseTest extends \OxidTestCase
     public function testSetNrOfArtPerPageFromSession()
     {
         $myConfig = $this->getConfig();
-        $myConfig->setConfigParam('aNrofCatArticles', [0 => 26]);
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', [0 => 26]);
         $this->setSessionParam('_artperpage', 26);
 
         $oView = oxNew('oxubase');
@@ -519,6 +521,7 @@ class UBaseTest extends \OxidTestCase
 
         $myConfig->setConfigParam('iNrofCatArticles', null);
         $myConfig->setConfigParam('aNrofCatArticles', null);
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', null);
 
         $oView = oxNew('oxubase');
         $oView->UNITsetNrOfArtPerPage();
@@ -539,7 +542,7 @@ class UBaseTest extends \OxidTestCase
         $myConfig = $this->getConfig();
 
         $myConfig->setConfigParam('iNrofCatArticles', null);
-        $myConfig->setConfigParam('aNrofCatArticles', [0 => 2]);
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', [0 => 2]);
         $this->setSessionParam('_artperpage', null);
         $this->setRequestParameter('_artperpage', null);
 
@@ -559,7 +562,7 @@ class UBaseTest extends \OxidTestCase
         $myConfig = $this->getConfig();
 
         $myConfig->setConfigParam('iNrofCatArticles', null);
-        $myConfig->setConfigParam('aNrofCatArticles', [0 => 2]);
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', [0 => 2]);
         $this->setSessionParam('_artperpage', null);
         $this->setRequestParameter('_artperpage', 2);
 
@@ -579,7 +582,7 @@ class UBaseTest extends \OxidTestCase
         $myConfig = $this->getConfig();
 
         $myConfig->setConfigParam('iNrofCatArticles', null);
-        $myConfig->setConfigParam('aNrofCatArticles', [0 => 10]);
+        $myConfig->setConfigParam('aNrofCatArticlesInGrid', [0 => 10]);
         $this->setSessionParam('_artperpage', null);
         $this->setRequestParameter('_artperpage', 2);
 

@@ -44,6 +44,13 @@ class EmailWaveTplTest extends \OxidTestCase
         parent::setUp();
 
         $this->getConfig()->setConfigParam('sTheme', 'wave');
+        $this->getConfig()->setConfigParam('sEmailLogo', 'logo_email.png');
+        $this->getConfig()->setConfigParam('aDetailImageSizes', [
+            'oxpic1' => '540*340', 'oxpic2' => '540*340', 'oxpic3' => '540*340',
+            'oxpic4' => '540*340', 'oxpic5' => '540*340', 'oxpic6' => '540*340',
+            'oxpic7' => '540*340', 'oxpic8' => '540*340', 'oxpic9' => '540*340',
+            'oxpic10' => '540*340', 'oxpic11' => '540*340', 'oxpic12' => '540*340',
+        ]);
 
         // reload smarty
         \OxidEsales\Eshop\Core\Registry::getUtilsView()->getSmarty(true);
