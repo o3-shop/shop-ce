@@ -52,7 +52,7 @@ class ThemeMainTest extends OxidTestCase
      */
     public function testRender()
     {
-        $this->getConfig()->setConfigParam('sTheme', 'wave');
+        $this->getConfig()->setConfigParam('sTheme', 'o3-theme');
 
         // testing..
         $oView = oxNew('Theme_Main');
@@ -62,7 +62,7 @@ class ThemeMainTest extends OxidTestCase
 
         $this->assertTrue(isset($aViewData['oTheme']));
         $this->assertTrue($aViewData['oTheme'] instanceof Theme);
-        $this->assertEquals('wave', $aViewData['oTheme']->getInfo('id'));
+        $this->assertEquals('o3-theme', $aViewData['oTheme']->getInfo('id'));
     }
 
     /**

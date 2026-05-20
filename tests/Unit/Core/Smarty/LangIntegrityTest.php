@@ -46,7 +46,7 @@ class LangIntegrityTest extends \OxidTestCase
      *
      * @var string
      */
-    protected $_sTheme = 'wave';
+    protected $_sTheme = 'o3-theme';
 
     /**
      * @return string theme name
@@ -707,7 +707,7 @@ class LangIntegrityTest extends \OxidTestCase
      *
      * @return array
      */
-    private function _getTemplateConstants($sTheme = 'wave')
+    private function _getTemplateConstants($sTheme = 'o3-theme')
     {
         $aLang = [];
 
