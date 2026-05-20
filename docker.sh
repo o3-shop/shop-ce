@@ -85,8 +85,22 @@ start_containers() {
 
 stop_containers() {
     MY_DIR=$(getMyPath)
-    cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
+    cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
     check_docker_compose
+
+    # When stopping the main repo, tear down all worktree stacks first
+    if ! $IS_WORKTREE; then
+        WORKTREE_PROJECTS=$(docker ps \
+            --format '{{index .Labels "com.docker.compose.project.working_dir"}}|{{index .Labels "com.docker.compose.project"}}' \
+            2>/dev/null \
+            | awk -F'|' '$1 ~ /\.claude\/worktrees\// {print $2}' \
+            | sort -u)
+        for project in $WORKTREE_PROJECTS; do
+            echo "Stopping worktree stack: $project"
+            docker compose -p "$project" down
+        done
+    fi
+
     echo "Stopping Docker containers..."
     $DOCKER_COMPOSE down
     if [ $? -eq 0 ]; then
@@ -98,38 +112,32 @@ stop_containers() {
 }
 
 rebuild_containers() {
-      MY_DIR=$(getMyPath)
-      rm -f $MY_DIR/runned.txt
-      rm -f $MY_DIR/source/tmp/*.txt
-      rm -f $MY_DIR/source/tmp/*.php
-      rm -f $MY_DIR/source/tmp/smarty/*.php
-      cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
-      check_docker_compose
-      echo "Pulling latest Docker images..."
-      $DOCKER_COMPOSE pull
-      $DOCKER_COMPOSE build --no-cache
-      echo "Starting Docker containers..."
-      $DOCKER_COMPOSE up -d
-      if [ $? -eq 0 ]; then
-          echo "Docker containers started successfully"
-          $DOCKER_COMPOSE ps
-          echo "
-| Credentials    |
-| -------------- | ---------------------------- |
-| Shop URL       | http://localhost:8080        |
-| Admin URL      | http://localhost:8080/admin/ |
-| Admin Login    | admin@example.com            |
-| Admin Password | admin123                     |
-| -------------- | ---------------------------- |
-| Adminer URL    | http://localhost:8081        |
-| DB Root User   | root                         |
-| DB Root PW     | supersecret                  |
-          "
-          return 0;
-      else
-          echo "Error: Failed to start Docker containers"
-          exit 1
-      fi
+    MY_DIR=$(getMyPath)
+    rm -f "$MY_DIR/runned.txt"
+    rm -f "$MY_DIR/source/tmp/"*.txt
+    rm -f "$MY_DIR/source/tmp/"*.php
+    rm -f "$MY_DIR/source/tmp/smarty/"*.php
+    cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
+    check_docker_compose
+
+    docker network create o3shop-shared 2>/dev/null || true
+
+    COMPOSE_PROFILES=""
+    $IS_WORKTREE || COMPOSE_PROFILES="--profile db"
+
+    echo "Pulling latest Docker images..."
+    $DOCKER_COMPOSE pull
+    $DOCKER_COMPOSE build --no-cache
+    echo "Starting Docker containers..."
+    $DOCKER_COMPOSE $COMPOSE_PROFILES up -d
+    if [ $? -eq 0 ]; then
+        echo "Docker containers started successfully"
+        $DOCKER_COMPOSE ps
+        return 0
+    else
+        echo "Error: Failed to start Docker containers"
+        exit 1
+    fi
 }
 
 run_tests() {
