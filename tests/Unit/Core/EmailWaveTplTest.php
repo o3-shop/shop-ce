@@ -371,7 +371,6 @@ class EmailWaveTplTest extends \OxidTestCase
         $this->checkMailFields($aFields, $oEmail);
         $this->checkMailBody('testSendOrderEMailToOwner', $oEmail->getBody());
 
-        // Clear log entries from email template rendering (empty salutation fields etc.)
     }
 
     /**
@@ -439,7 +438,6 @@ class EmailWaveTplTest extends \OxidTestCase
         //checking if mail body is in english
         $this->assertStringContainsString('The following products have been ordered in testShopName right now:', $oEmail->getBody());
 
-        // Clear log entries from email template rendering (empty salutation fields etc.)
     }
 
     /**
