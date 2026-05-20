@@ -65,7 +65,6 @@ class UBaseTest extends \OxidTestCase
         // backup
         $this->_sRequestMethod = $_SERVER['REQUEST_METHOD'] ?? null;
         $this->_sRequestUri = $_SERVER['REQUEST_URI'] ?? null;
-
     }
 
     /**

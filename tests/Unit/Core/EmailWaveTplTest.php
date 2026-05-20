@@ -1064,4 +1064,3 @@ class EmailWaveTplTest extends \OxidTestCase
         $this->assertEquals(strtolower(trim($sExpectedBody)), strtolower(trim($sBody)), 'Incorect mail body');
     }
 }
-
