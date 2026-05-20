@@ -96,3 +96,6 @@ oxideshop.log
 # pre-archive path (now archived to openspec/changes/archive/...).
 # Tracked in archive; not in active openspec/changes.
 /openspec/changes/fix-internal-shim-call-sites/
+
+# Satellite working tree for testing-library (same pattern as shop-demodata-ce).
+/testing-library

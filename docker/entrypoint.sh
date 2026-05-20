@@ -145,6 +145,64 @@ start_apache() {
     apache2-foreground
 }
 
+install_testing_library() {
+    local repo_url="https://github.com/o3-shop/testing-library.git"
+    local satellite_dir="testing-library"
+    local symlink_path="vendor/o3-shop/testing-library"
+
+    log "${YELLOW}Installing testing-library satellite...${NC}"
+
+    # The satellite working tree lives at the project top level, not under
+    # vendor/, so PhpStorm's Composer integration doesn't auto-exclude it
+    # and developers see modified-file indicators inside it without per-IDE
+    # config. We symlink vendor/o3-shop/testing-library -> ../../testing-library
+    # so composer's autoloader and every path that references the vendor
+    # location keeps working unchanged.
+
+    if [ -d "$satellite_dir" ] && [ "$(ls -A "$satellite_dir")" ]; then
+        if [ ! -d "$satellite_dir/.git" ]; then
+            handle_error "$(cat <<EOF
+
+Detected detached snapshot at ./${satellite_dir}/ (no .git/ subdirectory).
+The entrypoint expects a git working tree there so testing-library changes
+can be committed and pushed back to ${repo_url} directly.
+
+Run:
+
+    ./docker.sh stop
+    rm -rf ${satellite_dir} ${symlink_path}
+    ./docker.sh start
+
+Aborting so no work is destroyed.
+EOF
+            )"
+        fi
+        log "testing-library: satellite working tree already present, skipping clone"
+    else
+        log "Cloning testing-library from ${repo_url}..."
+        git clone --branch b-1.6 "$repo_url" "$satellite_dir" \
+            || handle_error "Failed to clone testing-library from ${repo_url}"
+    fi
+
+    # Replace the composer-installed real directory with a symlink.
+    # Composer puts a real directory here after install_dependencies; we
+    # swap it out so the working tree at ./${satellite_dir}/ is used instead.
+    if [ -e "$symlink_path" ] && [ ! -L "$symlink_path" ]; then
+        log "Replacing composer-installed ${symlink_path} with symlink to satellite..."
+        rm -rf "$symlink_path" \
+            || handle_error "Failed to remove composer-installed ${symlink_path}"
+    fi
+
+    if [ ! -e "$symlink_path" ]; then
+        mkdir -p "$(dirname "$symlink_path")" \
+            || handle_error "Failed to create $(dirname "$symlink_path")"
+        ln -s "../../${satellite_dir}" "$symlink_path" \
+            || handle_error "Failed to symlink ${symlink_path} -> ../../${satellite_dir}"
+    fi
+
+    log "${GREEN}testing-library ready${NC}"
+}
+
 install_demodata() {
     local repo_url="https://github.com/o3-shop/shop-demodata-ce.git"
     local satellite_dir="shop-demodata-ce"
@@ -264,6 +322,7 @@ main() {
 
     setup_environment || exit 127
     install_dependencies || exit 127
+    install_testing_library || exit 127
     install_demodata || exit 127
     setup_db || exit 127
     install_theme || exit 127
