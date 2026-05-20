@@ -25,32 +25,58 @@ check_docker_compose() {
 
 start_containers() {
     MY_DIR=$(getMyPath)
-    cd $MY_DIR/docker || { echo "Error: Docker directory not found"; exit 1; }
+    cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
     check_docker_compose
+
+    # Ensure the shared network exists (idempotent)
+    docker network create o3shop-shared 2>/dev/null || true
+
+    if $IS_WORKTREE; then
+        MAIN_REPO_DIR=$(echo "$MY_DIR" | sed 's|/.claude/worktrees/.*||')
+        MAIN_PROJECT="o3shop-$(basename "$MAIN_REPO_DIR")"
+        DB_CONTAINER=$(docker ps -q \
+            --filter "label=com.docker.compose.service=db" \
+            --filter "label=com.docker.compose.project=$MAIN_PROJECT")
+        if [ -z "$DB_CONTAINER" ]; then
+            echo "ERROR: Shared MariaDB is not running."
+            echo "  Start the main repo first: cd $MAIN_REPO_DIR && ./docker.sh start"
+            exit 1
+        fi
+        DBROOT=$(grep "^O3SHOP_CONF_DBROOT=" "$MY_DIR/.env.example" | cut -d= -f2- | tr -d '"')
+        echo "Creating database ${O3SHOP_CONF_DBNAME} in shared MariaDB..."
+        docker exec "$DB_CONTAINER" mysql -uroot -p"${DBROOT}" -e \
+            "CREATE DATABASE IF NOT EXISTS \`${O3SHOP_CONF_DBNAME}\`;
+             GRANT ALL ON \`${O3SHOP_CONF_DBNAME}\`.* TO 'o3shop'@'%';" 2>/dev/null
+    fi
+
+    COMPOSE_PROFILES=""
+    $IS_WORKTREE || COMPOSE_PROFILES="--profile db"
+
     echo "Pulling latest Docker images..."
     $DOCKER_COMPOSE pull
     echo "Starting Docker containers..."
-    $DOCKER_COMPOSE up -d
+    $DOCKER_COMPOSE $COMPOSE_PROFILES up -d
     if [ $? -eq 0 ]; then
         echo "Docker containers started successfully"
         $DOCKER_COMPOSE ps
         echo "
-+----------------+------------------------------+
-| Credentials    |                              |
-+----------------+------------------------------+
-| Shop URL       | http://localhost:8080        |
-| Admin URL      | http://localhost:8080/admin/ |
-| Admin Login    | admin@example.com            |
-| Admin Password | admin123                     |
-+----------------+------------------------------+
-| Mailpit URL    | http://localhost:8025        |
-+----------------+------------------------------+
-| Adminer URL    | http://localhost:8081        |
-| DB Root User   | root                         |
-| DB Root PW     | supersecret                  |
-+----------------+------------------------------+
++----------------+------------------------------------------+
+| Credentials    |                                          |
++----------------+------------------------------------------+
+| Shop URL       | http://localhost:${O3SHOP_PORT_HTTP}      |
+| Admin URL      | http://localhost:${O3SHOP_PORT_HTTP}/admin/ |
+| Admin Login    | admin@example.com                        |
+| Admin Password | admin123                                 |
++----------------+------------------------------------------+
+| Mailpit URL    | http://localhost:${O3SHOP_PORT_MAILPIT}   |
++----------------+------------------------------------------+
+| Adminer URL    | http://localhost:${O3SHOP_PORT_ADMINER}   |
+| DB Root User   | root                                     |
+| DB Root PW     | supersecret                              |
+| Database       | ${O3SHOP_CONF_DBNAME}                    |
++----------------+------------------------------------------+
 "
-      return 0
+        return 0
     else
         echo "Error: Failed to start Docker containers"
         exit 1
