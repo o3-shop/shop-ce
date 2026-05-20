@@ -97,7 +97,7 @@ stop_containers() {
             | sort -u)
         for project in $WORKTREE_PROJECTS; do
             echo "Stopping worktree stack: $project"
-            docker compose -p "$project" down
+            $DOCKER_COMPOSE -p "$project" down
         done
     fi
 
@@ -237,6 +237,15 @@ fi
 if [ ! -f "$MY_DIR/.env" ]; then
     cp "$MY_DIR/.env.example" "$MY_DIR/.env" || { echo "Failed to copy .env.example to .env"; exit 1; }
     echo "Created .env file from example"
+fi
+
+# For worktrees: patch project .env with the computed DBNAME and SHOPURL so the
+# shop installer uses the right database and generates correct URLs.
+if $IS_WORKTREE; then
+    grep -v "^O3SHOP_CONF_DBNAME=\|^O3SHOP_CONF_SHOPURL=" "$MY_DIR/.env" > "$MY_DIR/.env.tmp"
+    echo "O3SHOP_CONF_DBNAME=\"${O3SHOP_CONF_DBNAME}\"" >> "$MY_DIR/.env.tmp"
+    echo "O3SHOP_CONF_SHOPURL=\"http://localhost:${O3SHOP_PORT_HTTP}\"" >> "$MY_DIR/.env.tmp"
+    mv "$MY_DIR/.env.tmp" "$MY_DIR/.env"
 fi
 
 # Always regenerate docker/.env so port vars and project name are current
