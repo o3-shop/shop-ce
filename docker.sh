@@ -143,21 +143,19 @@ rebuild_containers() {
 run_tests() {
   GREEN='\033[0;32m'
   RED='\033[0;31m'
-  NC='\033[0m' # No Color
+  NC='\033[0m'
 
   MY_DIR=$(getMyPath)
-  containers=(o3shop-app o3shop-db o3shop-mailpit)
-  target_container="o3shop-app"
+  cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
+  check_docker_compose
 
-  for c in "${containers[@]}"; do
-      if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
-          echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
-          exit 1
-      fi
-  done
+  if ! $DOCKER_COMPOSE ps shop 2>/dev/null | grep -q "Up\|running"; then
+      echo -e "${RED} ✗ shop container is NOT running – aborting. ${NC}"
+      exit 1
+  fi
 
-  echo -e "${GREEN}✓ All containers are running – executing tests${NC}"
-  docker exec -i "$target_container" ./run-tests.sh "$@"
+  echo -e "${GREEN}✓ shop container is running – executing tests${NC}"
+  $DOCKER_COMPOSE exec shop ./run-tests.sh "$@"
 }
 
 run_php_cs_fixer() {
@@ -165,22 +163,20 @@ run_php_cs_fixer() {
   RED='\033[0;31m'
   NC='\033[0m'
 
-    containers=(o3shop-app)
-    target_container="o3shop-app"
+  MY_DIR=$(getMyPath)
+  cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
+  check_docker_compose
 
-    for c in "${containers[@]}"; do
-        if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
-            echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
-            exit 1
-        fi
-    done
+  if ! $DOCKER_COMPOSE ps shop 2>/dev/null | grep -q "Up\|running"; then
+      echo -e "${RED} ✗ shop container is NOT running – aborting. ${NC}"
+      exit 1
+  fi
 
-  # You may need to adjust path/to/php-cs-fixer and working directory if necessary
-  if docker exec -i "$target_container" php-cs-fixer --version &> /dev/null; then
+  if $DOCKER_COMPOSE exec shop php-cs-fixer --version &> /dev/null; then
       echo -e "${GREEN}✓ Running php-cs-fixer...${NC}"
-      docker exec -i "$target_container" php-cs-fixer fix || true
+      $DOCKER_COMPOSE exec shop php-cs-fixer fix || true
   else
-      echo -e "${RED}php-cs-fixer not found in $target_container. Please install it!${NC}"
+      echo -e "${RED}php-cs-fixer not found in shop container. Please install it!${NC}"
       exit 1
   fi
 }
@@ -191,18 +187,16 @@ run_quarantine_tests() {
   NC='\033[0m'
 
   MY_DIR=$(getMyPath)
-  containers=(o3shop-app o3shop-db o3shop-mailpit)
-  target_container="o3shop-app"
+  cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
+  check_docker_compose
 
-  for c in "${containers[@]}"; do
-      if ! docker ps --format '{{.Names}}' | grep -q "^${c}$"; then
-          echo -e "${RED} ✗ ${c} is NOT running – aborting. ${NC}"
-          exit 1
-      fi
-  done
+  if ! $DOCKER_COMPOSE ps shop 2>/dev/null | grep -q "Up\|running"; then
+      echo -e "${RED} ✗ shop container is NOT running – aborting. ${NC}"
+      exit 1
+  fi
 
   echo -e "${GREEN}✓ Running quarantine tests (slow / special tests)${NC}"
-  docker exec -i "$target_container" ./run-tests.sh --quarantine
+  $DOCKER_COMPOSE exec shop ./run-tests.sh --quarantine
 }
 
 run_full_test_with_cs_fixer() {
