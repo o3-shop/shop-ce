@@ -730,6 +730,38 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Whether the §356a BGB electronic revocation footer link should be
+     * rendered for the current request, per the visibility matrix in the
+     * spec / design D5.
+     *
+     *   | blShowRevocationForm | blRevocationRequireLogin | user        | result |
+     *   |----------------------|--------------------------|-------------|--------|
+     *   | 0                    | any                      | any         | false  |
+     *   | 1                    | 0                        | any         | true   |
+     *   | 1                    | 1                        | anonymous   | false  |
+     *   | 1                    | 1                        | logged in   | true   |
+     *
+     * The wave / o3-theme footer template is the single consumer; the
+     * matrix lives here (not in the template) so theme-portability stays
+     * intact and the rule is unit-testable.
+     *
+     * @return bool
+     */
+    public function getRevocationLinkVisible(): bool
+    {
+        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+        if (!$config->getConfigParam('blShowRevocationForm', false)) {
+            return false;
+        }
+        if (!$config->getConfigParam('blRevocationRequireLogin', false)) {
+            return true;
+        }
+        // login-required mode → only logged-in users see the link.
+        $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
+        return (bool) $user->loadActiveUser();
+    }
+
+    /**
      * Returns visitor ip address
      *
      * @return string

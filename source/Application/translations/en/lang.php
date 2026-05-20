@@ -753,6 +753,7 @@ $aLang = [
 'PAGE_TITLE_SUGGEST'                                          => 'Recommend product',
 'PAGE_TITLE_INVITE'                                           => 'Invite your friends',
 'PAGE_TITLE_REVIEW'                                           => 'Review',
+'PAGE_TITLE_REVOCATION'                                       => 'Cancel contract',
 
 'WISHLIST_PRODUCTS'                                           => 'These products are on the wish list of %s. If you want to please him/her, purchase one or more of these products.',
 
@@ -802,4 +803,39 @@ $aLang = [
 'PARTNERS'                                                    => 'Partners',
 
 'MY_REVIEWS'                                                  => 'My reviews',
+
+// §356a BGB electronic revocation feature (issue #99) — admin, email and
+// storefront default strings. Theme-specific storefront strings may be
+// overridden in wave / o3-theme lang files. All keys share the `O3_REVOCATION_` prefix.
+
+// Storefront — defaults (overridable by wave / o3-theme)
+'O3_REVOCATION_FOOTER_LINK'                                   => 'Cancel contract',
+'O3_REVOCATION_FORM_HEADING'                                  => 'Cancel contract',
+'O3_REVOCATION_FIELD_NAME_LABEL'                              => 'Full name',
+'O3_REVOCATION_FIELD_ORDERNUMBER_LABEL'                       => 'Order ID',
+'O3_REVOCATION_FIELD_EMAIL_LABEL'                             => 'Email address',
+'O3_REVOCATION_FIELD_FREETEXT_LABEL'                          => 'Notes (optional)',
+'O3_REVOCATION_CONFIRM_BUTTON'                                => 'Confirm revocation',
+'O3_REVOCATION_CONFIRMATION_PAGE_HEADING'                     => 'Revocation received',
+'O3_REVOCATION_VALIDATION_REQUIRED'                           => 'Required.',
+'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Please enter a valid email address.',
+'O3_REVOCATION_VALIDATION_SESSION_EXPIRED'                    => 'Your session has expired. Please submit the form again.',
+'O3_REVOCATION_VALIDATION_SPAM'                               => 'Your request could not be processed at this time. Please try again later.',
+
+// Email field labels — duplicated from admin lang (where the same labels live
+// for the admin detail view) so storefront-context email rendering can
+// resolve them. OXID's Language::translateString does not fall back across
+// domains.
+'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Submission ID',
+'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Received at',
+
+// Customer email (receipt of declaration per § 356a Abs. 4 BGB)
+'O3_REVOCATION_CUSTOMER_EMAIL_SUBJECT'                        => 'We have received your revocation declaration',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_INTRO'                     => 'we hereby confirm that your revocation declaration has been received.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_RECEIPT_NOTE'              => 'Please note that this is solely a confirmation of receipt. The validity and scope of your revocation declaration will be reviewed separately. We will get back to you on this shortly.',
+'O3_REVOCATION_CUSTOMER_EMAIL_BODY_FOOTER'                    => 'Kind regards',
+
+// Operator email (notification — operational, not legally required)
+'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'New revocation received',
+'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'A new revocation declaration has been received in the shop pursuant to § 356a BGB. The record is available in the admin area under "Customer Info → Revocations".',
 ];

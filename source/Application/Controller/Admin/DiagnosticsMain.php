@@ -89,19 +89,15 @@ class DiagnosticsMain extends AdminDetailsController
      * Error status getter
      *
      * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "hasError" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _hasError()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes hasError() to the canonical override
+      *             target and retires _hasError(); until then, _hasError() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _hasError() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->hasError();
-    }
-
-    /**
-     * Error status getter
-     *
-     * @return bool
-     */
-    protected function hasError()
     {
         return $this->_blError;
     }
@@ -109,22 +105,48 @@ class DiagnosticsMain extends AdminDetailsController
     /**
      * Error status getter
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getErrorMessage" in next major
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _hasError(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make hasError() the canonical override target.
      */
-    protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function hasError()
     {
-        return $this->getErrorMessage();
+        return $this->_hasError();
     }
 
     /**
      * Error status getter
      *
      * @return string
+     * @deprecated Transitional during #107. Modules SHOULD override _getErrorMessage()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getErrorMessage() to the canonical override
+      *             target and retires _getErrorMessage(); until then, _getErrorMessage() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
+     */
+    protected function _getErrorMessage() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->_sErrorMessage;
+    }
+
+    /**
+     * Error status getter
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getErrorMessage(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getErrorMessage() the canonical override target.
      */
     protected function getErrorMessage()
     {
-        return $this->_sErrorMessage;
+        return $this->_getErrorMessage();
     }
 
     /**
@@ -149,8 +171,8 @@ class DiagnosticsMain extends AdminDetailsController
     {
         parent::render();
 
-        if ($this->hasError()) {
-            $this->_aViewData['sErrorMessage'] = $this->getErrorMessage();
+        if ($this->_hasError()) {
+            $this->_aViewData['sErrorMessage'] = $this->_getErrorMessage();
         }
 
         return 'diagnostics_form.tpl';
@@ -255,7 +277,7 @@ class DiagnosticsMain extends AdminDetailsController
     {
         $sReport = '';
 
-        $aDiagnosticsResult = $this->runBasicDiagnostics();
+        $aDiagnosticsResult = $this->_runBasicDiagnostics();
         $sReport .= $this->_oRenderer->renderTemplate('diagnostics_main.tpl', $aDiagnosticsResult);
 
         /**
@@ -265,7 +287,7 @@ class DiagnosticsMain extends AdminDetailsController
             $aFileList = $this->_getFilesToCheck();
             $oFileCheckerResult = $this->_checkOxidFiles($aFileList);
 
-            if ($this->hasError()) {
+            if ($this->_hasError()) {
                 return;
             }
 
@@ -285,22 +307,15 @@ class DiagnosticsMain extends AdminDetailsController
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "runBasicDiagnostics" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _runBasicDiagnostics()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes runBasicDiagnostics() to the canonical override
+      *             target and retires _runBasicDiagnostics(); until then, _runBasicDiagnostics() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _runBasicDiagnostics() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->runBasicDiagnostics();
-    }
-
-    /**
-     * Performs main system diagnostic.
-     * Shop and module details, database health, php parameters, server information
-     *
-     * @return array
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    protected function runBasicDiagnostics()
     {
         $aViewData = [];
         $oDiagnostics = oxNew(Diagnostics::class);
@@ -366,12 +381,32 @@ class DiagnosticsMain extends AdminDetailsController
     }
 
     /**
+     * Performs main system diagnostic.
+     * Shop and module details, database health, php parameters, server information
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _runBasicDiagnostics(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make runBasicDiagnostics() the canonical override target.
+     */
+    protected function runBasicDiagnostics()
+    {
+        return $this->_runBasicDiagnostics();
+    }
+
+    /**
      * Downloads result of system file check
      */
     public function downloadResultFile()
     {
         $this->_oOutput->downloadResultFile();
-        exit(0);
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(0);
     }
 
     /**

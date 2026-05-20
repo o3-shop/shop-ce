@@ -60,20 +60,15 @@ class DeliverySetMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $sSynchId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
@@ -98,13 +93,29 @@ class DeliverySetMainAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Remove this delivery cost from these sets
      */
     public function removeFromSet()
     {
-        $aRemoveGroups = $this->getActionIds('oxdel2delset.oxid');
+        $aRemoveGroups = $this->_getActionIds('oxdel2delset.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxdel2delset.* ' . $this->getQuery());
+            $sQ = $this->_addFilter('delete oxdel2delset.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
             $sQ = 'delete from oxdel2delset where oxdel2delset.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
@@ -119,13 +130,13 @@ class DeliverySetMainAjax extends ListComponentAjax
      */
     public function addToSet()
     {
-        $aChosenSets = $this->getActionIds('oxdelivery.oxid');
+        $aChosenSets = $this->_getActionIds('oxdelivery.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sDeliveryViewName = $this->getViewName('oxdelivery');
-            $aChosenSets = $this->getAll($this->addFilter("select $sDeliveryViewName.oxid " . $this->getQuery()));
+            $aChosenSets = $this->_getAll($this->_addFilter("select $sDeliveryViewName.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != '-1' && is_array($aChosenSets)) {
             // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804 and ESDEV-3822).

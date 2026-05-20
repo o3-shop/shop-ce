@@ -36,42 +36,64 @@ class ContentSeo extends ObjectSeo
      * Returns url type
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getType" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getType()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getType() to the canonical override
+      *             target and retires _getType(); until then, _getType() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getType();
+        return 'oxcontent';
     }
 
     /**
      * Returns url type
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getType(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getType() the canonical override target.
      */
     protected function getType()
     {
-        return 'oxcontent';
+        return $this->_getType();
     }
 
     /**
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderContent
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEncoder" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getEncoder()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getEncoder() to the canonical override
+      *             target and retires _getEncoder(); until then, _getEncoder() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getEncoder() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getEncoder();
+        return Registry::get(SeoEncoderContent::class);
     }
 
     /**
      * Returns current object type seo encoder object
      *
      * @return SeoEncoderContent
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEncoder(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEncoder() the canonical override target.
      */
     protected function getEncoder()
     {
-        return Registry::get(SeoEncoderContent::class);
+        return $this->_getEncoder();
     }
 
     /**

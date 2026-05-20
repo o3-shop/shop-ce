@@ -363,6 +363,14 @@ class Database extends Core
      * @param string $sSQL query string (usually reqd from *.sql file)
      *
      * @return array
+     *
+     * Comment handling matches the MySQL reference: `#` starts a comment to
+     * end-of-line; `--` starts a comment to end-of-line when followed by
+     * whitespace (or EOL) — at any column, not just at line start. Earlier
+     * revisions only recognised `--` at column 0, which let an indented
+     * `--` comment inside an `INSERT … VALUES` list survive the line-join
+     * here and silently swallow the rest of the statement once handed to
+     * MySQL on a single line — see issue #136.
      */
     public function parseQuery($sSQL)
     {
@@ -378,8 +386,16 @@ class Database extends Core
         foreach ($aLines as $sLine) {
             $iLen = strlen($sLine);
             for ($i = 0; $i < $iLen; $i++) {
-                if (!$blQuote && ($sLine[$i] == '#' || ($sLine[0] == '-' && $sLine[1] == '-'))) {
-                    $blComment = true;
+                if (!$blQuote && !$blComment) {
+                    if ($sLine[$i] == '#') {
+                        $blComment = true;
+                    } elseif (
+                        $sLine[$i] == '-'
+                        && isset($sLine[$i + 1]) && $sLine[$i + 1] == '-'
+                        && (!isset($sLine[$i + 2]) || $sLine[$i + 2] === ' ' || $sLine[$i + 2] === "\t" || $sLine[$i + 2] === "\r")
+                    ) {
+                        $blComment = true;
+                    }
                 }
 
                 // add this char to current command
@@ -392,8 +408,10 @@ class Database extends Core
                     $blQuote = !$blQuote; // toggle
                 }
 
-                // now test if command end is reached
-                if (!$blQuote && $sLine[$i] == ';') {
+                // now test if command end is reached. Comment-mode also
+                // gates this so a `;` inside a `# …` or `-- …` comment
+                // does not split the surrounding statement.
+                if (!$blQuote && !$blComment && $sLine[$i] == ';') {
                     // add this
                     $sThisSQL = trim($sThisSQL);
                     if ($sThisSQL) {

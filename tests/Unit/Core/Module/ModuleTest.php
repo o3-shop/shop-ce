@@ -389,7 +389,7 @@ class ModuleTest extends \OxidTestCase
     }
 
     /**
-     * @covers OxidEsales\Eshop\Core\Module\Module::getControllers()
+     * @covers \OxidEsales\EshopCommunity\Core\Module\Module::getControllers()
      */
     public function testGetControllersWithMissingControllersKey()
     {
@@ -404,7 +404,7 @@ class ModuleTest extends \OxidTestCase
     }
 
     /**
-     * @covers OxidEsales\Eshop\Core\Module\Module::getControllers()
+     * @covers \OxidEsales\EshopCommunity\Core\Module\Module::getControllers()
      *
      * @dataProvider dataProviderTestGetControllersWithExistingControllers
      *
@@ -456,7 +456,7 @@ class ModuleTest extends \OxidTestCase
     /**
      * If the value for key controllers in metadata.php is set, but not an array an exception will be thrown
      *
-     * @covers OxidEsales\Eshop\Core\Module\Module::getControllers()
+     * @covers \OxidEsales\EshopCommunity\Core\Module\Module::getControllers()
      *
      * @dataProvider dataProviderTestGetControllersWithWrongMetadataValue
      *

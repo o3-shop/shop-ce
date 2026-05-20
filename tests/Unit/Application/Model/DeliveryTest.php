@@ -984,7 +984,7 @@ class DeliveryTest extends \OxidTestCase
         $oDelivery->setblFreeShipping(false);
         $oPrice = $oDelivery->getDeliveryPrice();
 
-        $this->assertEquals(14.33, $oPrice->getBruttoPrice());
+        $this->assertEquals(9.19, $oPrice->getBruttoPrice());
     }
 
     /*
@@ -1042,9 +1042,9 @@ class DeliveryTest extends \OxidTestCase
         $oDelivery->oxdelivery__oxdeltype = new oxField('p');
         $oDelivery->oxdelivery__oxparam = new oxField(80); // eur
         $oDelivery->oxdelivery__oxparamend = new oxField(100); // eur
-        $this->assertFalse($oDelivery->UNITcheckDeliveryAmount(81)); // chf -> 55.1 eur
-        $this->assertTrue($oDelivery->UNITcheckDeliveryAmount(120)); // chf -> 81 eur
-        $this->assertFalse($oDelivery->UNITcheckDeliveryAmount(161)); // chf -> 110 eur
+        $this->assertFalse($oDelivery->UNITcheckDeliveryAmount(60)); // chf -> 65.3 eur
+        $this->assertTrue($oDelivery->UNITcheckDeliveryAmount(85)); // chf -> 92.5 eur
+        $this->assertFalse($oDelivery->UNITcheckDeliveryAmount(100)); // chf -> 108.8 eur
     }
 
     public function testIsForArticle()

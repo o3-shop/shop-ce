@@ -24,3 +24,16 @@ services:
 
   OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicyInterface:
     class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Policy\PasswordPolicy
+
+  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Repository\AdminUserRepositoryInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Repository\AdminUserRepository
+
+  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserChangePasswordCommand:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserChangePasswordCommand
+    tags:
+      - { name: 'console.command', command: 'oe:user:change-password' }
+
+  OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateCommand:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Authentication\Command\UserCreateCommand
+    tags:
+      - { name: 'console.command', command: 'oe:user:create' }

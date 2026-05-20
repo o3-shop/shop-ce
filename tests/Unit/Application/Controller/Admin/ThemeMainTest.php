@@ -33,6 +33,19 @@ use oxTestModules;
 class ThemeMainTest extends OxidTestCase
 {
     /**
+     * The §356a `blShowRevocationForm` row is seeded into oxconfig by
+     * `initial_data.sql` (task 1.7). Reset it to `false` for each test in
+     * this class so the theme-switch `setTheme()` flow is not gated by
+     * the unrelated revocation feature — gate-specific behaviour is
+     * asserted by the `testRevocationGate*` tests added below.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->getConfig()->setConfigParam('blShowRevocationForm', false);
+    }
+
+    /**
      * Theme_Main::Render() test case
      *
      * @return null
@@ -131,5 +144,70 @@ class ThemeMainTest extends OxidTestCase
 
         $oView = oxNew('Theme_Main');
         $this->assertEquals(true, $oView->themeInConfigFile(), 'Should return true as there is sTheme and sCustomTheme.');
+    }
+
+    /**
+     * §356a template-presence gate (phase 8.3): when the revocation form
+     * is OFF, the gate always passes — even if the prospective theme is
+     * missing revocation assets. Validator must NOT be consulted.
+     */
+    public function testRevocationGateFeatureOffPasses()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', false);
+
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->never())->method('validate');
+
+        $controller = oxNew(ThemeMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $r = new \ReflectionMethod(ThemeMain::class, 'revocationActivationGatePasses');
+        $r->setAccessible(true);
+        $this->assertTrue($r->invoke($controller, 'wave'));
+    }
+
+    /**
+     * §356a gate: feature on, validator returns no missing assets — gate
+     * passes; theme activation proceeds.
+     */
+    public function testRevocationGateNoMissingAssetsPasses()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', true);
+
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->once())->method('validate')->willReturn([]);
+
+        $controller = oxNew(ThemeMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $r = new \ReflectionMethod(ThemeMain::class, 'revocationActivationGatePasses');
+        $r->setAccessible(true);
+        $this->assertTrue($r->invoke($controller, 'wave'));
+    }
+
+    /**
+     * §356a gate: feature on, validator reports a missing asset — gate
+     * rejects. Each missing-asset hint is pushed to the admin error
+     * display so the operator sees the concrete fix list.
+     */
+    public function testRevocationGateMissingAssetsRejects()
+    {
+        $this->getConfig()->setConfigParam('blShowRevocationForm', true);
+
+        $missing = new \OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset(
+            'page-template',
+            'source/Application/views/azure/tpl/page/revocation/revocation.tpl',
+            null,
+            'Install the missing page template under the active theme.'
+        );
+        $validator = $this->createMock(\OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator::class);
+        $validator->expects($this->once())->method('validate')->willReturn([$missing]);
+
+        $controller = oxNew(ThemeMain::class);
+        $controller->setRevocationTemplateValidator($validator);
+
+        $r = new \ReflectionMethod(ThemeMain::class, 'revocationActivationGatePasses');
+        $r->setAccessible(true);
+        $this->assertFalse($r->invoke($controller, 'azure'));
     }
 }

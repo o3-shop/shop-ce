@@ -133,7 +133,7 @@ class ModuleConfiguration extends ShopConfiguration
         $aVarConstraints = [];
         $aGrouping = [];
 
-        $aDbVariables = $this->loadConfVars($oConfig->getShopId(), $this->getModuleForConfigVars());
+        $aDbVariables = $this->loadConfVars($oConfig->getShopId(), $this->_getModuleForConfigVars());
 
         if (is_array($aModuleSettings)) {
             foreach ($aModuleSettings as $aValue) {
@@ -143,10 +143,10 @@ class ModuleConfiguration extends ShopConfiguration
                 if (is_null($oConfig->getConfigParam($sName))) {
                     switch ($aValue['type']) {
                         case 'arr':
-                            $sValue = $this->arrayToMultiline($aValue['value']);
+                            $sValue = $this->_arrayToMultiline($aValue['value']);
                             break;
                         case 'aarr':
-                            $sValue = $this->aarrayToMultiline($aValue['value']);
+                            $sValue = $this->_aarrayToMultiline($aValue['value']);
                             break;
                         case 'bool':
                             $sValue = filter_var($aValue['value'], FILTER_VALIDATE_BOOLEAN);
@@ -248,10 +248,10 @@ class ModuleConfiguration extends ShopConfiguration
                 foreach ($moduleConfiguration->getModuleSettings() as $moduleSetting) {
                     if ($moduleSetting->getName() === $name) {
                         if ($moduleSetting->getType() === 'aarr') {
-                            $value = $this->multilineToAarray($value);
+                            $value = $this->_multilineToAarray($value);
                         }
                         if ($moduleSetting->getType() === 'arr') {
-                            $value = $this->multilineToArray($value);
+                            $value = $this->_multilineToArray($value);
                         }
                         if ($moduleSetting->getType() === 'bool') {
                             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
@@ -310,10 +310,10 @@ class ModuleConfiguration extends ShopConfiguration
             if ($setting->getValue() !== null) {
                 switch ($setting->getType()) {
                     case 'arr':
-                        $value = $this->arrayToMultiline($setting->getValue());
+                        $value = $this->_arrayToMultiline($setting->getValue());
                         break;
                     case 'aarr':
-                        $value = $this->aarrayToMultiline($setting->getValue());
+                        $value = $this->_aarrayToMultiline($setting->getValue());
                         break;
                     case 'bool':
                         $value = filter_var($setting->getValue(), FILTER_VALIDATE_BOOLEAN);

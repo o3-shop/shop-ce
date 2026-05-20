@@ -299,6 +299,18 @@ run_full_test_with_coverage() {
   echo "Now running tests with coverage:"
   echo "---------------------------"
   run_tests --coverage
+  TEST_EXIT_CODE=$?
+  if [ $TEST_EXIT_CODE -ne 0 ]; then
+    return $TEST_EXIT_CODE
+  fi
+
+  echo ""
+  echo "---------------------------"
+  echo "Checking coverage threshold:"
+  echo "---------------------------"
+  docker exec -i o3shop-app php /var/www/html/bin/check-coverage-threshold.php \
+    --clover /var/www/html/coverage/coverage.xml \
+    --threshold "${COVERAGE_THRESHOLD:-90}"
 }
 
 MY_DIR=$(getMyPath)
@@ -404,23 +416,15 @@ case "$1" in
         echo ""
         echo "  test         Run unit tests (pass extra args to phpunit)"
         echo "  test-all     Run php-cs-fixer, then full test suite"
-        echo "  test-all-coverage  Run php-cs-fixer, then full test suite with coverage report"
-        echo "  cs-fixer     Run php-cs-fixer on the entire codebase"
         echo "  quarantine   Run slow/special @group quarantine tests only"
-        echo "  playwright   Run the Playwright browser test suite (auto-installs deps on first run)"
         echo ""
         echo "Options for 'test':"
-        echo "  --fast           Skip shop install, call phpunit directly"
-        echo "  --coverage       Generate coverage reports (clover, html, junit)"
-        echo "  --all-failures   Don't stop at the first failure — run the full"
-        echo "                   suite and collect every failure in one pass."
-        echo "                   Use when one fix dominoes into many test"
-        echo "                   updates (seed-data changes, fixture renames)."
+        echo "  --fast       Skip shop install, call phpunit directly"
+        echo "  --coverage   Generate coverage reports (clover, html, junit)"
         echo ""
         echo "Examples:"
         echo "  $0 start"
         echo "  $0 test --fast tests/Unit/Core/ConfigTest.php"
-        echo "  $0 test --all-failures"
         echo "  $0 test-all"
         echo "  $0 quarantine"
         exit

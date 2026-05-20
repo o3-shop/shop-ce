@@ -31,6 +31,10 @@ use OxidEsales\Eshop\Core\Exception\DatabaseErrorException;
 use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\NoJsValidator;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAsset;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAssetHintTranslator;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 use PDOException;
 
 /**
@@ -83,12 +87,12 @@ class LanguageMain extends AdminDetailsController
 
         $sOxId = $this->_aViewData['oxid'] = $this->getEditObjectId();
         //loading languages info from config
-        $this->_aLangData = $this->getLanguages();
+        $this->_aLangData = $this->_getLanguages();
 
         if (isset($sOxId) && $sOxId != '-1') {
             //checking if translations files exists
-            $this->checkLangTranslations($sOxId);
-            $this->_aViewData['edit'] = $this->getLanguageInfo($sOxId);
+            $this->_checkLangTranslations($sOxId);
+            $this->_aViewData['edit'] = $this->_getLanguageInfo($sOxId);
         }
 
         return 'language_main.tpl';
@@ -121,9 +125,19 @@ class LanguageMain extends AdminDetailsController
         }
 
         //loading languages info from config
-        $this->_aLangData = $this->getLanguages();
+        $this->_aLangData = $this->_getLanguages();
         //checking input errors
-        if (!$this->validateInput()) {
+        if (!$this->_validateInput()) {
+            return;
+        }
+
+        // §356a BGB template-presence gate (issue #99). When the operator
+        // activates a NEW language while the revocation form is enabled,
+        // refuse the save if the new language is missing revocation
+        // assets (templates / translations) — sibling guard to phase 8.1
+        // on the revocation config screen. Existing already-active
+        // languages are not re-validated; only the newly-activated one.
+        if (!$this->revocationActivationGatePasses($sOxId, $aParams)) {
             return;
         }
 
@@ -149,7 +163,7 @@ class LanguageMain extends AdminDetailsController
         // if adding new language, setting lang id to abbreviation
         if ($blNewLanguage = ($sOxId == -1)) {
             $sOxId = $aParams['abbr'];
-            $this->_aLangData['params'][$sOxId]['baseId'] = $this->getAvailableLangBaseId();
+            $this->_aLangData['params'][$sOxId]['baseId'] = $this->_getAvailableLangBaseId();
             $this->setEditObjectId($sOxId);
         }
 
@@ -163,7 +177,7 @@ class LanguageMain extends AdminDetailsController
 
         //if setting lang as default
         if ($aParams['default'] == '1') {
-            $this->setDefaultLang($sOxId);
+            $this->_setDefaultLang($sOxId);
         }
 
         //updating language urls
@@ -172,7 +186,7 @@ class LanguageMain extends AdminDetailsController
         $this->_aLangData['sslUrls'][$iBaseId] = $aParams['basesslurl'];
 
         //sort parameters, urls and languages arrays by language base id
-        $this->sortLangArraysByBaseId();
+        $this->_sortLangArraysByBaseId();
 
         $this->_aViewData['updatelist'] = '1';
 
@@ -185,8 +199,8 @@ class LanguageMain extends AdminDetailsController
             //checking if added language already has created multilang fields
             //with new base ID - if not, creating new fields
             if ($blNewLanguage) {
-                if (!$this->checkMultilangFieldsExistsInDb($sOxId)) {
-                    $this->addNewMultilangFieldsToDb();
+                if (!$this->_checkMultilangFieldsExistsInDb($sOxId)) {
+                    $this->_addNewMultilangFieldsToDb();
                 } else {
                     $blViewError = true;
                 }
@@ -206,21 +220,15 @@ class LanguageMain extends AdminDetailsController
      * @param string $sOxId language abbreviation
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLanguageInfo" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getLanguageInfo()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLanguageInfo() to the canonical override
+      *             target and retires _getLanguageInfo(); until then, _getLanguageInfo() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getLanguageInfo($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getLanguageInfo($sOxId);
-    }
-
-    /**
-     * Get selected language info
-     *
-     * @param string $sOxId language abbreviation
-     *
-     * @return array
-     */
-    protected function getLanguageInfo($sOxId)
     {
         $sDefaultLang = Registry::getConfig()->getConfigParam('sDefaultLang');
 
@@ -235,37 +243,52 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Languages array setter
+     * Get selected language info
      *
-     * @param array $aLangData languages parameters array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setLanguages" in next major
+     * @param string $sOxId language abbreviation
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLanguageInfo(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLanguageInfo() the canonical override target.
      */
-    protected function _setLanguages($aLangData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getLanguageInfo($sOxId)
     {
-        $this->setLanguages($aLangData);
+        return $this->_getLanguageInfo($sOxId);
     }
 
     /**
      * Languages array setter
      *
      * @param array $aLangData languages parameters array
+     * @deprecated Transitional during #107. Modules SHOULD override _setLanguages()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setLanguages() to the canonical override
+      *             target and retires _setLanguages(); until then, _setLanguages() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function setLanguages($aLangData)
+    protected function _setLanguages($aLangData) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $this->_aLangData = $aLangData;
     }
 
     /**
-     * Loads from config all data related with languages.
-     * If no languages parameters array exists, sets default parameters values.
-     * Returns collected languages parameters array.
+     * Languages array setter
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLanguages" in next major
+     * @param array $aLangData languages parameters array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setLanguages(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setLanguages() the canonical override target.
      */
-    protected function _getLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function setLanguages($aLangData)
     {
-        return $this->getLanguages();
+        $this->_setLanguages($aLangData);
     }
 
     /**
@@ -274,8 +297,15 @@ class LanguageMain extends AdminDetailsController
      * Returns collected languages parameters array.
      *
      * @return array
+     * @deprecated Transitional during #107. Modules SHOULD override _getLanguages()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getLanguages() to the canonical override
+      *             target and retires _getLanguages(); until then, _getLanguages() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function getLanguages()
+    protected function _getLanguages() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aLangData['params'] = Registry::getConfig()->getConfigParam('aLanguageParams');
         $aLangData['lang'] = Registry::getConfig()->getConfigParam('aLanguages');
@@ -284,10 +314,27 @@ class LanguageMain extends AdminDetailsController
 
         // empty languages parameters array - creating new one with default values
         if (!is_array($aLangData['params'])) {
-            $aLangData['params'] = $this->assignDefaultLangParams($aLangData['lang']);
+            $aLangData['params'] = $this->_assignDefaultLangParams($aLangData['lang']);
         }
 
         return $aLangData;
+    }
+
+    /**
+     * Loads from config all data related with languages.
+     * If no languages parameters array exists, sets default parameters values.
+     * Returns collected languages parameters array.
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getLanguages(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getLanguages() the canonical override target.
+     */
+    protected function getLanguages()
+    {
+        return $this->_getLanguages();
     }
 
     /**
@@ -330,18 +377,15 @@ class LanguageMain extends AdminDetailsController
     /**
      * Sort languages, languages parameters, urls, ssl urls arrays according
      * base land ID
-     * @deprecated underscore prefix violates PSR12, will be renamed to "sortLangArraysByBaseId" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _sortLangArraysByBaseId()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes sortLangArraysByBaseId() to the canonical override
+      *             target and retires _sortLangArraysByBaseId(); until then, _sortLangArraysByBaseId() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _sortLangArraysByBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->sortLangArraysByBaseId();
-    }
-
-    /**
-     * Sort languages, languages parameters, urls, ssl urls arrays according
-     * base land ID
-     */
-    protected function sortLangArraysByBaseId()
     {
         $aUrls = [];
         $aSslUrls = [];
@@ -362,16 +406,17 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Assign default values for each language
+     * Sort languages, languages parameters, urls, ssl urls arrays according
+     * base land ID
      *
-     * @param array $aLanguages language array
-     *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "assignDefaultLangParams" in next major
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _sortLangArraysByBaseId(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make sortLangArraysByBaseId() the canonical override target.
      */
-    protected function _assignDefaultLangParams($aLanguages) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function sortLangArraysByBaseId()
     {
-        return $this->assignDefaultLangParams($aLanguages);
+        $this->_sortLangArraysByBaseId();
     }
 
     /**
@@ -380,8 +425,15 @@ class LanguageMain extends AdminDetailsController
      * @param array $aLanguages language array
      *
      * @return array
+     * @deprecated Transitional during #107. Modules SHOULD override _assignDefaultLangParams()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes assignDefaultLangParams() to the canonical override
+      *             target and retires _assignDefaultLangParams(); until then, _assignDefaultLangParams() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function assignDefaultLangParams($aLanguages)
+    protected function _assignDefaultLangParams($aLanguages) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aParams = [];
         $iBaseId = 0;
@@ -398,44 +450,68 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Sets default language base ID to config var 'sDefaultLang'
+     * Assign default values for each language
      *
-     * @param string $sOxId language abbreviation
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setDefaultLang" in next major
+     * @param array $aLanguages language array
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _assignDefaultLangParams(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make assignDefaultLangParams() the canonical override target.
      */
-    protected function _setDefaultLang($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function assignDefaultLangParams($aLanguages)
     {
-        $this->setDefaultLang($sOxId);
+        return $this->_assignDefaultLangParams($aLanguages);
     }
 
     /**
      * Sets default language base ID to config var 'sDefaultLang'
      *
      * @param string $sOxId language abbreviation
+     * @deprecated Transitional during #107. Modules SHOULD override _setDefaultLang()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setDefaultLang() to the canonical override
+      *             target and retires _setDefaultLang(); until then, _setDefaultLang() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function setDefaultLang($sOxId)
+    protected function _setDefaultLang($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sDefaultId = $this->_aLangData['params'][$sOxId]['baseId'];
         Registry::getConfig()->saveShopConfVar('str', 'sDefaultLang', $sDefaultId);
     }
 
     /**
-     * Get available language base ID
+     * Sets default language base ID to config var 'sDefaultLang'
      *
-     * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAvailableLangBaseId" in next major
+     * @param string $sOxId language abbreviation
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setDefaultLang(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setDefaultLang() the canonical override target.
      */
-    protected function _getAvailableLangBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function setDefaultLang($sOxId)
     {
-        return $this->getAvailableLangBaseId();
+        $this->_setDefaultLang($sOxId);
     }
 
     /**
      * Get available language base ID
      *
      * @return int
+     * @deprecated Transitional during #107. Modules SHOULD override _getAvailableLangBaseId()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAvailableLangBaseId() to the canonical override
+      *             target and retires _getAvailableLangBaseId(); until then, _getAvailableLangBaseId() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function getAvailableLangBaseId()
+    protected function _getAvailableLangBaseId() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aBaseId = [];
         foreach ($this->_aLangData['params'] as $aLang) {
@@ -458,15 +534,18 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Check selected language has translation file lang.php
-     * If not - displays warning
+     * Get available language base ID
      *
-     * @param string $sOxId language abbreviation
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkLangTranslations" in next major
+     * @return int
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAvailableLangBaseId(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAvailableLangBaseId() the canonical override target.
      */
-    protected function _checkLangTranslations($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getAvailableLangBaseId()
     {
-        $this->checkLangTranslations($sOxId);
+        return $this->_getAvailableLangBaseId();
     }
 
     /**
@@ -474,8 +553,15 @@ class LanguageMain extends AdminDetailsController
      * If not - displays warning
      *
      * @param string $sOxId language abbreviation
+     * @deprecated Transitional during #107. Modules SHOULD override _checkLangTranslations()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkLangTranslations() to the canonical override
+      *             target and retires _checkLangTranslations(); until then, _checkLangTranslations() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function checkLangTranslations($sOxId)
+    protected function _checkLangTranslations($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
 
@@ -489,16 +575,19 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Check if selected language already has multilanguage fields in DB
+     * Check selected language has translation file lang.php
+     * If not - displays warning
      *
      * @param string $sOxId language abbreviation
      *
-     * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkMultilangFieldsExistsInDb" in next major
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkLangTranslations(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkLangTranslations() the canonical override target.
      */
-    protected function _checkMultilangFieldsExistsInDb($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function checkLangTranslations($sOxId)
     {
-        return $this->checkMultilangFieldsExistsInDb($sOxId);
+        $this->_checkLangTranslations($sOxId);
     }
 
     /**
@@ -507,8 +596,15 @@ class LanguageMain extends AdminDetailsController
      * @param string $sOxId language abbreviation
      *
      * @return bool
+     * @deprecated Transitional during #107. Modules SHOULD override _checkMultilangFieldsExistsInDb()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkMultilangFieldsExistsInDb() to the canonical override
+      *             target and retires _checkMultilangFieldsExistsInDb(); until then, _checkMultilangFieldsExistsInDb() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function checkMultilangFieldsExistsInDb($sOxId)
+    protected function _checkMultilangFieldsExistsInDb($sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $iBaseId = $this->_aLangData['params'][$sOxId]['baseId'];
         $sTable = getLangTableName('oxarticles', $iBaseId);
@@ -520,17 +616,20 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Adding new language to DB - creating new multilanguage fields with new
-     * language ID (e.g. oxtitle_4)
+     * Check if selected language already has multilanguage fields in DB
      *
-     * @return void
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addNewMultilangFieldsToDb" in next major
+     * @param string $sOxId language abbreviation
+     *
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkMultilangFieldsExistsInDb(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkMultilangFieldsExistsInDb() the canonical override target.
      */
-    protected function _addNewMultilangFieldsToDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function checkMultilangFieldsExistsInDb($sOxId)
     {
-        $this->addNewMultilangFieldsToDb();
+        return $this->_checkMultilangFieldsExistsInDb($sOxId);
     }
 
     /**
@@ -540,8 +639,15 @@ class LanguageMain extends AdminDetailsController
      * @return void
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Transitional during #107. Modules SHOULD override _addNewMultilangFieldsToDb()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addNewMultilangFieldsToDb() to the canonical override
+      *             target and retires _addNewMultilangFieldsToDb(); until then, _addNewMultilangFieldsToDb() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function addNewMultilangFieldsToDb()
+    protected function _addNewMultilangFieldsToDb() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         //creating new multilingual fields with new id over whole DB
         $oDbMeta = oxNew(DbMetaDataHandler::class);
@@ -563,16 +669,21 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Check if language already exists
+     * Adding new language to DB - creating new multilanguage fields with new
+     * language ID (e.g. oxtitle_4)
      *
-     * @param string $sAbbr language abbreviation
+     * @return void
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
      *
-     * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkLangExists" in next major
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addNewMultilangFieldsToDb(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addNewMultilangFieldsToDb() the canonical override target.
      */
-    protected function _checkLangExists($sAbbr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function addNewMultilangFieldsToDb()
     {
-        return $this->checkLangExists($sAbbr);
+        $this->_addNewMultilangFieldsToDb();
     }
 
     /**
@@ -581,8 +692,15 @@ class LanguageMain extends AdminDetailsController
      * @param string $sAbbr language abbreviation
      *
      * @return bool
+     * @deprecated Transitional during #107. Modules SHOULD override _checkLangExists()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkLangExists() to the canonical override
+      *             target and retires _checkLangExists(); until then, _checkLangExists() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function checkLangExists($sAbbr)
+    protected function _checkLangExists($sAbbr) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aAbbrs = array_keys($this->_aLangData['lang']);
 
@@ -590,18 +708,20 @@ class LanguageMain extends AdminDetailsController
     }
 
     /**
-     * Callback function for sorting languages already. Sorts array according
-     * 'baseId' parameter
+     * Check if language already exists
      *
-     * @param object $oLang1 language array
-     * @param object $oLang2 language array
+     * @param string $sAbbr language abbreviation
      *
-     * @return int
-     * @deprecated underscore prefix violates PSR12, will be renamed to "sortLangParamsByBaseIdCallback" in next major
+     * @return bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkLangExists(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkLangExists() the canonical override target.
      */
-    protected function _sortLangParamsByBaseIdCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function checkLangExists($sAbbr)
     {
-        return $this->sortLangParamsByBaseIdCallback($oLang1, $oLang2);
+        return $this->_checkLangExists($sAbbr);
     }
 
     /**
@@ -612,22 +732,36 @@ class LanguageMain extends AdminDetailsController
      * @param object $oLang2 language array
      *
      * @return int
+     * @deprecated Transitional during #107. Modules SHOULD override _sortLangParamsByBaseIdCallback()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes sortLangParamsByBaseIdCallback() to the canonical override
+      *             target and retires _sortLangParamsByBaseIdCallback(); until then, _sortLangParamsByBaseIdCallback() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function sortLangParamsByBaseIdCallback($oLang1, $oLang2)
+    protected function _sortLangParamsByBaseIdCallback($oLang1, $oLang2) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         return ($oLang1['baseId'] < $oLang2['baseId']) ? -1 : 1;
     }
 
     /**
-     * Check language input errors
+     * Callback function for sorting languages already. Sorts array according
+     * 'baseId' parameter
      *
-     * @return bool
-     * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "validateInput" in next major
+     * @param object $oLang1 language array
+     * @param object $oLang2 language array
+     *
+     * @return int
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _sortLangParamsByBaseIdCallback(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make sortLangParamsByBaseIdCallback() the canonical override target.
      */
-    protected function _validateInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function sortLangParamsByBaseIdCallback($oLang1, $oLang2)
     {
-        return $this->validateInput();
+        return $this->_sortLangParamsByBaseIdCallback($oLang1, $oLang2);
     }
 
     /**
@@ -635,8 +769,15 @@ class LanguageMain extends AdminDetailsController
      *
      * @return bool
      * @throws Exception
+     * @deprecated Transitional during #107. Modules SHOULD override _validateInput()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes validateInput() to the canonical override
+      *             target and retires _validateInput(); until then, _validateInput() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function validateInput()
+    protected function _validateInput() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $result = true;
 
@@ -645,7 +786,7 @@ class LanguageMain extends AdminDetailsController
 
         // if creating new language, checking if language already exists with
         // entered language abbreviation
-        if (($oxid == -1) && $this->checkLangExists($parameters['abbr'])) {
+        if (($oxid == -1) && $this->_checkLangExists($parameters['abbr'])) {
             $this->addDisplayException('LANGUAGE_ALREADYEXISTS_ERROR');
             $result = false;
         }
@@ -663,6 +804,22 @@ class LanguageMain extends AdminDetailsController
         }
 
         return $result;
+    }
+
+    /**
+     * Check language input errors
+     *
+     * @return bool
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _validateInput(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make validateInput() the canonical override target.
+     */
+    protected function validateInput()
+    {
+        return $this->_validateInput();
     }
 
     /**
@@ -738,5 +895,98 @@ class LanguageMain extends AdminDetailsController
         }
 
         return $this->noJsValidator;
+    }
+
+    /**
+     * §356a template-presence gate for language activation (phase 8.2).
+     *
+     * Returns true (proceed with save) when:
+     *   - the revocation feature is off, OR
+     *   - the language is being saved as inactive, OR
+     *   - the language was already active and is just being re-saved, OR
+     *   - the validator finds no missing revocation assets for the
+     *     newly-activated language.
+     *
+     * Returns false (reject the save) when the language is being activated
+     * and the validator reports missing revocation templates/translations
+     * for that language. Side effect on rejection: each missing asset's
+     * remediation hint is pushed to the admin error display, and the
+     * raw missing-asset list is exposed to the template via
+     * `_aViewData['revocationMissingAssets']` so the operator sees the
+     * concrete list of files/keys to add.
+     *
+     * @param string             $sOxId   the language OXID being saved
+     * @param array<string,mixed> $aParams submitted form values
+     */
+    protected function revocationActivationGatePasses(string $sOxId, array $aParams): bool
+    {
+        $config = Registry::getConfig();
+        if (!$config->getConfigParam('blShowRevocationForm', false)) {
+            return true;
+        }
+        if (empty($aParams['active'])) {
+            return true;
+        }
+
+        // Only validate when the language is *transitioning* to active.
+        // _aLangData reflects the pre-save state at this point in save().
+        $wasActive = isset($this->_aLangData['params'][$sOxId]['active'])
+            && $this->_aLangData['params'][$sOxId]['active'];
+        $isNewLanguage = ($sOxId === '-1' || !isset($this->_aLangData['params'][$sOxId]));
+        if (!$isNewLanguage && $wasActive) {
+            return true;
+        }
+
+        $themeId = (string) ($config->getConfigParam('sCustomTheme') ?: $config->getConfigParam('sTheme'));
+        if ($themeId === '') {
+            $themeId = 'wave';
+        }
+        $shopId = (int) $config->getShopId();
+        $newBaseId = isset($this->_aLangData['params'][$sOxId]['baseId'])
+            ? (int) $this->_aLangData['params'][$sOxId]['baseId']
+            : (int) $this->_getAvailableLangBaseId();
+
+        $missing = $this->getRevocationTemplateValidator()->validate($shopId, $themeId, [$newBaseId]);
+        if ($missing === []) {
+            return true;
+        }
+
+        foreach ($missing as $asset) {
+            $oEx = oxNew(ExceptionToDisplay::class);
+            $oEx->setMessage('§356a — ' . MissingAssetHintTranslator::translate($asset, Registry::getLang()));
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
+        }
+        $this->_aViewData['revocationMissingAssets'] = array_map(
+            static fn (MissingAsset $a) => [
+                'type' => $a->getAssetType(),
+                'path' => $a->getExpectedPath(),
+                'lang' => $a->getLangId(),
+                'hint' => $a->getRemediationHint(),
+            ],
+            $missing
+        );
+
+        return false;
+    }
+
+    /** @var RevocationTemplateValidator|null lazy-resolved; settable for tests */
+    protected ?RevocationTemplateValidator $revocationTemplateValidator = null;
+
+    /**
+     * Test seam — inject a mocked validator without driving the DI container.
+     */
+    public function setRevocationTemplateValidator(RevocationTemplateValidator $validator): void
+    {
+        $this->revocationTemplateValidator = $validator;
+    }
+
+    protected function getRevocationTemplateValidator(): RevocationTemplateValidator
+    {
+        if ($this->revocationTemplateValidator === null) {
+            $this->revocationTemplateValidator = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(RevocationTemplateValidator::class);
+        }
+        return $this->revocationTemplateValidator;
     }
 }

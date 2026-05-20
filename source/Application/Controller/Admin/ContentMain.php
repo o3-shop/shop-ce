@@ -99,7 +99,7 @@ class ContentMain extends AdminDetailsController
             $sCSS = null;
         }
 
-        $this->_aViewData['editor'] = $this->generateTextEditor('100%', 300, $oContent, 'oxcontents__oxcontent', $sCSS);
+        $this->_aViewData['editor'] = $this->_generateTextEditor('100%', 300, $oContent, 'oxcontents__oxcontent', $sCSS);
         $this->_aViewData['afolder'] = $myConfig->getConfigParam('aCMSfolder');
 
         return 'content_main.tpl';
@@ -119,11 +119,11 @@ class ContentMain extends AdminDetailsController
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (isset($aParams['oxcontents__oxloadid'])) {
-            $aParams['oxcontents__oxloadid'] = $this->prepareIdent($aParams['oxcontents__oxloadid']);
+            $aParams['oxcontents__oxloadid'] = $this->_prepareIdent($aParams['oxcontents__oxloadid']);
         }
 
         // check if loadid is unique
-        if ($this->checkIdent($aParams['oxcontents__oxloadid'], $soxId)) {
+        if ($this->_checkIdent($aParams['oxcontents__oxloadid'], $soxId)) {
             // loadid already used, display error message
             $this->_aViewData['blLoadError'] = true;
 
@@ -184,7 +184,7 @@ class ContentMain extends AdminDetailsController
         $aParams = Registry::getRequest()->getRequestEscapedParameter('editval');
 
         if (isset($aParams['oxcontents__oxloadid'])) {
-            $aParams['oxcontents__oxloadid'] = $this->prepareIdent($aParams['oxcontents__oxloadid']);
+            $aParams['oxcontents__oxloadid'] = $this->_prepareIdent($aParams['oxcontents__oxloadid']);
         }
 
         // checkbox handling
@@ -217,11 +217,19 @@ class ContentMain extends AdminDetailsController
      * @param string $sIdent ident to filter
      *
      * @return string|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareIdent" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _prepareIdent()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes prepareIdent() to the canonical override
+      *             target and retires _prepareIdent(); until then, _prepareIdent() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _prepareIdent($sIdent) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->prepareIdent($sIdent);
+        if ($sIdent) {
+            return Str::getStr()->preg_replace('/[^a-zA-Z0-9_]*/', '', $sIdent);
+        }
     }
 
     /**
@@ -230,12 +238,15 @@ class ContentMain extends AdminDetailsController
      * @param string $sIdent ident to filter
      *
      * @return string|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _prepareIdent(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make prepareIdent() the canonical override target.
      */
     protected function prepareIdent($sIdent)
     {
-        if ($sIdent) {
-            return Str::getStr()->preg_replace('/[^a-zA-Z0-9_]*/', '', $sIdent);
-        }
+        return $this->_prepareIdent($sIdent);
     }
 
     /**
@@ -246,23 +257,15 @@ class ContentMain extends AdminDetailsController
      *
      * @return null
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "checkIdent" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _checkIdent()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes checkIdent() to the canonical override
+      *             target and retires _checkIdent(); until then, _checkIdent() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _checkIdent($sIdent, $sOxId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->checkIdent($sIdent, $sOxId);
-    }
-
-    /**
-     * Check if ident is unique
-     *
-     * @param string $sIdent ident
-     * @param string $sOxId Object id
-     *
-     * @return null
-     * @throws DatabaseConnectionException
-     */
-    protected function checkIdent($sIdent, $sOxId)
     {
         // We force reading from master to prevent issues with slow replications or open transactions (see ESDEV-3804).
         $masterDb = DatabaseProvider::getMaster();
@@ -284,5 +287,24 @@ class ContentMain extends AdminDetailsController
         }
 
         return $blAllow;
+    }
+
+    /**
+     * Check if ident is unique
+     *
+     * @param string $sIdent ident
+     * @param string $sOxId Object id
+     *
+     * @return null
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _checkIdent(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make checkIdent() the canonical override target.
+     */
+    protected function checkIdent($sIdent, $sOxId)
+    {
+        return $this->_checkIdent($sIdent, $sOxId);
     }
 }

@@ -135,8 +135,8 @@ class ArticleSelectionAjaxTest extends \OxidTestCase
     {
         $oDb = oxDb::getDb();
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testOxid1', '_testOxid2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testOxid1', '_testOxid2']));
 
         $this->assertEquals(2, $oDb->getOne("select count(oxid) from oxobject2selectlist where oxobjectid='_testRemove'"));
         $oView->removeSel();
@@ -173,8 +173,8 @@ class ArticleSelectionAjaxTest extends \OxidTestCase
         $sSynchoxid = '_testAdd';
         $this->setRequestParameter('synchoxid', $sSynchoxid);
 
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testAdd1', '_testAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleSelectionAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testAdd1', '_testAdd2']));
 
         $this->assertEquals(0, $oDb->getOne("select count(oxid) from oxobject2selectlist where oxobjectid='_testAdd'"));
         $oView->addSel();

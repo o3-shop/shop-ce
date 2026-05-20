@@ -140,7 +140,7 @@ class AdminController extends BaseController
         $myConfig->setConfigParam('blAdmin', true);
         $this->setAdminMode(true);
 
-        if ($oShop = $this->getEditShop($myConfig->getShopId())) {
+        if ($oShop = $this->_getEditShop($myConfig->getShopId())) {
             // passing shop info
             $this->_sShopTitle = $oShop->oxshops__oxname->getRawValue();
             $this->_sShopVersion = oxNew(ShopVersion::class)->getVersion();
@@ -153,21 +153,12 @@ class AdminController extends BaseController
      * @param string $sShopId shop id
      *
      * @return Shop
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getEditShop" in next major
+     * @deprecated Use getEditShop() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getEditShop().
      */
     protected function _getEditShop($sShopId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getEditShop($sShopId);
-    }
-
-    /**
-     * Returns (cached) shop object
-     *
-     * @param string $sShopId shop id
-     *
-     * @return Shop
-     */
-    protected function getEditShop($sShopId)
     {
         if (!$this->_oEditShop) {
             $this->_oEditShop = Registry::getConfig()->getActiveShop();
@@ -183,6 +174,23 @@ class AdminController extends BaseController
     }
 
     /**
+     * Returns (cached) shop object
+     *
+     * @param string $sShopId shop id
+     *
+     * @return Shop
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getEditShop(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getEditShop() the canonical override target.
+     */
+    protected function getEditShop($sShopId)
+    {
+        return $this->_getEditShop($sShopId);
+    }
+
+    /**
      * Sets some shop configuration parameters (such as language),
      * creates some list object (depends on subclass) and executes
      * parent method parent::Init().
@@ -192,7 +200,8 @@ class AdminController extends BaseController
         // authorization check
         if (!$this->authorize()) {
             Registry::getUtils()->redirect('index.php?cl=login', true, 302);
-            exit('Authorization error occurred!');
+            Registry::get(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)
+                ->exit(0, 'Authorization error occurred!');
         }
 
         $oLang = Registry::getLang();
@@ -250,21 +259,29 @@ class AdminController extends BaseController
      * Returns service url protocol: "https" is admin works in ssl mode, "http" if no ssl
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getServiceProtocol" in next major
+     * @deprecated Use getServiceProtocol() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getServiceProtocol().
      */
     protected function _getServiceProtocol() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getServiceProtocol();
+        return Registry::getConfig()->isSsl() ? 'https' : 'http';
     }
 
     /**
      * Returns service url protocol: "https" is admin works in ssl mode, "http" if no ssl
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getServiceProtocol() (not the deprecated _getServiceProtocol()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getServiceProtocol()
     {
-        return Registry::getConfig()->isSsl() ? 'https' : 'http';
+        return $this->_getServiceProtocol();
     }
 
     /**
@@ -280,7 +297,7 @@ class AdminController extends BaseController
     public function getServiceUrl($sLangAbbr = null)
     {
         if ($this->_sServiceUrl === null) {
-            $sProtocol = $this->getServiceProtocol();
+            $sProtocol = $this->_getServiceProtocol();
 
             $oFacts = new Facts();
             $sUrl = $sProtocol . '://admin.oxid-esales.com/' . $oFacts->getEdition() . '/';
@@ -364,7 +381,7 @@ class AdminController extends BaseController
         $oLang = Registry::getLang();
 
         // sets up navigation data
-        $this->setupNavigation(Registry::getConfig()->getRequestControllerId());
+        $this->_setupNavigation(Registry::getConfig()->getRequestControllerId());
 
         // active object id
         $sOxId = $this->getEditObjectId();
@@ -379,7 +396,7 @@ class AdminController extends BaseController
         // loading active shop
         if ($sActShopId = Registry::getSession()->getVariable('actshop')) {
             // load object
-            $this->_aViewData['actshopobj'] = $this->getEditShop($sActShopId);
+            $this->_aViewData['actshopobj'] = $this->_getEditShop($sActShopId);
         }
 
         // add language data to all templates
@@ -500,7 +517,7 @@ class AdminController extends BaseController
                     $myUtilsCount->resetManufacturerArticleCount($sValue);
                     break;
             }
-            $this->resetContentCache();
+            $this->_resetContentCache();
         }
     }
 

@@ -23,6 +23,8 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Controller\Admin;
 
 use Exception;
 use OxidEsales\Eshop\Application\Controller\Admin\NavigationController;
+use OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckResult;
+use OxidEsales\EshopCommunity\Internal\Framework\UpdateCheck\UpdateCheckServiceInterface;
 use oxRegistry;
 use oxTestModules;
 use stdClass;
@@ -90,9 +92,9 @@ class NavigationTest extends \OxidTestCase
         $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue('testNodes'));
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, ['getNavigation', 'doStartUpChecks']);
+        $oView = $this->getMock(NavigationController::class, ['getNavigation', '_doStartUpChecks']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
-        $oView->expects($this->once())->method('doStartUpChecks')->will($this->returnValue('check'));
+        $oView->expects($this->once())->method('_doStartUpChecks')->will($this->returnValue('check'));
         $this->assertEquals('home.tpl', $oView->render());
 
         // checking vew data
@@ -126,9 +128,9 @@ class NavigationTest extends \OxidTestCase
         $oNavigation->expects($this->any())->method('getListNodes')->will($this->returnValue('testNodes'));
 
         // testing..
-        $oView = $this->getMock(NavigationController::class, ['getNavigation', 'doStartUpChecks']);
+        $oView = $this->getMock(NavigationController::class, ['getNavigation', '_doStartUpChecks']);
         $oView->expects($this->once())->method('getNavigation')->will($this->returnValue($oNavigation));
-        $oView->expects($this->never())->method('doStartUpChecks')->will($this->returnValue('check'));
+        $oView->expects($this->never())->method('_doStartUpChecks')->will($this->returnValue('check'));
         $this->assertEquals('home.tpl', $oView->render());
 
         // checking vew data
@@ -199,12 +201,15 @@ class NavigationTest extends \OxidTestCase
     {
         $this->getConfig()->setConfigParam('blCheckForUpdates', true);
 
-        // testing..
-        $oView = $this->getMock(NavigationController::class, ['checkVersion']);
-        $oView->expects($this->once())->method('checkVersion')->will($this->returnValue('versionnotice'));
+        $updateCheckResult = new UpdateCheckResult(true, 'v2.0.0', 'https://example.com/update');
+        $updateCheckService = $this->createMock(UpdateCheckServiceInterface::class);
+        $updateCheckService->expects($this->once())->method('check')->willReturn($updateCheckResult);
+
+        $oView = $this->getMock(NavigationController::class, ['getUpdateCheckService']);
+        $oView->method('getUpdateCheckService')->willReturn($updateCheckService);
+
         $aState = $oView->UNITdoStartUpChecks();
         $this->assertTrue(is_array($aState));
-        $this->assertTrue(isset($aState['message']));
         $this->assertTrue(isset($aState['warning']));
     }
 

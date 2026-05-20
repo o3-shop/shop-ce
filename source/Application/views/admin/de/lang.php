@@ -794,6 +794,13 @@ $aLang = [
     'NAVIGATION_NEWVERSIONAVAILABLE'                 => 'Version %s ist verfügbar!',
     // END deprecated
     'NAVIGATION_NEW_VERSION_AVAILABLE'               => 'Sie verwenden Version %s, Version %s ist jetzt verfügbar. Bitte aktualisieren Sie jetzt.',
+    'UPDATECHECK_TITLE'                              => 'Update-Prüfung',
+    'UPDATECHECK_CORE_NOTICE'                        => 'Eine neue Shop-Version %s ist verfügbar.',
+    'UPDATECHECK_MODULE_ID'                          => 'Modul',
+    'UPDATECHECK_MODULE_INSTALLED'                   => 'Installiert',
+    'UPDATECHECK_MODULE_LATEST'                      => 'Verfügbar',
+    'UPDATECHECK_MODULE_LINK'                        => 'Details',
+    'UPDATECHECK_BUTTON'                             => 'Nach Updates suchen',
     // @deprecated 6.5.6 "News" feature will be removed completely
     'NEWS_LIST_TITLE'                                => '[OXID Newsverwaltung]',
     'NEWS_LIST_SHORTTEXT'                            => 'Titel',
@@ -804,7 +811,7 @@ $aLang = [
     'NEWS_MAIN_NOTSHOWFORGROUP'                      => 'Nicht sichtbar für Benutzergruppe',
     // END deprecated
     'NAVIGATION_SYSREQ_MESSAGE'                      => 'Die Systemgesundheit dieses Shops ist gefährdet. Möglicherweise verhält sich Ihr O3-Shop in einigen Bereichen unerwartet. Bitte stellen Sie sicher, dass die Servereinstellungen korrekt vorgenommen werden. Unterstützung finden Sie in der ',
-    'NAVIGATION_SYSREQ_MESSAGE2'                     => '<b>Systemgesundheitsprüfung</b>.',
+    'NAVIGATION_SYSREQ_MESSAGE2'                     => 'Systemgesundheitsprüfung.',
     'NAVIGATION_SYSREQ_MESSAGE_INACTIVE'             => 'Die permanente Systemgesundheitsprüfung wurde deaktiviert. Sie können diese auf der Registerkarte Perform. unter Stammdaten -> Grundeinstellungen aktivieren. Um dennoch zu prüfen, klicken Sie bitte hier: ',
     'NAVIGATION_SHOPFRONT'                           => 'Startseite des Shops',
     'NAVIGATION_FULLVIEW'                            => 'Expertenmenü zeigen',
@@ -1569,6 +1576,8 @@ $aLang = [
     'mxpaymeth'                => 'Zahlungsarten',
     'mxpricealarm'             => 'Wunschpreis',
     'mxremlist'                => 'Alle Bewertungen',
+    'mxrevocationconfig'       => 'Widerruf-Einstellungen',
+    'mxrevocations'            => 'Widerrufe',
     'mxsellist'                => 'Auswahllisten',
     'mxservice'                => 'Service',
     'mxservicearea'            => 'E-Commerce Services',
@@ -1665,6 +1674,9 @@ $aLang = [
     //  Pricealarm',
     'tbclpricealarm_main'      => 'Stamm',
     'tbclpricealarm_mail'      => 'E-Mail',
+    //  revocation_list',
+    'tbclrevocation_main'      => 'Stamm',
+    'tbclrevocation_config'    => 'Einstellungen',
     //  selectlist_list',
     'tbclselectlist_main'      => 'Stamm',
     //  system requirements',
@@ -2032,6 +2044,49 @@ $aLang = [
     'MESSAGE'                        => 'Nachricht',
     'ADMIN_SETTINGS_LICENSE_VERSION_FETCH_INFO_ERROR' => 'Fehler beim Abrufen von Versionsinformationen!',
     'CURL_EXECUTE_ERROR' => 'Verbindungsfehler (%s). Bitte versuchen Sie es später noch einmal.',
+
+    // §356a BGB electronic revocation feature — admin keys (issue #99).
+    // Storefront-side keys (form labels, customer/operator email bodies)
+    // live in source/Application/translations/{en,de}/lang.php instead.
+    'O3_REVOCATION_ADMIN_NAV_LABEL'                               => 'Widerrufe',
+    'O3_REVOCATION_CONFIG_SHOW_LABEL'                             => 'Widerrufsformular im Footer anzeigen',
+    'O3_REVOCATION_CONFIG_REQUIRELOGIN_LABEL'                     => 'Login zum Aufruf des Widerrufsformulars erforderlich',
+    'O3_REVOCATION_CONFIG_NOTIFY_LABEL'                           => 'Shop-Betreiber per E-Mail über jeden Widerruf benachrichtigen',
+    'O3_REVOCATION_CONFIG_OPERATOR_EMAIL_LABEL'                   => 'E-Mail-Empfänger für Widerrufsbenachrichtigungen',
+    'O3_REVOCATION_VALIDATION_OPERATOR_EMAIL_REQUIRED'            => 'Bitte geben Sie eine E-Mail-Adresse für Widerrufsbenachrichtigungen an, oder deaktivieren Sie die Benachrichtigung.',
+    'O3_REVOCATION_VALIDATION_EMAIL_FORMAT'                       => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+    'O3_REVOCATION_ADMIN_GATE_HEADING'                            => 'Aktivierung nicht möglich – fehlende Vorlagen oder Übersetzungen',
+    'O3_REVOCATION_ADMIN_GATE_LANG_TAG'                           => 'Sprache',
+    // Per-asset hint lines surfaced via Registry::getUtilsView()->addErrorToDisplay()
+    // when the §356a activation gate rejects a save / language activation / theme switch.
+    // %1$s = absolute path (page/email template) or translation key; %2$d = language ID.
+    'O3_REVOCATION_ADMIN_GATE_HINT_PAGE_TEMPLATE'                 => 'Bitte fehlende Seitenvorlage im aktiven Theme anlegen: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_EMAIL_TEMPLATE'                => 'Bitte fehlende E-Mail-Vorlage im aktiven Theme anlegen: %1$s',
+    'O3_REVOCATION_ADMIN_GATE_HINT_TRANSLATION_KEY'               => 'Bitte eine nicht-leere Übersetzung für „%1$s" in der Sprachdatei für Sprach-ID %2$d ergänzen.',
+    'O3_REVOCATION_ADMIN_LIST_HEADING'                            => 'Widerrufe',
+    'O3_REVOCATION_ADMIN_LIST_MENUITEM'                           => 'Kundeninformation',
+    'O3_REVOCATION_ADMIN_LIST_MENUSUBITEM'                        => 'Widerrufe',
+    'O3_REVOCATION_ADMIN_LIST_EMPTY'                              => 'Keine Widerrufe vorhanden.',
+    'O3_REVOCATION_ADMIN_LIST_COL_SUBMITTED'                      => 'Eingegangen',
+    'O3_REVOCATION_ADMIN_LIST_COL_NAME'                           => 'Name',
+    'O3_REVOCATION_ADMIN_LIST_COL_EMAIL'                          => 'E-Mail',
+    'O3_REVOCATION_ADMIN_LIST_COL_ORDER'                          => 'Bestellnummer',
+    'O3_REVOCATION_ADMIN_LIST_COL_STATUS'                         => 'Status',
+    'O3_REVOCATION_ADMIN_FLAG_SENT'                               => 'Versand erfolgreich',
+    'O3_REVOCATION_ADMIN_FLAG_SEND_FAILED'                        => 'Versand fehlgeschlagen',
+    'O3_REVOCATION_ADMIN_DETAIL_HEADING'                          => 'Widerruf – Details',
+    'O3_REVOCATION_ADMIN_FIELD_OXID'                              => 'Vorgangs-ID',
+    'O3_REVOCATION_ADMIN_FIELD_SUBMITTED'                         => 'Eingegangen am',
+    'O3_REVOCATION_ADMIN_FIELD_NAME'                              => 'Name',
+    'O3_REVOCATION_ADMIN_FIELD_ORDER_IDENT'                       => 'Bestellnummer (vom Kunden eingegeben)',
+    'O3_REVOCATION_ADMIN_FIELD_EMAIL'                             => 'E-Mail-Adresse (vom Kunden eingegeben)',
+    'O3_REVOCATION_ADMIN_FIELD_FREETEXT'                          => 'Freitext / Anmerkungen',
+    'O3_REVOCATION_ADMIN_FIELD_FREETEXT_EMPTY'                    => '(leer)',
+    'O3_REVOCATION_ADMIN_FIELD_STATUS'                            => 'Versand-Status',
+    'O3_REVOCATION_ADMIN_ACTIONS_HEADING'                         => 'Aktionen',
+    'O3_REVOCATION_ADMIN_RESEND_BUTTON'                           => 'Bestätigung erneut senden',
+    'O3_REVOCATION_ADMIN_DELETE_BUTTON'                           => 'Datensatz löschen',
+    'O3_REVOCATION_ADMIN_DELETE_CONFIRM'                          => 'Diesen Widerrufs-Datensatz wirklich endgültig löschen? Diese Aktion ist nicht rückgängig zu machen.',
 ];
 
 /*

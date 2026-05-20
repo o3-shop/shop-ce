@@ -95,7 +95,7 @@ class ArticleFiles extends AdminDetailsController
             foreach ($aArticleFiles as $sArticleFileId => $aArticleFileUpdate) {
                 $oArticleFile = oxNew(File::class);
                 $oArticleFile->load($sArticleFileId);
-                $aArticleFileUpdate = $this->processOptions($aArticleFileUpdate);
+                $aArticleFileUpdate = $this->_processOptions($aArticleFileUpdate);
                 $oArticleFile->assign($aArticleFileUpdate);
 
                 if ($oArticleFile->isUnderDownloadFolder()) {
@@ -149,7 +149,7 @@ class ArticleFiles extends AdminDetailsController
         $soxId = $this->getEditObjectId();
 
         $aParams = Registry::getRequest()->getRequestEscapedParameter('newfile');
-        $aParams = $this->processOptions($aParams);
+        $aParams = $this->_processOptions($aParams);
         $aNewFile = Registry::getConfig()->getUploadedFile('newArticleFile');
 
         //uploading and processing supplied file
@@ -226,21 +226,12 @@ class ArticleFiles extends AdminDetailsController
      * @param array $aParams params
      *
      * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "processOptions" in next major
+     * @deprecated Use processOptions() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _processOptions().
      */
     protected function _processOptions($aParams) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->processOptions($aParams);
-    }
-
-    /**
-     * Process config options. If value is not set, save as "-1" to database
-     *
-     * @param array $aParams params
-     *
-     * @return array
-     */
-    protected function processOptions($aParams)
     {
         if (!is_array($aParams)) {
             $aParams = [];
@@ -260,5 +251,22 @@ class ArticleFiles extends AdminDetailsController
         }
 
         return $aParams;
+    }
+
+    /**
+     * Process config options. If value is not set, save as "-1" to database
+     *
+     * @param array $aParams params
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _processOptions(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make processOptions() the canonical override target.
+     */
+    protected function processOptions($aParams)
+    {
+        return $this->_processOptions($aParams);
     }
 }

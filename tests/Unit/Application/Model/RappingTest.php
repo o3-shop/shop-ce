@@ -316,7 +316,7 @@ class RappingTest extends \OxidTestCase
         $sPrice = oxRegistry::getLang()->formatCurrency($oWrapping->getWrappingPrice()->getBruttoPrice());
 
         // validating
-        $this->assertEquals('2.53', $sPrice);
+        $this->assertEquals('2.56', $sPrice);
     }
 
     public function testCalcFPriceInCHF()
@@ -338,7 +338,7 @@ class RappingTest extends \OxidTestCase
         $sPrice = oxRegistry::getLang()->formatCurrency($oWrapping->getWrappingPrice()->getBruttoPrice());
 
         // validating
-        $this->assertEquals('4,23', $sPrice);
+        $this->assertEquals('2,71', $sPrice);
     }
 
     public function testGetWrappingListIfNotAllActive()

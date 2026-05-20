@@ -422,10 +422,10 @@ class FunctionalityInAdminTest extends AdminTestCase
         $this->loginAdmin('Master Settings', 'Core Settings');
         $this->openTab('Settings');
         $this->click('link=Other settings');
-        $this->assertEquals("EUR@ 1.00@ ,@ .@ €@ 2\nGBP@ 0.8565@ .@  @ £@ 2\nCHF@ 1.4326@ ,@ .@ <small>CHF</small>@ 2\nUSD@ 1.2994@ .@  @ $@ 2", $this->getValue('confarrs[aCurrencies]'));
+        $this->assertEquals("EUR@ 1.00@ ,@ .@ €@ 2\nGBP@ 0.8663@ .@  @ £@ 2\nCHF@ 0.9190@ ,@ .@ <small>CHF</small>@ 2\nUSD@ 1.1702@ .@  @ $@ 2", $this->getValue('confarrs[aCurrencies]'));
         $this->clickAndWait('save');
         $this->click('link=Other settings');
-        $this->assertEquals("EUR@ 1.00@ ,@ .@ €@ 2\nGBP@ 0.8565@ .@  @ £@ 2\nCHF@ 1.4326@ ,@ .@ <small>CHF</small>@ 2\nUSD@ 1.2994@ .@  @ $@ 2", $this->getValue('confarrs[aCurrencies]'));
+        $this->assertEquals("EUR@ 1.00@ ,@ .@ €@ 2\nGBP@ 0.8663@ .@  @ £@ 2\nCHF@ 0.9190@ ,@ .@ <small>CHF</small>@ 2\nUSD@ 1.1702@ .@  @ $@ 2", $this->getValue('confarrs[aCurrencies]'));
     }
 
     /**

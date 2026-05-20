@@ -85,8 +85,8 @@ class NewsletterSendTest extends \OxidTestCase
         $oNewsSubscribed->save();
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSend::class, ['setupNavigation']);
-        $oView->expects($this->once())->method('setupNavigation');
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSend::class, ['_setupNavigation']);
+        $oView->expects($this->once())->method('_setupNavigation');
         $this->assertEquals('newsletter_send.tpl', $oView->render());
 
         $aViewData = $oView->getViewData();
@@ -124,8 +124,8 @@ class NewsletterSendTest extends \OxidTestCase
         $oNewsSubscribed->save();
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSend::class, ['setupNavigation', 'getUserCount']);
-        $oView->expects($this->exactly(2))->method('setupNavigation');
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\NewsletterSend::class, ['_setupNavigation', 'getUserCount']);
+        $oView->expects($this->exactly(2))->method('_setupNavigation');
         $oView->expects($this->exactly(2))->method('getUserCount')->will($this->returnValue(2));
         $this->assertEquals('newsletter_send.tpl', $oView->render());
 

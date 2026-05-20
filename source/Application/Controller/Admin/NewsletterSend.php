@@ -205,19 +205,15 @@ class NewsletterSend extends NewsletterSelection
      * Overrides parent method to pass referred id
      *
      * @param string $sNode referred id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setupNavigation" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _setupNavigation()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes setupNavigation() to the canonical override
+      *             target and retires _setupNavigation(); until then, _setupNavigation() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _setupNavigation($sNode) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setupNavigation($sNode);
-    }
-
-    /**
-     * Overrides parent method to pass referred id
-     *
-     * @param string $sNode referred id
-     */
-    protected function setupNavigation($sNode)
     {
         $sNode = 'newsletter_list';
 
@@ -237,6 +233,21 @@ class NewsletterSend extends NewsletterSelection
 
         // passing active tab number
         $this->_aViewData['actedit'] = $iActTab;
+    }
+
+    /**
+     * Overrides parent method to pass referred id
+     *
+     * @param string $sNode referred id
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setupNavigation(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setupNavigation() the canonical override target.
+     */
+    protected function setupNavigation($sNode)
+    {
+        $this->_setupNavigation($sNode);
     }
 
     /**

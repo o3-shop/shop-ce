@@ -33,9 +33,10 @@ class DynscreenListTest extends \OxidTestCase
      */
     public function testRender()
     {
-        // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenList::class, ['setupNavigation']);
-        $oView->expects($this->once())->method('setupNavigation');
+        // Post-#107 call-site sweep: AdminListController::render() now calls
+        // $this->_setupNavigation() (the BC anchor). Mock the underscore name.
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\DynamicScreenList::class, ['_setupNavigation']);
+        $oView->expects($this->once())->method('_setupNavigation');
         $this->assertEquals('dynscreen_list.tpl', $oView->render());
     }
 }

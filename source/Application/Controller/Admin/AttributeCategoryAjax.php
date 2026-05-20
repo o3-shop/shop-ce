@@ -67,20 +67,15 @@ class AttributeCategoryAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $myConfig = Registry::getConfig();
         $oDb = DatabaseProvider::getDb();
@@ -114,14 +109,30 @@ class AttributeCategoryAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes category from Attributes list
      */
     public function removeCatFromAttr()
     {
-        $aChosenCat = $this->getActionIds('oxcategory2attribute.oxid');
+        $aChosenCat = $this->_getActionIds('oxcategory2attribute.oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxcategory2attribute.* ' . $this->getQuery());
+            $sQ = $this->_addFilter('delete oxcategory2attribute.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCat)) {
             $sChosenCategories = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCat));
@@ -139,14 +150,14 @@ class AttributeCategoryAjax extends ListComponentAjax
      */
     public function addCatToAttr()
     {
-        $aAddCategory = $this->getActionIds('oxcategories.oxid');
+        $aAddCategory = $this->_getActionIds('oxcategories.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $oAttribute = oxNew(Attribute::class);
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sCatTable = $this->getViewName('oxcategories');
-            $aAddCategory = $this->getAll($this->addFilter("select $sCatTable.oxid " . $this->getQuery()));
+            $aAddCategory = $this->_getAll($this->_addFilter("select $sCatTable.oxid " . $this->getQuery()));
         }
 
         if ($oAttribute->load($soxId) && is_array($aAddCategory)) {

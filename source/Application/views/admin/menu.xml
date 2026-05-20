@@ -179,6 +179,13 @@
                 <TAB id="tbclpricealarm_main" cl="pricealarm_main" />
                 <TAB id="tbclpricealarm_mail" cl="pricealarm_mail" />
             </SUBMENU>
+            <!-- §356a BGB electronic revocation feature (issue #99) -->
+            <SUBMENU id="mxrevocations" cl="admin_revocation" list="revocation_list">
+                <TAB id="tbclrevocation_main" cl="revocation_main" />
+            </SUBMENU>
+            <SUBMENU id="mxrevocationconfig" cl="revocation_config" list="revocation_config">
+                <TAB id="tbclrevocation_config" cl="revocation_config" />
+            </SUBMENU>
         </MAINMENU>
         <MAINMENU id="mxservice" iconclass="fa-solid fa-screwdriver-wrench">
             <SUBMENU id="mxsysinfo" cl="systeminfo" rights="malladmin" disableForDemoShop="1" />

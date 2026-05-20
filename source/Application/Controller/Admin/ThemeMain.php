@@ -22,9 +22,13 @@
 namespace OxidEsales\EshopCommunity\Application\Controller\Admin;
 
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
+use OxidEsales\Eshop\Core\Exception\ExceptionToDisplay;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Theme;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\MissingAssetHintTranslator;
+use OxidEsales\EshopCommunity\Internal\Domain\Revocation\TemplateValidator\RevocationTemplateValidator;
 
 /**
  * Admin article main deliveryset manager.
@@ -92,6 +96,19 @@ class ThemeMain extends AdminDetailsController
 
             return;
         }
+
+        // §356a BGB template-presence gate (issue #99). When the operator
+        // switches to a different theme while the revocation form is
+        // enabled, refuse the activation if the prospective theme is
+        // missing revocation assets (templates / translations) — sibling
+        // guard to phase 8.1 (revocation config screen) and 8.2
+        // (LanguageMain). Each missing asset's remediation hint surfaces
+        // through the standard admin error display so the operator sees
+        // the concrete list of files to add to the new theme.
+        if (!$this->revocationActivationGatePasses($sTheme)) {
+            return;
+        }
+
         try {
             $oTheme->activate();
             $this->resetContentCache();
@@ -99,5 +116,72 @@ class ThemeMain extends AdminDetailsController
             Registry::getUtilsView()->addErrorToDisplay($oEx);
             $oEx->debugOut();
         }
+    }
+
+    /**
+     * §356a template-presence gate for theme activation (phase 8.3).
+     *
+     * Returns true (proceed with activation) when:
+     *   - the revocation feature is off, OR
+     *   - the validator finds no missing revocation assets in the
+     *     prospective theme for any currently-active language.
+     *
+     * Returns false (reject) when missing assets exist. Side effect on
+     * rejection: each missing asset's remediation hint is pushed to the
+     * admin error display.
+     */
+    protected function revocationActivationGatePasses(string $themeId): bool
+    {
+        $config = Registry::getConfig();
+        if (!$config->getConfigParam('blShowRevocationForm', false)) {
+            return true;
+        }
+
+        $shopId = (int) $config->getShopId();
+        $activeLangIds = [];
+        $params = $config->getConfigParam('aLanguageParams');
+        if (is_array($params)) {
+            foreach ($params as $entry) {
+                if (is_array($entry) && !empty($entry['active'])) {
+                    $activeLangIds[] = isset($entry['baseId']) ? (int) $entry['baseId'] : 0;
+                }
+            }
+        }
+        if ($activeLangIds === []) {
+            $activeLangIds = [0];
+        }
+
+        $missing = $this->getRevocationTemplateValidator()->validate($shopId, $themeId, $activeLangIds);
+        if ($missing === []) {
+            return true;
+        }
+
+        foreach ($missing as $asset) {
+            $oEx = oxNew(ExceptionToDisplay::class);
+            $oEx->setMessage('§356a — ' . MissingAssetHintTranslator::translate($asset, Registry::getLang()));
+            Registry::getUtilsView()->addErrorToDisplay($oEx);
+        }
+        return false;
+    }
+
+    /** @var RevocationTemplateValidator|null lazy-resolved; settable for tests */
+    protected ?RevocationTemplateValidator $revocationTemplateValidator = null;
+
+    /**
+     * Test seam — inject a mocked validator without driving the DI container.
+     */
+    public function setRevocationTemplateValidator(RevocationTemplateValidator $validator): void
+    {
+        $this->revocationTemplateValidator = $validator;
+    }
+
+    protected function getRevocationTemplateValidator(): RevocationTemplateValidator
+    {
+        if ($this->revocationTemplateValidator === null) {
+            $this->revocationTemplateValidator = ContainerFactory::getInstance()
+                ->getContainer()
+                ->get(RevocationTemplateValidator::class);
+        }
+        return $this->revocationTemplateValidator;
     }
 }

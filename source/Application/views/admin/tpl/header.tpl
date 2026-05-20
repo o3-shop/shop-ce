@@ -19,6 +19,11 @@
             [{$oView->getShopVersion()}]
             [{$oView->getSupportMarker()}]
         </b>
+        [{block name="admin_header_updatecheck_button"}]
+        [{if !$updateCheckResult || $updateCheckResult->areProvidersReachable()}]
+        <a href="[{$oViewConf->getSelfLink()}]&cl=navigation&item=home.tpl&forceUpdateCheck=1" target="basefrm" style="margin-left:10px;" title="[{oxmultilang ident="UPDATECHECK_BUTTON"}]"><i class="fas fa-sync-alt"></i></a>
+        [{/if}]
+        [{/block}]
     </div>
 </body>
 </html>

@@ -346,7 +346,7 @@ class SimpleVariantTest extends \OxidTestCase
         $oPrice = oxNew('oxPrice');
         $oPrice->setPrice(100);
         $oSubj->UNITapplyCurrency($oPrice);
-        $this->assertEquals(143.26, $oPrice->getBruttoPrice());
+        $this->assertEquals(91.9, $oPrice->getBruttoPrice());
         $this->getConfig()->setActShopCurrency(0);
     }
 

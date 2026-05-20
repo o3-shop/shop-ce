@@ -209,8 +209,8 @@ class ActionsMainAjaxTest extends \OxidTestCase
     public function testRemoveArtFromAct()
     {
         // Production calls getActionIds() (without underscore)
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxactions2article where oxactionid='_testActionAdd'"));
         $oView->removeartfromact();
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxactions2article where oxactionid='_testActionAdd'"));
@@ -267,8 +267,8 @@ class ActionsMainAjaxTest extends \OxidTestCase
         $this->assertEquals(0, oxDb::getDb()->getOne("select count(oxid) from oxactions2article where oxactionid='$sSynchoxid'"));
 
         // Production calls getActionIds() (without underscore)
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class, ['getActionIds']);
-        $oView->expects($this->any())->method('getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ActionsMainAjax::class, ['_getActionIds']);
+        $oView->expects($this->any())->method('_getActionIds')->will($this->returnValue(['_testActionAdd1', '_testActionAdd2']));
 
         $oView->addarttoact();
         $this->assertEquals(2, oxDb::getDb()->getOne("select count(oxid) from oxactions2article where oxactionid='$sSynchoxid'"));

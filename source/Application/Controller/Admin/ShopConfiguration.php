@@ -147,21 +147,32 @@ class ShopConfiguration extends AdminDetailsController
      * return theme filter for config variables
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getModuleForConfigVars" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getModuleForConfigVars()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getModuleForConfigVars() to the canonical override
+      *             target and retires _getModuleForConfigVars(); until then, _getModuleForConfigVars() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getModuleForConfigVars() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getModuleForConfigVars();
+        return '';
     }
 
     /**
      * return theme filter for config variables
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getModuleForConfigVars(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getModuleForConfigVars() the canonical override target.
      */
     protected function getModuleForConfigVars()
     {
-        return '';
+        return $this->_getModuleForConfigVars();
     }
 
     /**
@@ -286,11 +297,20 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $constraint serialized constraint
      *
      * @return array|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "parseConstraint" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _parseConstraint()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes parseConstraint() to the canonical override
+      *             target and retires _parseConstraint(); until then, _parseConstraint() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _parseConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->parseConstraint($type, $constraint);
+        if ($type == 'select') {
+            return array_map('trim', explode('|', $constraint));
+        }
+        return null;
     }
 
     /**
@@ -300,13 +320,15 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $constraint serialized constraint
      *
      * @return array|null
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _parseConstraint(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make parseConstraint() the canonical override target.
      */
     protected function parseConstraint($type, $constraint)
     {
-        if ($type == 'select') {
-            return array_map('trim', explode('|', $constraint));
-        }
-        return null;
+        return $this->_parseConstraint($type, $constraint);
     }
 
     /**
@@ -316,27 +338,38 @@ class ShopConfiguration extends AdminDetailsController
      * @param mixed  $constraint constraint value
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "serializeConstraint" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _serializeConstraint()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes serializeConstraint() to the canonical override
+      *             target and retires _serializeConstraint(); until then, _serializeConstraint() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _serializeConstraint($type, $constraint) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->serializeConstraint($type, $constraint);
-    }
-
-    /**
-     * serialize constraint from type and value
-     *
-     * @param string $type       variable type
-     * @param mixed  $constraint constraint value
-     *
-     * @return string
-     */
-    protected function serializeConstraint($type, $constraint)
     {
         if ($type == 'select') {
             return implode('|', array_map('trim', $constraint));
         }
         return '';
+    }
+
+    /**
+     * serialize constraint from type and value
+     *
+     * @param string $type       variable type
+     * @param mixed  $constraint constraint value
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _serializeConstraint(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make serializeConstraint() the canonical override target.
+     */
+    protected function serializeConstraint($type, $constraint)
+    {
+        return $this->_serializeConstraint($type, $constraint);
     }
 
     /**
@@ -436,11 +469,17 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array with text
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "arrayToMultiline" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _arrayToMultiline()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes arrayToMultiline() to the canonical override
+      *             target and retires _arrayToMultiline(); until then, _arrayToMultiline() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _arrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->arrayToMultiline($input);
+        return implode("\n", (array) $input);
     }
 
     /**
@@ -449,10 +488,15 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array with text
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _arrayToMultiline(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make arrayToMultiline() the canonical override target.
      */
     protected function arrayToMultiline($input)
     {
-        return implode("\n", (array) $input);
+        return $this->_arrayToMultiline($input);
     }
 
     /**
@@ -461,21 +505,15 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $multiline Multiline text
      *
      * @return array|void
-     * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToArray" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _multilineToArray()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes multilineToArray() to the canonical override
+      *             target and retires _multilineToArray(); until then, _multilineToArray() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _multilineToArray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->multilineToArray($multiline);
-    }
-
-    /**
-     * Converts Multiline text to simple array. Returns this array.
-     *
-     * @param string $multiline Multiline text
-     *
-     * @return array|void
-     */
-    protected function multilineToArray($multiline)
     {
         $array = explode("\n", $multiline);
         if (is_array($array)) {
@@ -491,16 +529,20 @@ class ShopConfiguration extends AdminDetailsController
     }
 
     /**
-     * Converts associative array to multiline text. Returns this text.
+     * Converts Multiline text to simple array. Returns this array.
      *
-     * @param array $input Array to convert
+     * @param string $multiline Multiline text
      *
-     * @return string|void
-     * @deprecated underscore prefix violates PSR12, will be renamed to "aarrayToMultiline" in next major
+     * @return array|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _multilineToArray(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make multilineToArray() the canonical override target.
      */
-    protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function multilineToArray($multiline)
     {
-        return $this->aarrayToMultiline($input);
+        return $this->_multilineToArray($multiline);
     }
 
     /**
@@ -509,8 +551,15 @@ class ShopConfiguration extends AdminDetailsController
      * @param array $input Array to convert
      *
      * @return string|void
+     * @deprecated Transitional during #107. Modules SHOULD override _aarrayToMultiline()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes aarrayToMultiline() to the canonical override
+      *             target and retires _aarrayToMultiline(); until then, _aarrayToMultiline() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function aarrayToMultiline($input)
+    protected function _aarrayToMultiline($input) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         if (is_array($input)) {
             $multiline = '';
@@ -526,16 +575,20 @@ class ShopConfiguration extends AdminDetailsController
     }
 
     /**
-     * Converts Multiline text to associative array. Returns this array.
+     * Converts associative array to multiline text. Returns this text.
      *
-     * @param string $multiline Multiline text
+     * @param array $input Array to convert
      *
-     * @return array
-     * @deprecated underscore prefix violates PSR12, will be renamed to "multilineToAarray" in next major
+     * @return string|void
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _aarrayToMultiline(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make aarrayToMultiline() the canonical override target.
      */
-    protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function aarrayToMultiline($input)
     {
-        return $this->multilineToAarray($multiline);
+        return $this->_aarrayToMultiline($input);
     }
 
     /**
@@ -544,8 +597,15 @@ class ShopConfiguration extends AdminDetailsController
      * @param string $multiline Multiline text
      *
      * @return array
+     * @deprecated Transitional during #107. Modules SHOULD override _multilineToAarray()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes multilineToAarray() to the canonical override
+      *             target and retires _multilineToAarray(); until then, _multilineToAarray() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function multilineToAarray($multiline)
+    protected function _multilineToAarray($multiline) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $string = Str::getStr();
         $array = [];
@@ -562,6 +622,23 @@ class ShopConfiguration extends AdminDetailsController
         }
 
         return $array;
+    }
+
+    /**
+     * Converts Multiline text to associative array. Returns this array.
+     *
+     * @param string $multiline Multiline text
+     *
+     * @return array
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _multilineToAarray(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make multilineToAarray() the canonical override target.
+     */
+    protected function multilineToAarray($multiline)
+    {
+        return $this->_multilineToAarray($multiline);
     }
 
     /**
