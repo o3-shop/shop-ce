@@ -48,7 +48,9 @@ if (!function_exists('redirectIfShopNotConfigured')) {
         header('Location: Setup/index.php');
         header('Connection: close');
 
-        die($message);
+        \OxidEsales\Eshop\Core\Registry::get(
+            \OxidEsales\Eshop\Core\ExitHandlerInterface::class
+        )->exit(0, $message);
     }
 }
 

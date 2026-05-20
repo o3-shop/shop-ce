@@ -174,8 +174,8 @@ class BasketComponent extends BaseController
         }
 
         // adding articles
-        if ($aProducts = $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
-            $this->setLastCallFnc('tobasket');
+        if ($aProducts = $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
+            $this->_setLastCallFnc('tobasket');
 
             $database = DatabaseProvider::getDb();
             $database->startTransaction();
@@ -206,7 +206,7 @@ class BasketComponent extends BaseController
             }
 
             // redirect to basket
-            $redirectUrl = $this->getRedirectUrl();
+            $redirectUrl = $this->_getRedirectUrl();
             $this->dispatchEvent(new BasketChangedEvent($this));
 
             return $redirectUrl;
@@ -268,11 +268,11 @@ class BasketComponent extends BaseController
         $aPersParam = $aPersParam ?: Registry::getRequest()->getRequestEscapedParameter('persparam');
 
         // adding articles
-        if ($aProducts = $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
+        if ($aProducts = $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride)) {
             // information that last call was changebasket
             $oBasket = Registry::getSession()->getBasket();
             $oBasket->onUpdate();
-            $this->setLastCallFnc('changebasket');
+            $this->_setLastCallFnc('changebasket');
 
             $database = DatabaseProvider::getDb();
             $database->startTransaction();
@@ -296,20 +296,12 @@ class BasketComponent extends BaseController
      * storing something to basket
      *
      * @return string   $sClass.$sPosition  redirection URL
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getRedirectUrl" in next major
+     * @deprecated Use getRedirectUrl() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getRedirectUrl().
      */
     protected function _getRedirectUrl() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getRedirectUrl();
-    }
-
-    /**
-     * Formats and returns redirect URL where shop must be redirected after
-     * storing something to basket
-     *
-     * @return string   $sClass.$sPosition  redirection URL
-     */
-    protected function getRedirectUrl()
     {
         // active controller id
         $controllerId = Registry::getConfig()->getRequestControllerId();
@@ -344,6 +336,22 @@ class BasketComponent extends BaseController
     }
 
     /**
+     * Formats and returns redirect URL where shop must be redirected after
+     * storing something to basket
+     *
+     * @return string   $sClass.$sPosition  redirection URL
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getRedirectUrl() (not the deprecated _getRedirectUrl()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getRedirectUrl()
+    {
+        return $this->_getRedirectUrl();
+    }
+
+    /**
      * Cleans and returns persisted parameters.
      *
      * @param array $persistedParameters key-value parameters (optional). If not passed - takes parameters from request.
@@ -370,31 +378,15 @@ class BasketComponent extends BaseController
      * @param bool   $blOverride amount override status
      *
      * @return array|bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getItems" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getItems()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getItems() to the canonical override
+      *             target and retires _getItems(); until then, _getItems() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getItems(// phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-        $sProductId = null,
-        $dAmount = null,
-        $aSel = null,
-        $aPersParam = null,
-        $blOverride = false
-    ) {
-        return $this->getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride);
-    }
-
-    /**
-     * Collects and returns array of items to add to basket. Product info is taken not only from
-     * given parameters, but additionally from request 'aproducts' parameter
-     *
-     * @param string $sProductId product ID
-     * @param double $dAmount    product amount
-     * @param array  $aSel       product select lists
-     * @param array  $aPersParam product persistent parameters
-     * @param bool   $blOverride amount override status
-     *
-     * @return array|bool
-     */
-    protected function getItems(
         $sProductId = null,
         $dAmount = null,
         $aSel = null,
@@ -444,6 +436,33 @@ class BasketComponent extends BaseController
         }
 
         return false;
+    }
+
+    /**
+     * Collects and returns array of items to add to basket. Product info is taken not only from
+     * given parameters, but additionally from request 'aproducts' parameter
+     *
+     * @param string $sProductId product ID
+     * @param double $dAmount    product amount
+     * @param array  $aSel       product select lists
+     * @param array  $aPersParam product persistent parameters
+     * @param bool   $blOverride amount override status
+     *
+     * @return array|bool
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getItems(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getItems() the canonical override target.
+     */
+    protected function getItems(
+        $sProductId = null,
+        $dAmount = null,
+        $aSel = null,
+        $aPersParam = null,
+        $blOverride = false
+    ) {
+        return $this->_getItems($sProductId, $dAmount, $aSel, $aPersParam, $blOverride);
     }
 
     /**
@@ -508,7 +527,7 @@ class BasketComponent extends BaseController
         }
 
         // information that last call was tobasket
-        $this->setLastCall($this->getLastCallFnc(), $products, $basketInfo);
+        $this->_setLastCall($this->_getLastCallFnc(), $products, $basketInfo);
 
         return $basketItem;
     }
@@ -519,11 +538,13 @@ class BasketComponent extends BaseController
      * @param string $sCallName    name of action ('tobasket', 'changebasket')
      * @param array  $aProductInfo data which comes from request when you press button "to basket"
      * @param array  $aBasketInfo  array returned by \OxidEsales\Eshop\Application\Model\Basket::getBasketSummary()
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setLastCall" in next major
+     * @deprecated Use setLastCall() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _setLastCall().
      */
     protected function _setLastCall($sCallName, $aProductInfo, $aBasketInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $this->setLastCall($sCallName, $aProductInfo, $aBasketInfo);
+        Registry::getSession()->setVariable('aLastcall', [$sCallName => $aProductInfo]);
     }
 
     /**
@@ -532,53 +553,71 @@ class BasketComponent extends BaseController
      * @param string $sCallName    name of action ('tobasket', 'changebasket')
      * @param array  $aProductInfo data which comes from request when you press button "to basket"
      * @param array  $aBasketInfo  array returned by \OxidEsales\Eshop\Application\Model\Basket::getBasketSummary()
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _setLastCall(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make setLastCall() the canonical override target.
      */
     protected function setLastCall($sCallName, $aProductInfo, $aBasketInfo)
     {
-        Registry::getSession()->setVariable('aLastcall', [$sCallName => $aProductInfo]);
+        $this->_setLastCall($sCallName, $aProductInfo, $aBasketInfo);
     }
 
     /**
      * Setting last call function name (data used by econda)
      *
      * @param string $sCallName name of action ('tobasket', 'changebasket')
-     * @deprecated underscore prefix violates PSR12, will be renamed to "setLastCallFnc" in next major
+     * @deprecated Use setLastCallFnc() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _setLastCallFnc().
      */
     protected function _setLastCallFnc($sCallName) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        $this->setLastCallFnc($sCallName);
-    }
-
-    /**
-     * Setting last call function name (data used by econda)
-     *
-     * @param string $sCallName name of action ('tobasket', 'changebasket')
-     */
-    protected function setLastCallFnc($sCallName)
     {
         $this->_sLastCallFnc = $sCallName;
     }
 
     /**
-     * Getting last call function name (data used by econda)
+     * Setting last call function name (data used by econda)
      *
-     * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLastCallFnc" in next major
+     * @param string $sCallName name of action ('tobasket', 'changebasket')
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::setLastCallFnc() (not the deprecated _setLastCallFnc()) so downstream
+     *           overrides in the class chain are preserved. Template-method refactor tracked
+     *           in o3-shop/o3-shop#108.
      */
-    protected function _getLastCallFnc() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function setLastCallFnc($sCallName)
     {
-        return $this->getLastCallFnc();
+        $this->_setLastCallFnc($sCallName);
     }
 
     /**
      * Getting last call function name (data used by econda)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLastCallFnc" in next major
+     * @deprecated Use getLastCallFnc() instead. This underscore-prefixed name is retained only
+     *             for backward compatibility with module subclasses that already override it;
+     *             new code, including new modules, MUST NOT call or override _getLastCallFnc().
+     */
+    protected function _getLastCallFnc() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        return $this->_sLastCallFnc;
+    }
+
+    /**
+     * Getting last call function name (data used by econda)
+     *
+     * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getLastCallFnc() (not the deprecated _getLastCallFnc()) so downstream
+     *           overrides in the class chain are preserved. Template-method refactor tracked
+     *           in o3-shop/o3-shop#108.
      */
     protected function getLastCallFnc()
     {
-        return $this->_sLastCallFnc;
+        return $this->_getLastCallFnc();
     }
 
     /**

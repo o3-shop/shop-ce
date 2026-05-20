@@ -75,20 +75,23 @@ class ArticleMainTest extends \OxidTestCase
         oxTestModules::addFunction('oxarticle', 'save', '{ return true; }');
         $this->getConfig()->setConfigParam('blDisableDublArtOnCopy', true);
 
-        $aTasks = ['copyCategories', 'copyAttributes', 'copySelectlists',
-                        'copyCrossseling', 'copyAccessoires', 'copyStaffelpreis',
-                        'copyArtExtends'];
+        // Production code in ArticleMain::copyArticle() now calls the underscore
+        // form for the copy* hooks (post-#107 call-site sweep). resetContentCache
+        // remains the public form because its shim pair is inverted (not swept).
+        $aTasks = ['_copyCategories', '_copyAttributes', '_copySelectlists',
+                        '_copyCrossseling', '_copyAccessoires', '_copyStaffelpreis',
+                        '_copyArtExtends'];
 
         $aTasks[] = 'resetContentCache';
 
         $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ArticleMain::class, $aTasks);
-        $oView->expects($this->once())->method('copyCategories');
-        $oView->expects($this->once())->method('copyAttributes');
-        $oView->expects($this->once())->method('copySelectlists');
-        $oView->expects($this->once())->method('copyCrossseling');
-        $oView->expects($this->once())->method('copyAccessoires');
-        $oView->expects($this->once())->method('copyStaffelpreis');
-        $oView->expects($this->once())->method('copyArtExtends');
+        $oView->expects($this->once())->method('_copyCategories');
+        $oView->expects($this->once())->method('_copyAttributes');
+        $oView->expects($this->once())->method('_copySelectlists');
+        $oView->expects($this->once())->method('_copyCrossseling');
+        $oView->expects($this->once())->method('_copyAccessoires');
+        $oView->expects($this->once())->method('_copyStaffelpreis');
+        $oView->expects($this->once())->method('_copyArtExtends');
 
         $oView->expects($this->once())->method('resetContentCache');
 

@@ -68,7 +68,7 @@ class ArticleExtend extends AdminDetailsController
 
         $oxId = $this->getEditObjectId();
 
-        $this->createCategoryTree('artcattree');
+        $this->_createCategoryTree('artcattree');
 
         // all categories
         if (isset($oxId) && $oxId != '-1') {

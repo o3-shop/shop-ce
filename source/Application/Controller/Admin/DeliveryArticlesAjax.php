@@ -72,20 +72,15 @@ class DeliveryArticlesAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $myConfig = Registry::getConfig();
         $oDb = DatabaseProvider::getDb();
@@ -124,6 +119,22 @@ class DeliveryArticlesAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Adds filter SQL to current query
      *
      * @param string $sQ query to add filter condition
@@ -145,7 +156,7 @@ class DeliveryArticlesAjax extends ListComponentAjax
      */
     public function removeArtFromDel()
     {
-        $aChosenArt = $this->getActionIds('oxobject2delivery.oxid');
+        $aChosenArt = $this->_getActionIds('oxobject2delivery.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sQ = parent::addFilter('delete oxobject2delivery.* ' . $this->getQuery());
@@ -161,13 +172,13 @@ class DeliveryArticlesAjax extends ListComponentAjax
      */
     public function addArtToDel()
     {
-        $aChosenArt = $this->getActionIds('oxarticles.oxid');
+        $aChosenArt = $this->_getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sArtTable = $this->getViewName('oxarticles');
-            $aChosenArt = $this->getAll($this->addFilter("select $sArtTable.oxid " . $this->getQuery()));
+            $aChosenArt = $this->_getAll($this->_addFilter("select $sArtTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != '-1' && is_array($aChosenArt)) {

@@ -28,6 +28,7 @@ use Psr\Log\LoggerInterface;
 
 class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {
+    use \OxidEsales\EshopCommunity\Tests\Unit\ExitHandlerTestTrait;
     protected $message = 'TEST_EXCEPTION';
 
     public function testCallUnExistingMethod()
@@ -83,7 +84,7 @@ class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     }
 
     /**
-     * @covers \OxidEsales\Eshop\Core\Exception\ExceptionHandler::handleDatabaseException()
+     * @covers \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::handleDatabaseException()
      */
     public function testHandleDatabaseExceptionDelegatesToHandleUncaughtException()
     {
@@ -129,7 +130,7 @@ class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
     }
 
     /**
-     * @covers \OxidEsales\Eshop\Core\Exception\ExceptionHandler::getLogFileName()
+     * @covers \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::getLogFileName()
      */
     public function testGetLogFileNameReturnsBaseNameOfLogeFile()
     {
@@ -140,5 +141,19 @@ class ExceptionHandlerTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $expectedLogFileName = basename($actualLogFileName);
 
         $this->assertEquals($expectedLogFileName, $actualLogFileName, 'getLogFileName returns basename of logFile');
+    }
+
+    public function testExitApplicationRoutesThroughExitHandler()
+    {
+        $this->installFakeExitHandler();
+
+        $handler = $this->getProxyClass(\OxidEsales\Eshop\Core\Exception\ExceptionHandler::class);
+
+        try {
+            $handler->exitApplication();
+            $this->fail('Expected ExitCalledException');
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            $this->assertSame(1, $e->getCode());
+        }
     }
 }

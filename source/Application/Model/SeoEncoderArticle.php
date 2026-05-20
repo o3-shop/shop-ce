@@ -51,21 +51,32 @@ class SeoEncoderArticle extends SeoEncoder
      * Returns target "extension" (.html)
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getUrlExtension" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getUrlExtension()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getUrlExtension() to the canonical override
+      *             target and retires _getUrlExtension(); until then, _getUrlExtension() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getUrlExtension() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getUrlExtension();
+        return '.html';
     }
 
     /**
      * Returns target "extension" (.html)
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getUrlExtension(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getUrlExtension() the canonical override target.
      */
     protected function getUrlExtension()
     {
-        return '.html';
+        return $this->_getUrlExtension();
     }
 
     /**
@@ -76,23 +87,15 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    user defined language id
      *
      * @return Article
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getProductForLang" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getProductForLang()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getProductForLang() to the canonical override
+      *             target and retires _getProductForLang(); until then, _getProductForLang() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getProductForLang($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getProductForLang($oArticle, $iLang);
-    }
-
-    /**
-     * Checks if current article is in same language as preferred (language id passed by param).
-     * In case languages are not the same - reloads article object in different language
-     *
-     * @param Article $oArticle article to check language
-     * @param int                                         $iLang    user defined language id
-     *
-     * @return Article
-     */
-    protected function getProductForLang($oArticle, $iLang)
     {
         if (isset($iLang) && $iLang != $oArticle->getLanguage()) {
             $sId = $oArticle->getId();
@@ -102,6 +105,25 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oArticle;
+    }
+
+    /**
+     * Checks if current article is in same language as preferred (language id passed by param).
+     * In case languages are not the same - reloads article object in different language
+     *
+     * @param Article $oArticle article to check language
+     * @param int                                         $iLang    user defined language id
+     *
+     * @return Article
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getProductForLang(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getProductForLang() the canonical override target.
+     */
+    protected function getProductForLang($oArticle, $iLang)
+    {
+        return $this->_getProductForLang($oArticle, $iLang);
     }
 
     /**
@@ -175,21 +197,32 @@ class SeoEncoderArticle extends SeoEncoder
      * Returns active list type
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getListType" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getListType()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getListType() to the canonical override
+      *             target and retires _getListType(); until then, _getListType() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getListType() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getListType();
+        return Registry::getConfig()->getActiveView()->getListType();
     }
 
     /**
      * Returns active list type
      *
      * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getListType(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getListType() the canonical override target.
      */
     protected function getListType()
     {
-        return Registry::getConfig()->getActiveView()->getListType();
+        return $this->_getListType();
     }
 
     /**
@@ -201,24 +234,15 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "createArticleCategoryUri" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _createArticleCategoryUri()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes createArticleCategoryUri() to the canonical override
+      *             target and retires _createArticleCategoryUri(); until then, _createArticleCategoryUri() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _createArticleCategoryUri($oArticle, $oCategory, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->createArticleCategoryUri($oArticle, $oCategory, $iLang);
-    }
-
-    /**
-     * create article uri for given category and save it
-     *
-     * @param Article $oArticle article object
-     * @param Category $oCategory category object
-     * @param int $iLang language to generate uri for
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function createArticleCategoryUri($oArticle, $oCategory, $iLang)
     {
         startProfile(__FUNCTION__);
         $oArticle = $this->_getProductForLang($oArticle, $iLang);
@@ -250,6 +274,26 @@ class SeoEncoderArticle extends SeoEncoder
         stopProfile(__FUNCTION__);
 
         return $sSeoUri;
+    }
+
+    /**
+     * create article uri for given category and save it
+     *
+     * @param Article $oArticle article object
+     * @param Category $oCategory category object
+     * @param int $iLang language to generate uri for
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _createArticleCategoryUri(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make createArticleCategoryUri() the canonical override target.
+     */
+    protected function createArticleCategoryUri($oArticle, $oCategory, $iLang)
+    {
+        return $this->_createArticleCategoryUri($oArticle, $oCategory, $iLang);
     }
 
     /**
@@ -302,22 +346,15 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    language id
      *
      * @return Category|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategory" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getCategory()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCategory() to the canonical override
+      *             target and retires _getCategory(); until then, _getCategory() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCategory($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getCategory($oArticle, $iLang);
-    }
-
-    /**
-     * Returns active category if available
-     *
-     * @param Article $oArticle product
-     * @param int                                         $iLang    language id
-     *
-     * @return Category|null
-     */
-    protected function getCategory($oArticle, $iLang)
     {
         $oCat = null;
         $oView = Registry::getConfig()->getActiveView();
@@ -331,17 +368,21 @@ class SeoEncoderArticle extends SeoEncoder
     }
 
     /**
-     * Returns products main category id
+     * Returns active category if available
      *
      * @param Article $oArticle product
+     * @param int                                         $iLang    language id
      *
-     * @return Category
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getMainCategory" in next major
+     * @return Category|null
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCategory(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCategory() the canonical override target.
      */
-    protected function _getMainCategory($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getCategory($oArticle, $iLang)
     {
-        return $this->getMainCategory($oArticle);
+        return $this->_getCategory($oArticle, $iLang);
     }
 
     /**
@@ -351,8 +392,15 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return Category
      * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getMainCategory()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getMainCategory() to the canonical override
+      *             target and retires _getMainCategory(); until then, _getMainCategory() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function getMainCategory($oArticle)
+    protected function _getMainCategory($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $oMainCat = null;
 
@@ -385,6 +433,24 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oMainCat;
+    }
+
+    /**
+     * Returns products main category id
+     *
+     * @param Article $oArticle product
+     *
+     * @return Category
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getMainCategory(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getMainCategory() the canonical override target.
+     */
+    protected function getMainCategory($oArticle)
+    {
+        return $this->_getMainCategory($oArticle);
     }
 
     /**
@@ -440,23 +506,15 @@ class SeoEncoderArticle extends SeoEncoder
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "prepareArticleTitle" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _prepareArticleTitle()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes prepareArticleTitle() to the canonical override
+      *             target and retires _prepareArticleTitle(); until then, _prepareArticleTitle() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _prepareArticleTitle($oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->prepareArticleTitle($oArticle);
-    }
-
-    /**
-     * Returns seo title for current article (if oxTitle field is empty, oxArtnum is used).
-     * Additionally - if oxVarSelect is set - title is appended with its value
-     *
-     * @param Article $oArticle article object
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function prepareArticleTitle($oArticle)
     {
         // create title part for uri
         if (!($sTitle = $oArticle->oxarticles__oxtitle->value)) {
@@ -483,6 +541,25 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $this->_prepareTitle($sTitle, false, $oArticle->getLanguage()) . $this->_getUrlExtension();
+    }
+
+    /**
+     * Returns seo title for current article (if oxTitle field is empty, oxArtnum is used).
+     * Additionally - if oxVarSelect is set - title is appended with its value
+     *
+     * @param Article $oArticle article object
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _prepareArticleTitle(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make prepareArticleTitle() the canonical override target.
+     */
+    protected function prepareArticleTitle($oArticle)
+    {
+        return $this->_prepareArticleTitle($oArticle);
     }
 
     /**
@@ -541,22 +618,15 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    language id
      *
      * @return Vendor|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getVendor" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getVendor()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getVendor() to the canonical override
+      *             target and retires _getVendor(); until then, _getVendor() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getVendor($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getVendor($oArticle, $iLang);
-    }
-
-    /**
-     * Returns active vendor if available
-     *
-     * @param Article $oArticle product
-     * @param int                                         $iLang    language id
-     *
-     * @return Vendor|null
-     */
-    protected function getVendor($oArticle, $iLang)
     {
         $oView = Registry::getConfig()->getActiveView();
 
@@ -576,6 +646,24 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oVendor;
+    }
+
+    /**
+     * Returns active vendor if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Vendor|null
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getVendor(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getVendor() the canonical override target.
+     */
+    protected function getVendor($oArticle, $iLang)
+    {
+        return $this->_getVendor($oArticle, $iLang);
     }
 
     /**
@@ -633,22 +721,15 @@ class SeoEncoderArticle extends SeoEncoder
      * @param int                                         $iLang    language id
      *
      * @return Manufacturer|null
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getManufacturer" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getManufacturer()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getManufacturer() to the canonical override
+      *             target and retires _getManufacturer(); until then, _getManufacturer() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getManufacturer($oArticle, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getManufacturer($oArticle, $iLang);
-    }
-
-    /**
-     * Returns active manufacturer if available
-     *
-     * @param Article $oArticle product
-     * @param int                                         $iLang    language id
-     *
-     * @return Manufacturer|null
-     */
-    protected function getManufacturer($oArticle, $iLang)
     {
         $oManufacturer = null;
         if ($sActManufacturerId = $oArticle->oxarticles__oxmanufacturerid->value) {
@@ -669,6 +750,24 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $oManufacturer;
+    }
+
+    /**
+     * Returns active manufacturer if available
+     *
+     * @param Article $oArticle product
+     * @param int                                         $iLang    language id
+     *
+     * @return Manufacturer|null
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getManufacturer(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getManufacturer() the canonical override target.
+     */
+    protected function getManufacturer($oArticle, $iLang)
+    {
+        return $this->_getManufacturer($oArticle, $iLang);
     }
 
     /**
@@ -763,24 +862,15 @@ class SeoEncoderArticle extends SeoEncoder
      * @return string
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getAltUri" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getAltUri()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getAltUri() to the canonical override
+      *             target and retires _getAltUri(); until then, _getAltUri() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getAltUri($sObjectId, $iLang) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getAltUri($sObjectId, $iLang);
-    }
-
-    /**
-     * Returns alternative uri used while updating seo
-     *
-     * @param string $sObjectId object id
-     * @param int $iLang language id
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     */
-    protected function getAltUri($sObjectId, $iLang)
     {
         $sSeoUrl = null;
         $oArticle = oxNew(Article::class);
@@ -801,5 +891,25 @@ class SeoEncoderArticle extends SeoEncoder
         }
 
         return $sSeoUrl;
+    }
+
+    /**
+     * Returns alternative uri used while updating seo
+     *
+     * @param string $sObjectId object id
+     * @param int $iLang language id
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getAltUri(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getAltUri() the canonical override target.
+     */
+    protected function getAltUri($sObjectId, $iLang)
+    {
+        return $this->_getAltUri($sObjectId, $iLang);
     }
 }

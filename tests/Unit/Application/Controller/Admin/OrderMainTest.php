@@ -121,4 +121,118 @@ class OrderMainTest extends \OxidTestCase
         }
         $this->fail('error in Order_Main::resetorder()');
     }
+
+    public function testResetorderIsNoopWhenOrderCannotBeLoaded(): void
+    {
+        // load() returns false → save() must NOT be invoked.
+        oxTestModules::addFunction('oxorder', 'load', '{ return false; }');
+        oxTestModules::addFunction('oxorder', 'save', '{ throw new Exception( "save must not run" ); }');
+
+        $oView = oxNew('Order_Main');
+        $oView->resetorder();
+        $this->assertTrue(true);
+    }
+
+    public function testSendOrderEarlyReturnsWhenOrderCannotBeLoaded(): void
+    {
+        oxTestModules::addFunction('oxorder', 'load', '{ return false; }');
+        oxTestModules::addFunction('oxorder', 'save', '{ throw new Exception( "save must not run" ); }');
+
+        $oView = oxNew('Order_Main');
+        $oView->sendOrder();
+        $this->assertTrue(true);
+    }
+
+    public function testSendOrderSavesAndCallsOrderArticlesWhenLoaded(): void
+    {
+        oxTestModules::addFunction('oxorder', 'load', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'save', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'getOrderArticles', '{ throw new Exception( "getOrderArticles" ); }');
+
+        try {
+            $oView = oxNew('Order_Main');
+            $oView->sendOrder();
+        } catch (Exception $e) {
+            $this->assertSame('getOrderArticles', $e->getMessage());
+            return;
+        }
+        $this->fail('Expected getOrderArticles to be invoked.');
+    }
+
+    public function testSendOrderTriggersEmailWhenSendmailFlagPresent(): void
+    {
+        oxTestModules::addFunction('oxorder', 'load', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'save', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'getOrderArticles', '{ return []; }');
+        oxTestModules::addFunction('oxemail', 'sendSendedNowMail', '{ throw new Exception( "sendSendedNowMail" ); }');
+
+        $this->setRequestParameter('sendmail', '1');
+        $this->setRequestParameter('oxid', 'order-7');
+
+        try {
+            $oView = oxNew('Order_Main');
+            $oView->sendOrder();
+        } catch (Exception $e) {
+            $this->assertSame('sendSendedNowMail', $e->getMessage());
+            return;
+        }
+        $this->fail('Expected sendSendedNowMail to be invoked when sendmail=1.');
+    }
+
+    public function testSenddownloadlinksReturnsSilentlyWhenLoadFails(): void
+    {
+        oxTestModules::addFunction('oxorder', 'load', '{ return false; }');
+        oxTestModules::addFunction('oxemail', 'sendDownloadLinksMail', '{ throw new Exception( "must not run" ); }');
+
+        $oView = oxNew('Order_Main');
+        $oView->senddownloadlinks();
+        $this->assertTrue(true);
+    }
+
+    public function testSaveAssignsParametersAndPersistsWhenNoRecalculationNeeded(): void
+    {
+        // No real changes → save() not recalculate(). reloadDelivery is the
+        // benign no-recalc path.
+        oxTestModules::addFunction('oxorder', 'load', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'reloadDelivery', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'save', '{ throw new Exception( "save called" ); }');
+
+        // The whitelisted oxordernr / oxbillnr changes don't trigger recalc.
+        $this->setRequestParameter('editval', ['oxorder__oxordernr' => '1234']);
+        $this->setRequestParameter('oxid', 'order-7');
+
+        try {
+            $oView = oxNew('Order_Main');
+            $oView->save();
+        } catch (Exception $e) {
+            $this->assertSame('save called', $e->getMessage());
+            return;
+        }
+        $this->fail('Expected save() to be invoked on the no-recalc path.');
+    }
+
+    public function testSaveRecalculatesWhenSetPaymentDiffers(): void
+    {
+        oxTestModules::addFunction('oxorder', 'load', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'reloadDelivery', '{ return true; }');
+        oxTestModules::addFunction('oxorder', 'reloadDiscount', '{ return true; }');
+        oxTestModules::addFunction(
+            'oxorder',
+            'recalculateOrder',
+            '{ throw new Exception( "recalculateOrder" ); }'
+        );
+
+        // setPayment ≠ existing → forces recalc.
+        $this->setRequestParameter('setPayment', 'oxidcreditcard');
+        $this->setRequestParameter('oxid', 'order-7');
+
+        try {
+            $oView = oxNew('Order_Main');
+            $oView->save();
+        } catch (Exception $e) {
+            $this->assertSame('recalculateOrder', $e->getMessage());
+            return;
+        }
+        $this->fail('Expected recalculateOrder() to fire when setPayment changes.');
+    }
 }

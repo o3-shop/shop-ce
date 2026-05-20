@@ -63,20 +63,15 @@ class DiscountItemAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $oConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
@@ -128,12 +123,28 @@ class DiscountItemAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes selected article (articles) from discount list
      */
     public function removeDiscArt()
     {
         $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
-        $aChosenArt = $this->getActionIds('oxdiscount.oxitmartid');
+        $aChosenArt = $this->_getActionIds('oxdiscount.oxitmartid');
         if (is_array($aChosenArt)) {
             $sQ = "update oxdiscount set oxitmartid = '' where oxid = :oxid and oxitmartid = :oxitmartid";
             DatabaseProvider::getDb()->execute($sQ, [
@@ -148,7 +159,7 @@ class DiscountItemAjax extends ListComponentAjax
      */
     public function addDiscArt()
     {
-        $aChosenArt = $this->getActionIds('oxarticles.oxid');
+        $aChosenArt = $this->_getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         if ($soxId && $soxId != '-1' && is_array($aChosenArt)) {
             $sQ = 'update oxdiscount set oxitmartid = :oxitmartid where oxid = :oxid';
@@ -164,20 +175,15 @@ class DiscountItemAjax extends ListComponentAjax
      * fields to load from DB. Adds sub-select to get variant title from parent article
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQueryCols" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQueryCols()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQueryCols() to the canonical override
+      *             target and retires _getQueryCols(); until then, _getQueryCols() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQueryCols() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQueryCols();
-    }
-
-    /**
-     * Formats and returns chunk of SQL query string with definition of
-     * fields to load from DB. Adds sub-select to get variant title from parent article
-     *
-     * @return string
-     */
-    protected function getQueryCols()
     {
         $queryForIdColumns = $this->getQueryForIdentifierColumns();
 
@@ -189,12 +195,28 @@ class DiscountItemAjax extends ListComponentAjax
         );
     }
 
+    /**
+     * Formats and returns chunk of SQL query string with definition of
+     * fields to load from DB. Adds sub-select to get variant title from parent article
+     *
+     * @return string
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQueryCols(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQueryCols() the canonical override target.
+     */
+    protected function getQueryCols()
+    {
+        return $this->_getQueryCols();
+    }
+
     private function getQueryForVisibleColumns(): string
     {
         $query = '';
         $languageSuffix = $this->getLanguageSuffix();
         $selectVariantsEnabled = Registry::getConfig()->getConfigParam('blVariantsSelection');
-        foreach ($this->getVisibleColNames() as $key => [$columnName, $tableName]) {
+        foreach ($this->_getVisibleColNames() as $key => [$columnName, $tableName]) {
             $view = $this->getViewName($tableName);
             if ($selectVariantsEnabled && $columnName === 'oxtitle') {
                 $query .= sprintf(
@@ -215,7 +237,7 @@ class DiscountItemAjax extends ListComponentAjax
     private function getQueryForIdentifierColumns(): string
     {
         $query = '';
-        foreach ($this->getIdentColNames() as $key => [$columnName, $tableName]) {
+        foreach ($this->_getIdentColNames() as $key => [$columnName, $tableName]) {
             $view = $this->getViewName($tableName);
             $query .= "{$view}.{$columnName} as _{$key}";
             $query .= ', ';

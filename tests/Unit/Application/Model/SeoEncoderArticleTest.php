@@ -544,15 +544,15 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
         $oEncoder = $this->getMock(
             'oxseoencoderarticle',
-            ['_loadFromDb', 'getProductForLang', 'createArticleCategoryUri',
-                                         '_processSeoUrl', 'prepareArticleTitle', '_saveToDb']
+            ['_loadFromDb', '_getProductForLang', '_createArticleCategoryUri',
+                                         '_processSeoUrl', '_prepareArticleTitle', '_saveToDb']
         );
 
         $oEncoder->expects($this->once())->method('_loadFromDb')->with($this->equalTo('oxarticle'), $this->equalTo('1126'), $this->equalTo(0), $this->equalTo(null), $this->equalTo($sMainCatId), $this->equalTo(true))->will($this->returnValue(false));
-        $oEncoder->expects($this->once())->method('createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
-        $oEncoder->expects($this->never())->method('getProductForLang');
+        $oEncoder->expects($this->once())->method('_createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
+        $oEncoder->expects($this->never())->method('_getProductForLang');
         $oEncoder->expects($this->never())->method('_processSeoUrl');
-        $oEncoder->expects($this->never())->method('prepareArticleTitle');
+        $oEncoder->expects($this->never())->method('_prepareArticleTitle');
         $oEncoder->expects($this->never())->method('_saveToDb');
 
         $this->assertEquals('testSeoUri', $oEncoder->getArticleMainUri($oArticle, 0));
@@ -572,15 +572,15 @@ class SeoEncoderArticleTest extends \OxidTestCase
 
         $oEncoder = $this->getMock(
             'oxseoencoderarticle',
-            ['_loadFromDb', 'getProductForLang', 'createArticleCategoryUri',
-                                         '_processSeoUrl', 'prepareArticleTitle', '_saveToDb']
+            ['_loadFromDb', '_getProductForLang', '_createArticleCategoryUri',
+                                         '_processSeoUrl', '_prepareArticleTitle', '_saveToDb']
         );
 
         $oEncoder->expects($this->once())->method('_loadFromDb')->with($this->equalTo('oxarticle'), $this->equalTo('testVarId'), $this->equalTo(0), $this->equalTo(null), $this->equalTo($sMainCatId), $this->equalTo(true))->will($this->returnValue(false));
-        $oEncoder->expects($this->once())->method('createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
-        $oEncoder->expects($this->never())->method('getProductForLang');
+        $oEncoder->expects($this->once())->method('_createArticleCategoryUri')->with($this->equalTo($oArticle), $this->equalTo($oCategory), $this->equalTo(0))->will($this->returnValue('testSeoUri'));
+        $oEncoder->expects($this->never())->method('_getProductForLang');
         $oEncoder->expects($this->never())->method('_processSeoUrl');
-        $oEncoder->expects($this->never())->method('prepareArticleTitle');
+        $oEncoder->expects($this->never())->method('_prepareArticleTitle');
         $oEncoder->expects($this->never())->method('_saveToDb');
 
         $this->assertEquals('testSeoUri', $oEncoder->getArticleMainUri($oArticle, 0));
@@ -632,7 +632,7 @@ class SeoEncoderArticleTest extends \OxidTestCase
     {
         oxTestModules::addFunction('oxlang', 'getSeoReplaceChars', '{return array();}');
 
-        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['getCategory']);
+        $oArticle = $this->getMock(\OxidEsales\Eshop\Application\Model\Article::class, ['_getCategory']);
         $oArticle = oxNew('oxArticle');
         $oArticle->setId('_testArtId');
         $oArticle->oxarticles__oxtitle = new oxField('äöüÄÖÜß');
@@ -735,8 +735,8 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxvendorid = new oxField($sVendorId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getVendor']);
-        $oEncoder->expects($this->once())->method('getVendor')->will($this->returnValue($oVendor));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getVendor']);
+        $oEncoder->expects($this->once())->method('_getVendor')->will($this->returnValue($oVendor));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleVendorUri($oArticle, 0));
     }
 
@@ -764,8 +764,8 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxmanufacturerid = new oxField($sManufacturerId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getManufacturer']);
-        $oEncoder->expects($this->once())->method('getManufacturer')->will($this->returnValue($oManufacturer));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getManufacturer']);
+        $oEncoder->expects($this->once())->method('_getManufacturer')->will($this->returnValue($oManufacturer));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleManufacturerUri($oArticle, 0));
     }
 
@@ -793,8 +793,8 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxvendorid = new oxField($sVendorId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getVendor']);
-        $oEncoder->expects($this->once())->method('getVendor')->will($this->returnValue($oVendor));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getVendor']);
+        $oEncoder->expects($this->once())->method('_getVendor')->will($this->returnValue($oVendor));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleVendorUri($oArticle, 1));
     }
 
@@ -822,8 +822,8 @@ class SeoEncoderArticleTest extends \OxidTestCase
         $oArticle->oxarticles__oxvarselect = new oxField('if this is here, object is not reloaded: bad :(');
         $oArticle->oxarticles__oxmanufacturerid = new oxField($sManufacturerId);
 
-        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['getManufacturer']);
-        $oEncoder->expects($this->once())->method('getManufacturer')->will($this->returnValue($oManufacturer));
+        $oEncoder = $this->getMock(\OxidEsales\Eshop\Application\Model\SeoEncoderArticle::class, ['_getManufacturer']);
+        $oEncoder->expects($this->once())->method('_getManufacturer')->will($this->returnValue($oManufacturer));
         $this->assertEquals($sSeoUri, $oEncoder->getArticleManufacturerUri($oArticle, 1));
     }
 

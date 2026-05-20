@@ -151,9 +151,12 @@ class PaymentTest extends \OxidTestCase
         $this->assertEquals(0, $oPayment->getPaymentValue($dBasePrice));
 
         $oPayment->load('oxidcashondel');
-        $this->assertEquals(10.7445, $oPayment->getPaymentValue($dBasePrice));
+        $this->assertEquals(6.8925, $oPayment->getPaymentValue($dBasePrice));
 
-        $oPayment->oxpayments__oxaddsum = new oxField(-105, oxField::T_RAW);
+        // After currency rate refresh: pick a magnitude past basePrice / rate
+        // (100 / 0.9190 ≈ 108.8) so the negative add-sum still trips the clamp
+        // back up to basePrice. Update the magnitude when CHF rate changes.
+        $oPayment->oxpayments__oxaddsum = new oxField(-110, oxField::T_RAW);
         $this->assertEquals(100, $oPayment->getPaymentValue($dBasePrice));
     }
 

@@ -43,7 +43,7 @@ VALUES ('8563fba1965a11df3.34244997', 1, '', 'blEnterNetPrice', 'bool', ''),
        ('mlabefd7ebdb5946e8f3f7e7a953b323', 1, '', 'aLanguageSSLURLs', 'arr', 'a:2:{i:0;s:0:"";i:1;s:0:"";}'),
        ('mla50c74dd79703312ffb8cfd82c3741', 1, '', 'aLanguageURLs', 'arr', 'a:2:{i:0;s:0:"";i:1;s:0:"";}'),
        ('3c4f033dfb8fd4fe692715dda19ecd28', 1, '', 'aCurrencies', 'arr',
-        'a:4:{i:0;s:23:"EUR@ 1.00@ ,@ .@ €@ 2";i:1;s:24:"GBP@ 0.8565@ .@  @ £@ 2";i:2;s:40:"CHF@ 1.4326@ ,@ .@ <small>CHF</small>@ 2";i:3;s:23:"USD@ 1.2994@ .@  @ $@ 2";}'),
+        'a:4:{i:0;s:23:"EUR@ 1.00@ ,@ .@ €@ 2";i:1;s:24:"GBP@ 0.8663@ .@  @ £@ 2";i:2;s:40:"CHF@ 0.9190@ ,@ .@ <small>CHF</small>@ 2";i:3;s:23:"USD@ 1.1702@ .@  @ $@ 2";}'),
        ('8563fba1baec4d3b7.61553539', 1, '', 'iNrofSimilarArticles', 'str', '5'),
        ('8563fba1baec4f6d3.38812651', 1, '', 'iNrofCustomerWhoArticles', 'str', '5'),
        ('8563fba1baec515d0.57265727', 1, '', 'iNrofCrossellArticles', 'str', '5'),
@@ -132,7 +132,7 @@ VALUES ('8563fba1965a11df3.34244997', 1, '', 'blEnterNetPrice', 'bool', ''),
        ('bd3e73e699331eb92c557113bac02fc4', 1, '', 'dPointsForInvitation', 'str', '10'),
        ('bd320d322fa2f638086787c512329eec', 1, '', 'dPointsForRegistration', 'str', '10'),
        ('99065ff58e9d2c1b2e362e54c0bb54f3', 1, '', 'blNewArtByInsert', 'bool', '1'),
-       ('rgk2a8c9cf8c9d23b3a7c8e9c090baf1', 1, '', 'sTheme', 'str', 'wave'),
+       ('rgk2a8c9cf8c9d23b3a7c8e9c090baf1', 1, '', 'sTheme', 'str', 'o3-theme'),
        ('8563fba1c39367724.92308656123111', 1, '', 'sDownloadsDir', 'str', 'out/downloads'),
        ('5i1c49faf83b3fe3d6bdbfa301e2704d', 1, '', 'iLinkExpirationTime', 'str', '168'),
        ('5i1d215fe1d6f0e1061ba1134e0ee4f2', 1, '', 'iDownloadExpirationTime', 'str', '24'),
@@ -344,7 +344,7 @@ VALUES ('0038ea008e74fdef4a0b0438ec2e4de6', 1, 'theme:o3-theme', 'sGATrackingId'
        ('3c982cc1e08b84a5c22480c5cc34da8c', 1, 'theme:o3-theme', 'sSliderSlideFade', 'select', 'fade'),
        ('3da9246b4f2efb51443325a0ecf16053', 1, 'theme:o3-theme', 'bl_showPriceAlarm', 'bool', ''),
        ('41384579c3a7d47b772620db43ad9021', 1, 'theme:o3-theme', 'sZoomImageSize', 'str', '665*665'),
-       ('43f048604489ea42c8a9376670d30260', 1, 'theme:o3-theme', 'blFooterColor', 'str', '#01071C'),
+       ('43f048604489ea42c8a9376670d30260', 1, 'theme:o3-theme', 'blFooterColor', 'str', '#F4F8F9'),
        ('45bd4cb2999988e1ebea4dc563db9348', 1, 'theme:o3-theme', 'bl_showVouchers', 'bool', '1'),
        ('4c3ef527daa125dae4974eb352a257f2', 1, 'theme:o3-theme', 'blFooterShowLinks', 'bool', '1'),
        ('4f0f19a0e8fb5a405df798e8d3bf54fd', 1, 'theme:o3-theme', 'sSliderSpeed', 'str', '400'),
@@ -360,8 +360,8 @@ VALUES ('0038ea008e74fdef4a0b0438ec2e4de6', 1, 'theme:o3-theme', 'sGATrackingId'
        ('7cd9f492416ce2162800f904dd0dc83b', 1, 'theme:o3-theme', 'sYouTubeUrl', 'str', 'https://www.youtube.com'),
        ('7f59fe0fbe7b5e660a4d14647a6e68fa', 1, 'theme:o3-theme', 'bl_showListmania', 'bool', '1'),
        ('82404676c1b4c8c78d33f4886ad7e51b', 1, 'theme:o3-theme', 'bl_showCompareList', 'bool', '1'),
-       ('85802bf4f63c0ec1fe111118cbcbe3ee', 1, 'theme:o3-theme', 'blSecondaryColor', 'str', '#F2F6FF'),
-       ('8fe2dd76ad13a65d9b0757d1e6a1989d', 1, 'theme:o3-theme', 'sEmailLogo', 'str', 'logo.svg'),
+       ('85802bf4f63c0ec1fe111118cbcbe3ee', 1, 'theme:o3-theme', 'blSecondaryColor', 'str', '#F2F8E6'),
+       ('8fe2dd76ad13a65d9b0757d1e6a1989d', 1, 'theme:o3-theme', 'sEmailLogo', 'str', 'logo_email.png'),
        ('909ee1f0dd5512e3e3dcf30ab2f34555', 1, 'theme:o3-theme', 'sPageLanguage', 'str', 'de_DE'),
        ('974cdabc9fe191a8d6db9c234217cb36', 1, 'theme:o3-theme', 'sShippingDaysNotOnStock', 'str', '5'),
        ('989dcbb5ad11593474982a1617ea73b8', 1, 'theme:o3-theme', 'aDetailImageSizes', 'aarr',
@@ -378,22 +378,36 @@ VALUES ('0038ea008e74fdef4a0b0438ec2e4de6', 1, 'theme:o3-theme', 'sGATrackingId'
         'a:4:{i:0;s:2:"10";i:1;s:2:"20";i:2;s:2:"50";i:3;s:3:"100";}'),
        ('aeedb385980967f9a20f4385a920cd56', 1, 'theme:o3-theme', 'blEmailsShowProductPictures', 'bool', ''),
        ('c73fe41ea379b0cc4ddd174ca9da0d44', 1, 'theme:o3-theme', 'activateJquery', 'bool', ''),
-       ('d00c428c2cc27155d6af1a301c631814', 1, 'theme:o3-theme', 'sLogoFile', 'str', 'logo.svg'),
+       ('d00c428c2cc27155d6af1a301c631814', 1, 'theme:o3-theme', 'sLogoFile', 'str', 'logo_o3.png'),
        ('d756c192c32bc43b379a2d050816a7e3', 1, 'theme:o3-theme', 'sDeliveryDaysNotOnStock', 'str', '14'),
        ('db0a8e5a3a54b001c8a3b3b7dea391cc', 1, 'theme:o3-theme', 'sManufacturerIconsize', 'str', '100*100'),
        ('dea59e4dff68d55315856a5518a46596', 1, 'theme:o3-theme', 'blFooterShowNewsletter', 'bool', '1'),
        ('e20cde39ce95a6527ea497f6ed68f78f', 1, 'theme:o3-theme', 'sGoogleMapsAddr', 'str',
         'O3-Shop, Musterstraße 17, 12345 Musterstadt'),
        ('e31ab0099d4f45c49f1ba2576be2cb9a', 1, 'theme:o3-theme', 'sSliderAutostart', 'select', 'on'),
-       ('e3ea2555fe9cb606100afe1e8c51b36f', 1, 'theme:o3-theme', 'sThumbnailsize', 'str', '330*185'),
+       ('e3ea2555fe9cb606100afe1e8c51b36f', 1, 'theme:o3-theme', 'sThumbnailsize', 'str', '412*240'),
        ('e450ff072664108ebac7ceeb17ee4acd', 1, 'theme:o3-theme', 'sFaviconAppleFile', 'str', 'apple-touch-icon.png'),
        ('e9d097758f8b34bbcf36f326275b02c6', 1, 'theme:o3-theme', 'sGoogleShoppingAccountId', 'str', ''),
        ('ebd38c5b887f570b7576c1936e110ea5', 1, 'theme:o3-theme', 'aNrofCatArticlesInGrid', 'arr',
         'a:4:{i:0;s:2:"12";i:1;s:2:"16";i:2;s:2:"24";i:3;s:2:"32";}'),
        ('ecc3b2c61c7d28856795cd5fdc71a4d5', 1, 'theme:o3-theme', 'sFavicon512PngFile', 'str', 'icon-512.png'),
        ('f0138a6c6476ad469fdece47080d2e63', 1, 'theme:o3-theme', 'sDeliveryDaysOnStock', 'str', '6'),
-       ('fd57bffe01b3ffbc77975bcc985df591', 1, 'theme:o3-theme', 'blPrimaryColor', 'str', '#2555FF'),
-       ('fefe216a7bba565b54c92183ac5d2199', 1, 'theme:o3-theme', 'sShoppingCountry', 'str', 'DE');
+       ('fd57bffe01b3ffbc77975bcc985df591', 1, 'theme:o3-theme', 'blPrimaryColor', 'str', '#82BA00'),
+       ('fefe216a7bba565b54c92183ac5d2199', 1, 'theme:o3-theme', 'sShoppingCountry', 'str', 'DE'),
+-- issue #118: settings present in theme.php but previously missing from initial_data.sql.
+-- iPasswordLength deliberately NOT seeded — see issue #125 (Config::reinitialize() caching
+-- leak). InputValidator falls back to 6 when unset, which the unit tests rely on.
+-- (Comments must stay at column 0; indented `--` inside an INSERT VALUES list silently
+-- swallowed the rest of this block before #136.)
+       ('96839442ce96de4e558377d77da64c9b', 1, 'theme:o3-theme', 'sShowMode', 'bool', ''),
+       ('9dc20d91df5914750245cf5ed5b0bdf4', 1, 'theme:o3-theme', 'sShowModePosition', 'select', 'topleft'),
+       ('9cd18f45054c3dc812b2d9b64df3f014', 1, 'theme:o3-theme', 'blShowFiltersSearch', 'str', '10'),
+       ('ceb7d00c057007c2c3ba0d1737761d74', 1, 'theme:o3-theme', 'bInputCompany', 'bool', ''),
+       ('3cd2cfb0758c0421346434007c133384', 1, 'theme:o3-theme', 'bInputUstid', 'bool', ''),
+       ('eb96d79eb736a81b35270761622fa146', 1, 'theme:o3-theme', 'bInputState', 'bool', ''),
+       ('b5230547747be2717cd69dcf877e007b', 1, 'theme:o3-theme', 'bInputFax', 'bool', ''),
+       ('9c956f4b3e6297dfc642d37d6501fb08', 1, 'theme:o3-theme', 'bInputMobilePhone', 'bool', ''),
+       ('8491773829d4f2a926273a5abe8f8984', 1, 'theme:o3-theme', 'bInputPrivatPhone', 'bool', '');
 
 
 INSERT INTO `oxconfigdisplay` (`OXID`, `OXCFGMODULE`, `OXCFGVARNAME`, `OXGROUPING`, `OXVARCONSTRAINT`, `OXPOS`)
@@ -614,7 +628,19 @@ VALUES ('091fa9cc622351c270d5522741a21695', 'theme:o3-theme', 'sYouTubeUrl', 'fo
        ('edcb8e31315a18780ab30ab29d714baf', 'theme:o3-theme', 'sCatThumbnailsize', 'images', '', 1),
        ('f0463f97d4bcdf07c4fa49c5e86a713a', 'theme:o3-theme', 'bl_showWishlist', 'features', '', 1),
        ('f2ebd34a35aba9ff51a3b19dcfd7d268', 'theme:o3-theme', 'blFooterShowLinks', 'footer', '', 1),
-       ('f3fbf3a218543967d2db45d9eda4bb7c', 'theme:o3-theme', 'sEmailLogo', 'logo', '', 1);
+       ('f3fbf3a218543967d2db45d9eda4bb7c', 'theme:o3-theme', 'sEmailLogo', 'logo', '', 1),
+-- issue #118: display rows for settings previously missing from initial_data.sql.
+-- iPasswordLength display row also omitted — see issue #125.
+-- (Comments must stay at column 0 — see #136.)
+       ('516c5d0284c8901295508fe5f2724014', 'theme:o3-theme', 'sShowMode', 'mode', '', 1),
+       ('dbee9d7d717f78f309386792e483a214', 'theme:o3-theme', 'sShowModePosition', 'mode', 'topleft|topright|bottomleft|bottomright', 1),
+       ('7cc228989a29ae584492ff08ab56cd92', 'theme:o3-theme', 'blShowFiltersSearch', 'display', '', 1),
+       ('1cc73e0e9c17e4d9ed1253196d463208', 'theme:o3-theme', 'bInputCompany', 'form', '', 1),
+       ('6c692dddcddddd2c7ec3b33241833f1d', 'theme:o3-theme', 'bInputUstid', 'form', '', 1),
+       ('dbfa6de4df36e0cd377f110a42a4eb19', 'theme:o3-theme', 'bInputState', 'form', '', 1),
+       ('2832c5dd423a2c1ee6f6b46241307b3e', 'theme:o3-theme', 'bInputFax', 'form', '', 1),
+       ('7927f4e6307593f63ca81c6993d6ac73', 'theme:o3-theme', 'bInputMobilePhone', 'form', '', 1),
+       ('308b98741d7152a8db937a989e2e4c0a', 'theme:o3-theme', 'bInputPrivatPhone', 'form', '', 1);
 
 
 INSERT INTO `oxcontents` (`OXID`, `OXLOADID`, `OXSHOPID`, `OXSNIPPET`, `OXTYPE`, `OXACTIVE`, `OXACTIVE_1`, `OXPOSITION`,
@@ -1533,3 +1559,14 @@ VALUES (@defaultAdminId, 1, 'malladmin', 1, 'admin',
 
 INSERT INTO `oxconfig` (`OXID`, `OXSHOPID`, `OXMODULE`, `OXVARNAME`, `OXVARTYPE`, `OXVARVALUE`)
 VALUES ('2a944b2cc31311e8957700163e4021bf', 1, '', 'includeProductReviewLinksInEmail', 'bool', '');
+
+-- §356a BGB electronic revocation feature (issue #99). Default-on for fresh
+-- installs (legally safe out of the box for typical B2C shops); upgrades inherit
+-- the absent-row → off behaviour from code defaults. Operator can flip these in
+-- admin once the templates and operator email are in place.
+INSERT INTO `oxconfig` (`OXID`, `OXSHOPID`, `OXMODULE`, `OXVARNAME`, `OXVARTYPE`, `OXVARVALUE`)
+VALUES
+    ('c7c6ef985f845e56417339ae7b930b20', 1, '', 'blShowRevocationForm',       'bool', '1'),
+    ('b4f36c830c18f275eef33491246b822e', 1, '', 'blRevocationRequireLogin',   'bool', '0'),
+    ('f4a110db564dcf6528ede68bddebe75c', 1, '', 'blRevocationNotifyOperator', 'bool', '1'),
+    ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  '');

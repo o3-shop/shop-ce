@@ -49,20 +49,15 @@ class CategoryUpdate extends AdminController
      *
      * @return CategoryList
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getCategoryList" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getCategoryList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getCategoryList() to the canonical override
+      *             target and retires _getCategoryList(); until then, _getCategoryList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getCategoryList() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getCategoryList();
-    }
-
-    /**
-     * Returns category list object
-     *
-     * @return CategoryList
-     * @throws Exception
-     */
-    protected function getCategoryList()
     {
         if ($this->_oCatList == null) {
             $this->_oCatList = oxNew(CategoryList::class);
@@ -75,11 +70,27 @@ class CategoryUpdate extends AdminController
     /**
      * Returns category list object
      *
+     * @return CategoryList
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getCategoryList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getCategoryList() the canonical override target.
+     */
+    protected function getCategoryList()
+    {
+        return $this->_getCategoryList();
+    }
+
+    /**
+     * Returns category list object
+     *
      * @return array
      * @throws Exception
      */
     public function getCatListUpdateInfo()
     {
-        return $this->getCategoryList()->getUpdateInfo();
+        return $this->_getCategoryList()->getUpdateInfo();
     }
 }

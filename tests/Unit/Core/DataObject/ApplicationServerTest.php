@@ -22,7 +22,7 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\DataObject;
 
 /**
- * @covers \OxidEsales\Eshop\Core\DataObject\ApplicationServer
+ * @covers \OxidEsales\EshopCommunity\Core\DataObject\ApplicationServer
  */
 class ApplicationServerTest extends \OxidEsales\TestingLibrary\UnitTestCase
 {

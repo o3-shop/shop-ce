@@ -91,16 +91,16 @@ class CategoriesComponent extends BaseController
             return;
         }
 
-        $sActCat = $this->getActCat();
+        $sActCat = $this->_getActCat();
 
         if ($myConfig->getConfigParam('bl_perfLoadManufacturerTree')) {
             // building Manufacturer tree
             $sActManufacturer = Registry::getRequest()->getRequestEscapedParameter('mnid');
-            $this->loadManufacturerTree($sActManufacturer);
+            $this->_loadManufacturerTree($sActManufacturer);
         }
 
         // building category tree for all purposes (nav, search and simple category trees)
-        $this->loadCategoryTree($sActCat);
+        $this->_loadCategoryTree($sActCat);
     }
 
     /**
@@ -134,22 +134,15 @@ class CategoriesComponent extends BaseController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws ObjectException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getActCat" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getActCat()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getActCat() to the canonical override
+      *             target and retires _getActCat(); until then, _getActCat() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getActCat() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getActCat();
-    }
-
-    /**
-     * get active category id
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @throws ObjectException
-     */
-    protected function getActCat()
     {
         $sActManufacturer = Registry::getRequest()->getRequestEscapedParameter('mnid');
 
@@ -164,7 +157,7 @@ class CategoriesComponent extends BaseController
 
             $sActVendor = (Str::getStr()->preg_match('/^v_.?/i', $sActCat)) ? $sActCat : null;
 
-            $sActCat = $this->addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
+            $sActCat = $this->_addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
         }
 
         // Checking for the default category
@@ -181,25 +174,35 @@ class CategoriesComponent extends BaseController
     }
 
     /**
-     * Category tree loader
+     * get active category id
      *
-     * @param string $sActCat active category id
-     * @return null
+     * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "loadCategoryTree" in next major
+     * @throws DatabaseErrorException
+     * @throws ObjectException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getActCat(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getActCat() the canonical override target.
      */
-    protected function _loadCategoryTree($sActCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getActCat()
     {
-        return $this->loadCategoryTree($sActCat);
+        return $this->_getActCat();
     }
 
     /**
      * Category tree loader
      *
      * @param string $sActCat active category id
+     * @return null
      * @throws DatabaseConnectionException
+     * @deprecated Use loadCategoryTree() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _loadCategoryTree().
      */
-    protected function loadCategoryTree($sActCat)
+    protected function _loadCategoryTree($sActCat) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         /** @var CategoryList $oCategoryTree */
         $oCategoryTree = oxNew(CategoryList::class);
@@ -216,22 +219,31 @@ class CategoriesComponent extends BaseController
     }
 
     /**
-     * Manufacturer tree loader
+     * Category tree loader
      *
-     * @param string $sActManufacturer active Manufacturer id
-     * @deprecated underscore prefix violates PSR12, will be renamed to "loadManufacturerTree" in next major
+     * @param string $sActCat active category id
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::loadCategoryTree() (not the deprecated _loadCategoryTree()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _loadManufacturerTree($sActManufacturer) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function loadCategoryTree($sActCat)
     {
-        return $this->loadManufacturerTree($sActManufacturer);
+        $this->_loadCategoryTree($sActCat);
     }
 
     /**
      * Manufacturer tree loader
      *
      * @param string $sActManufacturer active Manufacturer id
+     * @deprecated Use loadManufacturerTree() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call or
+     *             override _loadManufacturerTree().
      */
-    protected function loadManufacturerTree($sActManufacturer)
+    protected function _loadManufacturerTree($sActManufacturer) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $myConfig = Registry::getConfig();
         if ($myConfig->getConfigParam('bl_perfLoadManufacturerTree')) {
@@ -250,6 +262,21 @@ class CategoriesComponent extends BaseController
                 $oParentView->setActManufacturer($oManufacturer);
             }
         }
+    }
+
+    /**
+     * Manufacturer tree loader
+     *
+     * @param string $sActManufacturer active Manufacturer id
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::loadManufacturerTree() (not the deprecated _loadManufacturerTree())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function loadManufacturerTree($sActManufacturer)
+    {
+        $this->_loadManufacturerTree($sActManufacturer);
     }
 
     /**
@@ -288,27 +315,12 @@ class CategoriesComponent extends BaseController
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
      * @throws ObjectException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addAdditionalParams" in next major
+     * @deprecated Use addAdditionalParams() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call or
+     *             override _addAdditionalParams().
      */
     protected function _addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
-    }
-
-    /**
-     * Adds additional parameters: active category, list type and category id
-     *
-     * @param Article $oProduct loaded product
-     * @param string $sActCat active category id
-     * @param string $sActManufacturer active manufacturer id
-     * @param string $sActVendor active vendor
-     *
-     * @return string $sActCat
-     * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @throws ObjectException
-     */
-    protected function addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor)
     {
         $sSearchPar = Registry::getRequest()->getRequestEscapedParameter('searchparam');
         $sSearchCat = Registry::getRequest()->getRequestEscapedParameter('searchcnid');
@@ -333,7 +345,7 @@ class CategoriesComponent extends BaseController
             } elseif ($sActCat && $oProduct->isAssignedToCategory($sActCat)) {
                 // category ?
             } else {
-                list($sListType, $sActCat) = $this->getDefaultParams($oProduct);
+                list($sListType, $sActCat) = $this->_getDefaultParams($oProduct);
             }
         }
 
@@ -346,18 +358,26 @@ class CategoriesComponent extends BaseController
     }
 
     /**
-     * Returns array containing default list type and category (or manufacturer ir vendor) id
+     * Adds additional parameters: active category, list type and category id
      *
-     * @param Article $oProduct current product object
+     * @param Article $oProduct loaded product
+     * @param string $sActCat active category id
+     * @param string $sActManufacturer active manufacturer id
+     * @param string $sActVendor active vendor
      *
-     * @return array
+     * @return string $sActCat
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getDefaultParams" in next major
+     * @throws ObjectException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::addAdditionalParams() (not the deprecated _addAdditionalParams())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getDefaultParams($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor)
     {
-        return $this->getDefaultParams($oProduct);
+        return $this->_addAdditionalParams($oProduct, $sActCat, $sActManufacturer, $sActVendor);
     }
 
     /**
@@ -368,8 +388,12 @@ class CategoriesComponent extends BaseController
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Use getDefaultParams() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already override
+     *             it; new code, including new modules, MUST NOT call or override
+     *             _getDefaultParams().
      */
-    protected function getDefaultParams($oProduct)
+    protected function _getDefaultParams($oProduct) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sListType = null;
         $aArticleCats = $oProduct->getCategoryIds(true);
@@ -386,6 +410,25 @@ class CategoriesComponent extends BaseController
         }
 
         return [$sListType, $sActCat];
+    }
+
+    /**
+     * Returns array containing default list type and category (or manufacturer ir vendor) id
+     *
+     * @param Article $oProduct current product object
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getDefaultParams() (not the deprecated _getDefaultParams()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getDefaultParams($oProduct)
+    {
+        return $this->_getDefaultParams($oProduct);
     }
 
     /**

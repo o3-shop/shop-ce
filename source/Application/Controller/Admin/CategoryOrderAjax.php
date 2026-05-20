@@ -68,20 +68,15 @@ class CategoryOrderAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         // looking for table/view
         $sArtTable = $this->getViewName('oxarticles');
@@ -108,15 +103,19 @@ class CategoryOrderAjax extends ListComponentAjax
     }
 
     /**
-     * Returns SQL query addon for sorting
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getSorting" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
-    protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getQuery()
     {
-        return $this->getSorting();
+        return $this->_getQuery();
     }
 
     /**
@@ -124,12 +123,22 @@ class CategoryOrderAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _getSorting()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getSorting() to the canonical override
+      *             target and retires _getSorting(); until then, _getSorting() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function getSorting()
+    protected function _getSorting() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $sOrder = '';
         if (Registry::getRequest()->getRequestEscapedParameter('synchoxid')) {
-            $sOrder = parent::getSorting();
+            // NOTE: call parent::_getSorting() (not parent::getSorting()) to avoid
+            // infinite recursion through the parent's delegate. Restores baseline
+            // (ebe86dc0) call shape. See o3-shop/o3-shop#107 remediation.
+            $sOrder = parent::_getSorting();
         } elseif (($aSkipArt = Registry::getSession()->getVariable('neworder_sess'))) {
             $sOrderBy = '';
             $sArtTable = $this->getViewName('oxarticles');
@@ -145,11 +154,27 @@ class CategoryOrderAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query addon for sorting
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getSorting(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getSorting() the canonical override target.
+     */
+    protected function getSorting()
+    {
+        return $this->_getSorting();
+    }
+
+    /**
      * Removes article from list for sorting in category
      */
     public function removeCatOrderArticle()
     {
-        $aRemoveArt = $this->getActionIds('oxarticles.oxid');
+        $aRemoveArt = $this->_getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $aSkipArt = Registry::getSession()->getVariable('neworder_sess');
 
@@ -185,7 +210,7 @@ class CategoryOrderAjax extends ListComponentAjax
      */
     public function addCatOrderArticle()
     {
-        $aAddArticle = $this->getActionIds('oxarticles.oxid');
+        $aAddArticle = $this->_getActionIds('oxarticles.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         $aOrdArt = Registry::getSession()->getVariable('neworder_sess');

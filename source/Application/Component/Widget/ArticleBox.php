@@ -119,8 +119,8 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
 
                 $sAddDynParams = $this->updateDynamicParameters($sAddDynParams);
 
-                $oArticle = $this->getArticleById($this->getViewParameter('anid'));
-                $this->addDynParamsToLink($sAddDynParams, $oArticle);
+                $oArticle = $this->_getArticleById($this->getViewParameter('anid'));
+                $this->_addDynParamsToLink($sAddDynParams, $oArticle);
             }
 
             $this->setProduct($oArticle);
@@ -265,22 +265,12 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      * @param Article $oArticle      Article
      *
      * @return bool
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addDynParamsToLink" in next major
+     * @deprecated Use addDynParamsToLink() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _addDynParamsToLink().
      */
     protected function _addDynParamsToLink($sAddDynParams, $oArticle) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->addDynParamsToLink($sAddDynParams, $oArticle);
-    }
-
-    /**
-     * Appends dyn params to url.
-     *
-     * @param string                                      $sAddDynParams Dyn params
-     * @param Article $oArticle      Article
-     *
-     * @return bool
-     */
-    protected function addDynParamsToLink($sAddDynParams, $oArticle)
     {
         $blAddedParams = false;
         if ($sAddDynParams) {
@@ -297,17 +287,21 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
     }
 
     /**
-     * Returns prepared article by id.
+     * Appends dyn params to url.
      *
-     * @param string $sArticleId Article id
+     * @param string                                      $sAddDynParams Dyn params
+     * @param Article $oArticle      Article
      *
-     * @return Article
-     * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getArticleById" in next major
+     * @return bool
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::addDynParamsToLink() (not the deprecated _addDynParamsToLink())
+     *           so downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
-    protected function _getArticleById($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function addDynParamsToLink($sAddDynParams, $oArticle)
     {
-        return $this->getArticleById($sArticleId);
+        return $this->_addDynParamsToLink($sAddDynParams, $oArticle);
     }
 
     /**
@@ -317,8 +311,12 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
      *
      * @return Article
      * @throws DatabaseConnectionException
+     * @deprecated Use getArticleById() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getArticleById().
      */
-    protected function getArticleById($sArticleId)
+    protected function _getArticleById($sArticleId) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         /** @var Article $oArticle */
         $oArticle = oxNew(Article::class);
@@ -338,6 +336,24 @@ class ArticleBox extends \OxidEsales\Eshop\Application\Component\Widget\WidgetCo
         // END deprecated
 
         return $oArticle;
+    }
+
+    /**
+     * Returns prepared article by id.
+     *
+     * @param string $sArticleId Article id
+     *
+     * @return Article
+     * @throws DatabaseConnectionException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getArticleById() (not the deprecated _getArticleById()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getArticleById($sArticleId)
+    {
+        return $this->_getArticleById($sArticleId);
     }
 
     /**

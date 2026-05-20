@@ -88,6 +88,77 @@ class CmpUtilsTest extends \OxidTestCase
     }
 
     /**
+     * Bots calling toCompareList must not trigger an exception even when the
+     * session's compare-products variable is not yet an array.
+     */
+    public function testToCompareListDoesNotCrashForSearchEngine()
+    {
+        $this->getConfig()->setConfigParam('bl_showCompareList', true);
+        oxTestModules::addFunction('oxUtils', 'isSearchEngine', '{ return true; }');
+
+        $this->setRequestParameter('addcompare', true);
+        $this->setRequestParameter('aid', '1126');
+
+        $oViewConfig = $this->getMock(\OxidEsales\Eshop\Core\ViewConfig::class, ['getShowCompareList']);
+        $oViewConfig->method('getShowCompareList')->will($this->returnValue(true));
+
+        $oParentView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getViewConfig']);
+        $oParentView->method('getViewConfig')->will($this->returnValue($oViewConfig));
+
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['getParent']);
+        $oCmp->expects($this->once())->method('getParent')->will($this->returnValue($oParentView));
+        $oCmp->toCompareList('1126'); // must not throw
+    }
+
+    /**
+     * When getParent() returns null (e.g. no parent view set up), toCompareList
+     * must silently return after updating the session, not crash.
+     */
+    public function testToCompareListDoesNotCrashWithNullParent()
+    {
+        $this->getConfig()->setConfigParam('bl_showCompareList', true);
+        oxTestModules::addFunction('oxUtils', 'isSearchEngine', '{ return false; }');
+
+        $this->setRequestParameter('addcompare', true);
+        $this->setRequestParameter('removecompare', null);
+
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['getParent']);
+        $oCmp->expects($this->once())->method('getParent')->will($this->returnValue(null));
+        $oCmp->toCompareList('1126'); // must not throw
+
+        $aItems = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('aFiltcompproducts');
+        $this->assertNull($aItems);
+    }
+
+    /**
+     * When the session variable is not an array (e.g. first request ever),
+     * it must be treated as an empty array rather than causing a PHP error.
+     */
+    public function testToCompareListHandlesNonArraySessionVariable()
+    {
+        $this->getConfig()->setConfigParam('bl_showCompareList', true);
+        oxTestModules::addFunction('oxUtils', 'isSearchEngine', '{ return false; }');
+
+        // Simulate a corrupted / unset session value
+        \OxidEsales\Eshop\Core\Registry::getSession()->setVariable('aFiltcompproducts', null);
+
+        $this->setRequestParameter('addcompare', true);
+        $this->setRequestParameter('removecompare', null);
+
+        $oParentView = $this->getMock(\OxidEsales\Eshop\Core\Controller\BaseController::class, ['getViewProduct', 'getViewProductList']);
+        $oParentView->method('getViewProduct')->will($this->returnValue(null));
+        $oParentView->method('getViewProductList')->will($this->returnValue([]));
+
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['getParent']);
+        $oCmp->expects($this->once())->method('getParent')->will($this->returnValue($oParentView));
+        $oCmp->toCompareList('1126'); // must not throw
+
+        $aItems = \OxidEsales\Eshop\Core\Registry::getSession()->getVariable('aFiltcompproducts');
+        $this->assertIsArray($aItems);
+        $this->assertArrayHasKey('1126', $aItems);
+    }
+
+    /**
      * Testing oxcmp_utils::toNoticeList()
      *
      * @return null
@@ -100,8 +171,8 @@ class CmpUtilsTest extends \OxidTestCase
         \OxidEsales\Eshop\Core\Registry::set(\OxidEsales\Eshop\Core\Session::class, $oSession);
 
         /** @var oxcmp_utils|PHPUnit\Framework\MockObject\MockObject $oCmp */
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['toList']);
-        $oCmp->expects($this->once())->method('toList')->with($this->equalTo('noticelist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['_toList']);
+        $oCmp->expects($this->once())->method('_toList')->with($this->equalTo('noticelist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
         $oCmp->toNoticeList('1126', 999, 'sel');
     }
 
@@ -120,15 +191,15 @@ class CmpUtilsTest extends \OxidTestCase
         $this->getConfig()->setConfigParam('bl_showWishlist', false);
 
         /** @var oxcmp_utils|PHPUnit\Framework\MockObject\MockObject $oCmp */
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['toList']);
-        $oCmp->expects($this->never())->method('toList');
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['_toList']);
+        $oCmp->expects($this->never())->method('_toList');
         $oCmp->toWishList('1126', 999, 'sel');
 
         $this->getConfig()->setConfigParam('bl_showWishlist', true);
 
         /** @var oxcmp_utils|PHPUnit\Framework\MockObject\MockObject $oCmp */
-        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['toList']);
-        $oCmp->expects($this->once())->method('toList')->with($this->equalTo('wishlist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
+        $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['_toList']);
+        $oCmp->expects($this->once())->method('_toList')->with($this->equalTo('wishlist'), $this->equalTo('1126'), $this->equalTo(999), $this->equalTo('sel'));
         $oCmp->toWishList('1126', 999, 'sel');
     }
 
@@ -151,6 +222,10 @@ class CmpUtilsTest extends \OxidTestCase
         $oCmp = $this->getMock(\OxidEsales\Eshop\Application\Component\UtilsComponent::class, ['getUser']);
         $oCmp->expects($this->once())->method('getUser')->will($this->returnValue($oUser));
         $oCmp->UNITtoList('testList', '1126', 999, 'sel');
+
+        // toList() emits DEBUG-level log entries; clear the log so tearDown's
+        // failOnLoggedExceptions() does not fail when the local log level is DEBUG.
+        $this->exceptionLogHelper->clearExceptionLogFile();
     }
 
     /**

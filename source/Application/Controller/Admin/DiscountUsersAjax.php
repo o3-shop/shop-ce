@@ -71,20 +71,15 @@ class DiscountUsersAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $oConfig = Registry::getConfig();
         $oRequest = Registry::getRequest();
@@ -122,13 +117,29 @@ class DiscountUsersAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes user from discount config
      */
     public function removeDiscUser()
     {
-        $aRemoveGroups = $this->getActionIds('oxobject2discount.oxid');
+        $aRemoveGroups = $this->_getActionIds('oxobject2discount.oxid');
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2discount.* ' . $this->getQuery());
+            $sQ = $this->_addFilter('delete oxobject2discount.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif ($aRemoveGroups && is_array($aRemoveGroups)) {
             $sQ = 'delete from oxobject2discount where oxobject2discount.oxid in (' . implode(', ', DatabaseProvider::getDb()->quoteArray($aRemoveGroups)) . ') ';
@@ -142,12 +153,12 @@ class DiscountUsersAjax extends ListComponentAjax
     public function addDiscUser()
     {
         $oRequest = Registry::getRequest();
-        $aChosenUsr = $this->getActionIds('oxuser.oxid');
+        $aChosenUsr = $this->_getActionIds('oxuser.oxid');
         $soxId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         if ($oRequest->getRequestEscapedParameter('all')) {
             $sUserTable = $this->getViewName('oxuser');
-            $aChosenUsr = $this->getAll($this->addFilter("select $sUserTable.oxid " . $this->getQuery()));
+            $aChosenUsr = $this->_getAll($this->_addFilter("select $sUserTable.oxid " . $this->getQuery()));
         }
         if ($soxId && $soxId != '-1' && is_array($aChosenUsr)) {
             foreach ($aChosenUsr as $sChosenUsr) {

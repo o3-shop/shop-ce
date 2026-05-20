@@ -149,9 +149,9 @@ class SelectlistTest extends \OxidTestCase
         $aSelList = $oSelList->getFieldList();
 
         // checking loaded data
-        $this->assertEquals('&amp;amp;&amp;test1, 10 +14,33 CHF', $aSelList[0]->name);
-        $this->assertEquals('test2, 10 +14,33 CHF', $aSelList[1]->name);
-        $this->assertEquals('test3, 10 +14,33 CHF', $aSelList[2]->name);
+        $this->assertEquals('&amp;amp;&amp;test1, 10 +9,19 CHF', $aSelList[0]->name);
+        $this->assertEquals('test2, 10 +9,19 CHF', $aSelList[1]->name);
+        $this->assertEquals('test3, 10 +9,19 CHF', $aSelList[2]->name);
     }
 
     /**

@@ -1732,11 +1732,20 @@ class Order extends BaseModel
      */
     public function getOrderSum($blToday = false)
     {
+        // OXSTORNO is tinyint(1) constrained to {0, 1}; comparing `= 0` (int)
+        // instead of `!= "1"` (string) lets the optimizer use the composite
+        // index MAINIDX(OXSHOPID, OXSTORNO, OXORDERDATE) all the way to the
+        // third column. `!= "1"` is a range predicate that breaks the
+        // leftmost-prefix at column 2. Date comparison via `>= … AND <= …`
+        // for the same reason (LIKE on a DATETIME is a string scan).
+        // See o3-shop/o3-shop#112.
         $sSelect = 'select sum(oxtotalordersum / oxcurrate) from oxorder where ';
-        $sSelect .= 'oxshopid = :oxshopid and oxorder.oxstorno != "1" ';
+        $sSelect .= 'oxshopid = :oxshopid and oxorder.oxstorno = 0 ';
 
         if ($blToday) {
-            $sSelect .= 'and oxorderdate like "' . date('Y-m-d') . '%" ';
+            $sToday = date('Y-m-d');
+            $sSelect .= 'and oxorderdate >= "' . $sToday . ' 00:00:00" '
+                . 'and oxorderdate <= "' . $sToday . ' 23:59:59" ';
         }
 
         $params = [
@@ -1757,11 +1766,15 @@ class Order extends BaseModel
      */
     public function getOrderCnt($blToday = false)
     {
+        // See getOrderSum() above for the rationale on the index-friendly
+        // shape (`oxstorno = 0` vs `!= "1"`; range comparison vs LIKE).
         $sSelect = 'select count(*) from oxorder where ';
-        $sSelect .= 'oxshopid = :oxshopid  and oxorder.oxstorno != "1" ';
+        $sSelect .= 'oxshopid = :oxshopid and oxorder.oxstorno = 0 ';
 
         if ($blToday) {
-            $sSelect .= 'and oxorderdate like "' . date('Y-m-d') . '%" ';
+            $sToday = date('Y-m-d');
+            $sSelect .= 'and oxorderdate >= "' . $sToday . ' 00:00:00" '
+                . 'and oxorderdate <= "' . $sToday . ' 23:59:59" ';
         }
 
         $params = [

@@ -67,9 +67,9 @@ class ShopConfigTest extends \OxidTestCase
         oxTestModules::addFunction('oxConfig', 'getSavedVars', '{ return isset($this->_aSavedVars) ? $this->_aSavedVars : []; }');
 
         // testing..
-        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration::class, ['resetContentCache', 'getModuleForConfigVars'], [], '', false);
+        $oView = $this->getMock(\OxidEsales\Eshop\Application\Controller\Admin\ShopConfiguration::class, ['resetContentCache', '_getModuleForConfigVars'], [], '', false);
         $oView->expects($this->once())->method('resetContentCache');
-        $oView->expects($this->atLeastOnce())->method('getModuleForConfigVars')
+        $oView->expects($this->atLeastOnce())->method('_getModuleForConfigVars')
             ->will($this->returnValue('theme:mytheme'));
 
         $oView->saveConfVars();

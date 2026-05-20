@@ -75,7 +75,7 @@ class AdminlinksMain extends AdminDetailsController
         }
 
         // generate editor
-        $this->_aViewData['editor'] = $this->generateTextEditor(
+        $this->_aViewData['editor'] = $this->_generateTextEditor(
             '100%',
             255,
             $oLinks,

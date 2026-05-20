@@ -969,6 +969,14 @@ class SeoEncoder extends \OxidEsales\Eshop\Core\Base
      */
     public function setReservedWords($aReservedWords)
     {
+        // PHP 7 silently swallowed array_merge(array, null); PHP 8 raises a
+        // fatal TypeError. aSEOReservedWords config is allowed to be NULL
+        // (default seed is missing on some installs — see o3-shop/o3-shop#94),
+        // so guard against non-array input rather than crashing the whole
+        // frontend and backend.
+        if (!is_array($aReservedWords)) {
+            return;
+        }
         self::$_aReservedWords = array_merge(self::$_aReservedWords, $aReservedWords);
     }
 

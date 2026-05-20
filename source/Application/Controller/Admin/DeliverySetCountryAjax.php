@@ -61,20 +61,15 @@ class DeliverySetCountryAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $oDb = DatabaseProvider::getDb();
         $sId = Registry::getRequest()->getRequestEscapedParameter('oxid');
@@ -104,14 +99,30 @@ class DeliverySetCountryAjax extends ListComponentAjax
     }
 
     /**
+     * Returns SQL query for data to fetch
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
+     */
+    protected function getQuery()
+    {
+        return $this->_getQuery();
+    }
+
+    /**
      * Removes chosen countries from delivery list
      */
     public function removeCountryFromSet()
     {
-        $aChosenCntr = $this->getActionIds('oxobject2delivery.oxid');
+        $aChosenCntr = $this->_getActionIds('oxobject2delivery.oxid');
         // removing all
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
-            $sQ = $this->addFilter('delete oxobject2delivery.* ' . $this->getQuery());
+            $sQ = $this->_addFilter('delete oxobject2delivery.* ' . $this->getQuery());
             DatabaseProvider::getDb()->Execute($sQ);
         } elseif (is_array($aChosenCntr)) {
             $sChosenCountries = implode(', ', DatabaseProvider::getDb()->quoteArray($aChosenCntr));
@@ -125,13 +136,13 @@ class DeliverySetCountryAjax extends ListComponentAjax
      */
     public function addCountryToSet()
     {
-        $aChosenCntr = $this->getActionIds('oxcountry.oxid');
+        $aChosenCntr = $this->_getActionIds('oxcountry.oxid');
         $soxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
 
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $sCountryTable = $this->getViewName('oxcountry');
-            $aChosenCntr = $this->getAll($this->addFilter("select $sCountryTable.oxid " . $this->getQuery()));
+            $aChosenCntr = $this->_getAll($this->_addFilter("select $sCountryTable.oxid " . $this->getQuery()));
         }
 
         if ($soxId && $soxId != '-1' && is_array($aChosenCntr)) {

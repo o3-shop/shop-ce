@@ -65,7 +65,7 @@ class ArticleReview extends AdminDetailsController
                 $this->_aViewData['readonly'] = true;
             }
 
-            $reviewList = $this->getReviewList($article);
+            $reviewList = $this->_getReviewList($article);
 
             foreach ($reviewList as $review) {
                 if ($review->oxreviews__oxid->value == $reviewId) {
@@ -99,22 +99,12 @@ class ArticleReview extends AdminDetailsController
      *
      * @return ListModel
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getReviewList" in next major
+     * @deprecated Use getReviewList() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getReviewList().
      */
     protected function _getReviewList($article) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getReviewList($article);
-    }
-
-    /**
-     * returns reviews list for article
-     *
-     * @param Article $article Article object
-     *
-     * @return ListModel
-     * @throws DatabaseConnectionException
-     */
-    protected function getReviewList($article)
     {
         $database = DatabaseProvider::getDb();
         $query = 'select oxreviews.* from oxreviews
@@ -140,6 +130,24 @@ class ArticleReview extends AdminDetailsController
         $reviewList->selectString($query);
 
         return $reviewList;
+    }
+
+    /**
+     * returns reviews list for article
+     *
+     * @param Article $article Article object
+     *
+     * @return ListModel
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getReviewList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getReviewList() the canonical override target.
+     */
+    protected function getReviewList($article)
+    {
+        return $this->_getReviewList($article);
     }
 
     /**

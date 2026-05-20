@@ -48,7 +48,7 @@ class ListUser extends UserList
      */
     protected function _getViewListSize() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getUserDefListSize();
+        return $this->_getUserDefListSize();
     }
 
     /**

@@ -58,43 +58,66 @@ class UtilsComponent extends BaseController
         $blOverride = false,
         $blBundle = false
     ) {
-        // only if enabled and not search engine...
-        if ($this->getViewConfig()->getShowCompareList() && !Registry::getUtils()->isSearchEngine()) {
-            // #657 special treatment if we want to put on comparelist
-            $blAddCompare = Registry::getRequest()->getRequestEscapedParameter('addcompare');
-            $blRemoveCompare = Registry::getRequest()->getRequestEscapedParameter('removecompare');
-            $sProductId = $sProductId ? $sProductId : Registry::getRequest()->getRequestEscapedParameter('aid');
-            if (($blAddCompare || $blRemoveCompare) && $sProductId) {
-                // toggle state in session array
-                $aItems = Registry::getSession()->getVariable('aFiltcompproducts');
-                if ($blAddCompare && !isset($aItems[$sProductId])) {
-                    $aItems[$sProductId] = true;
-                }
+        $view = $this->getParent();
 
-                if ($blRemoveCompare) {
-                    unset($aItems[$sProductId]);
-                }
+        if ($view === null) {
+            return;
+        }
 
-                Registry::getSession()->setVariable('aFiltcompproducts', $aItems);
-                $oParentView = $this->getParent();
+        $viewConfig = method_exists($view, 'getViewConfig') ? $view->getViewConfig() : null;
 
-                // #843C there was problem then field "blIsOnComparisonList" was not set to article object
-                if (($oProduct = $oParentView->getViewProduct())) {
-                    if (isset($aItems[$oProduct->getId()])) {
-                        $oProduct->setOnComparisonList(true);
-                    } else {
-                        $oProduct->setOnComparisonList(false);
-                    }
-                }
+        if ($viewConfig === null
+            || !method_exists($viewConfig, 'getShowCompareList')
+            || !$viewConfig->getShowCompareList()
+        ) {
+            return;
+        }
 
-                $aViewProds = $oParentView->getViewProductList();
-                if (is_array($aViewProds) && count($aViewProds)) {
-                    foreach ($aViewProds as $oProduct) {
-                        if (isset($aItems[$oProduct->getId()])) {
-                            $oProduct->setOnComparisonList(true);
-                        } else {
-                            $oProduct->setOnComparisonList(false);
-                        }
+        if (Registry::getUtils()->isSearchEngine()) {
+            return;
+        }
+
+        $config = Registry::getConfig();
+        $blAddCompare = $config->getRequestParameter('addcompare');
+        $blRemoveCompare = $config->getRequestParameter('removecompare');
+        $sProductId = $sProductId ?: $config->getRequestParameter('aid');
+
+        if ((!$blAddCompare && !$blRemoveCompare) || !$sProductId) {
+            return;
+        }
+
+        $session = Registry::getSession();
+        $aItems = $session->getVariable('aFiltcompproducts');
+
+        if (!is_array($aItems)) {
+            $aItems = [];
+        }
+
+        if ($blAddCompare && !isset($aItems[$sProductId])) {
+            $aItems[$sProductId] = true;
+        }
+
+        if ($blRemoveCompare) {
+            unset($aItems[$sProductId]);
+        }
+
+        $session->setVariable('aFiltcompproducts', $aItems);
+
+        // Update in-memory product flags so templates show the correct
+        // comparison-list state without requiring a page reload.
+        if (method_exists($view, 'getViewProduct')) {
+            $oProduct = $view->getViewProduct();
+            if ($oProduct !== null && method_exists($oProduct, 'getId')) {
+                $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
+            }
+        }
+
+        if (method_exists($view, 'getViewProductList')) {
+            $aViewProds = $view->getViewProductList();
+            if (is_array($aViewProds)) {
+                foreach ($aViewProds as $oProduct) {
+                    if (method_exists($oProduct, 'getId')) {
+                        $oProduct->setOnComparisonList(isset($aItems[$oProduct->getId()]));
                     }
                 }
             }
@@ -116,7 +139,7 @@ class UtilsComponent extends BaseController
             return;
         }
 
-        $this->toList('noticelist', $sProductId, $dAmount, $aSel);
+        $this->_toList('noticelist', $sProductId, $dAmount, $aSel);
     }
 
     /**
@@ -136,7 +159,7 @@ class UtilsComponent extends BaseController
 
         // only if enabled
         if ($this->getViewConfig()->getShowWishlist()) {
-            $this->toList('wishlist', $sProductId, $dAmount, $aSel);
+            $this->_toList('wishlist', $sProductId, $dAmount, $aSel);
         }
     }
 
@@ -148,23 +171,15 @@ class UtilsComponent extends BaseController
      * @param double $dAmount product amount
      * @param array $aSel product selection list
      * @throws Exception
-     * @deprecated underscore prefix violates PSR12, will be renamed to "toList" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _toList()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes toList() to the canonical override
+      *             target and retires _toList(); until then, _toList() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _toList($sListType, $sProductId, $dAmount, $aSel) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->toList($sListType, $sProductId, $dAmount, $aSel);
-    }
-
-    /**
-     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
-     *
-     * @param string $sListType user product list type
-     * @param string $sProductId product id
-     * @param double $dAmount product amount
-     * @param array $aSel product selection list
-     * @throws Exception
-     */
-    protected function toList($sListType, $sProductId, $dAmount, $aSel)
     {
         // only if user is logged in
         if ($oUser = $this->getUser()) {
@@ -220,6 +235,25 @@ class UtilsComponent extends BaseController
                 }
             }
         }
+    }
+
+    /**
+     * Adds chosen product to defined user list. if amount is 0, item is removed from the list
+     *
+     * @param string $sListType user product list type
+     * @param string $sProductId product id
+     * @param double $dAmount product amount
+     * @param array $aSel product selection list
+     * @throws Exception
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _toList(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make toList() the canonical override target.
+     */
+    protected function toList($sListType, $sProductId, $dAmount, $aSel)
+    {
+        return $this->_toList($sListType, $sProductId, $dAmount, $aSel);
     }
 
     /**

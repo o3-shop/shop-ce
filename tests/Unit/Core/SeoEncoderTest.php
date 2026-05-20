@@ -230,6 +230,42 @@ class SeoEncoderTest extends \OxidTestCase
     }
 
     /**
+     * Regression guard for o3-shop/o3-shop#94.
+     *
+     * On PHP 7 array_merge(array, null) silently returned the first array.
+     * On PHP 8 it raises TypeError, taking down every page that constructs
+     * a SeoEncoder once aSEOReservedWords config is NULL — i.e. the entire
+     * frontend and backend in #94. setReservedWords(null) must therefore
+     * be a tolerated no-op, not a fatal.
+     */
+    public function testSetReservedWordsWithNullDoesNotCrash()
+    {
+        $oEncoder = oxNew(\OxidEsales\Eshop\Core\SeoEncoder::class);
+
+        $oEncoder->setReservedWords(null);
+
+        $this->assertTrue(
+            true,
+            'setReservedWords(null) must be a no-op, not a TypeError'
+        );
+    }
+
+    /**
+     * Companion to testSetReservedWordsWithNullDoesNotCrash:
+     * pin the integration path #94 actually crashed on. When the
+     * shop is configured with aSEOReservedWords = NULL,
+     * SeoEncoder::__construct() must not throw.
+     */
+    public function testConstructorTolerantOfNullSeoReservedWordsConfig()
+    {
+        $this->getConfig()->setConfigParam('aSEOReservedWords', null);
+
+        $oEncoder = oxNew(\OxidEsales\Eshop\Core\SeoEncoder::class);
+
+        $this->assertInstanceOf(\OxidEsales\Eshop\Core\SeoEncoder::class, $oEncoder);
+    }
+
+    /**
      * Test for #0001664
      *
      * @return null

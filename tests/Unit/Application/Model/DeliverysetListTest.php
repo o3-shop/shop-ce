@@ -115,7 +115,11 @@ class DeliverysetListTest extends \OxidTestCase
 
         $sShipSet = 'oxidstandard';
         $sProductId = '1126';
-        $dAmount = 29410;
+        // CHF amount chosen so the EUR-equivalent (~20530 EUR after dividing by
+        // the current CHF rate) stays in the same delivery-threshold band the
+        // original bug regression targeted. Update both rate and amount when
+        // currency rates are refreshed.
+        $dAmount = 18867;
 
         $oUser = $this->getMock(\OxidEsales\Eshop\Application\Model\User::class, ['getActiveCountry']);
         $oUser->expects($this->any())->method('getActiveCountry')->will($this->returnValue('a7c40f631fc920687.20179984'));

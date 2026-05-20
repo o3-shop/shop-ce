@@ -61,20 +61,15 @@ class ArticleExtendAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $categoriesTable = $this->getViewName('oxcategories');
         $objectToCategoryView = $this->getViewName('oxobject2category');
@@ -100,18 +95,19 @@ class ArticleExtendAjax extends ListComponentAjax
     }
 
     /**
-     * Returns array with DB records
+     * Returns SQL query for data to fetch
      *
-     * @param string $sQ SQL query
-     *
-     * @return array
+     * @return string
      * @throws DatabaseConnectionException
-     * @throws DatabaseErrorException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getDataFields" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
-    protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getQuery()
     {
-        return $this->getDataFields($sQ);
+        return $this->_getQuery();
     }
 
     /**
@@ -122,10 +118,18 @@ class ArticleExtendAjax extends ListComponentAjax
      * @return array
      * @throws DatabaseConnectionException
      * @throws DatabaseErrorException
+     * @deprecated Use getDataFields() instead. This underscore-prefixed name is retained
+     *             only for backward compatibility with module subclasses that already
+     *             override it; new code, including new modules, MUST NOT call or override
+     *             _getDataFields().
      */
-    protected function getDataFields($sQ)
+    protected function _getDataFields($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $dataFields = parent::getDataFields($sQ);
+        // NOTE: call parent::_getDataFields() (not parent::getDataFields()) to future-proof
+        // against the parent's eventual inversion: once the parent's getDataFields() becomes
+        // a delegate, calling parent::getDataFields() here would loop back through virtual
+        // dispatch. Restores the baseline (ebe86dc0) call shape. See o3-shop/o3-shop#107.
+        $dataFields = parent::_getDataFields($sQ);
         if (Registry::getRequest()->getRequestEscapedParameter('oxid') && is_array($dataFields) && count($dataFields)) {
             // looking for smallest time value to mark record as main category ...
             $minimalPosition = null;
@@ -156,11 +160,30 @@ class ArticleExtendAjax extends ListComponentAjax
     }
 
     /**
+     * Returns array with DB records
+     *
+     * @param string $sQ SQL query
+     *
+     * @return array
+     * @throws DatabaseConnectionException
+     * @throws DatabaseErrorException
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getDataFields() (not the deprecated _getDataFields()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
+     */
+    protected function getDataFields($sQ)
+    {
+        return $this->_getDataFields($sQ);
+    }
+
+    /**
      * Removes article from chosen category
      */
     public function removeCat()
     {
-        $categoriesToRemove = $this->getActionIds('oxcategories.oxid');
+        $categoriesToRemove = $this->_getActionIds('oxcategories.oxid');
 
         $oxId = Registry::getRequest()->getRequestEscapedParameter('oxid');
         $dataBase = DatabaseProvider::getDb();
@@ -168,7 +191,7 @@ class ArticleExtendAjax extends ListComponentAjax
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $categoriesTable = $this->getViewName('oxcategories');
-            $categoriesToRemove = $this->getAll($this->addFilter("select {$categoriesTable}.oxid " . $this->getQuery()));
+            $categoriesToRemove = $this->_getAll($this->_addFilter("select {$categoriesTable}.oxid " . $this->getQuery()));
         }
 
         // removing all
@@ -181,7 +204,7 @@ class ArticleExtendAjax extends ListComponentAjax
             ]);
 
             // updating oxtime values
-            $this->updateOxTime($oxId);
+            $this->_updateOxTime($oxId);
         }
 
         $this->resetArtSeoUrl($oxId, $categoriesToRemove);
@@ -198,7 +221,7 @@ class ArticleExtendAjax extends ListComponentAjax
     public function addCat()
     {
         $config = Registry::getConfig();
-        $categoriesToAdd = $this->getActionIds('oxcategories.oxid');
+        $categoriesToAdd = $this->_getActionIds('oxcategories.oxid');
         $oxId = Registry::getRequest()->getRequestEscapedParameter('synchoxid');
         $shopId = $config->getShopId();
         $objectToCategoryView = $this->getViewName('oxobject2category');
@@ -206,7 +229,7 @@ class ArticleExtendAjax extends ListComponentAjax
         // adding
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $categoriesTable = $this->getViewName('oxcategories');
-            $categoriesToAdd = $this->getAll($this->addFilter("select $categoriesTable.oxid " . $this->getQuery()));
+            $categoriesToAdd = $this->_getAll($this->_addFilter("select $categoriesTable.oxid " . $this->getQuery()));
         }
 
         if (isset($categoriesToAdd) && is_array($categoriesToAdd)) {
@@ -232,7 +255,7 @@ class ArticleExtendAjax extends ListComponentAjax
                 $objectToCategory->save();
             }
 
-            $this->updateOxTime($oxId);
+            $this->_updateOxTime($oxId);
 
             $this->resetArtSeoUrl($oxId);
             $this->resetContentCache();

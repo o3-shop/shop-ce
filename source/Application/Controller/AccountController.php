@@ -148,7 +148,7 @@ class AccountController extends FrontendController
             !$user || !$user->$passwordField->value ||
             ($this->isEnabledPrivateSales() && (!$user->isTermsAccepted() || $this->confirmTerms()))
         ) {
-            $this->_sThisTemplate = $this->getLoginTemplate();
+            $this->_sThisTemplate = $this->_getLoginTemplate();
         }
 
         return $this->_sThisTemplate;
@@ -160,11 +160,14 @@ class AccountController extends FrontendController
      *  - else returns $this->_sThisLoginTemplate
      *
      * @return string
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getLoginTemplate" in next major
+     * @deprecated Use getLoginTemplate() instead. This underscore-prefixed name is
+     *             retained only for backward compatibility with module subclasses that
+     *             already override it; new code, including new modules, MUST NOT call
+     *             or override _getLoginTemplate().
      */
     protected function _getLoginTemplate() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        return $this->getLoginTemplate();
+        return $this->isEnabledPrivateSales() ? $this->_sThisAltLoginTemplate : $this->_sThisLoginTemplate;
     }
 
     /**
@@ -173,10 +176,15 @@ class AccountController extends FrontendController
      *  - else returns $this->_sThisLoginTemplate
      *
      * @return string
+     *
+     * @internal If your override does not fully replace the behavior, call
+     *           parent::getLoginTemplate() (not the deprecated _getLoginTemplate()) so
+     *           downstream overrides in the class chain are preserved. Template-method
+     *           refactor tracked in o3-shop/o3-shop#108.
      */
     protected function getLoginTemplate()
     {
-        return $this->isEnabledPrivateSales() ? $this->_sThisAltLoginTemplate : $this->_sThisLoginTemplate;
+        return $this->_getLoginTemplate();
     }
 
     /**

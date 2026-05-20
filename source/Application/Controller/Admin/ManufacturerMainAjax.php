@@ -70,20 +70,15 @@ class ManufacturerMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "getQuery" in next major
+     * @deprecated Transitional during #107. Modules SHOULD override _getQuery()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes getQuery() to the canonical override
+      *             target and retires _getQuery(); until then, _getQuery() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
     protected function _getQuery() // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
-    {
-        return $this->getQuery();
-    }
-
-    /**
-     * Returns SQL query for data to fetch
-     *
-     * @return string
-     * @throws DatabaseConnectionException
-     */
-    protected function getQuery()
     {
         $config = Registry::getConfig();
         $oRequest = Registry::getRequest();
@@ -116,17 +111,19 @@ class ManufacturerMainAjax extends ListComponentAjax
     }
 
     /**
-     * Adds filter SQL to current query
-     *
-     * @param string $sQ query to add filter condition
+     * Returns SQL query for data to fetch
      *
      * @return string
      * @throws DatabaseConnectionException
-     * @deprecated underscore prefix violates PSR12, will be renamed to "addFilter" in next major
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _getQuery(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make getQuery() the canonical override target.
      */
-    protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    protected function getQuery()
     {
-        return $this->addFilter($sQ);
+        return $this->_getQuery();
     }
 
     /**
@@ -136,12 +133,19 @@ class ManufacturerMainAjax extends ListComponentAjax
      *
      * @return string
      * @throws DatabaseConnectionException
+     * @deprecated Transitional during #107. Modules SHOULD override _addFilter()
+      *             for now — internal call paths route through it. The
+      *             longer-term direction (issue #108) is a template-method
+      *             refactor that promotes addFilter() to the canonical override
+      *             target and retires _addFilter(); until then, _addFilter() is the
+      *             safe override target. Plan extension work with both stages
+      *             in mind.
      */
-    protected function addFilter($sQ)
+    protected function _addFilter($sQ) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $config = Registry::getConfig();
         $articleViewName = $this->getViewName('oxarticles');
-        $query = parent::addFilter($sQ);
+        $query = parent::_addFilter($sQ);
 
         // display variants or not ?
         $query .= $config->getConfigParam('blVariantsSelection') ? ' group by ' . $articleViewName . '.oxid ' : '';
@@ -150,16 +154,34 @@ class ManufacturerMainAjax extends ListComponentAjax
     }
 
     /**
+     * Adds filter SQL to current query
+     *
+     * @param string $sQ query to add filter condition
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     *
+     * @internal Public delegate during the #107 transition. Module subclasses
+      *           SHOULD override _addFilter(), not this — internal call paths
+      *           bypass this name. Issue #108 will eventually invert this and
+      *           make addFilter() the canonical override target.
+     */
+    protected function addFilter($sQ)
+    {
+        return $this->_addFilter($sQ);
+    }
+
+    /**
      * Removes article from Manufacturer config
      */
     public function removeManufacturer()
     {
-        $articleIds = $this->getActionIds('oxarticles.oxid');
+        $articleIds = $this->_getActionIds('oxarticles.oxid');
         $manufacturerId = Registry::getRequest()->getRequestEscapedParameter('oxid');
 
         if (Registry::getRequest()->getRequestEscapedParameter('all')) {
             $articleViewTable = $this->getViewName('oxarticles');
-            $articleIds = $this->getAll($this->addFilter("select $articleViewTable.oxid " . $this->getQuery()));
+            $articleIds = $this->_getAll($this->_addFilter("select $articleViewTable.oxid " . $this->getQuery()));
         }
 
         if (is_array($articleIds) && !empty($articleIds)) {
@@ -193,12 +215,12 @@ class ManufacturerMainAjax extends ListComponentAjax
     {
         $oRequest = Registry::getRequest();
 
-        $articleIds = $this->getActionIds('oxarticles.oxid');
+        $articleIds = $this->_getActionIds('oxarticles.oxid');
         $manufacturerId = $oRequest->getRequestEscapedParameter('synchoxid');
 
         if ($oRequest->getRequestEscapedParameter('all')) {
             $articleViewName = $this->getViewName('oxarticles');
-            $articleIds = $this->getAll($this->addFilter("select $articleViewName.oxid " . $this->getQuery()));
+            $articleIds = $this->_getAll($this->_addFilter("select $articleViewName.oxid " . $this->getQuery()));
         }
 
         if ($manufacturerId && $manufacturerId != '-1' && is_array($articleIds)) {
