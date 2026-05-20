@@ -24,7 +24,7 @@ namespace OxidEsales\EshopCommunity\Internal\Domain\Authentication\Repository;
 
 /**
  * Narrow DB-facing surface needed by the admin-user CLI commands
- * (oe:user:change-password / oe:user:create-admin). Exists so the
+ * (oe:user:change-password / oe:user:create). Exists so the
  * commands stay trivially unit-testable without mocking Doctrine's
  * QueryBuilder internals — concrete impl uses Connection, tests
  * mock this interface.
