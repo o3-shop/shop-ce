@@ -4,28 +4,39 @@ PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
 ## Claude Code Workflow
 
-The following dev workflow skills are **bundled in this repo** at `.claude/skills/` — no plugin installation required:
+All dev workflow skills are **bundled in this repo** at `.claude/skills/` — no plugin installation required. Skills trigger automatically based on context, or you can invoke them explicitly with `/skill-name`.
 
-| Skill | When to use |
-|---|---|
-| `brainstorming` | Before building anything new — explores intent and design |
-| `writing-plans` | Turns a spec into a step-by-step implementation plan |
-| `test-driven-development` | TDD for every feature or bugfix |
-| `systematic-debugging` | Any bug, test failure, or unexpected behaviour |
-| `verification-before-completion` | Before claiming work is done |
-| `finishing-a-development-branch` | Wrapping up a branch (merge/PR/discard) |
-| `subagent-driven-development` | Execute plans with parallel subagents + review checkpoints |
-| `/finish` | Quality gate: cs-fixer + full tests + coverage + memory update |
+### How skills work
 
-**Recommended additional plugins** (install once, auto-activate for this repo via `.claude/settings.json`):
+- **Auto-triggered:** Claude invokes the right skill based on what you ask. Say "help me build X" → brainstorming starts. Say "this test is failing" → systematic-debugging starts.
+- **Explicit:** Type `/brainstorming`, `/systematic-debugging`, etc. to invoke directly.
+- **Always run `/finish` before calling a task done** — it runs cs-fixer + full tests + coverage.
 
-```bash
-claude plugins add marketplace claude-plugins-official
-```
+### Skill reference
+
+| Skill | Trigger | When to use |
+|---|---|---|
+| `brainstorming` | "help me build/add/create X" | Before building anything new — explores intent and design |
+| `writing-plans` | "plan this", "write a plan for" | Turns a spec into a step-by-step implementation plan |
+| `test-driven-development` | any feature or bugfix | TDD for every feature or bugfix |
+| `systematic-debugging` | "this is broken", "test fails" | Any bug, test failure, or unexpected behaviour |
+| `verification-before-completion` | before "it's done" | Runs verification before claiming work is complete |
+| `finishing-a-development-branch` | "wrap up this branch" | Guided merge/PR/discard options |
+| `subagent-driven-development` | "execute this plan" | Execute plans with parallel subagents + review checkpoints |
+| `executing-plans` | "start implementing" | Run a written plan in a separate session with checkpoints |
+| `requesting-code-review` | before merging | Multi-agent review of your changes |
+| `receiving-code-review` | after getting review feedback | Structured response to review comments |
+| `dispatching-parallel-agents` | large independent tasks | Spawn multiple agents working in parallel |
+| `using-git-worktrees` | feature isolation needed | Creates an isolated workspace via git worktree |
+| `/finish` | task complete | Quality gate: cs-fixer + full tests + coverage + memory update |
+
+### Plugins (auto-installed)
+
+The repo registers `claude-plugins-official` automatically via `.claude/settings.json`. On first launch Claude Code will install:
 
 | Plugin | What it adds |
 |---|---|
-| `superpowers` | Extended skill set (receiving code review, git worktrees, parallel agents) |
+| `superpowers` | Extended skill set (already bundled, plugin kept for updates) |
 | `feature-dev` | Guided feature development with codebase understanding |
 | `php-lsp` | PHP language server (inline errors, go-to-definition) |
 
