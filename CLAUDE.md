@@ -62,6 +62,56 @@ Run `/finish` — cs-fixer, full test suite, coverage check. If anything fails, 
 
 ---
 
+### Other skills
+
+#### `writing-plans`
+
+After brainstorming has all the context, this skill writes the full implementation plan — broken into bite-sized tasks, each a 2–5 minute action, with exact files to touch, what to write, and how to verify it. Plans are saved to `docs/superpowers/plans/`. You review and approve before anything gets built.
+
+---
+
+#### `test-driven-development`
+
+Enforces the red-green-refactor loop on every feature and bugfix. The iron law: no production code without a failing test first. If you write the code before the test, delete it and start over. Claude will refuse to skip this even when it "seems obvious" — that's exactly when the test matters most.
+
+---
+
+#### `systematic-debugging`
+
+Stops you from guessing. When a test fails or something breaks, this skill forces root cause investigation before any fix is proposed. It traces the failure path, reads logs and stack traces, and identifies the actual cause. Symptom fixes are treated as failure — if you haven't found the root cause you haven't found the bug.
+
+---
+
+#### `verification-before-completion`
+
+Before claiming anything is done, this skill runs the actual verification command and reads the full output. No assertions without evidence. It will never say "tests pass" without having run them in that message — if it can't prove it, it says so.
+
+---
+
+#### `finishing-a-development-branch`
+
+When implementation is done and tests pass, this skill walks you through wrapping up: create a PR, merge, or discard. It verifies the test suite first and won't proceed if anything is failing. Presents structured options so you stay in control of what happens to the branch.
+
+---
+
+#### `executing-plans`
+
+Takes a written plan file and executes it task by task with progress tracking. Raises concerns before starting if anything in the plan looks wrong. After all tasks are done it hands off to `finishing-a-development-branch` automatically. Use `subagent-driven-development` instead when subagents are available — it gets significantly better results.
+
+---
+
+#### `dispatching-parallel-agents`
+
+When you have multiple independent problems (e.g. 3 failing test files with unrelated root causes), this skill dispatches one focused subagent per problem instead of investigating them one by one. Each agent gets precisely crafted context — never your session history — so they stay focused. Cuts investigation time dramatically on large breakages.
+
+---
+
+#### `using-git-worktrees`
+
+Sets up an isolated workspace before implementation starts. Detects if you're already in a worktree (common in this repo) and skips creation if so. Falls back to manual git worktree if no native tool is available. Ensures work never happens directly on the main checkout.
+
+---
+
 ### Code review skills
 
 Two skills handle the full review loop — one for requesting a review, one for receiving one.
