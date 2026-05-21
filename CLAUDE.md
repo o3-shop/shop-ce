@@ -4,7 +4,20 @@ PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
 ## Claude Code Workflow
 
-Workflow skills are bundled in `.claude/skills/` and trigger automatically based on context.
+Workflow skills are bundled in `.claude/skills/` and trigger automatically. See `superpowers.md` in the repo root for the full developer guide.
+
+| Skill | When to use |
+|---|---|
+| `brainstorming` | Before building anything new |
+| `writing-plans` | Turns a spec into an implementation plan |
+| `test-driven-development` | Every feature or bugfix |
+| `systematic-debugging` | Any bug, test failure, or unexpected behaviour |
+| `verification-before-completion` | Before claiming work is done |
+| `finishing-a-development-branch` | Wrapping up a branch |
+| `subagent-driven-development` | Execute plans with parallel subagents |
+| `requesting-code-review` | Before merging |
+| `receiving-code-review` | After getting review feedback |
+| `/finish` | Quality gate: cs-fixer + full tests + coverage |
 
 ## Quick Start
 
