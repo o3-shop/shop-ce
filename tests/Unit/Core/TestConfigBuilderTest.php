@@ -50,7 +50,7 @@ class TestConfigBuilderTest extends \OxidTestCase
 
     public function testBuildParametersReturnsEarlyWhenHandlerClassAbsent(): void
     {
-        $builder = new class extends TestConfigBuilder {
+        $builder = new class () extends TestConfigBuilder {
             protected static string $handlerClass = 'NonExistent\\Handler\\ThatDoesNotExist';
         };
 
