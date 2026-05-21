@@ -1122,7 +1122,6 @@ class EmailTest extends \OxidTestCase
         $aTo[0][0] = 'order@my-o3-shop.com';
         $aTo[0][1] = \OxidEsales\Eshop\Core\Registry::getLang()->translateString('ORDERS');
         $this->assertEquals($aTo, $oEmail->getRecipient());
-
     }
 
     /**
