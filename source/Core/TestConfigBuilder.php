@@ -24,11 +24,13 @@ use Composer\Script\Event;
 
 class TestConfigBuilder
 {
+    protected static string $handlerClass = \Incenteev\ParameterHandler\ScriptHandler::class;
+
     public static function buildParameters(Event $event): void
     {
-        if (!class_exists(\Incenteev\ParameterHandler\ScriptHandler::class)) {
+        if (!class_exists(static::$handlerClass)) {
             return;
         }
-        \Incenteev\ParameterHandler\ScriptHandler::buildParameters($event);
+        (static::$handlerClass)::buildParameters($event);
     }
 }

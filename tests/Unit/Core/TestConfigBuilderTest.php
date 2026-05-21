@@ -47,4 +47,17 @@ class TestConfigBuilderTest extends \OxidTestCase
         $this->assertNotNull($type);
         $this->assertSame(\Composer\Script\Event::class, $type->getName());
     }
+
+    public function testBuildParametersReturnsEarlyWhenHandlerClassAbsent(): void
+    {
+        $builder = new class extends TestConfigBuilder {
+            protected static string $handlerClass = 'NonExistent\\Handler\\ThatDoesNotExist';
+        };
+
+        $event = $this->createMock(\Composer\Script\Event::class);
+        $event->expects($this->never())->method('getComposer');
+
+        $builder::buildParameters($event);
+        $this->addToAssertionCount(1);
+    }
 }
