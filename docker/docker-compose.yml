@@ -1,7 +1,7 @@
 services:
   db:
+    profiles: [db]
     image: mariadb:10.11
-    container_name: o3shop-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${O3SHOP_CONF_DBROOT}
@@ -13,20 +13,22 @@ services:
       - ./database/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
+    networks:
+      default:
+      o3shop-shared:
+        aliases:
+          - db
 
   shop:
     build:
       dockerfile: Dockerfile
-    container_name: o3shop-app
-    depends_on:
-      - db
     volumes:
       - ./../:/var/www/html
     environment:
       PATH: /var/www/html/vendor/o3-shop/testing-library/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       TZ: Europe/Berlin
     ports:
-      - "8080:80"
+      - "${O3SHOP_PORT_HTTP:-8080}:80"
     working_dir: /var/www/html
     healthcheck:
       test: [ "CMD", "test", "!", "-f", "/tmp/o3setup-running" ]
@@ -34,37 +36,47 @@ services:
       timeout: 10s
       retries: 20
       start_period: 5s
+    networks:
+      - default
+      - o3shop-shared
 
   mailpit:
     image: axllent/mailpit
-    container_name: o3shop-mailpit
     restart: unless-stopped
     volumes:
       - ./mailpit/data:/data
     ports:
-      - 8025:8025
-      - 1025:1025
+      - "${O3SHOP_PORT_MAILPIT:-8025}:8025"
+      - "${O3SHOP_PORT_SMTP:-1025}:1025"
     environment:
       MP_MAX_MESSAGES: 5000
       MP_DATABASE: /data/mailpit.db
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - default
+      - o3shop-shared
 
   adminer:
     image: adminer:latest
-    container_name: o3shop-adminer
     restart: unless-stopped
-    depends_on:
-      - db
     ports:
-      - "8081:8080"
+      - "${O3SHOP_PORT_ADMINER:-8081}:8080"
     environment:
       ADMINER_DEFAULT_SERVER: db
       MYSQL_ROOT_PASSWORD: ${O3SHOP_CONF_DBROOT}
       MYSQL_DATABASE: ${O3SHOP_CONF_DBNAME}
       MYSQL_USER: ${O3SHOP_CONF_DBUSER}
       MYSQL_PASSWORD: ${O3SHOP_CONF_DBPWD}
+    networks:
+      - default
+      - o3shop-shared
 
 volumes:
   db_data:
 
+networks:
+  default:
+  o3shop-shared:
+    external: true
+    name: o3shop-shared

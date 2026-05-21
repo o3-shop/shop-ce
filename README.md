@@ -88,6 +88,12 @@ The entrypoint deliberately refuses to delete those paths itself — they're git
 
 The bootstrap symlinks `source/out/<theme>` into the cloned tree. Apache runs in the Linux container and follows the symlink fine on any host OS, so the storefront renders normally everywhere. On Windows hosts where shop-ce is checked out under `C:\...` (Windows-native FS via Docker Desktop's bridge), Windows-side tooling (IDE indexing, `git status` from PowerShell against the `out/` path) may show the symlink as broken — that's a host-side cosmetic issue only; the shop runs. WSL2-native FS (`\\wsl$\...`) and Mac/Linux hosts have no issue.
 
+### AI Development with Claude Code
+
+This repository ships with the [Superpowers](superpowers.md) skill set for Claude Code — no plugin installation required. Just open the repo in Claude Code and the skills activate automatically.
+
+Superpowers gives Claude a structured workflow: brainstorming → planning → subagent-driven development → code review → quality gate. See **[superpowers.md](superpowers.md)** for the full guide on what's included and how to use it.
+
 ### Testing 
 
 To run the tests, you have two choices. 
