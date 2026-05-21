@@ -30,6 +30,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Configuration\Service\Mo
 use OxidEsales\EshopCommunity\Internal\Framework\Module\MetaData\Dao\ModuleConfigurationDaoInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class RebuildModuleConfigurationCommandTest extends TestCase
@@ -40,6 +42,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
     {
         $this->tmpModulesPath = sys_get_temp_dir() . '/o3-rebuild-' . uniqid();
         mkdir($this->tmpModulesPath, 0777, true);
+        mkdir($this->tmpModulesPath . '/var/configuration/shops', 0777, true);
     }
 
     protected function tearDown(): void
@@ -69,7 +72,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
                 1
             );
 
-        (new CommandTester($this->makeCommand($shopConfigDao)))->execute([]);
+        (new CommandTester($this->makeCommand($shopConfigDao)))->execute([], ['interactive' => false]);
     }
 
     public function testOnDiskModuleIsMergedViaServiceAndSaved(): void
@@ -97,7 +100,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
 
         $exitCode = (new CommandTester(
             $this->makeCommand($shopConfigDao, null, $metadataDao, $mergingService)
-        ))->execute([]);
+        ))->execute([], ['interactive' => false]);
 
         $this->assertSame(0, $exitCode);
     }
@@ -113,7 +116,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
         $shopConfigDao->method('getAll')->willReturn([1 => $shopConfig]);
         $shopConfigDao->expects($this->never())->method('save');
 
-        (new CommandTester($this->makeCommand($shopConfigDao)))->execute(['--dry-run' => true]);
+        (new CommandTester($this->makeCommand($shopConfigDao)))->execute(['--dry-run' => true], ['interactive' => false]);
 
         $this->assertTrue($shopConfig->hasModuleConfiguration('phantom'), 'dry-run must not modify in-memory config');
     }
@@ -129,7 +132,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
         $shopConfigDao->method('getAll')->willReturn([1 => $shopConfig]);
 
         $tester = new CommandTester($this->makeCommand($shopConfigDao));
-        $tester->execute([]);
+        $tester->execute([], ['interactive' => false]);
 
         $this->assertStringContainsString('phantom', $tester->getDisplay());
         $this->assertStringContainsString('vendor/phantom', $tester->getDisplay());
@@ -154,7 +157,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
         $tester = new CommandTester(
             $this->makeCommand($shopConfigDao, null, $metadataDao, $mergingService)
         );
-        $tester->execute([]);
+        $tester->execute([], ['interactive' => false]);
 
         $this->assertStringContainsString('Kept: 1', $tester->getDisplay());
     }
@@ -183,7 +186,7 @@ class RebuildModuleConfigurationCommandTest extends TestCase
 
         (new CommandTester(
             $this->makeCommand($shopConfigDao, null, $metadataDao, $mergingService)
-        ))->execute([]);
+        ))->execute([], ['interactive' => false]);
     }
 
     public function testModulesWithInvalidMetadataAreSkipped(): void
@@ -201,9 +204,56 @@ class RebuildModuleConfigurationCommandTest extends TestCase
 
         $exitCode = (new CommandTester(
             $this->makeCommand($shopConfigDao, null, $metadataDao, null)
-        ))->execute([]);
+        ))->execute([], ['interactive' => false]);
 
-        $this->assertSame(0, $exitCode);
+        $this->assertSame(1, $exitCode);
+    }
+
+    public function testDepth3MetadataPhpIsIgnored(): void
+    {
+        mkdir($this->tmpModulesPath . '/vendor/mymodule/subdir', 0777, true);
+        file_put_contents($this->tmpModulesPath . '/vendor/mymodule/subdir/metadata.php', '<?php');
+
+        $shopConfigDao = $this->createMock(ShopConfigurationDaoInterface::class);
+        $shopConfigDao->method('getAll')->willReturn([1 => new ShopConfiguration()]);
+
+        $metadataDao = $this->createMock(ModuleConfigurationDaoInterface::class);
+        $metadataDao->expects($this->never())->method('get');
+
+        (new CommandTester(
+            $this->makeCommand($shopConfigDao, null, $metadataDao, null)
+        ))->execute([], ['interactive' => false]);
+    }
+
+    public function testCreatesTimestampedBackupBeforeSaving(): void
+    {
+        $shopsDir = $this->tmpModulesPath . '/var/configuration/shops';
+        file_put_contents($shopsDir . '/1.yaml', 'modules: []');
+
+        $shopConfig = new ShopConfiguration();
+        $shopConfigDao = $this->createMock(ShopConfigurationDaoInterface::class);
+        $shopConfigDao->method('getAll')->willReturn([1 => $shopConfig]);
+
+        (new CommandTester($this->makeCommand($shopConfigDao)))->execute([], ['interactive' => false]);
+
+        $backups = glob($shopsDir . '/1.yaml.bak.*');
+        $this->assertCount(1, $backups, 'Expected exactly one timestamped backup file');
+    }
+
+    public function testInteractiveDeclinationSkipsSave(): void
+    {
+        $shopConfig = new ShopConfiguration();
+        $shopConfigDao = $this->createMock(ShopConfigurationDaoInterface::class);
+        $shopConfigDao->method('getAll')->willReturn([1 => $shopConfig]);
+        $shopConfigDao->expects($this->never())->method('save');
+
+        $command = $this->makeCommand($shopConfigDao);
+        $app = new Application();
+        $app->add($command);
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['n']);
+        $tester->execute([], ['interactive' => true]);
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────
@@ -218,7 +268,8 @@ class RebuildModuleConfigurationCommandTest extends TestCase
             $shopConfigDao,
             $context ?? $this->makeContext(),
             $metadataDao ?? $this->createMock(ModuleConfigurationDaoInterface::class),
-            $mergingService ?? $this->createMock(ModuleConfigurationMergingServiceInterface::class)
+            $mergingService ?? $this->createMock(ModuleConfigurationMergingServiceInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
@@ -226,6 +277,8 @@ class RebuildModuleConfigurationCommandTest extends TestCase
     {
         $ctx = $this->createMock(BasicContextInterface::class);
         $ctx->method('getModulesPath')->willReturn($this->tmpModulesPath);
+        $ctx->method('getProjectConfigurationDirectory')
+            ->willReturn($this->tmpModulesPath . '/var/configuration/');
         return $ctx;
     }
 
