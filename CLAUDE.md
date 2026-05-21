@@ -30,6 +30,38 @@ All dev workflow skills are **bundled in this repo** at `.claude/skills/` — no
 | `using-git-worktrees` | feature isolation needed | Creates an isolated workspace via git worktree |
 | `/finish` | task complete | Quality gate: cs-fixer + full tests + coverage + memory update |
 
+### Example workflow: building a feature end-to-end
+
+This is the recommended way to tackle any non-trivial feature. You don't need to orchestrate it — just describe your problem and the skills chain together automatically.
+
+**1. Describe the problem in plain language**
+> "Multiple Claude agents are fighting over the same Docker containers. They try to start their own shop but it fails because the port is already taken and the database gets corrupted by the other agent."
+
+Brainstorming kicks in. It explores the codebase and asks targeted questions — each with multiple-choice answers or a free-text option:
+- "How should port conflicts be resolved? A) fixed ports per worktree B) random assignment C) deterministic hash"
+- "Should each worktree get its own database? A) yes B) shared DB with prefixed tables"
+
+**2. Plan review**
+Once brainstorming has enough context it writes a full implementation plan. You read it, push back on anything that looks wrong, and approve it. Nothing gets built until you say yes.
+
+**3. Design doc review**
+For larger features it also writes a design document (architecture, data flow, edge cases). Same drill — review, comment, approve.
+
+**4. Choose execution mode**
+> "Do you want to implement this in the current session or use subagent-driven development?"
+
+Always choose **subagent-driven development**. It creates an isolated git worktree, splits the plan into independent steps, and runs them with dedicated subagents. Each step gets an automatic code review by a separate reviewer agent before the next step starts. The main thread stays clean and you're not blocked while work happens.
+
+**5. Review and iterate**
+When all steps are done, the agent comes back to you with a summary. You test it. If something's broken:
+- Simple fix → it resolves it inline
+- Complex fix with multiple options → back to the planning phase: updated questions, updated plan, your approval, then back into subagent execution
+
+**6. Finish**
+Run `/finish` — cs-fixer, full test suite, coverage check. If anything fails, the task isn't done.
+
+---
+
 ### Plugins (auto-installed)
 
 The repo registers `claude-plugins-official` automatically via `.claude/settings.json`. On first launch Claude Code will install:
