@@ -43,6 +43,8 @@ class TestConfigBuilderTest extends \OxidTestCase
         $reflection = new \ReflectionMethod(TestConfigBuilder::class, 'buildParameters');
         $params = $reflection->getParameters();
         $this->assertCount(1, $params);
-        $this->assertSame('event', $params[0]->getName());
+        $type = $params[0]->getType();
+        $this->assertNotNull($type);
+        $this->assertSame(\Composer\Script\Event::class, $type->getName());
     }
 }
