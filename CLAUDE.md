@@ -62,6 +62,51 @@ Run `/finish` — cs-fixer, full test suite, coverage check. If anything fails, 
 
 ---
 
+### Code review skills
+
+Two skills handle the full review loop — one for requesting a review, one for receiving one.
+
+#### `requesting-code-review`
+
+Dispatches a dedicated reviewer subagent that looks at your changes with fresh eyes — it never sees your session history, only the code diff. This keeps it focused and unbiased.
+
+**When to use it:**
+- After each step in subagent-driven development (catches issues before they compound)
+- Before merging any feature branch
+- When you're stuck and want a second opinion
+
+**How it works:**
+
+The skill gets the base and head commit SHAs, spins up a reviewer subagent with the diff as context, and returns structured feedback:
+- **Critical** — fix immediately before continuing
+- **Important** — fix before merging
+- **Minor** — noted for later
+
+**Example:**
+> "I just finished implementing the port assignment logic. Let me request a code review before moving to the next step."
+
+Claude gets the SHAs, dispatches the reviewer, and brings back the findings. You fix Critical and Important issues, then continue.
+
+---
+
+#### `receiving-code-review`
+
+Use this when you get review feedback — whether from the reviewer subagent, a teammate on GitHub, or a PR comment. It enforces technical rigor instead of blind agreement.
+
+**Core behavior:**
+- Verifies feedback against the actual codebase before implementing anything
+- Pushes back with technical reasoning if the reviewer is wrong or missing context
+- Asks for clarification on unclear items before touching a single line (partial understanding = wrong implementation)
+- Never says "great point!" or "you're absolutely right!" — just fixes things and shows it in the code
+
+**Example — inline PR comment:**
+> A reviewer says "remove this legacy code." Claude checks whether anything still depends on it, finds it's used by a build target, and responds: "This is needed for backward compat on 10.15+. Remove if we're dropping pre-13 support — your call."
+
+**Example — unclear batch feedback:**
+> You say "fix items 1–6." Claude understands 1, 2, 3, 6 but not 4 and 5. Instead of guessing, it stops and asks: "Understand items 1, 2, 3, 6. Need clarification on 4 and 5 before implementing."
+
+---
+
 ### Plugins (auto-installed)
 
 The repo registers `claude-plugins-official` automatically via `.claude/settings.json`. On first launch Claude Code will install:
