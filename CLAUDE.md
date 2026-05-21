@@ -4,7 +4,7 @@ PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
 ## Claude Code Workflow
 
-Workflow skills are bundled in `.claude/skills/` and trigger automatically. See `.claude/superpowers.md` for the full developer guide.
+Workflow skills are bundled in `.claude/skills/` and trigger automatically. See `superpowers.md` in the repo root for the full developer guide.
 
 | Skill | When to use |
 |---|---|
