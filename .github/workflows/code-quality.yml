@@ -137,6 +137,9 @@ jobs:
           echo "::group::Composer Install"
           composer install --prefer-dist --no-progress
           echo "::endgroup::"
+          echo "::group::Install O3-Theme"
+          composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
+          echo "::endgroup::"
           echo "::group::Apt Intall"
           sudo apt-get update
           sudo apt-get install -y libxml2-utils 

@@ -480,7 +480,7 @@ class ArticleDetailsTest extends \OxidTestCase
         try {
             $oArticle = oxNew('oxArticle');
             $oArticle->load($sArtID);
-            $sActPic = $this->getConfig()->getPictureUrl(null) . 'generated/product/1/540_340_75/' . basename($oArticle->oxarticles__oxpic1->value);
+            $sActPic = $this->getConfig()->getPictureUrl(null) . 'generated/product/1/752_633_75/' . basename($oArticle->oxarticles__oxpic1->value);
 
             $oDetails = $this->getMock(\OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class, ['getPicturesProduct']);
             $oDetails->expects($this->once())->method('getPicturesProduct')->will($this->returnValue($oArticle));

@@ -132,7 +132,7 @@ class ConfigTest extends OxidTestCase
         parent::setUpBeforeClass();
 
         $theme = oxNew(Theme::class);
-        $theme->load('wave');
+        $theme->load('o3-theme');
         $theme->activate();
     }
 
@@ -2524,12 +2524,12 @@ class ConfigTest extends OxidTestCase
     {
         $oConfig = oxNew('oxConfig');
         $oConfig->init();
-        $oConfig->setConfigParam('sTheme', 'wave');
+        $oConfig->setConfigParam('sTheme', 'o3-theme');
 
         $sMainURL = $oConfig->getConfigParam('sShopURL');
         $sMallURL = 'http://www.example.com/';
 
-        $sDir = 'out/wave/src/';
+        $sDir = 'out/o3-theme/src/';
 
         $oConfig->setConfigParam('sMallShopURL', $sMallURL);
 

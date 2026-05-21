@@ -4,30 +4,20 @@ PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
 ## Claude Code Workflow
 
-The following dev workflow skills are **bundled in this repo** at `.claude/skills/` — no plugin installation required:
+Workflow skills are bundled in `.claude/skills/` and trigger automatically. See `superpowers.md` in the repo root for the full developer guide.
 
 | Skill | When to use |
 |---|---|
-| `brainstorming` | Before building anything new — explores intent and design |
-| `writing-plans` | Turns a spec into a step-by-step implementation plan |
-| `test-driven-development` | TDD for every feature or bugfix |
+| `brainstorming` | Before building anything new |
+| `writing-plans` | Turns a spec into an implementation plan |
+| `test-driven-development` | Every feature or bugfix |
 | `systematic-debugging` | Any bug, test failure, or unexpected behaviour |
 | `verification-before-completion` | Before claiming work is done |
-| `finishing-a-development-branch` | Wrapping up a branch (merge/PR/discard) |
-| `subagent-driven-development` | Execute plans with parallel subagents + review checkpoints |
-| `/finish` | Quality gate: cs-fixer + full tests + coverage + memory update |
-
-**Recommended additional plugins** (install once, auto-activate for this repo via `.claude/settings.json`):
-
-```bash
-claude plugins add marketplace claude-plugins-official
-```
-
-| Plugin | What it adds |
-|---|---|
-| `superpowers` | Extended skill set (receiving code review, git worktrees, parallel agents) |
-| `feature-dev` | Guided feature development with codebase understanding |
-| `php-lsp` | PHP language server (inline errors, go-to-definition) |
+| `finishing-a-development-branch` | Wrapping up a branch |
+| `subagent-driven-development` | Execute plans with parallel subagents |
+| `requesting-code-review` | Before merging |
+| `receiving-code-review` | After getting review feedback |
+| `/finish` | Quality gate: cs-fixer + full tests + coverage |
 
 ## Quick Start
 
