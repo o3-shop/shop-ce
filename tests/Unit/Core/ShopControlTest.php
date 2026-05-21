@@ -36,16 +36,16 @@ class ShopControlTest extends \OxidTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->originalEnvValue = getenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL');
-        putenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL');
+        $this->originalEnvValue = $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] ?? false;
+        unset($_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL']);
     }
 
     protected function tearDown(): void
     {
         if ($this->originalEnvValue === false) {
-            putenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL');
+            unset($_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL']);
         } else {
-            putenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL=' . $this->originalEnvValue);
+            $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = $this->originalEnvValue;
         }
         parent::tearDown();
     }
@@ -80,7 +80,7 @@ class ShopControlTest extends \OxidTestCase
 
     public function testHandleRoutingExceptionLogsAtConfiguredLevel()
     {
-        putenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL=warning');
+        $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = 'warning';
 
         $logger = $this->makeCaptureLogger();
         Registry::set('logger', $logger);
@@ -95,7 +95,7 @@ class ShopControlTest extends \OxidTestCase
     /** @dataProvider validLogLevels */
     public function testHandleRoutingExceptionAcceptsAllPsr3Levels(string $level)
     {
-        putenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL=' . $level);
+        $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = $level;
 
         $logger = $this->makeCaptureLogger();
         Registry::set('logger', $logger);
@@ -116,7 +116,7 @@ class ShopControlTest extends \OxidTestCase
 
     public function testHandleRoutingExceptionFallsBackToErrorForInvalidLevel()
     {
-        putenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL=not-a-level');
+        $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = 'not-a-level';
 
         $logger = $this->makeCaptureLogger();
         Registry::set('logger', $logger);

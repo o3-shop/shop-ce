@@ -816,13 +816,11 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
     private function resolveUnknownControllerLogLevel(): string
     {
         $validLevels = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'];
-        $configured = (string) getenv('O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL');
+        $configured = strtolower((string) ($_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] ?? ''));
 
-        if ($configured === '' || $configured === false) {
+        if ($configured === '') {
             return 'error';
         }
-
-        $configured = strtolower($configured);
 
         if (!in_array($configured, $validLevels, true)) {
             \OxidEsales\Eshop\Core\Registry::getLogger()->notice(
