@@ -23,7 +23,7 @@ namespace OxidEsales\EshopCommunity\Core;
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
 
-class TestConfigBuilder
+class IncenteevScriptHandlerWrapper
 {
     protected static string $handlerClass = \Incenteev\ParameterHandler\ScriptHandler::class;
 
@@ -31,7 +31,7 @@ class TestConfigBuilder
     {
         if (!class_exists(static::$handlerClass)) {
             $event->getIO()->writeError(
-                'TestConfigBuilder: ' . static::$handlerClass . ' not found, skipping.',
+                'IncenteevScriptHandlerWrapper: ' . static::$handlerClass . ' not found, skipping.',
                 true,
                 IOInterface::VERBOSE
             );

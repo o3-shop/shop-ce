@@ -1,8 +1,8 @@
-# TestConfigBuilder Implementation Plan
+# IncenteevScriptHandlerWrapper Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Create a `TestConfigBuilder` wrapper that delegates to `Incenteev\ParameterHandler\ScriptHandler::buildParameters` on dev installs and silently no-ops on prod (`--no-dev`) installs, eliminating the Composer autoload warning.
+**Goal:** Create a `IncenteevScriptHandlerWrapper` wrapper that delegates to `Incenteev\ParameterHandler\ScriptHandler::buildParameters` on dev installs and silently no-ops on prod (`--no-dev`) installs, eliminating the Composer autoload warning.
 
 **Architecture:** A single static wrapper class in `source/Core/` mirrors the pattern of `ShopVersionGenerator`. `composer.json` scripts are updated to call the wrapper instead of the Incenteev class directly.
 
@@ -13,7 +13,7 @@
 ### Task 1: Write the failing test
 
 **Files:**
-- Create: `tests/Unit/Core/TestConfigBuilderTest.php`
+- Create: `tests/Unit/Core/IncenteevScriptHandlerWrapperTest.php`
 
 - [ ] **Step 1: Create the test file**
 
@@ -40,27 +40,27 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
-use OxidEsales\EshopCommunity\Core\TestConfigBuilder;
+use OxidEsales\EshopCommunity\Core\IncenteevScriptHandlerWrapper;
 
-class TestConfigBuilderTest extends \OxidTestCase
+class IncenteevScriptHandlerWrapperTest extends \OxidTestCase
 {
     public function testBuildParametersMethodExists(): void
     {
         $this->assertTrue(
-            method_exists(TestConfigBuilder::class, 'buildParameters'),
-            'TestConfigBuilder::buildParameters must exist'
+            method_exists(IncenteevScriptHandlerWrapper::class, 'buildParameters'),
+            'IncenteevScriptHandlerWrapper::buildParameters must exist'
         );
     }
 
     public function testBuildParametersIsStatic(): void
     {
-        $reflection = new \ReflectionMethod(TestConfigBuilder::class, 'buildParameters');
+        $reflection = new \ReflectionMethod(IncenteevScriptHandlerWrapper::class, 'buildParameters');
         $this->assertTrue($reflection->isStatic(), 'buildParameters must be a static method');
     }
 
     public function testBuildParametersAcceptsComposerEvent(): void
     {
-        $reflection = new \ReflectionMethod(TestConfigBuilder::class, 'buildParameters');
+        $reflection = new \ReflectionMethod(IncenteevScriptHandlerWrapper::class, 'buildParameters');
         $params = $reflection->getParameters();
         $this->assertCount(1, $params);
         $this->assertSame('event', $params[0]->getName());
@@ -68,22 +68,22 @@ class TestConfigBuilderTest extends \OxidTestCase
 }
 ```
 
-Save to `tests/Unit/Core/TestConfigBuilderTest.php`.
+Save to `tests/Unit/Core/IncenteevScriptHandlerWrapperTest.php`.
 
 - [ ] **Step 2: Run the test to confirm it fails**
 
 ```bash
-./docker.sh test --fast tests/Unit/Core/TestConfigBuilderTest.php
+./docker.sh test --fast tests/Unit/Core/IncenteevScriptHandlerWrapperTest.php
 ```
 
-Expected output: error about class `TestConfigBuilder` not found. (Not a FAIL — a fatal class-not-found error is expected here.)
+Expected output: error about class `IncenteevScriptHandlerWrapper` not found. (Not a FAIL — a fatal class-not-found error is expected here.)
 
 ---
 
-### Task 2: Create TestConfigBuilder
+### Task 2: Create IncenteevScriptHandlerWrapper
 
 **Files:**
-- Create: `source/Core/TestConfigBuilder.php`
+- Create: `source/Core/IncenteevScriptHandlerWrapper.php`
 
 - [ ] **Step 1: Create the class**
 
@@ -112,7 +112,7 @@ namespace OxidEsales\EshopCommunity\Core;
 
 use Composer\Script\Event;
 
-class TestConfigBuilder
+class IncenteevScriptHandlerWrapper
 {
     public static function buildParameters(Event $event): void
     {
@@ -124,12 +124,12 @@ class TestConfigBuilder
 }
 ```
 
-Save to `source/Core/TestConfigBuilder.php`.
+Save to `source/Core/IncenteevScriptHandlerWrapper.php`.
 
 - [ ] **Step 2: Run the test to confirm it passes**
 
 ```bash
-./docker.sh test --fast tests/Unit/Core/TestConfigBuilderTest.php
+./docker.sh test --fast tests/Unit/Core/IncenteevScriptHandlerWrapperTest.php
 ```
 
 Expected: all 3 tests PASS, 0 failures.
@@ -137,8 +137,8 @@ Expected: all 3 tests PASS, 0 failures.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add source/Core/TestConfigBuilder.php tests/Unit/Core/TestConfigBuilderTest.php
-git commit -m "feat(#157): add TestConfigBuilder wrapper to silence --no-dev composer warning
+git add source/Core/IncenteevScriptHandlerWrapper.php tests/Unit/Core/IncenteevScriptHandlerWrapperTest.php
+git commit -m "feat(#157): add IncenteevScriptHandlerWrapper wrapper to silence --no-dev composer warning
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 ```
@@ -161,7 +161,7 @@ Old (appears twice — in `post-install-cmd` and `post-update-cmd`):
 
 New:
 ```
-"OxidEsales\\EshopCommunity\\Core\\TestConfigBuilder::buildParameters",
+"OxidEsales\\EshopCommunity\\Core\\IncenteevScriptHandlerWrapper::buildParameters",
 ```
 
 The resulting `scripts` block should look like:
@@ -170,12 +170,12 @@ The resulting `scripts` block should look like:
 "scripts": {
     "post-install-cmd": [
         "OxidEsales\\EshopCommunity\\Core\\ShopVersionGenerator::generate",
-        "OxidEsales\\EshopCommunity\\Core\\TestConfigBuilder::buildParameters",
+        "OxidEsales\\EshopCommunity\\Core\\IncenteevScriptHandlerWrapper::buildParameters",
         "@oe:ide-helper:generate"
     ],
     "post-update-cmd": [
         "OxidEsales\\EshopCommunity\\Core\\ShopVersionGenerator::generate",
-        "OxidEsales\\EshopCommunity\\Core\\TestConfigBuilder::buildParameters",
+        "OxidEsales\\EshopCommunity\\Core\\IncenteevScriptHandlerWrapper::buildParameters",
         "@oe:ide-helper:generate"
     ],
     ...
@@ -194,7 +194,7 @@ Expected: `OK`
 
 ```bash
 git add composer.json
-git commit -m "fix(#157): route composer scripts through TestConfigBuilder wrapper
+git commit -m "fix(#157): route composer scripts through IncenteevScriptHandlerWrapper wrapper
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 ```
@@ -215,8 +215,8 @@ Expected: all tests pass, 0 failures, 0 errors. cs-fixer should report no change
 
 ```bash
 # Only run if Step 1 reported cs-fixer fixes
-git add source/Core/TestConfigBuilder.php
-git commit -m "style: apply cs-fixer to TestConfigBuilder
+git add source/Core/IncenteevScriptHandlerWrapper.php
+git commit -m "style: apply cs-fixer to IncenteevScriptHandlerWrapper
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 ```

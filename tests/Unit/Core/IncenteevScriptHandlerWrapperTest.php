@@ -21,27 +21,27 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
 use Composer\IO\IOInterface;
-use OxidEsales\EshopCommunity\Core\TestConfigBuilder;
+use OxidEsales\EshopCommunity\Core\IncenteevScriptHandlerWrapper;
 
-class TestConfigBuilderTest extends \OxidTestCase
+class IncenteevScriptHandlerWrapperTest extends \OxidTestCase
 {
     public function testBuildParametersMethodExists(): void
     {
         $this->assertTrue(
-            method_exists(TestConfigBuilder::class, 'buildParameters'),
-            'TestConfigBuilder::buildParameters must exist'
+            method_exists(IncenteevScriptHandlerWrapper::class, 'buildParameters'),
+            'IncenteevScriptHandlerWrapper::buildParameters must exist'
         );
     }
 
     public function testBuildParametersIsStatic(): void
     {
-        $reflection = new \ReflectionMethod(TestConfigBuilder::class, 'buildParameters');
+        $reflection = new \ReflectionMethod(IncenteevScriptHandlerWrapper::class, 'buildParameters');
         $this->assertTrue($reflection->isStatic(), 'buildParameters must be a static method');
     }
 
     public function testBuildParametersAcceptsComposerEvent(): void
     {
-        $reflection = new \ReflectionMethod(TestConfigBuilder::class, 'buildParameters');
+        $reflection = new \ReflectionMethod(IncenteevScriptHandlerWrapper::class, 'buildParameters');
         $params = $reflection->getParameters();
         $this->assertCount(1, $params);
         $type = $params[0]->getType();
@@ -51,7 +51,7 @@ class TestConfigBuilderTest extends \OxidTestCase
 
     public function testBuildParametersReturnsEarlyWhenHandlerClassAbsent(): void
     {
-        $builder = new class () extends TestConfigBuilder {
+        $builder = new class () extends IncenteevScriptHandlerWrapper {
             protected static string $handlerClass = 'NonExistent\\Handler\\ThatDoesNotExist';
         };
 
@@ -67,24 +67,23 @@ class TestConfigBuilderTest extends \OxidTestCase
 
     public function testBuildParametersDelegatesToHandlerWhenPresent(): void
     {
-        $called = false;
-        $builder = new class () extends TestConfigBuilder {
+        $builder = new class () extends IncenteevScriptHandlerWrapper {
             public static bool $called = false;
 
-            protected static string $handlerClass = TestHandlerDouble::class;
+            protected static string $handlerClass = IncenteevHandlerDouble::class;
         };
 
         $event = $this->createMock(\Composer\Script\Event::class);
         $event->expects($this->never())->method('getIO');
 
-        TestHandlerDouble::$called = false;
+        IncenteevHandlerDouble::$called = false;
         $builder::buildParameters($event);
 
-        $this->assertTrue(TestHandlerDouble::$called, 'Handler double must have been called');
+        $this->assertTrue(IncenteevHandlerDouble::$called, 'Handler double must have been called');
     }
 }
 
-class TestHandlerDouble
+class IncenteevHandlerDouble
 {
     public static bool $called = false;
 

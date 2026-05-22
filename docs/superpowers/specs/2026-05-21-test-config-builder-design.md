@@ -1,4 +1,4 @@
-# TestConfigBuilder — fix Composer warning on --no-dev install
+# IncenteevScriptHandlerWrapper — fix Composer warning on --no-dev install
 
 **Issue:** o3-shop/o3-shop#157  
 **Date:** 2026-05-21
@@ -9,9 +9,9 @@
 
 ## Solution
 
-### 1. Wrapper class — `source/Core/TestConfigBuilder.php`
+### 1. Wrapper class — `source/Core/IncenteevScriptHandlerWrapper.php`
 
-New class `OxidEsales\EshopCommunity\Core\TestConfigBuilder` following the pattern of `ShopVersionGenerator`:
+New class `OxidEsales\EshopCommunity\Core\IncenteevScriptHandlerWrapper` following the pattern of `ShopVersionGenerator`:
 
 - Static `buildParameters(Event $event): void` method
 - Guards with `class_exists(\Incenteev\ParameterHandler\ScriptHandler::class)`
@@ -24,14 +24,14 @@ Replace both `post-install-cmd` and `post-update-cmd` entries:
 
 ```
 - "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
-+ "OxidEsales\\EshopCommunity\\Core\\TestConfigBuilder::buildParameters"
++ "OxidEsales\\EshopCommunity\\Core\\IncenteevScriptHandlerWrapper::buildParameters"
 ```
 
 No other changes to `composer.json`.
 
 ## Testing
 
-`tests/Unit/Core/TestConfigBuilderTest.php`:
+`tests/Unit/Core/IncenteevScriptHandlerWrapperTest.php`:
 
 - Verifies `buildParameters` exists and is callable as a static method
 - Verifies it does not throw when Incenteev's class is present (integration-style assertion)
