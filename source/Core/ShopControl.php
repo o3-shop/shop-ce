@@ -59,6 +59,9 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      */
     protected $_blMainTasksExecuted = null;
 
+    /** @var bool Prevents duplicate logging when a routing exception was already logged in handleRoutingException(). */
+    protected $routingExceptionHandled = false;
+
     /**
      * Profiler start time
      *
@@ -775,7 +778,9 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
      */
     protected function _handleSystemException($exception) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $exception->debugOut();
+        if (!$this->routingExceptionHandled) {
+            $exception->debugOut();
+        }
 
         if ($this->_isDebugMode()) {
             \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay($exception);
@@ -796,6 +801,35 @@ class ShopControl extends \OxidEsales\Eshop\Core\Base
          * @todo after removal of the BC layer this method will retrow the exception
          * throw $exception
          */
+        $this->routingExceptionHandled = true;
+
+        $level = $this->resolveUnknownControllerLogLevel();
+        \OxidEsales\Eshop\Core\Registry::getLogger()->$level(
+            __METHOD__ . " - Request for unknown controller key '" . $exception->getMessage() . "'."
+        );
+    }
+
+    /**
+     * Returns the PSR-3 log level to use when an unknown controller key is requested.
+     * Reads O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL; defaults to 'error'.
+     */
+    private function resolveUnknownControllerLogLevel(): string
+    {
+        $validLevels = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'];
+        $configured = strtolower((string) ($_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] ?? ''));
+
+        if ($configured === '') {
+            return 'error';
+        }
+
+        if (!in_array($configured, $validLevels, true)) {
+            \OxidEsales\Eshop\Core\Registry::getLogger()->notice(
+                __METHOD__ . " - Invalid value '$configured' for O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL. Falling back to 'error'."
+            );
+            return 'error';
+        }
+
+        return $configured;
     }
 
     /**

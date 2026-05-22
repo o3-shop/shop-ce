@@ -21,9 +21,34 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
+use OxidEsales\Eshop\Core\Exception\RoutingException;
+use OxidEsales\Eshop\Core\Exception\SystemComponentException;
+use OxidEsales\Eshop\Core\Registry;
+use Psr\Log\AbstractLogger;
+
 class ShopControlTest extends \OxidTestCase
 {
     use \OxidEsales\EshopCommunity\Tests\Unit\ExitHandlerTestTrait;
+
+    /** @var string|false */
+    private $originalEnvValue;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->originalEnvValue = $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] ?? false;
+        unset($_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL']);
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->originalEnvValue === false) {
+            unset($_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL']);
+        } else {
+            $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = $this->originalEnvValue;
+        }
+        parent::tearDown();
+    }
 
     public function testHandleAccessDeniedExceptionRoutesThroughExitHandler()
     {
@@ -39,5 +64,126 @@ class ShopControlTest extends \OxidTestCase
             $this->assertSame('nope', $e->getExitMessage());
             $this->assertSame(0, $e->getCode());
         }
+    }
+
+    public function testHandleRoutingExceptionLogsAtErrorLevelByDefault()
+    {
+        $logger = $this->makeCaptureLogger();
+        Registry::set('logger', $logger);
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+        $control->handleRoutingException(new RoutingException('no-such-key'));
+
+        $this->assertCount(1, $logger->captured);
+        $this->assertSame('error', $logger->captured[0]['level']);
+    }
+
+    public function testHandleRoutingExceptionLogsAtConfiguredLevel()
+    {
+        $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = 'warning';
+
+        $logger = $this->makeCaptureLogger();
+        Registry::set('logger', $logger);
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+        $control->handleRoutingException(new RoutingException('no-such-key'));
+
+        $this->assertCount(1, $logger->captured);
+        $this->assertSame('warning', $logger->captured[0]['level']);
+    }
+
+    /** @dataProvider validLogLevels */
+    public function testHandleRoutingExceptionAcceptsAllPsr3Levels(string $level)
+    {
+        $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = $level;
+
+        $logger = $this->makeCaptureLogger();
+        Registry::set('logger', $logger);
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+        $control->handleRoutingException(new RoutingException('no-such-key'));
+
+        $this->assertSame($level, $logger->captured[0]['level']);
+    }
+
+    public function validLogLevels(): array
+    {
+        return [
+            ['debug'], ['info'], ['notice'], ['warning'],
+            ['error'], ['critical'], ['alert'], ['emergency'],
+        ];
+    }
+
+    public function testHandleRoutingExceptionFallsBackToErrorForInvalidLevel()
+    {
+        $_ENV['O3SHOP_CONF_UNKNOWN_CONTROLLER_LOG_LEVEL'] = 'not-a-level';
+
+        $logger = $this->makeCaptureLogger();
+        Registry::set('logger', $logger);
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+        $control->handleRoutingException(new RoutingException('no-such-key'));
+
+        $levels = array_column($logger->captured, 'level');
+        $this->assertContains('notice', $levels, 'Expected a notice about the invalid level.');
+        $this->assertContains('error', $levels, 'Expected the routing failure logged at error (fallback).');
+    }
+
+    public function testHandleRoutingExceptionMessageContainsControllerKey()
+    {
+        $logger = $this->makeCaptureLogger();
+        Registry::set('logger', $logger);
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+        $control->handleRoutingException(new RoutingException('my-bad-key'));
+
+        $this->assertStringContainsString('my-bad-key', $logger->captured[0]['message']);
+    }
+
+    public function testHandleSystemExceptionSkipsDebugOutWhenRoutingWasAlreadyHandled()
+    {
+        $this->installFakeExitHandler();
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+        $control->setNonPublicVar('routingExceptionHandled', true);
+
+        $exception = $this->getMockBuilder(SystemComponentException::class)->getMock();
+        $exception->expects($this->never())->method('debugOut');
+
+        try {
+            $control->_handleSystemException($exception);
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            // redirect triggers exit — that is expected in production mode
+        }
+    }
+
+    public function testHandleSystemExceptionCallsDebugOutWhenNotARoutingFailure()
+    {
+        $this->installFakeExitHandler();
+
+        $control = $this->getProxyClass(\OxidEsales\Eshop\Core\ShopControl::class);
+
+        $exception = $this->getMockBuilder(SystemComponentException::class)->getMock();
+        $exception->expects($this->once())->method('debugOut');
+
+        try {
+            $control->_handleSystemException($exception);
+        } catch (\OxidEsales\Eshop\Core\Exception\ExitCalledException $e) {
+            // redirect triggers exit — that is expected in production mode
+        }
+    }
+
+    // -------------------------------------------------------------------------
+
+    private function makeCaptureLogger(): object
+    {
+        return new class () extends AbstractLogger {
+            public array $captured = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->captured[] = ['level' => $level, 'message' => $message, 'context' => $context];
+            }
+        };
     }
 }

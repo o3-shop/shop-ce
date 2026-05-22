@@ -190,6 +190,8 @@ run_php_cs_fixer() {
       echo -e "${RED}php-cs-fixer not found in shop container. Please install it!${NC}"
       exit 1
   fi
+
+  cd "$MY_DIR"
 }
 
 run_quarantine_tests() {
@@ -279,6 +281,8 @@ run_npm_audits() {
       fi
       echo -e "${GREEN}✓ npm audit clean for ${theme}.${NC}"
   done
+
+  cd "$MY_DIR"
 }
 
 run_full_test_with_cs_fixer() {
@@ -308,7 +312,10 @@ run_full_test_with_coverage() {
   echo "---------------------------"
   echo "Checking coverage threshold:"
   echo "---------------------------"
-  docker exec -i o3shop-app php /var/www/html/bin/check-coverage-threshold.php \
+
+  check_docker_compose
+
+  $DOCKER_COMPOSE exec shop php /var/www/html/bin/check-coverage-threshold.php \
     --clover /var/www/html/coverage/coverage.xml \
     --threshold "${COVERAGE_THRESHOLD:-90}"
 }

@@ -18,6 +18,7 @@ Workflow skills are bundled in `.claude/skills/` and trigger automatically. See 
 | `requesting-code-review` | Before merging |
 | `receiving-code-review` | After getting review feedback |
 | `/finish` | Quality gate: cs-fixer + full tests + coverage |
+| `/push-pr` | Only if the user prompt to run it |
 
 ## Quick Start
 
@@ -45,6 +46,12 @@ Adminer: http://localhost:8081 | Mailpit: http://localhost:8025
 | `./docker.sh quarantine` | Run slow/special quarantine tests only |
 
 Coverage reports land in `coverage/` (clover XML, HTML, JUnit XML).
+
+Always pull up your own docker environment with `./docker.sh start` before running any commands. The `test` commands assume the environment is up and will fail if it's not.
+
+If you want to run any `docker exec ...` command manually, pull up your own container and run it inside it. The naming is following: o3shop-{worktree-name}-1. For example, if your worktree is `feature/123-new-feature`, the container will be `o3shop-feature-123-new-feature-1`.
+
+Should your own docker environment not work, say it to me, I fix it for you.
 
 ## Project Structure
 

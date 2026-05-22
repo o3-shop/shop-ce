@@ -96,3 +96,4 @@ oxideshop.log
 # pre-archive path (now archived to openspec/changes/archive/...).
 # Tracked in archive; not in active openspec/changes.
 /openspec/changes/fix-internal-shim-call-sites/
+/.claude/worktrees/*
