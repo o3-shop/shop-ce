@@ -193,6 +193,14 @@ EOF
             || handle_error "Failed to remove composer-installed ${symlink_path}"
     fi
 
+    # PHP resolves __DIR__ to the real path of the git clone, so the
+    # testing-library's three-level-up vendor path calculation misses.
+    # A vendor symlink makes the fallback path resolve to the shop's vendor/.
+    if [ ! -e "$satellite_dir/vendor" ]; then
+        ln -s "../vendor" "$satellite_dir/vendor" \
+            || handle_error "Failed to create ${satellite_dir}/vendor symlink"
+    fi
+
     if [ ! -e "$symlink_path" ]; then
         mkdir -p "$(dirname "$symlink_path")" \
             || handle_error "Failed to create $(dirname "$symlink_path")"
