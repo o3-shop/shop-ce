@@ -7,8 +7,6 @@
 
 `composer.json` scripts reference `Incenteev\ParameterHandler\ScriptHandler::buildParameters` in both `post-install-cmd` and `post-update-cmd`. The package is declared in `require-dev`. On `composer install --no-dev` (production deployments), Composer cannot autoload the class and emits a warning, even though the install succeeds.
 
-A secondary issue: `testing-library/test_config.yml.dist` has a stale `additional_test_paths` value pointing at pre-fork OXID EE/PE vendor paths.
-
 ## Solution
 
 ### 1. Wrapper class — `source/Core/TestConfigBuilder.php`
@@ -30,17 +28,6 @@ Replace both `post-install-cmd` and `post-update-cmd` entries:
 ```
 
 No other changes to `composer.json`.
-
-### 3. Fix stale dist default
-
-In `testing-library/test_config.yml.dist`, change:
-
-```yaml
-- additional_test_paths: 'vendor/oxid-esales/oxideshop-ee/Tests,vendor/oxid-esales/oxideshop-pe/Tests'
-+ additional_test_paths: ''
-```
-
-These paths point to OXID Enterprise/Professional Edition which do not exist in o3-shop. Non-interactive installs silently inherit them, which is incorrect.
 
 ## Testing
 

@@ -20,6 +20,7 @@
 
 namespace OxidEsales\EshopCommunity\Core;
 
+use Composer\IO\IOInterface;
 use Composer\Script\Event;
 
 class TestConfigBuilder
@@ -29,6 +30,11 @@ class TestConfigBuilder
     public static function buildParameters(Event $event): void
     {
         if (!class_exists(static::$handlerClass)) {
+            $event->getIO()->writeError(
+                'TestConfigBuilder: ' . static::$handlerClass . ' not found, skipping.',
+                true,
+                IOInterface::VERBOSE
+            );
             return;
         }
         (static::$handlerClass)::buildParameters($event);

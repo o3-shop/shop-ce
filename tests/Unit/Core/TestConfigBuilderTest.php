@@ -20,6 +20,7 @@
 
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 
+use Composer\IO\IOInterface;
 use OxidEsales\EshopCommunity\Core\TestConfigBuilder;
 
 class TestConfigBuilderTest extends \OxidTestCase
@@ -54,10 +55,41 @@ class TestConfigBuilderTest extends \OxidTestCase
             protected static string $handlerClass = 'NonExistent\\Handler\\ThatDoesNotExist';
         };
 
+        $io = $this->createMock(IOInterface::class);
+        $io->expects($this->once())->method('writeError');
+
         $event = $this->createMock(\Composer\Script\Event::class);
+        $event->method('getIO')->willReturn($io);
         $event->expects($this->never())->method('getComposer');
 
         $builder::buildParameters($event);
-        $this->addToAssertionCount(1);
+    }
+
+    public function testBuildParametersDelegatesToHandlerWhenPresent(): void
+    {
+        $called = false;
+        $builder = new class () extends TestConfigBuilder {
+            public static bool $called = false;
+
+            protected static string $handlerClass = TestHandlerDouble::class;
+        };
+
+        $event = $this->createMock(\Composer\Script\Event::class);
+        $event->expects($this->never())->method('getIO');
+
+        TestHandlerDouble::$called = false;
+        $builder::buildParameters($event);
+
+        $this->assertTrue(TestHandlerDouble::$called, 'Handler double must have been called');
+    }
+}
+
+class TestHandlerDouble
+{
+    public static bool $called = false;
+
+    public static function buildParameters(\Composer\Script\Event $event): void
+    {
+        self::$called = true;
     }
 }

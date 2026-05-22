@@ -4,7 +4,7 @@
 
 **Goal:** Create a `TestConfigBuilder` wrapper that delegates to `Incenteev\ParameterHandler\ScriptHandler::buildParameters` on dev installs and silently no-ops on prod (`--no-dev`) installs, eliminating the Composer autoload warning.
 
-**Architecture:** A single static wrapper class in `source/Core/` mirrors the pattern of `ShopVersionGenerator`. `composer.json` scripts are updated to call the wrapper instead of the Incenteev class directly. The stale `additional_test_paths` default in `testing-library/test_config.yml.dist` is cleared.
+**Architecture:** A single static wrapper class in `source/Core/` mirrors the pattern of `ShopVersionGenerator`. `composer.json` scripts are updated to call the wrapper instead of the Incenteev class directly.
 
 **Tech Stack:** PHP 7.4+, PHPUnit 9, Composer scripts API (`Composer\Script\Event`)
 
@@ -201,51 +201,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 ---
 
-### Task 4: Fix stale dist default
-
-**Files:**
-- Modify: `testing-library/test_config.yml.dist`
-
-- [ ] **Step 1: Clear the stale additional_test_paths value**
-
-In `testing-library/test_config.yml.dist`, find the line near the bottom:
-
-```yaml
-    additional_test_paths: 'vendor/oxid-esales/oxideshop-ee/Tests,vendor/oxid-esales/oxideshop-pe/Tests'
-```
-
-Change it to:
-
-```yaml
-    additional_test_paths: ''
-```
-
-- [ ] **Step 2: Verify the file is valid YAML**
-
-```bash
-php -r "
-\$yaml = file_get_contents('testing-library/test_config.yml.dist');
-\$result = yaml_parse(\$yaml);
-echo \$result !== false ? 'OK' : 'INVALID';
-"
-```
-
-Expected: `OK`
-
-If `yaml_parse` is not available, visually confirm the indentation is correct (2-space indent, consistent with the rest of the file).
-
-- [ ] **Step 3: Commit**
-
-```bash
-git add testing-library/test_config.yml.dist
-git commit -m "fix(#157): clear stale OXID EE/PE paths from test_config dist defaults
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
-```
-
----
-
-### Task 5: Run full test suite
+### Task 4: Run full test suite
 
 - [ ] **Step 1: Run full tests with coverage**
 
