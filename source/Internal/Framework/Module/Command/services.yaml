@@ -31,3 +31,8 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\ClearCacheCommand
     tags:
       - { name: 'console.command', command: 'oe:cache:clear' }
+
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Command\RebuildModuleConfigurationCommand:
+    class: OxidEsales\EshopCommunity\Internal\Framework\Module\Command\RebuildModuleConfigurationCommand
+    tags:
+      - { name: 'console.command', command: 'oe:module:rebuild-configuration' }

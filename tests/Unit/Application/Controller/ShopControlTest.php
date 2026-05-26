@@ -127,7 +127,7 @@ class ShopControlTest extends \OxidTestCase
         $oxUtilsView->expects($this->never())->method('addErrorToDisplay')->with($componentException);
         oxTestModules::addModuleObject('oxUtilsView', $oxUtilsView);
 
-        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['_runOnce', '_process'], [], '', false);
+        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['_runOnce', '_process', 'handleRoutingException'], [], '', false);
         $oControl->expects($this->any())->method('_process')->will($this->throwException($componentException));
 
         $oControl->start('classToLoad', 'functionToLoad');
@@ -208,7 +208,7 @@ class ShopControlTest extends \OxidTestCase
         $oMockEx = $this->getMock(\OxidEsales\Eshop\Core\Exception\StandardException::class, ['debugOut']);
         $oMockEx->expects($this->once())->method('debugOut')->will($this->throwException(new oxException('log debug')));
 
-        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['getConfig', '_runOnce', '_process', '_isDebugMode', 'getStartControllerKey'], [], '', false, false, true);
+        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['getConfig', '_runOnce', '_process', '_isDebugMode', 'getStartControllerKey', 'handleRoutingException'], [], '', false, false, true);
         $oControl->expects($this->any())->method('getConfig');
         $oControl->expects($this->any())->method('_runOnce');
         $oControl->expects($this->once())->method('getStartControllerKey')->will($this->returnValue('testClass'));
@@ -633,7 +633,7 @@ class ShopControlTest extends \OxidTestCase
         $oView->expects($this->never())->method('executeFunction');
         $oView->expects($this->once())->method('getFncName')->will($this->returnValue($sFNC));
 
-        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['_initializeViewObject', '_handleSystemException']);
+        $oControl = $this->getMock(\OxidEsales\Eshop\Core\ShopControl::class, ['_initializeViewObject', '_handleSystemException', 'handleRoutingException']);
         $oControl->expects($this->once())->method('_initializeViewObject')->with($sCL, $sFNC, null, null)->will($this->returnValue($oView));
         $oControl->expects($this->once())->method('_handleSystemException')->with($oProtectedMethodException)->will($this->returnValue(true));
 

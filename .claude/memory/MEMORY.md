@@ -23,3 +23,4 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [Testing Patterns](testing-patterns.md) — PHPUnit setup, mocking, test structure conventions
 - [!] [Theme repos are external](architecture_theme-repos.md) — wave + o3-theme live in separate GitHub repos; their dirs in shop-ce are gitignored snapshots
 - [!] [o3-theme migration](project_o3-theme-migration.md) — wave → o3-theme cutover before 2026-05-01; keep new storefront templates portable
+- [o3-theme npm audit](project_o3-theme-dep-audit.md) — pre-existing brace-expansion vulnerability blocks test-all-coverage; use test --fast for PHP-only changes
