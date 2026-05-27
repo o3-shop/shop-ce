@@ -29,7 +29,7 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Tag;
  */
 final class TagCutResult
 {
-    public const SOURCE_SHOP_VERBATIM = 'shop-ce-verbatim';
+    public const SOURCE_SHOP_VERBATIM = 'shop-version-verbatim';
     public const SOURCE_FLAG = 'flag';
     public const SOURCE_NEXT_BUMP_FILE = 'next-bump-file';
     public const SOURCE_DEFAULT_PATCH = 'default-patch';

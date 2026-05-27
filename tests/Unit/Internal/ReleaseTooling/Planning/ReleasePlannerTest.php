@@ -153,10 +153,12 @@ class ReleasePlannerTest extends TestCase
             $byPackage[$c->package()] = $c;
         }
 
-        // The metapackage is a first-class release candidate.
+        // The metapackage is a first-class release candidate, tagged at the
+        // shop version (--to verbatim) in lockstep with shop-ce / o3-shop.
         $this->assertArrayHasKey('o3-shop/shop-metapackage-ce', $byPackage);
         $this->assertSame('cut-new-tag', $byPackage['o3-shop/shop-metapackage-ce']->caseLabel());
         $metaChosen = $byPackage['o3-shop/shop-metapackage-ce']->chosenVersion();
+        $this->assertSame('v1.6.1-RC1', $metaChosen, 'metapackage tags at --to verbatim');
 
         // shop-ce uses --to verbatim.
         $this->assertSame('v1.6.1-RC1', $byPackage['o3-shop/shop-ce']->chosenVersion());
@@ -225,9 +227,9 @@ class ReleasePlannerTest extends TestCase
             ]
         );
 
-        // --bump pins the forced metapackage cut to an exact version so the
-        // assertion does not depend on RC patch-bump semantics.
-        $plan = $planner->plan('v1.6.0', 'v1.6.1-RC8', ['shop-metapackage-ce' => 'v1.6.1-RC8']);
+        // No --bump needed: the metapackage tags at --to verbatim, so the
+        // forced re-tag lands at the shop version (v1.6.1-RC8).
+        $plan = $planner->plan('v1.6.0', 'v1.6.1-RC8', []);
 
         $byPackage = [];
         foreach ($plan->candidates() as $c) {

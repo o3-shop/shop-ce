@@ -51,6 +51,24 @@ class TagCutterTest extends TestCase
         $this->assertFalse($result->deleteNextBumpFile());
     }
 
+    /* ---------- shop-metapackage-ce uses --to verbatim (lockstep) ---------- */
+
+    public function testMetapackageAlwaysGetsToVerbatim(): void
+    {
+        // The metapackage is the compilation; it ships at the shop version.
+        // --to verbatim beats any --bump flag, just like shop-ce.
+        $result = $this->cutter()->cut(
+            'o3-shop/shop-metapackage-ce',
+            'v1.6.1-RC5',
+            'v1.6.1-RC8',
+            ['shop-metapackage-ce' => 'major'], // ignored: verbatim beats flag
+            'b-1.6'
+        );
+        $this->assertSame('v1.6.1-RC8', $result->newTag());
+        $this->assertSame(TagCutResult::SOURCE_SHOP_VERBATIM, $result->source());
+        $this->assertFalse($result->deleteNextBumpFile());
+    }
+
     /* ---------- 7.2 + 7.7 — default patch ---------- */
 
     public function testDefaultPatchBumpsLatestPatchByOne(): void

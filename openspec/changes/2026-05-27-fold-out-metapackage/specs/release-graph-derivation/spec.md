@@ -46,6 +46,42 @@ not declared anywhere; they emerge from the sort.
 - **THEN** `shop-metapackage-ce` is one tier below `o3-shop`, and
   `o3-shop` is at the highest tier
 
+### Requirement: Tag-cutting policy — shop-ce uses --to verbatim
+
+The CLI SHALL tag both `o3-shop/shop-ce` and `o3-shop/shop-metapackage-ce`
+at exactly the `--to` value. Both ARE the shop release — the code
+(`shop-ce`) and the compilation (`shop-metapackage-ce`) move in lockstep
+with the shop version. This rule is unconditional: it takes precedence over
+a `--bump` flag or a `.next-bump` file.
+
+#### Scenario: Cutting shop-ce v1.6.2
+
+- **WHEN** the CLI cuts a new tag on `shop-ce` during a release with
+  `--to v1.6.2`
+- **THEN** the new shop-ce tag is `v1.6.2`
+
+#### Scenario: Cutting the metapackage at the shop version
+
+- **WHEN** the CLI cuts a new tag on `o3-shop/shop-metapackage-ce`
+  during a release with `--to v1.6.2`, even when
+  `--bump shop-metapackage-ce=<other>` is supplied
+- **THEN** the new metapackage tag is `v1.6.2`
+
+### Requirement: Tag-cutting policy — every other repo bumps own line
+
+The CLI SHALL tag any repo other than `o3-shop/shop-ce` and
+`o3-shop/shop-metapackage-ce` by bumping its current latest tag on its own
+version line, with the bump level resolved by precedence: a
+`--bump <repo>=<level>` flag, then a `.next-bump` file at the repo's
+release-branch root, then a default `patch`.
+
+#### Scenario: Default patch bump
+
+- **WHEN** the CLI cuts a new tag on `testing-library` whose latest
+  tag is `v1.2.5`, no flag is passed for it, and no `.next-bump` file
+  exists
+- **THEN** the new tag is `v1.2.6`
+
 ## REMOVED Requirements
 
 ### Requirement: Pre-fold-in `--from` triggers metapackage indirection

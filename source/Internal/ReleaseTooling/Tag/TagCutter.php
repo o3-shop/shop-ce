@@ -28,7 +28,10 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\RawRepoFileFetche
 /**
  * Algorithm Step 4: decide what new tag to cut for a candidate.
  *
- *   shop-ce              → --to verbatim (the shop tag IS the shop version)
+ *   shop-ce, shop-metapackage-ce → --to verbatim. Both ARE the shop
+ *                          release — the code (shop-ce) and the
+ *                          compilation (shop-metapackage-ce) move in
+ *                          lockstep with the shop version.
  *   any other candidate  → bump latest_tag by level resolved with
  *                          precedence: --bump flag > .next-bump file > patch
  *
@@ -43,6 +46,7 @@ class TagCutter
 {
     public const O3_SHOP_PREFIX = 'o3-shop/';
     public const SHOP_CE_PACKAGE = 'o3-shop/shop-ce';
+    public const METAPACKAGE_PACKAGE = 'o3-shop/shop-metapackage-ce';
     public const NEXT_BUMP_PATH = '.next-bump';
 
     private RawRepoFileFetcher $fileFetcher;
@@ -55,7 +59,7 @@ class TagCutter
     /**
      * @param string                    $package     e.g. "o3-shop/shop-facts"
      * @param string|null               $latestTag   highest semver tag on the repo (null = no tags yet)
-     * @param string                    $shopTo      --to value, used for shop-ce verbatim case
+     * @param string                    $shopTo      --to value; used for the shop-ce / metapackage verbatim case
      * @param array<string,string>      $bumpFlags   short-slug => raw bump level (e.g. ["shop-facts" => "minor"])
      * @param string                    $packageRef  release branch on this repo (e.g. "b-1.6")
      */
@@ -66,7 +70,10 @@ class TagCutter
         array $bumpFlags,
         string $packageRef
     ): TagCutResult {
-        if ($package === self::SHOP_CE_PACKAGE) {
+        // shop-ce and the metapackage ARE the shop release: tag both at the
+        // --to version so the code and the compilation stay in lockstep.
+        // Unconditional — this beats any --bump flag / .next-bump file.
+        if ($package === self::SHOP_CE_PACKAGE || $package === self::METAPACKAGE_PACKAGE) {
             return new TagCutResult(
                 $shopTo,
                 false,
