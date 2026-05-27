@@ -26,3 +26,4 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [o3-theme npm audit](project_o3-theme-dep-audit.md) — pre-existing brace-expansion vulnerability blocks test-all-coverage; use test --fast for PHP-only changes
 - [bin/release intermediate-node re-tag gap](release-tooling-intermediate-node-retag-gap.md) — resolver "reuses" an intermediate fat node (the metapackage) while bumping its child pin → orphaned edit; force a re-tag during the fold-out cut (#169)
 - [!] [cs-fixer dirties nested clones](cs-fixer-pollutes-nested-clones.md) — ./docker.sh cs-fixer reformats testing-library/themes/demodata clones → aborts bin/release pre-flight; clean them before a cut
+- [!] [ExitHandler interface-guard bug](shop-ce-exithandler-interface-guard-bug.md) — bootstrap.php uses class_exists() on the ExitHandlerInterface (always false) → fresh-install Setup redirect dies in a DB-error loop; fix: interface_exists()
