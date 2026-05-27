@@ -25,6 +25,7 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Constraint\ConstraintUpdater;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightRunner;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\DepTreeWalker;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Graph\WalkResult;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\CandidateState;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Notes\ReleaseNotesAggregator;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot\FromSnapshotBuilder;
@@ -105,8 +106,20 @@ class ReleasePlanner
             'Steps 3 + 4: resolving versions for %d candidates',
             count($walkResult->topologicalOrder()) - 1
         ));
-        // Steps 3 + 4 — per candidate (skip the o3-shop project root; it is the orchestrator, not a candidate)
+        // Steps 3 + 4 — per candidate (skip the o3-shop project root; it is the orchestrator, not a candidate).
+        //
+        // A package cuts a new tag when the version resolver asks for one OR
+        // when one of its already-resolved children changed in a way that
+        // edits this package's own composer.json (a "downstream edit"). The
+        // walk is leaves-first, so a child is always resolved before its
+        // parent and the force-decision cascades up the tiers: bumping
+        // shop-ce forces the metapackage to re-tag, which in turn forces its
+        // dependents. Without this, an intermediate node (e.g. the
+        // metapackage) would "reuse" its latest tag while a constraint edit
+        // to its composer.json went un-tagged (orphaned).
         $candidates = [];
+        $chosen = [];   // package => chosen version (children resolved before parents)
+        $changed = [];  // package => did the chosen version differ from from_pin?
         foreach ($walkResult->topologicalOrder() as $package) {
             if ($package === self::O3_SHOP_PROJECT) {
                 continue;
@@ -124,7 +137,14 @@ class ReleasePlanner
             $packageRef = ($this->branchResolver)($package);
             $resolution = $this->versionResolver->resolve($package, $fromPin, $toTag, $packageRef);
 
-            if ($resolution->needsNewTag()) {
+            $forcedByDownstreamEdit = $this->willReceiveDownstreamEdit(
+                $package,
+                $walkResult,
+                $chosen,
+                $changed
+            );
+
+            if ($resolution->needsNewTag() || $forcedByDownstreamEdit) {
                 $tagCut = $this->tagCutter->cut(
                     $package,
                     $resolution->latestTag(),
@@ -133,11 +153,14 @@ class ReleasePlanner
                     $packageRef
                 );
                 $chosenVersion = $tagCut->newTag();
-                $candidates[] = new CandidatePlan($package, $fromPin, $chosenVersion, $resolution, $tagCut);
+                $candidate = new CandidatePlan($package, $fromPin, $chosenVersion, $resolution, $tagCut);
             } else {
                 $chosenVersion = (string) $resolution->chosenVersion();
-                $candidates[] = new CandidatePlan($package, $fromPin, $chosenVersion, $resolution, null);
+                $candidate = new CandidatePlan($package, $fromPin, $chosenVersion, $resolution, null);
             }
+            $candidates[] = $candidate;
+            $chosen[$package] = $chosenVersion;
+            $changed[$package] = $candidate->isChanged();
         }
 
         ($this->progress)('Step 5: checking constraint updates per pin location');
@@ -219,6 +242,42 @@ class ReleasePlanner
             $preFlightReports,
             $walkResult->backEdges()
         );
+    }
+
+    /**
+     * True when an already-resolved child of $package changed in a way that
+     * rewrites $package's own composer.json — i.e. Step 5 will emit a
+     * constraint edit whose parent is $package. Such a package MUST cut a
+     * new tag (its content changes); reusing the old tag would orphan the
+     * edit.
+     *
+     * Mirrors the Step 5 edit computation exactly, so "forced here" iff
+     * "edited there". Relies on the leaves-first order: every child is
+     * resolved (and present in $chosen/$changed) before its parent.
+     *
+     * @param array<string,string> $chosen  package => chosen version
+     * @param array<string,bool>   $changed package => changed flag
+     */
+    private function willReceiveDownstreamEdit(
+        string $package,
+        WalkResult $walkResult,
+        array $chosen,
+        array $changed
+    ): bool {
+        foreach ($walkResult->dependencies($package) as $child) {
+            if (empty($changed[$child]) || !isset($chosen[$child])) {
+                continue;
+            }
+            foreach ($walkResult->pinLocations($child) as $pin) {
+                if ($pin->parentPackage() !== $package) {
+                    continue;
+                }
+                if ($this->constraintUpdater->update($pin->constraint(), $chosen[$child])->changed()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private function slug(string $package): string

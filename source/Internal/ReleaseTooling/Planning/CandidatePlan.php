@@ -84,6 +84,11 @@ final class CandidatePlan
 
     public function caseLabel(): string
     {
+        if ($this->tagCut !== null && $this->resolution->case() !== VersionResolution::CASE_NEEDS_NEW_TAG) {
+            // The resolver would have reused a tag, but a downstream
+            // constraint edit forces a fresh cut to capture the change.
+            return 'cut-new-tag (downstream changed)';
+        }
         switch ($this->resolution->case()) {
             case VersionResolution::CASE_UNCHANGED:
                 return 'unchanged';

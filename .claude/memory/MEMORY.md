@@ -24,3 +24,4 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [!] [Theme repos are external](architecture_theme-repos.md) — wave + o3-theme live in separate GitHub repos; their dirs in shop-ce are gitignored snapshots
 - [!] [o3-theme migration](project_o3-theme-migration.md) — wave → o3-theme cutover before 2026-05-01; keep new storefront templates portable
 - [o3-theme npm audit](project_o3-theme-dep-audit.md) — pre-existing brace-expansion vulnerability blocks test-all-coverage; use test --fast for PHP-only changes
+- [bin/release intermediate-node re-tag gap](release-tooling-intermediate-node-retag-gap.md) — resolver "reuses" an intermediate fat node (the metapackage) while bumping its child pin → orphaned edit; force a re-tag during the fold-out cut (#169)
