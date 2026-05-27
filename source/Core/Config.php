@@ -2207,12 +2207,13 @@ class Config extends \OxidEsales\Eshop\Core\Base
     {
         if ($this->sLogDir === null) {
             $shopDir = $this->getConfigParam('sShopDir');
-            $logDir = $shopDir . 'log/';
+            $this->sLogDir = 'log/';
+            $logDir = $shopDir . $this->sLogDir;
             if ($shopDir && strpos($shopDir, '<') === false) {
                 oxNew(\OxidEsales\EshopCommunity\Core\FileSystem\FileSystem::class)
                     ->createDirIfNotExists($logDir, $shopDir);
             }
-            return $this->sLogDir = $logDir;
+            return $logDir;
         }
 
         return $this->getConfigParam('sShopDir') . $this->sLogDir;

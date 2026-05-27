@@ -182,10 +182,22 @@ class ConfigTest extends OxidTestCase
     public function testGetLogsDir()
     {
         $this->setConfigParam('sLogDir', 'some/log/dir/');
-        $this->assertEquals($this->getConfig()->getConfigParam('sShopDir') . 'some/log/dir/', $this->getConfig()->getLogsDir());
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertEquals(
+                $this->getConfig()->getConfigParam('sShopDir') . 'some/log/dir/',
+                $this->getConfig()->getLogsDir(),
+                "Iteration $i: expected sShopDir + 'some/log/dir/' when sLogDir is set."
+            );
+        }
 
         $this->setConfigParam('sLogDir', null);
-        $this->assertEquals($this->getConfig()->getConfigParam('sShopDir') . 'log/', $this->getConfig()->getLogsDir());
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertEquals(
+                $this->getConfig()->getConfigParam('sShopDir') . 'log/',
+                $this->getConfig()->getLogsDir(),
+                "Iteration $i: expected sShopDir + 'log/' when sLogDir is null."
+            );
+        }
     }
 
     /*
