@@ -238,8 +238,14 @@ $configFile = new \OxidEsales\Eshop\Core\ConfigFile(OX_BASE_PATH . 'config.inc.p
  * Register the default exit handler. Tests swap this for a throwing fake via
  * Registry::set() (see tests/Unit/ExitHandlerTestTrait.php) so exit() calls
  * in the code under test do not tear down the PHPUnit process.
+ *
+ * The guard skips registration when the unified namespace has not been
+ * generated yet (e.g. mid composer install). ExitHandlerInterface is an
+ * INTERFACE, so it MUST be probed with interface_exists(): class_exists()
+ * returns false for interfaces, which would leave the handler unregistered
+ * and break the fresh-install Setup redirect (see o3-shop/o3-shop#166).
  */
-if (class_exists(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)) {
+if (interface_exists(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)) {
     \OxidEsales\Eshop\Core\Registry::set(
         \OxidEsales\Eshop\Core\ExitHandlerInterface::class,
         new \OxidEsales\Eshop\Core\ExitHandler()

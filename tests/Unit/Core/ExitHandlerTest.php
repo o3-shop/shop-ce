@@ -26,6 +26,53 @@ class ExitHandlerTest extends UnitTestCase
         );
     }
 
+    /**
+     * Regression guard for o3-shop/o3-shop#166.
+     *
+     * ExitHandlerInterface is an interface, so class_exists() returns false
+     * for it — interface_exists() is the correct probe. bootstrap.php relies
+     * on this when deciding whether to register the default ExitHandler; the
+     * wrong probe leaves it unregistered and breaks the fresh-install Setup
+     * redirect with a DatabaseNotConfiguredException loop.
+     */
+    public function testExitHandlerInterfaceIsDetectedByInterfaceExistsNotClassExists()
+    {
+        $interface = \OxidEsales\Eshop\Core\ExitHandlerInterface::class;
+
+        $this->assertTrue(
+            interface_exists($interface),
+            'unified-namespace ExitHandlerInterface must resolve as an interface'
+        );
+        $this->assertFalse(
+            class_exists($interface),
+            'ExitHandlerInterface is an interface; class_exists() is always false for it (see #166)'
+        );
+    }
+
+    /**
+     * Regression guard for o3-shop/o3-shop#166: bootstrap.php must probe the
+     * ExitHandlerInterface with interface_exists() before registering the
+     * default ExitHandler. Probing with class_exists() (as shipped in
+     * shop-ce#156) is always false for an interface, so the handler is never
+     * registered. This asserts the source guard directly — it would have
+     * failed on the broken fix.
+     */
+    public function testBootstrapRegistersDefaultExitHandlerViaInterfaceExists()
+    {
+        $bootstrap = file_get_contents(dirname(__DIR__, 3) . '/source/bootstrap.php');
+
+        $this->assertStringNotContainsString(
+            'class_exists(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)',
+            $bootstrap,
+            'bootstrap.php must not guard ExitHandler registration with class_exists() on the interface (#166)'
+        );
+        $this->assertStringContainsString(
+            'interface_exists(\OxidEsales\Eshop\Core\ExitHandlerInterface::class)',
+            $bootstrap,
+            'bootstrap.php must guard ExitHandler registration with interface_exists() (#166)'
+        );
+    }
+
     public function testFakeHandlerFromTraitThrowsExitCalledException()
     {
         $this->installFakeExitHandler();
