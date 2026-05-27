@@ -45,7 +45,7 @@ class ReleaseCommandTest extends TestCase
         return new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -108,7 +108,7 @@ class ReleaseCommandTest extends TestCase
         $stub = new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -136,7 +136,7 @@ class ReleaseCommandTest extends TestCase
         $stub = new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -191,7 +191,7 @@ class ReleaseCommandTest extends TestCase
         $stub = new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -238,7 +238,7 @@ class ReleaseCommandTest extends TestCase
         $stub = new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -352,7 +352,7 @@ class ReleaseCommandTest extends TestCase
         $stub = new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -385,7 +385,7 @@ class ReleaseCommandTest extends TestCase
         $stub = new StubReleasePlanner(new ReleasePlan(
             'v1.6.0',
             'v1.6.1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -484,7 +484,7 @@ class ReleaseCommandTest extends TestCase
         return new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',

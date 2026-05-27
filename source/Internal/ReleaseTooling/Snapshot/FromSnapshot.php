@@ -23,47 +23,28 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot;
 
 /**
- * Result of Algorithm Step 1 — the per-tier-0 anchor map for a given
- * `--from` tag, plus metadata about whether pre-fold-in metapackage
- * indirection had to be applied to assemble it.
+ * Result of Algorithm Step 1 — the anchor map for a given `--from`
+ * tag. The map is recursive across the o3-shop subset of the
+ * dependency tree, so it includes `shop-metapackage-ce` (a first-class
+ * release candidate) alongside the packages it pins.
  */
 final class FromSnapshot
 {
     /** @var array<string,string> repo-slug => version constraint as recorded in composer.json */
     private array $fromPin;
 
-    private bool $usedPreFoldInIndirection;
-
-    private ?string $preFoldInMetapackageVersion;
-
     /**
      * @param array<string,string> $fromPin
      */
-    public function __construct(
-        array $fromPin,
-        bool $usedPreFoldInIndirection = false,
-        ?string $preFoldInMetapackageVersion = null
-    ) {
+    public function __construct(array $fromPin)
+    {
         ksort($fromPin);
         $this->fromPin = $fromPin;
-        $this->usedPreFoldInIndirection = $usedPreFoldInIndirection;
-        $this->preFoldInMetapackageVersion = $preFoldInMetapackageVersion;
     }
 
     /** @return array<string,string> */
     public function fromPin(): array
     {
         return $this->fromPin;
-    }
-
-    public function usedPreFoldInIndirection(): bool
-    {
-        return $this->usedPreFoldInIndirection;
-    }
-
-    /** @return string|null tag of `o3-shop/shop-metapackage-ce` consulted for indirection, or null */
-    public function preFoldInMetapackageVersion(): ?string
-    {
-        return $this->preFoldInMetapackageVersion;
     }
 }

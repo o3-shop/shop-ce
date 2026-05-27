@@ -349,7 +349,7 @@ final class LiveExecutorTest extends TestCase
         return new ReleasePlan(
             $fromTag,
             $toTag,
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             $candidates,
             $edits,
             $aggregatedNotes,

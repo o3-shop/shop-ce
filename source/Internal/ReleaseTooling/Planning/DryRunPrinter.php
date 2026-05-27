@@ -39,14 +39,6 @@ class DryRunPrinter
             $plan->toTag()
         ));
 
-        $snapshot = $plan->fromSnapshot();
-        if ($snapshot->usedPreFoldInIndirection()) {
-            $output->writeln(sprintf(
-                '<comment>Step 1: pre-fold-in --from detected; '
-                . 'harvested tier-0 pins from o3-shop/shop-metapackage-ce@%s</comment>',
-                (string) $snapshot->preFoldInMetapackageVersion()
-            ));
-        }
         $output->writeln('');
 
         $this->printBackEdges($plan, $output);

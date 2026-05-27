@@ -51,32 +51,12 @@ final class DryRunPrinterTest extends TestCase
         $this->assertStringContainsString('Pre-flight gates: skipped', $rendered);
     }
 
-    public function testPreFoldInIndirectionLineRenderedWhenSnapshotUsedIndirection(): void
-    {
-        $plan = new ReleasePlan(
-            'v1.6.0',
-            'v1.6.1-RC1',
-            new FromSnapshot([], true, 'v1.6.0'),
-            [],
-            [],
-            '',
-            []
-        );
-        $printer = new DryRunPrinter();
-        $output = new BufferedOutput();
-        $printer->print($plan, $output);
-
-        $rendered = $output->fetch();
-        $this->assertStringContainsString('pre-fold-in --from detected', $rendered);
-        $this->assertStringContainsString('shop-metapackage-ce@v1.6.0', $rendered);
-    }
-
     public function testBackEdgesSectionPrintedWhenPresent(): void
     {
         $plan = new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -114,7 +94,7 @@ final class DryRunPrinterTest extends TestCase
         $plan = new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [$candidate],
             [],
             '',
@@ -145,7 +125,7 @@ final class DryRunPrinterTest extends TestCase
         $plan = new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [$candidate],
             [],
             '',
@@ -165,7 +145,7 @@ final class DryRunPrinterTest extends TestCase
         $plan = new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [
                 new ConstraintEditPlan(
@@ -193,7 +173,7 @@ final class DryRunPrinterTest extends TestCase
         $plan = new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             "## o3-shop/shop-ce\n\nWhat's Changed\n* foo by @bar\n",
@@ -223,7 +203,7 @@ final class DryRunPrinterTest extends TestCase
         $plan = new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',
@@ -251,7 +231,7 @@ final class DryRunPrinterTest extends TestCase
         return new ReleasePlan(
             'v1.6.0',
             'v1.6.1-RC1',
-            new FromSnapshot([], false, null),
+            new FromSnapshot([]),
             [],
             [],
             '',

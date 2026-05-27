@@ -90,9 +90,10 @@ class ReleaseNotesAggregator
             // Normalize from_pin to a tag name before passing to the
             // provider. GitHub's generate-notes API rejects caret/tilde
             // constraints (`^v1.0.0`) with HTTP 400; we normalize to
-            // the canonical o3-shop tag form (`v1.0.0`) so the call
-            // works for the common pre-fold-in case where from_pin
-            // carries constraint strings instead of exact tags.
+            // the canonical o3-shop tag form (`v1.0.0`). Exact pins
+            // (shop-ce, the metapackage) pass through unchanged; only
+            // caret/tilde pins (themes, dev-tooling) are rewritten to
+            // their floor tag.
             $previousTag = TagFromConstraint::resolve($state->fromPin())
                 ?? $state->fromPin();
             ($this->progress)(sprintf(

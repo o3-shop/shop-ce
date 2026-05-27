@@ -40,10 +40,10 @@ class ReleasePlannerTest extends TestCase
 {
     public function testPlannerProducesExpectedReleasePlanForSimpleScenario(): void
     {
-        // o3-shop@v1.6.0 (pre-fold-in) → metapackage indirection →
-        // tier-0 pins (shop-ce, shop-facts) → planned upgrade to v1.6.1-RC1.
-        // shop-ce is the special case (uses --to verbatim);
-        // shop-facts gets a default-patch bump.
+        // --from o3-shop@v1.6.0 requires the metapackage, which pins the
+        // tier-0 packages (shop-ce, shop-facts). The b-1.6 walk here pins
+        // them directly on o3-shop. shop-ce is the special case (uses
+        // --to verbatim); shop-facts is unchanged.
         $manifests = [
             // --from snapshot (Section 4)
             'o3-shop/o3-shop|v1.6.0' => [
@@ -80,9 +80,9 @@ class ReleasePlannerTest extends TestCase
 
         $plan = $planner->plan('v1.6.0', 'v1.6.1-RC1', []);
 
-        // From-snapshot: pre-fold-in indirection applied
-        $this->assertTrue($plan->fromSnapshot()->usedPreFoldInIndirection());
-        $this->assertSame('v1.6.0', $plan->fromSnapshot()->preFoldInMetapackageVersion());
+        // From-snapshot recurses through the metapackage to harvest the
+        // tier-0 pins; the metapackage itself is also recorded.
+        $this->assertSame('v1.6.0', $plan->fromSnapshot()->fromPin()['shop-metapackage-ce']);
 
         // Two candidates: shop-ce (case-3, --to verbatim) and shop-facts (case-1, unchanged)
         $candidates = $plan->candidates();
@@ -108,6 +108,82 @@ class ReleasePlannerTest extends TestCase
         $this->assertSame('o3-shop/shop-ce', $edits[0]->depPackage());
         $this->assertSame('v1.6.0', $edits[0]->update()->oldConstraint());
         $this->assertSame('v1.6.1-RC1', $edits[0]->update()->newConstraint());
+    }
+
+    public function testFoldedOutWalkMakesMetapackageACandidateAndCascadesConstraints(): void
+    {
+        // Folded-out topology: o3-shop → metapackage → shop-ce. The
+        // metapackage is a first-class candidate; when shop-ce re-tags,
+        // the metapackage's pin on it is bumped, and when the metapackage
+        // re-tags, o3-shop's pin on the metapackage is bumped.
+        $manifests = [
+            // --from snapshot (thin o3-shop)
+            'o3-shop/o3-shop|v1.6.0' => [
+                'require' => ['o3-shop/shop-metapackage-ce' => 'v1.6.0'],
+            ],
+            'o3-shop/shop-metapackage-ce|v1.6.0' => [
+                'require' => ['o3-shop/shop-ce' => 'v1.6.0'],
+            ],
+            // walk on the release branch (folded-out)
+            'o3-shop/o3-shop|b-1.6' => [
+                'require' => ['o3-shop/shop-metapackage-ce' => 'v1.6.0'],
+            ],
+            'o3-shop/shop-metapackage-ce|b-1.6' => [
+                'require' => ['o3-shop/shop-ce' => 'v1.6.0'],
+            ],
+            'o3-shop/shop-ce|b-1.6' => ['require' => []],
+        ];
+
+        $planner = $this->wirePlanner(
+            $manifests,
+            [
+                'o3-shop/shop-ce' => ['v1.6.0' => 'sha-ce'],
+                'o3-shop/shop-metapackage-ce' => ['v1.6.0' => 'sha-meta'],
+            ],
+            [
+                'o3-shop/shop-ce' => ['b-1.6' => 'sha-ce-newer'],               // changed
+                'o3-shop/shop-metapackage-ce' => ['b-1.6' => 'sha-meta-newer'], // changed
+            ]
+        );
+
+        $plan = $planner->plan('v1.6.0', 'v1.6.1-RC1', []);
+
+        $byPackage = [];
+        foreach ($plan->candidates() as $c) {
+            $byPackage[$c->package()] = $c;
+        }
+
+        // The metapackage is a first-class release candidate.
+        $this->assertArrayHasKey('o3-shop/shop-metapackage-ce', $byPackage);
+        $this->assertSame('cut-new-tag', $byPackage['o3-shop/shop-metapackage-ce']->caseLabel());
+        $metaChosen = $byPackage['o3-shop/shop-metapackage-ce']->chosenVersion();
+
+        // shop-ce uses --to verbatim.
+        $this->assertSame('v1.6.1-RC1', $byPackage['o3-shop/shop-ce']->chosenVersion());
+
+        // Cascade: index edits by "<parent>|<dep>".
+        $edits = [];
+        foreach ($plan->constraintEdits() as $e) {
+            $edits[$e->parentPackage() . '|' . $e->depPackage()] = $e;
+        }
+
+        // metapackage's pin on shop-ce bumped to the new shop-ce tag.
+        $this->assertArrayHasKey('o3-shop/shop-metapackage-ce|o3-shop/shop-ce', $edits);
+        $this->assertSame(
+            'v1.6.1-RC1',
+            $edits['o3-shop/shop-metapackage-ce|o3-shop/shop-ce']->update()->newConstraint()
+        );
+
+        // o3-shop's pin on the metapackage bumped to the new metapackage tag.
+        $this->assertArrayHasKey('o3-shop/o3-shop|o3-shop/shop-metapackage-ce', $edits);
+        $this->assertSame(
+            'v1.6.0',
+            $edits['o3-shop/o3-shop|o3-shop/shop-metapackage-ce']->update()->oldConstraint()
+        );
+        $this->assertSame(
+            $metaChosen,
+            $edits['o3-shop/o3-shop|o3-shop/shop-metapackage-ce']->update()->newConstraint()
+        );
     }
 
     public function testPlannerEmitsAggregatedNotesUsingProvidedNotesProvider(): void

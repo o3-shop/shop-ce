@@ -29,10 +29,12 @@ use PHPUnit\Framework\TestCase;
 
 class FromSnapshotBuilderTest extends TestCase
 {
-    public function testPostFoldInRootBuildsDirectFromPin(): void
+    public function testFatFromBuildsDirectFromPin(): void
     {
-        // o3-shop@v1.6.1 (post-fold-in): tier-0 pins live directly
-        // in the root composer.json. No metapackage involved.
+        // A fold-in-era o3-shop@v1.6.1 pins tier-0 packages directly in
+        // the root composer.json (no metapackage require). The recursion
+        // records them as-is; the metapackage never appears because it
+        // isn't required at this --from.
         $fetcher = new FakeRawComposerJsonFetcher([
             'o3-shop/o3-shop|v1.6.1' => [
                 'require' => [
@@ -57,8 +59,7 @@ class FromSnapshotBuilderTest extends TestCase
 
         $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.1');
 
-        $this->assertFalse($snapshot->usedPreFoldInIndirection());
-        $this->assertNull($snapshot->preFoldInMetapackageVersion());
+        $this->assertArrayNotHasKey('shop-metapackage-ce', $snapshot->fromPin());
         $this->assertSame([
             'gdpr-optin-module' => 'v1.0.1',
             'o3-theme' => '^v1.3.0',
@@ -73,11 +74,12 @@ class FromSnapshotBuilderTest extends TestCase
         ], $snapshot->fromPin());
     }
 
-    public function testPreFoldInRootTriggersMetapackageIndirection(): void
+    public function testThinFromKeepsMetapackageAndHarvestsItsChildren(): void
     {
-        // o3-shop@v1.6.0 (pre-fold-in): the root composer.json only
-        // requires the metapackage. The actual tier-0 pins live one
-        // level deeper in shop-metapackage-ce@v1.6.0.
+        // Folded-out o3-shop: the root composer.json only requires the
+        // metapackage, which pins the tier-0 packages one level deeper.
+        // The metapackage stays in from_pin as a first-class release
+        // candidate AND its children are harvested.
         $fetcher = new FakeRawComposerJsonFetcher([
             'o3-shop/o3-shop|v1.6.0' => [
                 'require' => [
@@ -107,12 +109,10 @@ class FromSnapshotBuilderTest extends TestCase
 
         $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.0');
 
-        $this->assertTrue($snapshot->usedPreFoldInIndirection());
-        $this->assertSame('v1.6.0', $snapshot->preFoldInMetapackageVersion());
-        // Metapackage entry itself is dropped from from_pin.
-        $this->assertArrayNotHasKey('shop-metapackage-ce', $snapshot->fromPin());
-        // Tier-0 pins from the metapackage are present.
         $pins = $snapshot->fromPin();
+        // The metapackage itself is a first-class entry in from_pin.
+        $this->assertSame('v1.6.0', $pins['shop-metapackage-ce']);
+        // Tier-0 pins harvested from the metapackage are present too.
         $this->assertSame('v1.6.0', $pins['shop-ce']);
         $this->assertSame('^v1.3.0', $pins['o3-theme']);
         $this->assertSame('v1.0.1', $pins['gdpr-optin-module']);
@@ -157,6 +157,36 @@ class FromSnapshotBuilderTest extends TestCase
         $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.0');
 
         $this->assertSame('dev-override', $snapshot->fromPin()['shop-ce']);
+        // The metapackage entry survives as a first-class pin.
+        $this->assertSame('v1.6.0', $snapshot->fromPin()['shop-metapackage-ce']);
+    }
+
+    public function testMetapackageExactShopCePinBeatsTestingLibraryLoosePin(): void
+    {
+        // Folded-out root: `require` has only the metapackage (exact
+        // shop-ce pin); `require-dev` has testing-library (loose shop-ce
+        // pin). Root `require` merges before `require-dev` and the queue
+        // is FIFO, so the metapackage is processed first and its exact
+        // pin is recorded before testing-library's loose one — without
+        // any synchronous pre-harvest. Regression guard for the removed
+        // pre-fold-in indirection block.
+        $fetcher = new FakeRawComposerJsonFetcher([
+            'o3-shop/o3-shop|v1.6.0' => [
+                'require' => ['o3-shop/shop-metapackage-ce' => 'v1.6.0'],
+                'require-dev' => ['o3-shop/testing-library' => '^1.2.0'],
+            ],
+            'o3-shop/shop-metapackage-ce|v1.6.0' => [
+                'require' => ['o3-shop/shop-ce' => 'v1.6.0'],
+            ],
+            'o3-shop/testing-library|v1.2.0' => [
+                'require' => ['o3-shop/shop-ce' => '^1.2'],
+            ],
+            'o3-shop/shop-ce|v1.6.0' => ['require' => []],
+        ]);
+
+        $snapshot = (new FromSnapshotBuilder($fetcher))->build('v1.6.0');
+
+        $this->assertSame('v1.6.0', $snapshot->fromPin()['shop-ce']);
     }
 
     public function testNonO3ShopPackagesAreFilteredOut(): void
@@ -207,7 +237,7 @@ class FromSnapshotBuilderTest extends TestCase
 
     public function testRecursiveHarvestPullsTier0LeavesOfShopCe(): void
     {
-        // Pre-fold-in: o3-shop@v1.6.0 → metapackage@v1.6.0 → shop-ce@v1.6.0.
+        // Folded-out: o3-shop@v1.6.0 → metapackage@v1.6.0 → shop-ce@v1.6.0.
         // shop-ce's own require contains shop-doctrine-migration-wrapper
         // and shop-db-views-generator (tier-0 leaves) which neither the
         // root nor the metapackage mention. These MUST end up in
@@ -254,8 +284,8 @@ class FromSnapshotBuilderTest extends TestCase
         $this->assertSame('^v1.0.0', $pin['shop-db-views-generator']);
         $this->assertArrayHasKey('shop-ide-helper', $pin);
         $this->assertSame('^v1.0.0', $pin['shop-ide-helper']);
-        // Metapackage entry never appears in from_pin
-        $this->assertArrayNotHasKey('shop-metapackage-ce', $pin);
+        // Metapackage entry is a first-class pin too.
+        $this->assertSame('v1.6.0', $pin['shop-metapackage-ce']);
     }
 
     public function testRecursiveHarvestSkipsSubtreeOnFetcherFailure(): void

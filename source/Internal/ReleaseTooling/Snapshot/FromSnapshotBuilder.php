@@ -28,27 +28,26 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\TagFromConstraint
 
 /**
  * Algorithm Step 1: read `o3-shop/composer.json` at `--from` and
- * build the `from_pin[]` map of tier-0 dependencies.
+ * build the `from_pin[]` map of dependencies.
  *
  * The walk is recursive across the o3-shop subset of the dep tree
  * so tier-0 leaves of shop-ce (shop-doctrine-migration-wrapper,
  * shop-db-views-generator, etc.) appear in `from_pin[]` even though
- * they're not direct deps of o3-shop or the metapackage. Each
- * child is fetched at the constraint's bare-version form (e.g.
- * `^v1.3.0` → `v1.3.0`); when a constraint can't be resolved to
- * a fetchable ref (wildcards, dev-* etc.) or when a child fetch
- * 404s, the recursion silently skips that subtree — the caller
- * still gets every pin it COULD harvest.
+ * they're not direct deps of o3-shop. Each child is fetched at the
+ * constraint's bare-version form (e.g. `^v1.3.0` → `v1.3.0`); when a
+ * constraint can't be resolved to a fetchable ref (wildcards, dev-*
+ * etc.) or when a child fetch 404s, the recursion silently skips that
+ * subtree — the caller still gets every pin it COULD harvest.
  *
- * Pre-fold-in `--from` (composer.json still requires
- * `o3-shop/shop-metapackage-ce`): the metapackage is included in
- * the recursive walk and its entry is dropped from the final
- * `from_pin[]`. One-time transitional path covering the
- * v1.6.0 → v1.6.1-RC1 cut; bypassed for any post-fold-in `--from`.
+ * `o3-shop/shop-metapackage-ce` is an ordinary node in this walk: the
+ * thin `o3-shop` project requires it, so it lands in `from_pin[]` as a
+ * release candidate and is recursed into to harvest the packages it
+ * pins (shop-ce, themes, bundled modules, framework deps). A `--from`
+ * where o3-shop instead pins those packages directly (a fold-in-era
+ * tag) is handled by the same recursion — the metapackage simply
+ * won't appear.
  *
- * The output `FromSnapshot` is pure data — the CLI layer is responsible
- * for emitting the indirection log line based on the snapshot's
- * `usedPreFoldInIndirection()` flag.
+ * The output `FromSnapshot` is pure data.
  *
  * See: openspec/.../release-graph-derivation/spec.md
  */
@@ -56,7 +55,6 @@ class FromSnapshotBuilder
 {
     public const O3_SHOP_PROJECT = 'o3-shop/o3-shop';
     public const O3_SHOP_PREFIX = 'o3-shop/';
-    public const METAPACKAGE_PACKAGE = 'o3-shop/shop-metapackage-ce';
 
     private RawComposerJsonFetcher $fetcher;
 
@@ -84,57 +82,21 @@ class FromSnapshotBuilder
         $rootRequireDev = $this->extractO3ShopPins($rootManifest['require-dev'] ?? []);
         $fromPin = array_merge($rootRequire, $rootRequireDev);
 
-        $usedIndirection = isset($fromPin['shop-metapackage-ce']);
-        $metapackageVersion = $usedIndirection ? $fromPin['shop-metapackage-ce'] : null;
-        // The metapackage is harvested synchronously (below) but never
-        // appears in the final `from_pin[]` — it is the indirection
-        // anchor, not a release-eligible candidate.
-        unset($fromPin['shop-metapackage-ce']);
-
-        // Pre-fold-in: harvest the metapackage's pins SYNCHRONOUSLY before
-        // any further recursion. The metapackage's tier-0 require list
-        // is the authoritative "what shipped at --from" set; if recursion
-        // through root's require-dev (e.g. testing-library) ran first
-        // and learned a looser constraint for shop-ce (testing-library
-        // declares `require: shop-ce: ^1.2`), first-write-wins would
-        // lock in that loose constraint and the metapackage's exact
-        // `shop-ce: v1.6.0` would never get recorded.
-        $visited = [self::O3_SHOP_PROJECT => true];
-        if ($usedIndirection && $metapackageVersion !== null) {
-            $visited[self::METAPACKAGE_PACKAGE] = true;
-            ($this->progress)(sprintf(
-                '  fetching %s@%s (pre-fold-in indirection)',
-                self::METAPACKAGE_PACKAGE,
-                $metapackageVersion
-            ));
-            try {
-                $metaManifest = $this->fetcher->fetch(
-                    self::METAPACKAGE_PACKAGE,
-                    $metapackageVersion
-                );
-                $metaPins = array_merge(
-                    $this->extractO3ShopPins($metaManifest['require'] ?? []),
-                    $this->extractO3ShopPins($metaManifest['require-dev'] ?? [])
-                );
-                foreach ($metaPins as $slug => $constraint) {
-                    if ($slug === 'shop-metapackage-ce') {
-                        continue;
-                    }
-                    if (!isset($fromPin[$slug])) {
-                        $fromPin[$slug] = $constraint;
-                    }
-                }
-            } catch (RawRepoFetchException $e) {
-                // Metapackage unfetchable — recursion below still runs;
-                // the snapshot will be missing tier-0 pins the metapackage
-                // would have provided.
-            }
-        }
-
         // Recursive harvest: for every o3-shop/* slug currently in
         // fromPin, fetch its composer.json at the constraint's resolved
         // ref and add its o3-shop/* deps. Keeps walking until the queue
-        // is empty.
+        // is empty. `shop-metapackage-ce` is an ordinary node here: when
+        // o3-shop requires it, it lands in from_pin as a release
+        // candidate AND is recursed into so the packages it pins
+        // (shop-ce, themes, bundled modules, …) are harvested too.
+        //
+        // First-write-wins ordering note: root `require` is merged before
+        // `require-dev`, and the queue is FIFO, so the metapackage (in
+        // root `require`) is processed before testing-library (in root
+        // `require-dev`). Its EXACT `shop-ce` pin is therefore recorded
+        // before testing-library's looser `shop-ce: ^1.2` is seen, and
+        // the exact pin wins.
+        $visited = [self::O3_SHOP_PROJECT => true];
         $queue = [];
         foreach ($fromPin as $slug => $constraint) {
             $ref = $this->constraintToRef($constraint);
@@ -166,11 +128,6 @@ class FromSnapshotBuilder
             $requireDev = $this->extractO3ShopPins($manifest['require-dev'] ?? []);
 
             foreach (array_merge($require, $requireDev) as $childSlug => $childConstraint) {
-                if ($childSlug === 'shop-metapackage-ce') {
-                    // Never re-introduce the metapackage to from_pin even
-                    // if some downstream package still references it.
-                    continue;
-                }
                 // First-write wins: parent pins (visited earlier in the
                 // queue) take precedence over deeper-level pins.
                 if (!isset($fromPin[$childSlug])) {
@@ -185,7 +142,7 @@ class FromSnapshotBuilder
             }
         }
 
-        return new FromSnapshot($fromPin, $usedIndirection, $metapackageVersion);
+        return new FromSnapshot($fromPin);
     }
 
     /**
