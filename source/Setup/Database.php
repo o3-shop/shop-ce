@@ -330,17 +330,19 @@ class Database extends Core
 
         $this->addConfigValueIfShopInfoShouldBeSent($oUtils, $sBaseShopId, $aParams, $oConfk, $oSession);
 
-        //set only one active language
+        // Activate the wizard-chosen shop language on top of the seeded
+        // defaults (issue #170). The shipping seed already flags every
+        // bundled language active; we ensure the user's pick stays on
+        // without deactivating the others.
         $oStatement = $oPdo->query("select oxvarname, oxvartype, oxvarvalue from oxconfig where oxvarname='aLanguageParams'");
         if ($oStatement && false !== ($aRow = $oStatement->fetch())) {
             if ($aRow['oxvartype'] == 'arr' || $aRow['oxvartype'] == 'aarr') {
                 $aRow['oxvarvalue'] = unserialize($aRow['oxvarvalue']);
             }
             $aLanguageParams = $aRow['oxvarvalue'];
-            foreach ($aLanguageParams as $sKey => $aLang) {
-                $aLanguageParams[$sKey]['active'] = '0';
+            if (isset($aLanguageParams[$sShopLang])) {
+                $aLanguageParams[$sShopLang]['active'] = '1';
             }
-            $aLanguageParams[$sShopLang]['active'] = '1';
 
             $sValue = serialize($aLanguageParams);
 

@@ -397,6 +397,76 @@ class DatabaseTest extends \OxidTestCase
     }
 
     /**
+     * Regression test for issue #170: a stock O3-Shop install must ship
+     * with both German and English active by default. The install wizard's
+     * `sShopLang` selection determines `sDefaultLang`, but it must not
+     * deactivate the other seeded languages.
+     */
+    public function testSaveShopSettingsKeepsAllSeededLanguagesActive()
+    {
+        $session = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Session', ['setSessionParam', 'getSessionParam'], [], '', null);
+
+        $map = [
+            ['check_for_updates', null],
+            ['country_lang', null],
+        ];
+        if ($this->getTestConfig()->getShopEdition() == 'EE') {
+            $map[] = ['send_technical_information_to_oxid', true];
+        } else {
+            $map[] = ['send_technical_information_to_oxid', false];
+        }
+        $session->expects($this->any())->method('getSessionParam')->will($this->returnValueMap($map));
+
+        $setup = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Setup', ['getShopId']);
+        $setup->expects($this->any())->method('getShopId')->will($this->returnValue(1));
+
+        /** @var Database|PHPUnit\Framework\MockObject\MockObject $database */
+        $database = $this->getMock('OxidEsales\\EshopCommunity\\Setup\\Database', ['execSql', 'getInstance', 'getConnection']);
+        $instanceMap = [
+            ['Utilities', new Utilities()],
+            ['Session', $session],
+            ['Setup', $setup],
+        ];
+        $database->expects($this->any())->method('getInstance')->will($this->returnValueMap($instanceMap));
+        $pdo = $this->createConnection();
+        $database->expects($this->any())->method('getConnection')->will($this->returnValue($pdo));
+
+        // Seed aLanguageParams with both de and en active — the new
+        // shipping default per issue #170.
+        $seededParams = [
+            'de' => ['baseId' => 0, 'active' => '1', 'sort' => '1'],
+            'en' => ['baseId' => 1, 'active' => '1', 'sort' => '2', 'default' => false],
+        ];
+        $pdo->exec("delete from oxconfig where oxvarname = 'aLanguageParams'");
+        $insert = $pdo->prepare(
+            'insert into oxconfig (oxid, oxshopid, oxvarname, oxvartype, oxvarvalue) '
+            . 'values (:oxid, :shopid, :name, :type, :value)'
+        );
+        $insert->execute([
+            ':oxid'    => '39893a0ef6a6e11645d4beee4fd0cd51',
+            ':shopid'  => 1,
+            ':name'    => 'aLanguageParams',
+            ':type'    => 'aarr',
+            ':value'   => serialize($seededParams),
+        ]);
+
+        // Act: install wizard selects English as shop language.
+        $database->saveShopSettings(
+            [
+                'check_for_updates' => false,
+                'sShopLang' => 'en',
+            ]
+        );
+
+        // Assert: both seeded languages remain active.
+        $stmt = $pdo->query("select oxvarvalue from oxconfig where oxvarname = 'aLanguageParams'");
+        $stored = unserialize($stmt->fetchColumn());
+
+        $this->assertSame('1', $stored['de']['active'], 'German must remain active after the wizard picks English.');
+        $this->assertSame('1', $stored['en']['active'], 'English must be active after the wizard picks English.');
+    }
+
+    /**
      * Testing SetupDb::writeAdminLoginData()
      */
     public function testWriteAdminLoginData()
