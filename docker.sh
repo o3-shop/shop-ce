@@ -411,6 +411,7 @@ case "$1" in
             npm install || exit 127
             npx playwright install chromium || exit 127
         fi
+        export SHOP_CONTAINER="${COMPOSE_PROJECT_NAME}-shop-1"
         npx playwright test "$@" || exit 127
         ;;
     *)
