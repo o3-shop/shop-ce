@@ -346,7 +346,7 @@ class ReleaseCommandTest extends TestCase
 
     /* ---------- partial-state printing on live success ---------- */
 
-    public function testLiveSuccessPrintsCapturedReleaseAndMergeBackUrls(): void
+    public function testLiveSuccessPrintsFinishChecklist(): void
     {
         $tmpRepoPath = $this->makeFakeGitRepo();
         $stub = new StubReleasePlanner(new ReleasePlan(
@@ -360,7 +360,10 @@ class ReleaseCommandTest extends TestCase
         ));
         $executor = new RecordingLiveExecutor(
             false,
-            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1'],
+            [
+                'o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1',
+                'o3-shop/o3-shop' => 'https://github.com/o3-shop/o3-shop/releases/draft/v1.6.1',
+            ],
             ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/pull/200']
         );
         $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
@@ -372,10 +375,73 @@ class ReleaseCommandTest extends TestCase
 
         $display = $tester->getDisplay();
         $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('Draft GitHub releases created:', $display);
-        $this->assertStringContainsString('o3-shop/shop-ce -> https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1', $display);
-        $this->assertStringContainsString('Merge-back PRs opened:', $display);
-        $this->assertStringContainsString('o3-shop/shop-ce -> https://github.com/o3-shop/shop-ce/pull/200', $display);
+        $this->assertStringContainsString('To finish the release:', $display);
+        $this->assertStringContainsString('Publish the draft GitHub releases', $display);
+        $this->assertStringContainsString('https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1', $display);
+        $this->assertStringContainsString('https://github.com/o3-shop/o3-shop/releases/draft/v1.6.1', $display);
+        $this->assertStringContainsString('Review and merge the merge-back PRs', $display);
+        $this->assertStringContainsString('https://github.com/o3-shop/shop-ce/pull/200', $display);
+        // Success path drops the neutral partial-state framing.
+        $this->assertStringNotContainsString('Draft GitHub releases created:', $display);
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    public function testLiveSuccessOmitsMergeBackGroupForPreRelease(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1-RC1',
+            new FromSnapshot([]),
+            [],
+            [],
+            '',
+            []
+        ));
+        $executor = new RecordingLiveExecutor(
+            false,
+            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1-RC1'],
+            []
+        );
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1-RC1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
+        ]);
+
+        $display = $tester->getDisplay();
+        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
+        $this->assertStringContainsString('To finish the release:', $display);
+        $this->assertStringContainsString('Publish the draft GitHub releases', $display);
+        $this->assertStringNotContainsString('Review and merge the merge-back PRs', $display);
+        $this->cleanupFakeGitRepo($tmpRepoPath);
+    }
+
+    public function testLiveSuccessWithNothingToFinishPrintsNothingMessage(): void
+    {
+        $tmpRepoPath = $this->makeFakeGitRepo();
+        $stub = new StubReleasePlanner(new ReleasePlan(
+            'v1.6.0',
+            'v1.6.1',
+            new FromSnapshot([]),
+            [],
+            [],
+            '',
+            []
+        ));
+        $executor = new RecordingLiveExecutor(false, [], []);
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
+        $status = $tester->execute([
+            '--from' => 'v1.6.0',
+            '--to' => 'v1.6.1',
+            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
+        ]);
+
+        $display = $tester->getDisplay();
+        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
+        $this->assertStringContainsString('Nothing to publish or merge.', $display);
+        $this->assertStringNotContainsString('To finish the release:', $display);
         $this->cleanupFakeGitRepo($tmpRepoPath);
     }
 

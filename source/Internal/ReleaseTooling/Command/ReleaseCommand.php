@@ -265,8 +265,7 @@ class ReleaseCommand extends Command
             $this->printPartialState($executor, $output);
             return self::EXIT_PLAN_ERROR;
         }
-        $this->printPartialState($executor, $output);
-        $output->writeln('<info>Live execution complete. Publish the draft GitHub releases manually.</info>');
+        $this->printFinishChecklist($executor, $output);
         return self::EXIT_OK;
     }
 
@@ -486,6 +485,57 @@ class ReleaseCommand extends Command
         }
         $repoPaths[$package] = $path;
         return null;
+    }
+
+    /**
+     * Success-path summary: the manual steps that finish the release,
+     * each as a click-to-finish URL — draft releases to publish first,
+     * then the merge-back PRs (final releases only). The failure path
+     * keeps printPartialState()'s neutral "here's what got created
+     * before the error" framing instead, so a crash never reads as a
+     * completed release.
+     */
+    private function printFinishChecklist(LiveExecutor $executor, OutputInterface $output): void
+    {
+        $groups = [];
+        $releases = $executor->releaseUrls();
+        if ($releases !== []) {
+            $groups[] = [
+                'Publish the draft GitHub releases (open each, then click "Publish release"):',
+                $releases,
+            ];
+        }
+        $mergeBacks = $executor->mergeBackUrls();
+        if ($mergeBacks !== []) {
+            $groups[] = [
+                'Review and merge the merge-back PRs (release branch -> main):',
+                $mergeBacks,
+            ];
+        }
+
+        $output->writeln('');
+        if ($groups === []) {
+            $output->writeln('<info>Live execution complete. Nothing to publish or merge.</info>');
+            return;
+        }
+
+        // Align every URL under the widest package name across all groups
+        // so the two lists read as one column.
+        $width = 0;
+        foreach ($groups as [, $urls]) {
+            foreach (array_keys($urls) as $package) {
+                $width = max($width, strlen($package));
+            }
+        }
+
+        $output->writeln('<info>To finish the release:</info>');
+        foreach ($groups as $index => [$label, $urls]) {
+            $output->writeln('');
+            $output->writeln(sprintf('  %d. %s', $index + 1, $label));
+            foreach ($urls as $package => $url) {
+                $output->writeln(sprintf('       %s  %s', str_pad($package, $width), $url));
+            }
+        }
     }
 
     private function printPartialState(LiveExecutor $executor, OutputInterface $output): void
