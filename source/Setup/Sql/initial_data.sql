@@ -660,102 +660,14 @@ VALUES ('8709e45f31a86909e9f999222e80b1d0', 'oxstdfooter', 1, 1, 0, 1, 1, '', 'S
         '<div>Demo des O3-Shops - <a href="https://www.o3-shop.com">besuchen Sie die Community-Homepage</a></div>', 'standard footer',
         '<div>Demo of O3-Shop - <a href="https://www.o3-shop.com"> Visit our community home page</a></div>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', '', '', 0),
 ('ad542e49bff479009.64538090', 'oxadminorderemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin', 'Folgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->value }] bestellt:<br>\r\n<br>', 'your order admin', 'The following products have been ordered in [{ $shop->oxshops__oxname->value }] right now:<br>\r\n<br>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
-('c8d45408c4998f421.15746968', 'oxadminordernpemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin (Fremdländer)', '<div>\r\n<p> <span style="color: #ff0000;"><strong>Hinweis:</strong></span> Derzeit ist keine Liefermethode für dieses Land bekannt. Bitte Liefermöglichkeiten suchen und den Besteller unter Angabe der <strong>Lieferkosten</strong> informieren!\r\n&nbsp;
-</p> </div>
-\r
-\n<div>Folgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->value }] bestellt:<br>
-\r
-\n<br>
-\r
-\n</div>', 'your order admin (other country)', '<p> <span style="color: #ff0000"><strong>Information:</strong></span> Currently, there is no shipping method defined for this country. Please find a delivery option and inform the customer about the <strong>shipping costs</strong>.</p>
-\r
-\n<p>The following products have been ordered on [{ $shop->oxshops__oxname->value }]:<br />
-\r
-\n<br /></p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_EMAILS', '', 0),
-('c8d45408c718782f3.21298666
-', 'oxadminordernpplainemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin (Fremdländer) Plain', 'Hinweis: Derzeit ist keine Liefermethode für dieses Land bekannt. Bitte Liefermöglichkeiten suchen und den Besteller informieren!
-\r
-\n
-\r
-\nFolgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->getRawValue() }] bestellt:', 'your order admin plain (other country)', '<p>Information: Currently, there is no shipping method defined for this country. Please find a delivery option and inform the customer about the shipping costs.
-\r
-\n
-\r
-\nThe following products have been ordered on [{ $shop->oxshops__oxname->getRawValue() }]:</p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_EMAILS', '', 1),
-('ad542e49c19109ad6.04198712
-', 'oxadminorderplainemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin Plain', '<p>Folgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->getRawValue() }] bestellt:</p>', 'your order admin plain', 'The following products have been ordered in [{ $shop->oxshops__oxname->getRawValue() }] right now:', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_EMAILS', '', 1),
-('2eb4676806a3d2e87.06076523
-', 'oxagb', 1, 1, 0, 1, 1, '', 'AGB', '<div><strong>AGB</strong></div>
-\r
-\n<div><strong>&nbsp;
-</strong></div>
-\r
-\n<div>Fügen Sie hier Ihre allgemeinen Geschäftsbedingungen ein:</div>
-\r
-\n<div>&nbsp;
-</div>
-\r
-\n<div><span style="font-weight: bold">Strukturvorschlag:</span><br>
-\r
-\n<br>
-\r
-\n<ol>
-\r
-\n<li>Geltungsbereich </li>
-\r
-\n<li>Vertragspartner </li>
-\r
-\n<li>Angebot und Vertragsschluss </li>
-\r
-\n<li>Widerrufsrecht, Widerrufsbelehrung, Widerrufsfolgen </li>
-\r
-\n<li>Preise und Versandkosten </li>
-\r
-\n<li>Lieferung </li>
-\r
-\n<li>Zahlung </li>
-\r
-\n<li>Eigentumsvorbehalt </li>
-\r
-\n<li>Gewährleistung </li>
-\r
-\n<li>Weitere Informationen</li></ol></div>', 'Terms and Conditions', 'Insert your terms and conditions here.', 1, '', '', 0, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_USERINFO', '
-1', 0),
-('c4241316c6e7b9503.93160420
-', 'oxbargain', 1, 1, 0, 1, 1, '', 'Angebot der Woche', '<table>[{foreach from=$oView->getBargainArticleList() item=articlebargain_item}] <tbody><tr><td>
-\r
-\n<div class="product_image_s_container"><a href="[{$articlebargain_item->getLink()}]"><img border="0" alt="[{ $articlebargain_item->oxarticles__oxtitle->value }][{if $articlebargain_item->oxarticles__oxvarselect->value }] [{ $articlebargain_item->oxarticles__oxvarselect->value }][{/if}] [{$oxcmp_shop->oxshops__oxtitlesuffix->value}]" src="[{ $articlebargain_item->getDynImageDir()}]/[{$articlebargain_item->oxarticles__oxicon->value}]"></a></div> </td><td class="boxrightproduct-td"> <a href="[{$articlebargain_item->getLink()}]" class="boxrightproduct-td"><strong>[{ $articlebargain_item->oxarticles__oxtitle->value|cat:"\r\n"|cat:$articlebargain_item->oxarticles__oxvarselect->value|strip_tags|smartwordwrap:15:"<br>\r\n":2:1:"..." }]</strong></a><br>
-\r
-\n [{ if $articlebargain_item->isBuyable() }] <a href="[{$articlebargain_item->getToBasketLink()}]&amp;am=1" class="details" onclick="showBasketWnd();" rel="nofollow"><img border="0" src="[{$oViewConf->getImageUrl(''arrow_details.gif'')}]" alt=""> Jetzt bestellen! </a> [{/if}] </td></tr>[{/foreach}]
-\r
-\n</tbody></table>', 'Week''s Special', '<table>[{foreach from=$oView->getBargainArticleList() item=articlebargain_item}] <tbody><tr><td>
-\r
-\n<div class="product_image_s_container"><a href="[{$articlebargain_item->getLink()}]"><img border="0" src="[{ $articlebargain_item->getDynImageDir()}]/[{$articlebargain_item->oxarticles__oxicon->value}]" alt="[{ $articlebargain_item->oxarticles__oxtitle->value }][{if $articlebargain_item->oxarticles__oxvarselect->value }] [{ $articlebargain_item->oxarticles__oxvarselect->value }][{/if}] [{$oxcmp_shop->oxshops__oxtitlesuffix->value}]"></a></div> </td><td class="boxrightproduct-td"> <a class="boxrightproduct-td" href="[{$articlebargain_item->getLink()}]"><strong>[{ $articlebargain_item->oxarticles__oxtitle->value|cat:"\r\n"|cat:$articlebargain_item->oxarticles__oxvarselect->value|strip_tags|smartwordwrap:15:"<br>\r\n ":2:1:"..." }]</strong></a><br>
-\r
-\n [{ if $articlebargain_item->isBuyable()}] <a onclick="showBasketWnd();" class="details" href="[{$articlebargain_item->getToBasketLink()}]&amp;am=1" rel="nofollow"><img border="0" alt="" src="[{$oViewConf->getImageUrl(''arrow_details.gif'')}]"> Order now! </a> [{/if}] </td></tr>[{/foreach}] </tbody></table>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_EMAILS', '', 0),
-('1544167b4666ccdc1.28484600
-', 'oxblocked', 1, 1, 0, 1, 1, '', 'Benutzer geblockt', '<div><span style="color: #ff0000;"><strong>Der Zugang wurde Ihnen verweigert!</strong></span></div>
-\r
-\n<div>&nbsp;
-</div>
-\r
-\n<div>&nbsp;
-</div>', 'user blocked', '<div>
-\r
-\n   <span style="color: #ff0000;"><strong>Permission denied!</strong></span>
-\r
-\n</div>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_USERINFO', '', 0),
-('f41427a07519469f1.34718981
-', 'oxdeliveryinfo', 1, 1, 0, 1, 1, '', 'Zahlung und Lieferung', '<p>Fügen Sie hier Ihre Versandinformationen und -kosten ein.</p>', 'Shipping and Charges', '<p>Add your shipping information and costs here.</p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141
-', 'CMSFOLDER_USERINFO', '', 0),
-('42e4667ffcf844be0.22563656
-', 'oxemailfooter', 1, 1, 0, 1, 1, '', 'E-Mail Fußtext', '<p align="left">--</p>\r\n<p>Bitte fügen Sie hier Ihre vollständige Anbieterkennzeichnung ein.</p>', 'E-mail footer', '<p align="left">--</p>\r\n<p>Please insert your imprint here</p>', 1, '', '', 0, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
+('c8d45408c4998f421.15746968', 'oxadminordernpemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin (Fremdländer)', '<div>\r\n<p> <span style="color: #ff0000;"><strong>Hinweis:</strong></span> Derzeit ist keine Liefermethode für dieses Land bekannt. Bitte Liefermöglichkeiten suchen und den Besteller unter Angabe der <strong>Lieferkosten</strong> informieren!\r\n&nbsp;</p> </div>\r\n<div>Folgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->value }] bestellt:<br>\r\n<br>\r\n</div>', 'your order admin (other country)', '<p> <span style="color: #ff0000"><strong>Information:</strong></span> Currently, there is no shipping method defined for this country. Please find a delivery option and inform the customer about the <strong>shipping costs</strong>.</p>\r\n<p>The following products have been ordered on [{ $shop->oxshops__oxname->value }]:<br />\r\n<br /></p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
+('c8d45408c718782f3.21298666', 'oxadminordernpplainemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin (Fremdländer) Plain', 'Hinweis: Derzeit ist keine Liefermethode für dieses Land bekannt. Bitte Liefermöglichkeiten suchen und den Besteller informieren!\r\n\r\nFolgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->getRawValue() }] bestellt:', 'your order admin plain (other country)', '<p>Information: Currently, there is no shipping method defined for this country. Please find a delivery option and inform the customer about the shipping costs.\r\n\r\nThe following products have been ordered on [{ $shop->oxshops__oxname->getRawValue() }]:</p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 1),
+('ad542e49c19109ad6.04198712', 'oxadminorderplainemail', 1, 1, 0, 1, 1, '', 'Ihre Bestellung Admin Plain', '<p>Folgende Artikel wurden soeben unter [{ $shop->oxshops__oxname->getRawValue() }] bestellt:</p>', 'your order admin plain', 'The following products have been ordered in [{ $shop->oxshops__oxname->getRawValue() }] right now:', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 1),
+('2eb4676806a3d2e87.06076523', 'oxagb', 1, 1, 0, 1, 1, '', 'AGB', '<div><strong>AGB</strong></div>\r\n<div><strong>&nbsp;</strong></div>\r\n<div>Fügen Sie hier Ihre allgemeinen Geschäftsbedingungen ein:</div>\r\n<div>&nbsp;</div>\r\n<div><span style="font-weight: bold">Strukturvorschlag:</span><br>\r\n<br>\r\n<ol>\r\n<li>Geltungsbereich </li>\r\n<li>Vertragspartner </li>\r\n<li>Angebot und Vertragsschluss </li>\r\n<li>Widerrufsrecht, Widerrufsbelehrung, Widerrufsfolgen </li>\r\n<li>Preise und Versandkosten </li>\r\n<li>Lieferung </li>\r\n<li>Zahlung </li>\r\n<li>Eigentumsvorbehalt </li>\r\n<li>Gewährleistung </li>\r\n<li>Weitere Informationen</li></ol></div>', 'Terms and Conditions', 'Insert your terms and conditions here.', 1, '', '', 0, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_USERINFO', '1', 0),
+('c4241316c6e7b9503.93160420', 'oxbargain', 1, 1, 0, 1, 1, '', 'Angebot der Woche', '<table>[{foreach from=$oView->getBargainArticleList() item=articlebargain_item}] <tbody><tr><td>\r\n<div class="product_image_s_container"><a href="[{$articlebargain_item->getLink()}]"><img border="0" alt="[{ $articlebargain_item->oxarticles__oxtitle->value }][{if $articlebargain_item->oxarticles__oxvarselect->value }] [{ $articlebargain_item->oxarticles__oxvarselect->value }][{/if}] [{$oxcmp_shop->oxshops__oxtitlesuffix->value}]" src="[{ $articlebargain_item->getDynImageDir()}]/[{$articlebargain_item->oxarticles__oxicon->value}]"></a></div> </td><td class="boxrightproduct-td"> <a href="[{$articlebargain_item->getLink()}]" class="boxrightproduct-td"><strong>[{ $articlebargain_item->oxarticles__oxtitle->value|cat:"\r\n"|cat:$articlebargain_item->oxarticles__oxvarselect->value|strip_tags|smartwordwrap:15:"<br>\r\n":2:1:"..." }]</strong></a><br>\r\n [{ if $articlebargain_item->isBuyable() }] <a href="[{$articlebargain_item->getToBasketLink()}]&amp;am=1" class="details" onclick="showBasketWnd();" rel="nofollow"><img border="0" src="[{$oViewConf->getImageUrl(''arrow_details.gif'')}]" alt=""> Jetzt bestellen! </a> [{/if}] </td></tr>[{/foreach}]\r\n</tbody></table>', 'Week''s Special', '<table>[{foreach from=$oView->getBargainArticleList() item=articlebargain_item}] <tbody><tr><td>\r\n<div class="product_image_s_container"><a href="[{$articlebargain_item->getLink()}]"><img border="0" src="[{ $articlebargain_item->getDynImageDir()}]/[{$articlebargain_item->oxarticles__oxicon->value}]" alt="[{ $articlebargain_item->oxarticles__oxtitle->value }][{if $articlebargain_item->oxarticles__oxvarselect->value }] [{ $articlebargain_item->oxarticles__oxvarselect->value }][{/if}] [{$oxcmp_shop->oxshops__oxtitlesuffix->value}]"></a></div> </td><td class="boxrightproduct-td"> <a class="boxrightproduct-td" href="[{$articlebargain_item->getLink()}]"><strong>[{ $articlebargain_item->oxarticles__oxtitle->value|cat:"\r\n"|cat:$articlebargain_item->oxarticles__oxvarselect->value|strip_tags|smartwordwrap:15:"<br>\r\n ":2:1:"..." }]</strong></a><br>\r\n [{ if $articlebargain_item->isBuyable()}] <a onclick="showBasketWnd();" class="details" href="[{$articlebargain_item->getToBasketLink()}]&amp;am=1" rel="nofollow"><img border="0" alt="" src="[{$oViewConf->getImageUrl(''arrow_details.gif'')}]"> Order now! </a> [{/if}] </td></tr>[{/foreach}] </tbody></table>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
+('1544167b4666ccdc1.28484600', 'oxblocked', 1, 1, 0, 1, 1, '', 'Benutzer geblockt', '<div><span style="color: #ff0000;"><strong>Der Zugang wurde Ihnen verweigert!</strong></span></div>\r\n<div>&nbsp;</div>\r\n<div>&nbsp;</div>', 'user blocked', '<div>\r\n   <span style="color: #ff0000;"><strong>Permission denied!</strong></span>\r\n</div>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_USERINFO', '', 0),
+('f41427a07519469f1.34718981', 'oxdeliveryinfo', 1, 1, 0, 1, 1, '', 'Zahlung und Lieferung', '<p>Fügen Sie hier Ihre Versandinformationen und -kosten ein.</p>', 'Shipping and Charges', '<p>Add your shipping information and costs here.</p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_USERINFO', '', 0),
+('42e4667ffcf844be0.22563656', 'oxemailfooter', 1, 1, 0, 1, 1, '', 'E-Mail Fußtext', '<p align="left">--</p>\r\n<p>Bitte fügen Sie hier Ihre vollständige Anbieterkennzeichnung ein.</p>', 'E-mail footer', '<p align="left">--</p>\r\n<p>Please insert your imprint here</p>', 1, '', '', 0, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
 ('3194668fde854d711.73798992', 'oxemailfooterplain', 1, 1, 0, 1, 1, '', 'E-Mail Fußtext Plain', '-- Bitte fügen Sie hier Ihre vollständige Anbieterkennzeichnung ein.', 'E-mail footer plain', '-- Please insert your imprint here.', 1, '', '', 0, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 1),
 ('29142e76dd32dd477.41262508', 'oxforgotpwd', 1, 1, 0, 1, 1, '', 'Passwort vergessen', 'Sollten Sie innerhalb der nächsten Minuten KEINE E-Mail mit Ihren Zugangsdaten erhalten, so überprüfen Sie bitte: Haben Sie sich in unserem Shop bereits registriert? Wenn nicht, so tun Sie dies bitte einmalig im Rahmen des Bestellprozesses. Sie können dann selbst ein Passwort festlegen. Sobald Sie registriert sind, können Sie sich in Zukunft mit Ihrer E-Mail-Adresse und Ihrem Passwort einloggen.\r\n<ul>\r\n<li class="font11">Wenn Sie sich sicher sind, dass Sie sich in unserem Shop bereits registriert haben, dann überprüfen Sie bitte, ob Sie sich bei der Eingabe Ihrer E-Mail-Adresse evtl. vertippt haben.</li></ul>\r\n<p>Sollten Sie trotz korrekter E-Mail-Adresse und bereits bestehender Registrierung weiterhin Probleme mit dem Login haben und auch keine "Passwort vergessen"-E-Mail erhalten, so wenden Sie sich bitte per E-Mail an: <a href="mailto:[{ $oxcmp_shop->oxshops__oxinfoemail->value }]?subject=Passwort"><strong>[{ $oxcmp_shop->oxshops__oxinfoemail->value }]</strong></a></p>', 'Forgot password', '<p>If you don''t get an e-mail with your access data, please make sure that you have already registered with us. As soon as you are registered, you can login with your e-mail address and your password.</p>\r\n<ul>\r\n<li>\r\nIf you are sure you are already registered, please check the e-mail address you entered as user name.</li></ul>\r\n<p>\r\nIn case you still have problems logging in, please turn to us by e-mail: <a href="mailto:[{ $oxcmp_shop->oxshops__oxinfoemail->value }]?subject=Password"><strong>[{ $oxcmp_shop->oxshops__oxinfoemail->value }]</strong></a></p>', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_EMAILS', '', 0),
 ('2eb46767947d21851.22681675', 'oximpressum', 1, 1, 0, 1, 1, '', 'Impressum', '<p>Fügen Sie hier Ihre Anbieterkennzeichnung ein.</p>', 'About Us', '<p>Add provider identification here.</p>', 1, '', '', 0, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_USERINFO', '', 0),
