@@ -572,7 +572,7 @@ VALUES ('0d8f69efe8c663a61ce8933924bdbcdc', 'theme:wave', 'sShoppingLanguage', '
        ('fabba377ba7d7bd8925c8c4eae460ee5', 'theme:wave', 'blUseGAPageTracker', 'googleanalytics', '', 1);
 
 
-INSERT INTO `oxconfigdisplay` (`OXID`, `OXCFGMODULE`, `OXCFGVARNAME`, `OXGROUPING`, `OXVARCONSTRAINT`, `OXPOS`)
+INSERT IGNORE INTO `oxconfigdisplay` (`OXID`, `OXCFGMODULE`, `OXCFGVARNAME`, `OXGROUPING`, `OXVARCONSTRAINT`, `OXPOS`)
 VALUES ('091fa9cc622351c270d5522741a21695', 'theme:o3-theme', 'sYouTubeUrl', 'footer', '', 1),
        ('0b92e29245168b65f136ab55c30471b7', 'theme:o3-theme', 'sShippingDaysOnStock', 'googlets', '', 1),
        ('0d91c1227bca0842b946b67270e1f7e4', 'theme:o3-theme', 'sSliderInterval', 'slider', '', 1),
