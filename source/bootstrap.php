@@ -356,3 +356,19 @@ function writeToLog($message)
 
     file_put_contents(OX_LOG_FILE, $message, FILE_APPEND);
 }
+
+/**
+ * Optional local / environment-specific bootstrap overrides.
+ *
+ * This file is intentionally NOT committed (see .gitignore). Copy
+ * bootstrap.custom.php.dist to bootstrap.custom.php to add local overrides
+ * such as custom DI bindings, Whoops/Debugbar, or ini_set() tweaks.
+ *
+ * Loaded last, so the composer autoloader, the shop ConfigFile, the
+ * ExitHandler, oxNew() and all overridable functions are already available.
+ * The is_readable() guard means no error or warning is raised when the file
+ * is absent (the default state of the repository).
+ */
+if (is_readable(OX_BASE_PATH . 'bootstrap.custom.php')) {
+    require OX_BASE_PATH . 'bootstrap.custom.php';
+}
