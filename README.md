@@ -45,6 +45,23 @@ Once the setup is complete, all emails are sent to Mailpit. You reach it at http
 
 Adminer is included in the standard installation. Try http://localhost:8081.
 
+### Local bootstrap overrides
+
+Need local-only or environment-specific initialization (custom DI bindings, a
+Whoops error page, Debugbar, `ini_set()` tweaks) without patching tracked core
+files? Copy the committed example and edit your copy:
+
+```bash
+cp source/bootstrap.custom.php.dist source/bootstrap.custom.php
+```
+
+`source/bootstrap.custom.php` is gitignored, so it never ends up in a commit or
+a diff. It is `require`d at the very end of `source/bootstrap.php`, after the
+autoloaders, the shop configuration, the `ExitHandler` and `oxNew()` are all
+available — so it is the right place for overrides. If the file is absent
+(the default), bootstrap proceeds with no warning. See
+`source/bootstrap.custom.php.dist` for documented examples.
+
 ### Working on the storefront theme
 
 The first `./docker.sh start` clones the storefront themes directly into the served paths via `git`:
