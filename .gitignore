@@ -101,4 +101,10 @@ oxideshop.log
 # Satellite working tree for testing-library (same pattern as shop-demodata-ce).
 /testing-library
 
+# Satellite working tree for the tinymce-editor module (same pattern). The
+# top-level clone is symlinked into source/modules/o3-shop/tinymce-editor by
+# the docker entrypoint, so ignore both the clone and the symlink.
+/tinymce-editor
+/source/modules/o3-shop/tinymce-editor
+
 /graphify-out

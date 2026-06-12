@@ -62,7 +62,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "OxidEsales\\EshopCommunity\\Tests\\": "./tests"
+            "OxidEsales\\EshopCommunity\\Tests\\": "./tests",
+            "O3\\TinyMCE\\": "./source/modules/o3-shop/tinymce-editor"
         }
     },
     "minimum-stability": "dev",

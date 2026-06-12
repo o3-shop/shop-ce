@@ -322,6 +322,64 @@ setup_db() {
 
 
 
+install_tinymce_editor() {
+    local repo_url="https://github.com/o3-shop/tinymce-editor.git"
+    local satellite_dir="tinymce-editor"
+    local symlink_path="source/modules/o3-shop/tinymce-editor"
+
+    log "${YELLOW}Installing tinymce-editor module satellite...${NC}"
+
+    # Same satellite pattern as testing-library/shop-demodata-ce: the working
+    # tree lives at the project top level (gitignored) so PhpStorm doesn't
+    # auto-exclude it and developers see modified-file indicators without
+    # per-IDE config. tinymce-editor is an oxideshop-module, so its home is
+    # source/modules/<vendor>/<module> (not vendor/); we symlink that path
+    # -> ../../../tinymce-editor so OXID discovers the module from the
+    # working tree.
+
+    if [ -d "$satellite_dir" ] && [ "$(ls -A "$satellite_dir")" ]; then
+        if [ ! -d "$satellite_dir/.git" ]; then
+            handle_error "$(cat <<EOF
+
+Detected detached snapshot at ./${satellite_dir}/ (no .git/ subdirectory).
+The entrypoint expects a git working tree there so tinymce-editor changes
+can be committed and pushed back to ${repo_url} directly.
+
+Run:
+
+    ./docker.sh stop
+    rm -rf ${satellite_dir} ${symlink_path}
+    ./docker.sh start
+
+Aborting so no work is destroyed.
+EOF
+            )"
+        fi
+        log "tinymce-editor: satellite working tree already present, skipping clone"
+    else
+        log "Cloning tinymce-editor from ${repo_url}..."
+        git clone "$repo_url" "$satellite_dir" \
+            || handle_error "Failed to clone tinymce-editor from ${repo_url}"
+    fi
+
+    # Replace any real directory at the module path with a symlink to the
+    # satellite working tree.
+    if [ -e "$symlink_path" ] && [ ! -L "$symlink_path" ]; then
+        log "Replacing real ${symlink_path} with symlink to satellite..."
+        rm -rf "$symlink_path" \
+            || handle_error "Failed to remove ${symlink_path}"
+    fi
+
+    if [ ! -e "$symlink_path" ]; then
+        mkdir -p "$(dirname "$symlink_path")" \
+            || handle_error "Failed to create $(dirname "$symlink_path")"
+        ln -s "../../../${satellite_dir}" "$symlink_path" \
+            || handle_error "Failed to symlink ${symlink_path} -> ../../../${satellite_dir}"
+    fi
+
+    log "${GREEN}tinymce-editor module ready${NC}"
+}
+
 # Main execution
 main() {
     echo "setup is running" > /tmp/o3setup-running
@@ -332,6 +390,7 @@ main() {
     install_dependencies || exit 127
     install_testing_library || exit 127
     install_demodata || exit 127
+    install_tinymce_editor || exit 127
     setup_db || exit 127
     install_theme || exit 127
     install_o3_theme || exit 127
