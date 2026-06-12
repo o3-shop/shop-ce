@@ -378,8 +378,6 @@ function processUnitInput( oSelect, sInputId )
                 [{/oxhasrights}]
             </table>
 
-            [{oxinputhelp ident="HELP_ARTICLE_EXTEND_UPDATEPRICES"}]
-
        </fieldset>
 
       </td>
