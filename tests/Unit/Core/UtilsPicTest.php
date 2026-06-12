@@ -122,6 +122,51 @@ class UtilsPicTest extends \OxidTestCase
         $this->assertTrue($this->_resizeImageTest($sTestImageFilePNG, $sTestImageFileResizedPNG, 21, 10));
     }
 
+    /**
+     * resizePng()/resizeJpeg()/resizeGif() must not throw a TypeError when the
+     * source image cannot be decoded (imagecreatefrom*() returns false under
+     * PHP 8). They must return false so the picture pipeline can fall back to a
+     * 404 / placeholder instead of bubbling up as an HTTP 500.
+     *
+     * @see https://github.com/o3-shop/o3-shop/issues/174
+     */
+    public function testResizeFunctionsReturnFalseForUndecodableSource()
+    {
+        // Ensure the procedural resize functions from oxpicgenerator.php are loaded.
+        \OxidEsales\Eshop\Core\Registry::getUtilsPic();
+
+        $sDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR;
+        $iGdVer = getGdVersion();
+        // Pretend the source is 200x200 so a resize down to 100x100 is actually triggered.
+        $aImageInfo = [200, 200];
+
+        $aResizers = [
+            'png' => function ($sSrc, $sTarget) use ($aImageInfo, $iGdVer) {
+                return resizePng($sSrc, $sTarget, 100, 100, $aImageInfo, $iGdVer, null);
+            },
+            'jpg' => function ($sSrc, $sTarget) use ($aImageInfo, $iGdVer) {
+                return resizeJpeg($sSrc, $sTarget, 100, 100, $aImageInfo, $iGdVer, null, 90);
+            },
+            'gif' => function ($sSrc, $sTarget) use ($iGdVer) {
+                return resizeGif($sSrc, $sTarget, 100, 100, 200, 200, $iGdVer);
+            },
+        ];
+
+        foreach ($aResizers as $sExt => $callResizer) {
+            $sSrc = $sDir . 'o3_174_broken_source.' . $sExt;
+            $sTarget = $sDir . 'o3_174_broken_target.' . $sExt;
+            file_put_contents($sSrc, 'this is not a valid image'); // imagecreatefrom*() -> false
+
+            $mResult = $callResizer($sSrc, $sTarget);
+
+            $this->assertFalse($mResult, "resize for '$sExt' must return false for an undecodable source");
+            $this->assertFalse(is_file($sTarget), "resize for '$sExt' must not write a target from an undecodable source");
+
+            @unlink($sSrc);
+            @unlink($sTarget);
+        }
+    }
+
     protected function _resizeImageTest($sTestImageFile, $sTestImageFileResized, $iWidth = 100, $iHeight = 48)
     {
         $sDir = __DIR__ . '/../testData/misc' . DIRECTORY_SEPARATOR;

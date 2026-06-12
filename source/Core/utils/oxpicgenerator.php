@@ -157,7 +157,14 @@ if (!function_exists('resizeGif')) {
         if (is_array($aResult)) {
             list($iNewWidth, $iNewHeight) = $aResult;
             $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
-            $hSourceImage = imagecreatefromgif($sSrc);
+            $hSourceImage = @imagecreatefromgif($sSrc);
+            if ($hSourceImage === false) {
+                \OxidEsales\Eshop\Core\Registry::getLogger()->error(
+                    __FUNCTION__ . " - Could not decode source GIF '$sSrc'."
+                );
+                imagedestroy($hDestinationImage);
+                return false;
+            }
 
             $iFillColor = imagecolorresolve($hDestinationImage, 255, 255, 255);
             imagefill($hDestinationImage, 0, 0, $iFillColor);
@@ -198,7 +205,13 @@ if (!function_exists('resizePng')) {
             if ($hDestinationImage === null) {
                 $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
             }
-            $hSourceImage = imagecreatefrompng($sSrc);
+            $hSourceImage = @imagecreatefrompng($sSrc);
+            if ($hSourceImage === false) {
+                \OxidEsales\Eshop\Core\Registry::getLogger()->error(
+                    __FUNCTION__ . " - Could not decode source PNG '$sSrc'."
+                );
+                return false;
+            }
             if (!imageistruecolor($hSourceImage)) {
                 $hDestinationImage = imagecreate($iNewWidth, $iNewHeight);
                 // fix for transparent images sets image to transparent
@@ -246,7 +259,13 @@ if (!function_exists('resizeJpeg')) {
             if ($hDestinationImage === null) {
                 $hDestinationImage = imagecreatetruecolor($iNewWidth, $iNewHeight);
             }
-            $hSourceImage = imagecreatefromstring(file_get_contents($sSrc));
+            $hSourceImage = @imagecreatefromstring((string) @file_get_contents($sSrc));
+            if ($hSourceImage === false) {
+                \OxidEsales\Eshop\Core\Registry::getLogger()->error(
+                    __FUNCTION__ . " - Could not decode source JPEG '$sSrc'."
+                );
+                return false;
+            }
             if (copyAlteredImage($hDestinationImage, $hSourceImage, $iNewWidth, $iNewHeight, $aImageInfo, $sTarget, $iGdVer)) {
                 imagejpeg($hDestinationImage, $sTarget, $iDefQuality);
                 imagedestroy($hDestinationImage);
