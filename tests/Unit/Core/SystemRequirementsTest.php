@@ -59,6 +59,63 @@ class SystemRequirementsTest extends \OxidTestCase
     }
 
     /**
+     * Probe reached oxseo.php and the RewriteRule fired: mod_rewrite is confirmed working.
+     */
+    public function testCheckModRewriteReturnsOkWhenRewriteFired()
+    {
+        $systemRequirements = $this->getMockBuilder(SystemRequirements::class)
+            ->onlyMethods(['_getModRewriteResponse'])
+            ->getMock();
+        $systemRequirements->method('_getModRewriteResponse')
+            ->willReturn("HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nmod_rewrite_on");
+
+        $this->assertSame(
+            SystemRequirements::MODULE_STATUS_OK,
+            $systemRequirements->UNITcheckModRewrite($this->getModRewriteHostInfoStub())
+        );
+    }
+
+    /**
+     * Probe reached oxseo.php but the RewriteRule did NOT fire: mod_rewrite is genuinely off.
+     */
+    public function testCheckModRewriteBlocksSetupWhenRewriteDidNotFire()
+    {
+        $systemRequirements = $this->getMockBuilder(SystemRequirements::class)
+            ->onlyMethods(['_getModRewriteResponse'])
+            ->getMock();
+        $systemRequirements->method('_getModRewriteResponse')
+            ->willReturn("HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nmod_rewrite_off");
+
+        $this->assertSame(
+            SystemRequirements::MODULE_STATUS_BLOCKS_SETUP,
+            $systemRequirements->UNITcheckModRewrite($this->getModRewriteHostInfoStub())
+        );
+    }
+
+    /**
+     * Probe got a response that contains neither marker (e.g. a reverse-proxy / DDEV 301 redirect):
+     * the result is undeterminable and must NOT block setup.
+     */
+    public function testCheckModRewriteIsUndeterminableWhenNeitherMarkerIsPresent()
+    {
+        $systemRequirements = $this->getMockBuilder(SystemRequirements::class)
+            ->onlyMethods(['_getModRewriteResponse'])
+            ->getMock();
+        $systemRequirements->method('_getModRewriteResponse')
+            ->willReturn("HTTP/1.1 301 Moved Permanently\r\nLocation: https://example.ddev.site/oxseo.php\r\nConnection: close\r\n\r\n");
+
+        $this->assertSame(
+            SystemRequirements::MODULE_STATUS_UNABLE_TO_DETECT,
+            $systemRequirements->UNITcheckModRewrite($this->getModRewriteHostInfoStub())
+        );
+    }
+
+    private function getModRewriteHostInfoStub(): array
+    {
+        return ['host' => '127.0.0.1', 'port' => 80, 'dir' => '/', 'ssl' => false];
+    }
+
+    /**
      * Testing SystemRequirements::checkServerPermissions()
      */
     public function testCheckServerPermissions()
@@ -308,6 +365,63 @@ class SystemRequirementsTest extends \OxidTestCase
             ],
             $systemRequirements->UNITgetShopHostInfoFromServerVars()
         );
+    }
+
+    /**
+     * Behind a reverse proxy / TLS terminator (DDEV, Traefik, nginx ingress, load balancer) the PHP
+     * process sees the internal scheme/port while the client spoke HTTPS to the proxy. The forwarded
+     * headers must take precedence so the mod_rewrite self-probe dials the public scheme/port.
+     *
+     * @dataProvider providerGetShopHostInfoFromServerVarsBehindProxy
+     */
+    public function testGetShopHostInfoFromServerVarsBehindProxy(array $server, array $expected)
+    {
+        $backup = $_SERVER;
+
+        $_SERVER['SCRIPT_NAME'] = '/setup/index.php';
+        $_SERVER['HTTP_HOST'] = 'shop.ddev.site';
+        $_SERVER['HTTPS'] = null;
+        $_SERVER['SERVER_PORT'] = 80;
+        unset(
+            $_SERVER['HTTP_X_FORWARDED_PROTO'],
+            $_SERVER['HTTP_X_FORWARDED_PORT'],
+            $_SERVER['HTTP_X_FORWARDED_SSL']
+        );
+        foreach ($server as $key => $value) {
+            $_SERVER[$key] = $value;
+        }
+
+        $systemRequirements = new SystemRequirements();
+        try {
+            $this->assertEquals(
+                $expected + ['host' => 'shop.ddev.site', 'dir' => '/'],
+                $systemRequirements->UNITgetShopHostInfoFromServerVars()
+            );
+        } finally {
+            $_SERVER = $backup;
+        }
+    }
+
+    public function providerGetShopHostInfoFromServerVarsBehindProxy(): array
+    {
+        return [
+            'X-Forwarded-Proto https, default https port' => [
+                ['HTTP_X_FORWARDED_PROTO' => 'https'],
+                ['port' => 443, 'ssl' => true],
+            ],
+            'X-Forwarded-Proto https with explicit forwarded port' => [
+                ['HTTP_X_FORWARDED_PROTO' => 'https', 'HTTP_X_FORWARDED_PORT' => '8443'],
+                ['port' => 8443, 'ssl' => true],
+            ],
+            'X-Forwarded-Ssl on' => [
+                ['HTTP_X_FORWARDED_SSL' => 'on'],
+                ['port' => 443, 'ssl' => true],
+            ],
+            'X-Forwarded-Proto http stays plain on internal port' => [
+                ['HTTP_X_FORWARDED_PROTO' => 'http'],
+                ['port' => 80, 'ssl' => false],
+            ],
+        ];
     }
 
     public function testCheckTemplateBlockIfTemplateDoNotExists()

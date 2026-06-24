@@ -466,8 +466,28 @@ class SystemRequirements
     {
         // got here from setup dir
         $sScript = $_SERVER['SCRIPT_NAME'];
-        $iPort = (int) $_SERVER['SERVER_PORT'];
-        $blSsl = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'));
+
+        // Behind a reverse proxy / TLS terminator (DDEV, Traefik, nginx ingress, load balancer) the
+        // PHP process sees the *internal* scheme/port (typically plain HTTP on 80) while the client
+        // reached the proxy over HTTPS. Honor the forwarded headers so the mod_rewrite self-probe
+        // dials the public scheme/port the proxy serves and loops back cleanly, instead of hitting an
+        // HTTP->HTTPS redirect that would make the probe undeterminable. These headers are only used
+        // for the local loopback probe (never for auth or URL generation), so trusting them here is
+        // harmless: a spoofed value at worst makes the probe fail and degrade to a warning.
+        $blForwardedHttps = (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+                && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+            || (isset($_SERVER['HTTP_X_FORWARDED_SSL'])
+                && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on');
+        $blSsl = $blForwardedHttps || (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on'));
+
+        if (!empty($_SERVER['HTTP_X_FORWARDED_PORT'])) {
+            $iPort = (int) $_SERVER['HTTP_X_FORWARDED_PORT'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) || isset($_SERVER['HTTP_X_FORWARDED_SSL'])) {
+            // a proxy terminated the connection: SERVER_PORT is the internal port, not the public one
+            $iPort = $blSsl ? 443 : 80;
+        } else {
+            $iPort = (int) $_SERVER['SERVER_PORT'];
+        }
         if (!$iPort) {
             $iPort = $blSsl ? 443 : 80;
         }
@@ -553,33 +573,67 @@ class SystemRequirements
      */
     protected function _checkModRewrite($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sHostname = ($aHostInfo['ssl'] ? 'ssl://' : '') . $aHostInfo['host'];
-        if ($rFp = @fsockopen($sHostname, $aHostInfo['port'], $iErrNo, $sErrStr, 10)) {
-            $sReq = "POST {$aHostInfo['dir']}oxseo.php?mod_rewrite_module_is=off HTTP/1.1\r\n";
-            $sReq .= "Host: {$aHostInfo['host']}\r\n";
-            $sReq .= "User-Agent: O3-Shop setup\r\n";
-            $sReq .= "Content-Type: application/x-www-form-urlencoded\r\n";
-            $sReq .= "Content-Length: 0\r\n"; // empty post
-            $sReq .= "Connection: close\r\n\r\n";
+        $sOut = $this->_getModRewriteResponse($aHostInfo);
 
-            $sOut = '';
-            fwrite($rFp, $sReq);
-            while (!feof($rFp)) {
-                $sOut .= fgets($rFp, 100);
+        if ($sOut !== false) {
+            // The probe (POST oxseo.php?mod_rewrite_module_is=off) reached a server that answered.
+            // Classify three ways instead of two, so an undeterminable answer does not block setup:
+            //   - 'mod_rewrite_on'  -> the RewriteRule rewrote off->on, mod_rewrite is confirmed working
+            //   - 'mod_rewrite_off' -> the request reached oxseo.php unrewritten, mod_rewrite is genuinely off
+            //   - neither marker    -> a redirect / reverse proxy / TLS terminator (e.g. DDEV) answered;
+            //                          we cannot tell, so warn instead of blocking the install
+            if (strpos($sOut, 'mod_rewrite_on') !== false) {
+                $iModStat = static::MODULE_STATUS_OK;
+            } elseif (strpos($sOut, 'mod_rewrite_off') !== false) {
+                $iModStat = static::MODULE_STATUS_BLOCKS_SETUP;
+            } else {
+                $iModStat = static::MODULE_STATUS_UNABLE_TO_DETECT;
             }
-            fclose($rFp);
-
-            $iModStat = (strpos($sOut, 'mod_rewrite_on') !== false) ? 2 : 0;
         } else {
             if (function_exists('apache_get_modules')) {
-                // it does not assure that mod_rewrite is enabled on current host, so setting 1
-                $iModStat = in_array('mod_rewrite', apache_get_modules()) ? 1 : 0;
+                // mod_rewrite missing from the loaded modules is positive proof it is absent;
+                // its presence does not assure it is enabled for this host, so only flag the minimum.
+                $iModStat = in_array('mod_rewrite', apache_get_modules())
+                    ? static::MODULE_STATUS_FITS_MINIMUM_REQUIREMENTS
+                    : static::MODULE_STATUS_BLOCKS_SETUP;
             } else {
-                $iModStat = -1;
+                $iModStat = static::MODULE_STATUS_UNABLE_TO_DETECT;
             }
         }
 
         return $iModStat;
+    }
+
+    /**
+     * Performs the mod_rewrite self-probe: opens a socket back to the shop and POSTs to
+     * oxseo.php?mod_rewrite_module_is=off, returning the raw HTTP response.
+     *
+     * @param array $aHostInfo host info (host, port, dir, ssl)
+     *
+     * @return string|false the raw response, or false if the socket could not be opened
+     */
+    protected function _getModRewriteResponse($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $sHostname = ($aHostInfo['ssl'] ? 'ssl://' : '') . $aHostInfo['host'];
+        if (!($rFp = @fsockopen($sHostname, $aHostInfo['port'], $iErrNo, $sErrStr, 10))) {
+            return false;
+        }
+
+        $sReq = "POST {$aHostInfo['dir']}oxseo.php?mod_rewrite_module_is=off HTTP/1.1\r\n";
+        $sReq .= "Host: {$aHostInfo['host']}\r\n";
+        $sReq .= "User-Agent: O3-Shop setup\r\n";
+        $sReq .= "Content-Type: application/x-www-form-urlencoded\r\n";
+        $sReq .= "Content-Length: 0\r\n"; // empty post
+        $sReq .= "Connection: close\r\n\r\n";
+
+        $sOut = '';
+        fwrite($rFp, $sReq);
+        while (!feof($rFp)) {
+            $sOut .= fgets($rFp, 100);
+        }
+        fclose($rFp);
+
+        return $sOut;
     }
 
     /**

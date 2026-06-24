@@ -20,6 +20,15 @@ type: reference
 - PHPSpec Prophecy (`phpspec/prophecy-phpunit`)
 - Use `$this->prophesize(SomeClass::class)` — not PHPUnit's built-in mocks
 - Reveal the mock: `$mock->reveal()`
+- Exception: legacy `\OxidTestCase`-based tests (e.g. `tests/Unit/Core/*`) use PHPUnit's built-in
+  mocks (`getMockBuilder(...)->onlyMethods([...])`). Match the style already in the file.
+
+## Calling protected/`_`-prefixed methods from tests
+- `Core\Base::__call` (active when `OXID_PHP_UNIT` is defined) maps a `UNIT`-prefixed call to the
+  underscore method: `$obj->UNITcheckModRewrite($x)` invokes the protected `_checkModRewrite($x)`.
+- To unit-test the logic of a protected method that does I/O, extract the I/O into its own protected
+  `_`-method, then partial-mock that seam: `getMockBuilder(Cls)->onlyMethods(['_doIo'])` and stub it,
+  while calling the method under test via its `UNIT...` alias so the real logic runs.
 
 ## Bootstrap
 - Fast mode uses `vendor/o3-shop/testing-library/bootstrap.php`
