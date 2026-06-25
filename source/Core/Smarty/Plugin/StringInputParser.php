@@ -76,8 +76,8 @@ final class StringInputParser
             $stringWithRangeParams = preg_replace(['/^(range\()/i', '/(\))$/i'], '', $input);
             $params = explode(',', $stringWithRangeParams);
             $result = range(
-                $this->cleanString($params[0]),
-                $this->cleanString($params[1]),
+                $this->normalizeRangeBoundary($this->cleanString($params[0])),
+                $this->normalizeRangeBoundary($this->cleanString($params[1])),
                 !empty($params[2]) ? (int)$this->cleanString($params[2]) : 1
             );
         } catch (\Throwable $exception) {
@@ -86,6 +86,20 @@ final class StringInputParser
             );
         }
         return $result;
+    }
+
+    /**
+     * Casts numeric range boundaries to their native int/float type, leaving
+     * non-numeric boundaries (e.g. "A") as strings. Required because PHP 8.3+
+     * no longer coerces numeric strings to numbers in range(), which would
+     * otherwise yield string elements for inputs like range(1,5).
+     *
+     * @param string $boundary
+     * @return int|float|string
+     */
+    private function normalizeRangeBoundary(string $boundary)
+    {
+        return is_numeric($boundary) ? $boundary + 0 : $boundary;
     }
 
     private function defineAllowedLanguageConstructs(): void
