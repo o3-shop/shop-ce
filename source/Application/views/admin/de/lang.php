@@ -1932,4 +1932,20 @@ $aLang = [
     'usrRegistered' => 'Der Benutzer wird nach der Eingabe seines Passwortes registriert',
     'viewAll' => 'Alle anzeigen',
     'weight' => 'Gewicht',
+
+    // Core CAPTCHA provider configuration (issue #213)
+    'mxo3captcha' => 'CAPTCHA',
+    'tbclo3captcha_config' => 'Einstellungen',
+    'O3_CAPTCHA_ADMIN_NAV_LABEL' => 'CAPTCHA-Konfiguration',
+    'O3_CAPTCHA_PROVIDER_LABEL' => 'CAPTCHA-Anbieter',
+    'O3_CAPTCHA_FORMS_LABEL' => 'Geschützte Formulare',
+    'O3_CAPTCHA_PROVIDER_NONE' => 'Keiner (deaktiviert)',
+    'O3_CAPTCHA_REQUIRE_CONSENT' => 'Einwilligung des Besuchers vor dem Laden erforderlich',
+    'O3_CAPTCHA_FORM_contact' => 'Kontaktformular',
+    'O3_CAPTCHA_FORM_newsletter' => 'Newsletter-Formular',
+    'O3_CAPTCHA_FORM_suggest' => 'Produktempfehlungs-Formular',
+    'O3_CAPTCHA_FORM_forgotpwd' => 'Passwort-vergessen-Formular',
+    'O3_CAPTCHA_FORM_register' => 'Registrierungsformular',
+    'O3_CAPTCHA_FORM_pricealarm' => 'Preisalarm-Formular',
+    'O3_CAPTCHA_FORM_invite' => 'Einladungs-Formular',
 ];

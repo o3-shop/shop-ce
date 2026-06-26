@@ -1235,6 +1235,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\CaptchaConfigController'      => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\CaptchaConfigController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\RevocationConfigController'   => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationConfigController::class,
         'isAbstract'       => false,

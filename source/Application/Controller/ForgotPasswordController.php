@@ -80,6 +80,13 @@ class ForgotPasswordController extends FrontendController
      */
     public function forgotPassword()
     {
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('forgotpwd', \OxidEsales\Eshop\Core\Registry::getRequest())) {
+            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+            return false;
+        }
+
         $sEmail = Registry::getRequest()->getRequestEscapedParameter('lgn_usr');
         $this->_sForgotEmail = $sEmail;
         $oEmail = oxNew(Email::class);

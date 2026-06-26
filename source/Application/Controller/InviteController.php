@@ -117,6 +117,13 @@ class InviteController extends AccountController
      */
     public function send()
     {
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('invite', \OxidEsales\Eshop\Core\Registry::getRequest())) {
+            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+            return false;
+        }
+
         $oConfig = Registry::getConfig();
 
         if (!$oConfig->getConfigParam('blInvitationsEnabled')) {

@@ -80,6 +80,13 @@ class PriceAlarmController extends FrontendController
      */
     public function addme()
     {
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('pricealarm', \OxidEsales\Eshop\Core\Registry::getRequest())) {
+            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+            return false;
+        }
+
         $myConfig = Registry::getConfig();
         $myUtils = Registry::getUtils();
 

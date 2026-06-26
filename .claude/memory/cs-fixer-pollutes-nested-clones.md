@@ -31,6 +31,26 @@ rm -f source/Application/views/o3-theme/out/.DS_Store
 discarding cs-fixer churn + cache dumps in them is safe; they are not part of
 the release content.)
 
+**It also breaks the TEST HARNESS, not just `bin/release` (#213, 2026-06-25):**
+cs-fixer's churn in `testing-library/` can relocate that clone's files (the
+working tree ended up with root `bootstrap.php`/`composer.json` **deleted** and
+copies under an untracked `source/`). `vendor/o3-shop/testing-library` is a
+**symlink** to that clone, and both `./docker.sh test --fast`
+(`--bootstrap vendor/o3-shop/testing-library/bootstrap.php`) and
+`tests/phpunit.xml` (`bootstrap="bootstrap.php"` → `tests/bootstrap.php`)
+resolve through it. When it's dirtied you get:
+
+- `Cannot open file "vendor/o3-shop/testing-library/bootstrap.php"`, or
+- full-bootstrap tests (anything using `UnitTestCase` + shop `Registry`) crash
+  silently at **exit 255** with
+  `Undefined constant "OxidEsales\TestingLibrary\TEST_LIBRARY_HELPERS_PATH"`.
+
+Pure-unit tests that don't need the shop bootstrap may still pass, masking it.
+**Recovery (same as the release pre-flight clean — safe, it's a gitignored
+snapshot):** `git -C testing-library checkout -- . && git -C testing-library clean -fd`.
+**Order of ops:** run cs-fixer on your shop-ce changes, then clean the clones,
+THEN run the test suite — otherwise the suite runs against a broken bootstrap.
+
 **Root fix (follow-up):** scope `.php-cs-fixer.dist.php`'s Finder to exclude
 the nested clone paths so cs-fixer never touches them. See
 [[release-tooling-intermediate-node-retag-gap]] for the fold-out release work

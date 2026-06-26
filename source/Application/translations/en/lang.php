@@ -838,4 +838,8 @@ $aLang = [
 // Operator email (notification — operational, not legally required)
 'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'New revocation received',
 'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'A new revocation declaration has been received in the shop pursuant to § 356a BGB. The record is available in the admin area under "Customer Info → Revocations".',
+
+// Core CAPTCHA provider feature (issue #213) — storefront texts
+'O3_CAPTCHA_FAILED'                                           => 'The security check failed. Please try again.',
+'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Spam protection is disabled until you accept the required cookies.',
 ];

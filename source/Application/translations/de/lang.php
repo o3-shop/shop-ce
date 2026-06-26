@@ -842,4 +842,8 @@ $aLang = [
 // Operator email (notification — operational, not legally required)
 'O3_REVOCATION_OPERATOR_EMAIL_SUBJECT'                        => 'Neuer Widerruf eingegangen',
 'O3_REVOCATION_OPERATOR_EMAIL_BODY'                           => 'Im Shop ist ein neuer Widerruf gemäß § 356a BGB eingegangen. Den Datensatz finden Sie im Admin-Bereich unter „Kundeninformationen → Widerrufe“.',
+
+// Core CAPTCHA provider feature (issue #213) — storefront texts
+'O3_CAPTCHA_FAILED'                                           => 'Die Sicherheitsüberprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut.',
+'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Der Spam-Schutz ist deaktiviert, bis Sie die erforderlichen Cookies akzeptieren.',
 ];

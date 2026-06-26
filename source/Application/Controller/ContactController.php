@@ -107,6 +107,13 @@ class ContactController extends FrontendController
      */
     public function send()
     {
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('contact', \OxidEsales\Eshop\Core\Registry::getRequest())) {
+            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+            return false;
+        }
+
         $contactFormBridge = $this->getContainer()->get(ContactFormBridgeInterface::class);
 
         $form = $contactFormBridge->getContactForm();

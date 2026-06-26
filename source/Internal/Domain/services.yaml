@@ -4,3 +4,4 @@ imports:
     - { resource: Contact/services.yaml }
     - { resource: Email/services.yaml }
     - { resource: Revocation/services.yaml }
+    - { resource: Captcha/services.yaml }

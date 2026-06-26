@@ -182,6 +182,13 @@ class NewsletterController extends FrontendController
      */
     public function addme()
     {
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('newsletter', \OxidEsales\Eshop\Core\Registry::getRequest())) {
+            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+            return false;
+        }
+
         // user exists ?
         $oUser = oxNew(User::class);
         if ($oUser->load(Registry::getRequest()->getRequestEscapedParameter('uid'))) {

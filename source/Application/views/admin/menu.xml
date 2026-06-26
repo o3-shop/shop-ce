@@ -186,6 +186,10 @@
             <SUBMENU id="mxrevocationconfig" cl="revocation_config" list="revocation_config">
                 <TAB id="tbclrevocation_config" cl="revocation_config" />
             </SUBMENU>
+            <!-- Core CAPTCHA provider configuration (issue #213) -->
+            <SUBMENU id="mxo3captcha" cl="captcha_config" list="captcha_config">
+                <TAB id="tbclo3captcha_config" cl="captcha_config" />
+            </SUBMENU>
         </MAINMENU>
         <MAINMENU id="mxservice" iconclass="fa-solid fa-screwdriver-wrench">
             <SUBMENU id="mxsysinfo" cl="systeminfo" rights="malladmin" disableForDemoShop="1" />

@@ -1554,4 +1554,20 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     {
         return '';
     }
+
+    /**
+     * Returns the CAPTCHA widget markup for the given protected form id,
+     * or an empty string when CAPTCHA is inactive for that form.
+     *
+     * @param string $formId One of the ids in CaptchaFormRegistry.
+     *
+     * @return string
+     */
+    public function getCaptchaWidget(string $formId): string
+    {
+        $service = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+
+        return $service->renderForForm($formId);
+    }
 }

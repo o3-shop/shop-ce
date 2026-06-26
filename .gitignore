@@ -112,4 +112,8 @@ oxideshop.log
 /tinymce-editor
 /source/modules/o3-shop/tinymce-editor
 
+# Separate package: the o3-shop/recaptcha module is its own git repo / Composer
+# package (same pattern as tinymce-editor). It is not committed into shop-ce.
+/source/modules/o3-shop/recaptcha
+
 /graphify-out

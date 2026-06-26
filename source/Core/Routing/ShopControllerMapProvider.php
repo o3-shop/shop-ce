@@ -104,6 +104,7 @@ class ShopControllerMapProvider implements \OxidEsales\Eshop\Core\Contract\Contr
         'pricealarm_mail'                      => \OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmMail::class,
         'pricealarm_main'                      => \OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmMain::class,
         'pricealarm_send'                      => \OxidEsales\Eshop\Application\Controller\Admin\PriceAlarmSend::class,
+        'captcha_config'                       => \OxidEsales\Eshop\Application\Controller\Admin\CaptchaConfigController::class,
         'revocation_config'                    => \OxidEsales\Eshop\Application\Controller\Admin\RevocationConfigController::class,
         'revocation_list'                      => \OxidEsales\Eshop\Application\Controller\Admin\RevocationList::class,
         'revocation_main'                      => \OxidEsales\Eshop\Application\Controller\Admin\RevocationMain::class,
