@@ -21,5 +21,13 @@ if ($theme->load($activeThemeId)) {
     $theme->activate();
 }
 
+// Issue #125: iPasswordLength must stay unset in the test DB so
+// InputValidator::getPasswordLength() exercises its fallback of 6, which
+// ViewConfigTest::testGetPasswordLength asserts. The SQL install paths never
+// seeded it; now that the theme is activated above, a theme that declares
+// iPasswordLength (o3-theme does) would seed it — so drop it here to preserve
+// the documented test invariant. The bootstrap reinitialises config next.
+oxDb::getDb()->execute("DELETE FROM oxconfig WHERE oxvarname = 'iPasswordLength'");
+
 define('oxADMIN_LOGIN', oxDb::getDb()->getOne("select OXUSERNAME from oxuser where oxid='oxdefaultadmin'"));
 define('oxADMIN_PASSWD', getenv('oxADMIN_PASSWD') ? getenv('oxADMIN_PASSWD') : 'admin');
