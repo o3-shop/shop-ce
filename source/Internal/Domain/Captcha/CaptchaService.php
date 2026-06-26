@@ -28,6 +28,7 @@ use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Configuration\CaptchaConfi
 use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Consent\CaptchaConsentInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\CaptchaProviderInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\CaptchaProviderLocator;
+use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\ConsentExemptCaptchaProviderInterface;
 
 final class CaptchaService implements CaptchaServiceInterface
 {
@@ -60,13 +61,14 @@ final class CaptchaService implements CaptchaServiceInterface
         if (!$this->isEnabledForForm($formId)) {
             return '';
         }
-        if (!$this->consent->isConsentGranted(Registry::getRequest())) {
+        $provider = $this->activeProvider();
+        if (!($provider instanceof ConsentExemptCaptchaProviderInterface)
+            && !$this->consent->isConsentGranted(Registry::getRequest())) {
             return '<div class="o3-captcha-consent-notice">'
                 . htmlspecialchars((string) Registry::getLang()->translateString('O3_CAPTCHA_CONSENT_NOTICE'), ENT_QUOTES)
                 . '</div>';
         }
 
-        $provider = $this->activeProvider();
         $html = '';
         if (!$this->headScriptEmitted) {
             $script = $provider->getHeadScript();
@@ -83,10 +85,12 @@ final class CaptchaService implements CaptchaServiceInterface
         if (!$this->isEnabledForForm($formId)) {
             return true;
         }
-        if (!$this->consent->isConsentGranted($request)) {
+        $provider = $this->activeProvider();
+        if (!($provider instanceof ConsentExemptCaptchaProviderInterface)
+            && !$this->consent->isConsentGranted($request)) {
             return true;
         }
-        return $this->activeProvider()->verify($request, $formId);
+        return $provider->verify($request, $formId);
     }
 
     private function activeProvider(): CaptchaProviderInterface

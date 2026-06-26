@@ -232,3 +232,19 @@ services:
 ```
 
 As a CAPTCHA provider author, you should **not** load remote scripts unconditionally in `getHeadScript()` or emit tracking pixels in `renderWidget()`. Return `null` / empty string when consent has not been given, and let the consent adapter drive the injection. The core checks consent before calling these methods when the consent gate is active.
+
+### Consent-exempt providers
+
+A provider that makes **no third-party calls** and sets **no tracking cookies or pixels** (for example, a self-hosted proof-of-work CAPTCHA like [Altcha](https://altcha.org/)) may additionally implement `ConsentExemptCaptchaProviderInterface`:
+
+```php
+use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\ConsentExemptCaptchaProviderInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Captcha\Provider\CaptchaProviderInterface;
+
+final class AltchaCaptchaProvider implements CaptchaProviderInterface, ConsentExemptCaptchaProviderInterface
+{
+    // ... implementation
+}
+```
+
+When `CaptchaService` detects that the active provider implements `ConsentExemptCaptchaProviderInterface`, it skips the consent gate entirely and calls `renderWidget()` and `verify()` directly. Providers that do **not** implement this marker interface continue to be consent-gated as before.
