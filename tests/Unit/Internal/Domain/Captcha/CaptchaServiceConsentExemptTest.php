@@ -37,13 +37,34 @@ class CaptchaServiceConsentExemptTest extends TestCase
     private function exemptProvider(): CaptchaProviderInterface
     {
         return new class () implements CaptchaProviderInterface, ConsentExemptCaptchaProviderInterface {
-            public function getId(): string { return 'exempt'; }
-            public function getTitle(): string { return 'Exempt'; }
-            public function isConfigured(): bool { return true; }
-            public function getConfigFields(): array { return []; }
-            public function getHeadScript(): ?string { return '<script id="head"></script>'; }
-            public function renderWidget(string $formId): string { return '<div id="widget"></div>'; }
-            public function verify(Request $request, string $formId): bool { return true; }
+            public function getId(): string
+            {
+                return 'exempt';
+            }
+            public function getTitle(): string
+            {
+                return 'Exempt';
+            }
+            public function isConfigured(): bool
+            {
+                return true;
+            }
+            public function getConfigFields(): array
+            {
+                return [];
+            }
+            public function getHeadScript(): ?string
+            {
+                return '<script id="head"></script>';
+            }
+            public function renderWidget(string $formId): string
+            {
+                return '<div id="widget"></div>';
+            }
+            public function verify(Request $request, string $formId): bool
+            {
+                return true;
+            }
         };
     }
 

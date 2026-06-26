@@ -81,13 +81,14 @@ class CaptchaServiceTest extends TestCase
         $this->assertTrue($svc->verifyForForm('contact', $this->createMock(Request::class)));
     }
 
-    public function testConsentRequiredButNotGrantedShowsNoticeAndSkipsVerification(): void
+    public function testConsentRequiredButNotGrantedShowsNoticeAndBlocksVerification(): void
     {
         $svc = $this->service($this->provider('p'), ['consent' => false]);
         $html = $svc->renderForForm('contact');
         $this->assertStringContainsString('o3-captcha-consent-notice', $html);
         $this->assertStringNotContainsString('id="widget"', $html);
-        $this->assertTrue($svc->verifyForForm('contact', $this->createMock(Request::class)));
+        // Fail closed: without consent the captcha cannot load, so submission is blocked.
+        $this->assertFalse($svc->verifyForForm('contact', $this->createMock(Request::class)));
     }
 
     public function testHeadScriptEmittedOncePerRequest(): void

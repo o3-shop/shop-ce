@@ -845,5 +845,5 @@ $aLang = [
 
 // Core CAPTCHA provider feature (issue #213) — storefront texts
 'O3_CAPTCHA_FAILED'                                           => 'Die Sicherheitsüberprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut.',
-'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Der Spam-Schutz ist deaktiviert, bis Sie die erforderlichen Cookies akzeptieren.',
+'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Bitte akzeptieren Sie die erforderlichen Cookies. Andernfalls können wir nicht prüfen, ob Sie ein Mensch sind, und das Formular kann nicht abgesendet werden.',
 ];

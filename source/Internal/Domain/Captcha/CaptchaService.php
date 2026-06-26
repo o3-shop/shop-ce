@@ -88,7 +88,14 @@ final class CaptchaService implements CaptchaServiceInterface
         $provider = $this->activeProvider();
         if (!($provider instanceof ConsentExemptCaptchaProviderInterface)
             && !$this->consent->isConsentGranted($request)) {
-            return true;
+            // Fail closed: consent is required but not granted, so the captcha cannot
+            // load or verify. Passing the submission through would let bots bypass the
+            // captcha entirely, so the verification fails instead.
+            Registry::getLogger()->info(
+                __METHOD__ . " - Blocking submission for form '$formId': "
+                . 'consent is required but not granted, so the captcha cannot be verified.'
+            );
+            return false;
         }
         return $provider->verify($request, $formId);
     }
