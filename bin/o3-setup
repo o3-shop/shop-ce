@@ -127,12 +127,15 @@ if ($result->num_rows == 0) {
         echo "cd /var/www/html && php vendor/bin/oe-eshop-demodata_install\n";
     }
 
-    // Backfill initial_data.sql with INSERT IGNORE so it covers gaps in
-    // demodata.sql (notably the full theme:o3-theme block, which demodata
-    // does not seed) while demodata's existing rows win on shared OXIDs.
+    // Backfill initial_data.sql with INSERT IGNORE so it covers general
+    // oxconfig gaps not seeded by demodata.sql, while demodata's existing
+    // rows win on shared OXIDs. Theme config (the theme:<id> oxconfig /
+    // oxconfigdisplay rows) is NOT seeded here any more — issue #122 phase 3
+    // removed those blocks from both SQL files; the oe:theme:activate call
+    // below now populates them from theme.php (single source of truth).
     // The web Setup wizard runs either initial_data.sql OR demodata.sql,
     // never both — but in dev we want demo content AND complete config.
-    echo "Backfilling initial_data.sql (theme defaults & gaps)...\n";
+    echo "Backfilling initial_data.sql (general config gaps)...\n";
     $initialDataFile = __DIR__ . '/../source/Setup/Sql/initial_data.sql';
     $backfillCommand = "sed 's/INSERT INTO/INSERT IGNORE INTO/g' " . escapeshellarg($initialDataFile)
         . " | mysql --default-character-set=utf8mb4 --user=" . $dbUser . " --password='" . $dbPwd . "' -h " . $dbHost . " -D " . $dbName;
