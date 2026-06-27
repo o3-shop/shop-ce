@@ -199,7 +199,7 @@ class DynImgGeneratorTest extends \OxidTestCase
                 [1, 2, 3],
                 [4, 5, 6],
                 [7, 8, 75],
-                [87, 87, 75]
+                [114, 114, 75]
             );
 
         // missing image info
@@ -214,8 +214,10 @@ class DynImgGeneratorTest extends \OxidTestCase
         // wrogn size param
         $this->assertFalse($oGen->UNITisValidPath('/wrong/size/param/generated/product/icon/7_8_75'));
 
-        // all parameters are fine
-        $this->assertTrue($oGen->UNITisValidPath('/all/params/fine/generated/product/icon/87_87_75'));
+        // all parameters are fine (87*87 was theme:flow's sIconsize; the default
+        // o3-theme uses 114*114 — see issue #122 phase 3, which consolidated theme
+        // config to theme.php and dropped the legacy flow/wave SQL blocks)
+        $this->assertTrue($oGen->UNITisValidPath('/all/params/fine/generated/product/icon/114_114_75'));
     }
 
     /**
