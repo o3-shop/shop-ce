@@ -1948,11 +1948,11 @@ $aLang = [
     'O3_CAPTCHA_CONSENT_COOKIE_NAME' => 'Name des Einwilligungs-Cookies',
     'O3_CAPTCHA_CONSENT_COOKIE_MARKER' => 'Einwilligungs-Merkmal (Teilzeichenkette)',
     'O3_CAPTCHA_CONSENT_COOKIE_HINT' => 'Das CAPTCHA wird nur geladen, wenn dieses Cookie das Merkmal enthält. Solange der Besucher nicht zustimmt, kann das geschützte Formular nicht abgeschickt werden. Verwenden Sie das Merkmal, das Ihr Consent-Tool für die Kategorie von reCAPTCHA setzt – z. B. Cookiebot: Cookie "CookieConsent", Merkmal "marketing:true". Nutzen Sie die Form kategorie:true ohne Anführungszeichen oder < > &.',
-    'O3_CAPTCHA_FORM_contact' => 'Kontaktformular',
+    'O3_CAPTCHA_FORM_contact' => 'Kontakt-Formular',
     'O3_CAPTCHA_FORM_newsletter' => 'Newsletter-Formular',
     'O3_CAPTCHA_FORM_suggest' => 'Produktempfehlungs-Formular',
     'O3_CAPTCHA_FORM_forgotpwd' => 'Passwort-vergessen-Formular',
-    'O3_CAPTCHA_FORM_register' => 'Registrierungsformular',
+    'O3_CAPTCHA_FORM_register' => 'Registrierungs-Formular',
     'O3_CAPTCHA_FORM_pricealarm' => 'Preisalarm-Formular',
     'O3_CAPTCHA_FORM_invite' => 'Einladungs-Formular',
 ];
