@@ -23,30 +23,83 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Component\Captcha;
 
 use OxidEsales\Eshop\Application\Component\UserComponent;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Session;
+use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface;
 use OxidEsales\TestingLibrary\UnitTestCase;
 use Psr\Container\ContainerInterface;
 
 class UserComponentCaptchaTest extends UnitTestCase
 {
-    public function testRegisterUserRejectedWhenCaptchaFails(): void
+    /** @var string[] error idents passed to UtilsView::addErrorToDisplay */
+    private array $shownErrors = [];
+
+    /**
+     * Build a UserComponent whose CAPTCHA service is forced to a given verify
+     * result, with the CSRF challenge mocked to pass and displayed errors
+     * captured into $this->shownErrors.
+     */
+    private function makeComponentWithCaptcha(bool $captchaResult): UserComponent
     {
-        Registry::getSession()->deleteVariable('Errors');
+        // CSRF check must pass so we actually reach the CAPTCHA gate.
+        $session = $this->getMock(Session::class, ['checkSessionChallenge']);
+        $session->method('checkSessionChallenge')->willReturn(true);
+        \OxidEsales\Eshop\Core\Registry::set(Session::class, $session);
+
+        // Capture the error idents the component tries to display.
+        $this->shownErrors = [];
+        $utilsView = $this->getMock(UtilsView::class, ['addErrorToDisplay']);
+        $utilsView->method('addErrorToDisplay')->willReturnCallback(
+            function ($error) {
+                $this->shownErrors[] = $error;
+                return null;
+            }
+        );
+        \OxidEsales\Eshop\Core\Registry::set(UtilsView::class, $utilsView);
 
         $service = $this->createMock(CaptchaServiceInterface::class);
-        $service->method('verifyForForm')->willReturn(false);
+        $service->method('verifyForForm')->willReturn($captchaResult);
 
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
             ->willReturnCallback(fn ($id) => $id === CaptchaServiceInterface::class ? $service : null);
 
-        $component = $this->getMock(UserComponent::class, ['getContainer']);
+        // logout() is stubbed: registerUser()'s failure path calls it, and the real
+        // logout() needs a parent controller the unit test doesn't set up. It is
+        // irrelevant to the CAPTCHA gate under test.
+        $component = $this->getMock(UserComponent::class, ['getContainer', 'logout']);
         $component->method('getContainer')->willReturn($container);
 
-        $this->assertFalse($component->registerUser());
+        return $component;
+    }
 
-        $errors = Registry::getSession()->getVariable('Errors');
-        $this->assertNotEmpty($errors);
+    /**
+     * Security regression: createUser() is the user-creation chokepoint reached
+     * directly by the checkout forms via fnc=createuser. It MUST enforce the
+     * CAPTCHA, otherwise the registration captcha is trivially bypassable by
+     * posting fnc=createuser instead of fnc=registeruser.
+     */
+    public function testCreateUserBlockedWhenCaptchaFails(): void
+    {
+        $component = $this->makeComponentWithCaptcha(false);
+
+        $this->assertFalse($component->createUser(), 'createUser() must abort when the CAPTCHA fails.');
+        $this->assertContains(
+            'O3_CAPTCHA_FAILED',
+            $this->shownErrors,
+            'createUser() must show the CAPTCHA failure error (fnc=createuser bypass guard).'
+        );
+    }
+
+    /**
+     * The dedicated registration page (fnc=registeruser) must stay blocked too.
+     * It delegates to createUser(), so the same gate protects it.
+     */
+    public function testRegisterUserBlockedWhenCaptchaFails(): void
+    {
+        $component = $this->makeComponentWithCaptcha(false);
+
+        $this->assertNotSame('register?success=1', $component->registerUser());
+        $this->assertContains('O3_CAPTCHA_FAILED', $this->shownErrors);
     }
 }

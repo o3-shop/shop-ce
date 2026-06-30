@@ -528,6 +528,18 @@ class UserComponent extends BaseController
             return false;
         }
 
+        // CAPTCHA is enforced here, at the shared user-creation chokepoint, so it
+        // covers BOTH entry points: the dedicated registration page (registerUser,
+        // fnc=registeruser) and the checkout forms (fnc=createuser). Gating only
+        // registerUser would let bots bypass the captcha by posting fnc=createuser.
+        $captchaService = $this->getContainer()
+            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
+        if (!$captchaService->verifyForForm('register', Registry::getRequest())) {
+            Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
+
+            return false;
+        }
+
         $blActiveLogin = $this->getParent()->isEnabledPrivateSales();
 
         $oConfig = Registry::getConfig();
@@ -694,12 +706,9 @@ class UserComponent extends BaseController
      */
     public function registerUser()
     {
-        $captchaService = $this->getContainer()
-            ->get(\OxidEsales\EshopCommunity\Internal\Domain\Captcha\CaptchaServiceInterface::class);
-        if (!$captchaService->verifyForForm('register', \OxidEsales\Eshop\Core\Registry::getRequest())) {
-            \OxidEsales\Eshop\Core\Registry::getUtilsView()->addErrorToDisplay('O3_CAPTCHA_FAILED');
-            return false;
-        }
+        // CAPTCHA is verified inside createUser() (the shared chokepoint), so it is
+        // not repeated here — verifying twice would consume a single-use provider
+        // token (e.g. reCAPTCHA) and break the legitimate dedicated-page flow.
 
         // registered new user ?
         if ($this->createUser() && $this->_blIsNewUser) {
