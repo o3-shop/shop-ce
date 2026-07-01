@@ -1,5 +1,4 @@
 import { execFile } from 'node:child_process';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import type { DbClient } from '../fixtures/db';
@@ -43,35 +42,30 @@ function runInShop(cmd: string, args: string[]): Promise<{ stdout: string; stder
 }
 
 /**
- * Path to the host-mounted OXID file cache (matches the docker-compose
- * bind mount). Override via OXID_TMP_DIR if testing against a
- * differently-arranged install.
- */
-const OXID_TMP_DIR =
-  process.env.OXID_TMP_DIR ?? path.join(__dirname, '..', '..', '..', '..', 'source', 'tmp');
-
-/**
  * Clear the revocation anti-spam file cache. The default
  * `NoopAntiSpamService` writes per-IP rate-limit counters to OXID's tmp
  * cache (`oxc_o3rev_antispam_{f,s}_<hash>.txt`). One success locks the
  * IP out for 5 minutes; one set of failures hits the threshold within a
  * minute. Both make a multi-test browser suite unrunnable. Tests call
  * this helper in `beforeEach` to start each scenario with a clean slate.
+ *
+ * Delete via `runInShop` (docker exec / native rm), NOT host `fs.rm`: the
+ * anti-spam files are written by the shop's PHP process (root inside the
+ * container), and on a Docker-Desktop bind mount a host-side deletion is not
+ * reliably visible to the container before the next request. A stale
+ * post-success lockout then survives `beforeEach` and throttles every
+ * following form submit — the storefront redirects the POST to a bare
+ * `index.php` and the whole revocation suite fails after the first success.
+ * Removing the files where the shop runs guarantees the next request sees an
+ * empty rate-limit state. Same rationale as `clearShopRuntimeCache`.
  */
 export async function clearRevocationAntiSpamCache(): Promise<void> {
-  const dir = path.resolve(OXID_TMP_DIR);
-  let files: string[];
-  try {
-    files = await fs.readdir(dir);
-  } catch {
-    // tmp dir absent in this layout — nothing to clean.
-    return;
-  }
-  await Promise.all(
-    files
-      .filter((name) => /^oxc_o3rev_antispam_/.test(name))
-      .map((name) => fs.rm(path.join(dir, name), { force: true })),
-  );
+  // sh -c so the glob expands where the command runs (container in docker mode,
+  // runner in native mode).
+  await runInShop('sh', [
+    '-c',
+    `rm -f ${SHOP_ROOT}/source/tmp/oxc_o3rev_antispam_*`,
+  ]).catch(() => undefined); // tmp absent or shop down — ignore
 }
 
 /**
