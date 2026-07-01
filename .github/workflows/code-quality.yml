@@ -288,3 +288,107 @@ jobs:
         if: env.TESTS_FAILED == 'true'
         run: exit 1
 
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    # ── Why this is NOT in the PHP matrix ──────────────────────────────────
+    # The unit `test` job above runs across PHP 7.4–8.2. E2E is deliberately a
+    # single job on PHP 8.2 instead, because:
+    #   1. It exercises end-to-end storefront/admin BEHAVIOUR through a browser,
+    #      which is effectively PHP-version-independent — version-specific logic
+    #      is already covered by the unit matrix.
+    #   2. The shop is served from the docker image, which is fixed at PHP 8.2,
+    #      and the Playwright fixtures use `docker exec` into the shop container,
+    #      so e2e inherently runs against the 8.2 container.
+    #   3. Building 7.4/8.0/8.1 shop images + running the full browser suite ×4
+    #      would multiply CI time (docker build + demodata provisioning + browser
+    #      run) for negligible extra signal.
+    # If a PHP-version-specific end-to-end concern ever appears, add a targeted
+    # job on the minimum supported version (needs a 7.4 shop image).
+    #
+    # NOTE: first cut — validate on a PR run and tune the provisioning wait /
+    # container name before making this a *required* status check.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔧 Prepare shop config for the docker stack
+        run: |
+          cp source/config.inc.php.dist source/config.inc.php
+          # Docker-oriented .env (SHOPDIR=/var/www/html, DBHOST=db). SSLSHOPURL is
+          # set to the literal URL — NOT "${O3SHOP_CONF_SHOPURL}" — to avoid the
+          # phpdotenv forward-reference pitfall that leaves the placeholder
+          # unexpanded and breaks every SSL form submit (register/checkout).
+          cat > .env <<'EOF'
+          O3SHOP_CONF_DBHOST="db"
+          O3SHOP_CONF_DBPORT="3306"
+          O3SHOP_CONF_DBNAME="o3shop"
+          O3SHOP_CONF_DBUSER="o3shop"
+          O3SHOP_CONF_DBPWD="o3shop"
+          O3SHOP_CONF_DBROOT="supersecret"
+          O3SHOP_CONF_SHOPURL="http://localhost:8080"
+          O3SHOP_CONF_SSLSHOPURL="http://localhost:8080"
+          O3SHOP_CONF_SHOPDIR="/var/www/html/source"
+          O3SHOP_CONF_COMPILEDIR="/var/www/html/source/tmp"
+          O3SHOP_CONF_ADMINSSLURL=""
+          O3SHOP_CONF_LOG_LEVEL="error"
+          O3SHOP_CONF_LOG_DIR="log/"
+          O3SHOP_CONF_DEBUG=0
+          O3SHOP_CONF_ADMINEMAIL=""
+          O3SHOP_CONF_SKIPVIEWUSAGE=0
+          O3SHOP_CONF_DELSETUPDIR=1
+          EOF
+
+      - name: 🐳 Start shop stack (shop + db + mailpit)
+        working-directory: docker
+        run: |
+          docker network create o3shop-shared 2>/dev/null || true
+          COMPOSE_PROJECT_NAME=o3shop docker compose --env-file ../.env --profile db up -d --build
+
+      - name: ⏳ Wait for shop provisioning (setup + demodata)
+        run: |
+          # The shop container healthcheck turns "healthy" once o3 setup +
+          # demodata provisioning finishes (removes /tmp/o3setup-running).
+          for i in $(seq 1 120); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' o3shop-shop-1 2>/dev/null || echo "starting")
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || echo 000)
+            echo "attempt $i: health=$status http=$code"
+            if [ "$status" = "healthy" ] && [ "$code" = "200" ]; then echo "shop ready"; break; fi
+            if [ "$i" = "120" ]; then echo "::error::shop not ready"; docker logs o3shop-shop-1 --tail 200 || true; exit 1; fi
+            sleep 5
+          done
+
+      - name: 🟢 Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📥 Install Playwright + Chromium
+        working-directory: tests/Acceptance/playwright
+        run: |
+          npm ci || npm install
+          npx playwright install --with-deps chromium
+
+      - name: 🎭 Run Playwright e2e (CI=1 → 2 retries absorb known mail-timing flakiness)
+        working-directory: tests/Acceptance/playwright
+        env:
+          SHOP_URL: http://localhost:8080
+          MAILPIT_URL: http://localhost:8025
+          SHOP_CONTAINER: o3shop-shop-1
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: o3shop
+          DB_USER: root
+          DB_PASS: supersecret
+          CI: '1'
+        run: npx playwright test
+
+      - name: 📤 Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            tests/Acceptance/playwright/playwright-report/
+            tests/Acceptance/playwright/test-results/
+          retention-days: 7
+
