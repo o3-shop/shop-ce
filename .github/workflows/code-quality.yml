@@ -399,6 +399,12 @@ jobs:
           sudo a2ensite o3shop
           sudo chmod -R a+rX "${GITHUB_WORKSPACE}/source"
           sudo chown -R www-data:www-data "${GITHUB_WORKSPACE}/source/tmp" "${GITHUB_WORKSPACE}/source/log" 2>/dev/null || true
+          # Apache runs as www-data; it must be able to *traverse* every dir from
+          # / down to the docroot. The runner home ($GITHUB_WORKSPACE lives under
+          # /home/runner/work) lacks the o+x search bit, so grant it on each
+          # ancestor component (o+x on a dir only permits traversal, not listing).
+          d="${GITHUB_WORKSPACE}/source"
+          while [ "$d" != "/" ]; do sudo chmod o+x "$d"; d=$(dirname "$d"); done
           sudo service apache2 restart
           for i in $(seq 1 30); do
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || echo 000)
