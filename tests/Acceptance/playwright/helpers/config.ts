@@ -7,10 +7,40 @@ import type { DbClient } from '../fixtures/db';
 const execFileP = promisify(execFile);
 
 /**
- * Container name for the running shop. Override via SHOP_CONTAINER if
- * the local stack uses a non-default name.
+ * How the shop-side helpers (cache clears + category model saves) reach the
+ * shop's PHP and files:
+ *   - 'docker' (default): run the command INSIDE the shop container — the local
+ *     docker-compose stack, matching its bind-mounted `/var/www/html` layout.
+ *   - 'native': run the command directly on the host/runner — used in CI, where
+ *     the shop code + PHP live on the same filesystem and there is no container.
+ * Set `E2E_SHOP_EXEC=native` in CI.
  */
+const SHOP_EXEC_MODE = (process.env.E2E_SHOP_EXEC ?? 'docker') as 'docker' | 'native';
+
+/** Container name for the running shop (docker mode only). */
 const SHOP_CONTAINER = process.env.SHOP_CONTAINER ?? 'o3shop-app';
+
+/**
+ * Shop root as seen by whoever runs the command: the container path in docker
+ * mode, the checkout path on the runner in native mode. Override via SHOP_ROOT.
+ */
+const SHOP_ROOT =
+  process.env.SHOP_ROOT ??
+  (SHOP_EXEC_MODE === 'native'
+    ? path.resolve(__dirname, '..', '..', '..', '..') // …/shop-ce (repo root)
+    : '/var/www/html');
+
+/**
+ * Run a command against the shop — inside the container (docker) or directly on
+ * the runner (native). Path arguments must be absolute under SHOP_ROOT so they
+ * resolve the same way in both modes.
+ */
+function runInShop(cmd: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
+  if (SHOP_EXEC_MODE === 'native') {
+    return execFileP(cmd, args, { cwd: SHOP_ROOT });
+  }
+  return execFileP('docker', ['exec', SHOP_CONTAINER, cmd, ...args]);
+}
 
 /**
  * Path to the host-mounted OXID file cache (matches the docker-compose
@@ -72,14 +102,11 @@ export async function clearRevocationAntiSpamCache(): Promise<void> {
  *   the empty cache.
  */
 export async function clearShopRuntimeCache(): Promise<void> {
-  // sh -c so the glob expands inside the container.
-  await execFileP('docker', [
-    'exec',
-    SHOP_CONTAINER,
-    'sh',
-    '-c',
-    'rm -f /var/www/html/source/tmp/oxc_*',
-  ]).catch(() => undefined); // tmp absent or container down — ignore
+  // sh -c so the glob expands where the command runs (container in docker mode,
+  // runner in native mode).
+  await runInShop('sh', ['-c', `rm -f ${SHOP_ROOT}/source/tmp/oxc_*`]).catch(
+    () => undefined,
+  ); // tmp absent or container down — ignore
 }
 
 /**
@@ -98,14 +125,8 @@ export async function clearShopRuntimeCache(): Promise<void> {
  */
 export async function deleteCategoriesViaModel(oxids: string[]): Promise<string> {
   if (oxids.length === 0) return '';
-  const scriptPath = '/var/www/html/tests/Acceptance/playwright/helpers/category-cleanup.php';
-  const { stdout } = await execFileP('docker', [
-    'exec',
-    SHOP_CONTAINER,
-    'php',
-    scriptPath,
-    ...oxids,
-  ]);
+  const scriptPath = `${SHOP_ROOT}/tests/Acceptance/playwright/helpers/category-cleanup.php`;
+  const { stdout } = await runInShop('php', [scriptPath, ...oxids]);
   return stdout;
 }
 
@@ -127,15 +148,8 @@ export async function seedCategoryViaModel(
   title: string,
   parentOxid: string,
 ): Promise<string> {
-  const scriptPath = '/var/www/html/tests/Acceptance/playwright/helpers/category-seed.php';
-  const { stdout } = await execFileP('docker', [
-    'exec',
-    SHOP_CONTAINER,
-    'php',
-    scriptPath,
-    title,
-    parentOxid,
-  ]);
+  const scriptPath = `${SHOP_ROOT}/tests/Acceptance/playwright/helpers/category-seed.php`;
+  const { stdout } = await runInShop('php', [scriptPath, title, parentOxid]);
   const oxid = stdout.trim();
   if (!oxid) {
     throw new Error(
