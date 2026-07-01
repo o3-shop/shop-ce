@@ -399,6 +399,11 @@ jobs:
           sudo a2ensite o3shop
           sudo chmod -R a+rX "${GITHUB_WORKSPACE}/source"
           sudo chown -R www-data:www-data "${GITHUB_WORKSPACE}/source/tmp" "${GITHUB_WORKSPACE}/source/log" 2>/dev/null || true
+          # Apache (www-data) writes the runtime + anti-spam caches here, but the
+          # Playwright helpers run as 'runner' and delete them between tests.
+          # Unlink is governed by the *directory* mode, not file ownership, so make
+          # tmp/log world-writable — otherwise runner hits EACCES clearing caches.
+          sudo chmod -R 777 "${GITHUB_WORKSPACE}/source/tmp" "${GITHUB_WORKSPACE}/source/log" 2>/dev/null || true
           # Apache runs as www-data; it must be able to *traverse* every dir from
           # / down to the docroot. The runner home ($GITHUB_WORKSPACE lives under
           # /home/runner/work) lacks the o+x search bit, so grant it on each
