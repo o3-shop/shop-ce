@@ -289,72 +289,123 @@ jobs:
         run: exit 1
 
   e2e:
-    name: E2E (Playwright)
+    name: E2E (Playwright, native)
     runs-on: ubuntu-latest
-    # ── Why this is NOT in the PHP matrix ──────────────────────────────────
-    # The unit `test` job above runs across PHP 7.4–8.2. E2E is deliberately a
-    # single job on PHP 8.2 instead, because:
-    #   1. It exercises end-to-end storefront/admin BEHAVIOUR through a browser,
-    #      which is effectively PHP-version-independent — version-specific logic
-    #      is already covered by the unit matrix.
-    #   2. The shop is served from the docker image, which is fixed at PHP 8.2,
-    #      and the Playwright fixtures use `docker exec` into the shop container,
-    #      so e2e inherently runs against the 8.2 container.
-    #   3. Building 7.4/8.0/8.1 shop images + running the full browser suite ×4
-    #      would multiply CI time (docker build + demodata provisioning + browser
-    #      run) for negligible extra signal.
-    # If a PHP-version-specific end-to-end concern ever appears, add a targeted
-    # job on the minimum supported version (needs a 7.4 shop image).
+    # ── Native e2e — NOT in the PHP matrix ────────────────────────────────────
+    # Replicates the docker entrypoint's provisioning (composer + satellites +
+    # bin/o3-setup + themes) directly on the runner, serves the shop with Apache
+    # (mod_php + mod_rewrite for OXID SEO URLs), and runs Playwright with
+    # E2E_SHOP_EXEC=native so the harness runs its oe-console/php helpers on the
+    # host instead of `docker exec`. Single 8.2 job: e2e behaviour is
+    # PHP-version-independent (the unit matrix covers versions) and the suite is
+    # slow, so a per-version browser run adds cost without signal.
     #
-    # NOTE: first cut — validate on a PR run and tune the provisioning wait /
-    # container name before making this a *required* status check.
+    # ⚠ FIRST CUT — needs a PR dry-run to green. Likely tuning spots:
+    #   (a) Apache+mod_php serving OXID SEO URLs (AllowOverride / .htaccess),
+    #   (b) bin/o3-setup completing non-interactively against the service DB,
+    #   (c) PHP mail() → Mailpit via the msmtp sendmail shim.
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: o3shop_test
+          MYSQL_USER: o3shop
+          MYSQL_PASSWORD: o3shop
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - 8025:8025
+          - 1025:1025
+    env:
+      COMPOSER_ROOT_VERSION: dev-b-1.6
     steps:
       - uses: actions/checkout@v4
 
-      - name: 🔧 Prepare shop config for the docker stack
+      - name: 🐘 Install PHP 8.2 + Apache (mod_php) + msmtp
         run: |
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update
+          sudo apt-get install -y apache2 libapache2-mod-php8.2 \
+            php8.2 php8.2-mysql php8.2-gd php8.2-curl php8.2-mbstring php8.2-xml \
+            php8.2-intl php8.2-soap php8.2-bcmath php8.2-zip php8.2-bz2 \
+            libxml2-utils default-mysql-client msmtp msmtp-mta unzip git
+          sudo update-alternatives --set php /usr/bin/php8.2 || true
+          php -v
+
+      - name: 📮 Route PHP mail() → Mailpit (msmtp shim)
+        run: |
+          printf 'defaults\nhost 127.0.0.1\nport 1025\ntls off\nauth off\nfrom ci@localhost\naccount default :\n' \
+            | sudo tee /etc/msmtprc >/dev/null
+          echo 'sendmail_path = "/usr/bin/msmtp -t"' \
+            | sudo tee /etc/php/8.2/apache2/conf.d/99-mailpit.ini /etc/php/8.2/cli/conf.d/99-mailpit.ini >/dev/null
+
+      - name: ⬇️ Install Composer 2.2
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --version=2.2.28
+          php -r "unlink('composer-setup.php');"
+          sudo mv composer.phar /usr/local/bin/composer
+          composer --version
+
+      - name: 📥 Install dependencies + o3-theme
+        run: |
+          composer install --prefer-dist --no-progress --optimize-autoloader
+          composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
+
+      - name: 🧩 Clone satellites (testing-library, demodata) + symlinks
+        run: |
+          git clone --branch b-1.6 --depth 1 https://github.com/o3-shop/testing-library.git testing-library
+          rm -rf vendor/o3-shop/testing-library
+          ln -s ../../testing-library vendor/o3-shop/testing-library
+          [ -e testing-library/vendor ] || ln -s ../vendor testing-library/vendor
+          sed -i "s/ --skip-ssl//g" testing-library/library/Services/Library/DatabaseHandler.php || true
+          git clone --branch main --depth 1 https://github.com/o3-shop/shop-demodata-ce.git shop-demodata-ce
+          rm -rf vendor/o3-shop/shop-demodata-ce
+          ln -s ../../shop-demodata-ce vendor/o3-shop/shop-demodata-ce
+
+      - name: 🎨 Install wave theme + o3-theme out symlinks
+        run: |
+          git clone --branch main --depth 1 https://github.com/o3-shop/wave-theme.git source/Application/views/wave
+          mkdir -p source/out
+          ln -sf ../Application/views/wave/out/wave source/out/wave
+          ln -sf ../Application/views/o3-theme/out/o3-theme source/out/o3-theme || true
+
+      - name: 🔧 Shop config (.env.ci) + bin/o3-setup (schema + demodata)
+        run: |
+          cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
-          # Docker-oriented .env (SHOPDIR=/var/www/html, DBHOST=db). SSLSHOPURL is
-          # set to the literal URL — NOT "${O3SHOP_CONF_SHOPURL}" — to avoid the
-          # phpdotenv forward-reference pitfall that leaves the placeholder
-          # unexpanded and breaks every SSL form submit (register/checkout).
-          cat > .env <<'EOF'
-          O3SHOP_CONF_DBHOST="db"
-          O3SHOP_CONF_DBPORT="3306"
-          O3SHOP_CONF_DBNAME="o3shop"
-          O3SHOP_CONF_DBUSER="o3shop"
-          O3SHOP_CONF_DBPWD="o3shop"
-          O3SHOP_CONF_DBROOT="supersecret"
-          O3SHOP_CONF_SHOPURL="http://localhost:8080"
-          O3SHOP_CONF_SSLSHOPURL="http://localhost:8080"
-          O3SHOP_CONF_SHOPDIR="/var/www/html/source"
-          O3SHOP_CONF_COMPILEDIR="/var/www/html/source/tmp"
-          O3SHOP_CONF_ADMINSSLURL=""
-          O3SHOP_CONF_LOG_LEVEL="error"
-          O3SHOP_CONF_LOG_DIR="log/"
-          O3SHOP_CONF_DEBUG=0
-          O3SHOP_CONF_ADMINEMAIL=""
-          O3SHOP_CONF_SKIPVIEWUSAGE=0
-          O3SHOP_CONF_DELSETUPDIR=1
-          EOF
+          until mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent; do echo "waiting for db..."; sleep 2; done
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+          php bin/o3-setup
 
-      - name: 🐳 Start shop stack (shop + db + mailpit)
-        working-directory: docker
+      - name: 🌐 Serve the shop with Apache on :8080
         run: |
-          docker network create o3shop-shared 2>/dev/null || true
-          COMPOSE_PROJECT_NAME=o3shop docker compose --env-file ../.env --profile db up -d --build
-
-      - name: ⏳ Wait for shop provisioning (setup + demodata)
-        run: |
-          # The shop container healthcheck turns "healthy" once o3 setup +
-          # demodata provisioning finishes (removes /tmp/o3setup-running).
-          for i in $(seq 1 120); do
-            status=$(docker inspect -f '{{.State.Health.Status}}' o3shop-shop-1 2>/dev/null || echo "starting")
+          sudo a2enmod rewrite
+          sudo tee /etc/apache2/sites-available/o3shop.conf >/dev/null <<APACHE
+          Listen 8080
+          <VirtualHost *:8080>
+            DocumentRoot ${GITHUB_WORKSPACE}/source
+            <Directory ${GITHUB_WORKSPACE}/source>
+              AllowOverride All
+              Require all granted
+            </Directory>
+          </VirtualHost>
+          APACHE
+          sudo a2dissite 000-default || true
+          sudo a2ensite o3shop
+          sudo chmod -R a+rX "${GITHUB_WORKSPACE}/source"
+          sudo chown -R www-data:www-data "${GITHUB_WORKSPACE}/source/tmp" "${GITHUB_WORKSPACE}/source/log" 2>/dev/null || true
+          sudo service apache2 restart
+          for i in $(seq 1 30); do
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || echo 000)
-            echo "attempt $i: health=$status http=$code"
-            if [ "$status" = "healthy" ] && [ "$code" = "200" ]; then echo "shop ready"; break; fi
-            if [ "$i" = "120" ]; then echo "::error::shop not ready"; docker logs o3shop-shop-1 --tail 200 || true; exit 1; fi
-            sleep 5
+            echo "apache attempt $i: http=$code"
+            [ "$code" = "200" ] && { echo "shop serving"; break; }
+            if [ "$i" = "30" ]; then echo "::error::shop not serving"; sudo tail -100 /var/log/apache2/error.log 2>/dev/null; cat /tmp/php_errors.log 2>/dev/null; exit 1; fi
+            sleep 3
           done
 
       - name: 🟢 Set up Node
@@ -368,17 +419,18 @@ jobs:
           npm ci || npm install
           npx playwright install --with-deps chromium
 
-      - name: 🎭 Run Playwright e2e (CI=1 → 2 retries absorb known mail-timing flakiness)
+      - name: 🎭 Run Playwright e2e (native; CI=1 → 2 retries absorb mail-timing flakiness)
         working-directory: tests/Acceptance/playwright
         env:
+          E2E_SHOP_EXEC: native
+          SHOP_ROOT: ${{ github.workspace }}
           SHOP_URL: http://localhost:8080
           MAILPIT_URL: http://localhost:8025
-          SHOP_CONTAINER: o3shop-shop-1
           DB_HOST: 127.0.0.1
           DB_PORT: '3306'
-          DB_NAME: o3shop
+          DB_NAME: o3shop_test
           DB_USER: root
-          DB_PASS: supersecret
+          DB_PASS: root
           CI: '1'
         run: npx playwright test
 
@@ -391,4 +443,3 @@ jobs:
             tests/Acceptance/playwright/playwright-report/
             tests/Acceptance/playwright/test-results/
           retention-days: 7
-
