@@ -79,8 +79,8 @@ bin/oe-console                   # Symfony Console CLI entry point
 - **Database:** Doctrine DBAL ≤2.12. Use QueryBuilder — never raw PDO or string-concatenated SQL.
 - **Templates:** Smarty ~2.6. Template files live in `source/Application/views/{admin,o3-theme,wave}/`.
 - **Dependency injection:** Symfony container. Services registered via YAML configs in `source/Internal/`.
-- **Branches:** Feature branches off `b-1.6.0`. Naming: `NNN-short-description` (issue number prefix).
-- **Main branch:** `b-1.6.0`
+- **Branches:** Feature branches off `b-1.7`. Naming: `NNN-short-description` (issue number prefix).
+- **Main branch:** `b-1.7`
 
 ## Logging Standards
 
