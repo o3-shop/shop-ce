@@ -116,6 +116,129 @@ class SystemRequirementsTest extends \OxidTestCase
     }
 
     /**
+     * With a self-signed certificate the TLS handshake of the mod_rewrite self-probe fails, so on
+     * https shop URLs setup could not detect mod_rewrite (issue #27). When the config.inc.php flag
+     * blAllowSelfSignedCertificates is enabled (development setups), the probe must accept the
+     * certificate and return the server response.
+     */
+    public function testModRewriteProbeAcceptsSelfSignedCertificateWhenAllowed()
+    {
+        [$process, $pipes, $port, $certFile] = $this->startSelfSignedTlsServer();
+
+        $configFile = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class);
+        $originalFlag = $configFile->getVar('blAllowSelfSignedCertificates');
+        $configFile->setVar('blAllowSelfSignedCertificates', true);
+
+        try {
+            $systemRequirements = new SystemRequirements();
+            $response = $systemRequirements->UNITgetModRewriteResponse(
+                ['host' => '127.0.0.1', 'port' => $port, 'dir' => '/', 'ssl' => true]
+            );
+
+            $this->assertIsString($response, 'Probe must complete the TLS handshake when self-signed certificates are allowed');
+            $this->assertStringContainsString('mod_rewrite_on', $response);
+        } finally {
+            $configFile->setVar('blAllowSelfSignedCertificates', $originalFlag);
+            $this->stopSelfSignedTlsServer($process, $pipes, $certFile);
+        }
+    }
+
+    /**
+     * Secure default: without blAllowSelfSignedCertificates the probe must keep verifying
+     * certificates and refuse the handshake with a self-signed one.
+     */
+    public function testModRewriteProbeRejectsSelfSignedCertificateByDefault()
+    {
+        [$process, $pipes, $port, $certFile] = $this->startSelfSignedTlsServer();
+
+        $configFile = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class);
+        $originalFlag = $configFile->getVar('blAllowSelfSignedCertificates');
+        $configFile->setVar('blAllowSelfSignedCertificates', false);
+
+        try {
+            $systemRequirements = new SystemRequirements();
+            $response = $systemRequirements->UNITgetModRewriteResponse(
+                ['host' => '127.0.0.1', 'port' => $port, 'dir' => '/', 'ssl' => true]
+            );
+
+            $this->assertFalse($response, 'Probe must reject self-signed certificates unless explicitly allowed');
+        } finally {
+            $configFile->setVar('blAllowSelfSignedCertificates', $originalFlag);
+            $this->stopSelfSignedTlsServer($process, $pipes, $certFile);
+        }
+    }
+
+    /**
+     * Starts a one-shot TLS server on a random loopback port, using a freshly generated
+     * self-signed certificate. It answers any successfully handshaked HTTP request with the
+     * 'mod_rewrite_on' marker the probe looks for.
+     *
+     * @return array [proc resource, pipes, port, certFile]
+     */
+    private function startSelfSignedTlsServer(): array
+    {
+        $certFile = tempnam(sys_get_temp_dir(), 'o3tstcrt');
+        $this->createSelfSignedCertificate($certFile);
+
+        $serverCode = <<<'SRV'
+$ctx = stream_context_create(['ssl' => ['local_cert' => $argv[1]]]);
+$srv = stream_socket_server('ssl://127.0.0.1:0', $errNo, $errStr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ctx);
+if (!$srv) { fwrite(STDERR, $errNo . ' ' . $errStr); exit(1); }
+echo stream_socket_get_name($srv, false), "\n";
+$end = microtime(true) + 15;
+while (microtime(true) < $end) {
+    $client = @stream_socket_accept($srv, 1);
+    if (!$client) { continue; }
+    stream_set_timeout($client, 2);
+    fread($client, 4096);
+    fwrite($client, "HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nmod_rewrite_on");
+    fclose($client);
+}
+SRV;
+
+        $process = proc_open(
+            [PHP_BINARY, '-d', 'error_reporting=0', '-r', $serverCode, $certFile],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+            $pipes
+        );
+        $this->assertIsResource($process, 'Could not start TLS test server process');
+
+        stream_set_timeout($pipes[1], 5);
+        $listenAddress = (string) fgets($pipes[1]);
+        $port = (int) substr($listenAddress, strrpos($listenAddress, ':') + 1);
+        $this->assertGreaterThan(0, $port, 'TLS test server did not report a listen port');
+
+        return [$process, $pipes, $port, $certFile];
+    }
+
+    private function stopSelfSignedTlsServer($process, array $pipes, string $certFile): void
+    {
+        foreach ($pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+        if (is_resource($process)) {
+            proc_terminate($process);
+            proc_close($process);
+        }
+        if (file_exists($certFile)) {
+            unlink($certFile);
+        }
+    }
+
+    private function createSelfSignedCertificate(string $certFile): void
+    {
+        $key = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        $csr = openssl_csr_new(['commonName' => '127.0.0.1'], $key, ['digest_alg' => 'sha256']);
+        $cert = openssl_csr_sign($csr, null, $key, 1, ['digest_alg' => 'sha256']);
+
+        openssl_x509_export($cert, $certPem);
+        openssl_pkey_export($key, $keyPem);
+        file_put_contents($certFile, $certPem . $keyPem);
+    }
+
+    /**
      * Testing SystemRequirements::checkServerPermissions()
      */
     public function testCheckServerPermissions()

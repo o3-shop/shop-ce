@@ -614,8 +614,10 @@ class SystemRequirements
      */
     protected function _getModRewriteResponse($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sHostname = ($aHostInfo['ssl'] ? 'ssl://' : '') . $aHostInfo['host'];
-        if (!($rFp = @fsockopen($sHostname, $aHostInfo['port'], $iErrNo, $sErrStr, 10))) {
+        $sAddress = ($aHostInfo['ssl'] ? 'ssl://' : 'tcp://') . $aHostInfo['host'] . ':' . $aHostInfo['port'];
+        $rContext = stream_context_create($this->getModRewriteProbeContextOptions((bool) $aHostInfo['ssl']));
+        $rFp = @stream_socket_client($sAddress, $iErrNo, $sErrStr, 10, STREAM_CLIENT_CONNECT, $rContext);
+        if (!$rFp) {
             return false;
         }
 
@@ -634,6 +636,40 @@ class SystemRequirements
         fclose($rFp);
 
         return $sOut;
+    }
+
+    /**
+     * Builds the stream context options for the mod_rewrite self-probe socket.
+     *
+     * With the config.inc.php flag blAllowSelfSignedCertificates enabled, certificate
+     * verification is relaxed so the probe can complete the TLS handshake against a
+     * development shop that serves a self-signed certificate. Default is strict
+     * verification. The flag is read through ConfigFile instead of Config, because
+     * during Setup no database is available yet and Config::getConfigParam() would
+     * try to initialize one.
+     *
+     * @param bool $blSsl whether the probe target is an https address
+     *
+     * @return array stream context options for stream_context_create()
+     */
+    protected function getModRewriteProbeContextOptions(bool $blSsl): array
+    {
+        if (!$blSsl) {
+            return [];
+        }
+
+        $oConfigFile = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class);
+        if (!$oConfigFile->getVar('blAllowSelfSignedCertificates')) {
+            return [];
+        }
+
+        return [
+            'ssl' => [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ],
+        ];
     }
 
     /**

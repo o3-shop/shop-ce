@@ -52,6 +52,14 @@ $this->sCompileDir  = $_ENV['O3SHOP_CONF_COMPILEDIR'];
 $this->sLogDir = $_ENV['O3SHOP_CONF_LOG_DIR'];
 
 /**
+ * Accept self-signed SSL certificates when the shop probes itself over https,
+ * e.g. the mod_rewrite check during setup and on the admin system health page.
+ * Only enable this for development environments with self-signed certificates
+ * (DDEV, local docker, ...) — never in production.
+ */
+$this->blAllowSelfSignedCertificates = false;
+
+/**
  * Force shop edition. Shop edition can still be forced here.
  * Possible options: CE or left empty (will be determined automatically).
  */
