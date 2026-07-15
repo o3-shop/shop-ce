@@ -2024,6 +2024,81 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
+     * Producer commercial guarantee of durability in whole years (#219).
+     * 0 = none / not communicated to the trader.
+     *
+     * @return int
+     */
+    public function getGuaranteeYears(): int
+    {
+        return (int) $this->oxarticles__o3guaranteeyears->value;
+    }
+
+    /**
+     * THE single legal-qualification predicate for the EU durability-guarantee
+     * label: producer guarantee of MORE THAN two years (Art. 6(1)(la) CRD as
+     * amended by Directive (EU) 2024/825). Producer-only / no-extra-cost /
+     * whole-good are operator-side conditions documented in admin help; the
+     * code threshold is the duration rule. Do not re-implement elsewhere.
+     *
+     * @return bool
+     */
+    public function isDurabilityGuaranteeEligible(): bool
+    {
+        return $this->getGuaranteeYears() > 2;
+    }
+
+    /**
+     * Guarantor/brand name as it must appear on the label.
+     * Fallback chain: own field -> active linked manufacturer title -> ''.
+     * '' means the label CANNOT render (mandatory label component).
+     *
+     * @return string
+     */
+    public function getGuaranteeGuarantor(): string
+    {
+        $own = trim((string) $this->oxarticles__o3guaranteeguarantor->value);
+        if ($own !== '') {
+            return $own;
+        }
+        $manufacturer = $this->getManufacturer();
+        if ($manufacturer !== null) {
+            return trim((string) $manufacturer->oxmanufacturers__oxtitle->value);
+        }
+        return '';
+    }
+
+    /**
+     * Model identifier as it must appear on the label (mandatory component,
+     * Reg. (EU) 2025/1960 Annex II). Fallback chain: own field -> OXARTNUM
+     * -> article title.
+     *
+     * @return string
+     */
+    public function getGuaranteeModel(): string
+    {
+        $own = trim((string) $this->oxarticles__o3guaranteemodel->value);
+        if ($own !== '') {
+            return $own;
+        }
+        $artnum = trim((string) $this->oxarticles__oxartnum->value);
+        if ($artnum !== '') {
+            return $artnum;
+        }
+        return trim((string) $this->oxarticles__oxtitle->value);
+    }
+
+    /**
+     * Guarantee conditions text (sec. 479 BGB information duty).
+     *
+     * @return string
+     */
+    public function getGuaranteeConditions(): string
+    {
+        return trim((string) $this->oxarticles__o3guaranteeconditions->value);
+    }
+
+    /**
      * Checks if article is assigned to category $sCatNID.
      *
      * @param string $sCatNid category ID
@@ -4571,7 +4646,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
 
         // certain fields with zero value treat as empty
-        $aZeroValueFields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity'];
+        $aZeroValueFields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity', 'oxarticles__o3guaranteeyears'];
 
         if (!$mValue && in_array($sFieldName, $aZeroValueFields)) {
             return true;
