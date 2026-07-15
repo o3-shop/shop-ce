@@ -356,7 +356,13 @@ class SearchTest extends UnitTestCase
         and ( ( $sArticleTable.oxtitle like '%a%' or  $sArticleTable.oxshortdesc like '%a%' or $sArticleTable.oxsearchkeys like '%a%' or
         $sArticleTable.oxartnum like '%a%' ) )";
 
-        $aAll = oxDb::getDb()->getAll($sQ . ' limit 10, 10 ');
+        $sRelevanceOrder = " ORDER BY CASE" .
+            " WHEN ($sArticleTable.oxtitle LIKE '%a%') THEN 1" .
+            " WHEN ($sArticleTable.oxshortdesc LIKE '%a%') THEN 2" .
+            " WHEN ($sArticleTable.oxsearchkeys LIKE '%a%') THEN 3" .
+            " WHEN ($sArticleTable.oxartnum LIKE '%a%') THEN 4" .
+            " ELSE 5 END ASC, $sArticleTable.oxtitle ASC";
+        $aAll = oxDb::getDb()->getAll($sQ . $sRelevanceOrder . ' limit 10, 10 ');
 
         // testing if article count in list is <= 'iNrOfCatArticles' = 10;
         $this->assertEquals(10, $oSearchList->count());
@@ -820,6 +826,7 @@ class SearchTest extends UnitTestCase
         }
         $sQ .= ")  and $sArticleTable.oxparentid = '' and $sArticleTable.oxissearch = 1  and
                 ( (  $sAETable.oxlongdesc like '%xxx%' )  ) ";
+        $sQ .= " ORDER BY CASE WHEN ($sAETable.oxlongdesc LIKE '%xxx%') THEN 1 ELSE 2 END ASC, $sArticleTable.oxtitle ASC";
 
         /** @var Search $oSearch */
         $oSearch = oxNew('oxSearch');
