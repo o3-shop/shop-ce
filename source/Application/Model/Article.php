@@ -205,6 +205,9 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected $_oUser = null;
 
+    /** @var \OxidEsales\Eshop\Core\GuaranteeLabelGenerator|null lazy; settable for tests */
+    protected $_oGuaranteeLabelGenerator = null;
+
     /**
      * Performance issue. Sometimes you want to load articles without calculating
      * correct discounts and prices etc.
@@ -2096,6 +2099,53 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     public function getGuaranteeConditions(): string
     {
         return trim((string) $this->oxarticles__o3guaranteeconditions->value);
+    }
+
+    /**
+     * Test seam / DI point for the label generator.
+     *
+     * @param \OxidEsales\Eshop\Core\GuaranteeLabelGenerator $generator
+     *
+     * @return void
+     */
+    public function setGuaranteeLabelGenerator(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator $generator): void
+    {
+        $this->_oGuaranteeLabelGenerator = $generator;
+    }
+
+    /**
+     * URL of the composited EU durability-guarantee label PNG for this
+     * article, or null when the label must not / cannot render:
+     * master switch off, not eligible (<= 2 years), guarantor unresolvable
+     * (mandatory label component), or composition failed (already logged by
+     * the generator). Templates render the text fallback when this is null
+     * but the article IS eligible and enabled - see the theme plan.
+     *
+     * @return string|null
+     */
+    public function getDurabilityGuaranteeLabelUrl(): ?string
+    {
+        if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowDurabilityGuaranteeLabel', false)) {
+            return null;
+        }
+        if (!$this->isDurabilityGuaranteeEligible()) {
+            return null;
+        }
+        $guarantor = $this->getGuaranteeGuarantor();
+        if ($guarantor === '') {
+            return null;
+        }
+
+        if ($this->_oGuaranteeLabelGenerator === null) {
+            $this->_oGuaranteeLabelGenerator = oxNew(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class);
+        }
+
+        return $this->_oGuaranteeLabelGenerator->getLabelUrl(
+            (string) $this->getId(),
+            $this->getGuaranteeYears(),
+            $guarantor,
+            $this->getGuaranteeModel()
+        );
     }
 
     /**
