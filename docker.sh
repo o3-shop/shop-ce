@@ -157,13 +157,6 @@ run_tests() {
 
   echo -e "${GREEN}✓ shop container is running – executing tests${NC}"
 
-  # Warn if step debugging is left on: start_with_request=yes makes every CLI/test
-  # process attempt a debugger connection on port 9003, slowing the whole suite.
-  if [ -f "$MY_DIR/docker/xdebug/zz-xdebug-debug.ini" ]; then
-      echo -e "${YELLOW}⚠ Xdebug step debugging is ON – the suite may be slow.${NC}"
-      echo -e "${YELLOW}  Run './docker.sh xdebug off' before the test suite for normal speed.${NC}"
-  fi
-
   # Clear the application cache before the suite — stale Smarty / module /
   # container caches have masked real failures in the past (a stale class map
   # let a deleted class still resolve, an old Smarty template hid a syntax
@@ -218,61 +211,6 @@ run_quarantine_tests() {
 
   echo -e "${GREEN}✓ Running quarantine tests (slow / special tests)${NC}"
   $DOCKER_COMPOSE exec shop ./run-tests.sh --quarantine
-}
-
-toggle_xdebug() {
-  GREEN='\033[0;32m'
-  YELLOW='\033[1;33m'
-  RED='\033[0;31m'
-  NC='\033[0m'
-
-  MY_DIR=$(getMyPath)
-  local dist="$MY_DIR/docker/xdebug/zz-xdebug-debug.ini.dist"
-  local active="$MY_DIR/docker/xdebug/zz-xdebug-debug.ini"
-
-  # status needs no container and no docker — just report host-file presence.
-  if [ "$1" = "status" ]; then
-      if [ -f "$active" ]; then
-          echo -e "${GREEN}xdebug step debugging: ON${NC}"
-      else
-          echo -e "${YELLOW}xdebug step debugging: OFF${NC} (coverage-only default)"
-      fi
-      return 0
-  fi
-
-  if [ "$1" != "on" ] && [ "$1" != "off" ]; then
-      echo "Usage: $0 xdebug <on|off|status>"
-      exit 1
-  fi
-
-  cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
-  check_docker_compose
-
-  if ! $DOCKER_COMPOSE ps shop 2>/dev/null | grep -q "Up\|running"; then
-      echo -e "${RED} ✗ shop container is NOT running – start it first with './docker.sh start'. ${NC}"
-      exit 1
-  fi
-
-  if [ "$1" = "on" ]; then
-      if [ ! -f "$dist" ]; then
-          echo -e "${RED}Template not found: $dist${NC}"
-          exit 1
-      fi
-      cp "$dist" "$active" || { echo -e "${RED}Failed to write $active${NC}"; exit 1; }
-      $DOCKER_COMPOSE exec shop apache2ctl graceful \
-          || { echo -e "${RED}Failed to reload Apache – xdebug may not be active.${NC}"; exit 1; }
-      echo -e "${GREEN}✓ xdebug step debugging ENABLED.${NC}"
-      echo -e "${YELLOW}  → Start your IDE's debug listener on port 9003, then load a page.${NC}"
-      echo -e "${YELLOW}  → Connection log: $DOCKER_COMPOSE exec shop cat /tmp/xdebug.log${NC}"
-      echo -e "${YELLOW}  → Setup guide: docs/development/xdebug-step-debugging.md${NC}"
-  else
-      rm -f "$active"
-      $DOCKER_COMPOSE exec shop apache2ctl graceful \
-          || { echo -e "${RED}Failed to reload Apache – xdebug may still be active.${NC}"; exit 1; }
-      echo -e "${GREEN}✓ xdebug step debugging DISABLED (coverage-only).${NC}"
-  fi
-
-  cd "$MY_DIR"
 }
 
 run_npm_audits() {
