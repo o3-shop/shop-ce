@@ -2999,6 +2999,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Core\GuaranteeLabelGenerator'                             => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Core\GuaranteeLabelGenerator::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Core\Hasher'                                               => [
         'editionClassName' => \OxidEsales\EshopCommunity\Core\Hasher::class,
         'isAbstract'       => true,
