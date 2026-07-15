@@ -52,6 +52,8 @@ final class Version20260715090000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+
         $table = $schema->getTable('oxarticles');
         $after = 'OXPRICE';
         foreach (self::COLUMNS as $name => $definition) {
@@ -65,6 +67,8 @@ final class Version20260715090000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
+        $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+
         $table = $schema->getTable('oxarticles');
         foreach (array_keys(self::COLUMNS) as $name) {
             if ($table->hasColumn($name)) {
