@@ -2024,6 +2024,96 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
+     * EmpCo durability guarantee duration in months, as communicated by the
+     * producer (Directive (EU) 2024/825, issue #219). 0 = not communicated.
+     * Variant inheritance is handled by the standard parent/child field-copy
+     * mechanism (empty/zero child value copies from the parent article).
+     */
+    public function getGuaranteeDurationMonths(): int
+    {
+        return (int) $this->oxarticles__o3guaranteedurationmonths->value;
+    }
+
+    /**
+     * Whether the producer-communicated durability guarantee exceeds two
+     * years (strictly more than 24 months), the Art. 22a trigger for the
+     * mandatory harmonised durability-guarantee label.
+     */
+    public function isDurationGuaranteeEligible(): bool
+    {
+        return $this->getGuaranteeDurationMonths() > 24;
+    }
+
+    /**
+     * Guarantor/brand name to display on the durability-guarantee label.
+     * Falls back to the linked manufacturer's title when the article's own
+     * field is empty; returns '' when neither is available.
+     *
+     * Loads the manufacturer directly instead of going through
+     * {@see getManufacturer()}, which hides inactive manufacturers: whether
+     * a manufacturer's storefront brand page is enabled has no bearing on
+     * whether its name is the legally correct guarantor to print on the
+     * label, so an inactive manufacturer must still be usable as a fallback.
+     */
+    public function getGuaranteeGuarantor(): string
+    {
+        $guarantor = (string) $this->oxarticles__o3guaranteeguarantor->value;
+        if ($guarantor !== '') {
+            return $guarantor;
+        }
+
+        $manufacturerId = $this->getManufacturerId();
+        if (!$manufacturerId) {
+            return '';
+        }
+
+        $manufacturer = oxNew(Manufacturer::class);
+        return $manufacturer->load($manufacturerId) ? (string) $manufacturer->oxmanufacturers__oxtitle->value : '';
+    }
+
+    /**
+     * Model identifier to display on the durability-guarantee label — a
+     * mandatory variable component of the harmonised label (Annex II,
+     * Implementing Regulation (EU) 2025/1960). Falls back to the article
+     * number (`OXARTNUM`) when the dedicated field is empty, since that is
+     * the identifier already printed on most product presentations; returns
+     * '' only when neither is available.
+     *
+     * Variant inheritance for the article's own field follows the standard
+     * OXID empty-string parent copy, exactly like the guarantor field.
+     */
+    public function getGuaranteeModel(): string
+    {
+        $model = (string) $this->oxarticles__o3guaranteemodel->value;
+        if ($model !== '') {
+            return $model;
+        }
+
+        return (string) $this->oxarticles__oxartnum->value;
+    }
+
+    /**
+     * § 479 BGB guarantee conditions text/URL, shown once the durability
+     * label triggers the pre-existing guarantee-information duties.
+     */
+    public function getGuaranteeConditions(): ?string
+    {
+        $value = $this->oxarticles__o3guaranteeconditions->value;
+        return ($value === null || $value === '') ? null : (string) $value;
+    }
+
+    /**
+     * Whether the harmonised durability-guarantee label may render for this
+     * article: duration threshold met AND a guarantor name is resolvable.
+     * Does not consider the shop-level `blShowDurabilityGuaranteeLabel`
+     * switch — that master on/off gate is a rendering-layer concern.
+     */
+    public function isDurabilityGuaranteeLabelEligible(): bool
+    {
+        return $this->isDurationGuaranteeEligible() && $this->getGuaranteeGuarantor() !== '';
+    }
+
+    /**
      * Checks if article is assigned to category $sCatNID.
      *
      * @param string $sCatNid category ID
@@ -4571,7 +4661,12 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         }
 
         // certain fields with zero value treat as empty
-        $aZeroValueFields = ['oxarticles__oxprice', 'oxarticles__oxvat', 'oxarticles__oxunitquantity'];
+        $aZeroValueFields = [
+            'oxarticles__oxprice',
+            'oxarticles__oxvat',
+            'oxarticles__oxunitquantity',
+            'oxarticles__o3guaranteedurationmonths',
+        ];
 
         if (!$mValue && in_array($sFieldName, $aZeroValueFields)) {
             return true;

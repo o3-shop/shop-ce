@@ -1495,3 +1495,15 @@ VALUES
     ('b4f36c830c18f275eef33491246b822e', 1, '', 'blRevocationRequireLogin',   'bool', '0'),
     ('f4a110db564dcf6528ede68bddebe75c', 1, '', 'blRevocationNotifyOperator', 'bool', '1'),
     ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  '');
+
+-- EU harmonised guarantee labels, EmpCo Directive (EU) 2024/825 / Implementing
+-- Regulation (EU) 2025/1960, applies 2026-09-27 (issue #219). Default-on for
+-- fresh installs (legally safe out of the box); upgrades inherit the
+-- absent-row → off behaviour from code defaults, so existing operators
+-- consciously opt in after reviewing their situation (e.g. pure-B2B shops
+-- are out of scope of the duty).
+INSERT INTO `oxconfig` (`OXID`, `OXSHOPID`, `OXMODULE`, `OXVARNAME`, `OXVARTYPE`, `OXVARVALUE`)
+VALUES
+    ('a1d9f3c6e8b34a5c9d2f7e6b0c4a8f31', 1, '', 'blShowLegalGuaranteeNotice',      'bool', '1'),
+    ('b2e0a4d7f9c45b6d0e3f8a7c1d5b9042', 1, '', 'blShowDurabilityGuaranteeLabel',  'bool', '1'),
+    ('c3f1b5e809d56c7e1f4a9b8d2e6c0153', 1, '', 'sLegalGuaranteeNoticePlacement',  'str',  'footer');

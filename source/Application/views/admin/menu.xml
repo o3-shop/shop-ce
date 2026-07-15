@@ -190,6 +190,10 @@
             <SUBMENU id="mxo3captcha" cl="captcha_config" list="captcha_config">
                 <TAB id="tbclo3captcha_config" cl="captcha_config" />
             </SUBMENU>
+            <!-- EU harmonised guarantee labels, EmpCo Directive (EU) 2024/825 (issue #219) -->
+            <SUBMENU id="mxguaranteeconfig" cl="guarantee_config" list="guarantee_config">
+                <TAB id="tbclguarantee_config" cl="guarantee_config" />
+            </SUBMENU>
         </MAINMENU>
         <MAINMENU id="mxservice" iconclass="fa-solid fa-screwdriver-wrench">
             <SUBMENU id="mxsysinfo" cl="systeminfo" rights="malladmin" disableForDemoShop="1" />

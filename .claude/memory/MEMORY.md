@@ -27,6 +27,7 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [!] [Theme repos are external](architecture_theme-repos.md) — wave + o3-theme live in separate GitHub repos; their dirs in shop-ce are gitignored snapshots
 - [!] [o3-theme migration](project_o3-theme-migration.md) — wave → o3-theme cutover before 2026-05-01; keep new storefront templates portable
 - [o3-theme npm audit](project_o3-theme-dep-audit.md) — pre-existing brace-expansion vulnerability blocks test-all-coverage; use test --fast for PHP-only changes
+- [o3-theme data-js conventions](architecture_o3-theme-js-conventions.md) — data-js hooks must match a build/js binder (root cause of #214); no AJAX re-renders; tpl live-test loop = copy into installed checkout + smarty cache clear
 - [bin/release intermediate-node re-tag gap](release-tooling-intermediate-node-retag-gap.md) — resolver "reuses" an intermediate fat node (the metapackage) while bumping its child pin → orphaned edit; force a re-tag during the fold-out cut (#169)
 - [!] [cs-fixer dirties nested clones](cs-fixer-pollutes-nested-clones.md) — ./docker.sh cs-fixer reformats testing-library/themes/demodata clones → aborts bin/release pre-flight; clean them before a cut
 - [!] [ExitHandler interface-guard bug](shop-ce-exithandler-interface-guard-bug.md) — bootstrap.php uses class_exists() on the ExitHandlerInterface (always false) → fresh-install Setup redirect dies in a DB-error loop; fix: interface_exists()
@@ -36,3 +37,4 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [Core CAPTCHA provider layer (#213)](captcha-provider-layer.md) — pluggable captcha; DI/import conventions; $this->getContainer() pattern; testing-library env gotchas
 - [Adding a core admin controller](adding-a-core-admin-controller.md) — new core admin controller needs UnifiedNameSpaceClassMap + BackwardsCompatibilityClassMap + ShopControllerMapProvider entries + regenerate, else admin menu → main page
 - [Theme ↔ shop version compat](reference_theme-shop-version-compat.md) — guard new ViewConfig methods in theme templates with method_exists; old shops fatal otherwise
+- [EU Reg 2025/1960 guarantee labels](reference_eu-reg-2025-1960-guarantee-labels.md) — Annex I notice = static per-language artwork, QR fixed to Your Europe portal (no runtime generation); Annex II GARAN label editable fields; CELLAR fetch trick for EUR-Lex

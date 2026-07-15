@@ -314,6 +314,36 @@ class OrderController extends FrontendController
     }
 
     /**
+     * Template variable getter. Whether the EU harmonised durability-guarantee
+     * label (EmpCo Directive (EU) 2024/825, issue #219) must render on the
+     * order-final page (§ 312j Abs. 2 BGB n.F.): the shop-level master switch
+     * is on AND at least one basket item is eligible. Per-item eligibility
+     * for the actual label content is checked separately by the theme via
+     * each basket item's linked article.
+     *
+     * @return bool
+     */
+    public function isDurabilityGuaranteeLabelVisible()
+    {
+        if (!$this->getViewConfig()->getDurabilityGuaranteeLabelVisible()) {
+            return false;
+        }
+
+        $basket = $this->getBasket();
+        if (!$basket) {
+            return false;
+        }
+
+        foreach ($basket->getContents() as $basketItem) {
+            if ($basketItem->getArticle()->isDurabilityGuaranteeLabelEligible()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Template variable getter. Returns execution function name
      *
      * @return string

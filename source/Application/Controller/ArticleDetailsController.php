@@ -782,6 +782,21 @@ class ArticleDetailsController extends FrontendController
     }
 
     /**
+     * Template variable getter. Whether the EU harmonised durability-guarantee
+     * label (EmpCo Directive (EU) 2024/825, issue #219) must render for the
+     * current product: combines the shop-level master switch with the
+     * product's own eligibility (duration > 24 months and a resolvable
+     * guarantor), so the theme does not need to combine both checks itself.
+     *
+     * @return bool
+     */
+    public function isDurabilityGuaranteeLabelVisible()
+    {
+        return $this->getViewConfig()->getDurabilityGuaranteeLabelVisible()
+            && $this->getProduct()->isDurabilityGuaranteeLabelEligible();
+    }
+
+    /**
      * returns object, associated with current view.
      * (the object that is shown in frontend)
      *

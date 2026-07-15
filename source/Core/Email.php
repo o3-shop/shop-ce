@@ -2388,6 +2388,33 @@ class Email extends PHPMailer
     }
 
     /**
+     * Template variable getter. Whether the EU harmonised durability-guarantee
+     * label (EmpCo Directive (EU) 2024/825, issue #219) must render in the
+     * order confirmation email: the shop-level master switch is on AND at
+     * least one ordered article is eligible. Per-item eligibility for the
+     * actual label content is checked separately by the theme via each
+     * order article's linked article.
+     *
+     * @param Order $order
+     *
+     * @return bool
+     */
+    public function isDurabilityGuaranteeLabelVisible($order)
+    {
+        if (!$this->getViewConfig()->getDurabilityGuaranteeLabelVisible()) {
+            return false;
+        }
+
+        foreach ($order->getOrderArticles() as $orderArticle) {
+            if ($orderArticle->getArticle()->isDurabilityGuaranteeLabelEligible()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get active view
      *
      * @return object

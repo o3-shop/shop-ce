@@ -762,6 +762,42 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Whether the shop-global harmonised legal-guarantee notice
+     * (EmpCo Directive (EU) 2024/825, issue #219) must render.
+     *
+     * @return bool
+     */
+    public function getLegalGuaranteeNoticeVisible(): bool
+    {
+        return (bool) \OxidEsales\Eshop\Core\Registry::getConfig()
+            ->getConfigParam('blShowLegalGuaranteeNotice', false);
+    }
+
+    /**
+     * Where the shop-global legal-guarantee notice renders
+     * (e.g. `footer` or a dedicated info page). Defaults to `footer`.
+     *
+     * @return string
+     */
+    public function getLegalGuaranteeNoticePlacement(): string
+    {
+        return (string) \OxidEsales\Eshop\Core\Registry::getConfig()
+            ->getConfigParam('sLegalGuaranteeNoticePlacement', 'footer');
+    }
+
+    /**
+     * Master switch for product-level durability-guarantee labels. Per-article
+     * eligibility is a separate check ({@see \OxidEsales\Eshop\Application\Model\Article::isDurabilityGuaranteeLabelEligible()}).
+     *
+     * @return bool
+     */
+    public function getDurabilityGuaranteeLabelVisible(): bool
+    {
+        return (bool) \OxidEsales\Eshop\Core\Registry::getConfig()
+            ->getConfigParam('blShowDurabilityGuaranteeLabel', false);
+    }
+
+    /**
      * Returns visitor ip address
      *
      * @return string

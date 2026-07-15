@@ -1954,4 +1954,21 @@ $aLang = [
     'O3_CAPTCHA_FORM_register' => 'Registration form',
     'O3_CAPTCHA_FORM_pricealarm' => 'Price-alarm form',
     'O3_CAPTCHA_FORM_invite' => 'Invite-a-friend form',
+
+    // EU harmonised guarantee labels, EmpCo Directive (EU) 2024/825 (issue #219)
+    'mxguaranteeconfig' => 'Guarantee Label',
+    'tbclguarantee_config' => 'Settings',
+    'O3_GUARANTEE_ADMIN_NAV_LABEL' => 'EU Guarantee Label Configuration',
+    'O3_GUARANTEE_ADMIN_CONFIG_SHOW_NOTICE_LABEL' => 'Show the legal guarantee notice',
+    'O3_GUARANTEE_ADMIN_CONFIG_SHOW_LABEL_LABEL' => 'Show the product-level guarantee label',
+    'O3_GUARANTEE_ADMIN_CONFIG_PLACEMENT_LABEL' => 'Legal guarantee notice placement',
+    'O3_GUARANTEE_ADMIN_CONFIG_PLACEMENT_FOOTER' => 'Footer',
+    'O3_GUARANTEE_ADMIN_CONFIG_PLACEMENT_PAGE' => 'Dedicated info page',
+    'O3_GUARANTEE_ADMIN_VALIDATION_PLACEMENT_INVALID' => 'Please select a valid placement.',
+    'O3_GUARANTEE_ADMIN_NO_QUALIFYING_PRODUCTS_HINT' => 'The guarantee label is enabled, but no product currently has a durability guarantee of more than two years recorded. The label will not display anywhere yet.',
+    'O3_GUARANTEE_ADMIN_DURATION_LABEL' => 'Guarantee duration (months)',
+    'O3_GUARANTEE_ADMIN_GUARANTOR_LABEL' => 'Guarantor / brand',
+    'O3_GUARANTEE_ADMIN_MODEL_LABEL' => 'Model identifier',
+    'O3_GUARANTEE_ADMIN_CONDITIONS_LABEL' => 'Guarantee conditions',
+    'O3_GUARANTEE_ADMIN_WARNING_NO_GUARANTOR' => 'This article meets the durability-guarantee label trigger (more than two years), but neither a guarantor/brand is set nor a manufacturer with a title is linked. The label cannot be displayed until a guarantor/brand is recorded.',
 ];

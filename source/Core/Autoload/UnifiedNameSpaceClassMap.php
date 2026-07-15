@@ -1241,6 +1241,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\Admin\GuaranteeConfigController'    => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\GuaranteeConfigController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\Admin\RevocationConfigController'   => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\Admin\RevocationConfigController::class,
         'isAbstract'       => false,

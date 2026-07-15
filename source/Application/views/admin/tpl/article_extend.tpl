@@ -268,6 +268,51 @@ function processUnitInput( oSelect, sInputId )
                   <input [{$readonly}] type="button" value="[{oxmultilang ident="GENERAL_ASSIGNARTICLES"}]" class="edittext" onclick="JavaScript:showDialog('&cl=article_extend&aoc=2&oxid=[{$oxid}]');">
                 </td>
               </tr>
+              [{* EU harmonised guarantee labels, EmpCo Directive (EU) 2024/825 (issue #219). *}]
+              [{* Label rendering triggers only when duration is > 24 months (more than two years). *}]
+              [{if $edit->isDurationGuaranteeEligible() && $edit->getGuaranteeGuarantor() eq ""}]
+              <tr>
+                <td colspan="2">
+                  <div class="errorbox">[{oxmultilang ident="O3_GUARANTEE_ADMIN_WARNING_NO_GUARANTOR"}]</div>
+                </td>
+              </tr>
+              [{/if}]
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_DURATION_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="10" maxlength="[{$edit->oxarticles__o3guaranteedurationmonths->fldmax_length}]" name="editval[oxarticles__o3guaranteedurationmonths]" value="[{$edit->oxarticles__o3guaranteedurationmonths->value}]" [{$readonly}]>
+                  [{oxinputhelp ident="O3_GUARANTEE_ADMIN_HELP_DURATION"}]
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_GUARANTOR_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="40" maxlength="[{$edit->oxarticles__o3guaranteeguarantor->fldmax_length}]" name="editval[oxarticles__o3guaranteeguarantor]" value="[{$edit->oxarticles__o3guaranteeguarantor->value|escape:'html'}]" [{$readonly}]>
+                  [{oxinputhelp ident="O3_GUARANTEE_ADMIN_HELP_GUARANTOR"}]
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_MODEL_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="40" maxlength="[{$edit->oxarticles__o3guaranteemodel->fldmax_length}]" name="editval[oxarticles__o3guaranteemodel]" value="[{$edit->oxarticles__o3guaranteemodel->value|escape:'html'}]" [{$readonly}]>
+                  [{oxinputhelp ident="O3_GUARANTEE_ADMIN_HELP_MODEL"}]
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext" valign="top">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_CONDITIONS_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <textarea class="editinput" rows="4" cols="45" name="editval[oxarticles__o3guaranteeconditions]" [{$readonly}]>[{$edit->oxarticles__o3guaranteeconditions->value|escape:'html'}]</textarea>
+                  [{oxinputhelp ident="O3_GUARANTEE_ADMIN_HELP_CONDITIONS"}]
+                </td>
+              </tr>
           [{/block}]
           <tr>
             <td class="edittext"></td>

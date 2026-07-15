@@ -842,4 +842,17 @@ $aLang = [
 // Core CAPTCHA provider feature (issue #213) — storefront texts
 'O3_CAPTCHA_FAILED'                                           => 'The security check failed. Please try again.',
 'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Please accept the required cookies. Otherwise we cannot verify that you are human, and the form cannot be submitted.',
+
+// EU harmonised guarantee labels, EmpCo Directive (EU) 2024/825 / Implementing
+// Regulation (EU) 2025/1960 (issue #219). All keys share the
+// `O3_GUARANTEE_` prefix. The fixed, EU-prescribed wording and layout of the
+// harmonised notice/label body is intentionally NOT included here yet —
+// it must be sourced verbatim from Implementing Regulation (EU) 2025/1960
+// (open question, see issue #219); only the heading and a generic duration
+// suffix are shipped so storefront theme work has something safe to build on.
+'O3_GUARANTEE_NOTICE_HEADING'                                 => 'Legal guarantee of conformity',
+'O3_GUARANTEE_LABEL_HEADING'                                   => 'Durability guarantee',
+'O3_GUARANTEE_LABEL_DURATION_SUFFIX'                           => 'years',
+'O3_GUARANTEE_LABEL_DURATION_SUFFIX_MONTHS'                    => 'months',
+'O3_GUARANTEE_LABEL_CONDITIONS_LABEL'                          => 'Guarantee conditions',
 ];

@@ -1955,4 +1955,21 @@ $aLang = [
     'O3_CAPTCHA_FORM_register' => 'Registrierungsformular',
     'O3_CAPTCHA_FORM_pricealarm' => 'Preisalarm-Formular',
     'O3_CAPTCHA_FORM_invite' => 'Einladungs-Formular',
+
+    // EU harmonised guarantee labels, EmpCo Directive (EU) 2024/825 (issue #219)
+    'mxguaranteeconfig' => 'Garantie-Label',
+    'tbclguarantee_config' => 'Einstellungen',
+    'O3_GUARANTEE_ADMIN_NAV_LABEL' => 'EU-Garantie-Label-Konfiguration',
+    'O3_GUARANTEE_ADMIN_CONFIG_SHOW_NOTICE_LABEL' => 'Hinweis auf die gesetzliche Gewährleistung anzeigen',
+    'O3_GUARANTEE_ADMIN_CONFIG_SHOW_LABEL_LABEL' => 'Garantie-Label auf Artikelebene anzeigen',
+    'O3_GUARANTEE_ADMIN_CONFIG_PLACEMENT_LABEL' => 'Platzierung des Gewährleistungs-Hinweises',
+    'O3_GUARANTEE_ADMIN_CONFIG_PLACEMENT_FOOTER' => 'Footer',
+    'O3_GUARANTEE_ADMIN_CONFIG_PLACEMENT_PAGE' => 'Eigene Infoseite',
+    'O3_GUARANTEE_ADMIN_VALIDATION_PLACEMENT_INVALID' => 'Bitte eine gültige Platzierung auswählen.',
+    'O3_GUARANTEE_ADMIN_NO_QUALIFYING_PRODUCTS_HINT' => 'Das Garantie-Label ist aktiviert, aber derzeit ist bei keinem Artikel eine Haltbarkeitsgarantie von mehr als zwei Jahren hinterlegt. Das Label wird daher aktuell nirgendwo angezeigt.',
+    'O3_GUARANTEE_ADMIN_DURATION_LABEL' => 'Garantiedauer (Monate)',
+    'O3_GUARANTEE_ADMIN_GUARANTOR_LABEL' => 'Garantiegeber / Marke',
+    'O3_GUARANTEE_ADMIN_MODEL_LABEL' => 'Modellbezeichnung',
+    'O3_GUARANTEE_ADMIN_CONDITIONS_LABEL' => 'Garantiebedingungen',
+    'O3_GUARANTEE_ADMIN_WARNING_NO_GUARANTOR' => 'Dieser Artikel erfüllt die Bedingung für das Garantie-Label (mehr als zwei Jahre Haltbarkeitsgarantie), aber es ist weder ein Garantiegeber/Marke hinterlegt noch ein Hersteller mit Titel verknüpft. Das Label kann daher nicht angezeigt werden, bis ein Garantiegeber/Marke hinterlegt ist.',
 ];
