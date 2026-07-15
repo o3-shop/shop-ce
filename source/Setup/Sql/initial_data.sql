@@ -1494,4 +1494,7 @@ VALUES
     ('c7c6ef985f845e56417339ae7b930b20', 1, '', 'blShowRevocationForm',       'bool', '1'),
     ('b4f36c830c18f275eef33491246b822e', 1, '', 'blRevocationRequireLogin',   'bool', '0'),
     ('f4a110db564dcf6528ede68bddebe75c', 1, '', 'blRevocationNotifyOperator', 'bool', '1'),
-    ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  '');
+    ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  ''),
+-- #219 EU guarantee labels: fresh installs are compliant out of the box; upgrades default OFF in code.
+    ('3bab9ff7dfb761e35b833dcf56c9593d', 1, '', 'blShowLegalGuaranteeNotice',      'bool', '1'),
+    ('465bf751756bc97271fc580071ee5fc8', 1, '', 'blShowDurabilityGuaranteeLabel',  'bool', '1');
