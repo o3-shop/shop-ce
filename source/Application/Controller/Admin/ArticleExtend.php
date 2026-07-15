@@ -117,7 +117,58 @@ class ArticleExtend extends AdminDetailsController
         //load media files
         $this->_aViewData['aMediaUrls'] = $article->getMediaUrls();
 
+        $this->_aViewData['guaranteeWarnings'] = $this->collectGuaranteeAdvisories();
+
         return 'article_extend.tpl';
+    }
+
+    /**
+     * Loads the currently edited article, or null when there is none to load.
+     * Thin seam used by the guarantee advisories (#219); keeps render()
+     * untouched and mockable in tests.
+     *
+     * @return Article|null
+     */
+    protected function loadCurrentArticle(): ?Article
+    {
+        $oxId = $this->getEditObjectId();
+        if (empty($oxId) || $oxId === '-1') {
+            return null;
+        }
+
+        $article = oxNew(Article::class);
+        if (!$article->load($oxId)) {
+            return null;
+        }
+
+        return $article;
+    }
+
+    /**
+     * Non-blocking advisories for the EU durability-guarantee fields (#219).
+     * Saving is NEVER blocked - the label simply does not render while the
+     * data is incomplete/ineligible; these hints tell the operator why.
+     *
+     * @return string[] translation keys
+     */
+    protected function collectGuaranteeAdvisories(): array
+    {
+        $article = $this->loadCurrentArticle();
+        if ($article === null) {
+            return [];
+        }
+
+        $warnings = [];
+        $years = $article->getGuaranteeYears();
+
+        if ($years > 0 && !$article->isDurabilityGuaranteeEligible()) {
+            $warnings[] = 'O3_GUARANTEE_ADMIN_WARN_NOT_ELIGIBLE';
+        }
+        if ($article->isDurabilityGuaranteeEligible() && $article->getGuaranteeGuarantor() === '') {
+            $warnings[] = 'O3_GUARANTEE_ADMIN_WARN_NO_GUARANTOR';
+        }
+
+        return $warnings;
     }
 
     /**

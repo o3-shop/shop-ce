@@ -134,6 +134,57 @@ function processUnitInput( oSelect, sInputId )
                   [{oxinputhelp ident="HELP_ARTICLE_EXTEND_EXTURL"}]
                 </td>
               </tr>
+              [{* EU guarantee labels (#219): producer durability guarantee - Reg. (EU) 2025/1960 *}]
+              [{if $guaranteeWarnings}]
+              <tr>
+                <td class="edittext" colspan="2">
+                  <div class="messagebox">
+                    [{foreach from=$guaranteeWarnings item=warningKey}]
+                      <p>[{oxmultilang ident=$warningKey}]</p>
+                    [{/foreach}]
+                  </div>
+                </td>
+              </tr>
+              [{/if}]
+              <tr>
+                <td class="edittext" colspan="2">
+                  <b>[{oxmultilang ident="O3_GUARANTEE_ADMIN_FIELDS_HEADING"}]</b>
+                  [{oxinputhelp ident="HELP_O3_GUARANTEE_FIELDS"}]
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_YEARS_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="4" name="editval[oxarticles__o3guaranteeyears]" value="[{$edit->oxarticles__o3guaranteeyears->value}]" [{$readonly}]>
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_YEARS_UNIT"}]
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_GUARANTOR_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="40" maxlength="255" name="editval[oxarticles__o3guaranteeguarantor]" value="[{$edit->oxarticles__o3guaranteeguarantor->value}]" [{$readonly}]>
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_MODEL_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="40" maxlength="255" name="editval[oxarticles__o3guaranteemodel]" value="[{$edit->oxarticles__o3guaranteemodel->value}]" [{$readonly}]>
+                </td>
+              </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="O3_GUARANTEE_ADMIN_CONDITIONS_LABEL"}]
+                </td>
+                <td class="edittext">
+                  <textarea class="editinput" cols="60" rows="6" name="editval[oxarticles__o3guaranteeconditions]" [{$readonly}]>[{$edit->oxarticles__o3guaranteeconditions->value}]</textarea>
+                </td>
+              </tr>
               <tr>
                 <td class="edittext">
                   [{oxmultilang ident="ARTICLE_EXTEND_URLDESC"}]
