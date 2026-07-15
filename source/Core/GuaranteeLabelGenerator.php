@@ -51,16 +51,23 @@ class GuaranteeLabelGenerator
     /**
      * Field placement, as FRACTIONS of template width/height so the layout
      * survives template re-exports at other resolutions.
-     *   x, y      - anchor point (y = text BASELINE), centred horizontally
+     *   x, y      - anchor point (y = text BASELINE); x is the horizontal
+     *               anchor interpreted per 'align'
      *   size      - font size as a fraction of template HEIGHT
      *   font      - TTF filename in the asset dir
+     *   align     - 'center' (x = centre, default) or 'left' (x = left edge);
+     *               the official artwork left-anchors the brand/model fields
+     *               and centres the years figure in the "XX" placeholder.
+     *   maxw      - width of the field's blanked box as a fraction of template
+     *               WIDTH; text wider than 90% of it shrinks to fit (never
+     *               overflows into neighbouring artwork).
      * Values calibrated visually against the official artwork in the
      * calibration task; adjust there, not ad hoc.
      */
     public const LAYOUT = [
-        'years' => ['x' => 0.50, 'y' => 0.46, 'size' => 0.170, 'font' => 'Inter-ExtraBold.ttf'],
-        'guarantor' => ['x' => 0.50, 'y' => 0.80, 'size' => 0.032, 'font' => 'Inter-SemiBold.ttf'],
-        'model' => ['x' => 0.50, 'y' => 0.86, 'size' => 0.032, 'font' => 'Inter-Regular.ttf'],
+        'years' => ['x' => 0.231, 'y' => 0.539, 'size' => 0.260, 'font' => 'Inter-ExtraBold.ttf', 'align' => 'center', 'maxw' => 0.430],
+        'guarantor' => ['x' => 0.0203, 'y' => 0.265, 'size' => 0.032, 'font' => 'Inter-SemiBold.ttf', 'align' => 'left', 'maxw' => 0.282],
+        'model' => ['x' => 0.7265, 'y' => 0.268, 'size' => 0.030, 'font' => 'Inter-Regular.ttf', 'align' => 'left', 'maxw' => 0.258],
     ];
 
     private const TEMPLATE_FILE = 'label-template.png';
@@ -206,7 +213,30 @@ class GuaranteeLabelGenerator
                 return false;
             }
             $textWidth = $box[2] - $box[0];
-            $x = (int) round($spec['x'] * $width - $textWidth / 2);
+            // Shrink-to-fit: keep the text within 90% of its blanked box so a
+            // long guarantor/model never overflows into neighbouring artwork.
+            if (isset($spec['maxw'])) {
+                $maxWidth = $spec['maxw'] * $width * 0.9;
+                if ($textWidth > $maxWidth && $textWidth > 0) {
+                    $sizePt *= $maxWidth / $textWidth;
+                    $box = imagettfbbox($sizePt, 0, $fontFile, $text);
+                    if ($box === false) {
+                        imagedestroy($image);
+                        Registry::getLogger()->error(
+                            __METHOD__ . " - Re-measuring shrunk text for field '$field' failed with font '$fontFile'."
+                        );
+                        return false;
+                    }
+                    $textWidth = $box[2] - $box[0];
+                }
+            }
+            // $box[0] is the left side bearing; subtract it so the visible
+            // glyphs start exactly at the computed origin.
+            if (($spec['align'] ?? 'center') === 'left') {
+                $x = (int) round($spec['x'] * $width - $box[0]);
+            } else {
+                $x = (int) round($spec['x'] * $width - $textWidth / 2 - $box[0]);
+            }
             $y = (int) round($spec['y'] * $height);
 
             imagettftext($image, $sizePt, 0, $x, $y, $color, $fontFile, $text);
