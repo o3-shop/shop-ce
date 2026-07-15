@@ -356,7 +356,7 @@ class SearchTest extends UnitTestCase
         and ( ( $sArticleTable.oxtitle like '%a%' or  $sArticleTable.oxshortdesc like '%a%' or $sArticleTable.oxsearchkeys like '%a%' or
         $sArticleTable.oxartnum like '%a%' ) )";
 
-        $sRelevanceOrder = " ORDER BY CASE" .
+        $sRelevanceOrder = ' ORDER BY CASE' .
             " WHEN ($sArticleTable.oxtitle LIKE '%a%') THEN 1" .
             " WHEN ($sArticleTable.oxshortdesc LIKE '%a%') THEN 2" .
             " WHEN ($sArticleTable.oxsearchkeys LIKE '%a%') THEN 3" .
