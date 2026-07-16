@@ -851,8 +851,9 @@ $aLang = [
 // Die Texte IN den Labels selbst sind festes EU-Artwork, keine Übersetzungen.
 'O3_GUARANTEE_NOTICE_IMG_ALT'                                 => 'EU-einheitlicher Hinweis auf die gesetzliche Gewährleistung von mindestens zwei Jahren',
 'O3_GUARANTEE_LABEL_IMG_ALT'                                  => 'EU-Garantie-Label: Haltbarkeitsgarantie des Herstellers für dieses Produkt',
-'O3_GUARANTEE_LABEL_UNAVAILABLE_TEXT'                         => 'Dieses Produkt hat eine Haltbarkeitsgarantie des Herstellers von %d Jahren (Garantiegeber: %s). Das offizielle EU-Garantie-Label kann derzeit leider nicht angezeigt werden.',
+'O3_GUARANTEE_LABEL_FALLBACK_DURATION'                        => 'Haltbarkeitsgarantie des Herstellers: %s Jahre',
+'O3_GUARANTEE_LABEL_FALLBACK_GUARANTOR'                       => 'Garantiegeber: %s',
+'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'Das offizielle EU-Garantie-Label kann derzeit leider nicht angezeigt werden.',
 'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Unabhängig davon gilt die gesetzliche Gewährleistung von mindestens zwei Jahren.',
 'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Garantiebedingungen',
-'O3_GUARANTEE_EMAIL_ITEM_LINE'                               => 'Herstellergarantie: %d Jahre (Garantiegeber: %s). Zusätzlich gilt die gesetzliche Gewährleistung von mindestens zwei Jahren.',
 ];
