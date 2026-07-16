@@ -2427,63 +2427,63 @@
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 996,
+            "line": 999,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 1037,
+            "line": 1040,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getVarMinPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 1735,
+            "line": 1738,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 2069,
+            "line": 2227,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 2114,
+            "line": 2272,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getVarMinPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 2117,
+            "line": 2275,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 3187,
+            "line": 3345,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 3219,
+            "line": 3377,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 4526,
+            "line": 4684,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getAmountPriceList",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
