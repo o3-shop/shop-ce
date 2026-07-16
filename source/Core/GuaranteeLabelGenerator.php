@@ -43,14 +43,17 @@ use OxidEsales\Eshop\Core\Registry;
 class GuaranteeLabelGenerator
 {
     /**
-     * Bump whenever label-template.png or LAYOUT changes; invalidates every
-     * cached label via the content hash.
+     * Bump whenever label-template.png, nested-template.png, LAYOUT or
+     * NESTED_LAYOUT changes; invalidates every cached label via the content
+     * hash. v3 = official Commission artwork (label 1400x1474 + nested banner
+     * 2211x340) with recalibrated field placement.
      */
-    public const TEMPLATE_VERSION = 2;
+    public const TEMPLATE_VERSION = 3;
 
     /**
-     * Field placement, as FRACTIONS of template width/height so the layout
-     * survives template re-exports at other resolutions.
+     * Field placement on the full label, as FRACTIONS of template
+     * width/height so the layout survives template re-exports at other
+     * resolutions.
      *   x, y      - anchor point (y = text BASELINE); x is the horizontal
      *               anchor interpreted per 'align'
      *   size      - font size as a fraction of template HEIGHT
@@ -61,16 +64,34 @@ class GuaranteeLabelGenerator
      *   maxw      - width of the field's blanked box as a fraction of template
      *               WIDTH; text wider than 90% of it shrinks to fit (never
      *               overflows into neighbouring artwork).
-     * Values calibrated visually against the official artwork in the
-     * calibration task; adjust there, not ad hoc.
+     * Derived from the official GARAN Label_colour.svg blanked-field boxes
+     * (1400x1474, scale 5.19886): brand [36,351,417,391] / model
+     * [1026,351,1367,387] on baseline y=387 (Inter-Regular 9px SVG =46.8px);
+     * "XX" box [36,480,635,782], baseline y=783 (Inter-ExtraBold 80px SVG
+     * =415.9px), centred at x=336. Values calibrated visually against the
+     * official artwork in the calibration task; adjust there, not ad hoc.
      */
     public const LAYOUT = [
-        'years' => ['x' => 0.231, 'y' => 0.539, 'size' => 0.260, 'font' => 'Inter-ExtraBold.ttf', 'align' => 'center', 'maxw' => 0.430],
-        'guarantor' => ['x' => 0.0203, 'y' => 0.265, 'size' => 0.032, 'font' => 'Inter-SemiBold.ttf', 'align' => 'left', 'maxw' => 0.282],
-        'model' => ['x' => 0.7265, 'y' => 0.268, 'size' => 0.030, 'font' => 'Inter-Regular.ttf', 'align' => 'left', 'maxw' => 0.258],
+        'years' => ['x' => 0.2400, 'y' => 0.5312, 'size' => 0.2822, 'font' => 'Inter-ExtraBold.ttf', 'align' => 'center', 'maxw' => 0.4286],
+        'guarantor' => ['x' => 0.0257, 'y' => 0.2626, 'size' => 0.0317, 'font' => 'Inter-Regular.ttf', 'align' => 'left', 'maxw' => 0.2729],
+        'model' => ['x' => 0.7329, 'y' => 0.2626, 'size' => 0.0317, 'font' => 'Inter-Regular.ttf', 'align' => 'left', 'maxw' => 0.2443],
+    ];
+
+    /**
+     * Field placement on the official nested/reduced-display banner
+     * (nested-template.png, 2211x340, scale 6x from viewBox 368.5x56.69).
+     * Same fraction conventions as LAYOUT. Exactly one editable field: the
+     * duration/year, ExtraBold, centred in the blanked "XX" box
+     * [68,98,429,279] (baseline y=280, Inter-ExtraBold 41.56px SVG =249.4px,
+     * centred at x=249). The "365" icon and vertical divider (px=562) sit to
+     * the right and must not be overlapped, hence the maxw clamp.
+     */
+    public const NESTED_LAYOUT = [
+        'years' => ['x' => 0.1126, 'y' => 0.8235, 'size' => 0.7334, 'font' => 'Inter-ExtraBold.ttf', 'align' => 'center', 'maxw' => 0.1637],
     ];
 
     private const TEMPLATE_FILE = 'label-template.png';
+    private const NESTED_TEMPLATE_FILE = 'nested-template.png';
     private const TEXT_COLOR = [0, 0, 0]; // black per Annex II spec
 
     /** @var string|null test seam; null = repo default */
@@ -128,7 +149,12 @@ class GuaranteeLabelGenerator
             if (!$this->ensureDirectory($targetDir)) {
                 return null;
             }
-            if (!$this->compose($targetFile, $years, $guarantor, $model)) {
+            $texts = [
+                'years' => (string) $years,
+                'guarantor' => $guarantor,
+                'model' => $model,
+            ];
+            if (!$this->compose($this->getAssetDir() . self::TEMPLATE_FILE, $this->layout ?? self::LAYOUT, $texts, $targetFile)) {
                 return null;
             }
 
@@ -142,6 +168,47 @@ class GuaranteeLabelGenerator
         }
     }
 
+    /**
+     * Composes the official nested/reduced-display banner, filling only the
+     * single editable field (the duration in years) onto nested-template.png.
+     *
+     * Same content-addressed caching, atomic write and never-throws policy as
+     * getLabelUrl(); shares the same target directory/URL. The cache filename
+     * embeds md5(years|TEMPLATE_VERSION) so a stale banner can never be served.
+     *
+     * @param string $articleId article OXID (used in the cache filename only)
+     * @param int    $years     guarantee duration in whole years
+     *
+     * @return string|null public URL of the banner PNG, or null on failure
+     */
+    public function getNestedBannerUrl(string $articleId, int $years): ?string
+    {
+        try {
+            $filename = $this->buildNestedFilename($articleId, $years);
+            $targetDir = $this->getTargetDir();
+            $targetFile = $targetDir . $filename;
+
+            if (is_file($targetFile)) {
+                return $this->getTargetUrl() . $filename;
+            }
+
+            if (!$this->ensureDirectory($targetDir)) {
+                return null;
+            }
+            if (!$this->compose($this->getAssetDir() . self::NESTED_TEMPLATE_FILE, self::NESTED_LAYOUT, ['years' => (string) $years], $targetFile)) {
+                return null;
+            }
+
+            return $this->getTargetUrl() . $filename;
+        } catch (\Throwable $e) {
+            Registry::getLogger()->error(
+                __METHOD__ . " - Nested banner composition failed for article-ID '$articleId': '{$e->getMessage()}'.",
+                ['exception' => $e]
+            );
+            return null;
+        }
+    }
+
     private function buildFilename(string $articleId, int $years, string $guarantor, string $model): string
     {
         $safeId = preg_replace('/[^a-zA-Z0-9_-]/', '', $articleId);
@@ -149,10 +216,26 @@ class GuaranteeLabelGenerator
         return $safeId . '_' . $hash . '.png';
     }
 
+    private function buildNestedFilename(string $articleId, int $years): string
+    {
+        $safeId = preg_replace('/[^a-zA-Z0-9_-]/', '', $articleId);
+        $hash = md5($years . '|' . self::TEMPLATE_VERSION);
+        return $safeId . '_nested_' . $hash . '.png';
+    }
+
     /**
+     * Composites the given text fields onto a template PNG and writes the
+     * result atomically. Layout fractions and texts are keyed identically;
+     * only fields present in $layout are drawn.
+     *
+     * @param string               $templatePath absolute path to the template PNG
+     * @param array<string,array>  $layout       field placement fractions
+     * @param array<string,string> $texts        field text keyed like $layout
+     * @param string               $targetFile   absolute destination path
+     *
      * @return bool true when the target file was written
      */
-    private function compose(string $targetFile, int $years, string $guarantor, string $model): bool
+    private function compose(string $templatePath, array $layout, array $texts, string $targetFile): bool
     {
         if (!function_exists('imagettftext')) {
             Registry::getLogger()->error(
@@ -161,20 +244,12 @@ class GuaranteeLabelGenerator
             return false;
         }
 
-        $templatePath = $this->getAssetDir() . self::TEMPLATE_FILE;
         if (!is_file($templatePath)) {
             Registry::getLogger()->error(
                 __METHOD__ . " - Label template '$templatePath' is missing. The EU guarantee label cannot be generated."
             );
             return false;
         }
-
-        $texts = [
-            'years' => (string) $years,
-            'guarantor' => $guarantor,
-            'model' => $model,
-        ];
-        $layout = $this->layout ?? self::LAYOUT;
 
         foreach ($layout as $field => $spec) {
             if (!is_file($this->getAssetDir() . $spec['font'])) {

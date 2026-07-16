@@ -48,6 +48,12 @@ class GuaranteeLabelGeneratorTest extends UnitTestCase
         imagepng($im, $this->workDir . '/assets/label-template.png');
         imagedestroy($im);
 
+        // synthetic 600x100 white nested banner template
+        $nested = imagecreatetruecolor(600, 100);
+        imagefill($nested, 0, 0, imagecolorallocate($nested, 255, 255, 255));
+        imagepng($nested, $this->workDir . '/assets/nested-template.png');
+        imagedestroy($nested);
+
         // real Inter fonts are required for imagettftext; copy from the repo
         foreach (['Inter-Regular.ttf', 'Inter-SemiBold.ttf', 'Inter-ExtraBold.ttf'] as $font) {
             copy(
@@ -168,6 +174,87 @@ class GuaranteeLabelGeneratorTest extends UnitTestCase
     public function testArticleIdIsSanitizedForFilesystem(): void
     {
         $url = $this->generator->getLabelUrl('../evil/../id', 5, 'ACME GmbH', 'X-2000');
+
+        $this->assertNotNull($url);
+        $this->assertStringNotContainsString('..', basename($url));
+        $this->assertStringNotContainsString('/', substr($url, strlen('http://shop.local/out/pictures/generated/guarantee/')));
+    }
+
+    public function testNestedBannerComposesValidPngWithTemplateDimensions(): void
+    {
+        $url = $this->generator->getNestedBannerUrl('art1', 5);
+
+        $this->assertNotNull($url);
+        $file = $this->workDir . '/target/' . basename($url);
+        $this->assertFileExists($file);
+        $info = getimagesize($file);
+        $this->assertSame(600, $info[0]);
+        $this->assertSame(100, $info[1]);
+        $this->assertSame('image/png', $info['mime']);
+    }
+
+    public function testNestedBannerFilenameCarriesNestedMarker(): void
+    {
+        $url = $this->generator->getNestedBannerUrl('art1', 5);
+
+        $this->assertNotNull($url);
+        $this->assertStringStartsWith('art1_nested_', basename($url));
+        // The full-label and nested outputs for the same inputs must not collide.
+        $labelUrl = $this->generator->getLabelUrl('art1', 5, 'ACME GmbH', 'X-2000');
+        $this->assertNotSame(basename($labelUrl), basename($url));
+    }
+
+    public function testNestedBannerCompositedTextChangesPixels(): void
+    {
+        $url = $this->generator->getNestedBannerUrl('art1', 5);
+        $im = imagecreatefrompng($this->workDir . '/target/' . basename($url));
+
+        $found = false;
+        for ($x = 0; $x < 600 && !$found; $x += 2) {
+            for ($y = 0; $y < 100 && !$found; $y += 2) {
+                if ((imagecolorat($im, $x, $y) & 0xFFFFFF) !== 0xFFFFFF) {
+                    $found = true;
+                }
+            }
+        }
+        imagedestroy($im);
+        $this->assertTrue($found, 'Composited nested banner must contain rendered text pixels.');
+    }
+
+    public function testNestedBannerCacheHitReturnsSameUrlWithoutRegenerating(): void
+    {
+        $url1 = $this->generator->getNestedBannerUrl('art1', 5);
+        $file = $this->workDir . '/target/' . basename($url1);
+        $mtime = filemtime($file);
+        touch($file, $mtime - 100);
+        clearstatcache();
+
+        $url2 = $this->generator->getNestedBannerUrl('art1', 5);
+
+        $this->assertSame($url1, $url2);
+        clearstatcache();
+        $this->assertSame($mtime - 100, filemtime($file), 'Cache hit must not rewrite the file.');
+    }
+
+    public function testNestedBannerContentChangeProducesNewFilename(): void
+    {
+        $url1 = $this->generator->getNestedBannerUrl('art1', 5);
+        $url2 = $this->generator->getNestedBannerUrl('art1', 10);
+
+        $this->assertNotSame($url1, $url2);
+        $this->assertStringStartsWith('art1_nested_', basename($url1));
+        $this->assertStringStartsWith('art1_nested_', basename($url2));
+    }
+
+    public function testNestedBannerMissingTemplateReturnsNullAndDoesNotThrow(): void
+    {
+        unlink($this->workDir . '/assets/nested-template.png');
+        $this->assertNull($this->generator->getNestedBannerUrl('art1', 5));
+    }
+
+    public function testNestedBannerArticleIdIsSanitizedForFilesystem(): void
+    {
+        $url = $this->generator->getNestedBannerUrl('../evil/../id', 5);
 
         $this->assertNotNull($url);
         $this->assertStringNotContainsString('..', basename($url));

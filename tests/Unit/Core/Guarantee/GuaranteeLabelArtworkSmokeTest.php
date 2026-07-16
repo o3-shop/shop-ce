@@ -40,6 +40,12 @@ class GuaranteeLabelArtworkSmokeTest extends UnitTestCase
         $this->assertSame('image/png', $template['mime']);
         $this->assertGreaterThanOrEqual(1000, $template[0], 'Label template must be >= 1000px wide.');
 
+        $nested = getimagesize($assetDir . 'nested-template.png');
+        $this->assertNotFalse($nested, 'Nested banner template must exist.');
+        $this->assertSame('image/png', $nested['mime']);
+        $this->assertGreaterThanOrEqual(1000, $nested[0], 'Nested banner template must be >= 1000px wide.');
+        $this->assertGreaterThan($nested[1], $nested[0], 'Nested banner template must be landscape (wide banner).');
+
         foreach (['Inter-Regular.ttf', 'Inter-SemiBold.ttf', 'Inter-ExtraBold.ttf'] as $font) {
             $this->assertFileExists($assetDir . $font);
             $this->assertGreaterThan(10000, filesize($assetDir . $font), "Font '$font' looks truncated.");
@@ -64,6 +70,26 @@ class GuaranteeLabelArtworkSmokeTest extends UnitTestCase
         $this->assertNotNull($url);
         $file = $targetDir . basename($url);
         $template = getimagesize(OX_BASE_PATH . 'Core/GuaranteeLabel/assets/label-template.png');
+        $generated = getimagesize($file);
+        $this->assertSame($template[0], $generated[0]);
+        $this->assertSame($template[1], $generated[1]);
+
+        unlink($file);
+        rmdir($targetDir);
+    }
+
+    public function testNestedBannerCompositionSucceedsWithRealArtwork(): void
+    {
+        $targetDir = sys_get_temp_dir() . '/guarantee_nested_smoke_' . uniqid() . '/';
+        $generator = oxNew(GuaranteeLabelGenerator::class);
+        $generator->setTargetDir($targetDir);
+        $generator->setTargetUrl('http://shop.local/labels/');
+
+        $url = $generator->getNestedBannerUrl('smoke', 5);
+
+        $this->assertNotNull($url);
+        $file = $targetDir . basename($url);
+        $template = getimagesize(OX_BASE_PATH . 'Core/GuaranteeLabel/assets/nested-template.png');
         $generated = getimagesize($file);
         $this->assertSame($template[0], $generated[0]);
         $this->assertSame($template[1], $generated[1]);
