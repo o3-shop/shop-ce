@@ -28,14 +28,6 @@ use OxidEsales\TestingLibrary\UnitTestCase;
 
 class ViewConfigGuaranteeTest extends UnitTestCase
 {
-    private string $noticeDir;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->noticeDir = Registry::getConfig()->getOutDir(true) . 'pictures/guarantee/';
-    }
-
     public function testDurabilitySwitchGetterReflectsConfig(): void
     {
         $viewConfig = oxNew(ViewConfig::class);

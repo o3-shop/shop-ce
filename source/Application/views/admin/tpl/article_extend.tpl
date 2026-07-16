@@ -134,6 +134,15 @@ function processUnitInput( oSelect, sInputId )
                   [{oxinputhelp ident="HELP_ARTICLE_EXTEND_EXTURL"}]
                 </td>
               </tr>
+              <tr>
+                <td class="edittext">
+                  [{oxmultilang ident="ARTICLE_EXTEND_URLDESC"}]
+                </td>
+                <td class="edittext">
+                  <input type="text" class="editinput" size="40" maxlength="[{$edit->oxarticles__oxurldesc->fldmax_length}]" name="editval[oxarticles__oxurldesc]" value="[{$edit->oxarticles__oxurldesc->value}]" [{$readonly}]>
+                  [{oxinputhelp ident="HELP_ARTICLE_EXTEND_URLDESC"}]
+                </td>
+              </tr>
               [{* EU guarantee labels (#219): producer durability guarantee - Reg. (EU) 2025/1960 *}]
               [{if $guaranteeWarnings}]
               <tr>
@@ -183,15 +192,6 @@ function processUnitInput( oSelect, sInputId )
                 </td>
                 <td class="edittext">
                   <textarea class="editinput" cols="60" rows="6" name="editval[oxarticles__o3guaranteeconditions]" [{$readonly}]>[{$edit->oxarticles__o3guaranteeconditions->value}]</textarea>
-                </td>
-              </tr>
-              <tr>
-                <td class="edittext">
-                  [{oxmultilang ident="ARTICLE_EXTEND_URLDESC"}]
-                </td>
-                <td class="edittext">
-                  <input type="text" class="editinput" size="40" maxlength="[{$edit->oxarticles__oxurldesc->fldmax_length}]" name="editval[oxarticles__oxurldesc]" value="[{$edit->oxarticles__oxurldesc->value}]" [{$readonly}]>
-                  [{oxinputhelp ident="HELP_ARTICLE_EXTEND_URLDESC"}]
                 </td>
               </tr>
               <tr>

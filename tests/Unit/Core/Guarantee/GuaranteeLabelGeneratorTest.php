@@ -64,7 +64,12 @@ class GuaranteeLabelGeneratorTest extends UnitTestCase
 
     protected function tearDown(): void
     {
-        foreach (glob($this->workDir . '/{assets,target}/*', GLOB_BRACE) ?: [] as $f) {
+        // Plain glob() (no GLOB_BRACE): brace expansion is a GNU-libc
+        // extension and is absent on musl/Alpine PHP builds.
+        foreach (glob($this->workDir . '/assets/*') ?: [] as $f) {
+            unlink($f);
+        }
+        foreach (glob($this->workDir . '/target/*') ?: [] as $f) {
             unlink($f);
         }
         rmdir($this->workDir . '/assets');
@@ -144,8 +149,20 @@ class GuaranteeLabelGeneratorTest extends UnitTestCase
 
     public function testUnwritableTargetDirReturnsNull(): void
     {
-        $this->generator->setTargetDir($this->workDir . '/does-not-exist-and-mkdir-fails/../../../../../../root/x/');
-        $this->assertNull($this->generator->getLabelUrl('art1', 5, 'ACME GmbH', 'X-2000'));
+        // Force mkdir() to fail robustly, independent of the runtime UID:
+        // make the target's PARENT a regular file, then point the target at a
+        // subdirectory of it. mkdir() then fails with ENOTDIR everywhere -
+        // even as root (root bypasses mode bits, so chmod 0555 would not
+        // block it) and on musl/Alpine PHP alike - so getLabelUrl() must
+        // return null via its graceful-degradation path.
+        $blockingFile = $this->workDir . '/not-a-dir';
+        file_put_contents($blockingFile, 'x');
+        try {
+            $this->generator->setTargetDir($blockingFile . '/cannot-create/');
+            $this->assertNull($this->generator->getLabelUrl('art1', 5, 'ACME GmbH', 'X-2000'));
+        } finally {
+            unlink($blockingFile);
+        }
     }
 
     public function testArticleIdIsSanitizedForFilesystem(): void

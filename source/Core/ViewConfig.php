@@ -806,6 +806,9 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     public function getGuaranteeNoticeUrlForLanguage(string $abbr): ?string
     {
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+        // Sanitize ONCE here so the existence checks and the emitted URL use
+        // the exact same value (no path traversal, no case/charset drift).
+        $abbr = preg_replace('/[^a-z]/', '', strtolower($abbr));
 
         if ($this->guaranteeNoticeAssetExists($abbr)) {
             return $config->getOutUrl(null, false) . 'pictures/guarantee/notice-' . $abbr . '.png';

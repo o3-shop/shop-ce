@@ -46,7 +46,7 @@ class GuaranteeLabelGenerator
      * Bump whenever label-template.png or LAYOUT changes; invalidates every
      * cached label via the content hash.
      */
-    public const TEMPLATE_VERSION = 1;
+    public const TEMPLATE_VERSION = 2;
 
     /**
      * Field placement, as FRACTIONS of template width/height so the layout

@@ -76,9 +76,11 @@ class GuaranteeMigrationTest extends UnitTestCase
     public function testSnippetSeedIsIdempotent(): void
     {
         $db = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
-        // Re-run the seed statement verbatim; INSERT IGNORE keyed on the
-        // OXLOADID unique index must not duplicate or overwrite.
-        $oxid = md5('o3_guarantee_notice_info');
+        // Re-run the seed with a DIFFERENT primary key (OXID) but the SAME
+        // OXLOADID. INSERT IGNORE must be rejected by the OXLOADID unique
+        // index - not merely by the OXID primary key - so this genuinely
+        // proves the unique index protects against duplicate snippets.
+        $oxid = md5('o3_guarantee_notice_info_2');
         $db->execute(
             "INSERT IGNORE INTO oxcontents
                 (OXID, OXLOADID, OXSHOPID, OXSNIPPET, OXTYPE,
