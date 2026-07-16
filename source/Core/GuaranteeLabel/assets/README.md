@@ -28,13 +28,13 @@ never generated or altered. Colour is legally mandatory for online display
 | `label-template.png` | Language-neutral Annex II full label, colour, three variable areas blanked (1400×1474). |
 | `nested-template.png` | Official nested/reduced-display banner, colour, year area blanked (2211×340). |
 | `Inter-Regular.ttf` / `Inter-SemiBold.ttf` / `Inter-ExtraBold.ttf` | Fonts for runtime text compositing. |
+| `Inter-LICENSE.txt` | SIL Open Font License 1.1 for the Inter fonts. |
+| `../../../out/pictures/guarantee/notice-en.png` | Annex I notice, English, colour (1185×1675). |
+| `../../../out/pictures/guarantee/notice-de.png` | Annex I notice, German, colour (1185×1675). |
 
 `Inter-SemiBold.ttf` is retained even though the current LAYOUT composites only with
 Regular (brand/model) and ExtraBold (duration); it is kept as part of the official Inter
 font set shipped with these assets.
-| `Inter-LICENSE.txt` | SIL Open Font License 1.1 for the Inter fonts. |
-| `../../../out/pictures/guarantee/notice-en.png` | Annex I notice, English, colour (1185×1675). |
-| `../../../out/pictures/guarantee/notice-de.png` | Annex I notice, German, colour (1185×1675). |
 
 ## Sources (exact URLs)
 
