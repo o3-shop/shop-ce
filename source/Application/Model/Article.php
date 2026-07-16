@@ -2060,13 +2060,13 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getGuaranteeGuarantor(): string
     {
-        $own = trim((string) $this->oxarticles__o3guaranteeguarantor->value);
+        $own = trim(html_entity_decode((string) $this->getRawFieldData('o3guaranteeguarantor'), ENT_QUOTES));
         if ($own !== '') {
             return $own;
         }
         $manufacturer = $this->getManufacturer();
         if ($manufacturer !== null) {
-            return trim((string) $manufacturer->oxmanufacturers__oxtitle->value);
+            return trim(html_entity_decode((string) $manufacturer->getRawFieldData('oxtitle'), ENT_QUOTES));
         }
         return '';
     }
@@ -2080,15 +2080,15 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getGuaranteeModel(): string
     {
-        $own = trim((string) $this->oxarticles__o3guaranteemodel->value);
+        $own = trim(html_entity_decode((string) $this->getRawFieldData('o3guaranteemodel'), ENT_QUOTES));
         if ($own !== '') {
             return $own;
         }
-        $artnum = trim((string) $this->oxarticles__oxartnum->value);
+        $artnum = trim(html_entity_decode((string) $this->getRawFieldData('oxartnum'), ENT_QUOTES));
         if ($artnum !== '') {
             return $artnum;
         }
-        return trim((string) $this->oxarticles__oxtitle->value);
+        return trim(html_entity_decode((string) $this->getRawFieldData('oxtitle'), ENT_QUOTES));
     }
 
     /**
@@ -2098,7 +2098,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getGuaranteeConditions(): string
     {
-        return trim((string) $this->oxarticles__o3guaranteeconditions->value);
+        return trim(html_entity_decode((string) $this->getRawFieldData('o3guaranteeconditions'), ENT_QUOTES));
     }
 
     /**

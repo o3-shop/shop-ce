@@ -92,6 +92,82 @@ class ArticleGuaranteeTest extends UnitTestCase
         $this->assertSame('', $article->getGuaranteeGuarantor());
     }
 
+    /**
+     * The linked manufacturer exists but carries no title: the label component
+     * is still unresolvable, so the getter must yield '' (the caller treats ''
+     * as "cannot render the mandatory guarantor line").
+     */
+    public function testGuarantorEmptyWhenManufacturerHasEmptyTitle(): void
+    {
+        $article = $this->getMockBuilder(Article::class)
+            ->onlyMethods(['getManufacturer'])
+            ->getMock();
+        $manufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $manufacturer->oxmanufacturers__oxtitle = new \OxidEsales\Eshop\Core\Field('');
+        $article->method('getManufacturer')->willReturn($manufacturer);
+        $article->oxarticles__o3guaranteeguarantor = new \OxidEsales\Eshop\Core\Field('');
+
+        $this->assertSame('', $article->getGuaranteeGuarantor());
+    }
+
+    /**
+     * Round-trip regression (#219): the guarantor is composited as PLAINTEXT
+     * onto the official label artwork. An ampersand in the brand name must
+     * survive a save/load cycle unescaped - the getter must never return the
+     * HTML-entity form (`H&amp;M GmbH`), which would be baked into the PNG and
+     * re-encoded again in templates.
+     */
+    public function testGuarantorRoundTripReturnsPlaintextAmpersand(): void
+    {
+        $article = oxNew(Article::class);
+        $article->setId('_guaranteeampersand');
+        $article->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('AMP-1');
+        $article->oxarticles__o3guaranteeguarantor = new \OxidEsales\Eshop\Core\Field('H&M GmbH');
+        $article->save();
+
+        $loaded = oxNew(Article::class);
+        $loaded->load('_guaranteeampersand');
+
+        $this->assertSame('H&M GmbH', $loaded->getGuaranteeGuarantor());
+    }
+
+    /**
+     * Round-trip regression (#219): a model identifier with a double quote
+     * (`19" Rack`) must come back verbatim, not as `19&quot; Rack`.
+     */
+    public function testModelRoundTripReturnsPlaintextQuotes(): void
+    {
+        $article = oxNew(Article::class);
+        $article->setId('_guaranteemodelquotes');
+        $article->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('RACK-1');
+        $article->oxarticles__o3guaranteemodel = new \OxidEsales\Eshop\Core\Field('19" Rack');
+        $article->save();
+
+        $loaded = oxNew(Article::class);
+        $loaded->load('_guaranteemodelquotes');
+
+        $this->assertSame('19" Rack', $loaded->getGuaranteeModel());
+    }
+
+    /**
+     * Round-trip regression (#219): guarantee conditions text with an
+     * ampersand must round-trip as plaintext (`Terms & conditions apply.`),
+     * not `Terms &amp; conditions apply.`.
+     */
+    public function testConditionsRoundTripReturnsPlaintextAmpersand(): void
+    {
+        $article = oxNew(Article::class);
+        $article->setId('_guaranteeconditionsamp');
+        $article->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('COND-1');
+        $article->oxarticles__o3guaranteeconditions = new \OxidEsales\Eshop\Core\Field('Terms & conditions apply.');
+        $article->save();
+
+        $loaded = oxNew(Article::class);
+        $loaded->load('_guaranteeconditionsamp');
+
+        $this->assertSame('Terms & conditions apply.', $loaded->getGuaranteeConditions());
+    }
+
     public function testModelFallbackChainFieldThenArtnumThenTitle(): void
     {
         $article = $this->makeArticle([
