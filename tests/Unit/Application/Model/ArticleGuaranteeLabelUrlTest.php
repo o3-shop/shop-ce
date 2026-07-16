@@ -40,12 +40,13 @@ class ArticleGuaranteeLabelUrlTest extends UnitTestCase
         return $article;
     }
 
-    private function stubGenerator(?string $returnUrl): GuaranteeLabelGenerator
+    private function stubGenerator(?string $returnUrl, ?string $nestedUrl = null): GuaranteeLabelGenerator
     {
         $generator = $this->getMockBuilder(GuaranteeLabelGenerator::class)
-            ->onlyMethods(['getLabelUrl'])
+            ->onlyMethods(['getLabelUrl', 'getNestedBannerUrl'])
             ->getMock();
         $generator->method('getLabelUrl')->willReturn($returnUrl);
+        $generator->method('getNestedBannerUrl')->willReturn($nestedUrl);
         return $generator;
     }
 
@@ -98,5 +99,56 @@ class ArticleGuaranteeLabelUrlTest extends UnitTestCase
         $article->setGuaranteeLabelGenerator($this->stubGenerator(null));
 
         $this->assertNull($article->getDurabilityGuaranteeLabelUrl());
+    }
+
+    public function testNestedReturnsNullWhenMasterSwitchOff(): void
+    {
+        Registry::getConfig()->setConfigParam('blShowDurabilityGuaranteeLabel', false);
+        $article = $this->makeArticle(5);
+        $article->setGuaranteeLabelGenerator($this->stubGenerator(null, 'http://x/nested.png'));
+
+        $this->assertNull($article->getDurabilityGuaranteeNestedUrl());
+    }
+
+    public function testNestedReturnsNullWhenNotEligible(): void
+    {
+        Registry::getConfig()->setConfigParam('blShowDurabilityGuaranteeLabel', true);
+        $article = $this->makeArticle(2);
+        $article->setGuaranteeLabelGenerator($this->stubGenerator(null, 'http://x/nested.png'));
+
+        $this->assertNull($article->getDurabilityGuaranteeNestedUrl());
+    }
+
+    public function testNestedReturnsNullWhenGuarantorUnresolvable(): void
+    {
+        Registry::getConfig()->setConfigParam('blShowDurabilityGuaranteeLabel', true);
+        $article = $this->getMockBuilder(Article::class)
+            ->onlyMethods(['getManufacturer'])
+            ->getMock();
+        $article->method('getManufacturer')->willReturn(null);
+        $article->oxarticles__o3guaranteeyears = new Field(5);
+        $article->oxarticles__o3guaranteeguarantor = new Field('');
+        $article->oxarticles__o3guaranteemodel = new Field('X-1');
+        $article->setGuaranteeLabelGenerator($this->stubGenerator(null, 'http://x/nested.png'));
+
+        $this->assertNull($article->getDurabilityGuaranteeNestedUrl());
+    }
+
+    public function testNestedReturnsGeneratorUrlWhenEligible(): void
+    {
+        Registry::getConfig()->setConfigParam('blShowDurabilityGuaranteeLabel', true);
+        $article = $this->makeArticle(5);
+        $article->setGuaranteeLabelGenerator($this->stubGenerator(null, 'http://x/nested.png'));
+
+        $this->assertSame('http://x/nested.png', $article->getDurabilityGuaranteeNestedUrl());
+    }
+
+    public function testNestedReturnsNullWhenGenerationFails(): void
+    {
+        Registry::getConfig()->setConfigParam('blShowDurabilityGuaranteeLabel', true);
+        $article = $this->makeArticle(5);
+        $article->setGuaranteeLabelGenerator($this->stubGenerator(null, null));
+
+        $this->assertNull($article->getDurabilityGuaranteeNestedUrl());
     }
 }

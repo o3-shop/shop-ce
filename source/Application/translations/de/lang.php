@@ -856,4 +856,6 @@ $aLang = [
 'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'Das offizielle EU-Garantie-Label kann derzeit leider nicht angezeigt werden.',
 'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Unabhängig davon gilt die gesetzliche Gewährleistung von mindestens zwei Jahren.',
 'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Garantiebedingungen',
+'O3_GUARANTEE_RIGHTS_LINK'                                   => 'Ihre gesetzlichen Gewährleistungsrechte',
+'O3_GUARANTEE_CLOSE'                                         => 'Schließen',
 ];

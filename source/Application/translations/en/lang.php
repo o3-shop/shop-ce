@@ -852,4 +852,6 @@ $aLang = [
 'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'The official EU guarantee label cannot be displayed right now.',
 'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Regardless of this guarantee, the statutory legal guarantee of at least two years applies.',
 'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Guarantee conditions',
+'O3_GUARANTEE_RIGHTS_LINK'                                   => 'Your legal guarantee rights',
+'O3_GUARANTEE_CLOSE'                                         => 'Close',
 ];

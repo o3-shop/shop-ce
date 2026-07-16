@@ -2149,6 +2149,39 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
     }
 
     /**
+     * URL of the official EU nested GARAN banner PNG (year editable only) for
+     * this article, or null under the same gate chain as
+     * getDurabilityGuaranteeLabelUrl(): master switch off, not eligible
+     * (<= 2 years), guarantor unresolvable (mandatory label component), or
+     * banner generation failed (already logged by the generator). The theme
+     * shows this banner in the buy area; it expands to the full label on first
+     * click - see the theme plan.
+     *
+     * @return string|null
+     */
+    public function getDurabilityGuaranteeNestedUrl(): ?string
+    {
+        if (!\OxidEsales\Eshop\Core\Registry::getConfig()->getConfigParam('blShowDurabilityGuaranteeLabel', false)) {
+            return null;
+        }
+        if (!$this->isDurabilityGuaranteeEligible()) {
+            return null;
+        }
+        if ($this->getGuaranteeGuarantor() === '') {
+            return null;
+        }
+
+        if ($this->_oGuaranteeLabelGenerator === null) {
+            $this->_oGuaranteeLabelGenerator = oxNew(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class);
+        }
+
+        return $this->_oGuaranteeLabelGenerator->getNestedBannerUrl(
+            (string) $this->getId(),
+            $this->getGuaranteeYears()
+        );
+    }
+
+    /**
      * Checks if article is assigned to category $sCatNID.
      *
      * @param string $sCatNid category ID
