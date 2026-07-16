@@ -6,7 +6,7 @@ CELEX `32025R1960`): the harmonised **notice** on the legal guarantee of conform
 (Annex I) and the harmonised **label** for the commercial guarantee of durability
 (Annex II).
 
-Retrieval date: **2026-07-15**.
+Retrieval date: **2026-07-16** (v2 — official Commission artwork packages).
 
 ## Legal note
 
@@ -14,40 +14,41 @@ Artwork per Reg. (EU) 2025/1960 Annexes I/II. **The notice must never be modifie
 it is per-language fixed artwork; every element (text, colours, QR code) is baked in
 and legally fixed. The **label** is one language-neutral artwork with exactly three
 editable areas (duration in years, brand/trademark, model identifier); these variable
-fields are composited at runtime by `GuaranteeLabelGenerator`. Both QR codes (notice
-and label) are static and part of the official artwork — they are never generated or
-altered. Colour is legally mandatory for online display
-(Pantone Reflex Blue C ≈ `#003399`, Pantone Yellow C ≈ `#FFED00`).
+fields are composited at runtime by `GuaranteeLabelGenerator`. The **nested banner** is
+the official reduced-display asset with exactly one editable area (the duration/year).
+Both QR codes (notice and label) are static and part of the official artwork — they are
+never generated or altered. Colour is legally mandatory for online display
+(Pantone Reflex Blue C ≈ `#003399`, rendered `#034ea2` in the artwork; Pantone Yellow C
+≈ `#FFED00`, rendered `#fff200`).
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `label-template.png` | Language-neutral Annex II label, colour, variable areas blanked (1481×1559). |
+| `label-template.png` | Language-neutral Annex II full label, colour, three variable areas blanked (1400×1474). |
+| `nested-template.png` | Official nested/reduced-display banner, colour, year area blanked (2211×340). |
 | `Inter-Regular.ttf` / `Inter-SemiBold.ttf` / `Inter-ExtraBold.ttf` | Fonts for runtime text compositing. |
 | `Inter-LICENSE.txt` | SIL Open Font License 1.1 for the Inter fonts. |
-| `../../../out/pictures/guarantee/notice-en.png` | Annex I notice, English, colour (1186×1675). |
-| `../../../out/pictures/guarantee/notice-de.png` | Annex I notice, German, colour (1224×1675). |
+| `../../../out/pictures/guarantee/notice-en.png` | Annex I notice, English, colour (1185×1675). |
+| `../../../out/pictures/guarantee/notice-de.png` | Annex I notice, German, colour (1185×1675). |
 
 ## Sources (exact URLs)
 
-**Official artwork — Regulation (EU) 2025/1960.**
-The Commission "ready-made files" landing page
-`https://commission.europa.eu/publications/harmonised-notice-legal-guarantee-conformity-and-harmonised-label-commercial-guarantee-durability_en`
-offers only the regulation and its annexes as documents; its "Annexes" link redirects to
-the EUR-Lex OJ rendition, which is served behind an AWS WAF JS-challenge and cannot be
-fetched non-interactively. The authoritative artwork was therefore taken from the official
-**OJ PDF/A-2a manifestations** (the authoritative depiction) via the Publications Office
-CELLAR content-negotiation endpoint (not WAF-gated):
+**Official Commission artwork packages** (the Commission's own "ready-made files",
+verified downloadable 2026-07-16):
 
-- English act (Annex I EN notice + Annex II label):
-  `http://publications.europa.eu/resource/oj/L_202501960.ENG.pdfa2a.L_202501960EN.pdf`
-- German act (Annex I DE notice):
-  `http://publications.europa.eu/resource/oj/L_202501960.DEU.pdfa2a.L_202501960DE.pdf`
+- **GARAN label package** (colour/bw/nested, SVG + PNG + JPG):
+  `https://commission.europa.eu/document/download/435fbeb1-fccc-4ead-bfa9-96625962ba09_en?filename=GARAN%20label%20for%20website.zip`
+  — `label-template.png` is rasterized from `GARAN Label_colour.svg`; `nested-template.png`
+  from `GARAN Label_nested display.svg`.
+- **Harmonised notice, 24 languages** (colour + black-and-white, one PDF per language):
+  `https://commission.europa.eu/document/download/29acbfc0-a26e-4c21-85af-8bc2b167103e_en?filename=Harmonised%20notice%20in%2024%20languages%20colour%20and%20black%20and%20white_0.zip`
+  — `notice-de.png` from `Legal guarantee_notice DEN.pdf`, `notice-en.png` from
+  `Legal guarantee_notice ENG.pdf`. Each PDF has 2 pages: **page 0 = colour** (used here),
+  page 1 = black-and-white (unused).
 
-(CELEX `32025R1960` resolves to CELLAR work `cellar:471b4f1e-9f2a-11f0-97c8-01aa75ed71a1`.)
-The label is language-neutral; it was taken from the English PDF (identical artwork appears
-in every language edition). No third-party recreations were used.
+The label SVG is language-neutral; the nested banner and the notice are the Commission's
+official display assets. No third-party recreations were used.
 
 **Inter fonts.**
 `https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip`
@@ -56,45 +57,64 @@ inside the zip; license from `LICENSE.txt` (SIL OFL 1.1), saved as `Inter-LICENS
 
 ## Conversion / preparation commands
 
-Embedded artwork images were extracted from the PDF/A at native resolution with PyMuPDF
-(`page.get_images` + `doc.extract_image`). The relevant XObjects were:
+**Templates (SVG → PNG).** In *copies* of the two SVGs, the editable `<text>` elements
+were blanked (their text content emptied; nothing else changed). All *fixed* typography
+in the official SVGs (GARAN wordmark, "365", the 27-language legend) is stored as vector
+paths, not live text — so the rasterizer never needs a text font for the fixed artwork, and
+the only live `<text>` elements are exactly the editable fields (removed here). The Inter
+TTFs above are still shipped for runtime compositing by `GuaranteeLabelGenerator`.
 
-- notice colour: EN 2372×3350, DE 2437×3336 (RGB JPEG)
-- label colour (language-neutral): 1481×1559 (RGB JPEG)
-- (mono variants, the annotated specification diagram and the horizontal banner variant
-  were present in the PDF but are not used here.)
+Rasterized with **headless Google Chrome** (deterministic; renders the vector paths and the
+blue/yellow colours exactly). Each blanked SVG was inlined into a minimal wrapper HTML
+(`@font-face` pointing at the local Inter TTFs, `svg{width:<target>px;height:auto}`,
+white background) and captured at 1:1:
 
-PNG conversion + notice downscale (PHP GD):
-
-```php
-// JPEG -> truecolour RGB PNG (label kept at native 1481×1559)
-$im = imagecreatefromjpeg($jpeg); imagepng($rgbCopy, $out, 9);
-
-// notice downscaled to 1675 px height (bicubic), preserving aspect ratio
-imagecopyresampled($dst, $im, 0,0,0,0, $nw, 1675, $w, $h); imagepng($dst, $out, 9);
+```
+"Google Chrome" --headless=new --disable-gpu --hide-scrollbars \
+  --force-device-scale-factor=1 --default-background-color=ffffffff \
+  --window-size=1400,1474 --screenshot=label-template.png file://.../label_blank.html
+# nested: --window-size=2211,340
 ```
 
-Resulting sizes: `label-template.png` 1481×1559, `notice-en.png` 1186×1675,
-`notice-de.png` 1224×1675. All RGB, `image/png`, QR modules verified crisp and scannable.
+- Full label: `GARAN Label_colour.svg` viewBox `269.29×283.46`, target width 1400 px
+  (scale ≈ **5.19886**) → **1400×1474**.
+- Nested banner: `GARAN Label_nested display.svg` viewBox `368.5×56.69`, **6×** → **2211×340**.
 
-## Blanked variable areas (label-template.png, 1481×1559)
+Result verified visually against the package's official `GARAN Label_colour.jpg`
+(fixed typography, QR modules and colours identical).
 
-Each region was blanked by filling a rectangle with the white background colour sampled at
-the box's top-left corner (`imagecolorat`). Coordinates are pixels on the final template,
-origin top-left, given as `[x0, y0, x1, y1]` (inclusive fill rectangle):
+**Notices (PDF → PNG).** Rendered with **PyMuPDF** (`page.get_pixmap`) at a zoom of
+`1675 / 841.89 ≈ 1.9896` so the A4 page (595.276×841.89 pt) yields **1185×1675 px**
+(height ≤ 1675). Page 0 (colour) only. The full official page is preserved unmodified —
+**no cropping** (the notice may never be altered). QR modules verified crisp/scannable.
 
-| # | Field | `[x0, y0, x1, y1]` | x, y, w, h |
-|---|---|---|---|
-| VII  | Brand/Trademark  | `[30, 368, 448, 419]`   | x=30,  y=368, w=418, h=51  |
-| VIII | Model identifier | `[1076, 366, 1458, 418]` | x=1076, y=366, w=382, h=52 |
-| VI   | Duration ("XX")  | `[24, 496, 660, 840]`   | x=24,  y=496, w=636, h=344 |
+Resulting sizes: `label-template.png` 1400×1474, `nested-template.png` 2211×340,
+`notice-en.png` 1185×1675, `notice-de.png` 1185×1675. All RGB, `image/png`.
 
-**Fixed reference points for runtime compositing (Task 5), same coordinate system:**
+## Blanked variable areas — bounding boxes for runtime compositing (Task 2)
 
-- Original placeholder text extents: Brand/Trademark x≈41–434 y≈378–409;
-  Model identifier x≈1087–1445 y≈376–410; "XX" x≈41–653 y≈509–827.
-- Calendar/"365" icon (fixed, keep clear): left edge at **x≈667**.
-- Inner border lines (double frame): left **x≈19**, right **x≈1463**; outer frame right **x≈1479**.
-- Divider under "GARAN": **y≈336–340**. Bottom multilingual legend box starts at **y≈922**.
-- The EU shield (top-right), GARAN wordmark + checkmark, QR code, "365" calendar and the
-  27-language legend are all fixed artwork and were left untouched.
+Boxes are the **ink bounding box of the original placeholder text** (the pixels that
+disappeared when the field was blanked), measured by diffing the original vs. blanked
+render. Pixels, origin top-left, `[x0, y0, x1, y1]` inclusive plus `x, y, w, h`.
+The SVG anchor is the `<text>` element's `translate()` origin, i.e. the **left edge of the
+baseline** — the natural reference for re-compositing runtime text in the correct font.
+
+### `label-template.png` (1400×1474) — scale ≈ 5.19886 from viewBox 269.29×283.46
+
+| Field | SVG `<text>` (font) | SVG anchor (baseline L) | Baseline px (x, y) | Ink box `[x0,y0,x1,y1]` | x, y, w, h |
+|---|---|---|---|---|---|
+| Brand/Trademark  | `translate(6.32, 74.52)` cls-5, Inter-Regular 9px      | (6.32, 74.52)   | (33, 387)   | `[36, 351, 417, 391]`   | x=36,  y=351, w=382, h=41  |
+| Model identifier | `translate(196.75, 74.52)` cls-5, Inter-Regular 9px    | (196.75, 74.52) | (1023, 387) | `[1026, 351, 1367, 387]` | x=1026, y=351, w=342, h=37 |
+| Duration ("XX")  | `translate(5.07, 150.57)` cls-3, Inter-ExtraBold 80px  | (5.07, 150.57)  | (26, 783)   | `[36, 480, 635, 782]`   | x=36,  y=480, w=600, h=303 |
+
+### `nested-template.png` (2211×340) — scale 6× from viewBox 368.5×56.69
+
+| Field | SVG `<text>` (font) | SVG anchor (baseline L) | Baseline px (x, y) | Ink box `[x0,y0,x1,y1]` | x, y, w, h |
+|---|---|---|---|---|---|
+| Duration/year ("XX") | `translate(10.39, 46.65)` cls-1, Inter-ExtraBold 41.56px | (10.39, 46.65) | (62, 280) | `[68, 98, 429, 279]` | x=68, y=98, w=362, h=182 |
+
+Fixed elements left untouched on both templates: the GARAN wordmark + checkmark, the EU
+shield ("G"), the QR code, the "365" calendar icon and (full label) the 27-language legend.
+On the nested banner the "365" calendar icon and the vertical divider line (SVG x=93.73 →
+px≈562) sit to the right of the year field; the divider is the right boundary of the
+editable area.
