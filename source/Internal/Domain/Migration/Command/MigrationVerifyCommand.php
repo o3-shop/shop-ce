@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Internal\Domain\Migration\Command;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\ComposerLockInspectorInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\DatabaseViewsInspectorInterface;
 use OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\MigrationStateServiceInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,14 +57,17 @@ final class MigrationVerifyCommand extends Command
     protected static $defaultName = 'oe:migrate:verify';
 
     private MigrationStateServiceInterface $migrationStateService;
+    private DatabaseViewsInspectorInterface $databaseViewsInspector;
     private ComposerLockInspectorInterface $composerLockInspector;
 
     public function __construct(
         MigrationStateServiceInterface $migrationStateService,
+        DatabaseViewsInspectorInterface $databaseViewsInspector,
         ComposerLockInspectorInterface $composerLockInspector
     ) {
         parent::__construct(null);
         $this->migrationStateService = $migrationStateService;
+        $this->databaseViewsInspector = $databaseViewsInspector;
         $this->composerLockInspector = $composerLockInspector;
     }
 
@@ -75,6 +79,7 @@ final class MigrationVerifyCommand extends Command
                 "Runs post-migration sanity checks and prints a green/red list:\n"
                 . "  - migration tracking table present\n"
                 . "  - no pending migrations\n"
+                . "  - database views present and queryable\n"
                 . "  - no leftover oxid-esales/* packages in composer.lock\n\n"
                 . 'Exits with a non-zero status if any check fails, for use in scripts and CI.'
             );
@@ -85,6 +90,7 @@ final class MigrationVerifyCommand extends Command
         $failed = false;
         $failed = !$this->checkTrackingTable($output) || $failed;
         $failed = !$this->checkNoPendingMigrations($output) || $failed;
+        $failed = !$this->checkDatabaseViews($output) || $failed;
         $failed = !$this->checkNoUpstreamPackages($output) || $failed;
 
         $output->writeln('');
@@ -121,6 +127,27 @@ final class MigrationVerifyCommand extends Command
             count($pending),
             implode(', ', $pending)
         ));
+    }
+
+    private function checkDatabaseViews(OutputInterface $output): bool
+    {
+        $viewCount = $this->databaseViewsInspector->getViewCount();
+        if ($viewCount === 0) {
+            return $this->fail(
+                $output,
+                'No database views found. Run vendor/bin/oe-eshop-db_views_regenerate.'
+            );
+        }
+
+        if (!$this->databaseViewsInspector->coreViewIsQueryable()) {
+            return $this->fail($output, sprintf(
+                '%d database view(s) present but a core view is not queryable. '
+                . 'Regenerate views with vendor/bin/oe-eshop-db_views_regenerate.',
+                $viewCount
+            ));
+        }
+
+        return $this->pass($output, sprintf('%d database view(s) present and queryable.', $viewCount));
     }
 
     private function checkNoUpstreamPackages(OutputInterface $output): bool

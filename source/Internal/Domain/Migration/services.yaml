@@ -9,6 +9,9 @@ services:
   OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\MigrationStateServiceInterface:
     class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\MigrationStateService
 
+  OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\DatabaseViewsInspectorInterface:
+    class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\DatabaseViewsInspector
+
   OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\ComposerLockInspectorInterface:
     class: OxidEsales\EshopCommunity\Internal\Domain\Migration\Service\ComposerLockInspector
 
