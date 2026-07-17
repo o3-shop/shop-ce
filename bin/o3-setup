@@ -38,9 +38,11 @@ $adminPass = 'admin123';
 // Overridable via env for the native CI run, where the shop runs on the host
 // and Mailpit is reachable only on the port-mapped 127.0.0.1 (the 'mailpit'
 // alias does not resolve off the docker network).
-$mailpitHost = $_ENV['MAILPIT_HOST'] ?? 'mailpit';       // Usually the service name in Docker
-$mailpitPort = $_ENV['MAILPIT_PORT'] ?? 1025;            // Default Mailpit SMTP port
-$mailpitWebPort = $_ENV['MAILPIT_WEB_PORT'] ?? 8025;     // Default Mailpit web interface port
+// `?:` on a `?? ''` base falls back when the var is unset OR blank — a blank
+// env value would otherwise override the default with an empty host/port.
+$mailpitHost = ($_ENV['MAILPIT_HOST'] ?? '') ?: 'mailpit';       // Usually the service name in Docker
+$mailpitPort = ($_ENV['MAILPIT_PORT'] ?? '') ?: 1025;            // Default Mailpit SMTP port
+$mailpitWebPort = ($_ENV['MAILPIT_WEB_PORT'] ?? '') ?: 8025;     // Default Mailpit web interface port
 
 // Check if database already exists
 $mysqli = new mysqli($dbHost, $dbUser, $dbPwd, '', $dbPort);

@@ -338,7 +338,7 @@ jobs:
 
       - name: 📮 Route PHP mail() → Mailpit (msmtp shim)
         run: |
-          printf 'defaults\nhost 127.0.0.1\nport 1025\ntls off\nauth off\nfrom ci@localhost\naccount default :\n' \
+          printf 'defaults\nhost 127.0.0.1\nport 1025\ntls off\nauth off\nfrom ci@localhost\naccount default\n' \
             | sudo tee /etc/msmtprc >/dev/null
           echo 'sendmail_path = "/usr/bin/msmtp -t"' \
             | sudo tee /etc/php/8.2/apache2/conf.d/99-mailpit.ini /etc/php/8.2/cli/conf.d/99-mailpit.ini >/dev/null
@@ -378,7 +378,12 @@ jobs:
         run: |
           cp .env.ci .env
           cp source/config.inc.php.dist source/config.inc.php
-          until mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent; do echo "waiting for db..."; sleep 2; done
+          for i in $(seq 1 30); do
+            mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent && { echo "db ready"; break; }
+            echo "waiting for db... ($i/30)"
+            if [ "$i" = "30" ]; then echo "::error::database not reachable"; exit 1; fi
+            sleep 2
+          done
           mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
           php bin/o3-setup
 

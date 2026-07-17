@@ -27,18 +27,6 @@ export class AdminThemeConfigPage extends BaseAdminPage {
     );
   }
 
-  private async extractStoken(): Promise<string> {
-    const navFrame = this.page
-      .frameLocator('frame[name="navigation"]')
-      .frameLocator('frame[name="adminnav"]');
-    const link = await navFrame.locator('a[href*="stoken="]').first().getAttribute('href');
-    const match = link?.match(/stoken=([A-Za-z0-9]+)/);
-    if (!match) {
-      throw new Error('AdminThemeConfigPage: could not extract stoken from admin nav.');
-    }
-    return match[1] ?? '';
-  }
-
   get form(): Locator {
     return this.page.locator('#myedit');
   }

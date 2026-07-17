@@ -24,7 +24,9 @@ const SHOP_CONTAINER = process.env.SHOP_CONTAINER ?? 'o3shop-app';
  * mode, the checkout path on the runner in native mode. Override via SHOP_ROOT.
  */
 const SHOP_ROOT =
-  process.env.SHOP_ROOT ??
+  // `||` not `??`: fall back when SHOP_ROOT is unset OR blank — an empty
+  // string would otherwise resolve every shop path against '' silently.
+  process.env.SHOP_ROOT ||
   (SHOP_EXEC_MODE === 'native'
     ? path.resolve(__dirname, '..', '..', '..', '..') // …/shop-ce (repo root)
     : '/var/www/html');
