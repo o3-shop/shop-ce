@@ -22,10 +22,6 @@ services:
   shop:
     build:
       dockerfile: Dockerfile
-    extra_hosts:
-      # Makes host.docker.internal resolve to the host on Colima / plain Linux
-      # Docker (auto on Docker Desktop). Required for Xdebug to reach the IDE.
-      - "host.docker.internal:host-gateway"
     volumes:
       - ./../:/var/www/html
     environment:

@@ -23,17 +23,11 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Command;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Command\ReleaseCommand;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\DeleteBranchOnMergeGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\LiveExecutor;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessOutcome;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\CandidatePlan;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DryRunPrinter;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlan;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlanner;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Snapshot\FromSnapshot;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Tag\TagCutResult;
-use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Version\VersionResolution;
-use OxidEsales\EshopCommunity\Tests\Unit\Internal\ReleaseTooling\Flow\FakeProcessExecutor;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -352,7 +346,7 @@ class ReleaseCommandTest extends TestCase
 
     /* ---------- partial-state printing on live success ---------- */
 
-    public function testLiveSuccessPrintsFinishChecklist(): void
+    public function testLiveSuccessPrintsCapturedReleaseAndMergeBackUrls(): void
     {
         $tmpRepoPath = $this->makeFakeGitRepo();
         $stub = new StubReleasePlanner(new ReleasePlan(
@@ -366,92 +360,22 @@ class ReleaseCommandTest extends TestCase
         ));
         $executor = new RecordingLiveExecutor(
             false,
-            [
-                'o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1',
-                'o3-shop/o3-shop' => 'https://github.com/o3-shop/o3-shop/releases/draft/v1.6.1',
-            ],
+            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1'],
             ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/pull/200']
-        );
-        $tester = new CommandTester(
-            new ReleaseCommand($stub, null, $executor, $this->passingDeleteBranchGate())
-        );
-        $status = $tester->execute([
-            '--from' => 'v1.6.0',
-            '--to' => 'v1.6.1',
-            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
-        ]);
-
-        $display = $tester->getDisplay();
-        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('To finish the release:', $display);
-        $this->assertStringContainsString('Publish the draft GitHub releases', $display);
-        $this->assertStringContainsString('https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1', $display);
-        $this->assertStringContainsString('https://github.com/o3-shop/o3-shop/releases/draft/v1.6.1', $display);
-        $this->assertStringContainsString('Review and merge the merge-back PRs', $display);
-        $this->assertStringContainsString('https://github.com/o3-shop/shop-ce/pull/200', $display);
-        // Success path drops the neutral partial-state framing.
-        $this->assertStringNotContainsString('Draft GitHub releases created:', $display);
-        $this->cleanupFakeGitRepo($tmpRepoPath);
-    }
-
-    public function testLiveSuccessOmitsMergeBackGroupForPreRelease(): void
-    {
-        $tmpRepoPath = $this->makeFakeGitRepo();
-        $stub = new StubReleasePlanner(new ReleasePlan(
-            'v1.6.0',
-            'v1.6.1-RC1',
-            new FromSnapshot([]),
-            [],
-            [],
-            '',
-            []
-        ));
-        $executor = new RecordingLiveExecutor(
-            false,
-            ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1-RC1'],
-            []
         );
         $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
         $status = $tester->execute([
             '--from' => 'v1.6.0',
-            '--to' => 'v1.6.1-RC1',
-            '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
-        ]);
-
-        $display = $tester->getDisplay();
-        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('To finish the release:', $display);
-        $this->assertStringContainsString('Publish the draft GitHub releases', $display);
-        $this->assertStringNotContainsString('Review and merge the merge-back PRs', $display);
-        $this->cleanupFakeGitRepo($tmpRepoPath);
-    }
-
-    public function testLiveSuccessWithNothingToFinishPrintsNothingMessage(): void
-    {
-        $tmpRepoPath = $this->makeFakeGitRepo();
-        $stub = new StubReleasePlanner(new ReleasePlan(
-            'v1.6.0',
-            'v1.6.1',
-            new FromSnapshot([]),
-            [],
-            [],
-            '',
-            []
-        ));
-        $executor = new RecordingLiveExecutor(false, [], []);
-        $tester = new CommandTester(
-            new ReleaseCommand($stub, null, $executor, $this->passingDeleteBranchGate())
-        );
-        $status = $tester->execute([
-            '--from' => 'v1.6.0',
             '--to' => 'v1.6.1',
             '--repo-path' => ['o3-shop/shop-ce=' . $tmpRepoPath],
         ]);
 
         $display = $tester->getDisplay();
         $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertStringContainsString('Nothing to publish or merge.', $display);
-        $this->assertStringNotContainsString('To finish the release:', $display);
+        $this->assertStringContainsString('Draft GitHub releases created:', $display);
+        $this->assertStringContainsString('o3-shop/shop-ce -> https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1', $display);
+        $this->assertStringContainsString('Merge-back PRs opened:', $display);
+        $this->assertStringContainsString('o3-shop/shop-ce -> https://github.com/o3-shop/shop-ce/pull/200', $display);
         $this->cleanupFakeGitRepo($tmpRepoPath);
     }
 
@@ -472,9 +396,7 @@ class ReleaseCommandTest extends TestCase
             ['o3-shop/shop-ce' => 'https://github.com/o3-shop/shop-ce/releases/draft/v1.6.1'],
             []
         );
-        $tester = new CommandTester(
-            new ReleaseCommand($stub, null, $executor, $this->passingDeleteBranchGate())
-        );
+        $tester = new CommandTester(new ReleaseCommand($stub, null, $executor));
         $status = $tester->execute([
             '--from' => 'v1.6.0',
             '--to' => 'v1.6.1',
@@ -552,142 +474,6 @@ class ReleaseCommandTest extends TestCase
         $buildLiveExecutor->setAccessible(true);
         $live = $buildLiveExecutor->invoke($command, null);
         $this->assertInstanceOf(LiveExecutor::class, $live);
-    }
-
-    /* ---------- delete-branch-on-merge gate (#190) ---------- */
-
-    public function testFinalReleaseAbortsWhenDeleteBranchOnMergeIsTrue(): void
-    {
-        $exec = new FakeProcessExecutor([
-            'gh api repos/o3-shop/o3-shop --jq .delete_branch_on_merge'
-                => new ProcessOutcome(0, "true\n", ''),
-        ]);
-        $gate = new DeleteBranchOnMergeGate($exec);
-        $stub = new StubReleasePlanner(new ReleasePlan(
-            'v1.6.1',
-            'v1.6.2',
-            new FromSnapshot([]),
-            [],
-            [],
-            '',
-            []
-        ));
-        $tester = new CommandTester(new ReleaseCommand($stub, null, null, $gate));
-        $status = $tester->execute([
-            '--from' => 'v1.6.1',
-            '--to' => 'v1.6.2',
-            '--dry-run' => true,
-        ]);
-        $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
-        $this->assertStringContainsString('delete_branch_on_merge', $tester->getDisplay());
-        $this->assertStringContainsString(
-            'gh api -X PATCH repos/o3-shop/o3-shop -F delete_branch_on_merge=false',
-            $tester->getDisplay()
-        );
-        $this->assertCount(1, $exec->calls);
-    }
-
-    public function testFinalReleaseReportsVerificationWhenAllReposPass(): void
-    {
-        // The gate must report it ran even on the happy path, so an
-        // operator (esp. in dry-run) can see the safety check happened.
-        $exec = new FakeProcessExecutor([
-            'gh api repos/o3-shop/o3-shop --jq .delete_branch_on_merge'
-                => new ProcessOutcome(0, "false\n", ''),
-        ]);
-        $gate = new DeleteBranchOnMergeGate($exec);
-        $stub = new StubReleasePlanner(new ReleasePlan(
-            'v1.6.1',
-            'v1.6.2',
-            new FromSnapshot([]),
-            [],
-            [],
-            '',
-            []
-        ));
-        $tester = new CommandTester(new ReleaseCommand($stub, null, null, $gate));
-        $status = $tester->execute([
-            '--from' => 'v1.6.1',
-            '--to' => 'v1.6.2',
-            '--dry-run' => true,
-        ]);
-        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $display = $tester->getDisplay();
-        $this->assertStringContainsString('verifying delete_branch_on_merge', $display);
-        $this->assertStringContainsString('o3-shop/o3-shop: ok', $display);
-        $this->assertCount(1, $exec->calls);
-    }
-
-    public function testFinalReleaseChecksTaggedCandidatesAndAbortsOnOne(): void
-    {
-        // A tagged candidate (tagCut() !== null) gets a merge-back PR, so
-        // the gate must run against it too — not just o3-shop/o3-shop.
-        $candidate = new CandidatePlan(
-            'o3-shop/some-module',
-            'v1.0.0',
-            'v1.0.1',
-            new VersionResolution('o3-shop/some-module', VersionResolution::CASE_USABLE_TAG, 'v1.0.1'),
-            new TagCutResult('v1.0.1', false, TagCutResult::SOURCE_FLAG)
-        );
-        $exec = new FakeProcessExecutor([
-            'gh api repos/o3-shop/some-module --jq .delete_branch_on_merge'
-                => new ProcessOutcome(0, "true\n", ''),
-            'gh api repos/o3-shop/o3-shop --jq .delete_branch_on_merge'
-                => new ProcessOutcome(0, "false\n", ''),
-        ]);
-        $gate = new DeleteBranchOnMergeGate($exec);
-        $stub = new StubReleasePlanner(new ReleasePlan(
-            'v1.6.1',
-            'v1.6.2',
-            new FromSnapshot([]),
-            [$candidate],
-            [],
-            '',
-            []
-        ));
-        $tester = new CommandTester(new ReleaseCommand($stub, null, null, $gate));
-        $status = $tester->execute([
-            '--from' => 'v1.6.1',
-            '--to' => 'v1.6.2',
-            '--dry-run' => true,
-        ]);
-        $this->assertSame(ReleaseCommand::EXIT_PRE_FLIGHT_ABORT, $status);
-        $this->assertStringContainsString('o3-shop/some-module', $tester->getDisplay());
-        // Both the tagged candidate and the o3-shop project were checked.
-        $this->assertCount(2, $exec->calls);
-    }
-
-    public function testPreReleaseSkipsDeleteBranchOnMergeCheck(): void
-    {
-        $exec = new FakeProcessExecutor([
-            'gh api repos/o3-shop/o3-shop --jq .delete_branch_on_merge'
-                => new ProcessOutcome(0, "true\n", ''),
-        ]);
-        $gate = new DeleteBranchOnMergeGate($exec);
-        $stub = new StubReleasePlanner(new ReleasePlan(
-            'v1.6.1',
-            'v1.6.2-RC1',
-            new FromSnapshot([]),
-            [],
-            [],
-            '',
-            []
-        ));
-        $tester = new CommandTester(new ReleaseCommand($stub, null, null, $gate));
-        $status = $tester->execute([
-            '--from' => 'v1.6.1',
-            '--to' => 'v1.6.2-RC1',
-            '--dry-run' => true,
-        ]);
-        $this->assertSame(ReleaseCommand::EXIT_OK, $status);
-        $this->assertSame([], $exec->calls);
-    }
-
-    private function passingDeleteBranchGate(): DeleteBranchOnMergeGate
-    {
-        return new DeleteBranchOnMergeGate(
-            new FakeProcessExecutor([], new ProcessOutcome(0, "false\n", ''))
-        );
     }
 
     private function planThatAborts(): ReleasePlan
