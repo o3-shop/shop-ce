@@ -116,14 +116,24 @@ jobs:
           echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Using version: $VERSION"
 
-      - name: 📦 Cache Composer Dependencies
+      # Cache Composer's DOWNLOAD cache, not vendor/. composer.lock is gitignored,
+      # so hashFiles('**/composer.lock') was always empty -> a constant cache key
+      # that froze a stale vendor/. `composer install` then reported "0 installs"
+      # and a poisoned vendor/o3-shop/testing-library (missing test_config.yml.dist)
+      # survived, breaking the Incenteev post-update script. Caching only the
+      # download dir keeps vendor/ fully materialized on every run while still
+      # avoiding re-downloads; the key is derived from composer.json (no lock).
+      - name: 📁 Determine Composer Cache Directory
         id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: 📦 Cache Composer Downloads
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php-version }}-
+            ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
 
       - name: 🔧 Copy CI Config Files
         run: |
