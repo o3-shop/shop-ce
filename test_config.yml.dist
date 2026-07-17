@@ -1,0 +1,90 @@
+# parameters for testing library
+mandatory_parameters:
+    # Path to eShop source. Defaults to the same directory as to where vendor is located.
+    shop_path: 'source'
+
+    # Path to eShop tests
+    shop_tests_path: 'tests'
+
+    # When testing not activated module, specify module path in shop.
+    # Module path in shop, e.g. if module is in 'shop/modules/oe/mymodule' directory, value here should be 'oe/mymodule'.
+    # Multiple modules can be specified separated by comma: 'oe/module1,module2,tt/module3'.
+    partial_module_paths:
+
+optional_parameters:
+    # eShop base url (if not set, takes it from shop's config.inc.php file)
+    shop_url:
+
+    # Run tests with varnish on. Shop has to be configured to work with varnish
+    enable_varnish: false
+
+    # Whether to run subshop tests. Currently only used when running selenium tests.
+    is_subshop: false
+
+    # Whether to prepare shop database for testing. Shop config.ing.php file must be correct.
+    install_shop: true
+
+    # If defined, testing services will be copied to this directory and called via url instead of used locally.
+    # Example: username@server.com:/path/to/shop
+    remote_server_dir:
+
+    # eShop setup directory. After setting up the shop, setup directory will be deleted.
+    # For shop installation to work during tests run, path to this directory must be specified.
+    # Uses shop/directory/Setup/ if not set.
+    shop_setup_path:
+
+    # Whether to restore shop data after running all tests. If this is set to false, shop will be left with tests data added on it.
+    restore_shop_after_tests_suite: false
+
+    # If specified, this database is used instead of real one for unit and integration tests.
+    test_database_name:
+
+    # Whether to dump and restore the database after a single acceptance test.
+    restore_after_acceptance_tests: true
+
+    # Whether to dump and restore the database after all tests are finished in a single unit, integration test suite.
+    restore_after_unit_tests: true
+
+    # If php has no write access to /tmp folder, provide alternative temp folder for tests.
+    tmp_path: /tmp/oxid_test_library/
+
+    # Currently exists DatabaseRestorer and LocalDatabaseRestorer.
+    # DatabaseRestorer - used with external database.
+    # DatabaseRestorerLocal - used with local database (faster).
+    # DatabaseRestorerToFile - used for selenium tests, but can also be used for units.
+    database_restoration_class: 'DatabaseRestorer'
+
+    # Whether to activate all modules defined in partial_module_paths when running tests.
+    # Normally only tested module is activated during test run. Modules will be activated in the specified order.
+    activate_all_modules: false
+
+    # Whether to run shop unit tests. This applies only when correct shop_tests_path are set.
+    run_tests_for_shop: true
+
+    # Whether to run modules unit tests. All modules provided in partial_module_paths will be tested.
+    # If shop_tests_path and run_shop_tests are set, shop tests will be run with module tests.
+    run_tests_for_modules: true
+
+    # Folder where to save selenium screen shots. If not specified, screenshots will not be taken.
+    screen_shots_path: null
+
+    # Url, where selenium screen shots should be available.
+    screen_shots_url: null
+
+    # Browser name which will be used for acceptance testing.
+    # Possible values: *iexplore, *iehta, *firefox, *chrome, *piiexplore, *pifirefox, *safari, *opera.
+    # Make sure that path to browser executable is known for the system.
+    browser_name: 'firefox'
+
+    # Selenium server IP address. Used to connect to selenium server when Mink selenium driver is used for acceptance tests.
+    selenium_server_ip: '127.0.0.1'
+
+    # Selenium server port. Used to connect to selenium server when Mink selenium driver is used for acceptance tests.
+    selenium_server_port: '4444'
+
+    # For running additional tests, please specify paths separated by commas.
+    additional_test_paths: 'vendor/oxid-esales/oxideshop-ee/Tests,vendor/oxid-esales/oxideshop-pe/Tests'
+
+    # How many times to try test before marking it as failure.
+    # Could be used for unstable tests which fails randomly.
+    retry_times_after_test_fail: 2
