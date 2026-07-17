@@ -198,9 +198,7 @@ class SearchController extends FrontendController
             $sInitialSearchCat,
             $sInitialSearchVendor,
             $sInitialSearchManufacturer,
-            ($this->getUserSelectedSorting() || (int) $oRequest->getRequestEscapedParameter('pgNr') > 0)
-                ? $this->getSortingSql($this->getSortIdent())
-                : false
+            $this->getSortingSql($this->getSortIdent())
         );
 
         // list of found articles
