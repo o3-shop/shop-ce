@@ -11,8 +11,8 @@ Typed properties WITHOUT promotion (`private Foo $bar;`) ARE fine — that's a 7
 
 ## Symfony Console is v3.4 (NOT 4.4+)
 `symfony/console` resolves to **v3.4.47**. Therefore in console Command classes:
-- Do NOT use `Command::SUCCESS` / `Command::FAILURE` constants (added in 4.4) — return plain `0` / `1`.
-- Do NOT add a `: int` return type to `execute()` — declare `protected function execute(InputInterface $input, OutputInterface $output)` with no return type, exactly like the existing `ModuleActivateCommand`.
+- Do NOT use `Command::SUCCESS` / `Command::FAILURE` constants (added in 4.4) — return plain `0` / `1` (define your own `EXIT_*` int constants).
+- `: int` return type on `execute()` IS fine (correction — the old note here said avoid it). PHP allows a child to add a return type where the parent declares none, and Symfony Console 3.4's `execute()` has none. As of b-1.7, 7 commands use `: int` (incl. `Domain/Authentication/Command/UserCreateCommand`, CI-green on 7.4/8.0/8.1/8.2) and 9 omit it — both work. `Domain/Migration/Command/*` (#205) use `: int`.
 - `Symfony\Component\Console\Helper\Table` and `CommandTester::getStatusCode()` ARE available in 3.4.
 
 ## Registering a console command
