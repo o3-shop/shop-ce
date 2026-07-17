@@ -21,7 +21,7 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [!] [Form input must survive errors](feedback_form-input-preservation.md) — when a form submission is rejected, re-render with submitted values — never make the user re-type
 - [!] [Git / PR / merge workflow](feedback_git-pr-workflow.md) — wait-for-instruction cadence; never auto-push; squash-merge default; cs-fixer before every commit
 - [Architecture](architecture.md) — DI wiring, module system, key architectural decisions
-- [composer update never runs migrations](architecture_composer-no-auto-migrations.md) — by design: composer plugin is file-level only; migrations are an explicit deploy-time step via oe-eshop-db_migrate
+- [composer update auto-runs migrations](architecture_composer-auto-migrations.md) — since #192 post-update-cmd runs MigrationsRunner (migrate + view regen) behind a guard; skips safely when no DB; must be wired in the o3-shop distribution root too
 - [Testing Patterns](testing-patterns.md) — PHPUnit setup, mocking, test structure conventions
 - [Contact page Google Map](architecture_contact-page-google-maps.md) — map uses per-theme sGoogleMapsAddr (placeholder default), never the shop contact address; o3-shop#196
 - [!] [Theme repos are external](architecture_theme-repos.md) — wave + o3-theme live in separate GitHub repos; their dirs in shop-ce are gitignored snapshots
