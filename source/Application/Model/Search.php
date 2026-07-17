@@ -254,9 +254,52 @@ class Search extends Base
 
         if ($sSortBy) {
             $sSelect .= " order by {$sSortBy} ";
+        } elseif ($sSearchParamForQuery) {
+            $sSelect .= $this->_getRelevanceOrder($sSearchParamForQuery);
         }
 
         return $sSelect;
+    }
+
+    /**
+     * Builds a relevance ORDER BY clause ranked by field priority from aSearchCols config.
+     * Title match ranks highest; each subsequent configured field ranks lower.
+     * Used as default sort when no explicit sort is requested.
+     *
+     * @param string $sSearchString
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function _getRelevanceOrder(string $sSearchString): string // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $aSearchCols = Registry::getConfig()->getConfigParam('aSearchCols');
+        if (!is_array($aSearchCols) || !$sSearchString) {
+            return '';
+        }
+
+        $oDb = DatabaseProvider::getDb();
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
+        $myUtilsString = Registry::getUtilsString();
+        $sUml = $myUtilsString->prepareStrForSearch($sSearchString);
+
+        $cases = [];
+        $rank = 1;
+        foreach ($aSearchCols as $sField) {
+            $sSearchField = $this->getSearchField($sArticleTable, $sField);
+            $condition = "{$sSearchField} LIKE " . $oDb->quote("%{$sSearchString}%");
+            if ($sUml) {
+                $condition .= " OR {$sSearchField} LIKE " . $oDb->quote("%{$sUml}%");
+            }
+            $cases[] = "WHEN ({$condition}) THEN {$rank}";
+            $rank++;
+        }
+
+        if (!$cases) {
+            return '';
+        }
+
+        return ' ORDER BY CASE ' . implode(' ', $cases) . " ELSE {$rank} END ASC, {$sArticleTable}.oxtitle ASC";
     }
 
     /**

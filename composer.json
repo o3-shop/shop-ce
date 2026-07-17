@@ -102,7 +102,7 @@
         },
         "incenteev-parameters": {
             "file": "test_config.yml",
-            "dist-file": "vendor/o3-shop/testing-library/test_config.yml.dist",
+            "dist-file": "test_config.yml.dist",
             "parameter-key": "mandatory_parameters",
             "env-map": {
                 "shop_path": "SHOP_PATH",
