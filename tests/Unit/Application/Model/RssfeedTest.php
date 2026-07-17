@@ -25,6 +25,7 @@ use oxField;
 use oxRegistry;
 use oxRssFeed;
 use oxTestModules;
+use ReflectionMethod;
 use stdClass;
 
 class RssfeedTest extends \OxidTestCase
@@ -1283,5 +1284,38 @@ class RssfeedTest extends \OxidTestCase
         $oRssFeed->expects($this->once())->method('_deleteFile');
 
         $oRssFeed->removeCacheFile('oxnewest');
+    }
+
+    /**
+     * Every RssFeed method that takes a Category must type-hint the unified
+     * namespace class (OxidEsales\Eshop\Application\Model\Category), like every
+     * other core class does. Otherwise the short name binds to the concrete
+     * OxidEsales\EshopCommunity\Application\Model\Category, and a module that
+     * extends RssFeed against the unified class narrows the parameter type,
+     * producing a fatal E_COMPILE_ERROR on every request. See issue #221.
+     *
+     * @dataProvider providerCategoryParameterMethods
+     */
+    public function testCategoryParameterUsesUnifiedNamespace($sMethod)
+    {
+        $oReflection = new ReflectionMethod(\OxidEsales\Eshop\Application\Model\RssFeed::class, $sMethod);
+        $aParams = $oReflection->getParameters();
+        $oType = $aParams[0]->getType();
+
+        $this->assertNotNull($oType, "Method '$sMethod' must keep its Category type hint.");
+        $this->assertSame(
+            \OxidEsales\Eshop\Application\Model\Category::class,
+            $oType->getName(),
+            "Method '$sMethod' must type-hint the unified Category so module overrides do not fatal (#221)."
+        );
+    }
+
+    public function providerCategoryParameterMethods()
+    {
+        return [
+            ['getCategoryArticlesTitle'],
+            ['getCategoryArticlesUrl'],
+            ['loadCategoryArticles'],
+        ];
     }
 }
