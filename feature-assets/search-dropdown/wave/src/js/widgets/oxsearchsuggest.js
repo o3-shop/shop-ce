@@ -1,18 +1,18 @@
-$(document).ready(function() {
-    var searchInput = $('#searchParam');
-    var dropdown = $('#searchSuggestDropdown');
-    var searchForm = $('#searchForm');
-    var searchSubmit = $('#searchSubmit');
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchParam');
+    var dropdown = document.getElementById('searchSuggestDropdown');
+    var searchForm = document.getElementById('searchForm');
+    var searchSubmit = document.getElementById('searchSubmit');
     var debounceTimer = null;
     var minChars = 2;
     var isActive = false;
 
-    if (!searchInput.length) {
+    if (!searchInput) {
         return;
     }
 
-    searchInput.on('input', function() {
-        var query = $(this).val().trim();
+    searchInput.addEventListener('input', function() {
+        var query = this.value.trim();
         clearTimeout(debounceTimer);
 
         if (query.length < minChars) {
@@ -25,46 +25,46 @@ $(document).ready(function() {
         }, 300);
     });
 
-    searchInput.on('focus', function() {
-        if (dropdown.find('.search-suggest-item').length > 0) {
+    searchInput.addEventListener('focus', function() {
+        if (dropdown.querySelectorAll('.search-suggest-item').length > 0) {
             openDropdown();
         }
     });
 
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('.search-suggest-wrapper').length) {
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-suggest-wrapper')) {
             closeDropdown();
         }
     });
 
-    searchInput.on('keydown', function(e) {
+    searchInput.addEventListener('keydown', function(e) {
         if (!isActive) return;
 
-        var items = dropdown.find('.search-suggest-item');
-        var activeItem = items.filter('.active');
-        var index = items.index(activeItem);
+        var items = dropdown.querySelectorAll('.search-suggest-item');
+        var activeItem = dropdown.querySelector('.search-suggest-item.active');
+        var index = activeItem ? Array.prototype.indexOf.call(items, activeItem) : -1;
 
         if (e.keyCode === 40) {
             e.preventDefault();
-            items.removeClass('active');
+            items.forEach(function(item) { item.classList.remove('active'); });
             if (index < items.length - 1) {
-                items.eq(index + 1).addClass('active');
+                items[index + 1].classList.add('active');
             } else {
-                items.eq(0).addClass('active');
+                items[0].classList.add('active');
             }
         } else if (e.keyCode === 38) {
             e.preventDefault();
-            items.removeClass('active');
+            items.forEach(function(item) { item.classList.remove('active'); });
             if (index > 0) {
-                items.eq(index - 1).addClass('active');
+                items[index - 1].classList.add('active');
             } else {
-                items.eq(items.length - 1).addClass('active');
+                items[items.length - 1].classList.add('active');
             }
         } else if (e.keyCode === 13) {
             e.preventDefault();
-            var activeLink = dropdown.find('.search-suggest-item.active a');
-            if (activeLink.length) {
-                window.location.href = activeLink.attr('href');
+            var activeLink = dropdown.querySelector('.search-suggest-item.active a');
+            if (activeLink) {
+                window.location.href = activeLink.getAttribute('href');
             } else {
                 closeDropdown();
                 searchForm.submit();
@@ -74,82 +74,102 @@ $(document).ready(function() {
         }
     });
 
-    searchSubmit.on('click', function() {
+    searchSubmit.addEventListener('click', function() {
         closeDropdown();
         searchForm.submit();
     });
 
     function fetchSuggestions(query) {
-        var actionUrl = searchForm.attr('action');
-        $.ajax({
-            url: actionUrl,
-            type: 'GET',
-            data: {
-                cl: 'searchsuggest',
-                searchparam: query,
-                fnc: ''
-            },
-            dataType: 'json',
-            success: function(data) {
-                renderSuggestions(data);
-            },
-            error: function() {
-                closeDropdown();
+        var actionUrl = searchForm.getAttribute('action');
+        var params = 'cl=searchsuggest&searchparam=' + encodeURIComponent(query) + '&fnc=';
+        var url = actionUrl + params;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        renderSuggestions(data);
+                    } catch (e) {
+                        closeDropdown();
+                    }
+                } else {
+                    closeDropdown();
+                }
             }
-        });
+        };
+        xhr.send();
     }
 
     function renderSuggestions(items) {
-        dropdown.empty();
+        dropdown.innerHTML = '';
 
         if (!items || items.length === 0) {
             closeDropdown();
             return;
         }
 
-        var list = $('<div class="search-suggest-list"></div>');
+        var list = document.createElement('div');
+        list.className = 'search-suggest-list';
 
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            var itemEl = $('<div class="search-suggest-item"></div>');
-            var link = $('<a></a>').attr('href', item.link);
+            var itemEl = document.createElement('div');
+            itemEl.className = 'search-suggest-item';
+            var link = document.createElement('a');
+            link.href = item.link;
 
             if (item.icon) {
-                var iconSpan = $('<span class="search-suggest-icon"></span>');
-                var img = $('<img>').attr('src', item.icon).attr('alt', item.title);
-                iconSpan.append(img);
-                link.append(iconSpan);
+                var iconSpan = document.createElement('span');
+                iconSpan.className = 'search-suggest-icon';
+                var img = document.createElement('img');
+                img.src = item.icon;
+                img.alt = item.title;
+                iconSpan.appendChild(img);
+                link.appendChild(iconSpan);
             }
 
-            var infoSpan = $('<span class="search-suggest-info"></span>');
-            infoSpan.append($('<span class="search-suggest-title"></span>').text(item.title));
-            infoSpan.append($('<span class="search-suggest-price"></span>').text(item.price));
-            link.append(infoSpan);
+            var infoSpan = document.createElement('span');
+            infoSpan.className = 'search-suggest-info';
+            var titleSpan = document.createElement('span');
+            titleSpan.className = 'search-suggest-title';
+            titleSpan.textContent = item.title;
+            var priceSpan = document.createElement('span');
+            priceSpan.className = 'search-suggest-price';
+            priceSpan.textContent = item.price;
+            infoSpan.appendChild(titleSpan);
+            infoSpan.appendChild(priceSpan);
+            link.appendChild(infoSpan);
 
-            itemEl.append(link);
-            list.append(itemEl);
+            itemEl.appendChild(link);
+            list.appendChild(itemEl);
         }
 
-        dropdown.append(list);
+        dropdown.appendChild(list);
         openDropdown();
 
-        dropdown.find('.search-suggest-item').on('mouseenter', function() {
-            dropdown.find('.search-suggest-item').removeClass('active');
-            $(this).addClass('active');
-        });
-
-        dropdown.find('.search-suggest-item').on('mouseleave', function() {
-            $(this).removeClass('active');
+        var suggestItems = dropdown.querySelectorAll('.search-suggest-item');
+        suggestItems.forEach(function(el) {
+            el.addEventListener('mouseenter', function() {
+                suggestItems.forEach(function(item) { item.classList.remove('active'); });
+                el.classList.add('active');
+            });
+            el.addEventListener('mouseleave', function() {
+                el.classList.remove('active');
+            });
         });
     }
 
     function openDropdown() {
-        dropdown.addClass('show');
+        dropdown.classList.add('show');
         isActive = true;
     }
 
     function closeDropdown() {
-        dropdown.removeClass('show').empty();
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
         isActive = false;
     }
 });
