@@ -80,9 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function fetchSuggestions(query) {
-        var actionUrl = searchForm.getAttribute('action');
-        var params = 'cl=searchsuggest&searchparam=' + encodeURIComponent(query) + '&fnc=';
-        var url = actionUrl + params;
+        var url = '/index.php?cl=searchsuggest&searchparam=' + encodeURIComponent(query) + '&fnc=';
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
