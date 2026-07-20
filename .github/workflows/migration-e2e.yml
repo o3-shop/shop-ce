@@ -34,14 +34,42 @@ jobs:
       matrix:
         db: ['mariadb:10.11', 'mysql:8.0']
         php: ['7.4', '8.0', '8.1', '8.2']
+    env:
+      DB_IMAGE: ${{ matrix.db }}
+      PHP_VERSION: ${{ matrix.php }}
+      # workflow_dispatch supplies target_version; pull_request falls back to the b-1.7 dev line.
+      TARGET_VERSION: ${{ github.event.inputs.target_version || 'dev-b-1.7' }}
+      # Stable container-name prefix so each phase step reuses the same containers
+      # (each matrix cell runs on its own runner VM, so a fixed value can't collide).
+      MIGRATION_E2E_RUN: o3mig-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run migration E2E (${{ matrix.db }}, PHP ${{ matrix.php }})
-        env:
-          DB_IMAGE: ${{ matrix.db }}
-          PHP_VERSION: ${{ matrix.php }}
-          # workflow_dispatch supplies target_version; pull_request falls back to the b-1.7 dev line.
-          TARGET_VERSION: ${{ github.event.inputs.target_version || 'dev-b-1.7' }}
-        run: bash tests/Migration/e2e/run-migration-e2e.sh
+      - name: Start database
+        run: bash tests/Migration/e2e/run-migration-e2e.sh start-db
+
+      - name: Load OXID 6.4.3 fixture
+        run: bash tests/Migration/e2e/run-migration-e2e.sh load-fixture
+
+      - name: Provision PHP + copy o3-shop tree
+        run: bash tests/Migration/e2e/run-migration-e2e.sh provision
+
+      - name: Install o3-shop (composer, ${{ env.TARGET_VERSION }})
+        run: bash tests/Migration/e2e/run-migration-e2e.sh install
+
+      - name: Configure shop
+        run: bash tests/Migration/e2e/run-migration-e2e.sh configure
+
+      - name: Migrate + regenerate views
+        run: bash tests/Migration/e2e/run-migration-e2e.sh migrate
+
+      - name: Verify (oe:migrate:verify)
+        run: bash tests/Migration/e2e/run-migration-e2e.sh verify
+
+      - name: App smoke asserts
+        run: bash tests/Migration/e2e/run-migration-e2e.sh asserts
+
+      - name: Cleanup
+        if: always()
+        run: bash tests/Migration/e2e/run-migration-e2e.sh cleanup
