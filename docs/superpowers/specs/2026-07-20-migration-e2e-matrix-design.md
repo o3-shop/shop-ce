@@ -33,6 +33,15 @@ closes the loop with an end-to-end verification matrix.
   fail. Instead: install OXID 6.4.3 CE + demodata **once** (PHP 7.4), capture a
   canonical DB dump as a fixture; every cell loads that dump and migrates under its
   own PHP. The migration under test is DB-centric, so this is faithful.
+- **Migrate to the development version (`dev-main`) by default.** The whole point of
+  the matrix is to catch regressions in unreleased code, so the target o3-shop is
+  installed at its **dev** version, not a frozen stable tag: the driver exports
+  `COMPOSER_ROOT_VERSION=dev-main` (default) so the o3-shop package graph resolves to
+  its dev branches (peer packages pin o3-shop with `dev-*` — see
+  `.claude/memory/known-pitfalls.md`). This makes a red matrix cell mean "a current
+  change broke the migration." The target is a parameter (`TARGET_VERSION`, default
+  `dev-main`) so a stable tag (e.g. `v1.7.0`) or another dev branch (`dev-b-1.7`) can
+  also be verified on demand.
 
 ## Architecture
 
@@ -55,14 +64,16 @@ unreproducible, escalate before building the matrix.
 
 ### Per-cell driver — `tests/Migration/e2e/run-migration-e2e.sh`
 
-Parameterized by environment: `DB_IMAGE` (e.g. `mariadb:10.11` / `mysql:8.0`) and
-`PHP_VERSION`. Idempotent, self-contained, and the single source of truth shared by
-local runs and CI. Steps:
+Parameterized by environment: `DB_IMAGE` (e.g. `mariadb:10.11` / `mysql:8.0`),
+`PHP_VERSION`, and `TARGET_VERSION` (default `dev-main`). Idempotent, self-contained,
+and the single source of truth shared by local runs and CI. Steps:
 
 1. Start the DB service; wait for readiness.
 2. Load the OXID 6.4.3 dump (download + checksum if it's a release asset).
-3. Configure o3-shop (this repo, at the branch under test) to use that DB — the
-   inlined "swap".
+3. Install o3-shop at `TARGET_VERSION` (default `dev-main`) against that DB — the
+   inlined "swap". Export `COMPOSER_ROOT_VERSION=$TARGET_VERSION` so the o3-shop
+   package graph resolves to its dev branches by default (catching cross-package
+   regressions); a stable tag can be passed to verify a release instead.
 4. **MySQL 8 only:** run the `decode-mysql8` SQL (`DECODE()` of `oxconfig.OXVARVALUE`
    and `oxuserpayments.OXVALUE`) so the two `skipIf(MySQL80)` migrations are no-ops.
    Idempotent.
@@ -79,9 +90,11 @@ local runs and CI. Steps:
 
 - `strategy: { fail-fast: false, matrix: { db: [mariadb:10.11, mysql:8.0], php: [7.4, 8.0, 8.1, 8.2] } }`
 - Each cell checks out the repo, restores the fixture, and runs
-  `run-migration-e2e.sh` with the cell's `DB_IMAGE` / `PHP_VERSION`.
-- Trigger: `workflow_dispatch` + `pull_request` on the migration paths (scoped so it
-  doesn't run on every PR — it's heavy). Concurrency group per ref.
+  `run-migration-e2e.sh` with the cell's `DB_IMAGE` / `PHP_VERSION` and
+  `TARGET_VERSION` (default `dev-main`).
+- Trigger: `workflow_dispatch` (with an optional `target_version` input, default
+  `dev-main`) + `pull_request` on the migration paths (scoped so it doesn't run on
+  every PR — it's heavy). Concurrency group per ref.
 
 ### Runbook — `tests/Migration/e2e/README.md`
 
