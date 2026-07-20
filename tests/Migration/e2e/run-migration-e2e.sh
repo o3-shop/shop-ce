@@ -64,7 +64,34 @@ done
 [ "$ready" = "1" ] || { echo "Database never became auth-ready"; exit 1; }
 
 step "Load OXID 6.4.3 fixture into $DBNAME"
-gunzip -c "$FIXTURE" | docker exec -i "$DBC" mysql -uroot -proot "$DBNAME"
+case "$DB_IMAGE" in
+    mysql:*)
+        # MySQL 8.0 removed ENCODE()/DECODE(), so the OXID-encrypted oxconfig /
+        # oxuserpayments columns can't be decoded on the target. Decode them on a
+        # throwaway MariaDB sidecar (which still has DECODE()), then load the
+        # decoded result into MySQL 8. The o3-shop decode migrations then
+        # skipIf(MySQL80) harmlessly — the data is already plaintext.
+        SIDECAR="${RUN_ID}-decode"
+        echo "MySQL 8 target -> decoding via MariaDB sidecar ($SIDECAR)"
+        docker run -d --name "$SIDECAR" --network "$NET" \
+            -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE="$DBNAME" \
+            mariadb:10.11 --default-authentication-plugin=mysql_native_password >/dev/null
+        for _ in $(seq 1 60); do
+            docker exec "$SIDECAR" mysql -uroot -proot -e "SELECT 1" >/dev/null 2>&1 && break
+            sleep 2
+        done
+        gunzip -c "$FIXTURE" | docker exec -i "$SIDECAR" mysql -uroot -proot "$DBNAME"
+        docker exec -i "$SIDECAR" mysql -uroot -proot "$DBNAME" < "$HERE/lib/decode-mysql8.sql"
+        # Transfer decoded data to MySQL 8. --force tolerates MariaDB view-definition
+        # incompatibilities; the oxv_* views are dropped/regenerated post-migration.
+        docker exec "$SIDECAR" mysqldump -uroot -proot --no-tablespaces --single-transaction "$DBNAME" \
+            | docker exec -i "$DBC" mysql -uroot -proot --force "$DBNAME"
+        docker rm -f "$SIDECAR" >/dev/null 2>&1 || true
+        ;;
+    *)
+        gunzip -c "$FIXTURE" | docker exec -i "$DBC" mysql -uroot -proot "$DBNAME"
+        ;;
+esac
 
 step "Start PHP $PHP_VERSION container + provision"
 docker run -d --name "$PHPC" --network "$NET" -w /app "php:${PHP_VERSION}-cli" sleep infinity >/dev/null
@@ -105,13 +132,6 @@ docker exec "$PHPC" bash -lc "
     cp source/config.inc.php.dist source/config.inc.php
     mkdir -p source/tmp source/log && chmod -R 777 source/tmp source/log
 "
-
-case "$DB_IMAGE" in
-    mysql:*)
-        step "MySQL 8: decode encrypted columns (decode-mysql8)"
-        docker exec -i "$DBC" mysql -uroot -proot "$DBNAME" < "$HERE/lib/decode-mysql8.sql"
-        ;;
-esac
 
 step "migrations:migrate + views generate"
 # NOTE (known-pitfalls): oe-eshop-db_migrate's 2nd arg is the EDITION filter, not a flag —
