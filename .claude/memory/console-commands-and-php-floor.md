@@ -11,12 +11,15 @@ Typed properties WITHOUT promotion (`private Foo $bar;`) ARE fine — that's a 7
 
 ## Symfony Console is v3.4 (NOT 4.4+)
 `symfony/console` resolves to **v3.4.47**. Therefore in console Command classes:
-- Do NOT use `Command::SUCCESS` / `Command::FAILURE` constants (added in 4.4) — return plain `0` / `1`.
-- Do NOT add a `: int` return type to `execute()` — declare `protected function execute(InputInterface $input, OutputInterface $output)` with no return type, exactly like the existing `ModuleActivateCommand`.
+- Do NOT use `Command::SUCCESS` / `Command::FAILURE` constants (added in 4.4) — return plain `0` / `1` (define your own `EXIT_*` int constants).
+- `: int` return type on `execute()` IS fine (correction — the old note here said avoid it). PHP allows a child to add a return type where the parent declares none, and Symfony Console 3.4's `execute()` has none. As of b-1.7, 7 commands use `: int` (incl. `Domain/Authentication/Command/UserCreateCommand`, CI-green on 7.4/8.0/8.1/8.2) and 9 omit it — both work. `Domain/Migration/Command/*` (#205) use `: int`.
 - `Symfony\Component\Console\Helper\Table` and `CommandTester::getStatusCode()` ARE available in 3.4.
 
 ## Registering a console command
-Add a service in the relevant `Internal/Framework/<area>/services.yaml` (or a `Command/services.yaml` imported by it) tagged `{ name: 'console.command', command: 'oe:foo:bar' }`. `_defaults: autowire: true` injects constructor deps by interface FQCN. `Internal/Framework/services.yaml` already imports `Theme/services.yaml`, `Console/services.yaml`, `Module/services.yaml`, etc. After editing, `php bin/oe-console oe:cache:clear` then `php bin/oe-console list` to confirm the command appears.
+Add a service in the relevant `Internal/Framework/<area>/services.yaml` (or a `Command/services.yaml` imported by it) tagged `{ name: 'console.command', command: 'oe:foo:bar' }`. `_defaults: autowire: true` injects constructor deps by interface FQCN. `Internal/Framework/services.yaml` already imports `Theme/services.yaml`, `Console/services.yaml`, `Module/services.yaml`, etc. (`Internal/Domain/services.yaml` is the aggregator for domain sub-services — add `{ resource: <Domain>/services.yaml }` there.) After editing, `php bin/oe-console oe:cache:clear` then `php bin/oe-console list` to confirm the command appears.
+
+## Stale container_cache.php after changing a command's constructor — cache:clear can't self-heal
+The compiled DI container is cached at `source/tmp/container_cache.php`. If you CHANGE the constructor signature of an already-registered command/service (e.g. add a 4th injected dep), the stale cache still instantiates it with the OLD arg list → `TypeError: Argument #N must be of type X, Y given ... called in source/tmp/container_cache.php`. The trap: `oe:cache:clear` ITSELF fails (exit 255, silent — error only in `source/log/oxideshop.log`) because building the command list instantiates the broken cached command before it can clear. Also breaks `./docker.sh test` ("✗ oe:cache:clear failed – aborting"). Fix: `rm -f source/tmp/container_cache.php` in the container, then it recompiles. Adding a NEW command doesn't trigger this — only editing an existing one's signature does.
 
 ## Theme CLI (#122) — oe:theme:activate / deactivate / list
 Live as of #122, in `source/Internal/Framework/Theme/` (Bridge/Command/Exception/DataObject). They wrap the legacy `\OxidEsales\Eshop\Core\Theme` model via `ThemeBridge`. Key facts:

@@ -26,6 +26,9 @@ type: feedback
 ## `UtilsObjectTest::testOxNewClassExtendingWhenClassesDoesNotExists` fails when run in isolation (pre-existing)
 - The test asserts the log message `Module class notExistingClass not found. Module ID notExistingClass`, but `ModuleChainsGenerator::onModuleExtensionCreationError()` only resolves the module ID when `class_exists(Module::class, false)` — **no autoload**. Run the file alone and `Module` isn't loaded yet → message says `(module id not availible)` → assertion fails. In a full-suite (or whole `tests/Unit/Core`) run, earlier tests load `Module` and it passes. Don't chase this as a regression when a single-file run shows it red.
 
+## `RssfeedTest::testPrepareUrlSeoOff` fails in a worktree (non-8080 shop URL) — not a regression
+- The test hardcodes `assertEquals('http://localhost:8080/?cl=rss...')` but `oxrssfeed::UNITprepareUrl()` reads the REAL config `sShopURL` (the mocked `getShopUrl` is ignored on this path). Git worktrees get a deterministic non-default port (e.g. `localhost:9440`), so the full unit suite shows this ONE test red with `Expected localhost:8080 / Actual localhost:9440`. It passes on the main repo (port 8080) and in CI. Don't chase it when running `./docker.sh test` from a `.claude/worktrees/*` checkout.
+
 ## php-cs-fixer Cache
 - `.php-cs-fixer.cache` is gitignored but speeds up repeated runs significantly. If fixer seems to miss files, delete the cache and re-run.
 
