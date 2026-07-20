@@ -1,10 +1,19 @@
 name: Code Quality
 
 on:
+  # Full validation runs on PRs (into any base) and on pushes to the
+  # integration branches. Feature-branch pushes no longer trigger a run on
+  # their own — the PR covers them — which also stops the double run (push +
+  # pull_request) for same-repo PRs.
   push:
-    branches: ['**']
+    branches: [b-1.7, b-1.6]
   pull_request:
-    branches: ['**']
+
+# A new commit on the same ref cancels the superseded, still-running job —
+# important for the slow native e2e job.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -360,8 +369,19 @@ jobs:
           composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
 
       - name: 🧩 Clone satellites (testing-library, demodata) + symlinks
+        env:
+          # PR base branch (pull_request) or pushed branch (push). testing-library
+          # tracks its own release lines and currently has none past b-1.6, so we
+          # probe for a matching branch and fall back to b-1.6 when it has none —
+          # this auto-tracks the shop's release line once testing-library advances.
+          TARGET_REF: ${{ github.base_ref || github.ref_name }}
         run: |
-          git clone --branch b-1.6 --depth 1 https://github.com/o3-shop/testing-library.git testing-library
+          TL_BRANCH="b-1.6"
+          if git ls-remote --exit-code --heads https://github.com/o3-shop/testing-library.git "$TARGET_REF" >/dev/null 2>&1; then
+            TL_BRANCH="$TARGET_REF"
+          fi
+          echo "Cloning testing-library branch '$TL_BRANCH'."
+          git clone --branch "$TL_BRANCH" --depth 1 https://github.com/o3-shop/testing-library.git testing-library
           rm -rf vendor/o3-shop/testing-library
           ln -s ../../testing-library vendor/o3-shop/testing-library
           [ -e testing-library/vendor ] || ln -s ../vendor testing-library/vendor
