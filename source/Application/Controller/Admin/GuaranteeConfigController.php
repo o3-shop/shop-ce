@@ -71,7 +71,7 @@ class GuaranteeConfigController extends AdminDetailsController
         $request = Registry::getRequest();
         $config = Registry::getConfig();
         foreach (self::FIELDS_BOOL as $key) {
-            $value = (bool) $request->getRequestParameter($key, 0);
+            $value = (bool) $request->getRequestEscapedParameter($key, 0);
             $config->saveShopConfVar('bool', $key, $value ? '1' : '');
         }
     }
