@@ -34,12 +34,13 @@ REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
 FIXTURE="$HERE/fixtures/oxid-6.4.3-ce-demodata.sql.gz"
 DBNAME=o3migrate
 RUN_ID="o3mig-$$"
-NET="${RUN_ID}-net"; DBC="${RUN_ID}-db"; PHPC="${RUN_ID}-php"
+NET="${RUN_ID}-net"; DBC="${RUN_ID}-db"; PHPC="${RUN_ID}-php"; SIDECAR="${RUN_ID}-decode"
 
 step() { printf '\n==== %s ====\n' "$*"; }
 cleanup() {
     [ "${KEEP:-0}" = "1" ] && { echo "KEEP=1 -> leaving $DBC / $PHPC up"; return; }
-    docker rm -f "$DBC" "$PHPC" >/dev/null 2>&1 || true
+    # SIDECAR is only created for MySQL 8 targets; rm -f is a no-op otherwise.
+    docker rm -f "$DBC" "$PHPC" "$SIDECAR" >/dev/null 2>&1 || true
     docker network rm "$NET" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
@@ -71,7 +72,6 @@ case "$DB_IMAGE" in
         # throwaway MariaDB sidecar (which still has DECODE()), then load the
         # decoded result into MySQL 8. The o3-shop decode migrations then
         # skipIf(MySQL80) harmlessly — the data is already plaintext.
-        SIDECAR="${RUN_ID}-decode"
         echo "MySQL 8 target -> decoding via MariaDB sidecar ($SIDECAR)"
         docker run -d --name "$SIDECAR" --network "$NET" \
             -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE="$DBNAME" \
