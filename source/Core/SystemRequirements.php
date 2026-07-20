@@ -615,7 +615,9 @@ class SystemRequirements
      * The flag is read from the DB-less ConfigFile (config.inc.php), never the DB-backed
      * Config: this probe runs during the Setup System Requirements step, before a database
      * is configured, so touching Config::getConfigParam() there would trigger a DB load and
-     * break the requirements page on a fresh install. This mirrors checkServerPermissions().
+     * break the requirements page on a fresh install. Same DB-less rationale as
+     * checkServerPermissions() (which reads config.inc.php via ConfigFile too); here we use
+     * the ConfigFile instance bootstrap.php already registered in the Registry.
      *
      * @param array $aHostInfo host info (host, port, dir, ssl)
      *
