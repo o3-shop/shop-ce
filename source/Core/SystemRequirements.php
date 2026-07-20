@@ -612,6 +612,11 @@ class SystemRequirements
      * verification is relaxed so the loopback probe can complete against a self-signed
      * certificate. In every other case certificate verification stays on.
      *
+     * The flag is read from the DB-less ConfigFile (config.inc.php), never the DB-backed
+     * Config: this probe runs during the Setup System Requirements step, before a database
+     * is configured, so touching Config::getConfigParam() there would trigger a DB load and
+     * break the requirements page on a fresh install. This mirrors checkServerPermissions().
+     *
      * @param array $aHostInfo host info (host, port, dir, ssl)
      *
      * @return resource stream context
@@ -620,7 +625,8 @@ class SystemRequirements
     protected function _buildModRewriteStreamContext($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
         $aOptions = [];
-        $blAllowSelfSigned = (bool) $this->getConfig()->getConfigParam('blAllowSelfSignedCertificates');
+        $blAllowSelfSigned = (bool) \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->getVar('blAllowSelfSignedCertificates');
         if (!empty($aHostInfo['ssl']) && $blAllowSelfSigned) {
             $aOptions['ssl'] = [
                 'verify_peer'       => false,

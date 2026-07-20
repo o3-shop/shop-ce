@@ -38,7 +38,8 @@ class SystemRequirementsTest extends \OxidTestCase
 
     public function testBuildModRewriteStreamContextKeepsVerificationForSslWhenFlagOff()
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig()->setConfigParam('blAllowSelfSignedCertificates', false);
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', false);
         $systemRequirements = new SystemRequirements();
 
         $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => true]);
@@ -49,7 +50,8 @@ class SystemRequirementsTest extends \OxidTestCase
 
     public function testBuildModRewriteStreamContextRelaxesVerificationForSslWhenFlagOn()
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig()->setConfigParam('blAllowSelfSignedCertificates', true);
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', true);
         $systemRequirements = new SystemRequirements();
 
         $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => true]);
@@ -62,7 +64,8 @@ class SystemRequirementsTest extends \OxidTestCase
 
     public function testBuildModRewriteStreamContextKeepsVerificationForNonSslWhenFlagOn()
     {
-        \OxidEsales\Eshop\Core\Registry::getConfig()->setConfigParam('blAllowSelfSignedCertificates', true);
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', true);
         $systemRequirements = new SystemRequirements();
 
         $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => false]);
