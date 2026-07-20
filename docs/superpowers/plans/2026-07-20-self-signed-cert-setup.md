@@ -222,6 +222,7 @@ Refs o3-shop/shop-ce#27"
 - Modify: `docker/Dockerfile:79-83` (after the `a2enmod rewrite` / DocumentRoot block)
 - Modify: `docker/entrypoint.sh` (`start_apache`, after `a2enmod rewrite`)
 - Modify: `docker/docker-compose.yml:33-34` (shop `ports`)
+- Modify: `docker.sh` (port-block + `docker/.env` generation + info table) — **added during execution**: `docker.sh` computes per-worktree ports and writes `docker/.env`, but had no `O3SHOP_PORT_HTTPS`. Without this, every worktree's compose falls back to the hardcoded `8443` and concurrent worktrees collide on it. Assign `O3SHOP_PORT_HTTPS=$((O3SHOP_PORT_HTTP + 4))` for worktrees / `8443` for the main checkout, emit it into `docker/.env`, and show it in the info table.
 
 - [ ] **Step 1: Enable mod_ssl, generate cert, configure SSL vhost in the Dockerfile**
 
