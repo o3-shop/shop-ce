@@ -47,6 +47,8 @@ $this->dbUnixSocket = null;                         // unix domain socket, optio
 $this->sShopURL     = $_ENV['O3SHOP_CONF_SHOPURL']; // Shop base url, required
 $this->sSSLShopURL  = $_ENV['O3SHOP_CONF_SSLSHOPURL'];  // Shop SSL url, optional
 $this->sAdminSSLURL = $_ENV['O3SHOP_CONF_ADMINSSLURL']; // Shop Admin SSL url, optional
+// Development only: accept self-signed SSL certificates for the setup mod_rewrite self-probe. Default off; never enable in production.
+$this->blAllowSelfSignedCertificates = filter_var($_ENV['O3SHOP_CONF_ALLOWSELFSIGNEDCERTIFICATES'] ?? false, FILTER_VALIDATE_BOOLEAN);
 $this->sShopDir     = $_ENV['O3SHOP_CONF_SHOPDIR'];
 $this->sCompileDir  = $_ENV['O3SHOP_CONF_COMPILEDIR'];
 $this->sLogDir = $_ENV['O3SHOP_CONF_LOG_DIR'];
