@@ -11,17 +11,16 @@
 #   DB_IMAGE        DB service image           (default: mariadb:10.11)
 #   PHP_VERSION     PHP version for o3-shop     (default: 8.2)
 #   TARGET_VERSION  COMPOSER_ROOT_VERSION used to resolve the o3-shop dev graph
-#                   (default: 1.7.x-dev)
+#                   (default: dev-b-1.7)
 #   KEEP=1          leave containers running afterwards (debugging)
 #
 # TARGET_VERSION note: the intent (#206) is to migrate to the *development* line
-# so regressions surface. The literal branch labels `dev-main` / `dev-b-1.7` do
-# NOT resolve: o3-shop/shop-ce is the root package, and o3-shop/shop-composer-plugin
-# requires shop-ce `^1.2.0 || dev-*`; a branch-style root self-version doesn't
-# satisfy it and there is no `dev-b-1.7` branch-alias in composer.json. A NUMERIC
-# dev version (`1.7.x-dev`) satisfies `^1.2.0` and represents the b-1.7 dev line,
-# so that is the default. (Fix to make `dev-b-1.7` work too: add
-# `"branch-alias": { "dev-b-1.7": "1.7-dev" }` to composer.json.)
+# so regressions surface, hence a dev version (not a stable tag). `dev-b-1.7` is
+# the b-1.7 dev line and resolves via the `branch-alias` in composer.json
+# ("dev-b-1.7": "1.7-dev"), which makes the shop-ce root satisfy
+# o3-shop/shop-composer-plugin's `^1.2.0` constraint. `1.7.x-dev` is an equivalent
+# numeric form. `dev-main` does NOT resolve — shop-ce has no `main` branch (its
+# development line is b-1.7), so there is deliberately no alias for it.
 #
 set -euo pipefail
 
@@ -30,7 +29,7 @@ REPO_ROOT="$(cd "$HERE/../../.." && pwd)"
 
 : "${DB_IMAGE:=mariadb:10.11}"
 : "${PHP_VERSION:=8.2}"
-: "${TARGET_VERSION:=1.7.x-dev}"
+: "${TARGET_VERSION:=dev-b-1.7}"
 
 FIXTURE="$HERE/fixtures/oxid-6.4.3-ce-demodata.sql.gz"
 DBNAME=o3migrate
