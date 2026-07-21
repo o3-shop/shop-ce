@@ -15,7 +15,7 @@
                     </button>
                 [{/block}]
                 [{block name="header_search_field"}]
-                    <input class="form-control" type="text" id="searchParam" name="searchparam" value="[{$oView->getSearchParamForHtml()}]" placeholder="[{oxmultilang ident="SEARCH"}]" autocomplete="off">
+                    <input class="form-control" type="text" id="searchParam" name="searchparam" value="[{$oView->getSearchParamForHtml()}]" placeholder="[{oxmultilang ident="SEARCH"}]" autocomplete="off" data-suggest-url="[{$oViewConf->getSelfLink()}]">
                 [{/block}]
 
                 [{block name="dd_header_search_button"}]
