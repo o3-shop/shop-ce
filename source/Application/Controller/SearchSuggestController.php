@@ -9,7 +9,7 @@ use OxidEsales\Eshop\Core\Registry;
 
 class SearchSuggestController extends FrontendController
 {
-    protected $_sThisTemplate = 'searchsuggest.tpl';
+    protected $_sThisTemplate = 'widget/header/searchsuggest.tpl';
 
     public const MAX_SUGGESTIONS = 8;
 
