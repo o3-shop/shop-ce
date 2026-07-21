@@ -57,6 +57,6 @@ class ContainerAwareProjectYamlDao extends ProjectYamlDao
     public function saveProjectConfigFile(DIConfigWrapper $config)
     {
         parent::saveProjectConfigFile($config);
-        $this->eventDispatcher->dispatch(ProjectYamlChangedEvent::NAME, new ProjectYamlChangedEvent());
+        $this->eventDispatcher->dispatch(new ProjectYamlChangedEvent(), ProjectYamlChangedEvent::NAME);
     }
 }

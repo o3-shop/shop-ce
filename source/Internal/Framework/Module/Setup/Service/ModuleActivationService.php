@@ -116,8 +116,8 @@ class ModuleActivationService implements ModuleActivationServiceInterface
         $this->classExtensionChainService->updateChain($shopId);
 
         $this->eventDispatcher->dispatch(
-            FinalizingModuleActivationEvent::NAME,
-            new FinalizingModuleActivationEvent($shopId, $moduleId)
+            new FinalizingModuleActivationEvent($shopId, $moduleId),
+            FinalizingModuleActivationEvent::NAME
         );
     }
 
@@ -135,8 +135,8 @@ class ModuleActivationService implements ModuleActivationServiceInterface
         }
 
         $this->eventDispatcher->dispatch(
-            BeforeModuleDeactivationEvent::NAME,
-            new BeforeModuleDeactivationEvent($shopId, $moduleId)
+            new BeforeModuleDeactivationEvent($shopId, $moduleId),
+            BeforeModuleDeactivationEvent::NAME
         );
 
         $moduleConfiguration = $this->moduleConfigurationDao->get($moduleId, $shopId);
@@ -153,8 +153,8 @@ class ModuleActivationService implements ModuleActivationServiceInterface
         $this->classExtensionChainService->updateChain($shopId);
 
         $this->eventDispatcher->dispatch(
-            FinalizingModuleDeactivationEvent::NAME,
-            new FinalizingModuleDeactivationEvent($shopId, $moduleId)
+            new FinalizingModuleDeactivationEvent($shopId, $moduleId),
+            FinalizingModuleDeactivationEvent::NAME
         );
     }
 }

@@ -137,8 +137,8 @@ class ModuleServicesActivationServiceTest extends TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                ServicesYamlConfigurationErrorEvent::NAME,
-                $this->isInstanceOf(ServicesYamlConfigurationErrorEvent::class)
+                $this->isInstanceOf(ServicesYamlConfigurationErrorEvent::class),
+                ServicesYamlConfigurationErrorEvent::NAME
             );
 
         $dao = $this->createMock(ProjectYamlDaoInterface::class);
