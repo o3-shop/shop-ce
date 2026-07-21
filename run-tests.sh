@@ -182,6 +182,15 @@ else
     GROUP_FLAGS="--exclude-group quarantine"
 fi
 
+# The image ships xdebug in coverage mode; it is ONLY needed for --coverage. For
+# every other run turn it OFF via XDEBUG_MODE (xdebug's env override, inherited by
+# the ParaTest worker subprocesses): coverage-mode xdebug is a known source of PHP
+# segfaults under the parallel workers (WorkerCrashedException, exit 139) and it
+# slows execution substantially. Disabling it removes the crashes and speeds runs.
+if [ "$COVERAGE_MODE" != true ]; then
+    export XDEBUG_MODE=off
+fi
+
 # Build config flag for --all-failures mode. The default tests/phpunit.xml has
 # stopOnError/stopOnFailure="true" (fast CI feedback); we generate a sibling
 # config with those flipped off so the suite runs to completion. The temp

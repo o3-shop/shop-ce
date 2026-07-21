@@ -218,4 +218,21 @@ NOTE the DatabaseRestorer EXCLUDES views (`getDbTables()` unsets `oxv_*`) and ca
 recreate dropped tables/views — so view/table drops by a test are not auto-repaired;
 the leaked-abbreviation reset (7) avoids the need to touch views for the known case.
 
+8. **Serial split for the plain gate + the ParaTest --exclude-group gotcha.**
+   `run-tests.sh` non-coverage parallel path now mirrors coverage: run everything
+   except `@group parallel-unsafe` in parallel, then that group once serially (those
+   ~6 tests are inherently order-coupled AND pollute shared state for other workers).
+   CRITICAL GOTCHA: **ParaTest honours only the LAST `--exclude-group`.** Passing two
+   (`--exclude-group quarantine --exclude-group parallel-unsafe`) silently DROPS the
+   quarantine exclusion, so `@group quarantine` tests (e.g.
+   `LangIntegrityTest::testNotUsedTranslations`, which scans o3-theme templates and
+   is a known-flaky data test) run in parallel and fail ~every run. Fix: ONE
+   comma-separated flag: `--exclude-group quarantine,parallel-unsafe` (applied to
+   both the plain and coverage parallel paths). PHPUnit (the serial phase) accumulates
+   multiple group flags fine — this only bit ParaTest.
+
 STATUS: proving ≥20 consecutive green `-p4` runs (real gate config). Then attempt `-p6`.
+The rare view-naming cascade (`oxv_oxshops_0`: leaked language config makes
+`getLanguageAbbr(0)` return '0' not 'de') was likely driven by a quarantine polluter
+that shouldn't have been running — expected to vanish with the quarantine fix; the
+proof confirms.
