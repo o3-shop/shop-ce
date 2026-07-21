@@ -40,6 +40,7 @@ ALL_FAILURES_MODE=false
 PARALLEL_MODE=false
 SEQUENTIAL_EXPLICIT=false
 PROCESSES=""
+PARATEST_RUNNER="WrapperRunner"
 PASSTHROUGH_ARGS=()
 
 # Parse arguments
@@ -270,7 +271,7 @@ provision_and_run_parallel() {
     if [ "$COVERAGE_MODE" != true ]; then
         vendor/bin/paratest \
             -p "$PROCESSES" \
-            --runner WrapperRunner \
+            --runner "$PARATEST_RUNNER" \
             --bootstrap /var/www/html/tests/paratest_bootstrap.php \
             $config_arg \
             $GROUP_FLAGS \

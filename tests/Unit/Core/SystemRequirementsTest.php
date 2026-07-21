@@ -120,6 +120,19 @@ class SystemRequirementsTest extends \OxidTestCase
      */
     public function testCheckServerPermissions()
     {
+        // Check an isolated, writable shop-base tree rather than the live shop.
+        // checkServerPermissions() inspects "$sPath/../var/" AND globs its
+        // subfolders; the real var/ is shared across parallel workers (it holds
+        // every worker's var/configuration_N[-backup]), so another worker
+        // creating/removing one of those dirs mid-check would intermittently flip
+        // the result to 0. An isolated base makes the check deterministic.
+        $root = sys_get_temp_dir() . '/srq_' . uniqid();
+        $base = $root . '/source/';
+        mkdir($base, 0777, true);
+        mkdir($root . '/var', 0777, true);
+        file_put_contents($base . 'config.inc.php', '<?php');
+        chmod($base . 'config.inc.php', 0666);
+
         $systemRequirementsMock = $this
             ->getMockBuilder(SystemRequirements::class)
             ->setMethods(['isAdmin'])
@@ -127,7 +140,11 @@ class SystemRequirementsTest extends \OxidTestCase
 
         $systemRequirementsMock->method('isAdmin')->willReturn(false);
 
-        $this->assertEquals(2, $systemRequirementsMock->checkServerPermissions());
+        try {
+            $this->assertEquals(2, $systemRequirementsMock->checkServerPermissions($base));
+        } finally {
+            (new \Symfony\Component\Filesystem\Filesystem())->remove($root);
+        }
     }
 
     public function testCheckServerPermissionsReturnsSetupBlockedStatusIfDirectoriesDoNotExist()

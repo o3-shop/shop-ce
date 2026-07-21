@@ -179,4 +179,19 @@ it for enumeration; loop the WrapperRunner suite instead.
 
 STATUS: full parallel run went from "crashes at 19%, cannot complete" to "9795
 tests complete in ~54-62s". Enumerating the remaining tail by looping WrapperRunner
-(-p6/-p4) to collect every unique straggler, then fixing + proving ≥20 green runs.
+to collect every unique straggler, then fixing + proving ≥20 green runs.
+
+4. **The intermittent "cascade" is `-p6` OVERSUBSCRIPTION, not a test bug.** The
+   container has 6 cores. Running `-p6` = 6 PHP workers + MariaDB + system all
+   fighting for 6 cores → a worker gets starved, hangs, and paratest kills it
+   (WorkerCrashedException, exit 255, run balloons to 7–22 min). Observed only at
+   `-p6` (≈2 of 9 `-p6` runs); NEVER at `-p4` (0 of several). The crash names
+   whichever file the killed worker held (e.g. OnlineVatIdCheckTest) — that's
+   COLLATERAL, not the cause (that test fully mocks its SoapClient; no network).
+   FIX: use the documented default `-p4` (min(4, cpu-2)) which leaves 2 cores of
+   headroom. `-p4` full suite ≈ 52s — still well inside the 40–55s goal. Do NOT
+   force `-p6` on a 6-core box.
+
+Remaining order-coupling stragglers to root-fix (victims of leaked state, cheap):
+`SystemRequirementsTest::testCheckServerPermissions` (leaked sShopDir / config.inc.php
+perms) + whatever a `-p4` loop surfaces. Then prove ≥20 consecutive green `-p4` runs.
