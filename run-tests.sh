@@ -274,13 +274,23 @@ provision_and_run_parallel() {
         # run in parallel, both fail themselves and pollute shared state for
         # other workers. So — exactly like the coverage path — run everything
         # else in parallel, then run just that group once, serially.
+        #
+        # NOTE: ParaTest honours only the LAST --exclude-group, so the quarantine
+        # and parallel-unsafe exclusions MUST be a single comma-separated flag —
+        # two separate --exclude-group flags would silently drop the first
+        # (quarantine tests would then run in parallel and fail).
+        local par_exclude_flags="--exclude-group parallel-unsafe"
+        if [ "$QUARANTINE_MODE" != true ]; then
+            par_exclude_flags="--exclude-group quarantine,parallel-unsafe"
+        else
+            par_exclude_flags="$GROUP_FLAGS --exclude-group parallel-unsafe"
+        fi
         vendor/bin/paratest \
             -p "$PROCESSES" \
             --runner "$PARATEST_RUNNER" \
             --bootstrap /var/www/html/tests/paratest_bootstrap.php \
             $config_arg \
-            $GROUP_FLAGS \
-            --exclude-group parallel-unsafe \
+            $par_exclude_flags \
             --path "$paratest_path"
         local par_ec=$?
 
@@ -327,13 +337,20 @@ provision_and_run_parallel() {
     local cov_config_flag="-c $cov_config"
 
     echo -e "${YELLOW}[coverage 1/3] Parallel run (--exclude-group parallel-unsafe)...${NC}"
+    # ParaTest honours only the LAST --exclude-group; combine with quarantine
+    # into one flag so the quarantine exclusion isn't silently dropped.
+    local cov_exclude_flags="--exclude-group parallel-unsafe"
+    if [ "$QUARANTINE_MODE" != true ]; then
+        cov_exclude_flags="--exclude-group quarantine,parallel-unsafe"
+    else
+        cov_exclude_flags="$GROUP_FLAGS --exclude-group parallel-unsafe"
+    fi
     vendor/bin/paratest \
         -p "$PROCESSES" \
         --runner WrapperRunner \
         --bootstrap /var/www/html/tests/paratest_bootstrap.php \
         $cov_config_flag \
-        $GROUP_FLAGS \
-        --exclude-group parallel-unsafe \
+        $cov_exclude_flags \
         --coverage-php "$cov_dir/_parallel.cov" \
         --log-junit "$cov_dir/_junit_parallel.xml" \
         --path "$paratest_path"
