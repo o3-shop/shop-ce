@@ -156,9 +156,19 @@ class SeoEncoderCategoryTest extends \OxidTestCase
 
     /**
      * Test case: encoding url for categody named admin
+     *
+     * @group parallel-unsafe
      */
     public function testAncodingCategoryNamedAdmin()
     {
+        // The reserved-word collision suffix ("Admin-<prefix>/") is built from
+        // SeoEncoder::$_sPrefix, a STATIC that survives tearDown/DB restore. On a
+        // clean shop it defaults to 'o3'; this assertion expects 'oxid', which is
+        // only true when an earlier test (Core/SeoEncoderTest) has leaked
+        // setPrefix('oxid') into the static. Set it explicitly so the test is
+        // deterministic regardless of execution order (needed for parallel runs).
+        \OxidEsales\Eshop\Core\Registry::getSeoEncoder()->setPrefix('oxid');
+
         oxTestModules::addFunction('oxUtilsServer', 'getServerVar', "{ \$aArgs = func_get_args(); if ( \$aArgs[0] === 'HTTP_HOST' ) { return '" . $this->getConfig()->getShopUrl() . "'; } elseif ( \$aArgs[0] === 'SCRIPT_NAME' ) { return ''; } else { return \$_SERVER[\$aArgs[0]]; } }");
 
         $oCategory = oxNew('oxCategory');

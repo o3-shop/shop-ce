@@ -303,7 +303,10 @@ run_full_test_with_coverage() {
   echo "---------------------------"
   echo "Now running tests with coverage:"
   echo "---------------------------"
-  run_tests --coverage
+  # Coverage runs in parallel by default (parallel suite + serial parallel-unsafe
+  # tests, merged into one report). Extra args (e.g. --sequential, -p N) are
+  # forwarded to the runner.
+  run_tests --coverage "$@"
   TEST_EXIT_CODE=$?
   if [ $TEST_EXIT_CODE -ne 0 ]; then
     return $TEST_EXIT_CODE
@@ -396,7 +399,8 @@ case "$1" in
         run_full_test_with_cs_fixer || exit 127
         ;;
     test-all-coverage)
-        run_full_test_with_coverage || exit 127
+        shift
+        run_full_test_with_coverage "$@" || exit 127
         ;;
     quarantine)
         run_quarantine_tests || exit 127
@@ -430,12 +434,20 @@ case "$1" in
         echo "  test         Run unit tests (pass extra args to phpunit)"
         echo "  test-all     Run php-cs-fixer, then full test suite"
         echo "  test-all-coverage  Run php-cs-fixer, then full test suite with coverage report"
+        echo "                     (parallel + merged by default; --sequential to force one process)"
         echo "  cs-fixer     Run php-cs-fixer on the entire codebase"
         echo "  xdebug       Toggle step debugging: $0 xdebug <on|off|status>"
         echo "  quarantine   Run slow/special @group quarantine tests only"
         echo "  playwright   Run the Playwright browser test suite (auto-installs deps on first run)"
         echo ""
         echo "Options for 'test':"
+        echo "  --parallel       Run the suite in parallel with ParaTest. Each"
+        echo "                   worker gets its own isolated database, compile"
+        echo "                   dir and project-config dir. Opt-in (default is"
+        echo "                   sequential). Combine with -p N to set worker"
+        echo "                   count (default min(4, cpu-2))."
+        echo "  --sequential     Force the sequential runner (this is the default)."
+        echo "  -p N             ParaTest worker count (only with --parallel)."
         echo "  --fast           Skip shop install, call phpunit directly"
         echo "  --coverage       Generate coverage reports (clover, html, junit)"
         echo "  --all-failures   Don't stop at the first failure — run the full"
@@ -446,6 +458,8 @@ case "$1" in
         echo "Examples:"
         echo "  $0 start"
         echo "  $0 test --fast tests/Unit/Core/ConfigTest.php"
+        echo "  $0 test --parallel"
+        echo "  $0 test --parallel -p 4 tests/Unit/Core"
         echo "  $0 test --all-failures"
         echo "  $0 test-all"
         echo "  $0 quarantine"

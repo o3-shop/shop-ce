@@ -163,6 +163,9 @@ class RssfeedTest extends \OxidTestCase
         $this->assertEquals('asdid', $res[0]);
     }
 
+    /**
+     * @group parallel-unsafe
+     */
     public function testGetArticleItems()
     {
         oxTestModules::addFunction('oxutilsurl', 'prepareUrlForNoSession', '{return $aA[0]."extra";}');

@@ -138,6 +138,18 @@ class BasicContext implements BasicContextInterface
      */
     public function getConfigurationDirectoryPath(): string
     {
+        // Test-only override: ParaTest runs the suite in parallel worker
+        // processes that would otherwise race on the single, shop-root-relative
+        // var/configuration directory. When this environment variable is set
+        // (exclusively by the test runner, one distinct path per worker), the
+        // project configuration is read from and written to that isolated
+        // directory instead. It is never set in production, so shop behaviour is
+        // unchanged there.
+        $testConfigurationDir = getenv('O3SHOP_TEST_CONFIGURATION_DIR');
+        if ($testConfigurationDir !== false && $testConfigurationDir !== '') {
+            return rtrim($testConfigurationDir, '/') . '/';
+        }
+
         return $this->getShopRootPath() . '/var/configuration/';
     }
 

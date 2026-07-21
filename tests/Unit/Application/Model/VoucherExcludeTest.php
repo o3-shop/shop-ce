@@ -26,6 +26,8 @@ use OxidEsales\EshopCommunity\Core\ShopIdCalculator;
 
 /**
  * Testing oxVoucher class
+ *
+ * @group parallel-unsafe
  */
 class VoucherExcludeTest extends \OxidTestCase
 {

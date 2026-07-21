@@ -34,6 +34,9 @@ if (file_exists($filePath)) {
     require_once dirname(__FILE__) . '/../../../../source/Core/Smarty/Plugin/function.oxprice.php';
 }
 
+/**
+ * @group parallel-unsafe
+ */
 class PluginSmartyOxPriceTest extends \OxidTestCase
 {
     /**

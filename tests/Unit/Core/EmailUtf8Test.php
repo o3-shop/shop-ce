@@ -24,6 +24,9 @@ namespace OxidEsales\EshopCommunity\Tests\Unit\Core;
 use oxField;
 use oxStr;
 
+/**
+ * @group parallel-unsafe
+ */
 class EmailUtf8Test extends \OxidTestCase
 {
     /**

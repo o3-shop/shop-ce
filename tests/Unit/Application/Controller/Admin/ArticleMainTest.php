@@ -106,6 +106,8 @@ class ArticleMainTest extends \OxidTestCase
      * Copying attributes assignments
      *
      * @return null
+     *
+     * @group parallel-unsafe
      */
     public function testCopyCategories()
     {
