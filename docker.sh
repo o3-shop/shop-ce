@@ -112,6 +112,7 @@ start_containers() {
 +----------------+------------------------------------------+
 | Shop URL       | http://localhost:${O3SHOP_PORT_HTTP}      |
 | Admin URL      | http://localhost:${O3SHOP_PORT_HTTP}/admin/ |
+| Shop URL (SSL) | https://localhost:${O3SHOP_PORT_HTTPS} (self-signed) |
 | Admin Login    | admin@example.com                        |
 | Admin Password | admin123                                 |
 +----------------+------------------------------------------+
@@ -381,12 +382,14 @@ if $IS_WORKTREE; then
     O3SHOP_PORT_ADMINER=$(( O3SHOP_PORT_HTTP + 1 ))
     O3SHOP_PORT_MAILPIT=$(( O3SHOP_PORT_HTTP + 2 ))
     O3SHOP_PORT_SMTP=$(( O3SHOP_PORT_HTTP + 3 ))
+    O3SHOP_PORT_HTTPS=$(( O3SHOP_PORT_HTTP + 4 ))
     O3SHOP_CONF_DBNAME="o3shop_${O3SHOP_PORT_HTTP}"
 else
     O3SHOP_PORT_HTTP=8080
     O3SHOP_PORT_ADMINER=8081
     O3SHOP_PORT_MAILPIT=8025
     O3SHOP_PORT_SMTP=1025
+    O3SHOP_PORT_HTTPS=8443
 fi
 
 # Bootstrap .env if missing
@@ -415,6 +418,7 @@ fi
         grep "^O3SHOP_CONF_DBNAME=" "$MY_DIR/.env.example"
     fi
     echo "O3SHOP_PORT_HTTP=${O3SHOP_PORT_HTTP}"
+    echo "O3SHOP_PORT_HTTPS=${O3SHOP_PORT_HTTPS}"
     echo "O3SHOP_PORT_ADMINER=${O3SHOP_PORT_ADMINER}"
     echo "O3SHOP_PORT_MAILPIT=${O3SHOP_PORT_MAILPIT}"
     echo "O3SHOP_PORT_SMTP=${O3SHOP_PORT_SMTP}"
