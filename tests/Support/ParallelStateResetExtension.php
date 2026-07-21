@@ -23,6 +23,7 @@ namespace OxidEsales\EshopCommunity\Tests\Support;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Core\Config;
+use OxidEsales\EshopCommunity\Core\Language;
 use OxidEsales\EshopCommunity\Core\Utils;
 use OxidEsales\EshopCommunity\Core\UtilsView;
 use PHPUnit\Runner\BeforeTestHook;
@@ -61,6 +62,7 @@ final class ParallelStateResetExtension implements BeforeTestHook
         try {
             $this->resetActiveCurrency();
             $this->resetCurrencyPrecision();
+            $this->resetLanguageAbbreviations();
             $this->resetSmarty();
         } catch (\Throwable $e) {
             // Best effort — never let the reset itself break a test run.
@@ -104,6 +106,21 @@ final class ParallelStateResetExtension implements BeforeTestHook
     private function resetCurrencyPrecision(): void
     {
         $this->nullProperty(Registry::getUtils(), Utils::class, '_iCurPrecision');
+    }
+
+    /**
+     * Language caches the id=>abbreviation map in the per-instance $_aLangAbbr the
+     * first time getLanguageAbbr() runs. If a leaked/empty map is left behind,
+     * getLanguageAbbr(0) returns the numeric id '0' instead of 'de', so
+     * TableViewNameGenerator::getViewName() builds names like 'oxv_oxshops_0'
+     * that don't exist (the real views are 'oxv_oxshops' / 'oxv_oxshops_de') —
+     * producing whole-class "view doesn't exist" cascades (ArticleMainTest,
+     * VendorTest). Nulling the cache forces a fresh, correct lookup from the
+     * current language config on the next call.
+     */
+    private function resetLanguageAbbreviations(): void
+    {
+        $this->nullProperty(Registry::getLang(), Language::class, '_aLangAbbr');
     }
 
     /**

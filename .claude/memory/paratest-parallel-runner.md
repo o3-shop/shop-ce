@@ -192,6 +192,30 @@ to collect every unique straggler, then fixing + proving ≥20 green runs.
    headroom. `-p4` full suite ≈ 52s — still well inside the 40–55s goal. Do NOT
    force `-p6` on a 6-core box.
 
-Remaining order-coupling stragglers to root-fix (victims of leaked state, cheap):
-`SystemRequirementsTest::testCheckServerPermissions` (leaked sShopDir / config.inc.php
-perms) + whatever a `-p4` loop surfaces. Then prove ≥20 consecutive green `-p4` runs.
+5. **Pristine DB restore baseline (per worker).** The testing-library captures its
+   DatabaseRestorer baseline lazily at the first UnitTestCase; a test running earlier
+   in a worker poisons it, so every per-class restore keeps the pollution
+   (nondeterministic "article 1126 not available" / missing-demo-row). Fixed: the
+   per-worker bootstrap dumps the baseline right after install (pristine), and a
+   runtime patch skips the later `backupDatabase()` (env `O3SHOP_BASELINE_CAPTURED`).
+
+6. **MariaDB was tuned for durability, not tests** → intermittent MULTI-MINUTE stalls
+   (a whole -p4/-p6 run 13× slower, or a worker hangs 7–22 min then crashes). Root:
+   `innodb_buffer_pool_size=128M` (too small for demo DB × N workers → disk thrash) +
+   `innodb_flush_log_at_trx_commit=1` (fsync every commit) under the restore-heavy
+   parallel load. Fix: `docker/docker-compose.yml` db service now runs with
+   `--innodb-buffer-pool-size=1G --innodb-flush-log-at-trx-commit=2`. Stalls gone,
+   timing steady ~74s. (Apply live without restart via `SET GLOBAL` of both.)
+
+7. **View-naming cascade (whole-class).** `Language::getLanguageAbbr($id)` returns the
+   numeric id (e.g. '0') instead of the abbreviation ('de') when the per-instance
+   `$_aLangAbbr` cache is leaked/empty, so `TableViewNameGenerator` builds view names
+   like `oxv_oxshops_0` that don't exist (real views are `oxv_oxshops` / `oxv_oxshops_de`)
+   → 50-failure ArticleMainTest+VendorTest cascade. Fixed: the parallel reset hook now
+   nulls `Language::$_aLangAbbr` before each test.
+
+NOTE the DatabaseRestorer EXCLUDES views (`getDbTables()` unsets `oxv_*`) and cannot
+recreate dropped tables/views — so view/table drops by a test are not auto-repaired;
+the leaked-abbreviation reset (7) avoids the need to touch views for the known case.
+
+STATUS: proving ≥20 consecutive green `-p4` runs (real gate config). Then attempt `-p6`.

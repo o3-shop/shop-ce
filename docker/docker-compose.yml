@@ -3,6 +3,16 @@ services:
     profiles: [db]
     image: mariadb:10.11
     restart: always
+    # Tuned for the test workload (the parallel suite hammers the DB with
+    # per-class TRUNCATE+reinsert restores across N worker databases): a larger
+    # InnoDB buffer pool holds the whole test dataset in RAM (no disk thrashing),
+    # and flush-log-at-trx-commit=2 drops the per-commit fsync. Together these
+    # remove the intermittent multi-minute stalls seen under load and keep run
+    # time consistent. Safe for a dev/test box (at most ~1s of committed data at
+    # risk on a host crash).
+    command:
+      - --innodb-buffer-pool-size=1073741824
+      - --innodb-flush-log-at-trx-commit=2
     environment:
       MYSQL_ROOT_PASSWORD: ${O3SHOP_CONF_DBROOT}
       MYSQL_DATABASE: ${O3SHOP_CONF_DBNAME}

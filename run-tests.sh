@@ -269,14 +269,33 @@ provision_and_run_parallel() {
     export O3SHOP_CONF_DBNAME="$base_db"
 
     if [ "$COVERAGE_MODE" != true ]; then
+        # A handful of tests are inherently order-coupled (tagged
+        # @group parallel-unsafe): they only pass in a stable serial order and,
+        # run in parallel, both fail themselves and pollute shared state for
+        # other workers. So — exactly like the coverage path — run everything
+        # else in parallel, then run just that group once, serially.
         vendor/bin/paratest \
             -p "$PROCESSES" \
             --runner "$PARATEST_RUNNER" \
             --bootstrap /var/www/html/tests/paratest_bootstrap.php \
             $config_arg \
             $GROUP_FLAGS \
+            --exclude-group parallel-unsafe \
             --path "$paratest_path"
-        return $?
+        local par_ec=$?
+
+        echo -e "${YELLOW}Running @group parallel-unsafe tests serially...${NC}"
+        O3SHOP_CONF_DBNAME="$base_db" php vendor/bin/phpunit \
+            --bootstrap /var/www/html/vendor/o3-shop/testing-library/bootstrap.php \
+            --colors=always \
+            $config_arg \
+            $GROUP_FLAGS \
+            --group parallel-unsafe \
+            $TEST_TARGETS
+        local ser_ec=$?
+
+        [ "$par_ec" -ne 0 ] && return "$par_ec"
+        return "$ser_ec"
     fi
 
     # --- Parallel + merged coverage ---------------------------------------
