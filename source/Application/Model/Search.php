@@ -417,7 +417,7 @@ class Search extends Base
                 'id'    => $oSuggestion->oxarticles__oxid->value,
                 'title' => $oSuggestion->oxarticles__oxtitle->value
                     . ($oSuggestion->oxarticles__oxvarselect->value ? ' ' . $oSuggestion->oxarticles__oxvarselect->value : ''),
-                'price' => number_format((float) $oSuggestion->oxarticles__oxprice->value, 2, '.', ''),
+                'price' => Registry::getLang()->formatCurrency((float) $oSuggestion->oxarticles__oxprice->value),
                 'icon'  => $oSuggestion->getIconUrl(),
                 'link'  => $oSuggestion->getLink(),
             ];
