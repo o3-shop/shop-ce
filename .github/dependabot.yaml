@@ -8,5 +8,6 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "cron 0 * * * *" # Runs at the start of every hour
     target-branch: "b-2.0-update-symmfony"   
+    
