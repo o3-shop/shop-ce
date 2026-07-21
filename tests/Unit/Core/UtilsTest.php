@@ -765,6 +765,50 @@ class UtilsTest extends \OxidTestCase
         $this->assertEquals(1, count($aPaths));
     }
 
+    /**
+     * oxResetFileCache() must never fall back to globbing the current working
+     * directory. When the compile dir cannot be resolved,
+     * getCacheFilePath(null, true) returns false and "false . '*'" collapsed
+     * to glob('*'), which @unlink-ed every top-level entry of the CWD. During
+     * test runs base.php chdir()s into the testing-library root, so this wiped
+     * base.php/composer.json/the vendor symlink and broke the whole suite.
+     * Guard: an unresolvable cache path must delete nothing.
+     */
+    public function testOxResetFileCacheDoesNotWipeCurrentWorkingDirectory()
+    {
+        $sSandbox = sys_get_temp_dir() . '/reset_cwd_guard_' . uniqid();
+        mkdir($sSandbox, 0777, true);
+        $sCanary = $sSandbox . '/canary.php';
+        file_put_contents($sCanary, '<?php // must survive');
+
+        $sOldCwd = getcwd();
+        $sOldCompileDir = $this->getConfig()->getConfigParam('sCompileDir');
+
+        // Both invalid states must make getCacheFilePath() return false and the
+        // reset a no-op: a non-existent dir (realpath -> false, the actual
+        // production trigger) and an empty dir (realpath('') -> CWD).
+        $aInvalidCompileDirs = ['/var/www/html/source/tmp/does_not_exist_' . uniqid(), ''];
+
+        $blSurvived = true;
+        foreach ($aInvalidCompileDirs as $sInvalid) {
+            $this->getConfig()->setConfigParam('sCompileDir', $sInvalid);
+            try {
+                chdir($sSandbox);
+                oxRegistry::getUtils()->oxResetFileCache();
+            } finally {
+                chdir($sOldCwd);
+            }
+            clearstatcache();
+            $blSurvived = $blSurvived && file_exists($sCanary);
+        }
+
+        $this->getConfig()->setConfigParam('sCompileDir', $sOldCompileDir);
+        @unlink($sCanary);
+        @rmdir($sSandbox);
+
+        $this->assertTrue($blSurvived, 'oxResetFileCache() wiped the current working directory');
+    }
+
     public function testResetTemplateCache()
     {
         $config = $this->getConfig();

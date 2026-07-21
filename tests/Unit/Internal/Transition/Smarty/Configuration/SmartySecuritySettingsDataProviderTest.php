@@ -29,6 +29,12 @@ class SmartySecuritySettingsDataProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSecuritySettings()
     {
+        // SMARTY_PHP_REMOVE is defined by the bundled Smarty (Smarty.class.php),
+        // which is loaded lazily. Make this test self-contained so it passes in
+        // any run order (isolation / parallel worker) instead of relying on a
+        // predecessor test having loaded Smarty first.
+        class_exists(\Smarty::class);
+
         $smartyContextMock = $this->getSmartyContextMock();
 
         $dataProvider = new SmartySecuritySettingsDataProvider($smartyContextMock);

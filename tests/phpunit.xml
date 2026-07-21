@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="true" backupStaticAttributes="false" bootstrap="bootstrap.php" colors="false" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" forceCoversAnnotation="false" processIsolation="false" stopOnError="true" stopOnFailure="true" stopOnIncomplete="false" stopOnSkipped="false" beStrictAboutTestsThatDoNotTestAnything="false" verbose="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <extensions>
+    <!-- Resets process-global statics (currency / SEO prefix / Smarty) before each
+         test so the parallel ParaTest run is reliable. No-op unless TEST_TOKEN is
+         set, i.e. it only affects ParaTest workers; sequential runs are unchanged. -->
+    <extension class="OxidEsales\EshopCommunity\Tests\Support\ParallelStateResetExtension"/>
+  </extensions>
   <coverage includeUncoveredFiles="true" processUncoveredFiles="true">
     <include>
       <directory suffix=".php">../source/Application</directory>

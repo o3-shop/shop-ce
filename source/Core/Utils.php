@@ -632,6 +632,12 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     protected function _lockFile($sFilePath, $sIdent, $iLockMode = LOCK_EX) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
+        // No resolvable cache path (e.g. compile dir unset) -> nothing to lock.
+        // fopen('') throws a ValueError in PHP 8, so bail with the documented
+        // "false on error" return instead; callers treat it as a cache miss.
+        if (empty($sFilePath)) {
+            return false;
+        }
         $rHandle = isset($this->_aLockedFileHandles[$iLockMode][$sIdent]) ? $this->_aLockedFileHandles[$iLockMode][$sIdent] : null;
         if ($rHandle === null) {
             $blLocked = false;
@@ -706,7 +712,13 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function oxResetFileCache()
     {
-        $aFiles = glob($this->getCacheFilePath(null, true) . '*');
+        $sCachePath = $this->getCacheFilePath(null, true);
+        if ($sCachePath === false) {
+            // No resolvable cache dir -> nothing to reset. Never glob('*'),
+            // which would enumerate (and @unlink) the current working directory.
+            return;
+        }
+        $aFiles = glob($sCachePath . '*');
         if (is_array($aFiles)) {
             // delete all the files, except cached tables field names
             $aFiles = preg_grep($this->_sPermanentCachePattern, $aFiles, PREG_GREP_INVERT);
@@ -749,7 +761,11 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function resetLanguageCache()
     {
-        $aFiles = glob($this->getCacheFilePath(null, true) . '*');
+        $sCachePath = $this->getCacheFilePath(null, true);
+        if ($sCachePath === false) {
+            return;
+        }
+        $aFiles = glob($sCachePath . '*');
         if (is_array($aFiles)) {
             // delete all language cache files
             $sPattern = $this->_sLanguageCachePattern;
@@ -765,7 +781,11 @@ class Utils extends \OxidEsales\Eshop\Core\Base
      */
     public function resetMenuCache()
     {
-        $aFiles = glob($this->getCacheFilePath(null, true) . '*');
+        $sCachePath = $this->getCacheFilePath(null, true);
+        if ($sCachePath === false) {
+            return;
+        }
+        $aFiles = glob($sCachePath . '*');
         if (is_array($aFiles)) {
             // delete all menu cache files
             $sPattern = $this->_sMenuCachePattern;
@@ -1381,7 +1401,15 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     {
         $versionPrefix = $this->getEditionCacheFilePrefix();
 
-        $sPath = realpath($this->getConfig()->getConfigParam('sCompileDir'));
+        $sCompileDir = (string) $this->getConfig()->getConfigParam('sCompileDir');
+        // An empty compile dir makes realpath('') resolve to the current working
+        // directory. Treat it as "no cache path" so callers never read/write/glob
+        // the CWD by accident.
+        if ($sCompileDir === '') {
+            return false;
+        }
+
+        $sPath = realpath($sCompileDir);
 
         if (!$sPath) {
             return false;

@@ -99,7 +99,84 @@ Container has 6 cores. Default is min(4, cpu-2)=4; override with `-p N`. For
 xdebug coverage 4 is the safer default (each worker installs a shop + holds a full
 CodeCoverage object; 6 roughly doubles peak RAM for a modest wall-clock gain).
 
+## Central state reset (ParallelStateResetExtension)
+`tests/Support/ParallelStateResetExtension.php` (PHPUnit 9 BeforeTestHook, registered
+in `tests/phpunit.xml <extensions>`) resets process-global STATIC caches before each
+test — these survive DatabaseRestorer + UnitTestCase::tearDown and leak between test
+classes in a WrapperRunner worker:
+- `Config::$_oActCurrencyObject` (+ session 'currency'=0) — leaked non-default
+  currency changed rate/decimal/thousands separators (ArticleTest::testApplyCurrency
+  100 vs 91.9, SelectlistTest € vs CHF, the Smarty price/number-format tests).
+- `UtilsView::$_oSmarty` — a Smarty built without block-plugin dirs caused
+  EmailUtf8Test "unrecognized tag oxcontent".
+GUARDED to ParaTest workers (`getenv('TEST_TOKEN') !== false`) so sequential runs —
+the default and the coverage gate serial pass — are byte-for-byte unchanged.
+DO NOT also reset `SeoEncoder::$_sPrefix/$_sSeparator` centrally: nulling them
+mid-suite re-inits the encoder and corrupts in-flight SEO URLs (regressed
+ArticleTest::testGetLinkSeoEng). The one prefix victim fixes itself (setPrefix).
+
+### Measured effect (full `tests/Unit`, `--parallel -p6 --all-failures`, 2 runs)
+Before: ~1-6 nondeterministic stragglers/run (currency/smarty/SEO family).
+After: run 1 = **0 failures**, run 2 = **1 failure**, ~1m0-1m3s wall. The central
+reset cleared the entire currency/smarty family (0 occurrences in either run). The
+lone residual, `UtilsobjectTest::testOxNewClassExtendingWhenClassesDoesNotExists`, is
+a DIFFERENT category (oxNew module class-chain) that fails even in whole-class
+isolation — it needs a predecessor class from the full order — so tagging it
+parallel-unsafe would NOT make the serial group green. Left as a known residual
+(don't chase the long tail); a module-config/ModuleVariablesLocator reset would be
+the next lever but is high-risk (cf. the SeoEncoder regression).
+
 ## Plain `test --parallel` still opt-in
-Without the group split, full-suite `test --parallel` leaves a small NONDETERMINISTIC
-set of failures (the same coupled tests). Coverage handles them via the split above;
-plain parallel does not, so it stays opt-in.
+Even with the central reset, plain full-suite `test --parallel` can leave the one
+residual straggler above (nondeterministic), so it stays opt-in. Coverage stays
+deterministic via the @group parallel-unsafe split.
+
+## Session 2026-07-21 — the REAL blockers (root causes, not order-coupling)
+Chasing "24/7 green parallel" surfaced that the dominant failures were NOT test
+order-coupling but concrete bugs. Fixed:
+
+1. **CWD-wipe (the worker crash at ~19%, and broke sequential too).**
+   `oxUtils::oxResetFileCache()` did `glob($this->getCacheFilePath(null,true).'*')`.
+   `getCacheFilePath()` returns `false` when the compile dir is unresolvable
+   (empty config OR a non-existent dir → `realpath` false). `false.'*'` == `'*'`,
+   so `glob('*')` enumerated the **process CWD** — which `base.php` `chdir()`s into
+   (the testing-library satellite) — and `@unlink`ed every top-level file + the
+   `vendor` symlink. That wrecked the shared satellite mid-run (crashing other
+   parallel workers with "test_config.yml not found") and left the NEXT run (incl.
+   sequential) unbootstrappable. NOTE `realpath('')` returns the CWD on Linux (not
+   false), so an *empty* compile dir is a second route to the same wipe.
+   **Fix (source/Core/Utils.php):** `getCacheFilePath()` returns false for an empty
+   compile dir too; `oxResetFileCache()`/`resetLanguageCache()`/`resetMenuCache()`
+   bail when the path is false (never `glob('*')`); `_lockFile()` bails on an empty
+   path (PHP 8 `fopen('')` throws a ValueError that `@` does NOT suppress).
+   The satellite `vendor` symlink (`testing-library/vendor -> ../vendor`, made by
+   docker/entrypoint.sh so base.php's 3-levels-up vendor fallback resolves) is what
+   the wipe destroyed; if a run dies with base.php requiring
+   `/var/www/html/testing-library/vendor/autoload.php`, recreate that symlink and
+   `git -C testing-library checkout -- composer.json test_config.yml.dist ...`.
+
+2. **Cold-start global-constant family.** Plain `\PHPUnit\Framework\TestCase` unit
+   tests that reference a global constant/class defined only when some other test
+   first loads it (Smarty's `SMARTY_PHP_REMOVE` from
+   `vendor/o3-shop/smarty/libs/Smarty.class.php`; `Core\Module\Module` for the
+   module-id in a log message). They pass when a predecessor loaded it, fail when
+   they're the first file in a fresh WrapperRunner worker. **Fix = make the test
+   self-contained** (call `class_exists(\Smarty::class)` / `class_exists(Module::class)`
+   before use). Fixed: `SmartySecuritySettingsDataProviderTest::testGetSecuritySettings`,
+   `UtilsobjectTest::testOxNewClassExtendingWhenClassesDoesNotExists`.
+
+3. **fRound() precision leak (currency family the hook missed).** `oxUtils::fRound()`
+   caches the currency precision in the per-instance `$_iCurPrecision` on the Utils
+   SINGLETON on first call, then ignores the currency passed on every later call.
+   A polluter that rounds a 2-decimal currency poisons
+   `LangTest::testFormatsCurrencyUsingSimulatedCurrencyObject` (3-decimal → 10322.326
+   formatted as `10#322~330` not `10#322~326`). **Fix:** the central reset extension
+   now also nulls `Utils::$_iCurPrecision` before each test.
+
+**`--isolate` (ParaTest Runner, fresh process per file) is unreliable** — its
+per-file bootstrap crashes ("Log file empty … PHPUnit process crashed"). Do NOT use
+it for enumeration; loop the WrapperRunner suite instead.
+
+STATUS: full parallel run went from "crashes at 19%, cannot complete" to "9795
+tests complete in ~54-62s". Enumerating the remaining tail by looping WrapperRunner
+(-p6/-p4) to collect every unique straggler, then fixing + proving ≥20 green runs.

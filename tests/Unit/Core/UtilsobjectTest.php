@@ -195,6 +195,14 @@ class UtilsobjectTest extends \OxidEsales\TestingLibrary\UnitTestCase
         $logger = new TestLogger();
         Registry::set('logger', $logger);
 
+        // Self-containment: ModuleChainsGenerator::onModuleExtensionCreationError()
+        // resolves the module ID for the log message only when the Module class is
+        // already loaded (it checks class_exists(Module::class, false) WITHOUT
+        // autoload). Without a predecessor test having loaded it, the message reads
+        // "Module ID (module id not availible)" and the assertion below fails. Load
+        // it explicitly so this test passes in any order (isolation / parallel).
+        class_exists(\OxidEsales\Eshop\Core\Module\Module::class);
+
         $config->setConfigParam('aModules', $aModules);
 
         $configFile = Registry::get('oxConfigFile');
