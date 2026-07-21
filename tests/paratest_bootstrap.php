@@ -113,3 +113,31 @@ if (!defined('OXID_PHP_UNIT')) {
 
 $bootstrap = new OxidEsales\TestingLibrary\Bootstrap\UnitBootstrap();
 $bootstrap->init();
+
+if ($isWorker) {
+    // Capture the DB restore baseline NOW — right after the fresh shop install
+    // and BEFORE any test runs. The testing-library otherwise captures it lazily
+    // in the FIRST UnitTestCase (setUpBeforeTestSuite -> backupDatabase). In a
+    // WrapperRunner worker any test that runs before that first UnitTestCase
+    // (e.g. a plain PHPUnit\Framework\TestCase, or a test that mutates shared
+    // demo data) would poison the baseline, so every later per-class restore
+    // restores to a polluted shop — the source of nondeterministic "article
+    // 1126 not available" / missing-row stragglers. Dumping here guarantees a
+    // pristine baseline; the patched UnitTestCase::backupDatabase() then skips
+    // re-dumping (see tests/bin/apply-parallel-patches.php).
+    try {
+        $factory = new \OxidEsales\TestingLibrary\Services\Library\DatabaseRestorer\DatabaseRestorerFactory();
+        $restorer = $factory->createRestorer('DatabaseRestorer');
+        $restorer->dumpDB('test');
+
+        $restoreProperty = new \ReflectionProperty(\OxidEsales\TestingLibrary\UnitTestCase::class, 'dbRestore');
+        $restoreProperty->setAccessible(true);
+        $restoreProperty->setValue(null, $restorer);
+
+        putenv('O3SHOP_BASELINE_CAPTURED=1');
+    } catch (\Throwable $e) {
+        // Best effort: if the pristine capture fails, fall back to the stock
+        // lazy behaviour rather than breaking the worker.
+        putenv('O3SHOP_BASELINE_CAPTURED');
+    }
+}

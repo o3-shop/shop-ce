@@ -34,27 +34,43 @@
  * Exit code 0 on success (patched or already patched), 1 on failure.
  */
 
-$target = dirname(__DIR__, 2)
-    . '/vendor/o3-shop/testing-library/library/Helper/ProjectConfigurationHelper.php';
+$vendorTestingLib = dirname(__DIR__, 2) . '/vendor/o3-shop/testing-library';
 
-if (!is_file($target)) {
-    fwrite(STDERR, "apply-parallel-patches: target not found: $target\n");
-    exit(1);
-}
+/**
+ * Idempotently replace $search with $inject in $file, keyed by a $marker that
+ * is present in $inject. Returns true on success (patched or already patched).
+ */
+$applyPatch = function (string $file, string $marker, string $search, string $inject, string $label): bool {
+    if (!is_file($file)) {
+        fwrite(STDERR, "apply-parallel-patches: target not found: $file\n");
+        return false;
+    }
+    $contents = file_get_contents($file);
+    if (strpos($contents, $marker) !== false) {
+        echo "apply-parallel-patches: $label already patched.\n";
+        return true;
+    }
+    if (strpos($contents, $search) === false) {
+        fwrite(STDERR, "apply-parallel-patches: $label anchor not found; upstream layout changed.\n");
+        return false;
+    }
+    if (file_put_contents($file, str_replace($search, $inject, $contents)) === false) {
+        fwrite(STDERR, "apply-parallel-patches: failed to write $file\n");
+        return false;
+    }
+    echo "apply-parallel-patches: $label patched.\n";
+    return true;
+};
 
-$contents = file_get_contents($target);
-
-if (strpos($contents, 'O3SHOP_TEST_CONFIGURATION_DIR') !== false) {
-    echo "apply-parallel-patches: ProjectConfigurationHelper already patched.\n";
-    exit(0);
-}
-
-$search = <<<'PHP'
+// 1) Per-worker project-configuration directory isolation.
+$ok = $applyPatch(
+    $vendorTestingLib . '/library/Helper/ProjectConfigurationHelper.php',
+    'O3SHOP_TEST_CONFIGURATION_DIR',
+    <<<'PHP'
     public function getConfigurationDirectoryPath(): string
     {
-PHP;
-
-$inject = <<<'PHP'
+PHP,
+    <<<'PHP'
     public function getConfigurationDirectoryPath(): string
     {
         $testConfigurationDir = getenv('O3SHOP_TEST_CONFIGURATION_DIR');
@@ -64,19 +80,39 @@ $inject = <<<'PHP'
             return rtrim($testConfigurationDir, '/');
         }
 
-PHP;
+PHP,
+    'ProjectConfigurationHelper (per-worker config isolation)'
+);
 
-if (strpos($contents, $search) === false) {
-    fwrite(STDERR, "apply-parallel-patches: anchor method not found; upstream layout changed.\n");
-    exit(1);
-}
+// 2) Pristine DB baseline: skip the lazy first-UnitTestCase dumpDB when the
+//    per-worker bootstrap already captured a clean baseline right after install
+//    (O3SHOP_BASELINE_CAPTURED=1). Otherwise a test running before the first
+//    UnitTestCase can poison the baseline and every per-class restore preserves
+//    the pollution (nondeterministic missing-demo-row stragglers).
+$ok = $applyPatch(
+    $vendorTestingLib . '/library/UnitTestCase.php',
+    'O3SHOP_BASELINE_CAPTURED',
+    <<<'PHP'
+    protected function backupDatabase()
+    {
+        $oDbRestore = self::_getDbRestore();
+        $oDbRestore->dumpDB();
+    }
+PHP,
+    <<<'PHP'
+    protected function backupDatabase()
+    {
+        if (getenv('O3SHOP_BASELINE_CAPTURED') === '1') {
+            // A pristine baseline was already captured post-install by the
+            // ParaTest per-worker bootstrap; do not overwrite it with a
+            // possibly-polluted later snapshot.
+            return;
+        }
+        $oDbRestore = self::_getDbRestore();
+        $oDbRestore->dumpDB();
+    }
+PHP,
+    'UnitTestCase::backupDatabase (pristine baseline)'
+) && $ok;
 
-$patched = str_replace($search, $inject, $contents);
-
-if (file_put_contents($target, $patched) === false) {
-    fwrite(STDERR, "apply-parallel-patches: failed to write $target\n");
-    exit(1);
-}
-
-echo "apply-parallel-patches: ProjectConfigurationHelper patched for per-worker config isolation.\n";
-exit(0);
+exit($ok ? 0 : 1);
