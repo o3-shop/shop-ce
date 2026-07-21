@@ -1,0 +1,25 @@
+version: 2
+
+updates:
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    # Symfony (and Doctrine) components must move in lockstep — bumping a single
+    # component on its own cannot resolve against the rest of the stack (learned
+    # the hard way during the Symfony 3.4 -> 5.4 migration). Grouping makes
+    # Dependabot open one coherent PR per family instead of many that each fail.
+    groups:
+      symfony:
+        patterns:
+          - "symfony/*"
+      doctrine:
+        patterns:
+          - "doctrine/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
