@@ -390,8 +390,8 @@ main() {
     log "${GREEN}Starting shop setup...${NC}"
 
     setup_environment || exit 127
-    install_dependencies || exit 127
     install_testing_library || exit 127
+    install_dependencies || exit 127
     install_demodata || exit 127
     install_tinymce_editor || exit 127
     setup_db || exit 127
