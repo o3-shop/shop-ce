@@ -8,6 +8,8 @@ services:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\BootstrapModuleInstaller
     public: true
 
+  OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\BootstrapModuleInstaller: '@oxid_esales.module.install.service.bootstrap_module_installer'
+
   OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleFilesInstallerInterface:
     class: OxidEsales\EshopCommunity\Internal\Framework\Module\Install\Service\ModuleFilesInstaller
     arguments:
