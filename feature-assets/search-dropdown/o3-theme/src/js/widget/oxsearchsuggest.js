@@ -89,8 +89,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     try {
-                        var data = JSON.parse(xhr.responseText);
-                        renderSuggestions(data);
+                        var response = JSON.parse(xhr.responseText);
+                        var items = JSON.parse(response.content);
+                        renderSuggestions(items);
                     } catch (e) {
                         closeDropdown();
                     }
