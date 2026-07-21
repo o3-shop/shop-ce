@@ -1,1 +1,0 @@
-[{$suggestions|json_encode}]
