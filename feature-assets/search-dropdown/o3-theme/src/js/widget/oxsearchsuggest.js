@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchSuggestions(query) {
         var baseUrl = searchInput.dataset.suggestUrl;
-        var url = baseUrl + '?cl=searchsuggest&searchparam=' + encodeURIComponent(query) + '&renderPartial=1';
+        var url = baseUrl + 'cl=searchsuggest&searchparam=' + encodeURIComponent(query) + '&renderPartial=1';
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
