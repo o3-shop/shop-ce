@@ -59,6 +59,21 @@ class ServicesCommandsProvider implements CommandsProviderInterface
                 $this->setNonShopAwareCommands($service);
             }
         }
+
+        // Since Symfony 4.4/5.x, AddConsoleCommandPass lazy-registers every
+        // *named* command in the "console.command_loader" and leaves
+        // "console.command.ids" holding only unnamed commands (usually none).
+        // Pull the named commands from the loader too, otherwise no oe:*
+        // command registers under Symfony 5.4.
+        if ($this->container->has('console.command_loader')) {
+            $commandLoader = $this->container->get('console.command_loader');
+            foreach ($commandLoader->getNames() as $commandName) {
+                $service = $commandLoader->get($commandName);
+                $this->setShopAwareCommands($service);
+                $this->setNonShopAwareCommands($service);
+            }
+        }
+
         return $this->commands;
     }
 
