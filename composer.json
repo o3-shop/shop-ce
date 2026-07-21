@@ -124,6 +124,9 @@
         "exclude": [".next-bump"]
     },
     "config": {
+        "platform": {
+            "php": "7.4.33"
+        },
         "allow-plugins": {
             "o3-shop/shop-composer-plugin": true,
             "o3-shop/shop-unified-namespace-generator": true
