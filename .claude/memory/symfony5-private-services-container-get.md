@@ -44,3 +44,14 @@ pull by id (the OXID `ContainerFactory::getInstance()->getContainer()->get(...)`
 bridge pattern), mark that service `public: true`. Remember the compiled
 `source/tmp/container_cache.php` must be cleared for a services.yaml change to take
 effect. See [[console-commands-and-php-floor]] and [[architecture]].
+
+## Variant: compiler-added private services (`.lazy` command proxies)
+
+`ServicesYamlValidator` (module activation, `Internal/Framework/Module/Setup/Validator`)
+makes every definition `public` then `compile()`s, then `->get()`s **every** definition
+to check a module's services.yaml is loadable. But Symfony's `AddConsoleCommandPass`
+adds private lazy command proxies (ids like `.oxid_esales.command.*.lazy`, leading dot)
+*during* compile — after the setPublic loop — so `->get()` on them throws. Fix: skip
+non-public definitions in the check loop (`if (!$definition->isPublic()) continue;`).
+This affects real module activation on 5.4, not just tests (surfaced via
+`ModuleInstallerCoverageTest::testActivateSucceedsForRegisteredModule`).

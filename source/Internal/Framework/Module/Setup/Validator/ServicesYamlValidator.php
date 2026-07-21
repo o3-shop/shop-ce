@@ -98,6 +98,13 @@ class ServicesYamlValidator implements ModuleConfigurationValidatorInterface
     private function checkContainer(\Symfony\Component\DependencyInjection\ContainerBuilder $container)
     {
         foreach ($container->getDefinitions() as $definitionKey => $definition) {
+            // Symfony compiler passes (e.g. the console-command loader) add private,
+            // internal services such as ".<command-id>.lazy" after buildContainer()
+            // made every declared definition public. Those cannot be fetched from the
+            // compiled container, so validate only the publicly accessible services.
+            if (!$definition->isPublic()) {
+                continue;
+            }
             $container->get($definitionKey);
         }
     }
