@@ -117,6 +117,8 @@ class InstallModuleConfigurationCommand extends Command
 
             throw $throwable;
         }
+
+        return 0;
     }
 
     /**

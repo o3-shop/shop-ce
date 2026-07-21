@@ -73,6 +73,8 @@ class ApplyModulesConfigurationCommand extends Command
         } else {
             $this->applyModulesConfigurationForAllShops($output);
         }
+
+        return 0;
     }
 
     private function applyModulesConfigurationForOneShop(OutputInterface $output, int $shopId): void
