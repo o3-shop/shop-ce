@@ -413,11 +413,19 @@ class Search extends Base
         $oArtList->selectString($sSelect);
 
         foreach ($oArtList as $oSuggestion) {
+            $dPrice = (float) $oSuggestion->oxarticles__oxprice->value;
+            $sFormattedPrice = Registry::getLang()->formatCurrency($dPrice);
+
+            $oCurrency = Registry::getConfig()->getActShopCurrencyObject();
+            $sSign = $oCurrency->sign ?? '';
+            $sSide = $oCurrency->side ?? '';
+            $sPrice = ($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign;
+
             $aResults[] = [
                 'id'    => $oSuggestion->oxarticles__oxid->value,
                 'title' => $oSuggestion->oxarticles__oxtitle->value
                     . ($oSuggestion->oxarticles__oxvarselect->value ? ' ' . $oSuggestion->oxarticles__oxvarselect->value : ''),
-                'price' => Registry::getLang()->formatCurrency((float) $oSuggestion->oxarticles__oxprice->value),
+                'price' => trim($sPrice),
                 'icon'  => $oSuggestion->getIconUrl(),
                 'link'  => $oSuggestion->getLink(),
             ];
