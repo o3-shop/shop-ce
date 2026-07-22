@@ -4082,6 +4082,8 @@ class BasketTest extends \OxidTestCase
      * #0002163: itm discount option "multiple" is not working if several products/categires are assigned to discount
      *
      * @return null
+     *
+     * @group parallel-unsafe
      */
     public function testForBugEntry2163()
     {

@@ -197,9 +197,11 @@ jobs:
           echo "::group::Install O3-Theme"
           composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
           echo "::endgroup::"
-          echo "::group::Apt Intall"
-          sudo apt-get update
-          sudo apt-get install -y libxml2-utils 
+          echo "::group::Apt Install"
+          # xmllint (libxml2-utils) is the only apt need; skip the ~apt-get update
+          # + install when it's already present (persistent self-hosted runners keep
+          # it between runs, hosted runners install it once per fresh VM).
+          command -v xmllint >/dev/null 2>&1 || { sudo apt-get update && sudo apt-get install -y libxml2-utils; }
           echo "::endgroup::"
 
       - name: 🎨 Install Wave Theme

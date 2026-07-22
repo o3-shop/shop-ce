@@ -681,6 +681,8 @@ class PictureHandlerTest extends \OxidTestCase
      * Product picture url getter test
      *
      * @return null
+     *
+     * @group parallel-unsafe
      */
     public function testGetProductPicUrl()
     {
