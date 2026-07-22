@@ -86,7 +86,10 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
-          coverage: pcov
+          # Coverage is identical across PHP versions (same source), so we compute
+          # it on ONE leg (8.2) and run the others as plain parallel tests. Enable
+          # the pcov driver only on that leg; 'none' keeps the others overhead-free.
+          coverage: ${{ matrix.php-version == '8.2' && 'pcov' || 'none' }}
           # Match docker's default so exported env vars (e.g. O3SHOP_CONF_DBNAME)
           # are copied into $_ENV, which source/config.inc.php reads. Without the
           # 'E', an exported var isn't in $_ENV and Dotenv::createImmutable skips it
@@ -191,6 +194,13 @@ jobs:
           # parallelism actually pays off here. Give each worker its own database.
           WORKERS=$(nproc); [ "$WORKERS" -gt 4 ] && WORKERS=4
           echo "PARATEST_WORKERS=$WORKERS" >> $GITHUB_ENV
+          # Only the 8.2 leg computes coverage (see setup-php note); the rest just
+          # prove the tests pass on their PHP version.
+          if [ "${{ matrix.php-version }}" = "8.2" ]; then
+            echo "IS_COVERAGE_LEG=true" >> $GITHUB_ENV
+          else
+            echo "IS_COVERAGE_LEG=false" >> $GITHUB_ENV
+          fi
           mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
           for t in $(seq 1 "$WORKERS"); do
             mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test_${t};"
@@ -198,49 +208,76 @@ jobs:
             if [ -d var/configuration ]; then cp -r var/configuration "var/configuration_${t}"; else mkdir -p "var/configuration_${t}/shops"; fi
           done
 
-      - name: ✅ Run ParaTest (parallel, with pcov coverage)
+      - name: ✅ Run ParaTest (parallel)
         id: phpunit
         continue-on-error: true
         run: |
-          echo "::group::ParaTest coverage (-p ${PARATEST_WORKERS})"
           mkdir -p coverage
-          PCOV="-d pcov.enabled=1 -d pcov.directory=$PWD/source"
           export O3SHOP_CONF_DBNAME=o3shop_test   # per-worker bootstrap derives o3shop_test_<token>
 
           # One-time setup shared by all workers.
           php tests/bin/apply-parallel-patches.php
           php -r 'require "vendor/autoload.php"; \OxidEsales\TestingLibrary\TestConfig::prepareUnifiedNamespaceClasses();'
 
-          # Parallel run: everything except quarantine + the order-coupled group.
-          # (ParaTest honours only the LAST --exclude-group, so combine them.)
-          php $PCOV vendor/bin/paratest \
-            -p "$PARATEST_WORKERS" --runner WrapperRunner \
-            --bootstrap "$PWD/tests/paratest_bootstrap.php" \
-            --passthru-php="$PCOV" \
-            -c "$PWD/tests/phpunit.xml" \
-            --exclude-group quarantine,parallel-unsafe \
-            --coverage-php "$PWD/coverage/_parallel.cov" \
-            --log-junit "$PWD/coverage/_junit_parallel.xml" \
-            --path "$PWD/tests/Unit" || true
+          if [ "$IS_COVERAGE_LEG" = "true" ]; then
+            echo "::group::ParaTest + pcov coverage (-p ${PARATEST_WORKERS})"
+            PCOV="-d pcov.enabled=1 -d pcov.directory=$PWD/source"
 
-          # Serial run: the order-coupled @group parallel-unsafe tests.
-          php $PCOV vendor/bin/phpunit \
-            --bootstrap "$PWD/vendor/o3-shop/testing-library/bootstrap.php" \
-            -c "$PWD/tests/phpunit.xml" \
-            --exclude-group quarantine --group parallel-unsafe \
-            --coverage-php "$PWD/coverage/_serial.cov" \
-            --log-junit "$PWD/coverage/_junit_serial.xml" \
-            "$PWD/tests/Unit" || true
+            # Parallel run: everything except quarantine + the order-coupled group.
+            # (ParaTest honours only the LAST --exclude-group, so combine them.)
+            php $PCOV vendor/bin/paratest \
+              -p "$PARATEST_WORKERS" --runner WrapperRunner \
+              --bootstrap "$PWD/tests/paratest_bootstrap.php" \
+              --passthru-php="$PCOV" \
+              -c "$PWD/tests/phpunit.xml" \
+              --exclude-group quarantine,parallel-unsafe \
+              --coverage-php "$PWD/coverage/_parallel.cov" \
+              --log-junit "$PWD/coverage/_junit_parallel.xml" \
+              --path "$PWD/tests/Unit" || true
 
-          # Merge the two coverage sets + JUnit logs into one report, then expose
-          # them at the paths the downstream steps expect.
-          php tests/bin/merge-coverage.php
-          cp coverage/coverage.xml coverage.xml
-          rm -rf coverage-html && cp -r coverage/html coverage-html
-          cp coverage/junit.xml junit.xml
-          echo "::endgroup::"
+            # Serial run: the order-coupled @group parallel-unsafe tests.
+            php $PCOV vendor/bin/phpunit \
+              --bootstrap "$PWD/vendor/o3-shop/testing-library/bootstrap.php" \
+              -c "$PWD/tests/phpunit.xml" \
+              --exclude-group quarantine --group parallel-unsafe \
+              --coverage-php "$PWD/coverage/_serial.cov" \
+              --log-junit "$PWD/coverage/_junit_serial.xml" \
+              "$PWD/tests/Unit" || true
+
+            # Merge the two coverage sets + JUnit logs into one report, then expose
+            # them at the paths the downstream steps expect.
+            php tests/bin/merge-coverage.php
+            cp coverage/coverage.xml coverage.xml
+            rm -rf coverage-html && cp -r coverage/html coverage-html
+            cp coverage/junit.xml junit.xml
+            echo "::endgroup::"
+          else
+            echo "::group::ParaTest (no coverage, -p ${PARATEST_WORKERS})"
+
+            # Same split as the coverage leg, but no pcov: just prove the tests pass.
+            php vendor/bin/paratest \
+              -p "$PARATEST_WORKERS" --runner WrapperRunner \
+              --bootstrap "$PWD/tests/paratest_bootstrap.php" \
+              -c "$PWD/tests/phpunit.xml" \
+              --exclude-group quarantine,parallel-unsafe \
+              --log-junit "$PWD/coverage/_junit_parallel.xml" \
+              --path "$PWD/tests/Unit" || true
+
+            php vendor/bin/phpunit \
+              --bootstrap "$PWD/vendor/o3-shop/testing-library/bootstrap.php" \
+              -c "$PWD/tests/phpunit.xml" \
+              --exclude-group quarantine --group parallel-unsafe \
+              --log-junit "$PWD/coverage/_junit_serial.xml" \
+              "$PWD/tests/Unit" || true
+
+            # Combine the two JUnit logs (no coverage) so the failure gate can read it.
+            php tests/bin/merge-coverage.php --junit-only
+            cp coverage/junit.xml junit.xml
+            echo "::endgroup::"
+          fi
 
       - name: ☁️ Upload Coverage Report (HTML)
+        if: env.IS_COVERAGE_LEG == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: coverage-report-php-${{ matrix.php-version }}
@@ -277,6 +314,7 @@ jobs:
             fi
 
       - name: 📝 Generate Coverage Summary
+        if: env.IS_COVERAGE_LEG == 'true'
         run: |
           if [ -f coverage.xml ]; then
             COVERAGE=$(php -r "
@@ -296,7 +334,7 @@ jobs:
 
       - name: 🛑 Enforce Coverage Threshold (≥ 90%)
         id: coverage_gate
-        if: env.TESTS_FAILED == 'false'
+        if: env.IS_COVERAGE_LEG == 'true' && env.TESTS_FAILED == 'false'
         run: php bin/check-coverage-threshold.php --clover coverage.xml --threshold 90
 
       - name: 💡 Add failed test summary if not PR

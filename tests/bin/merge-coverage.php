@@ -102,6 +102,19 @@ function applyCoverageFilter(CodeCoverage $coverage, string $configFile): void
 $root = dirname(__DIR__, 2);
 $covDir = $root . '/coverage';
 
+// --junit-only: the non-coverage CI legs (every PHP version except the single
+// coverage leg) run the tests without pcov, so there are no .cov files to merge
+// — they only need the combined JUnit for the "Parse Failed Tests" gate. Skip
+// all coverage work and just concatenate the two JUnit logs.
+if (in_array('--junit-only', $argv, true)) {
+    mergeJUnit(
+        [$covDir . '/_junit_parallel.xml', $covDir . '/_junit_serial.xml'],
+        $covDir . '/junit.xml'
+    );
+    echo "merge-coverage: junit-only merge — wrote coverage/junit.xml\n";
+    exit(0);
+}
+
 $covFiles = [
     $covDir . '/_parallel.cov',
     $covDir . '/_serial.cov',
