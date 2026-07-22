@@ -250,7 +250,15 @@ jobs:
         run: |
           # CI runners have no virtiofs mount (unlike local docker), so ParaTest
           # parallelism actually pays off here. Give each worker its own database.
-          WORKERS=$(nproc); [ "$WORKERS" -gt 8 ] && WORKERS=8
+          # The self-hosted box sits at ~40-65% CPU with plenty of free RAM during
+          # the run — workers block on the single MariaDB, not on CPU. Oversubscribe
+          # cores there so idle cores pick up work while others wait. Hosted runners
+          # stay 1:1 with their cores.
+          if [ "${{ runner.environment }}" = "self-hosted" ]; then
+            WORKERS=12
+          else
+            WORKERS=$(nproc); [ "$WORKERS" -gt 8 ] && WORKERS=8
+          fi
           echo "PARATEST_WORKERS=$WORKERS" >> $GITHUB_ENV
           # Only the 8.2 leg computes coverage (see setup-php note); the rest just
           # prove the tests pass on their PHP version.
@@ -280,13 +288,17 @@ jobs:
           if [ "$IS_COVERAGE_LEG" = "true" ]; then
             echo "::group::ParaTest + pcov coverage (-p ${PARATEST_WORKERS})"
             PCOV="-d pcov.enabled=1 -d pcov.directory=$PWD/source"
+            # CLI opcode cache on every worker: each runs ~1000 test classes that
+            # reload the same framework classes, so caching compiled opcodes (and
+            # not stat-ing files) is a big win. JIT off (irrelevant under coverage).
+            OPC="-d opcache.enable_cli=1 -d opcache.jit_buffer_size=0 -d opcache.validate_timestamps=0 -d opcache.max_accelerated_files=130000 -d opcache.memory_consumption=256"
 
             # Parallel run: everything except quarantine + the order-coupled group.
             # (ParaTest honours only the LAST --exclude-group, so combine them.)
-            php $PCOV vendor/bin/paratest \
+            php $PCOV $OPC vendor/bin/paratest \
               -p "$PARATEST_WORKERS" --runner WrapperRunner \
               --bootstrap "$PWD/tests/paratest_bootstrap.php" \
-              --passthru-php="$PCOV" \
+              --passthru-php="$PCOV $OPC" \
               -c "$PWD/tests/phpunit.xml" \
               --exclude-group quarantine,parallel-unsafe \
               --coverage-php "$PWD/coverage/_parallel.cov" \
@@ -294,7 +306,7 @@ jobs:
               --path "$PWD/tests/Unit" || true
 
             # Serial run: the order-coupled @group parallel-unsafe tests.
-            php $PCOV vendor/bin/phpunit \
+            php $PCOV $OPC vendor/bin/phpunit \
               --bootstrap "$PWD/vendor/o3-shop/testing-library/bootstrap.php" \
               -c "$PWD/tests/phpunit.xml" \
               --exclude-group quarantine --group parallel-unsafe \
