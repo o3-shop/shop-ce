@@ -160,6 +160,13 @@ jobs:
       - name: 🔧 Copy CI Config Files
         run: |
           cp .env.ci .env
+          # .env.ci hardcodes the GitHub-hosted work dir (/home/runner/work/...).
+          # Rewrite the shop paths to the actual checkout so this also works on
+          # self-hosted runners, whose work dir differs (e.g.
+          # /home/<user>/actions-runner/_work/...). $GITHUB_WORKSPACE is the
+          # checkout path on ANY runner, so hosted legs are unaffected.
+          sed -i "s#^O3SHOP_CONF_SHOPDIR=.*#O3SHOP_CONF_SHOPDIR=\"${GITHUB_WORKSPACE}/source\"#" .env
+          sed -i "s#^O3SHOP_CONF_COMPILEDIR=.*#O3SHOP_CONF_COMPILEDIR=\"${GITHUB_WORKSPACE}/source/tmp\"#" .env
           cp source/config.inc.php.dist source/config.inc.php
 
       - name: 📥 Install Dependencies
