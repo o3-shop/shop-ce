@@ -52,17 +52,24 @@
 $token = getenv('TEST_TOKEN');
 $isWorker = ($token !== false && $token !== '');
 
+// Propagate the database name into $_ENV/$_SERVER for source/config.inc.php,
+// which reads it from $_ENV — for BOTH the ParaTest parent AND the workers.
+// Why explicitly and not just rely on the exported env var: on some SAPIs
+// variables_order lacks 'E' (an exported var is NOT copied into $_ENV), and
+// Dotenv::createImmutable won't overwrite a var already present in getenv() —
+// so an exported base DB name would be missing from $_ENV and the parent's shop
+// install fails with "Incorrect database name ''" (seen in CI). The parent uses
+// the base name; each worker uses "<base>_<token>" for its own isolated database.
+$baseDb = getenv('O3SHOP_CONF_DBNAME');
+if ($baseDb === false || $baseDb === '') {
+    $baseDb = 'o3shop-test';
+}
+$dbName = $isWorker ? ($baseDb . '_' . $token) : $baseDb;
+putenv('O3SHOP_CONF_DBNAME=' . $dbName);
+$_ENV['O3SHOP_CONF_DBNAME'] = $dbName;
+$_SERVER['O3SHOP_CONF_DBNAME'] = $dbName;
+
 if ($isWorker) {
-    $baseDb = getenv('O3SHOP_CONF_DBNAME');
-    if ($baseDb === false || $baseDb === '') {
-        $baseDb = 'o3shop-test';
-    }
-    $workerDb = $baseDb . '_' . $token;
-
-    putenv('O3SHOP_CONF_DBNAME=' . $workerDb);
-    $_ENV['O3SHOP_CONF_DBNAME'] = $workerDb;
-    $_SERVER['O3SHOP_CONF_DBNAME'] = $workerDb;
-
     // Repo root — /var/www/html under docker, the checkout dir under CI. Derived
     // from this file's location (tests/paratest_bootstrap.php) so the per-worker
     // dirs resolve correctly in both environments.
