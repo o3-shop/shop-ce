@@ -180,24 +180,59 @@ jobs:
             echo "Verifying patch:"
             grep -n "skip-ssl" vendor/o3-shop/testing-library/library/Services/Library/DatabaseHandler.php && echo "PATCH FAILED - still found" || echo "PATCH OK - removed"
 
-      - name: 🗄️ Create Test Database
-        run: mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+      - name: 🗄️ Create Test Databases (base + per-worker)
+        run: |
+          # CI runners have no virtiofs mount (unlike local docker), so ParaTest
+          # parallelism actually pays off here. Give each worker its own database.
+          WORKERS=$(nproc); [ "$WORKERS" -gt 4 ] && WORKERS=4
+          echo "PARATEST_WORKERS=$WORKERS" >> $GITHUB_ENV
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+          for t in $(seq 1 "$WORKERS"); do
+            mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test_${t};"
+            mkdir -p "source/tmp/paratest_${t}/smarty"
+            if [ -d var/configuration ]; then cp -r var/configuration "var/configuration_${t}"; else mkdir -p "var/configuration_${t}/shops"; fi
+          done
 
-      - name: ✅ Run PHPUnit (with Coverage)
+      - name: ✅ Run ParaTest (parallel, with pcov coverage)
         id: phpunit
         continue-on-error: true
         run: |
-          echo "::group::PHPUnit"
-          CURRENT_DIR=$(pwd)
-          php $CURRENT_DIR/vendor/bin/phpunit \
-            --bootstrap $CURRENT_DIR/vendor/o3-shop/testing-library/bootstrap.php \
-            -c $CURRENT_DIR/tests/phpunit.xml \
-            $CURRENT_DIR/tests/Unit \
-            --exclude-group quarantine \
-            --colors=always \
-            --coverage-clover="$CURRENT_DIR/coverage.xml" \
-            --coverage-html="$CURRENT_DIR/coverage-html/" \
-            --log-junit="$CURRENT_DIR/junit.xml"
+          echo "::group::ParaTest coverage (-p ${PARATEST_WORKERS})"
+          mkdir -p coverage
+          PCOV="-d pcov.enabled=1 -d pcov.directory=$PWD/source"
+          export O3SHOP_CONF_DBNAME=o3shop_test   # per-worker bootstrap derives o3shop_test_<token>
+
+          # One-time setup shared by all workers.
+          php tests/bin/apply-parallel-patches.php
+          php -r 'require "vendor/autoload.php"; \OxidEsales\TestingLibrary\TestConfig::prepareUnifiedNamespaceClasses();'
+
+          # Parallel run: everything except quarantine + the order-coupled group.
+          # (ParaTest honours only the LAST --exclude-group, so combine them.)
+          php $PCOV vendor/bin/paratest \
+            -p "$PARATEST_WORKERS" --runner WrapperRunner \
+            --bootstrap "$PWD/tests/paratest_bootstrap.php" \
+            --passthru-php="$PCOV" \
+            -c "$PWD/tests/phpunit.xml" \
+            --exclude-group quarantine,parallel-unsafe \
+            --coverage-php "$PWD/coverage/_parallel.cov" \
+            --log-junit "$PWD/coverage/_junit_parallel.xml" \
+            --path "$PWD/tests/Unit" || true
+
+          # Serial run: the order-coupled @group parallel-unsafe tests.
+          php $PCOV vendor/bin/phpunit \
+            --bootstrap "$PWD/vendor/o3-shop/testing-library/bootstrap.php" \
+            -c "$PWD/tests/phpunit.xml" \
+            --exclude-group quarantine --group parallel-unsafe \
+            --coverage-php "$PWD/coverage/_serial.cov" \
+            --log-junit "$PWD/coverage/_junit_serial.xml" \
+            "$PWD/tests/Unit" || true
+
+          # Merge the two coverage sets + JUnit logs into one report, then expose
+          # them at the paths the downstream steps expect.
+          php tests/bin/merge-coverage.php
+          cp coverage/coverage.xml coverage.xml
+          rm -rf coverage-html && cp -r coverage/html coverage-html
+          cp coverage/junit.xml junit.xml
           echo "::endgroup::"
 
       - name: ☁️ Upload Coverage Report (HTML)

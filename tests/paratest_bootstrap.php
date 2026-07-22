@@ -63,7 +63,12 @@ if ($isWorker) {
     $_ENV['O3SHOP_CONF_DBNAME'] = $workerDb;
     $_SERVER['O3SHOP_CONF_DBNAME'] = $workerDb;
 
-    $compileDir = '/var/www/html/source/tmp/paratest_' . $token;
+    // Repo root — /var/www/html under docker, the checkout dir under CI. Derived
+    // from this file's location (tests/paratest_bootstrap.php) so the per-worker
+    // dirs resolve correctly in both environments.
+    $baseDir = dirname(__DIR__);
+
+    $compileDir = $baseDir . '/source/tmp/paratest_' . $token;
     if (!is_dir($compileDir)) {
         @mkdir($compileDir, 0777, true);
     }
@@ -87,7 +92,7 @@ if ($isWorker) {
     // populated copy per worker before launch. Without this, every test class'
     // setUpBeforeClass()/tearDownAfterClass() backup+restore of the single shared
     // var/configuration directory races across workers.
-    $projectConfigDir = '/var/www/html/var/configuration_' . $token;
+    $projectConfigDir = $baseDir . '/var/configuration_' . $token;
     if (!is_dir($projectConfigDir)) {
         @mkdir($projectConfigDir . '/shops', 0777, true);
     }
