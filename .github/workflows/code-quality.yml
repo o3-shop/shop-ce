@@ -94,7 +94,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
+          # Full set the shop needs (mirrors docker/Dockerfile). Hosted PHP ships
+          # most of these by default, so the short list worked there — but a minimal
+          # self-hosted PHP install does not, which surfaced as missing bcmath (bcmod),
+          # gd (imagecreatetruecolor), and soap (SoapFault) at test time.
+          extensions: mbstring, xml, ctype, json, tokenizer, iconv, pdo, pdo_mysql, mysqli, gd, curl, bcmath, soap, bz2, intl, calendar, exif, zip
           # Coverage is identical across PHP versions (same source), so we compute
           # it on ONE leg (8.2) and run the others as plain parallel tests. Enable
           # the pcov driver only on that leg; 'none' keeps the others overhead-free.
