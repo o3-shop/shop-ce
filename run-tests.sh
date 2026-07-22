@@ -191,6 +191,15 @@ if [ "$COVERAGE_MODE" != true ]; then
     export XDEBUG_MODE=off
 fi
 
+# The repo is a virtiofs (FUSE) mount under colima, so every PHP include is a
+# slow round-trip to the host filesystem. CLI opcache is OFF by default, so each
+# ParaTest worker re-reads AND recompiles every file for every one of its ~2400
+# tests — the workers spend most of their time blocked in the FUSE wait channel
+# (which is why more workers don't help and CPU/DB/disk sit idle). Enabling CLI
+# opcache and skipping timestamp revalidation (the code cannot change during a
+# run) keeps compiled files in each worker's memory and removes the stalls.
+OPCACHE_PHP_FLAGS="-d opcache.enable_cli=1 -d opcache.validate_timestamps=0 -d opcache.memory_consumption=256 -d opcache.max_accelerated_files=30000 -d opcache.interned_strings_buffer=32"
+
 # Build config flag for --all-failures mode. The default tests/phpunit.xml has
 # stopOnError/stopOnFailure="true" (fast CI feedback); we generate a sibling
 # config with those flipped off so the suite runs to completion. The temp
@@ -298,13 +307,14 @@ provision_and_run_parallel() {
             -p "$PROCESSES" \
             --runner "$PARATEST_RUNNER" \
             --bootstrap /var/www/html/tests/paratest_bootstrap.php \
+            --passthru-php="$OPCACHE_PHP_FLAGS" \
             $config_arg \
             $par_exclude_flags \
             --path "$paratest_path"
         local par_ec=$?
 
         echo -e "${YELLOW}Running @group parallel-unsafe tests serially...${NC}"
-        O3SHOP_CONF_DBNAME="$base_db" php vendor/bin/phpunit \
+        O3SHOP_CONF_DBNAME="$base_db" php $OPCACHE_PHP_FLAGS vendor/bin/phpunit \
             --bootstrap /var/www/html/vendor/o3-shop/testing-library/bootstrap.php \
             --colors=always \
             $config_arg \
