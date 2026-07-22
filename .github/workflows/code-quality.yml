@@ -277,7 +277,7 @@ jobs:
           # connection cap for the oversubscribed worker pool + testing-library CLI
           # subprocesses. (Runtime SET GLOBAL because service containers can't take
           # server flags.)
-          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "SET GLOBAL innodb_flush_log_at_trx_commit=0; SET GLOBAL max_connections=512;" || true
+          mysql -h 127.0.0.1 -P 3306 -u root -proot -e "SET GLOBAL innodb_flush_log_at_trx_commit=0; SET GLOBAL max_connections=512; SET GLOBAL innodb_buffer_pool_size=2147483648;" || true
 
       - name: ✅ Run ParaTest (parallel)
         id: phpunit
