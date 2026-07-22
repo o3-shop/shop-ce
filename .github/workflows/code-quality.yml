@@ -85,7 +85,17 @@ jobs:
           MYSQL_PASSWORD: o3shop
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        # --tmpfs: put the DB data dir in RAM so the per-worker shop installs and
+        #   the many restore cycles aren't disk-bound (big win on self-hosted).
+        # Tighter healthcheck (3s interval + start-period) so the job proceeds as
+        #   soon as MariaDB is actually up instead of rounding up to a 10s tick.
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=3s
+          --health-timeout=4s
+          --health-retries=15
+          --health-start-period=8s
+          --tmpfs /var/lib/mysql:rw,size=4g
 
     steps:
       - uses: actions/checkout@v7
@@ -237,7 +247,7 @@ jobs:
         run: |
           # CI runners have no virtiofs mount (unlike local docker), so ParaTest
           # parallelism actually pays off here. Give each worker its own database.
-          WORKERS=$(nproc); [ "$WORKERS" -gt 4 ] && WORKERS=4
+          WORKERS=$(nproc); [ "$WORKERS" -gt 8 ] && WORKERS=8
           echo "PARATEST_WORKERS=$WORKERS" >> $GITHUB_ENV
           # Only the 8.2 leg computes coverage (see setup-php note); the rest just
           # prove the tests pass on their PHP version.
