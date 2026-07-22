@@ -62,6 +62,17 @@ class ArticleGuaranteeTest extends UnitTestCase
         ];
     }
 
+    /**
+     * Nullable column (#219 review): an unset years field is NULL, which must
+     * read as 0 whole years and therefore never be label-eligible.
+     */
+    public function testNullYearsReadsAsZeroAndNotEligible(): void
+    {
+        $article = $this->makeArticle(['oxarticles__o3guaranteeyears' => null]);
+        $this->assertSame(0, $article->getGuaranteeYears());
+        $this->assertFalse($article->isDurabilityGuaranteeEligible());
+    }
+
     public function testGuarantorPrefersOwnField(): void
     {
         $article = $this->makeArticle(['oxarticles__o3guaranteeguarantor' => 'ACME GmbH']);

@@ -51,12 +51,15 @@ class GuaranteeMigrationTest extends UnitTestCase
         $this->assertStringContainsString('text', $columns['O3GUARANTEECONDITIONS']);
     }
 
-    public function testYearsColumnCarriesLegalCommentAndDefaultZero(): void
+    public function testYearsColumnCarriesLegalCommentAndIsNullable(): void
     {
         $db = DatabaseProvider::getDb(DatabaseProvider::FETCH_MODE_ASSOC);
         $row = $db->getRow("SHOW FULL COLUMNS FROM oxarticles LIKE 'O3GUARANTEEYEARS'");
 
-        $this->assertSame('0', $row['Default']);
+        // Nullable (#219 review): an unset guarantee reads empty, not a
+        // misleading 0. No DB-side default so a blank field stays NULL.
+        $this->assertSame('YES', $row['Null']);
+        $this->assertNull($row['Default']);
         $this->assertStringContainsString('2025/1960', $row['Comment']);
     }
 

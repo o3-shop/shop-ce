@@ -117,31 +117,9 @@ class ArticleExtend extends AdminDetailsController
         //load media files
         $this->_aViewData['aMediaUrls'] = $article->getMediaUrls();
 
-        $this->_aViewData['guaranteeWarnings'] = $this->collectGuaranteeAdvisories();
+        $this->_aViewData['guaranteeWarnings'] = $this->collectGuaranteeAdvisories($article);
 
         return 'article_extend.tpl';
-    }
-
-    /**
-     * Loads the currently edited article, or null when there is none to load.
-     * Thin seam used by the guarantee advisories (#219); keeps render()
-     * untouched and mockable in tests.
-     *
-     * @return Article|null
-     */
-    protected function loadCurrentArticle(): ?Article
-    {
-        $oxId = $this->getEditObjectId();
-        if (empty($oxId) || $oxId === '-1') {
-            return null;
-        }
-
-        $article = oxNew(Article::class);
-        if (!$article->load($oxId)) {
-            return null;
-        }
-
-        return $article;
     }
 
     /**
@@ -149,15 +127,16 @@ class ArticleExtend extends AdminDetailsController
      * Saving is NEVER blocked - the label simply does not render while the
      * data is incomplete/ineligible; these hints tell the operator why.
      *
+     * Operates on the article render() has already loaded into
+     * $_aViewData['edit'] (no extra DB round-trip); the guarantee fields are
+     * single-language, so the base-language instance carries the right values.
+     *
+     * @param Article $article the article currently being edited
+     *
      * @return string[] translation keys
      */
-    protected function collectGuaranteeAdvisories(): array
+    protected function collectGuaranteeAdvisories(Article $article): array
     {
-        $article = $this->loadCurrentArticle();
-        if ($article === null) {
-            return [];
-        }
-
         $warnings = [];
         $years = $article->getGuaranteeYears();
 

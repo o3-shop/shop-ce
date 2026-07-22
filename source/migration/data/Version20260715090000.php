@@ -39,7 +39,7 @@ final class Version20260715090000 extends AbstractMigration
     private const SNIPPET_LOADID = 'o3_guarantee_notice_info';
 
     private const COLUMNS = [
-        'O3GUARANTEEYEARS' => "INT NOT NULL DEFAULT 0 COMMENT 'Producer commercial guarantee of durability in WHOLE YEARS; 0 = none/not communicated. Label-eligible only when > 2 (Art. 6(1)(la) CRD as amended by Directive (EU) 2024/825; label design per Reg. (EU) 2025/1960 renders whole years only). Producer guarantees only - seller guarantees never qualify.'",
+        'O3GUARANTEEYEARS' => "INT NULL DEFAULT NULL COMMENT 'Producer commercial guarantee of durability in WHOLE YEARS; NULL/0 = none/not communicated (nullable so an unset field reads empty, not a misleading 0). Label-eligible only when > 2 (Art. 6(1)(la) CRD as amended by Directive (EU) 2024/825; label design per Reg. (EU) 2025/1960 renders whole years only). Producer guarantees only - seller guarantees never qualify.'",
         'O3GUARANTEEGUARANTOR' => "VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Producer/brand name exactly as it must appear on the EU durability-guarantee label. Empty = fall back to the linked oxmanufacturers title; if that is also empty the label cannot render.'",
         'O3GUARANTEEMODEL' => "VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Model identifier exactly as it must appear on the EU durability-guarantee label (mandatory label component per Reg. (EU) 2025/1960 Annex II). Empty = fall back to OXARTNUM, then to the article title.'",
         'O3GUARANTEECONDITIONS' => "TEXT NULL COMMENT 'Guarantee conditions the trader must provide when advertising with the guarantee (sec. 479 BGB: guarantor name/address, scope, conditions). Shown as an expandable section under the label. Single-language field by design.'",

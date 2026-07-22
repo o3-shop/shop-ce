@@ -33,7 +33,12 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class ArticleExtendGuaranteeTest extends UnitTestCase
 {
-    private function renderWithArticle(int $years, string $guarantor, ?string $manufacturerTitle = null): array
+    /**
+     * Exercises the advisory logic directly on the already-loaded article
+     * (post-review: collectGuaranteeAdvisories() no longer re-loads it, so
+     * there is no render()/DB round-trip to drive here).
+     */
+    private function advisoriesFor(int $years, string $guarantor, ?string $manufacturerTitle = null): array
     {
         $article = $this->getMockBuilder(Article::class)
             ->onlyMethods(['getManufacturer'])
@@ -47,36 +52,33 @@ class ArticleExtendGuaranteeTest extends UnitTestCase
         $article->oxarticles__o3guaranteeyears = new Field($years);
         $article->oxarticles__o3guaranteeguarantor = new Field($guarantor);
 
-        $controller = $this->getMockBuilder(ArticleExtend::class)
-            ->onlyMethods(['getEditObjectId', 'loadCurrentArticle'])
-            ->getMock();
-        $controller->method('getEditObjectId')->willReturn('_x');
-        $controller->method('loadCurrentArticle')->willReturn($article);
-        $controller->render();
+        $controller = oxNew(ArticleExtend::class);
+        $method = new \ReflectionMethod(ArticleExtend::class, 'collectGuaranteeAdvisories');
+        $method->setAccessible(true);
 
-        return $controller->getViewData()['guaranteeWarnings'] ?? [];
+        return $method->invoke($controller, $article);
     }
 
     public function testNoWarningsWhenNoGuaranteeEntered(): void
     {
-        $this->assertSame([], $this->renderWithArticle(0, ''));
+        $this->assertSame([], $this->advisoriesFor(0, ''));
     }
 
     public function testShortDurationYieldsNotEligibleInfo(): void
     {
-        $warnings = $this->renderWithArticle(2, 'ACME');
+        $warnings = $this->advisoriesFor(2, 'ACME');
         $this->assertContains('O3_GUARANTEE_ADMIN_WARN_NOT_ELIGIBLE', $warnings);
     }
 
     public function testEligibleWithoutResolvableGuarantorYieldsWarning(): void
     {
-        $warnings = $this->renderWithArticle(5, '', null);
+        $warnings = $this->advisoriesFor(5, '', null);
         $this->assertContains('O3_GUARANTEE_ADMIN_WARN_NO_GUARANTOR', $warnings);
     }
 
     public function testEligibleWithManufacturerFallbackYieldsNoGuarantorWarning(): void
     {
-        $warnings = $this->renderWithArticle(5, '', 'Brand Co');
+        $warnings = $this->advisoriesFor(5, '', 'Brand Co');
         $this->assertNotContains('O3_GUARANTEE_ADMIN_WARN_NO_GUARANTOR', $warnings);
     }
 }

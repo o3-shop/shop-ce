@@ -2034,7 +2034,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     public function getGuaranteeYears(): int
     {
-        return (int) $this->oxarticles__o3guaranteeyears->value;
+        return (int) $this->getRawFieldData('o3guaranteeyears');
     }
 
     /**
