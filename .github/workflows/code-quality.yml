@@ -155,7 +155,11 @@ jobs:
           # tree + dumps autoload) and the o3-theme dev-main require afterwards
           # keeps that one package fresh.
           path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php-version }}-vendor-${{ hashFiles('composer.lock') }}
+          # Include runner.environment in the key: the testing-library patch below
+          # differs between hosted and self-hosted (--skip-ssl kept vs stripped), and
+          # that patched vendor gets cached — so the two environments must not share a
+          # cache entry or a hosted-stripped copy would poison the self-hosted leg.
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ runner.environment }}-vendor-${{ hashFiles('composer.lock') }}
 
       - name: 🔧 Copy CI Config Files
         run: |
@@ -209,12 +213,21 @@ jobs:
             sleep 1
           done
 
-      - name: 🩹 Patch Testing Library (MariaDB --skip-ssl fix)
+      - name: 🩹 Patch Testing Library (MariaDB SSL handling)
         run: |
-            sed -i "s/ --skip-ssl//g" \
-            vendor/o3-shop/testing-library/library/Services/Library/DatabaseHandler.php
-            echo "Verifying patch:"
-            grep -n "skip-ssl" vendor/o3-shop/testing-library/library/Services/Library/DatabaseHandler.php && echo "PATCH FAILED - still found" || echo "PATCH OK - removed"
+            DBH=vendor/o3-shop/testing-library/library/Services/Library/DatabaseHandler.php
+            if [ "${{ runner.environment }}" = "github-hosted" ]; then
+              # Hosted uses the MySQL 8 client, which rejects --skip-ssl → strip it.
+              # (The library ships mysql/mysqldump commands with --skip-ssl baked in.)
+              sed -i "s/ --skip-ssl//g" "$DBH"
+              grep -q "skip-ssl" "$DBH" && echo "WARN: --skip-ssl still present" || echo "hosted: --skip-ssl removed"
+            else
+              # Self-hosted uses the MariaDB client, which REQUIRES SSL unless told
+              # otherwise. Those commands run with --defaults-file (so ~/.my.cnf's
+              # skip-ssl is ignored) — the library's original command-line --skip-ssl
+              # must stay. Just verify it's present (fresh/env-scoped-cached vendor).
+              grep -q "skip-ssl" "$DBH" && echo "self-hosted: --skip-ssl kept" || echo "WARN: --skip-ssl missing on self-hosted!"
+            fi
 
       - name: 🗄️ Create Test Databases (base + per-worker)
         run: |
