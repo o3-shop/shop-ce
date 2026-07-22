@@ -80,7 +80,7 @@ class EmailUtf8Test extends \OxidTestCase
         $oPrice->expects($this->any())->method('getPrice')->will($this->returnValue(256));
         $oPrice->expects($this->any())->method('getBruttoPrice')->will($this->returnValue(8));
 
-        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle']);
+        $oBasketItem = $this->getMock(\OxidEsales\Eshop\Application\Model\BasketItem::class, ['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle', 'getArticle']);
         $oBasketItem->expects($this->any())->method('getPrice')->will($this->returnValue($oPrice));
         $oBasketItem->expects($this->any())->method('getUnitPrice')->will($this->returnValue($oPrice));
         $oBasketItem->expects($this->any())->method('getRegularUnitPrice')->will($this->returnValue($oPrice));
@@ -91,6 +91,7 @@ class EmailUtf8Test extends \OxidTestCase
         $oArticle->setId('_testArticleId');
         $oArticle->setId('_testArticleId');
         $oArticle->oxarticles__oxtitle = new oxField();
+        $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($oArticle));
 
         $aBasketContents[] = $oBasketItem;
         $aBasketArticles[] = $oArticle;

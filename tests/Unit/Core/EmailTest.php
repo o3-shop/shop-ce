@@ -1286,7 +1286,7 @@ class EmailTest extends \OxidTestCase
         $priceStub->method('getBruttoPrice')->will($this->returnValue(8));
 
         $basketItemStub = $this->getMockBuilder(BasketItem::class)
-            ->setMethods(['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle'])
+            ->setMethods(['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle', 'getArticle'])
             ->getMock();
         $basketItemStub->method('getPrice')->will($this->returnValue($priceStub));
         $basketItemStub->method('getUnitPrice')->will($this->returnValue($priceStub));
@@ -1298,6 +1298,7 @@ class EmailTest extends \OxidTestCase
         $article->setId('_testArticleId');
         $article->setId('_testArticleId');
         $article->oxarticles__oxtitle = new oxField();
+        $basketItemStub->method('getArticle')->will($this->returnValue($article));
 
         $priceStub->setPrice(0);
 
