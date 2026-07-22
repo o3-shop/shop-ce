@@ -6,7 +6,7 @@
          set, i.e. it only affects ParaTest workers; sequential runs are unchanged. -->
     <extension class="OxidEsales\EshopCommunity\Tests\Support\ParallelStateResetExtension"/>
   </extensions>
-  <coverage includeUncoveredFiles="true" processUncoveredFiles="true">
+  <coverage cacheDirectory="../coverage/.phpunit-coverage-cache" includeUncoveredFiles="true" processUncoveredFiles="true">
     <include>
       <directory suffix=".php">../source/Application</directory>
       <directory suffix=".php">../source/Core</directory>

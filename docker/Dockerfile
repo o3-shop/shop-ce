@@ -45,6 +45,14 @@ RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+# pcov: the fast code-coverage driver used by the test runner (much faster than
+# xdebug). Left DISABLED by default (pcov.enabled=0) so it adds no overhead to
+# normal runs; run-tests.sh enables it (-d pcov.enabled=1) only for --coverage.
+RUN pecl install pcov \
+    && docker-php-ext-enable pcov \
+    && { echo "pcov.enabled=0"; echo "pcov.directory=/var/www/html/source"; } \
+        >> /usr/local/etc/php/conf.d/docker-php-ext-pcov.ini
+
 # Node.js 20 LTS + global gulp-cli (o3-theme build pipeline) and grunt-cli
 # (wave-theme build pipeline). Themes ship their own local gulp/grunt versions
 # via node_modules; the *-cli globals just give us `gulp` / `grunt` on PATH so
