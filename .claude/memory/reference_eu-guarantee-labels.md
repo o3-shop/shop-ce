@@ -13,15 +13,36 @@ Four `oxarticles` columns, two bool config switches
 (`blShowLegalGuaranteeNotice`, `blShowDurabilityGuaranteeLabel`). Theme templates
 are a separate plan; shop-ce only ships the interfaces.
 
-## 1. `Article::_isFieldEmpty()` needs a whitelist entry for zero-valued INT columns
+## 1. `O3GUARANTEEYEARS` is nullable; `_isFieldEmpty()` whitelist still covers explicit 0
 
-`Article::_isFieldEmpty()` carries a `$aZeroValueFields` list of columns whose
-legitimate `0` must be treated as *empty* (so variants inherit the parent value
-instead of a spurious 0). A new NOT-NULL-DEFAULT-0 int column that participates in
-parent→variant inheritance (here `oxarticles__o3guaranteeyears`) **must be added to
-that whitelist** — otherwise a variant with years 0 shadows the parent's real value.
-Any future inheritable int column with a meaningful non-zero value has the same
-requirement. (`source/Application/Model/Article.php`, method `_isFieldEmpty`.)
+Per the PR #192 review, `oxarticles.O3GUARANTEEYEARS` is **`INT NULL DEFAULT NULL`**
+(NOT the original `NOT NULL DEFAULT 0`) — a default 0 confused operators (every
+article looked like it had a 0-year guarantee). Unset now reads empty. Keep the
+migration and `Setup/Sql/database_schema.sql` column defs byte-identical; the
+integration `GuaranteeMigrationTest` asserts `Null = YES` / `Default = NULL`.
+
+Variant inheritance still works two ways: `Article::_isFieldEmpty()` already returns
+true for `NULL` (`is_null` check up top), so an unset child inherits the parent; and
+the `$aZeroValueFields` whitelist entry `oxarticles__o3guaranteeyears` additionally
+makes an explicit `0` inherit. **Keep the whitelist entry** even though the column is
+nullable — dropping it would make a deliberately-entered `0` shadow the parent's
+value differently than NULL, and it pins the existing
+`testVariantChildWithZeroYearsInheritsParentValue`. Any future inheritable INT column
+whose legitimate `0` must inherit has the same whitelist requirement.
+(`source/Application/Model/Article.php`, method `_isFieldEmpty`.)
+
+`getGuaranteeYears()` reads via `getRawFieldData('o3guaranteeyears')` (like the sibling
+getters); `(int)` casts NULL → 0 → never label-eligible.
+
+## 1b. Admin: `<textarea>` renders darker than text inputs (facelift CSS gap)
+
+`source/out/admin/src/main_facelift.css` colours `input[type="text"], input[type="password"], select`
+`#555` (grey) but does **not** include `textarea`, so an admin `<textarea class="editinput">`
+inherits the darker body colour `#34495e` and looks "black" next to grey inputs.
+Fix locally with an inline `style="color: #555;"` on the textarea (done for the
+guarantee-conditions field in `article_extend.tpl`) rather than touching the shared
+CSS. The guarantee fields also live in their own right-side `<fieldset>` (like the
+Media/UpdatePrices panels), not inline in the left column.
 
 ## 2. Serving artwork under `out/pictures/` makes email embedding free
 

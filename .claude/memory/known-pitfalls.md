@@ -29,6 +29,10 @@ type: feedback
 ## `RssfeedTest::testPrepareUrlSeoOff` fails in a worktree (non-8080 shop URL) — not a regression
 - The test hardcodes `assertEquals('http://localhost:8080/?cl=rss...')` but `oxrssfeed::UNITprepareUrl()` reads the REAL config `sShopURL` (the mocked `getShopUrl` is ignored on this path). Git worktrees get a deterministic non-default port (e.g. `localhost:9440`), so the full unit suite shows this ONE test red with `Expected localhost:8080 / Actual localhost:9440`. It passes on the main repo (port 8080) and in CI. Don't chase it when running `./docker.sh test` from a `.claude/worktrees/*` checkout.
 
+## A whole CLUSTER of ~14 tests false-fails in a non-8080 worktree — shop-URL / SHOPURL-env coupled, not regressions
+- Running `./docker.sh test --all-failures` from a `.claude/worktrees/*` checkout (shop bound to e.g. `localhost:9240`) reliably shows **~14** red that are ALL environmental — the shop URL/host differs from CI's `localhost:8080`, or the `${O3SHOP_CONF_SHOPURL}` env placeholder isn't substituted in the worktree config. Confirmed set (2026-07-22, review of PR #192): `RssfeedTest::testPrepareUrlSeoOn/Off`; `EmailTest` order-email link tests (`testProductReviewLinksAreNotIncludedByDefaultInOrderEmail`, the 4 `...AccordingConfiguration` data sets, `testAddUserInfoOrderEmail`); `EmailUtf8Test::testSendOrderEmailToUser`; `EmailWaveTplTest::testSendOrderEmailToUser`; `ConfigTest::testGetImageDirNativeImagesIsSsl`, `testGetShopSecureHomeUrl`; `UtilsServerTest::testSaveSessionCookie`; `UtilsUrlTest::testAddBaseUrl` data sets #3/#4.
+- These are the SAME on a clean branch — verify quickly with `git stash push -u && ./docker.sh test --fast <suspect files>` then `git stash pop`; the failures reproduce without your changes, proving they're not yours. CI (port 8080) is green. Don't chase them; only your feature's own tests matter from a worktree.
+
 ## php-cs-fixer Cache
 - `.php-cs-fixer.cache` is gitignored but speeds up repeated runs significantly. If fixer seems to miss files, delete the cache and re-run.
 
