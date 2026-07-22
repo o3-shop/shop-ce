@@ -231,7 +231,35 @@ the leaked-abbreviation reset (7) avoids the need to touch views for the known c
    both the plain and coverage parallel paths). PHPUnit (the serial phase) accumulates
    multiple group flags fine — this only bit ParaTest.
 
-STATUS: proving ≥20 consecutive green `-p4` runs (real gate config). Then attempt `-p6`.
+9. **xdebug caused the worker SEGFAULTS (exit 139) and slowed runs.** The image
+   loads xdebug in `xdebug.mode=coverage` for ALL runs. Under the parallel workers
+   this intermittently segfaulted a worker (WorkerCrashedException, exit 139) and
+   added ~20s overhead even without collecting coverage. Fix: `run-tests.sh` exports
+   `XDEBUG_MODE=off` (xdebug's env override, inherited by ParaTest worker
+   subprocesses) for every non-coverage run; coverage runs keep xdebug. Verified:
+   `XDEBUG_MODE=off` → "Coverage ✘ disabled". Full `-p4` dropped 85s → ~66s.
+
+10. **The wall-clock bottleneck was virtiofs + no CLI opcache — NOT the DB.**
+    Under colima the repo is a virtiofs (FUSE) mount, and `opcache.enable_cli=Off`
+    by default, so each ParaTest worker re-read AND recompiled every PHP file from
+    the host for all ~2400 of its tests — workers sat blocked in the FUSE
+    `request_wait_answer` channel (diagnosis: VM ~70% idle, MySQL idle (0–2 queries),
+    iowait ~2%, huge context-switch rate, and `-p6` == `-p4` timing). Fix:
+    `run-tests.sh` passes CLI-opcache flags to the workers via ParaTest
+    `--passthru-php` (and to the serial phpunit run):
+    `-d opcache.enable_cli=1 -d opcache.validate_timestamps=0 -d opcache.memory_consumption=256 -d opcache.max_accelerated_files=30000`.
+    Full `-p4` dropped ~62s → ~51s (inside the 40–55s goal). More workers do NOT
+    help (virtiofs daemon serialises), so -p4 is the sweet spot.
+
+11. **Leaked language config → numeric view names (root of the ArticleMain/Vendor
+    cascade).** `getActiveShopLanguageIds()` reads config params
+    `aLanguageParams`/`aLanguages`; OXID's UnitTestCase doesn't fully rebuild Config
+    between tests, so a test overriding them leaks it → `getLanguageAbbr(0)` returns
+    '0' not 'de' → `oxv_oxshops_0` (nonexistent) → whole-class cascade. The reset
+    hook now snapshots those two params once per worker (pristine) and restores them
+    before each test (superseding the weaker `_aLangAbbr`-only reset).
+
+STATUS: proving ≥20 consecutive green `-p4` runs (real gate config, ~51s each).
 The rare view-naming cascade (`oxv_oxshops_0`: leaked language config makes
 `getLanguageAbbr(0)` return '0' not 'de') was likely driven by a quarantine polluter
 that shouldn't have been running — expected to vanish with the quarantine fix; the

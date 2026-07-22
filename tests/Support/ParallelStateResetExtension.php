@@ -46,6 +46,9 @@ use PHPUnit\Runner\BeforeTestHook;
  */
 final class ParallelStateResetExtension implements BeforeTestHook
 {
+    /** @var array<string, mixed>|null Pristine language config captured once per worker. */
+    private static $languageConfigSnapshot = null;
+
     public function executeBeforeTest(string $test): void
     {
         // Only inside ParaTest workers; leave sequential runs untouched.
@@ -62,6 +65,7 @@ final class ParallelStateResetExtension implements BeforeTestHook
         try {
             $this->resetActiveCurrency();
             $this->resetCurrencyPrecision();
+            $this->resetLanguageConfig();
             $this->resetLanguageAbbreviations();
             $this->resetSmarty();
         } catch (\Throwable $e) {
@@ -106,6 +110,32 @@ final class ParallelStateResetExtension implements BeforeTestHook
     private function resetCurrencyPrecision(): void
     {
         $this->nullProperty(Registry::getUtils(), Utils::class, '_iCurPrecision');
+    }
+
+    /**
+     * getActiveShopLanguageIds() derives the active languages from the config
+     * params 'aLanguageParams'/'aLanguages'. OXID's UnitTestCase does not fully
+     * rebuild the Config between tests, so a test that overrides one of these
+     * (e.g. restricting active languages) leaks it: getLanguageAbbr(0) then can't
+     * map 0 -> 'de' and returns the numeric '0', yielding non-existent view names
+     * like 'oxv_oxshops_0' (whole-class ArticleMain/Vendor cascade). Snapshot the
+     * pristine values once per worker (first test, freshly-installed shop) and
+     * restore them before every test.
+     */
+    private function resetLanguageConfig(): void
+    {
+        $config = Registry::getConfig();
+
+        if (self::$languageConfigSnapshot === null) {
+            self::$languageConfigSnapshot = [
+                'aLanguages' => $config->getConfigParam('aLanguages'),
+                'aLanguageParams' => $config->getConfigParam('aLanguageParams'),
+            ];
+            return;
+        }
+
+        $config->setConfigParam('aLanguages', self::$languageConfigSnapshot['aLanguages']);
+        $config->setConfigParam('aLanguageParams', self::$languageConfigSnapshot['aLanguageParams']);
     }
 
     /**
