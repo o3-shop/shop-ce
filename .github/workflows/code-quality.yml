@@ -136,6 +136,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
 
+      - name: 📦 Cache Vendor Directory
+        uses: actions/cache@v6
+        with:
+          # vendor/ is a pure function of the committed, platform-pinned
+          # composer.lock. Key on its exact hash with NO restore-keys: any
+          # dependency change fully busts the cache, so a re-resolve is never
+          # masked by a stale tree. composer install still runs (validates the
+          # tree + dumps autoload) and the o3-theme dev-main require afterwards
+          # keeps that one package fresh.
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-vendor-${{ hashFiles('composer.lock') }}
+
       - name: 🔧 Copy CI Config Files
         run: |
           cp .env.ci .env
@@ -245,10 +257,11 @@ jobs:
               "$PWD/tests/Unit" || true
 
             # Merge the two coverage sets + JUnit logs into one report, then expose
-            # them at the paths the downstream steps expect.
-            php tests/bin/merge-coverage.php
+            # them at the paths the downstream steps expect. --no-html: the gate
+            # only reads the Clover XML and nothing consumes the HTML artifact, so
+            # skip the expensive whole-source HTML render.
+            php tests/bin/merge-coverage.php --no-html
             cp coverage/coverage.xml coverage.xml
-            rm -rf coverage-html && cp -r coverage/html coverage-html
             cp coverage/junit.xml junit.xml
             echo "::endgroup::"
           else
@@ -275,13 +288,6 @@ jobs:
             cp coverage/junit.xml junit.xml
             echo "::endgroup::"
           fi
-
-      - name: ☁️ Upload Coverage Report (HTML)
-        if: env.IS_COVERAGE_LEG == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage-report-php-${{ matrix.php-version }}
-          path: coverage-html/
 
       - name: 📝 Parse Failed Tests
         id: parse_failed_tests

@@ -117,25 +117,31 @@ jobs:
               commentBody += '### ⚠️ Code Style Check\n⚠️ No code style results available.\n\n';
             }
             
-            // Check for test results
-            commentBody += '### 📊 Coverage Report\n';
+            // Test pass/fail per PHP version, plus coverage — which is computed on
+            // ONE leg only (see code-quality.yml), so it is shown once, not per row.
+            commentBody += '### 🧪 Tests\n';
             let hasFailures = false;
+            let coverageLine = '';
             const phpVersions = ['7.4', '8.0', '8.1', '8.2'];
-            
+
             phpVersions.forEach(version => {
               try {
                 const filePath = `./test-results/test-result-${version}.json`;
                 if (fs.existsSync(filePath)) {
                   const result = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                   const status = result.tests_failed === 'true' ? '❌' : '✅';
-                  const coverage = parseFloat(result.coverage) || 0;
-                  const coverageStatus = coverage >= 80 ? '✅' : coverage >= 60 ? '⚠️' : '❌';
-            
-                  commentBody += `${status} **PHP ${result.php_version}**: Coverage ${result.coverage}% ${coverageStatus}\n`;
-            
+                  commentBody += `${status} **PHP ${result.php_version}**\n`;
+
                   if (result.tests_failed === 'true' && result.failed_tests) {
                     hasFailures = true;
                     commentBody += `   Failed tests: ${result.failed_tests}\n`;
+                  }
+
+                  // Only one leg reports coverage; capture the first non-empty value.
+                  const coverage = parseFloat(result.coverage);
+                  if (!coverageLine && !isNaN(coverage) && coverage > 0) {
+                    const coverageStatus = coverage >= 90 ? '✅' : coverage >= 80 ? '⚠️' : '❌';
+                    coverageLine = `${coverageStatus} **${result.coverage}%** (PHP ${result.php_version})\n`;
                   }
                 } else {
                   commentBody += `⚠️ **PHP ${version}**: No results available\n`;
@@ -145,6 +151,9 @@ jobs:
                 commentBody += `❌ **PHP ${version}**: Error processing results\n`;
               }
             });
+
+            commentBody += '\n### 📊 Coverage\n';
+            commentBody += coverageLine || '⚠️ No coverage data available.\n';
             
             if (hasFailures) {
               commentBody += '\n### ❌ Failed Tests\nPlease check the failed tests above.\n';

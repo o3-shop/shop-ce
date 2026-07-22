@@ -162,8 +162,14 @@ $merged->doNotProcessUncoveredFiles();
 // Clover (the file the coverage-threshold gate reads).
 (new Clover())->process($merged, $covDir . '/coverage.xml');
 
-// HTML (for humans).
-(new HtmlFacade())->process($merged, $covDir . '/html');
+// HTML (for humans). Rendering the whole-source report is expensive; skip it with
+// --no-html in CI, where only the Clover gate is consumed. Local runs
+// (./docker.sh test-all-coverage) omit the flag and still get the HTML report.
+$htmlWritten = false;
+if (!in_array('--no-html', $argv, true)) {
+    (new HtmlFacade())->process($merged, $covDir . '/html');
+    $htmlWritten = true;
+}
 
 // Combine the two JUnit logs into one <testsuites> document.
 mergeJUnit(
@@ -173,7 +179,8 @@ mergeJUnit(
 
 $pct = round($merged->getReport()->percentageOfExecutedLines()->asFloat(), 2);
 echo "merge-coverage: merged $loaded coverage file(s). Line coverage: {$pct}%\n";
-echo "merge-coverage: wrote coverage/coverage.xml, coverage/html/, coverage/junit.xml\n";
+$outputs = 'coverage/coverage.xml, ' . ($htmlWritten ? 'coverage/html/, ' : '') . 'coverage/junit.xml';
+echo "merge-coverage: wrote {$outputs}\n";
 exit(0);
 
 /**
