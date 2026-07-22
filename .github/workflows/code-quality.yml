@@ -87,6 +87,11 @@ jobs:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, xml, ctype, json, tokenizer, pdo, pdo_mysql, mysqli
           coverage: pcov
+          # Match docker's default so exported env vars (e.g. O3SHOP_CONF_DBNAME)
+          # are copied into $_ENV, which source/config.inc.php reads. Without the
+          # 'E', an exported var isn't in $_ENV and Dotenv::createImmutable skips it
+          # (it's already in getenv), so shop-install subprocesses see an empty DB.
+          ini-values: variables_order=EGPCS
 
       - name: ⬇️ Install Composer 2.2
         run: |
