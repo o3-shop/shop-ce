@@ -59,7 +59,16 @@ jobs:
         run: exit 1
 
   test:
-    runs-on: ubuntu-latest
+    # Route ONLY the 8.2 coverage leg to the self-hosted runner, and only for
+    # trusted pushes: never for fork PRs (they'd run untrusted code on our box)
+    # and only when the triggering actor is on the allowlist. Everything else —
+    # the 7.4/8.0/8.1 legs, fork PRs, and non-listed actors — uses the free
+    # GitHub-hosted runners. The self-hosted box only ever runs one job at a time.
+    runs-on: >-
+      ${{ (matrix.php-version == '8.2'
+           && github.event.pull_request.head.repo.fork != true
+           && contains(fromJSON('["nlo-tronet"]'), github.actor))
+          && 'self-hosted' || 'ubuntu-latest' }}
 
     strategy:
       matrix:
