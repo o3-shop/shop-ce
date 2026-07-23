@@ -21,24 +21,6 @@ export class AdminRevocationConfigPage extends BaseAdminPage {
     );
   }
 
-  /**
-   * Read the stoken from the admin nav frame. The adminPage fixture
-   * leaves the page on the framed admin home, where every nav link
-   * carries a `stoken=` query param. We need it for any subsequent
-   * top-level admin navigation in the same session.
-   */
-  private async extractStoken(): Promise<string> {
-    const navFrame = this.page
-      .frameLocator('frame[name="navigation"]')
-      .frameLocator('frame[name="adminnav"]');
-    const link = await navFrame.locator('a[href*="stoken="]').first().getAttribute('href');
-    const match = link?.match(/stoken=([A-Za-z0-9]+)/);
-    if (!match) {
-      throw new Error('AdminRevocationConfigPage: could not extract stoken from admin nav.');
-    }
-    return match[1] ?? '';
-  }
-
   get form(): Locator {
     return this.page.locator('#myedit');
   }
