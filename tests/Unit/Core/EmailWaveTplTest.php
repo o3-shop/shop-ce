@@ -172,7 +172,7 @@ class EmailWaveTplTest extends \OxidTestCase
         /** @var oxBasketItem|PHPUnit\Framework\MockObject\MockObject $oBasketItem */
         $oBasketItem = $this->getMock(
             'oxBasketItem',
-            ['getRegularUnitPrice', 'getVatPercent', 'getAmount', 'getTitle', 'getProductId']
+            ['getRegularUnitPrice', 'getVatPercent', 'getAmount', 'getTitle', 'getProductId', 'getArticle']
         );
 
         $oBasketItem->expects($this->any())->method('getRegularUnitPrice')->will($this->returnValue($oPrice));
@@ -180,6 +180,9 @@ class EmailWaveTplTest extends \OxidTestCase
         $oBasketItem->expects($this->any())->method('getAmount')->will($this->returnValue(1));
         $oBasketItem->expects($this->any())->method('getTitle')->will($this->returnValue('testArticle'));
         $oBasketItem->expects($this->any())->method('getProductId')->will($this->returnValue('_testArticleId'));
+        // Theme order_cust.tpl may call getArticle() directly (wave #219 guarantee label);
+        // stub it or the real getArticle() throws EXCEPTION_ARTICLE_NOPRODUCTID.
+        $oBasketItem->expects($this->any())->method('getArticle')->will($this->returnValue($this->_oArticle));
 
         $oBasketItem->oxarticles__oxtitle = new oxField();
         $oBasketItem->oxarticles__oxvarselect = new oxField();
