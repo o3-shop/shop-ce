@@ -23,6 +23,47 @@ check_docker_compose() {
     echo "Using command: $DOCKER_COMPOSE"
 }
 
+# Wait until the shop container is actually serving before returning.
+# After `up -d` returns, the shop entrypoint still runs composer install, the
+# DB schema + demodata import and theme setup (~1-2 min on a first run) before
+# Apache answers requests. The compose healthcheck (`test ! -f
+# /tmp/o3setup-running`) flips to "healthy" only once that work is done, so we
+# poll it and show progress dots. Note: with the current healthcheck timing
+# (interval 5s / retries 20 / start_period 5s) a long first-run setup can make
+# the container report "unhealthy" transiently before it goes "healthy" — so we
+# treat only "healthy" as done and keep waiting through anything else until the
+# timeout. Must be called from the docker/ dir (where $DOCKER_COMPOSE resolves).
+wait_for_shop() {
+    local shop_cid status i
+    local timeout=180   # up to 180 * 2s = 6 minutes
+
+    shop_cid=$($DOCKER_COMPOSE ps -q shop)
+    if [ -z "$shop_cid" ]; then
+        echo "Warning: could not locate the shop container; skipping the readiness wait."
+        return 0
+    fi
+
+    echo "Installing Composer dependencies, importing the database + demo data and setting up themes."
+    echo "This can take 1-2 minutes on the first run — the shop is not reachable until it finishes."
+    printf "Waiting for the shop to become ready"
+
+    for ((i = 1; i <= timeout; i++)); do
+        status=$(docker inspect --format '{{.State.Health.Status}}' "$shop_cid" 2>/dev/null || echo starting)
+        if [ "$status" = "healthy" ]; then
+            echo " ready."
+            return 0
+        fi
+        printf "."
+        sleep 2
+    done
+
+    echo
+    echo "Timed out after $((timeout * 2))s waiting for the shop to become healthy (last status: '$status')."
+    echo "Recent shop container logs:"
+    docker logs --tail 40 "$shop_cid"
+    return 1
+}
+
 start_containers() {
     MY_DIR=$(getMyPath)
     cd "$MY_DIR/docker" || { echo "Error: Docker directory not found"; exit 1; }
@@ -56,15 +97,22 @@ start_containers() {
     $DOCKER_COMPOSE pull
     echo "Starting Docker containers..."
     $DOCKER_COMPOSE $COMPOSE_PROFILES up -d
-    if [ $? -eq 0 ]; then
-        echo "Docker containers started successfully"
-        $DOCKER_COMPOSE ps
-        echo "
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to start Docker containers"
+        exit 1
+    fi
+
+    wait_for_shop || exit 1
+
+    echo "Docker containers started successfully"
+    $DOCKER_COMPOSE ps
+    echo "
 +----------------+------------------------------------------+
 | Credentials    |                                          |
 +----------------+------------------------------------------+
 | Shop URL       | http://localhost:${O3SHOP_PORT_HTTP}      |
 | Admin URL      | http://localhost:${O3SHOP_PORT_HTTP}/admin/ |
+| Shop URL (SSL) | https://localhost:${O3SHOP_PORT_HTTPS} (self-signed) |
 | Admin Login    | admin@example.com                        |
 | Admin Password | admin123                                 |
 +----------------+------------------------------------------+
@@ -76,11 +124,7 @@ start_containers() {
 | Database       | ${O3SHOP_CONF_DBNAME}                    |
 +----------------+------------------------------------------+
 "
-        return 0
-    else
-        echo "Error: Failed to start Docker containers"
-        exit 1
-    fi
+    return 0
 }
 
 stop_containers() {
@@ -338,12 +382,14 @@ if $IS_WORKTREE; then
     O3SHOP_PORT_ADMINER=$(( O3SHOP_PORT_HTTP + 1 ))
     O3SHOP_PORT_MAILPIT=$(( O3SHOP_PORT_HTTP + 2 ))
     O3SHOP_PORT_SMTP=$(( O3SHOP_PORT_HTTP + 3 ))
+    O3SHOP_PORT_HTTPS=$(( O3SHOP_PORT_HTTP + 4 ))
     O3SHOP_CONF_DBNAME="o3shop_${O3SHOP_PORT_HTTP}"
 else
     O3SHOP_PORT_HTTP=8080
     O3SHOP_PORT_ADMINER=8081
     O3SHOP_PORT_MAILPIT=8025
     O3SHOP_PORT_SMTP=1025
+    O3SHOP_PORT_HTTPS=8443
 fi
 
 # Bootstrap .env if missing
@@ -378,6 +424,7 @@ fi
         grep "^O3SHOP_CONF_DBNAME=" "$MY_DIR/.env.example"
     fi
     echo "O3SHOP_PORT_HTTP=${O3SHOP_PORT_HTTP}"
+    echo "O3SHOP_PORT_HTTPS=${O3SHOP_PORT_HTTPS}"
     echo "O3SHOP_PORT_ADMINER=${O3SHOP_PORT_ADMINER}"
     echo "O3SHOP_PORT_MAILPIT=${O3SHOP_PORT_MAILPIT}"
     echo "O3SHOP_PORT_SMTP=${O3SHOP_PORT_SMTP}"
