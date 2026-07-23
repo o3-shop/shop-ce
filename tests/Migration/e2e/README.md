@@ -39,6 +39,10 @@ KEEP=1 tests/Migration/e2e/run-migration-e2e.sh
 
 Parameters (env vars): `DB_IMAGE`, `PHP_VERSION`, `TARGET_VERSION`, `KEEP`.
 
+> **Working-tree caveat:** the driver copies the shop into the container with `git archive HEAD`,
+> i.e. the **committed** tree. Uncommitted local edits (e.g. a WIP `source/migration/data/Version*.php`)
+> are **not** exercised — commit them first, or they'll appear to pass without being tested.
+
 ## Run in CI
 
 `.github/workflows/migration-e2e.yml` runs the full 8-cell matrix

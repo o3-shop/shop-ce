@@ -11,8 +11,10 @@
 -- runs it on a throwaway MariaDB sidecar, then loads the decoded result into the
 -- MySQL 8 target, so the shop's decode migrations become harmless no-ops there.
 --
--- Idempotent: the o3-shop migrations guard on the column still being a BLOB; once
--- these columns are TEXT the shop treats them as already decoded.
+-- Run ONCE on a fresh fixture load: this script is NOT itself re-runnable (a second run
+-- fails on `ADD COLUMN ..._UNENC`, which already exists). What IS idempotent is the shop's
+-- own decode migration afterwards — it guards on the column still being a BLOB, so once these
+-- columns are TEXT the shop treats them as already decoded and skips.
 
 -- Decoded OXID config values are byte strings (historically latin1), not
 -- guaranteed valid UTF-8. Disable strict mode so copying them into the TEXT

@@ -71,6 +71,22 @@ phase_start_db() {
 
 phase_load_fixture() {
     echo "Fixture: $(basename "$FIXTURE") ($(du -h "$FIXTURE" | cut -f1) gzipped)"
+    # Verify the committed checksum before loading, so fixture corruption or an accidental
+    # re-dump is caught rather than silently exercised. The .sha256 holds a bare hash (as
+    # written by build-oxid643-fixture.sh), so compare manually — portable across sha256sum
+    # (CI/Linux) and shasum (macOS).
+    local sha_file="$HERE/fixtures/oxid-6.4.3-ce-demodata.sha256"
+    if [ -f "$sha_file" ]; then
+        local sha_expected sha_actual
+        sha_expected="$(tr -d '[:space:]' < "$sha_file")"
+        if command -v sha256sum >/dev/null 2>&1; then sha_actual="$(sha256sum "$FIXTURE" | awk '{print $1}')"
+        else sha_actual="$(shasum -a 256 "$FIXTURE" | awk '{print $1}')"; fi
+        [ "$sha_expected" = "$sha_actual" ] \
+            || { echo "FAIL: fixture checksum mismatch (expected $sha_expected, got $sha_actual)"; exit 1; }
+        echo "Fixture checksum OK ($sha_actual)"
+    else
+        echo "WARNING: no fixture checksum file ($sha_file) — skipping integrity check"
+    fi
     case "$DB_IMAGE" in
         mysql:*)
             # MySQL 8.0 removed ENCODE()/DECODE(), so the OXID-encrypted oxconfig /
@@ -91,9 +107,18 @@ phase_load_fixture() {
             gunzip -c "$FIXTURE" | docker exec -i "$SIDECAR" mysql -uroot -proot "$DBNAME"
             echo "  - decoding oxconfig.OXVARVALUE / oxuserpayments.OXVALUE"
             docker exec -i "$SIDECAR" mysql -uroot -proot "$DBNAME" < "$HERE/lib/decode-mysql8.sql"
-            echo "  - transferring decoded data to MySQL 8 (--force tolerates MariaDB view defs; views are regenerated later)"
-            docker exec "$SIDECAR" mysqldump -uroot -proot --no-tablespaces --single-transaction "$DBNAME" \
-                | docker exec -i "$DBC" mysql -uroot -proot --force "$DBNAME"
+            # Transfer only BASE TABLES (views are regenerated later by db_views_generate), so we no
+            # longer need --force to swallow MariaDB view-definition errors — a genuine base-table
+            # import failure now fails the phase loudly. Load under a relaxed sql_mode so the decoded,
+            # non-UTF8 bytes (oxconfig.OXVARVALUE / oxuserpayments.OXVALUE) survive MySQL 8's default
+            # strict mode instead of being silently skipped (matching the sidecar decode).
+            echo "  - transferring decoded base tables to MySQL 8 (views regenerated later)"
+            local base_tables
+            base_tables=$(docker exec "$SIDECAR" mysql -uroot -proot -N -e \
+                "SELECT table_name FROM information_schema.tables WHERE table_schema='$DBNAME' AND table_type='BASE TABLE'")
+            # shellcheck disable=SC2086  # word-splitting is intentional: pass each table as its own arg
+            docker exec "$SIDECAR" mysqldump -uroot -proot --no-tablespaces --single-transaction "$DBNAME" $base_tables \
+                | docker exec -i "$DBC" mysql -uroot -proot --init-command="SET SESSION sql_mode=''" "$DBNAME"
             docker rm -f "$SIDECAR" >/dev/null 2>&1 || true
             ;;
         *)
@@ -101,12 +126,21 @@ phase_load_fixture() {
             gunzip -c "$FIXTURE" | docker exec -i "$DBC" mysql -uroot -proot "$DBNAME"
             ;;
     esac
-    # Make the import unmistakably visible in the log.
+    # Make the import unmistakably visible in the log AND assert the invariants as hard gates.
+    # (echo alone can't fail the phase: a failed $(dbq ...) inside an echo argument still exits 0
+    # under `set -euo pipefail`, so a bad/empty load would scroll past to a misleading green.)
+    local n_articles n_categories n_tables n_migrations
+    n_articles=$(dbq "SELECT COUNT(*) FROM $DBNAME.oxarticles")
+    n_categories=$(dbq "SELECT COUNT(*) FROM $DBNAME.oxcategories")
+    n_tables=$(dbq "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$DBNAME'")
+    n_migrations=$(dbq "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$DBNAME' AND table_name LIKE 'oxmigrations%'")
     echo "Imported OXID 6.4.3 database:"
-    echo "  articles      = $(dbq "SELECT COUNT(*) FROM $DBNAME.oxarticles")"
-    echo "  categories    = $(dbq "SELECT COUNT(*) FROM $DBNAME.oxcategories")"
-    echo "  tables+views  = $(dbq "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$DBNAME'")"
-    echo "  oxmigrations  = $(dbq "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$DBNAME' AND table_name LIKE 'oxmigrations%'") (expected 0 — pre-migration state)"
+    echo "  articles      = $n_articles"
+    echo "  categories    = $n_categories"
+    echo "  tables+views  = $n_tables"
+    echo "  oxmigrations  = $n_migrations (expected 0 — pre-migration state)"
+    [ "${n_articles:-0}" -gt 0 ] || { echo "FAIL: fixture load produced no articles"; exit 1; }
+    [ "${n_migrations:-0}" -eq 0 ] || { echo "FAIL: fixture already migrated (oxmigrations table present)"; exit 1; }
 }
 
 phase_provision() {
@@ -124,7 +158,9 @@ phase_provision() {
         curl -fsSL https://getcomposer.org/download/2.2.21/composer.phar -o /usr/local/bin/composer
         chmod +x /usr/local/bin/composer
     '
-    # git archive keeps the working tree clean (no vendor/ written into the repo).
+    # git archive keeps the working tree clean (no vendor/ written into the repo). NOTE: it copies
+    # the COMMITTED tree at HEAD — uncommitted local edits (e.g. a WIP source/migration/data/
+    # Version*.php) are NOT exercised. Commit first when iterating locally. See README caveat.
     echo "Copying o3-shop tree into container (git archive HEAD)"
     git -C "$REPO_ROOT" archive HEAD | docker exec -i "$PHPC" tar x -C /app
 }

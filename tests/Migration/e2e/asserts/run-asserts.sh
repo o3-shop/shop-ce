@@ -16,6 +16,9 @@
 set -euo pipefail
 
 PHPC="${1:?PHP container name required}"
+# The driver also passes $2 (DB container) and $3 (network); they are intentionally not consumed
+# here — reserved for future DB-level asserts (e.g. row-count checks against the migrated DB).
+# The current boot-smoke only needs the PHP container.
 PORT=8888
 
 fail() { echo "ASSERT FAIL: $*" >&2; exit 1; }
