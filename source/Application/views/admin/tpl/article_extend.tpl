@@ -398,7 +398,7 @@ function processUnitInput( oSelect, sInputId )
                 <tr>
                     <td class="edittext">[{oxmultilang ident="O3_GUARANTEE_ADMIN_YEARS_LABEL"}]:&nbsp;</td>
                     <td class="edittext">
-                        <input type="text" class="editinput" size="4" name="editval[oxarticles__o3guaranteeyears]" value="[{$edit->oxarticles__o3guaranteeyears->value}]" [{$readonly}]>
+                        <input type="text" class="editinput" size="4" name="editval[oxarticles__o3guaranteeyears]" value="[{if $edit->oxarticles__o3guaranteeyears->value}][{$edit->oxarticles__o3guaranteeyears->value}][{/if}]" [{$readonly}]>
                         [{oxmultilang ident="O3_GUARANTEE_ADMIN_YEARS_UNIT"}]
                     </td>
                 </tr>
