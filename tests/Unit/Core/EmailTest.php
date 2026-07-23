@@ -1286,7 +1286,7 @@ class EmailTest extends \OxidTestCase
         $priceStub->method('getBruttoPrice')->will($this->returnValue(8));
 
         $basketItemStub = $this->getMockBuilder(BasketItem::class)
-            ->setMethods(['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle'])
+            ->setMethods(['getPrice', 'getUnitPrice', 'getRegularUnitPrice', 'getTitle', 'getArticle'])
             ->getMock();
         $basketItemStub->method('getPrice')->will($this->returnValue($priceStub));
         $basketItemStub->method('getUnitPrice')->will($this->returnValue($priceStub));
@@ -1298,6 +1298,12 @@ class EmailTest extends \OxidTestCase
         $article->setId('_testArticleId');
         $article->setId('_testArticleId');
         $article->oxarticles__oxtitle = new oxField();
+
+        // A theme's order-confirmation template may call $basketitem->getArticle()
+        // directly (e.g. the wave #219 durability-guarantee label). Without this stub
+        // the real BasketItem::getArticle() runs against a product-less mock and throws
+        // EXCEPTION_ARTICLE_NOPRODUCTID, erroring these tests. Return the test article.
+        $basketItemStub->method('getArticle')->will($this->returnValue($article));
 
         $priceStub->setPrice(0);
 
