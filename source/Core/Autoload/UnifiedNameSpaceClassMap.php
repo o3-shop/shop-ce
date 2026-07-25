@@ -1757,7 +1757,7 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
-    'OxidEsales\EshopCommunity\Application\Controller\SearchSuggestController'             => [
+    'OxidEsales\Eshop\Application\Controller\SearchSuggestController'           => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\SearchSuggestController::class,
         'isAbstract'       => false,
         'isInterface'      => false,
