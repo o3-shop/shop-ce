@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Application\Controller;
 
 use OxidEsales\Eshop\Application\Model\Search;
+use OxidEsales\Eshop\Core\Header;
 use OxidEsales\Eshop\Core\Registry;
 
 class SearchSuggestController extends FrontendController
 {
-    protected $_sThisTemplate = 'widget/header/searchsuggest.tpl';
-
     public const MAX_SUGGESTIONS = 8;
 
     public function render()
@@ -24,10 +23,7 @@ class SearchSuggestController extends FrontendController
             $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, self::MAX_SUGGESTIONS);
         }
 
-        $this->_aViewData['suggestionsJson'] = json_encode($aResult, JSON_THROW_ON_ERROR);
-
-        parent::render();
-
-        return $this->_sThisTemplate;
+        Registry::get(Header::class)->setHeader('Content-Type: application/json; charset=UTF-8');
+        Registry::getUtils()->showMessageAndExit(json_encode($aResult, JSON_THROW_ON_ERROR));
     }
 }

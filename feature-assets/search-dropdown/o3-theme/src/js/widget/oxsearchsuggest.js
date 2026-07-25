@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fetchSuggestions(query) {
         var baseUrl = searchInput.dataset.suggestUrl;
-        var url = baseUrl + 'cl=searchsuggest&searchparam=' + encodeURIComponent(query) + '&renderPartial=1';
+        var url = baseUrl + 'cl=searchsuggest&searchparam=' + encodeURIComponent(query);
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
@@ -89,8 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
                     try {
-                        var response = JSON.parse(xhr.responseText);
-                        var items = JSON.parse(response.content);
+                        var items = JSON.parse(xhr.responseText);
                         renderSuggestions(items);
                     } catch (e) {
                         closeDropdown();
