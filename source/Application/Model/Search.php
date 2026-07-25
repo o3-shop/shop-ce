@@ -413,7 +413,8 @@ class Search extends Base
         $oArtList->selectString($sSelect);
 
         foreach ($oArtList as $oSuggestion) {
-            $dPrice = (float) $oSuggestion->oxarticles__oxprice->value;
+            $oPrice = $oSuggestion->getPrice();
+            $dPrice = $oPrice ? $oPrice->getBruttoPrice() : 0;
             $sFormattedPrice = Registry::getLang()->formatCurrency($dPrice);
 
             $oCurrency = Registry::getConfig()->getActShopCurrencyObject();
