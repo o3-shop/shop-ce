@@ -380,6 +380,44 @@ function processUnitInput( oSelect, sInputId )
 
        </fieldset>
 
+        [{* EU guarantee labels (#219): producer durability guarantee - Reg. (EU) 2025/1960. *}]
+        [{* Own boxed panel (fixed EU design; operator only fills the trader data). *}]
+        <br><br>
+        <fieldset title="[{oxmultilang ident="O3_GUARANTEE_ADMIN_FIELDS_HEADING"}]" style="padding-left: 5px;">
+            <legend>[{oxmultilang ident="O3_GUARANTEE_ADMIN_FIELDS_HEADING"}][{oxinputhelp ident="HELP_O3_GUARANTEE_FIELDS"}]</legend><br>
+
+            [{if $guaranteeWarnings}]
+              <div class="messagebox">
+                [{foreach from=$guaranteeWarnings item=warningKey}]
+                  <p>[{oxmultilang ident=$warningKey}]</p>
+                [{/foreach}]
+              </div>
+            [{/if}]
+
+            <table cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td class="edittext">[{oxmultilang ident="O3_GUARANTEE_ADMIN_YEARS_LABEL"}]:&nbsp;</td>
+                    <td class="edittext">
+                        <input type="text" class="editinput" size="4" name="editval[oxarticles__o3guaranteeyears]" value="[{if $edit->oxarticles__o3guaranteeyears->value}][{$edit->oxarticles__o3guaranteeyears->value}][{/if}]" [{$readonly}]>
+                        [{oxmultilang ident="O3_GUARANTEE_ADMIN_YEARS_UNIT"}]
+                    </td>
+                </tr>
+                <tr>
+                    <td class="edittext">[{oxmultilang ident="O3_GUARANTEE_ADMIN_GUARANTOR_LABEL"}]:&nbsp;</td>
+                    <td class="edittext"><input type="text" class="editinput" size="40" maxlength="255" name="editval[oxarticles__o3guaranteeguarantor]" value="[{$edit->oxarticles__o3guaranteeguarantor->value}]" [{$readonly}]></td>
+                </tr>
+                <tr>
+                    <td class="edittext">[{oxmultilang ident="O3_GUARANTEE_ADMIN_MODEL_LABEL"}]:&nbsp;</td>
+                    <td class="edittext"><input type="text" class="editinput" size="40" maxlength="255" name="editval[oxarticles__o3guaranteemodel]" value="[{$edit->oxarticles__o3guaranteemodel->value}]" [{$readonly}]></td>
+                </tr>
+                <tr>
+                    <td class="edittext" valign="top">[{oxmultilang ident="O3_GUARANTEE_ADMIN_CONDITIONS_LABEL"}]:&nbsp;</td>
+                    <td class="edittext"><textarea class="editinput" style="color: #555;" cols="60" rows="6" name="editval[oxarticles__o3guaranteeconditions]" [{$readonly}]>[{$edit->oxarticles__o3guaranteeconditions->value}]</textarea></td>
+                </tr>
+            </table>
+
+       </fieldset>
+
       </td>
       <!-- Ende rechte Seite -->
     </tr>

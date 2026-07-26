@@ -724,6 +724,67 @@ class UtilsTest extends \OxidTestCase
         $this->assertTrue($aPaths == null);
     }
 
+    /**
+     * An unset/empty sCompileDir must never resolve to the current working
+     * directory. Previously realpath('') returned the CWD, so every cache
+     * path pointed at wherever the process happened to be running.
+     */
+    public function testGetCacheFilePathReturnsFalseWhenCompileDirEmpty()
+    {
+        $oUtils = oxNew('oxUtils');
+        $this->getConfig()->setConfigParam('sCompileDir', '');
+
+        $this->assertFalse($oUtils->getCacheFilePath('someCacheName'));
+        $this->assertFalse($oUtils->getCacheFilePath(null, true));
+    }
+
+    /**
+     * Regression: with an empty sCompileDir, oxResetFileCache() used to glob
+     * realpath('') === the current working directory and delete every file in
+     * it. In the test/service bootstrap the CWD is the testing-library
+     * satellite, so a coverage run silently wiped base.php, the vendor symlink
+     * and test_config.yml. It must never touch the CWD.
+     */
+    public function testOxResetFileCacheDoesNotWipeCwdWhenCompileDirEmpty()
+    {
+        $sSafeDir = sys_get_temp_dir() . '/oxutils_cache_guard_' . uniqid('', true);
+        mkdir($sSafeDir);
+        $sMarker = $sSafeDir . '/keep_me.php';
+        file_put_contents($sMarker, '<?php // must survive');
+
+        $sOldCwd = getcwd();
+        try {
+            chdir($sSafeDir);
+            $this->getConfig()->setConfigParam('sCompileDir', '');
+
+            oxNew('oxUtils')->oxResetFileCache();
+
+            $this->assertFileExists(
+                $sMarker,
+                'oxResetFileCache() must not delete files in the current working directory when sCompileDir is empty.'
+            );
+        } finally {
+            chdir($sOldCwd);
+            @unlink($sMarker);
+            @rmdir($sSafeDir);
+        }
+    }
+
+    /**
+     * Regression: with an empty/unconfigured compile dir the file cache must
+     * degrade gracefully (skip caching) instead of calling fopen('')/rename('')
+     * which throw a ValueError on PHP 8.
+     */
+    public function testToFileCacheDegradesGracefullyWhenCompileDirEmpty()
+    {
+        $this->getConfig()->setConfigParam('sCompileDir', '');
+        $oUtils = oxNew('oxUtils');
+
+        $this->assertFalse($oUtils->toFileCache('someKey', 'someValue'));
+        // Must not throw when flushing either.
+        $oUtils->commitFileCache();
+    }
+
     public function testOxResetFileCacheSkipsTablesFieldNames()
     {
         $myConfig = $this->getConfig();
