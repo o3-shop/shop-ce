@@ -28,6 +28,7 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Constraint\ConstraintUpdat
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ComposerJsonConstraintWriter;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\BranchGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\ComposerInstallGate;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\DeleteBranchOnMergeGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\IncomingPrGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\MergeBackPrGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates\TestSuiteGate;
@@ -352,6 +353,11 @@ class ReleaseCommand extends Command
             new ComposerInstallGate($exec, $this->resolveBundledComposer()),
             new TestSuiteGate($exec, $skipTestsResolver),
             new IncomingPrGate($exec),
+            // Ordered before MergeBackPrGate: that gate points at the
+            // merge-back PR whose head IS the release branch, so the
+            // repo must be known-safe against auto-delete before the
+            // maintainer is told to go merge it.
+            new DeleteBranchOnMergeGate($exec),
             new MergeBackPrGate($exec),
         ]);
     }
