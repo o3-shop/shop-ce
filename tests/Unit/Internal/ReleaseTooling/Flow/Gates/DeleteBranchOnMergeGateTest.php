@@ -71,6 +71,28 @@ class DeleteBranchOnMergeGateTest extends TestCase
         $this->assertStringContainsString('unexpected value', $outcome->messages()[0]);
     }
 
+    /**
+     * A repo released from `main` has no separate maintenance line, so
+     * no merge-back PR can exist and auto-delete cannot reach a release
+     * branch. Aborting there would let a benign setting on any theme or
+     * satellite repo block the whole release.
+     */
+    public function testSkipsRepoReleasedFromMainWithoutQueryingGitHub(): void
+    {
+        $exec = new FakeProcessExecutor([]);
+        $outcome = (new DeleteBranchOnMergeGate($exec))->evaluate('', 'main', 'o3-shop/wave-theme');
+        $this->assertTrue($outcome->isPassed());
+        $this->assertSame([], $exec->commands(), 'Skipped repos must not cost a gh round-trip.');
+    }
+
+    public function testStillAbortsForMaintenanceLineRepoEvenWhenNamedLikeMain(): void
+    {
+        $cmd = 'gh api repos/o3-shop/smarty --jq .delete_branch_on_merge';
+        $exec = new FakeProcessExecutor([$cmd => new ProcessOutcome(0, "true\n", '')]);
+        $outcome = (new DeleteBranchOnMergeGate($exec))->evaluate('', 'support/2.6', 'o3-shop/smarty');
+        $this->assertTrue($outcome->aborts());
+    }
+
     public function testResolvesRenamedSlugForGhApi(): void
     {
         $cmd = 'gh api repos/o3-shop/o3-Theme --jq .delete_branch_on_merge';

@@ -30,11 +30,14 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning;
  * The `b-1.<n>` group is the shop release line: every one of those
  * repos branches per shop minor, so opening a new line (1.6 -> 1.7)
  * means cutting `b-1.<n>` in each of them and bumping the whole
- * group here in lockstep. A package whose branch is missing on the
- * remote fails pre-flight (BranchGate / UpToDateGate) rather than
- * silently releasing from the wrong ref. The other groups —
- * `b-1.0`, `b-7.0.x`, `b-6.5.x`, `support/2.6`, `main` — version
- * independently of the shop line and do not move with it.
+ * group here in lockstep. Bump this map only once those branches
+ * exist: pre-flight runs LAST inside ReleasePlanner::plan(), so a
+ * branch that is missing on the remote surfaces earlier and less
+ * legibly as a raw composer.json 404 from DepTreeWalker, reported as
+ * `Plan failed:` — no gate ever runs. BranchGate covers the other
+ * direction, a local checkout sitting on the wrong branch. The other
+ * groups — `b-1.0`, `b-7.0.x`, `b-6.5.x`, `support/2.6`, `main` —
+ * version independently of the shop line and do not move with it.
  *
  * Repos not in the map fall back to `main`.
  */

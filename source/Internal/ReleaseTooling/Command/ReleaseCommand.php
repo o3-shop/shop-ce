@@ -353,10 +353,13 @@ class ReleaseCommand extends Command
             new ComposerInstallGate($exec, $this->resolveBundledComposer()),
             new TestSuiteGate($exec, $skipTestsResolver),
             new IncomingPrGate($exec),
-            // Ordered before MergeBackPrGate: that gate points at the
-            // merge-back PR whose head IS the release branch, so the
-            // repo must be known-safe against auto-delete before the
-            // maintainer is told to go merge it.
+            // Adjacent to MergeBackPrGate because they concern the same
+            // PR — that gate points at the merge-back whose head IS the
+            // release branch, this one proves merging it cannot delete
+            // that branch. Placement is presentational only: the runner
+            // evaluates every gate unconditionally and never
+            // short-circuits, so order affects the report, not control
+            // flow.
             new DeleteBranchOnMergeGate($exec),
             new MergeBackPrGate($exec),
         ]);

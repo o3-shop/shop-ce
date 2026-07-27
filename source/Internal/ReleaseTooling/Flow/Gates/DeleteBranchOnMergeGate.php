@@ -36,6 +36,14 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
  * it needs no local checkout (and `$repoPath` is intentionally unused).
  * Fails CLOSED — any unverifiable result aborts.
  *
+ * Scoped to repos that HAVE a separate maintenance line. When the
+ * release branch is `main`, the merge-back PR would need `main` as
+ * both base and head, so no such PR can exist and no release branch
+ * is reachable by auto-delete — there `delete_branch_on_merge = true`
+ * is ordinary feature-branch hygiene, not a hazard. Aborting on it
+ * would turn a benign repo setting anywhere in the network into a
+ * full release blocker, so those repos are skipped outright.
+ *
  * Output assumption: `--jq .delete_branch_on_merge` renders the JSON
  * boolean as the lowercase strings `true`/`false`; anything else
  * (e.g. `null`) is treated as unverifiable and aborts.
@@ -60,6 +68,10 @@ class DeleteBranchOnMergeGate implements PreFlightGate
 
     public function evaluate(string $repoPath, string $expectedBranch, string $packageName): GateOutcome
     {
+        if ($expectedBranch === MergeBackPrGate::MERGE_BACK_BASE) {
+            return GateOutcome::passed(self::NAME); // no merge-back possible, nothing to guard
+        }
+
         $slug = PackageRepoSlug::resolve($packageName);
         $outcome = $this->exec->execute(
             [$this->ghBin, 'api', 'repos/' . $slug, '--jq', '.delete_branch_on_merge'],
