@@ -1,10 +1,19 @@
 name: Code Quality
 
 on:
+  # Full validation runs on PRs (into any base) and on pushes to the
+  # integration branches. Feature-branch pushes no longer trigger a run on
+  # their own — the PR covers them — which also stops the double run (push +
+  # pull_request) for same-repo PRs.
   push:
-    branches: ['**']
+    branches: [b-1.7, b-1.6]
   pull_request:
-    branches: ['**']
+
+# A new commit on the same ref cancels the superseded, still-running job —
+# important for the slow native e2e job.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -16,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: 🐘 Setup PHP 8.2
         uses: shivammathur/setup-php@v2
@@ -48,7 +57,7 @@ jobs:
 
       - name: 📤 Upload Code Style Results
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cs-fixer-result
           path: cs-fixer-result.txt
@@ -79,7 +88,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: 🐘 Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -117,7 +126,7 @@ jobs:
           echo "Using version: $VERSION"
 
       - name: 📦 Cache Composer Downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           # composer.lock is gitignored, so CI resolves to the latest deps on
           # every run. Caching `vendor` would freeze a stale tree (a lockless
@@ -201,7 +210,7 @@ jobs:
           echo "::endgroup::"
 
       - name: ☁️ Upload Coverage Report (HTML)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report-php-${{ matrix.php-version }}
           path: coverage-html/
@@ -281,7 +290,7 @@ jobs:
 
       - name: 📤 Upload Test Results
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-result-${{ matrix.php-version }}
           path: test-result-${{ matrix.php-version }}.json
@@ -291,3 +300,185 @@ jobs:
         if: env.TESTS_FAILED == 'true'
         run: exit 1
 
+  e2e:
+    name: E2E (Playwright, native)
+    runs-on: ubuntu-latest
+    # ── Native e2e — NOT in the PHP matrix ────────────────────────────────────
+    # Replicates the docker entrypoint's provisioning (composer + satellites +
+    # bin/o3-setup + themes) directly on the runner, serves the shop with Apache
+    # (mod_php + mod_rewrite for OXID SEO URLs), and runs Playwright with
+    # E2E_SHOP_EXEC=native so the harness runs its oe-console/php helpers on the
+    # host instead of `docker exec`. Single 8.2 job: e2e behaviour is
+    # PHP-version-independent (the unit matrix covers versions) and the suite is
+    # slow, so a per-version browser run adds cost without signal.
+    #
+    # ⚠ FIRST CUT — needs a PR dry-run to green. Likely tuning spots:
+    #   (a) Apache+mod_php serving OXID SEO URLs (AllowOverride / .htaccess),
+    #   (b) bin/o3-setup completing non-interactively against the service DB,
+    #   (c) PHP mail() → Mailpit via the msmtp sendmail shim.
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: o3shop_test
+          MYSQL_USER: o3shop
+          MYSQL_PASSWORD: o3shop
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - 8025:8025
+          - 1025:1025
+    env:
+      COMPOSER_ROOT_VERSION: dev-b-1.6
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: 🐘 Install PHP 8.2 + Apache (mod_php) + msmtp
+        run: |
+          sudo add-apt-repository -y ppa:ondrej/php
+          sudo apt-get update
+          sudo apt-get install -y apache2 libapache2-mod-php8.2 \
+            php8.2 php8.2-mysql php8.2-gd php8.2-curl php8.2-mbstring php8.2-xml \
+            php8.2-intl php8.2-soap php8.2-bcmath php8.2-zip php8.2-bz2 \
+            libxml2-utils default-mysql-client msmtp msmtp-mta unzip git
+          sudo update-alternatives --set php /usr/bin/php8.2 || true
+          php -v
+
+      - name: 📮 Route PHP mail() → Mailpit (msmtp shim)
+        run: |
+          printf 'defaults\nhost 127.0.0.1\nport 1025\ntls off\nauth off\nfrom ci@localhost\naccount default\n' \
+            | sudo tee /etc/msmtprc >/dev/null
+          echo 'sendmail_path = "/usr/bin/msmtp -t"' \
+            | sudo tee /etc/php/8.2/apache2/conf.d/99-mailpit.ini /etc/php/8.2/cli/conf.d/99-mailpit.ini >/dev/null
+
+      - name: ⬇️ Install Composer 2.2
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --version=2.2.28
+          php -r "unlink('composer-setup.php');"
+          sudo mv composer.phar /usr/local/bin/composer
+          composer --version
+
+      - name: 📥 Install dependencies + o3-theme
+        run: |
+          composer install --prefer-dist --no-progress --optimize-autoloader
+          composer require o3-shop/o3-theme:dev-main --prefer-dist --no-progress
+
+      - name: 🧩 Clone satellites (testing-library, demodata) + symlinks
+        env:
+          # PR base branch (pull_request) or pushed branch (push). testing-library
+          # tracks its own release lines and currently has none past b-1.6, so we
+          # probe for a matching branch and fall back to b-1.6 when it has none —
+          # this auto-tracks the shop's release line once testing-library advances.
+          TARGET_REF: ${{ github.base_ref || github.ref_name }}
+        run: |
+          TL_BRANCH="b-1.6"
+          if git ls-remote --exit-code --heads https://github.com/o3-shop/testing-library.git "$TARGET_REF" >/dev/null 2>&1; then
+            TL_BRANCH="$TARGET_REF"
+          fi
+          echo "Cloning testing-library branch '$TL_BRANCH'."
+          git clone --branch "$TL_BRANCH" --depth 1 https://github.com/o3-shop/testing-library.git testing-library
+          rm -rf vendor/o3-shop/testing-library
+          ln -s ../../testing-library vendor/o3-shop/testing-library
+          [ -e testing-library/vendor ] || ln -s ../vendor testing-library/vendor
+          sed -i "s/ --skip-ssl//g" testing-library/library/Services/Library/DatabaseHandler.php || true
+          git clone --branch main --depth 1 https://github.com/o3-shop/shop-demodata-ce.git shop-demodata-ce
+          rm -rf vendor/o3-shop/shop-demodata-ce
+          ln -s ../../shop-demodata-ce vendor/o3-shop/shop-demodata-ce
+
+      - name: 🎨 Install wave theme + o3-theme out symlinks
+        run: |
+          git clone --branch main --depth 1 https://github.com/o3-shop/wave-theme.git source/Application/views/wave
+          mkdir -p source/out
+          ln -sf ../Application/views/wave/out/wave source/out/wave
+          ln -sf ../Application/views/o3-theme/out/o3-theme source/out/o3-theme || true
+
+      - name: 🔧 Shop config (.env.ci) + bin/o3-setup (schema + demodata)
+        run: |
+          cp .env.ci .env
+          cp source/config.inc.php.dist source/config.inc.php
+          for i in $(seq 1 30); do
+            mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent && { echo "db ready"; break; }
+            echo "waiting for db... ($i/30)"
+            if [ "$i" = "30" ]; then echo "::error::database not reachable"; exit 1; fi
+            sleep 2
+          done
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS o3shop_test;"
+          php bin/o3-setup
+
+      - name: 🌐 Serve the shop with Apache on :8080
+        run: |
+          sudo a2enmod rewrite
+          sudo tee /etc/apache2/sites-available/o3shop.conf >/dev/null <<APACHE
+          Listen 8080
+          <VirtualHost *:8080>
+            DocumentRoot ${GITHUB_WORKSPACE}/source
+            <Directory ${GITHUB_WORKSPACE}/source>
+              AllowOverride All
+              Require all granted
+            </Directory>
+          </VirtualHost>
+          APACHE
+          sudo a2dissite 000-default || true
+          sudo a2ensite o3shop
+          sudo chmod -R a+rX "${GITHUB_WORKSPACE}/source"
+          sudo chown -R www-data:www-data "${GITHUB_WORKSPACE}/source/tmp" "${GITHUB_WORKSPACE}/source/log" 2>/dev/null || true
+          # Apache (www-data) writes the runtime + anti-spam caches here, but the
+          # Playwright helpers run as 'runner' and delete them between tests.
+          # Unlink is governed by the *directory* mode, not file ownership, so make
+          # tmp/log world-writable — otherwise runner hits EACCES clearing caches.
+          sudo chmod -R 777 "${GITHUB_WORKSPACE}/source/tmp" "${GITHUB_WORKSPACE}/source/log" 2>/dev/null || true
+          # Apache runs as www-data; it must be able to *traverse* every dir from
+          # / down to the docroot. The runner home ($GITHUB_WORKSPACE lives under
+          # /home/runner/work) lacks the o+x search bit, so grant it on each
+          # ancestor component (o+x on a dir only permits traversal, not listing).
+          d="${GITHUB_WORKSPACE}/source"
+          while [ "$d" != "/" ]; do sudo chmod o+x "$d"; d=$(dirname "$d"); done
+          sudo service apache2 restart
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || echo 000)
+            echo "apache attempt $i: http=$code"
+            [ "$code" = "200" ] && { echo "shop serving"; break; }
+            if [ "$i" = "30" ]; then echo "::error::shop not serving"; sudo tail -100 /var/log/apache2/error.log 2>/dev/null; cat /tmp/php_errors.log 2>/dev/null; exit 1; fi
+            sleep 3
+          done
+
+      - name: 🟢 Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+
+      - name: 📥 Install Playwright + Chromium
+        working-directory: tests/Acceptance/playwright
+        run: |
+          npm ci || npm install
+          npx playwright install --with-deps chromium
+
+      - name: 🎭 Run Playwright e2e (native; CI=1 → 2 retries absorb mail-timing flakiness)
+        working-directory: tests/Acceptance/playwright
+        env:
+          E2E_SHOP_EXEC: native
+          SHOP_ROOT: ${{ github.workspace }}
+          SHOP_URL: http://localhost:8080
+          MAILPIT_URL: http://localhost:8025
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_NAME: o3shop_test
+          DB_USER: root
+          DB_PASS: root
+          CI: '1'
+        run: npx playwright test
+
+      - name: 📤 Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            tests/Acceptance/playwright/playwright-report/
+            tests/Acceptance/playwright/test-results/
+          retention-days: 7

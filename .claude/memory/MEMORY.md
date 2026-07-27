@@ -18,6 +18,8 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [Issue-audit traps (2026-06-25)](issue-audit-2026-06-25-traps.md) — board-says-done ≠ code-says-done; #123/#189 not resolved by their siblings; #81 premise stale; close candidates #28/#13/#134
 - [!] [Project Conventions](project-conventions.md) — PSR-12, DBAL patterns, namespace rules, Smarty usage
 - [!] [Graceful degradation over fail-fast](feedback_graceful-degradation.md) — user-facing flows must not break on missing templates / lang keys / assets — fall back, log, don't block
+- [Fetching official EU artwork](reference_eu-official-artwork-fetch.md) — EUR-Lex is WAF-gated; use publications.europa.eu CELLAR (xhtml/pdfa2a manifestations) + PyMuPDF to extract native-res regulation artwork
+- [EU guarantee labels (#219)](reference_eu-guarantee-labels.md) — _isFieldEmpty zero-whitelist for inheritable int columns; serving artwork under out/pictures/ makes email embedding free; migrations on oxarticles must registerDoctrineTypeMapping('enum','string')
 - [!] [Form input must survive errors](feedback_form-input-preservation.md) — when a form submission is rejected, re-render with submitted values — never make the user re-type
 - [!] [Git / PR / merge workflow](feedback_git-pr-workflow.md) — wait-for-instruction cadence; never auto-push; squash-merge default; cs-fixer before every commit
 - [Architecture](architecture.md) — DI wiring, module system, key architectural decisions
@@ -27,6 +29,7 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [!] [Theme repos are external](architecture_theme-repos.md) — wave + o3-theme live in separate GitHub repos; their dirs in shop-ce are gitignored snapshots
 - [!] [o3-theme migration](project_o3-theme-migration.md) — wave → o3-theme cutover before 2026-05-01; keep new storefront templates portable
 - [o3-theme npm audit](project_o3-theme-dep-audit.md) — pre-existing brace-expansion vulnerability blocks test-all-coverage; use test --fast for PHP-only changes
+- [!] [bin/release branch selection & execution gotchas](release-tooling-branch-selection.md) — `--to` does NOT pick the branch (only DefaultBranchResolver does); pre-flight runs last so a missing branch is a `Plan failed:` 404, not a gate error; live mode fires with no confirmation and bare `--dry-run` skips pre-flight entirely
 - [bin/release intermediate-node re-tag gap](release-tooling-intermediate-node-retag-gap.md) — resolver "reuses" an intermediate fat node (the metapackage) while bumping its child pin → orphaned edit; force a re-tag during the fold-out cut (#169)
 - [!] [cs-fixer dirties nested clones](cs-fixer-pollutes-nested-clones.md) — ./docker.sh cs-fixer reformats testing-library/themes/demodata clones → aborts bin/release pre-flight; clean them before a cut
 - [!] [ExitHandler interface-guard bug](shop-ce-exithandler-interface-guard-bug.md) — bootstrap.php uses class_exists() on the ExitHandlerInterface (always false) → fresh-install Setup redirect dies in a DB-error loop; fix: interface_exists()
@@ -36,4 +39,8 @@ Shared memory for all Claude agents working in this repository. Read this first,
 - [Core CAPTCHA provider layer (#213)](captcha-provider-layer.md) — pluggable captcha; DI/import conventions; $this->getContainer() pattern; testing-library env gotchas
 - [!] [CI is lockless — never cache vendor/](ci-lockless-composer-vendor-cache.md) — composer.lock is gitignored so CI installs latest; caching vendor/ froze a stale testing-library → PHPUnit couldn't find bootstrap.php → coverage gate failed. Cache ~/.cache/composer only.
 - [Adding a core admin controller](adding-a-core-admin-controller.md) — new core admin controller needs UnifiedNameSpaceClassMap + BackwardsCompatibilityClassMap + ShopControllerMapProvider entries + regenerate, else admin menu → main page
+- [Theme ↔ shop version compat](reference_theme-shop-version-compat.md) — guard new ViewConfig methods in theme templates with method_exists; old shops fatal otherwise
+- [!] [OXID field escaping is two-layered](reference_oxid-field-escaping.md) — admin input is entity-encoded at request level AND Field T_TEXT `->value` htmlspecialchars()es again; use getRawFieldData()+html_entity_decode for GD/plaintext sinks; test text fields with `&`/quotes
+- [wave-theme legacy CSS build](reference_wave-theme-legacy-build.md) — rebuilding committed styles.css needs a node:14 container (node-sass), a 3-deep symlink harness for the Gruntfile's ../../../out path, and bootstrap@4.3.1 (package.json's 4.1.3 pin doesn't match the committed CSS)
 - [oe:migrate:status / oe:migrate:verify](migration-status-verify-commands.md) — #205 CLI; CE migration state read from oxmigrations_ce (doctrine 2.3.5 stores bare version timestamps) vs source/migration/data/Version*.php
+- [Migration E2E matrix](migration-e2e-matrix.md) — #206 tests/Migration/e2e/: OXID 6.4.3 fixture build gotchas, dev-b-1.7 branch-alias, MySQL 8 decode-via-MariaDB-sidecar, phase-based driver + 8-cell GHA matrix

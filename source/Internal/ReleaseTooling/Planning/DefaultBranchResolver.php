@@ -27,21 +27,33 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning;
  * from. The map matches the per-repo branch decisions made during
  * Section 1.5 (archive.exclude rollout).
  *
+ * The `b-1.<n>` group is the shop release line: every one of those
+ * repos branches per shop minor, so opening a new line (1.6 -> 1.7)
+ * means cutting `b-1.<n>` in each of them and bumping the whole
+ * group here in lockstep. Bump this map only once those branches
+ * exist: pre-flight runs LAST inside ReleasePlanner::plan(), so a
+ * branch that is missing on the remote surfaces earlier and less
+ * legibly as a raw composer.json 404 from DepTreeWalker, reported as
+ * `Plan failed:` — no gate ever runs. BranchGate covers the other
+ * direction, a local checkout sitting on the wrong branch. The other
+ * groups — `b-1.0`, `b-7.0.x`, `b-6.5.x`, `support/2.6`, `main` —
+ * version independently of the shop line and do not move with it.
+ *
  * Repos not in the map fall back to `main`.
  */
 final class DefaultBranchResolver
 {
     /** @var array<string,string> package => branch */
     public const PACKAGE_TO_BRANCH = [
-        'o3-shop/o3-shop' => 'b-1.6',
-        'o3-shop/shop-ce' => 'b-1.6',
-        'o3-shop/shop-metapackage-ce' => 'b-1.6',
-        'o3-shop/testing-library' => 'b-1.6',
-        'o3-shop/shop-facts' => 'b-1.6',
-        'o3-shop/shop-ide-helper' => 'b-1.6',
-        'o3-shop/shop-unified-namespace-generator' => 'b-1.6',
-        'o3-shop/shop-doctrine-migration-wrapper' => 'b-1.6',
-        'o3-shop/shop-demodata-installer' => 'b-1.6',
+        'o3-shop/o3-shop' => 'b-1.7',
+        'o3-shop/shop-ce' => 'b-1.7',
+        'o3-shop/shop-metapackage-ce' => 'b-1.7',
+        'o3-shop/testing-library' => 'b-1.7',
+        'o3-shop/shop-facts' => 'b-1.7',
+        'o3-shop/shop-ide-helper' => 'b-1.7',
+        'o3-shop/shop-unified-namespace-generator' => 'b-1.7',
+        'o3-shop/shop-doctrine-migration-wrapper' => 'b-1.7',
+        'o3-shop/shop-demodata-installer' => 'b-1.7',
         'o3-shop/gdpr-optin-module' => 'b-1.0',
         'o3-shop/paypal-module' => 'b-1.0',
         'o3-shop/usercentrics' => 'b-1.0',

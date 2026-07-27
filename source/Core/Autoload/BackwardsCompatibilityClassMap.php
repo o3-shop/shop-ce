@@ -245,6 +245,7 @@ return [
     'pricealarm_main'                     => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmMain',
     'pricealarm_send'                     => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\PriceAlarmSend',
     'captcha_config'                      => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\CaptchaConfigController',
+    'guarantee_config'                    => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\GuaranteeConfigController',
     'revocation_config'                   => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\RevocationConfigController',
     'revocation_list'                     => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\RevocationList',
     'revocation_main'                     => 'OxidEsales\\Eshop\\Application\\Controller\\Admin\\RevocationMain',
