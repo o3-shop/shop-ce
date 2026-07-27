@@ -52,6 +52,42 @@ final class RepoCloneUrlResolverTest extends TestCase
         $this->assertSame('git@github.com:o3-shop/shop-ce.git', $resolver->urlFor('o3-shop/shop-ce'));
     }
 
+    /**
+     * An ~/.ssh/config alias picks the identity the maintainer configured for it, so
+     * rewriting it to github.com would clone with the wrong (default) key.
+     */
+    public function testSshHostAliasPreservedInCloneUrl(): void
+    {
+        $exec = new FakeProcessExecutor([
+            'git config --get remote.origin.url' => new ProcessOutcome(
+                0,
+                "git@github-work:o3-shop/shop-ce.git\n",
+                ''
+            ),
+        ]);
+        $resolver = RepoCloneUrlResolver::fromRepoOrigin($exec, '/tmp/shop-ce');
+
+        $this->assertSame(RepoCloneUrlResolver::SCHEME_SSH, $resolver->scheme());
+        $this->assertSame('github-work', $resolver->sshHost());
+        $this->assertSame('git@github-work:o3-shop/shop-ce.git', $resolver->urlFor('o3-shop/shop-ce'));
+        $this->assertSame('git@github-work:o3-shop/o3-Theme.git', $resolver->urlFor('o3-shop/o3-theme'));
+    }
+
+    public function testSshProtocolOriginYieldsSshCloneUrl(): void
+    {
+        $exec = new FakeProcessExecutor([
+            'git config --get remote.origin.url' => new ProcessOutcome(
+                0,
+                "ssh://git@github.com/o3-shop/shop-ce.git\n",
+                ''
+            ),
+        ]);
+        $resolver = RepoCloneUrlResolver::fromRepoOrigin($exec, '/tmp/shop-ce');
+
+        $this->assertSame(RepoCloneUrlResolver::SCHEME_SSH, $resolver->scheme());
+        $this->assertSame('git@github.com:o3-shop/shop-ce.git', $resolver->urlFor('o3-shop/shop-ce'));
+    }
+
     public function testCaseRenamePreservedInUrl(): void
     {
         $resolver = new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS);

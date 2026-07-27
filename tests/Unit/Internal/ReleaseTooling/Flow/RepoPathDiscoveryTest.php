@@ -270,6 +270,34 @@ final class RepoPathDiscoveryTest extends TestCase
         );
     }
 
+    /**
+     * Origins cloned through an ~/.ssh/config host alias must still be recognised —
+     * otherwise the scan silently skips the repo and the flow re-clones it.
+     */
+    public function testNestedCloneWithSshHostAliasOrigin(): void
+    {
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/shop-demodata-ce',
+            'git@github-work:o3-shop/shop-demodata-ce.git'
+        );
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/shop-demodata-ce']);
+
+        $this->assertSame(
+            $shopCe . '/shop-demodata-ce',
+            $resolved['o3-shop/shop-demodata-ce']
+        );
+        $this->assertSame([], $exec->commands());
+    }
+
     public function testNestedScanReverseMapsCaseRenamedPackages(): void
     {
         // o3-Theme is a PackageRepoSlug rename: composer name is
