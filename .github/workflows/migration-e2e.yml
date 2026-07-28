@@ -44,7 +44,7 @@ jobs:
       MIGRATION_E2E_RUN: o3mig-ci
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Start database
         run: bash tests/Migration/e2e/run-migration-e2e.sh start-db
