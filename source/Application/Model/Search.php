@@ -448,7 +448,7 @@ class Search extends Base
                       AND {$sArticleTable}.oxparentid = ''
                       AND {$sArticleTable}.oxissearch = 1
                       {$sSearchClause}
-                    ORDER BY {$sArticleTable}.oxtitle
+                    {$this->_getRelevanceOrder($sSearchParam)}
                     LIMIT " . (int) $iLimit;
 
         $aResults = [];
