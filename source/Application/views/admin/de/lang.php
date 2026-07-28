@@ -1531,6 +1531,7 @@ $aLang = [
     'SYSREQ_DESCRIPTION_PMIN' => 'Nicht oder nur teilweise erfüllt. Dieser O3-Shop kann sich in Bereichen unerwartet verhalten.',
     'SYSREQ_DESCRIPTION_REQ' => 'Systemgesundheit',
     'SYSREQ_FILE_UPLOADS' => 'Hochladen von Dateien erlaubt (file_uploads)',
+    'SYSREQ_GD_FREETYPE' => 'GDlib FreeType-Unterstützung (imagettftext)',
     'SYSREQ_GD_INFO' => 'GDlib v2 incl. JPEG Unterstützung',
     'SYSREQ_INI_SET' => 'ini_set erlaubt',
     'SYSREQ_I_CONV' => 'ICONV',
