@@ -725,6 +725,74 @@ class Utils extends \OxidEsales\Eshop\Core\Base
     }
 
     /**
+     * Drops the PERMANENT field-name/table-description cache entries for one
+     * table — the entries `oxResetFileCache()` deliberately keeps.
+     *
+     * `BaseModel::_initDataStructure()` and `_getTableFields()` read these to
+     * decide which columns a model exposes, and nothing invalidates them: a
+     * normal cache clear inverts `$_sPermanentCachePattern` and skips them on
+     * purpose. So after a migration adds a column to a shop with a warm
+     * `source/tmp/`, the column exists in MySQL but never materialises on the
+     * model — `$oArticle->oxarticles__newcolumn` stays unset and any feature
+     * built on it is silently inert until someone purges `source/tmp/` by hand.
+     *
+     * Call this from a migration's `postUp()` for every table whose columns
+     * changed. Never throws: failing to clear a cache must not fail a
+     * migration that already altered the schema.
+     *
+     * @param string $sTable core table name, e.g. 'oxarticles'
+     *
+     * @return int number of cache files removed
+     */
+    public function resetTableFieldCache($sTable)
+    {
+        return static::clearTableFieldCacheIn($this->getCacheFilePath(null, true), $sTable);
+    }
+
+    /**
+     * Directory-explicit, dependency-free variant of resetTableFieldCache().
+     *
+     * Static and free of Registry/oxNew/Config on purpose: a database migration
+     * runs WITHOUT the shop bootstrap (`oxNew()` is not even defined there), so
+     * `Registry::getUtils()` is unavailable — but a migration is exactly where
+     * this cache has to be invalidated. Migrations resolve the compile dir via
+     * `ConfigFile` + `Facts` and call this directly.
+     *
+     * @param string|false $sCacheDir absolute cache/compile dir, or false when unresolvable
+     * @param string       $sTable    core table name, e.g. 'oxarticles'
+     *
+     * @return int number of cache files removed
+     */
+    public static function clearTableFieldCacheIn($sCacheDir, $sTable)
+    {
+        $sTable = strtolower(preg_replace('/[^a-zA-Z0-9_]/', '', (string) $sTable));
+        if ($sTable === '' || !$sCacheDir) {
+            return 0;
+        }
+
+        $aFiles = glob(rtrim((string) $sCacheDir, '/\\') . '/*');
+        if (!is_array($aFiles)) {
+            return 0;
+        }
+
+        // Mirrors the three permanent key shapes kept by $_sPermanentCachePattern:
+        // 'fieldnames_<table>_<key>', '<table>_allfields_<bool>' and 'tbdsc_<table>'.
+        $sPattern = sprintf(
+            '/(c_fieldnames_%1$s_|c_%1$s_allfields_|c_tbdsc_%1$s)/i',
+            preg_quote($sTable, '/')
+        );
+
+        $iRemoved = 0;
+        foreach (preg_grep($sPattern, $aFiles) ?: [] as $sFile) {
+            if (@unlink($sFile)) {
+                $iRemoved++;
+            }
+        }
+
+        return $iRemoved;
+    }
+
+    /**
      * Removes smarty template cache for given templates
      *
      * @param array $aTemplates Template name array

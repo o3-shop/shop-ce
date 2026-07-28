@@ -725,6 +725,98 @@ class UtilsTest extends \OxidTestCase
     }
 
     /**
+     * The permanent field-name entries survive oxResetFileCache() by design,
+     * so a migration that adds a column has no way to make the model see it.
+     * resetTableFieldCache() is that missing counterpart: it must remove
+     * exactly the target table's permanent entries and nothing else.
+     */
+    public function testResetTableFieldCacheRemovesOnlyTheGivenTablesPermanentEntries()
+    {
+        $oUtils = oxNew('oxUtils');
+        // An isolated dir, NOT the shared compile dir: the live tmp dir already
+        // holds real oxarticles entries written by whichever tests ran before,
+        // so an exact-count assertion against it is order-dependent.
+        $sDir = sys_get_temp_dir() . '/oxutils_fieldcache_' . uniqid('', true) . '/';
+        mkdir($sDir);
+        $sPrefix = 'ox' . $oUtils->getEditionCacheFilePrefix() . 'c_';
+
+        $aTargets = [
+            $sPrefix . 'fieldnames_oxarticles_allviews.txt',
+            $sPrefix . 'fieldnames_oxarticles_core.txt',
+            $sPrefix . 'oxarticles_allfields_0.txt',
+            $sPrefix . 'oxarticles_allfields_1.txt',
+            $sPrefix . 'tbdsc_oxarticles.txt',
+        ];
+        $aSurvivors = [
+            $sPrefix . 'fieldnames_oxorder_allviews.txt',
+            $sPrefix . 'oxorder_allfields_1.txt',
+            $sPrefix . 'someothercache.txt',
+        ];
+
+        foreach (array_merge($aTargets, $aSurvivors) as $sFile) {
+            file_put_contents($sDir . $sFile, 'x');
+        }
+
+        try {
+            $iRemoved = \OxidEsales\Eshop\Core\Utils::clearTableFieldCacheIn($sDir, 'oxarticles');
+
+            $this->assertSame(count($aTargets), $iRemoved);
+            foreach ($aTargets as $sFile) {
+                $this->assertFileDoesNotExist($sDir . $sFile, "'$sFile' should have been removed.");
+            }
+            foreach ($aSurvivors as $sFile) {
+                $this->assertFileExists($sDir . $sFile, "'$sFile' belongs to another table and must survive.");
+            }
+        } finally {
+            foreach (array_merge($aTargets, $aSurvivors) as $sFile) {
+                @unlink($sDir . $sFile);
+            }
+            @rmdir($sDir);
+        }
+    }
+
+    /**
+     * The instance method is the shop-context wrapper: it must resolve the
+     * compile dir itself and delegate. Asserted by writing one entry into the
+     * REAL compile dir and watching it disappear (count-free, so it does not
+     * care what other tests left behind).
+     */
+    public function testResetTableFieldCacheUsesTheConfiguredCompileDir()
+    {
+        $oUtils = oxNew('oxUtils');
+        $sFile = $oUtils->getCacheFilePath('fieldnames_oxutilsprobe_allviews');
+        file_put_contents($sFile, 'x');
+
+        try {
+            $oUtils->resetTableFieldCache('oxutilsprobe');
+
+            $this->assertFileDoesNotExist($sFile);
+        } finally {
+            @unlink($sFile);
+        }
+    }
+
+    /**
+     * Never let a bad table name turn into a broad glob, and never fail a
+     * migration that has already altered the schema.
+     */
+    public function testResetTableFieldCacheIgnoresUnusableTableNames()
+    {
+        $oUtils = oxNew('oxUtils');
+
+        $this->assertSame(0, $oUtils->resetTableFieldCache(''));
+        $this->assertSame(0, $oUtils->resetTableFieldCache('../*'));
+    }
+
+    public function testResetTableFieldCacheSurvivesAnUnusableCompileDir()
+    {
+        $oUtils = oxNew('oxUtils');
+        $this->getConfig()->setConfigParam('sCompileDir', '');
+
+        $this->assertSame(0, $oUtils->resetTableFieldCache('oxarticles'));
+    }
+
+    /**
      * An unset/empty sCompileDir must never resolve to the current working
      * directory. Previously realpath('') returned the CWD, so every cache
      * path pointed at wherever the process happened to be running.
