@@ -316,6 +316,8 @@ $aLang = [
     'HELP_SHOP_CONFIG_RSSSELECTED' => 'Defines which RSS feeds are displayed and linked in the shop.',
     'HELP_SHOP_CONFIG_RSSTOPSHOP' => 'Enables the RSS feed for the top products of the shop.',
     'HELP_SHOP_CONFIG_SEARCHFIELDS' => 'Here you can define the database fields in which the product search searches. Enter one field per row.<br>The most common entries are:<ul><li>oxtitle = Title</li><li>oxshortdesc = Short description</li><li>oxsearchkeys = Search terms entered for each product</li><li>oxartnum = Product number</li></ul>',
+    'HELP_SHOP_CONFIG_SEARCHSUGGEST' => 'Enables or disables the search suggestions dropdown that appears while typing in the search field.',
+    'HELP_SHOP_CONFIG_SEARCHSUGGESTCOUNT' => 'Defines the maximum number of entries displayed in the search suggestions dropdown.',
     'HELP_SHOP_CONFIG_SETORDELETECURRENCY' => 'Add or remove currencies. Each line contains currency parameters separated by the symbol @.<br /><br /><ul><li>currency code according to ISO 4217 (e.g. EUR)</li><li>currency rate to basic currency with the value 1.00</li><li>decimal separator</li><li>thousands separator</li><li>currency sign</li><li>number of decimal places</li><li>optional parameter "Front". If entered, the currency sign shows up in front of the price.</li></ul>',
     'HELP_SHOP_CONFIG_SHIPPINGCOUNTRYVAT' => 'The shipping country is used for VAT calculation instead of the customer\'s billing country.',
     'HELP_SHOP_CONFIG_SHOWORDERBUTTONONTHETOP' => 'An additional "Order now" button is shown at the top of the page in the fourth checkout step.',

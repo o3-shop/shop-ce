@@ -10,17 +10,29 @@ use OxidEsales\Eshop\Core\Registry;
 
 class SearchSuggestController extends FrontendController
 {
-    public const MAX_SUGGESTIONS = 8;
+    public const DEFAULT_SUGGESTIONS = 10;
 
     public function render()
     {
+        $oConfig = Registry::getConfig();
+
+        if (!$oConfig->getConfigParam('blSearchSuggest')) {
+            Registry::getUtils()->showMessageAndExit(json_encode([], JSON_THROW_ON_ERROR));
+            return;
+        }
+
         $oRequest = Registry::getRequest();
         $sSearchParam = trim((string) $oRequest->getRequestParameter('searchparam'));
 
         $aResult = [];
         if (mb_strlen($sSearchParam) >= 2) {
+            $iLimit = (int) $oConfig->getConfigParam('iSearchSuggestCount');
+            if ($iLimit < 1) {
+                $iLimit = self::DEFAULT_SUGGESTIONS;
+            }
+
             $oSearchHandler = oxNew(Search::class);
-            $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, self::MAX_SUGGESTIONS);
+            $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, $iLimit);
         }
 
         Registry::get(Header::class)->setHeader('Content-Type: application/json; charset=UTF-8');
