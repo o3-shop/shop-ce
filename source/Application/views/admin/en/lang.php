@@ -1530,6 +1530,7 @@ $aLang = [
     'SYSREQ_DESCRIPTION_PMIN' => 'System health might be broken.',
     'SYSREQ_DESCRIPTION_REQ' => 'State of system health',
     'SYSREQ_FILE_UPLOADS' => 'File uploads are enabled (file_uploads)',
+    'SYSREQ_GD_FREETYPE' => 'GDlib FreeType support (imagettftext)',
     'SYSREQ_GD_INFO' => 'GDlib v2 incl. JPEG support',
     'SYSREQ_INI_SET' => 'ini_set allowed',
     'SYSREQ_I_CONV' => 'ICONV',
