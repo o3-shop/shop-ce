@@ -2680,6 +2680,11 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
      */
     protected function purgeOutdatedGuaranteeLabels(): void
     {
+        // Resolved before the try so the catch can log it without calling back
+        // into the object: if getId() is what threw, re-calling it there would
+        // throw again out of the catch and take save() down with it.
+        $articleId = '';
+
         try {
             $articleId = (string) $this->getId();
             if ($articleId === '') {
@@ -2699,7 +2704,7 @@ class Article extends MultiLanguageModel implements ArticleInterface, IUrl
         } catch (\Throwable $e) {
             \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
                 __METHOD__ . ' - Could not collect outdated guarantee labels for article-ID'
-                . " '{$this->getId()}': '{$e->getMessage()}'."
+                . " '" . ($articleId ?: '(unknown)') . "': '{$e->getMessage()}'."
             );
         }
     }

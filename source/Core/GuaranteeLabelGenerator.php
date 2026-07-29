@@ -439,7 +439,14 @@ class GuaranteeLabelGenerator
                         );
                         $text = $truncated;
                         $box = imagettfbbox($sizePt, 0, $fontFile, $text);
-                        $textWidth = $box === false ? $textWidth : $box[2] - $box[0];
+                        if ($box === false) {
+                            imagedestroy($image);
+                            Registry::getLogger()->error(
+                                __METHOD__ . " - Re-measuring truncated text for field '$field' failed with font '$fontFile'."
+                            );
+                            return false;
+                        }
+                        $textWidth = $box[2] - $box[0];
                     }
                 }
             }

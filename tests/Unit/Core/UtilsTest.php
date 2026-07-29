@@ -797,6 +797,72 @@ class UtilsTest extends \OxidTestCase
     }
 
     /**
+     * Review finding (PR #218): the 'tbdsc' shape had no trailing boundary, so
+     * purging a table also deleted the table-description cache of any table
+     * whose name STARTS with it. database_schema.sql has 10 such pairs
+     * (oxorder/oxorderarticles, oxuser/oxuserpayments, oxnews/oxnewsletter, ...).
+     * The other two shapes are bounded by their trailing '_'.
+     */
+    public function testResetTableFieldCacheDoesNotTouchPrefixSharingSiblingTables()
+    {
+        $sDir = sys_get_temp_dir() . '/oxutils_sibling_' . uniqid('', true) . '/';
+        mkdir($sDir);
+        $sPrefix = 'ox' . oxNew('oxUtils')->getEditionCacheFilePrefix() . 'c_';
+
+        $aTargets = [
+            $sPrefix . 'tbdsc_oxorder.txt',
+            $sPrefix . 'fieldnames_oxorder_core.txt',
+            $sPrefix . 'oxorder_allfields_1.txt',
+        ];
+        $aSiblings = [
+            $sPrefix . 'tbdsc_oxorderarticles.txt',
+            $sPrefix . 'fieldnames_oxorderarticles_core.txt',
+            $sPrefix . 'oxorderarticles_allfields_1.txt',
+        ];
+        foreach (array_merge($aTargets, $aSiblings) as $sFile) {
+            file_put_contents($sDir . $sFile, 'x');
+        }
+
+        try {
+            $iRemoved = \OxidEsales\Eshop\Core\Utils::clearTableFieldCacheIn($sDir, 'oxorder');
+
+            $this->assertSame(count($aTargets), $iRemoved);
+            foreach ($aTargets as $sFile) {
+                $this->assertFileDoesNotExist($sDir . $sFile);
+            }
+            foreach ($aSiblings as $sFile) {
+                $this->assertFileExists($sDir . $sFile, "'$sFile' belongs to oxorderarticles and must survive.");
+            }
+        } finally {
+            foreach (glob($sDir . '*') ?: [] as $sFile) {
+                @unlink($sFile);
+            }
+            @rmdir($sDir);
+        }
+    }
+
+    /**
+     * Review finding (PR #218): the pattern was matched against the FULL path,
+     * so a compile dir whose own path contained one of these tokens matched
+     * every file inside it. Only the basename may decide.
+     */
+    public function testResetTableFieldCacheIgnoresTokensInTheDirectoryPath()
+    {
+        $sDir = sys_get_temp_dir() . '/c_tbdsc_oxarticles_' . uniqid('', true) . '/';
+        mkdir($sDir);
+        $sInnocent = $sDir . 'unrelated.txt';
+        file_put_contents($sInnocent, 'x');
+
+        try {
+            $this->assertSame(0, \OxidEsales\Eshop\Core\Utils::clearTableFieldCacheIn($sDir, 'oxarticles'));
+            $this->assertFileExists($sInnocent);
+        } finally {
+            @unlink($sInnocent);
+            @rmdir($sDir);
+        }
+    }
+
+    /**
      * Never let a bad table name turn into a broad glob, and never fail a
      * migration that has already altered the schema.
      */

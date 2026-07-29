@@ -777,13 +777,26 @@ class Utils extends \OxidEsales\Eshop\Core\Base
 
         // Mirrors the three permanent key shapes kept by $_sPermanentCachePattern:
         // 'fieldnames_<table>_<key>', '<table>_allfields_<bool>' and 'tbdsc_<table>'.
+        //
+        // The first two are self-bounding: their trailing '_' cannot be reached
+        // by a longer table name. 'tbdsc_<table>' runs straight into whatever
+        // follows, so it needs an explicit boundary — without it, purging
+        // 'oxorder' also deleted 'c_tbdsc_oxorderarticles'. database_schema.sql
+        // has 10 such prefix-sharing pairs (oxuser/oxuserpayments,
+        // oxnews/oxnewsletter, oxdelivery/oxdeliveryset, ...).
         $sPattern = sprintf(
-            '/(c_fieldnames_%1$s_|c_%1$s_allfields_|c_tbdsc_%1$s)/i',
+            '/(c_fieldnames_%1$s_|c_%1$s_allfields_|c_tbdsc_%1$s(?![a-z0-9_]))/i',
             preg_quote($sTable, '/')
         );
 
         $iRemoved = 0;
-        foreach (preg_grep($sPattern, $aFiles) ?: [] as $sFile) {
+        foreach ($aFiles as $sFile) {
+            // basename(), not the full path: a compile dir whose OWN path
+            // contained one of these tokens would otherwise match every file
+            // inside it.
+            if (!preg_match($sPattern, basename($sFile))) {
+                continue;
+            }
             if (@unlink($sFile)) {
                 $iRemoved++;
             }

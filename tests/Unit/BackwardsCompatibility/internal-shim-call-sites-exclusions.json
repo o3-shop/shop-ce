@@ -2469,21 +2469,21 @@
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 3412,
+            "line": 3417,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 3444,
+            "line": 3449,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getPrice",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"
         },
         {
             "file": "source/Application/Model/Article.php",
-            "line": 4751,
+            "line": 4756,
             "class": "OxidEsales\\EshopCommunity\\Application\\Model\\Article",
             "method": "getAmountPriceList",
             "reason": "authored by trusted Daniel/O3-Shop identity o3-shop-github@ist-einmalig.de in 2022-10-11 (sha ebe86dc0); not a rename to revert"

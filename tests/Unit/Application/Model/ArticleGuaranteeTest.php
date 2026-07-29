@@ -189,6 +189,30 @@ class ArticleGuaranteeTest extends UnitTestCase
         }
     }
 
+    /**
+     * Review finding (PR #218): the label collection is documented as "never
+     * throws and never affects the save result". Proven rather than asserted in
+     * a docblock — a generator that blows up must not take save() with it.
+     */
+    public function testSaveSucceedsEvenWhenLabelCollectionThrows(): void
+    {
+        $generator = $this->getMockBuilder(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class)
+            ->onlyMethods(['purgeOutdatedLabels'])
+            ->getMock();
+        $generator->method('purgeOutdatedLabels')
+            ->willThrowException(new \RuntimeException('disk on fire'));
+
+        $article = oxNew(Article::class);
+        $article->setId('_guaranteepurgethrows');
+        $article->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('THROW-1');
+        $article->setGuaranteeLabelGenerator($generator);
+
+        $article->save();
+
+        $loaded = oxNew(Article::class);
+        $this->assertTrue($loaded->load('_guaranteepurgethrows'), 'The article must still have been saved.');
+    }
+
     public function testGuarantorEmptyWhenNoFieldAndNoManufacturer(): void
     {
         $article = $this->getMockBuilder(Article::class)

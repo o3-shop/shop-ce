@@ -51,7 +51,7 @@ final class Version20260715090000 extends AbstractMigration
     public function getDescription(): string
     {
         return '#219 EU guarantee labels: oxarticles guarantee columns + supplementary-notice CMS snippet'
-            . ' (clears the permanent oxarticles field-name cache so the new columns become visible)';
+            . ' (clears the permanent oxarticles field-name cache in both directions)';
     }
 
     public function up(Schema $schema): void
@@ -92,17 +92,36 @@ final class Version20260715090000 extends AbstractMigration
      */
     public function postUp(Schema $schema): void
     {
+        $this->clearArticleFieldCache('the new guarantee columns become visible on the article model');
+    }
+
+    /**
+     * The mirror image of postUp(), and just as necessary: after down() drops
+     * the columns the cache still lists them, so the model would keep exposing
+     * four fields that no longer exist in MySQL — and that field list is what
+     * `_getUpdateFields()` builds its SQL from, so article writes would
+     * reference dropped columns until someone purged `source/tmp/` by hand.
+     */
+    public function postDown(Schema $schema): void
+    {
+        $this->clearArticleFieldCache('the dropped guarantee columns disappear from the article model');
+    }
+
+    /**
+     * @param string $outcome what clearing the cache achieves, for the CLI line
+     */
+    private function clearArticleFieldCache(string $outcome): void
+    {
         try {
             $removed = Utils::clearTableFieldCacheIn($this->resolveCompileDir(), 'oxarticles');
             $this->write(
-                "    -> cleared $removed permanent 'oxarticles' field-name cache file(s)"
-                . ' so the new guarantee columns become visible on the article model.'
+                "    -> cleared $removed permanent 'oxarticles' field-name cache file(s) so $outcome."
             );
         } catch (\Throwable $e) {
             $this->write(
                 '    -> WARNING: could not clear the permanent oxarticles field-name cache'
-                . " ('{$e->getMessage()}'). Delete 'source/tmp/*' manually, otherwise the"
-                . ' guarantee fields stay invisible to the article model.'
+                . " ('{$e->getMessage()}'). Delete 'source/tmp/*' manually, otherwise the article"
+                . ' model and the oxarticles table stay out of sync.'
             );
         }
     }
