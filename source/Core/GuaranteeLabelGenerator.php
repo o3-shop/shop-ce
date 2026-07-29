@@ -543,9 +543,17 @@ class GuaranteeLabelGenerator
         return true;
     }
 
+    /**
+     * Templates and fonts ship next to this class, so they are addressed
+     * relative to it. OX_BASE_PATH must NOT be used here: it points at the
+     * shop's source directory, and the composer installer strips `Core/**` on
+     * its way there (extra.oxideshop.blacklist-filter) because those classes
+     * are autoloaded from vendor/ instead. A git checkout hides the difference
+     * — a composer-installed shop does not.
+     */
     private function getAssetDir(): string
     {
-        return $this->assetDir ?? OX_BASE_PATH . 'Core/GuaranteeLabel/assets/';
+        return $this->assetDir ?? __DIR__ . '/GuaranteeLabel/assets/';
     }
 
     private function getTargetDir(): string

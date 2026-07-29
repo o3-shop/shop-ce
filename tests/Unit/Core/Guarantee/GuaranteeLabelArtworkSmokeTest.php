@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace OxidEsales\EshopCommunity\Tests\Unit\Core\Guarantee;
 
 use OxidEsales\Eshop\Core\GuaranteeLabelGenerator;
+use OxidEsales\EshopCommunity\Core\GuaranteeLabelGenerator as GeneratorImplementation;
 use OxidEsales\TestingLibrary\UnitTestCase;
 
 /**
@@ -31,9 +32,39 @@ use OxidEsales\TestingLibrary\UnitTestCase;
  */
 class GuaranteeLabelArtworkSmokeTest extends UnitTestCase
 {
+    /**
+     * The generator's own default asset location — resolved the way it
+     * resolves it, so this test follows the assets wherever they ship rather
+     * than validating a directory the shop may not even have (see
+     * ComposerBlacklistedAssetPathTest).
+     */
+    private function getShippedAssetDir(): string
+    {
+        $method = new \ReflectionMethod(GeneratorImplementation::class, 'getAssetDir');
+        $method->setAccessible(true);
+
+        return $method->invoke(oxNew(GuaranteeLabelGenerator::class));
+    }
+
+    /**
+     * Reflect on the implementation class, not the unified-namespace alias:
+     * the alias is generated into vendor/, so only the implementation file's
+     * directory says where the assets actually ship.
+     */
+    public function testAssetsAreResolvedRelativeToTheClassFile(): void
+    {
+        $classDir = dirname((new \ReflectionClass(GeneratorImplementation::class))->getFileName());
+
+        $this->assertSame(
+            $classDir . '/GuaranteeLabel/assets/',
+            $this->getShippedAssetDir(),
+            'Assets must travel with the class file — a composer-installed shop has no source/Core/.'
+        );
+    }
+
     public function testShippedAssetsExistAndAreValid(): void
     {
-        $assetDir = OX_BASE_PATH . 'Core/GuaranteeLabel/assets/';
+        $assetDir = $this->getShippedAssetDir();
 
         $template = getimagesize($assetDir . 'label-template.png');
         $this->assertNotFalse($template);
@@ -69,7 +100,7 @@ class GuaranteeLabelArtworkSmokeTest extends UnitTestCase
 
         $this->assertNotNull($url);
         $file = $targetDir . basename($url);
-        $template = getimagesize(OX_BASE_PATH . 'Core/GuaranteeLabel/assets/label-template.png');
+        $template = getimagesize($this->getShippedAssetDir() . 'label-template.png');
         $generated = getimagesize($file);
         $this->assertSame($template[0], $generated[0]);
         $this->assertSame($template[1], $generated[1]);
@@ -89,7 +120,7 @@ class GuaranteeLabelArtworkSmokeTest extends UnitTestCase
 
         $this->assertNotNull($url);
         $file = $targetDir . basename($url);
-        $template = getimagesize(OX_BASE_PATH . 'Core/GuaranteeLabel/assets/nested-template.png');
+        $template = getimagesize($this->getShippedAssetDir() . 'nested-template.png');
         $generated = getimagesize($file);
         $this->assertSame($template[0], $generated[0]);
         $this->assertSame($template[1], $generated[1]);

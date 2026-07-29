@@ -89,6 +89,7 @@ $aLang = [
 'MOD_MYSQL_CONNECT'                             => 'PDO_MySQL',
 'MOD_MYSQL_VERSION'                             => 'MySQL Version 5.5, 5.7, 8.0 oder MariaDB 10',
 'MOD_GD_INFO'                                   => 'GDlib v2 incl. JPEG Unterstützung',
+'MOD_GD_FREETYPE'                               => 'GDlib FreeType-Unterstützung (imagettftext)',
 'MOD_INI_SET'                                   => 'ini_set erlaubt',
 'MOD_REGISTER_GLOBALS'                          => 'register_globals muss ausgeschaltet sein',
 'MOD_MAGIC_QUOTES_GPC'                          => 'magic_quotes_gpc muss ausgeschaltet sein',
