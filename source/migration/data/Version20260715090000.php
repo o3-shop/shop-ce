@@ -24,6 +24,9 @@ namespace OxidEsales\EshopCommunity\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use OxidEsales\EshopCommunity\Core\ConfigFile;
+use OxidEsales\EshopCommunity\Core\Utils;
+use OxidEsales\Facts\Facts;
 
 /**
  * EU guarantee labels (issue #219; Directive (EU) 2024/825, Implementing
@@ -47,7 +50,8 @@ final class Version20260715090000 extends AbstractMigration
 
     public function getDescription(): string
     {
-        return '#219 EU guarantee labels: oxarticles guarantee columns + supplementary-notice CMS snippet';
+        return '#219 EU guarantee labels: oxarticles guarantee columns + supplementary-notice CMS snippet'
+            . ' (clears the permanent oxarticles field-name cache in both directions)';
     }
 
     public function up(Schema $schema): void
@@ -63,6 +67,74 @@ final class Version20260715090000 extends AbstractMigration
             $after = $name;
         }
         $this->seedSupplementarySnippet();
+    }
+
+    /**
+     * Adding a column is not enough for the model to expose it: the
+     * `oxarticles` field-name cache under `source/tmp/` is PERMANENT — a normal
+     * cache clear skips it on purpose (`Utils::$_sPermanentCachePattern`). On a
+     * shop upgraded with a warm tmp dir the columns would exist in MySQL while
+     * `$oArticle->oxarticles__o3guaranteeyears` stayed unset, so
+     * `getGuaranteeYears()` returned 0, `isDurabilityGuaranteeEligible()` was
+     * permanently false and the whole feature was silently inert — with no
+     * error anywhere. That is not acceptable for a legally mandatory label
+     * (Reg. (EU) 2025/1960, applicable from 2026-09-27), hence clearing it here
+     * rather than asking operators to read a release note.
+     *
+     * A migration runs WITHOUT the shop bootstrap — `oxNew()` is not defined,
+     * so `Registry::getUtils()` is unusable here. The compile dir is therefore
+     * resolved straight from `config.inc.php` via `ConfigFile` (+ `Facts` for
+     * the source path, both dependency-free) and handed to the static
+     * `Utils::clearTableFieldCacheIn()`.
+     *
+     * Never throws: the schema change has already been applied at this point,
+     * so a cache-clearing problem must not abort the migration.
+     */
+    public function postUp(Schema $schema): void
+    {
+        $this->clearArticleFieldCache('the new guarantee columns become visible on the article model');
+    }
+
+    /**
+     * The mirror image of postUp(), and just as necessary: after down() drops
+     * the columns the cache still lists them, so the model would keep exposing
+     * four fields that no longer exist in MySQL — and that field list is what
+     * `_getUpdateFields()` builds its SQL from, so article writes would
+     * reference dropped columns until someone purged `source/tmp/` by hand.
+     */
+    public function postDown(Schema $schema): void
+    {
+        $this->clearArticleFieldCache('the dropped guarantee columns disappear from the article model');
+    }
+
+    /**
+     * @param string $outcome what clearing the cache achieves, for the CLI line
+     */
+    private function clearArticleFieldCache(string $outcome): void
+    {
+        try {
+            $removed = Utils::clearTableFieldCacheIn($this->resolveCompileDir(), 'oxarticles');
+            $this->write(
+                "    -> cleared $removed permanent 'oxarticles' field-name cache file(s) so $outcome."
+            );
+        } catch (\Throwable $e) {
+            $this->write(
+                '    -> WARNING: could not clear the permanent oxarticles field-name cache'
+                . " ('{$e->getMessage()}'). Delete 'source/tmp/*' manually, otherwise the article"
+                . ' model and the oxarticles table stay out of sync.'
+            );
+        }
+    }
+
+    /**
+     * @return string|false absolute compile/cache dir, or false when unresolvable
+     */
+    private function resolveCompileDir()
+    {
+        $configFile = new ConfigFile((new Facts())->getSourcePath() . '/config.inc.php');
+        $compileDir = $configFile->getVar('sCompileDir');
+
+        return is_string($compileDir) && $compileDir !== '' ? $compileDir : false;
     }
 
     public function down(Schema $schema): void

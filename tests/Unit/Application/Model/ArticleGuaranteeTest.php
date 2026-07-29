@@ -92,6 +92,127 @@ class ArticleGuaranteeTest extends UnitTestCase
         $this->assertSame('Fallback Brand', $article->getGuaranteeGuarantor());
     }
 
+    /**
+     * #226 item 2: getManufacturer() does a fresh oxNew() + load() on every
+     * call, and the guarantor is resolved up to 3x per article render on the
+     * documented empty-field fallback path (twice from core, once from the
+     * theme). That is 3 SELECTs from oxmanufacturers per article. Resolve once.
+     */
+    public function testGuarantorResolvesTheManufacturerOnlyOncePerInstance(): void
+    {
+        $article = $this->getMockBuilder(Article::class)
+            ->onlyMethods(['getManufacturer'])
+            ->getMock();
+        $manufacturer = oxNew(\OxidEsales\Eshop\Application\Model\Manufacturer::class);
+        $manufacturer->oxmanufacturers__oxtitle = new \OxidEsales\Eshop\Core\Field('Fallback Brand');
+        $article->expects($this->once())->method('getManufacturer')->willReturn($manufacturer);
+        $article->oxarticles__o3guaranteeguarantor = new \OxidEsales\Eshop\Core\Field('');
+
+        $this->assertSame('Fallback Brand', $article->getGuaranteeGuarantor());
+        $this->assertSame('Fallback Brand', $article->getGuaranteeGuarantor());
+        $this->assertSame('Fallback Brand', $article->getGuaranteeGuarantor());
+    }
+
+    /**
+     * The empty guarantor is the expensive case AND a meaningful value ('' =
+     * "cannot render"), so it must be memoised too - a null-coalescing cache
+     * would re-resolve it on every call.
+     */
+    public function testEmptyGuarantorIsMemoisedToo(): void
+    {
+        $article = $this->getMockBuilder(Article::class)
+            ->onlyMethods(['getManufacturer'])
+            ->getMock();
+        $article->expects($this->once())->method('getManufacturer')->willReturn(null);
+        $article->oxarticles__o3guaranteeguarantor = new \OxidEsales\Eshop\Core\Field('');
+
+        $this->assertSame('', $article->getGuaranteeGuarantor());
+        $this->assertSame('', $article->getGuaranteeGuarantor());
+    }
+
+    /**
+     * Memoisation must not outlive the record: OXID reuses model instances, so
+     * a re-load()ed article must never serve the previous article's guarantor.
+     */
+    public function testGuarantorMemoisationIsResetOnAssign(): void
+    {
+        $first = oxNew(Article::class);
+        $first->setId('_guaranteememo1');
+        $first->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('MEMO-1');
+        $first->oxarticles__o3guaranteeguarantor = new \OxidEsales\Eshop\Core\Field('First Brand');
+        $first->save();
+
+        $second = oxNew(Article::class);
+        $second->setId('_guaranteememo2');
+        $second->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('MEMO-2');
+        $second->oxarticles__o3guaranteeguarantor = new \OxidEsales\Eshop\Core\Field('Second Brand');
+        $second->save();
+
+        $article = oxNew(Article::class);
+        $article->load('_guaranteememo1');
+        $this->assertSame('First Brand', $article->getGuaranteeGuarantor());
+
+        $article->load('_guaranteememo2');
+        $this->assertSame('Second Brand', $article->getGuaranteeGuarantor());
+    }
+
+    /**
+     * #226 item 5 wiring: saving an article must collect its own orphaned
+     * labels. The generator-level behaviour is covered in
+     * GuaranteeLabelGeneratorTest; this proves save() actually calls it.
+     */
+    public function testSavingAnArticleCollectsItsOrphanedLabels(): void
+    {
+        $targetDir = sys_get_temp_dir() . '/guarantee_purge_' . uniqid() . '/';
+        mkdir($targetDir, 0777, true);
+        $orphan = $targetDir . '_guaranteepurge_' . str_repeat('a', 32) . '.png';
+        $foreign = $targetDir . 'otherarticle_' . str_repeat('b', 32) . '.png';
+        file_put_contents($orphan, 'stale');
+        file_put_contents($foreign, 'keep');
+
+        $generator = oxNew(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class);
+        $generator->setTargetDir($targetDir);
+
+        try {
+            $article = oxNew(Article::class);
+            $article->setId('_guaranteepurge');
+            $article->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('PURGE-1');
+            $article->setGuaranteeLabelGenerator($generator);
+            $article->save();
+
+            $this->assertFileDoesNotExist($orphan, 'save() must collect the article\'s orphaned labels.');
+            $this->assertFileExists($foreign, 'save() must never touch another article\'s labels.');
+        } finally {
+            @unlink($orphan);
+            @unlink($foreign);
+            @rmdir($targetDir);
+        }
+    }
+
+    /**
+     * Review finding (PR #218): the label collection is documented as "never
+     * throws and never affects the save result". Proven rather than asserted in
+     * a docblock — a generator that blows up must not take save() with it.
+     */
+    public function testSaveSucceedsEvenWhenLabelCollectionThrows(): void
+    {
+        $generator = $this->getMockBuilder(\OxidEsales\Eshop\Core\GuaranteeLabelGenerator::class)
+            ->onlyMethods(['purgeOutdatedLabels'])
+            ->getMock();
+        $generator->method('purgeOutdatedLabels')
+            ->willThrowException(new \RuntimeException('disk on fire'));
+
+        $article = oxNew(Article::class);
+        $article->setId('_guaranteepurgethrows');
+        $article->oxarticles__oxartnum = new \OxidEsales\Eshop\Core\Field('THROW-1');
+        $article->setGuaranteeLabelGenerator($generator);
+
+        $article->save();
+
+        $loaded = oxNew(Article::class);
+        $this->assertTrue($loaded->load('_guaranteepurgethrows'), 'The article must still have been saved.');
+    }
+
     public function testGuarantorEmptyWhenNoFieldAndNoManufacturer(): void
     {
         $article = $this->getMockBuilder(Article::class)

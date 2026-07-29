@@ -94,6 +94,27 @@ class GuaranteeLabelGenerator
     private const NESTED_TEMPLATE_FILE = 'nested-template.png';
     private const TEXT_COLOR = [0, 0, 0]; // black per Annex II spec
 
+    /**
+     * Legibility floor for shrink-to-fit, as a fraction of the field's own
+     * configured size. Text that still does not fit at this size is TRUNCATED
+     * rather than shrunk further (#226 item 4).
+     *
+     * Why a floor exists at all: the model identifier is a mandatory label
+     * component under Reg. (EU) 2025/1960 Annex II and must be legible.
+     * `Article::getGuaranteeModel()` falls back to the full article title when
+     * neither O3GUARANTEEMODEL nor OXARTNUM is set, and an unbounded shrink
+     * scaled such a title down to ~1px of ink — technically "rendered", legally
+     * useless, and (because imagettfbbox is unreliable at sub-point sizes) it
+     * overflowed the blanked box into neighbouring artwork as well.
+     *
+     * This is the calibration knob: 0.6 keeps the field at >= 60% of its
+     * designed size (~28px of ~47px on the official 1400x1474 artwork).
+     */
+    private const MIN_FONT_SCALE = 0.6;
+
+    /** Appended to truncated text; present in the shipped Inter fonts. */
+    private const TRUNCATION_SUFFIX = '…';
+
     /** @var string|null test seam; null = repo default */
     private ?string $assetDir = null;
 
@@ -103,8 +124,11 @@ class GuaranteeLabelGenerator
     /** @var string|null test seam; null = <picture url>/generated/guarantee/ */
     private ?string $targetUrl = null;
 
-    /** @var array|null test seam; null = self::LAYOUT */
+    /** @var array|null test seam; null = self::LAYOUT. Full label only - see setNestedLayout(). */
     private ?array $layout = null;
+
+    /** @var array|null test seam; null = self::NESTED_LAYOUT */
+    private ?array $nestedLayout = null;
 
     public function setAssetDir(string $dir): void
     {
@@ -121,9 +145,23 @@ class GuaranteeLabelGenerator
         $this->targetUrl = rtrim($url, '/') . '/';
     }
 
+    /**
+     * Overrides the FULL-label layout. The nested banner has its own seam -
+     * setNestedLayout() - because it uses a different template and field set.
+     * Both participate in the cache filename, so two layouts can never collide
+     * on one cached file (#226 item 6).
+     */
     public function setLayout(array $layout): void
     {
         $this->layout = $layout;
+    }
+
+    /**
+     * Overrides the nested/reduced-display banner layout.
+     */
+    public function setNestedLayout(array $layout): void
+    {
+        $this->nestedLayout = $layout;
     }
 
     /**
@@ -195,7 +233,8 @@ class GuaranteeLabelGenerator
             if (!$this->ensureDirectory($targetDir)) {
                 return null;
             }
-            if (!$this->compose($this->getAssetDir() . self::NESTED_TEMPLATE_FILE, self::NESTED_LAYOUT, ['years' => (string) $years], $targetFile)) {
+            $layout = $this->nestedLayout ?? self::NESTED_LAYOUT;
+            if (!$this->compose($this->getAssetDir() . self::NESTED_TEMPLATE_FILE, $layout, ['years' => (string) $years], $targetFile)) {
                 return null;
             }
 
@@ -209,18 +248,95 @@ class GuaranteeLabelGenerator
         }
     }
 
+    /**
+     * Deletes this article's generated labels that are no longer current
+     * (#226 item 5).
+     *
+     * Filenames are content-addressed, so every edit to years/guarantor/model —
+     * and every TEMPLATE_VERSION bump — orphans the previous PNG, and nothing
+     * ever collected them: the directory only grew. Rather than tracking which
+     * fields changed, this computes the two filenames that ARE current and
+     * removes every other file belonging to the article. That makes it
+     * idempotent, self-correcting, and it also collects TEMPLATE_VERSION
+     * orphans for the articles that get touched.
+     *
+     * Deliberately narrow: only files whose name matches this article's exact
+     * `<id>_[nested_]<md5>.png` shape are considered, so a prefix-sharing id can
+     * never have its labels deleted.
+     *
+     * @return int number of files removed
+     */
+    public function purgeOutdatedLabels(string $articleId, int $years, string $guarantor, string $model): int
+    {
+        $targetDir = $this->getTargetDir();
+        // One stat call, and it short-circuits the overwhelmingly common case:
+        // the feature is off / no label was ever generated for this shop.
+        if (!is_dir($targetDir)) {
+            return 0;
+        }
+
+        $safeId = preg_replace('/[^a-zA-Z0-9_-]/', '', $articleId);
+        if ($safeId === '') {
+            return 0;
+        }
+
+        $keep = [
+            $this->buildFilename($articleId, $years, $guarantor, $model),
+            $this->buildNestedFilename($articleId, $years),
+        ];
+        $ownFile = '/^' . preg_quote($safeId, '/') . '_(nested_)?[0-9a-f]{32}\.png$/';
+
+        $removed = 0;
+        foreach (glob($targetDir . $safeId . '_*.png') ?: [] as $file) {
+            $name = basename($file);
+            if (!preg_match($ownFile, $name) || in_array($name, $keep, true)) {
+                continue;
+            }
+            if (@unlink($file)) {
+                $removed++;
+            }
+        }
+
+        return $removed;
+    }
+
     private function buildFilename(string $articleId, int $years, string $guarantor, string $model): string
     {
         $safeId = preg_replace('/[^a-zA-Z0-9_-]/', '', $articleId);
-        $hash = md5($years . '|' . $guarantor . '|' . $model . '|' . self::TEMPLATE_VERSION);
+        $hash = md5(
+            $years . '|' . $guarantor . '|' . $model . '|' . self::TEMPLATE_VERSION
+            . $this->getLayoutDiscriminator($this->layout)
+        );
         return $safeId . '_' . $hash . '.png';
     }
 
     private function buildNestedFilename(string $articleId, int $years): string
     {
         $safeId = preg_replace('/[^a-zA-Z0-9_-]/', '', $articleId);
-        $hash = md5($years . '|' . self::TEMPLATE_VERSION);
+        $hash = md5(
+            $years . '|' . self::TEMPLATE_VERSION
+            . $this->getLayoutDiscriminator($this->nestedLayout)
+        );
         return $safeId . '_nested_' . $hash . '.png';
+    }
+
+    /**
+     * Cache-key contribution of an overridden layout (#226 item 6).
+     *
+     * Without it, two different layouts produced the same filename and the
+     * second silently served the first one's cached bytes — a real trap during
+     * calibration work. Contributes NOTHING for the default layout on purpose:
+     * hashing the constant would rename every already-generated production
+     * label at once and orphan the whole directory for no benefit (the constant
+     * is already covered by TEMPLATE_VERSION).
+     *
+     * @param array|null $layout the override, or null when the constant is used
+     *
+     * @return string '' for the default layout
+     */
+    private function getLayoutDiscriminator(?array $layout): string
+    {
+        return $layout === null ? '' : '|layout:' . md5(json_encode($layout));
     }
 
     /**
@@ -290,10 +406,13 @@ class GuaranteeLabelGenerator
             $textWidth = $box[2] - $box[0];
             // Shrink-to-fit: keep the text within 90% of its blanked box so a
             // long guarantor/model never overflows into neighbouring artwork.
+            // The shrink stops at MIN_FONT_SCALE; anything still too wide at
+            // that size is truncated instead, because a label component that is
+            // present but illegible does not satisfy Annex II (#226 item 4).
             if (isset($spec['maxw'])) {
                 $maxWidth = $spec['maxw'] * $width * 0.9;
                 if ($textWidth > $maxWidth && $textWidth > 0) {
-                    $sizePt *= $maxWidth / $textWidth;
+                    $sizePt = max($sizePt * $maxWidth / $textWidth, $sizePt * self::MIN_FONT_SCALE);
                     $box = imagettfbbox($sizePt, 0, $fontFile, $text);
                     if ($box === false) {
                         imagedestroy($image);
@@ -303,6 +422,32 @@ class GuaranteeLabelGenerator
                         return false;
                     }
                     $textWidth = $box[2] - $box[0];
+
+                    if ($textWidth > $maxWidth) {
+                        $truncated = $this->truncateToWidth($text, $sizePt, $fontFile, $maxWidth);
+                        if ($truncated === null) {
+                            imagedestroy($image);
+                            Registry::getLogger()->error(
+                                __METHOD__ . " - Measuring truncated text for field '$field' failed with font '$fontFile'."
+                            );
+                            return false;
+                        }
+                        Registry::getLogger()->notice(
+                            __METHOD__ . " - Field '$field' is too long for its label box and was truncated to"
+                            . " '$truncated'. Set a shorter value explicitly so the mandatory label component stays"
+                            . ' complete and legible.'
+                        );
+                        $text = $truncated;
+                        $box = imagettfbbox($sizePt, 0, $fontFile, $text);
+                        if ($box === false) {
+                            imagedestroy($image);
+                            Registry::getLogger()->error(
+                                __METHOD__ . " - Re-measuring truncated text for field '$field' failed with font '$fontFile'."
+                            );
+                            return false;
+                        }
+                        $textWidth = $box[2] - $box[0];
+                    }
                 }
             }
             // $box[0] is the left side bearing; subtract it so the visible
@@ -333,6 +478,55 @@ class GuaranteeLabelGenerator
             __METHOD__ . " - Generated EU guarantee label '$targetFile'."
         );
         return true;
+    }
+
+    /**
+     * Longest leading substring of $text that, with the ellipsis appended, fits
+     * into $maxWidth at $sizePt.
+     *
+     * Measured rather than estimated: glyph widths vary, so character counts
+     * cannot be derived arithmetically. Binary search keeps this at ~log2(n)
+     * imagettfbbox() calls instead of one per character.
+     *
+     * @return string|null null when measuring failed
+     */
+    private function truncateToWidth(string $text, float $sizePt, string $fontFile, float $maxWidth): ?string
+    {
+        $measure = static function (string $candidate) use ($sizePt, $fontFile): ?float {
+            $box = imagettfbbox($sizePt, 0, $fontFile, $candidate);
+
+            return $box === false ? null : (float) ($box[2] - $box[0]);
+        };
+
+        // The ellipsis alone may already exceed the box on a pathological
+        // layout; there is nothing sensible left to draw in that case.
+        $suffixWidth = $measure(self::TRUNCATION_SUFFIX);
+        if ($suffixWidth === null) {
+            return null;
+        }
+        if ($suffixWidth > $maxWidth) {
+            return self::TRUNCATION_SUFFIX;
+        }
+
+        $low = 0;
+        $high = mb_strlen($text);
+        $best = '';
+        while ($low <= $high) {
+            $mid = intdiv($low + $high, 2);
+            $candidate = rtrim(mb_substr($text, 0, $mid)) . self::TRUNCATION_SUFFIX;
+            $candidateWidth = $measure($candidate);
+            if ($candidateWidth === null) {
+                return null;
+            }
+            if ($candidateWidth <= $maxWidth) {
+                $best = $candidate;
+                $low = $mid + 1;
+            } else {
+                $high = $mid - 1;
+            }
+        }
+
+        return $best === '' ? self::TRUNCATION_SUFFIX : $best;
     }
 
     private function ensureDirectory(string $dir): bool

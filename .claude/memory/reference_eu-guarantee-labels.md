@@ -97,3 +97,13 @@ Non-obvious calibration lessons:
   guess used SemiBold for the guarantor; v3 corrected it to Regular.
 - Same-hash caching bites calibration loops: identical inputs → identical filename
   → cache hit. Delete stale samples in the scratch target dir before regenerating.
+
+## Review follow-ups from o3-shop/o3-shop#226 (resolved 2026-07-28, branch `226-guarantee-followups`)
+
+- **Field cache / upgrade path.** `Version20260715090000::postUp()` now clears the permanent `oxarticles` field-name cache. Without it the feature was silently inert on any shop upgraded with a warm `source/tmp/`. See the migration-bootstrap entry in [[known-pitfalls]] — the migration process has no `oxNew()`, so this goes through the static `Utils::clearTableFieldCacheIn()`.
+- **Guarantor memoisation.** Only the MANUFACTURER lookup is cached (`Article::$guaranteeManufacturerTitleCache`, reset in `assign()`). Caching the whole getter — as the issue suggested — would serve a stale value after a direct write to `oxarticles__o3guaranteeguarantor` without `assign()`. Reading the own field is free (no query), so leave it uncached.
+- **Notice artwork.** `ViewConfig::$guaranteeNoticeUrlCache` is keyed by the SANITIZED language and caches `null` too (hence `array_key_exists`, not `isset`) — the no-artwork-at-all case is the one you least want to re-probe and re-log.
+- **Legibility floor.** `GuaranteeLabelGenerator::MIN_FONT_SCALE = 0.6` is the calibration knob; text still too wide at the floor is truncated with `…` via a binary search over measured widths. Unbounded shrink was worse than the issue described: an overlong model collapsed to ~1px of ink AND overflowed its blanked box, because `imagettfbbox` is unreliable at sub-point sizes. **Still open for legal:** whether a title-derived model identifier is acceptable at all (`getGuaranteeModel()` still falls back to the article title).
+- **Label GC.** `purgeOutdatedLabels()` is called from `Article::save()`: it computes the two CURRENT filenames and deletes every other `<id>_[nested_]<md5>.png`. Idempotent, self-correcting, also collects TEMPLATE_VERSION orphans for touched articles — but NOT for untouched ones, so a `TEMPLATE_VERSION` bump still leaves shop-wide orphans. Short-circuits on one `is_dir()`.
+- **Layout in the cache key.** `getLayoutDiscriminator()` contributes to the hash ONLY when a custom layout is set. Hashing the default constant would rename every already-generated production label at once and orphan the whole directory for no benefit.
+- **Not changed:** `docker.sh`'s `O3SHOP_CONF_SSLSHOPURL="http://…"` (item 7) — deliberate, out of scope for this branch.
