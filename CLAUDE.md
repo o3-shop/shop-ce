@@ -6,19 +6,20 @@ PHP e-commerce platform (OxidEsales fork). All dev work runs inside Docker.
 
 Workflow skills are bundled in `.claude/skills/` and trigger automatically. See `superpowers.md` in the repo root for the full developer guide.
 
-| Skill | When to use |
-|---|---|
-| `brainstorming` | Before building anything new |
-| `writing-plans` | Turns a spec into an implementation plan |
-| `test-driven-development` | Every feature or bugfix |
-| `systematic-debugging` | Any bug, test failure, or unexpected behaviour |
-| `verification-before-completion` | Before claiming work is done |
-| `finishing-a-development-branch` | Wrapping up a branch |
-| `subagent-driven-development` | Execute plans with parallel subagents |
-| `requesting-code-review` | Before merging |
-| `receiving-code-review` | After getting review feedback |
-| `/finish` | Quality gate: cs-fixer + full tests + coverage |
-| `/push-pr` | Only if the user prompt to run it |
+| Skill                            | When to use                                    |
+|----------------------------------|------------------------------------------------|
+| `ponytail`                       | Always when installed                          |
+| `brainstorming`                  | Before building anything new                   |
+| `writing-plans`                  | Turns a spec into an implementation plan       |
+| `test-driven-development`        | Every feature or bugfix                        |
+| `systematic-debugging`           | Any bug, test failure, or unexpected behaviour |
+| `verification-before-completion` | Before claiming work is done                   |
+| `finishing-a-development-branch` | Wrapping up a branch                           |
+| `subagent-driven-development`    | Execute plans with parallel subagents          |
+| `requesting-code-review`         | Before merging                                 |
+| `receiving-code-review`          | After getting review feedback                  |
+| `/finish`                        | Quality gate: cs-fixer + full tests + coverage |
+| `/push-pr`                       | Only if the user prompt to run it              |
 
 ## Quick Start
 
@@ -28,7 +29,7 @@ Workflow skills are bundled in `.claude/skills/` and trigger automatically. See 
 ./docker.sh rebuild # full rebuild from scratch (slow — only when needed)
 ```
 
-Shop: http://localhost:8080 | Admin: http://localhost:8080/admin/ (admin@example.com / admin123)
+Shop: http://localhost:8080 (or https://localhost:8443, self-signed) | Admin: http://localhost:8080/admin/ (admin@example.com / admin123)
 Adminer: http://localhost:8081 | Mailpit: http://localhost:8025
 
 ## Command Reference

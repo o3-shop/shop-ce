@@ -153,6 +153,7 @@ class SystemRequirements
         'tokenizer'          => 'php',
         'mysql_connect'      => 'php',
         'gd_info'            => 'php',
+        'gd_freetype'        => 'php',
         'mb_string'          => 'php',
         'curl'               => 'php',
         'bc_math'            => 'php',
@@ -241,6 +242,7 @@ class SystemRequirements
                 'tokenizer',
                 'mysql_connect',
                 'gd_info',
+                'gd_freetype',
                 'mb_string',
                 'curl',
                 'bc_math',
@@ -605,6 +607,42 @@ class SystemRequirements
     }
 
     /**
+     * Builds the stream context for the mod_rewrite self-probe.
+     *
+     * When the shop is reached over TLS and the operator has explicitly opted in via the
+     * blAllowSelfSignedCertificates config flag (development only, default off), peer
+     * verification is relaxed so the loopback probe can complete against a self-signed
+     * certificate. In every other case certificate verification stays on.
+     *
+     * The flag is read from the DB-less ConfigFile (config.inc.php), never the DB-backed
+     * Config: this probe runs during the Setup System Requirements step, before a database
+     * is configured, so touching Config::getConfigParam() there would trigger a DB load and
+     * break the requirements page on a fresh install. Same DB-less rationale as
+     * checkServerPermissions() (which reads config.inc.php via ConfigFile too); here we use
+     * the ConfigFile instance bootstrap.php already registered in the Registry.
+     *
+     * @param array $aHostInfo host info (host, port, dir, ssl)
+     *
+     * @return resource stream context
+     * @deprecated underscore prefix violates PSR12, will be renamed to "buildModRewriteStreamContext" in next major
+     */
+    protected function _buildModRewriteStreamContext($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+    {
+        $aOptions = [];
+        $blAllowSelfSigned = (bool) \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->getVar('blAllowSelfSignedCertificates');
+        if (!empty($aHostInfo['ssl']) && $blAllowSelfSigned) {
+            $aOptions['ssl'] = [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ];
+        }
+
+        return stream_context_create($aOptions);
+    }
+
+    /**
      * Performs the mod_rewrite self-probe: opens a socket back to the shop and POSTs to
      * oxseo.php?mod_rewrite_module_is=off, returning the raw HTTP response.
      *
@@ -614,8 +652,10 @@ class SystemRequirements
      */
     protected function _getModRewriteResponse($aHostInfo) // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     {
-        $sHostname = ($aHostInfo['ssl'] ? 'ssl://' : '') . $aHostInfo['host'];
-        if (!($rFp = @fsockopen($sHostname, $aHostInfo['port'], $iErrNo, $sErrStr, 10))) {
+        $sScheme = $aHostInfo['ssl'] ? 'ssl' : 'tcp';
+        $sRemote = $sScheme . '://' . $aHostInfo['host'] . ':' . $aHostInfo['port'];
+        $rContext = $this->_buildModRewriteStreamContext($aHostInfo);
+        if (!($rFp = @stream_socket_client($sRemote, $iErrNo, $sErrStr, 10, STREAM_CLIENT_CONNECT, $rContext))) {
             return false;
         }
 
@@ -850,6 +890,19 @@ class SystemRequirements
         $iModStat = function_exists('imagecreatefrompng') ? $iModStat : 0;
 
         return $iModStat;
+    }
+
+    /**
+     * Checks if GD is built with FreeType support (imagettftext), required to
+     * render text into images, e.g. the EU guarantee label.
+     *
+     * @return integer
+     */
+    public function checkGdFreetype()
+    {
+        return function_exists('imagettftext')
+            ? static::MODULE_STATUS_OK
+            : static::MODULE_STATUS_BLOCKS_SETUP;
     }
 
     /**

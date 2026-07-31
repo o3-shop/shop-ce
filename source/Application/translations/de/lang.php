@@ -846,4 +846,16 @@ $aLang = [
 // Core CAPTCHA provider feature (issue #213) — storefront texts
 'O3_CAPTCHA_FAILED'                                           => 'Die Sicherheitsüberprüfung ist fehlgeschlagen. Bitte versuchen Sie es erneut.',
 'O3_CAPTCHA_CONSENT_NOTICE'                                   => 'Bitte akzeptieren Sie die erforderlichen Cookies. Andernfalls können wir nicht prüfen, ob Sie ein Mensch sind, und das Formular kann nicht abgesendet werden.',
+
+// EU-Garantie-Labels (Issue #219, Reg. (EU) 2025/1960) - Storefront-Texte.
+// Die Texte IN den Labels selbst sind festes EU-Artwork, keine Übersetzungen.
+'O3_GUARANTEE_NOTICE_IMG_ALT'                                 => 'EU-einheitlicher Hinweis auf die gesetzliche Gewährleistung von mindestens zwei Jahren',
+'O3_GUARANTEE_LABEL_IMG_ALT'                                  => 'EU-Garantie-Label: Haltbarkeitsgarantie des Herstellers für dieses Produkt',
+'O3_GUARANTEE_LABEL_FALLBACK_DURATION'                        => 'Haltbarkeitsgarantie des Herstellers: %s Jahre',
+'O3_GUARANTEE_LABEL_FALLBACK_GUARANTOR'                       => 'Garantiegeber: %s',
+'O3_GUARANTEE_LABEL_FALLBACK_NOTE'                            => 'Das offizielle EU-Garantie-Label kann derzeit leider nicht angezeigt werden.',
+'O3_GUARANTEE_LEGAL_REMINDER'                                => 'Unabhängig davon gilt die gesetzliche Gewährleistung von mindestens zwei Jahren.',
+'O3_GUARANTEE_CONDITIONS_HEADING'                            => 'Garantiebedingungen',
+'O3_GUARANTEE_RIGHTS_LINK'                                   => 'Ihre gesetzlichen Gewährleistungsrechte',
+'O3_GUARANTEE_CLOSE'                                         => 'Schließen',
 ];

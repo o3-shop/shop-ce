@@ -36,6 +36,44 @@ class SystemRequirementsTest extends \OxidTestCase
         $this->assertEquals(34359738368, $systemRequirements->UNITgetBytes('32G'));
     }
 
+    public function testBuildModRewriteStreamContextKeepsVerificationForSslWhenFlagOff()
+    {
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', false);
+        $systemRequirements = new SystemRequirements();
+
+        $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => true]);
+        $options = stream_context_get_options($context);
+
+        $this->assertArrayNotHasKey('ssl', $options);
+    }
+
+    public function testBuildModRewriteStreamContextRelaxesVerificationForSslWhenFlagOn()
+    {
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', true);
+        $systemRequirements = new SystemRequirements();
+
+        $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => true]);
+        $options = stream_context_get_options($context);
+
+        $this->assertFalse($options['ssl']['verify_peer']);
+        $this->assertFalse($options['ssl']['verify_peer_name']);
+        $this->assertTrue($options['ssl']['allow_self_signed']);
+    }
+
+    public function testBuildModRewriteStreamContextKeepsVerificationForNonSslWhenFlagOn()
+    {
+        \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class)
+            ->setVar('blAllowSelfSignedCertificates', true);
+        $systemRequirements = new SystemRequirements();
+
+        $context = $systemRequirements->UNITbuildModRewriteStreamContext(['ssl' => false]);
+        $options = stream_context_get_options($context);
+
+        $this->assertArrayNotHasKey('ssl', $options);
+    }
+
     public function testGetRequiredModules()
     {
         $systemRequirements = new SystemRequirements();
@@ -45,6 +83,51 @@ class SystemRequirementsTest extends \OxidTestCase
         $requirementGroups = array_unique(array_values($requiredModules));
 
         $this->assertCount(3, $requirementGroups);
+    }
+
+    public function testGdFreetypeIsARequiredPhpExtension()
+    {
+        $systemRequirements = new SystemRequirements();
+
+        $this->assertArrayHasKey('gd_freetype', $systemRequirements->getRequiredModules());
+    }
+
+    /**
+     * Every required module id must resolve to an existing check method, otherwise
+     * getModuleInfo() fatals while rendering the setup / system health page.
+     */
+    public function testEveryRequiredModuleHasACheckMethod()
+    {
+        $systemRequirements = new SystemRequirements();
+
+        foreach (array_keys($systemRequirements->getRequiredModules()) as $moduleId) {
+            $checkMethod = 'check' . str_replace(' ', '', ucwords(str_replace('_', ' ', $moduleId)));
+            $this->assertTrue(
+                method_exists($systemRequirements, $checkMethod),
+                "Missing $checkMethod() for required module '$moduleId'."
+            );
+        }
+    }
+
+    public function testCheckGdFreetypeReflectsImagettftextAvailability()
+    {
+        $systemRequirements = new SystemRequirements();
+
+        $this->assertSame(
+            function_exists('imagettftext')
+                ? SystemRequirements::MODULE_STATUS_OK
+                : SystemRequirements::MODULE_STATUS_BLOCKS_SETUP,
+            $systemRequirements->checkGdFreetype()
+        );
+    }
+
+    public function testMissingGdFreetypeBlocksSetup()
+    {
+        $this->assertFalse(
+            SystemRequirements::canSetupContinue(
+                ['php_extennsions' => ['gd_freetype' => SystemRequirements::MODULE_STATUS_BLOCKS_SETUP]]
+            )
+        );
     }
 
     public function testGetModuleInfo()

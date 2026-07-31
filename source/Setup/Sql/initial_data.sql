@@ -711,6 +711,24 @@ VALUES ('8709e45f31a86909e9f999222e80b1d0', 'oxstdfooter', 1, 1, 0, 1, 1, '', 'S
 ('220404cee0caf470e227c1c9f1ec4aL3', 'oxdownloadableproductsagreement', 1, 1, 0, 1, 1, '', 'Für digitale Inhalte', 'Ja, ich möchte sofort Zugang zu dem digitalen Inhalt und weiß, dass mein Widerrufsrecht mit dem Zugang erlischt.', 'For the supply of digital content', 'I want immediate access to the digital content and I acknowledge that thereby I lose my right to cancel once the service has begun.', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_USERINFO', '', 0),
 ('220404cee0caf470e227c1c9f1ec4aL4', 'oxserviceproductsagreement', 1, 1, 0, 1, 1, '', 'Für Dienstleistungen', 'Ja, bitte beginnen Sie sofort mit der Dienstleistung. Mein Widerrufsrecht erlischt mit vollständiger Ausführung.', 'For service contracts', 'I agree to the starting of the service and I acknowledge that I lose my right to cancel once the service has been fully performed.', 1, '', '', 1, '', '', '30e44ab83fdee7564.23264141', 'CMSFOLDER_USERINFO', '', 0);
 
+-- #219 EU guarantee labels: operator-editable supplementary-notice CMS snippet.
+-- Kept byte-identical to migration Version20260715090000 (same OXID/OXLOADID,
+-- inactive + empty) so a fresh install matches an upgraded shop.
+INSERT INTO `oxcontents`
+    (`OXID`, `OXLOADID`, `OXSHOPID`, `OXSNIPPET`, `OXTYPE`,
+     `OXACTIVE`,   `OXTITLE`,   `OXCONTENT`,
+     `OXACTIVE_1`, `OXTITLE_1`, `OXCONTENT_1`,
+     `OXACTIVE_2`, `OXTITLE_2`, `OXCONTENT_2`,
+     `OXACTIVE_3`, `OXTITLE_3`, `OXCONTENT_3`,
+     `OXFOLDER`)
+VALUES
+    ('2dc2706b4b1b08bda977496b32e9b3fc', 'o3_guarantee_notice_info', 1, 1, 0,
+     0, '', '',
+     0, '', '',
+     0, '', '',
+     0, '', '',
+     '');
+
 INSERT INTO `oxcountry` (`OXID`, `OXACTIVE`, `OXTITLE`, `OXISOALPHA2`, `OXISOALPHA3`, `OXUNNUM3`, `OXVATINPREFIX`,
                          `OXORDER`, `OXSHORTDESC`, `OXLONGDESC`, `OXTITLE_1`, `OXTITLE_2`, `OXTITLE_3`, `OXSHORTDESC_1`,
                          `OXSHORTDESC_2`, `OXSHORTDESC_3`, `OXLONGDESC_1`, `OXLONGDESC_2`, `OXLONGDESC_3`,
@@ -1496,4 +1514,7 @@ VALUES
     ('c7c6ef985f845e56417339ae7b930b20', 1, '', 'blShowRevocationForm',       'bool', '1'),
     ('b4f36c830c18f275eef33491246b822e', 1, '', 'blRevocationRequireLogin',   'bool', '0'),
     ('f4a110db564dcf6528ede68bddebe75c', 1, '', 'blRevocationNotifyOperator', 'bool', '1'),
-    ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  '');
+    ('222ef6f2a5c46a0f105c3ce2ca538f0b', 1, '', 'sRevocationOperatorEmail',   'str',  ''),
+-- #219 EU guarantee labels: fresh installs are compliant out of the box; upgrades default OFF in code.
+    ('3bab9ff7dfb761e35b833dcf56c9593d', 1, '', 'blShowLegalGuaranteeNotice',      'bool', '1'),
+    ('465bf751756bc97271fc580071ee5fc8', 1, '', 'blShowDurabilityGuaranteeLabel',  'bool', '1');

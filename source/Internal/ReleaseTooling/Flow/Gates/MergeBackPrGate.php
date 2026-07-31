@@ -40,6 +40,15 @@ class MergeBackPrGate implements PreFlightGate
 {
     public const NAME = 'merge-back-pending';
 
+    /**
+     * Branch every merge-back PR targets. Also the signal for "this
+     * repo has no separate maintenance line": a package released from
+     * this branch cannot have a merge-back PR at all, since base and
+     * head would coincide. DeleteBranchOnMergeGate keys its skip on
+     * this, so the two gates cannot drift apart.
+     */
+    public const MERGE_BACK_BASE = 'main';
+
     private ProcessExecutor $exec;
     private string $ghBin;
 
@@ -61,7 +70,7 @@ class MergeBackPrGate implements PreFlightGate
                 $this->ghBin, 'pr', 'list',
                 '--repo', PackageRepoSlug::resolve($packageName),
                 '--state', 'open',
-                '--base', 'main',
+                '--base', self::MERGE_BACK_BASE,
                 '--head', $expectedBranch,
                 '--json', 'number,title,url',
                 '--limit', '50',

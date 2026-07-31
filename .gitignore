@@ -120,3 +120,9 @@ oxideshop.log
 /source/modules/o3-shop/recaptcha
 
 /graphify-out
+
+
+#custom nlo
+HANDOFF*.md
+ISSUE.md
+package-lock.json

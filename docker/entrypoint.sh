@@ -138,9 +138,7 @@ start_apache() {
     
     # Enable Apache modules
     a2enmod rewrite || handle_error "Failed to enable Apache rewrite module"
-    
-    # Ensure www-data can write to temp/log/pictures dirs
-    chown -R www-data:www-data /var/www/html/source/tmp /var/www/html/source/log /var/www/html/source/out/pictures/generated 2>/dev/null || true
+    a2enmod ssl || handle_error "Failed to enable Apache ssl module"
 
     log "${GREEN}Starting Apache...${NC}"
     rm /tmp/o3setup-running

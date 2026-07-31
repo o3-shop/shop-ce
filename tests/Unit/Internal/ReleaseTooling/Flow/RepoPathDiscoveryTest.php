@@ -111,7 +111,7 @@ final class RepoPathDiscoveryTest extends TestCase
             $branchIdx = array_search('--branch', $cmd, true);
             $cloneBranches[end($cmd)] = $cmd[$branchIdx + 1];
         }
-        $this->assertSame('b-1.6', $cloneBranches[$base . '/testing-library']);
+        $this->assertSame('b-1.7', $cloneBranches[$base . '/testing-library']);
         $this->assertSame('main', $cloneBranches[$base . '/o3-Theme']);
 
         $this->assertSame($base . '/testing-library', $resolved['o3-shop/testing-library']);
@@ -268,6 +268,34 @@ final class RepoPathDiscoveryTest extends TestCase
             $shopCe . '/shop-demodata-ce',
             $resolved['o3-shop/shop-demodata-ce']
         );
+    }
+
+    /**
+     * Origins cloned through an ~/.ssh/config host alias must still be recognised —
+     * otherwise the scan silently skips the repo and the flow re-clones it.
+     */
+    public function testNestedCloneWithSshHostAliasOrigin(): void
+    {
+        $base = $this->mkdir();
+        $shopCe = $this->mkdir();
+        $this->mkNestedGitWorkingTree(
+            $shopCe . '/shop-demodata-ce',
+            'git@github-work:o3-shop/shop-demodata-ce.git'
+        );
+
+        $exec = new FakeProcessExecutor();
+        $discovery = new RepoPathDiscovery(
+            $exec,
+            new RepoCloneUrlResolver(RepoCloneUrlResolver::SCHEME_HTTPS),
+            new DefaultBranchResolver()
+        );
+        $resolved = $discovery->discoverAll($base, $shopCe, ['o3-shop/shop-demodata-ce']);
+
+        $this->assertSame(
+            $shopCe . '/shop-demodata-ce',
+            $resolved['o3-shop/shop-demodata-ce']
+        );
+        $this->assertSame([], $exec->commands());
     }
 
     public function testNestedScanReverseMapsCaseRenamedPackages(): void

@@ -108,6 +108,7 @@ class ShopControllerMapProvider implements \OxidEsales\Eshop\Core\Contract\Contr
         'revocation_config'                    => \OxidEsales\Eshop\Application\Controller\Admin\RevocationConfigController::class,
         'revocation_list'                      => \OxidEsales\Eshop\Application\Controller\Admin\RevocationList::class,
         'revocation_main'                      => \OxidEsales\Eshop\Application\Controller\Admin\RevocationMain::class,
+        'guarantee_config'                     => \OxidEsales\Eshop\Application\Controller\Admin\GuaranteeConfigController::class,
         'selectlist'                           => \OxidEsales\Eshop\Application\Controller\Admin\SelectListController::class,
         'selectlist_list'                      => \OxidEsales\Eshop\Application\Controller\Admin\SelectListList::class,
         'selectlist_main'                      => \OxidEsales\Eshop\Application\Controller\Admin\SelectListMain::class,
