@@ -471,7 +471,7 @@ class Search extends Base
                     . ($oSuggestion->oxarticles__oxvarselect->value ? ' ' . $oSuggestion->oxarticles__oxvarselect->value : ''),
                 'price' => trim($sPrice),
                 'icon'  => $oSuggestion->getThumbnailUrl(),
-                'link'  => $oSuggestion->getLink(),
+                'link'  => htmlspecialchars_decode($oSuggestion->getLink(), ENT_QUOTES),
             ];
         }
 

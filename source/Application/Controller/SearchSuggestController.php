@@ -16,9 +16,9 @@ class SearchSuggestController extends FrontendController
     {
         $oConfig = Registry::getConfig();
 
+        Registry::get(Header::class)->setHeader('Content-Type: application/json; charset=UTF-8');
         if (!$oConfig->getConfigParam('blSearchSuggest')) {
-            Registry::getUtils()->showMessageAndExit(json_encode([], JSON_THROW_ON_ERROR));
-            return;
+            Registry::getUtils()->showMessageAndExit('[]');
         }
 
         $oRequest = Registry::getRequest();
@@ -30,6 +30,7 @@ class SearchSuggestController extends FrontendController
             if ($iLimit < 1) {
                 $iLimit = self::DEFAULT_SUGGESTIONS;
             }
+            $iLimit = min($iLimit, 50);
 
             $oSearchHandler = oxNew(Search::class);
             $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, $iLimit);
