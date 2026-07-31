@@ -116,14 +116,17 @@ jobs:
           echo "COMPOSER_ROOT_VERSION=$VERSION" >> $GITHUB_ENV
           echo "Using version: $VERSION"
 
-      - name: 📦 Cache Composer Dependencies
-        id: composer-cache
+      - name: 📦 Cache Composer Downloads
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          # composer.lock is gitignored, so CI resolves to the latest deps on
+          # every run. Caching `vendor` would freeze a stale tree (a lockless
+          # `composer install` no-ops when packages are already present), so we
+          # cache only Composer's download cache and let `vendor` rebuild fresh.
+          path: ~/.cache/composer
+          key: ${{ runner.os }}-php-${{ matrix.php-version }}-composer-${{ hashFiles('composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php-version }}-
+            ${{ runner.os }}-php-${{ matrix.php-version }}-composer-
 
       - name: 🔧 Copy CI Config Files
         run: |
