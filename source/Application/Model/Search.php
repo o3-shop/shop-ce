@@ -452,27 +452,27 @@ class Search extends Base
                     LIMIT " . (int) $iLimit;
 
         $aResults = [];
+        $oCurrency = Registry::getConfig()->getActShopCurrencyObject();
         $oArtList = oxNew(ArticleList::class);
         $oArtList->selectString($sSelect);
 
         foreach ($oArtList as $oSuggestion) {
-            $oPrice = $oSuggestion->getPrice();
-            $dPrice = $oPrice ? $oPrice->getBruttoPrice() : 0;
-            $sFormattedPrice = Registry::getLang()->formatCurrency($dPrice);
-
-            $oCurrency = Registry::getConfig()->getActShopCurrencyObject();
-            $sSign = $oCurrency->sign ?? '';
-            $sSide = $oCurrency->side ?? '';
-            $sPrice = ($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign;
-
-            $aResults[] = [
+            $aResult = [
                 'id'    => $oSuggestion->oxarticles__oxid->value,
                 'title' => $oSuggestion->oxarticles__oxtitle->value
                     . ($oSuggestion->oxarticles__oxvarselect->value ? ' ' . $oSuggestion->oxarticles__oxvarselect->value : ''),
-                'price' => trim($sPrice),
                 'icon'  => $oSuggestion->getThumbnailUrl(),
                 'link'  => htmlspecialchars_decode($oSuggestion->getLink(), ENT_QUOTES),
             ];
+
+            $sFormattedPrice = $oSuggestion->getFPrice();
+            if ($sFormattedPrice !== null) {
+                $sSign = $oCurrency->sign ?? '';
+                $sSide = $oCurrency->side ?? '';
+                $aResult['price'] = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+            }
+
+            $aResults[] = $aResult;
         }
 
         return $aResults;

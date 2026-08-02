@@ -48,6 +48,7 @@ class SearchTest extends UnitTestCase
         $this->tableViewNameGenerator = oxNew('oxTableViewNameGenerator');
         $this->getConfig()->setConfigParam('blUseTimeCheck', true);
         $this->cleanUpTable('oxarticles');
+        $this->cleanUpTable('oxartextends');
         $this->cleanUpTable('oxobject2category');
         $this->cleanUpTable('oxcategories');
     }
@@ -64,6 +65,7 @@ class SearchTest extends UnitTestCase
         $myDB->execute('delete from oxobject2selectlist where oxselnid = "oxsellisttest" ');
         $this->cleanUpTable('oxcategories');
         $this->cleanUpTable('oxarticles');
+        $this->cleanUpTable('oxartextends');
         $this->cleanUpTable('oxobject2category');
         parent::tearDown();
     }
@@ -895,5 +897,83 @@ class SearchTest extends UnitTestCase
         $this->addToDatabase($sQ3, 'oxobject2category');
         $aResults = $this->_oSearchHandler->getSearchArticles('searchTestVal', '_testCatSearch');
         $this->assertEquals(1, count($aResults));
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyWhenNoSearchColsConfigured()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', 'xxx');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyWhenSearchColsIsEmptyArray()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', []);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsMatchingArticles()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar', 10);
+
+        $this->assertNotEmpty($aSuggestions);
+        $this->assertLessThanOrEqual(10, count($aSuggestions));
+
+        $expectedKeys = ['id', 'title', 'price', 'icon', 'link'];
+        foreach ($aSuggestions as $aSuggestion) {
+            foreach ($expectedKeys as $sKey) {
+                $this->assertArrayHasKey($sKey, $aSuggestion);
+            }
+        }
+    }
+
+    public function testGetSearchSuggestionsRespectsLimit()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('a', 3);
+
+        $this->assertCount(3, $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsMatchesLongDescription()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
+
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxtitle) VALUES ('_testSuggDesc', 1, 1, 'NoMatchingTitle')";
+        if ($this->getConfig()->getEdition() === 'EE') {
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxtitle) VALUES ('_testSuggDesc', 1, 1, 1, 'NoMatchingTitle')";
+        }
+        $this->addToDatabase($sInsert, 'oxarticles');
+        $this->addToDatabase("REPLACE INTO oxartextends (oxid, oxlongdesc) VALUES ('_testSuggDesc', 'uniqueNeedleInLongDesc')", 'oxartextends');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('uniqueNeedleInLongDesc');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggDesc', $aSuggestions[0]['id']);
+    }
+
+    public function testGetSearchSuggestionsFormatsNetPriceWhenShowNetPriceIsEnabled()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('blShowNetPrice', true);
+
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxtitle, oxprice) VALUES ('_testSuggNet', 1, 1, 'NetPriceTest', 100)";
+        if ($this->getConfig()->getEdition() === 'EE') {
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxtitle, oxprice) VALUES ('_testSuggNet', 1, 1, 1, 'NetPriceTest', 100)";
+        }
+        $this->addToDatabase($sInsert, 'oxarticles');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NetPriceTest');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('84,03 €', $aSuggestions[0]['price']);
     }
 }
