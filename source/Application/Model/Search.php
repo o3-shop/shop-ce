@@ -414,7 +414,7 @@ class Search extends Base
      *
      * @return array
      */
-    public function getSearchSuggestions($sSearchParam, $iLimit = 8)
+    public function getSearchSuggestions($sSearchParam, $iLimit = 10)
     {
         $myConfig = Registry::getConfig();
         $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);

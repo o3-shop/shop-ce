@@ -19,6 +19,7 @@ class SearchSuggestController extends FrontendController
         Registry::get(Header::class)->setHeader('Content-Type: application/json; charset=UTF-8');
         if (!$oConfig->getConfigParam('blSearchSuggest')) {
             Registry::getUtils()->showMessageAndExit('[]');
+            return;
         }
 
         $oRequest = Registry::getRequest();
@@ -36,7 +37,6 @@ class SearchSuggestController extends FrontendController
             $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, $iLimit);
         }
 
-        Registry::get(Header::class)->setHeader('Content-Type: application/json; charset=UTF-8');
         Registry::getUtils()->showMessageAndExit(json_encode($aResult, JSON_THROW_ON_ERROR));
     }
 }

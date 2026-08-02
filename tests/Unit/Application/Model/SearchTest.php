@@ -908,6 +908,25 @@ class SearchTest extends UnitTestCase
         $this->assertSame([], $aSuggestions);
     }
 
+    /**
+     * Inserts a searchable article fixture for the suggestion tests.
+     *
+     * @param string $sOxid  article id
+     * @param string $sTitle article title
+     * @param float  $dPrice optional price
+     */
+    private function _insertSuggestionArticle($sOxid, $sTitle, $dPrice = null)
+    {
+        $sPriceCol = $dPrice === null ? '' : ', oxprice';
+        $sPriceVal = $dPrice === null ? '' : ', ' . (float) $dPrice;
+
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, '{$sTitle}'{$sPriceVal})";
+        if ($this->getConfig()->getEdition() === 'EE') {
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, 1, '{$sTitle}'{$sPriceVal})";
+        }
+        $this->addToDatabase($sInsert, 'oxarticles');
+    }
+
     public function testGetSearchSuggestionsReturnsEmptyWhenSearchColsIsEmptyArray()
     {
         $this->getConfig()->setConfigParam('aSearchCols', []);
@@ -920,8 +939,9 @@ class SearchTest extends UnitTestCase
     public function testGetSearchSuggestionsReturnsMatchingArticles()
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSuggestionArticle('_testSuggResult', 'SuggFixtureResult');
 
-        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar', 10);
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureResult', 10);
 
         $this->assertNotEmpty($aSuggestions);
         $this->assertLessThanOrEqual(10, count($aSuggestions));
@@ -937,8 +957,11 @@ class SearchTest extends UnitTestCase
     public function testGetSearchSuggestionsRespectsLimit()
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        for ($i = 1; $i <= 4; $i++) {
+            $this->_insertSuggestionArticle('_testSuggLimit' . $i, 'SuggFixtureLimit' . $i);
+        }
 
-        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('a', 3);
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureLimit', 3);
 
         $this->assertCount(3, $aSuggestions);
     }
