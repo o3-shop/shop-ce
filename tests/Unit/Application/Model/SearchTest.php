@@ -22,6 +22,8 @@
 namespace OxidEsales\EshopCommunity\Tests\Unit\Application\Model;
 
 use oxDb;
+use OxidEsales\Eshop\Core\Price;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Application\Model\Article;
 use OxidEsales\EshopCommunity\Application\Model\Search;
 use OxidEsales\EshopCommunity\Core\TableViewNameGenerator;
@@ -920,9 +922,9 @@ class SearchTest extends UnitTestCase
         $sPriceCol = $dPrice === null ? '' : ', oxprice';
         $sPriceVal = $dPrice === null ? '' : ', ' . (float) $dPrice;
 
-        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, '{$sTitle}'{$sPriceVal})";
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxparentid, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, '', '{$sTitle}'{$sPriceVal})";
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, 1, '{$sTitle}'{$sPriceVal})";
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxparentid, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, 1, '', '{$sTitle}'{$sPriceVal})";
         }
         $this->addToDatabase($sInsert, 'oxarticles');
     }
@@ -943,14 +945,13 @@ class SearchTest extends UnitTestCase
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureResult', 10);
 
-        $this->assertNotEmpty($aSuggestions);
-        $this->assertLessThanOrEqual(10, count($aSuggestions));
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('_testSuggResult', $aSuggestions[0]['id']);
+        $this->assertSame('SuggFixtureResult', $aSuggestions[0]['title']);
 
         $expectedKeys = ['id', 'title', 'price', 'icon', 'link'];
-        foreach ($aSuggestions as $aSuggestion) {
-            foreach ($expectedKeys as $sKey) {
-                $this->assertArrayHasKey($sKey, $aSuggestion);
-            }
+        foreach ($expectedKeys as $sKey) {
+            $this->assertArrayHasKey($sKey, $aSuggestions[0]);
         }
     }
 
@@ -970,11 +971,7 @@ class SearchTest extends UnitTestCase
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
 
-        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxtitle) VALUES ('_testSuggDesc', 1, 1, 'NoMatchingTitle')";
-        if ($this->getConfig()->getEdition() === 'EE') {
-            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxtitle) VALUES ('_testSuggDesc', 1, 1, 1, 'NoMatchingTitle')";
-        }
-        $this->addToDatabase($sInsert, 'oxarticles');
+        $this->_insertSuggestionArticle('_testSuggDesc', 'NoMatchingTitle');
         $this->addToDatabase("REPLACE INTO oxartextends (oxid, oxlongdesc) VALUES ('_testSuggDesc', 'uniqueNeedleInLongDesc')", 'oxartextends');
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('uniqueNeedleInLongDesc');
@@ -987,16 +984,36 @@ class SearchTest extends UnitTestCase
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
         $this->getConfig()->setConfigParam('blShowNetPrice', true);
+        $this->getConfig()->setConfigParam('blEnterNetPrice', false);
 
-        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxtitle, oxprice) VALUES ('_testSuggNet', 1, 1, 'NetPriceTest', 100)";
-        if ($this->getConfig()->getEdition() === 'EE') {
-            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxtitle, oxprice) VALUES ('_testSuggNet', 1, 1, 1, 'NetPriceTest', 100)";
-        }
-        $this->addToDatabase($sInsert, 'oxarticles');
+        $this->_insertSuggestionArticle('_testSuggNet', 'NetPriceTest', 100);
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NetPriceTest');
 
         $this->assertCount(1, $aSuggestions);
-        $this->assertSame('84,03 €', $aSuggestions[0]['price']);
+
+        $oConfig = Registry::getConfig();
+        $oCurrency = $oConfig->getActShopCurrencyObject();
+        $dVat = (float) $oConfig->getConfigParam('dDefaultVAT');
+        $dNetto = round(Price::brutto2Netto(100, $dVat), $oCurrency->decimal);
+        $sFormattedPrice = Registry::getLang()->formatCurrency($dNetto * (float) $oCurrency->rate);
+        $sSign = $oCurrency->sign ?? '';
+        $sSide = $oCurrency->side ?? '';
+        $sExpectedPrice = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+
+        $this->assertSame($sExpectedPrice, $aSuggestions[0]['price']);
+    }
+
+    public function testGetSearchSuggestionsOmitsPriceWhenPriceLoadingIsDisabled()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('bl_perfLoadPrice', false);
+
+        $this->_insertSuggestionArticle('_testSuggNoPrice', 'NoPriceTest');
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NoPriceTest');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertArrayNotHasKey('price', $aSuggestions[0]);
     }
 }

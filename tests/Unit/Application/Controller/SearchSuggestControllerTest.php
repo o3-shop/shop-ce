@@ -47,6 +47,7 @@ class SearchSuggestControllerTest extends \OxidTestCase
     {
         parent::setUp();
         $this->getConfig()->setConfigParam('blSearchSuggest', true);
+        $this->getConfig()->setConfigParam('iSearchSuggestCount', SearchSuggestController::DEFAULT_SUGGESTIONS);
         $this->setRequestParameter('searchparam', null);
         oxTestModules::addFunction('oxutils', 'showMessageAndExit', '{$this->showMessageAndExitCall[] = $aA[0];}');
     }
@@ -191,7 +192,7 @@ class SearchSuggestControllerTest extends \OxidTestCase
         $search = $this->getMock(Search::class, ['getSearchSuggestions']);
         $search->expects($this->once())
             ->method('getSearchSuggestions')
-            ->with($this->equalTo('test'), $this->equalTo(50))
+            ->with($this->equalTo('test'), $this->equalTo(SearchSuggestController::MAX_SUGGESTIONS))
             ->will($this->returnValue([]));
         oxTestModules::addModuleObject(Search::class, $search);
 

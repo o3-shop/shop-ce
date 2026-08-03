@@ -452,7 +452,7 @@ class Search extends Base
                     LIMIT " . (int) $iLimit;
 
         $aResults = [];
-        $oCurrency = Registry::getConfig()->getActShopCurrencyObject();
+        $oCurrency = $myConfig->getActShopCurrencyObject();
         $oArtList = oxNew(ArticleList::class);
         $oArtList->selectString($sSelect);
 

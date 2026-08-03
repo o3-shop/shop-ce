@@ -11,6 +11,8 @@ use OxidEsales\Eshop\Core\Registry;
 class SearchSuggestController extends FrontendController
 {
     public const DEFAULT_SUGGESTIONS = 10;
+    public const MIN_SEARCH_LENGTH = 2;
+    public const MAX_SUGGESTIONS = 50;
 
     public function render()
     {
@@ -26,12 +28,12 @@ class SearchSuggestController extends FrontendController
         $sSearchParam = trim((string) $oRequest->getRequestParameter('searchparam'));
 
         $aResult = [];
-        if (mb_strlen($sSearchParam) >= 2) {
+        if (mb_strlen($sSearchParam) >= self::MIN_SEARCH_LENGTH) {
             $iLimit = (int) $oConfig->getConfigParam('iSearchSuggestCount');
             if ($iLimit < 1) {
                 $iLimit = self::DEFAULT_SUGGESTIONS;
             }
-            $iLimit = min($iLimit, 50);
+            $iLimit = min($iLimit, self::MAX_SUGGESTIONS);
 
             $oSearchHandler = oxNew(Search::class);
             $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, $iLimit);
