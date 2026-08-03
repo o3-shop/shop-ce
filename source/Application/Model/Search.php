@@ -416,6 +416,11 @@ class Search extends Base
      */
     public function getSearchSuggestions($sSearchParam, $iLimit = 10)
     {
+        $sSearchParam = trim((string) $sSearchParam);
+        if ($sSearchParam === '') {
+            return [];
+        }
+
         $myConfig = Registry::getConfig();
         $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
         $sDescView = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage);

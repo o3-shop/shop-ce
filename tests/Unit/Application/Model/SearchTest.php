@@ -919,12 +919,15 @@ class SearchTest extends UnitTestCase
      */
     private function _insertSuggestionArticle($sOxid, $sTitle, $dPrice = null)
     {
+        $oDb = $this->getDb();
+        $sOxidQuoted = $oDb->quote($sOxid);
+        $sTitleQuoted = $oDb->quote($sTitle);
         $sPriceCol = $dPrice === null ? '' : ', oxprice';
         $sPriceVal = $dPrice === null ? '' : ', ' . (float) $dPrice;
 
-        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxparentid, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, '', '{$sTitle}'{$sPriceVal})";
+        $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxparentid, oxtitle{$sPriceCol}) VALUES ({$sOxidQuoted}, 1, 1, '', {$sTitleQuoted}{$sPriceVal})";
         if ($this->getConfig()->getEdition() === 'EE') {
-            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxparentid, oxtitle{$sPriceCol}) VALUES ('{$sOxid}', 1, 1, 1, '', '{$sTitle}'{$sPriceVal})";
+            $sInsert = "REPLACE INTO oxarticles (oxid, oxactive, oxissearch, oxshopid, oxparentid, oxtitle{$sPriceCol}) VALUES ({$sOxidQuoted}, 1, 1, 1, '', {$sTitleQuoted}{$sPriceVal})";
         }
         $this->addToDatabase($sInsert, 'oxarticles');
     }
@@ -934,6 +937,15 @@ class SearchTest extends UnitTestCase
         $this->getConfig()->setConfigParam('aSearchCols', []);
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('bar');
+
+        $this->assertSame([], $aSuggestions);
+    }
+
+    public function testGetSearchSuggestionsReturnsEmptyForWhitespace()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('   ');
 
         $this->assertSame([], $aSuggestions);
     }

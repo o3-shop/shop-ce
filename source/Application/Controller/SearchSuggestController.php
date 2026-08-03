@@ -39,6 +39,6 @@ class SearchSuggestController extends FrontendController
             $aResult = $oSearchHandler->getSearchSuggestions($sSearchParam, $iLimit);
         }
 
-        Registry::getUtils()->showMessageAndExit(json_encode($aResult, JSON_THROW_ON_ERROR));
+        Registry::getUtils()->showMessageAndExit(json_encode($aResult, JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE));
     }
 }
