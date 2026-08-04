@@ -88,3 +88,10 @@ like they worked but were lost on container rebuild. The clone-into-place
 bootstrap eliminates that foot-gun by making the directory a real working tree.
 Captured during scoping of issue #99 / change `add-electronic-revocation` on
 2026-04-26.
+
+## Review implication: a shop-ce diff can never contain theme files
+Because both theme dirs are gitignored here, `grep`ing `source/Application/views/` for a new
+template/JS proves nothing about whether the frontend exists. Do NOT report "feature has no
+frontend / endpoint is unreachable" as a finding on a shop-ce PR — the counterpart lives in
+`wave-theme` / `o3-Theme`. Ask for the theme-repo PR link instead. (Incident: PR #219 review,
+2026-07-31 — the claim was posted and had to be retracted. See `tasks/lessons.md`.)
