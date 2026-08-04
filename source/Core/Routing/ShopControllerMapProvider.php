@@ -270,6 +270,7 @@ class ShopControllerMapProvider implements \OxidEsales\Eshop\Core\Contract\Contr
         'recommlist'                           => \OxidEsales\Eshop\Application\Controller\RecommListController::class,
         'rss'                                  => \OxidEsales\Eshop\Application\Controller\RssController::class,
         'search'                               => \OxidEsales\Eshop\Application\Controller\SearchController::class,
+        'searchsuggest'                        => \OxidEsales\Eshop\Application\Controller\SearchSuggestController::class,
         'start'                                => \OxidEsales\Eshop\Application\Controller\StartController::class,
         'thankyou'                             => \OxidEsales\Eshop\Application\Controller\ThankYouController::class,
         'wishlist'                             => \OxidEsales\Eshop\Application\Controller\WishListController::class,

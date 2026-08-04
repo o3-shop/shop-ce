@@ -1763,6 +1763,12 @@ return [
         'isInterface'      => false,
         'isDeprecated'     => false,
     ],
+    'OxidEsales\Eshop\Application\Controller\SearchSuggestController'           => [
+        'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\SearchSuggestController::class,
+        'isAbstract'       => false,
+        'isInterface'      => false,
+        'isDeprecated'     => false,
+    ],
     'OxidEsales\Eshop\Application\Controller\StartController'                    => [
         'editionClassName' => \OxidEsales\EshopCommunity\Application\Controller\StartController::class,
         'isAbstract'       => false,

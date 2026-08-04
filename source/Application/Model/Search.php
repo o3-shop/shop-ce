@@ -404,4 +404,82 @@ class Search extends Base
         }
         return $searchField;
     }
+
+    /**
+     * Returns a list of article suggestions for the search dropdown.
+     * Returns lightweight data: id, title, price, icon url, link.
+     *
+     * @param string $sSearchParam search term
+     * @param int    $iLimit      max results
+     *
+     * @return array
+     */
+    public function getSearchSuggestions($sSearchParam, $iLimit = 10)
+    {
+        $sSearchParam = trim((string) $sSearchParam);
+        if ($sSearchParam === '') {
+            return [];
+        }
+
+        $myConfig = Registry::getConfig();
+        $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
+        $sDescView = Registry::get(TableViewNameGenerator::class)->getViewName('oxartextends', $this->_iLanguage);
+
+        $aSearchCols = $myConfig->getConfigParam('aSearchCols');
+        if (!(is_array($aSearchCols) && count($aSearchCols))) {
+            return [];
+        }
+
+        $oArticle = oxNew(Article::class);
+        $sActiveSnippet = $oArticle->getSqlActiveSnippet();
+
+        $sSearchClause = $this->_getWhere($sSearchParam);
+        if (!$sSearchClause) {
+            return [];
+        }
+
+        $sDescJoin = '';
+        if (in_array('oxlongdesc', $aSearchCols)) {
+            $sDescJoin = " LEFT JOIN {$sDescView} ON {$sArticleTable}.oxid={$sDescView}.oxid";
+        }
+
+        $sSelect = "SELECT {$sArticleTable}.oxid,
+                           {$sArticleTable}.oxtitle,
+                           {$sArticleTable}.oxvarselect,
+                           {$sArticleTable}.oxprice,
+                           {$sArticleTable}.oxthumb
+                    FROM {$sArticleTable} {$sDescJoin}
+                    WHERE {$sActiveSnippet}
+                      AND {$sArticleTable}.oxparentid = ''
+                      AND {$sArticleTable}.oxissearch = 1
+                      {$sSearchClause}
+                    {$this->_getRelevanceOrder($sSearchParam)}
+                    LIMIT " . (int) $iLimit;
+
+        $aResults = [];
+        $oCurrency = $myConfig->getActShopCurrencyObject();
+        $oArtList = oxNew(ArticleList::class);
+        $oArtList->selectString($sSelect);
+
+        foreach ($oArtList as $oSuggestion) {
+            $aResult = [
+                'id'    => $oSuggestion->oxarticles__oxid->value,
+                'title' => $oSuggestion->oxarticles__oxtitle->value
+                    . ($oSuggestion->oxarticles__oxvarselect->value ? ' ' . $oSuggestion->oxarticles__oxvarselect->value : ''),
+                'icon'  => $oSuggestion->getThumbnailUrl(),
+                'link'  => htmlspecialchars_decode($oSuggestion->getLink(), ENT_QUOTES),
+            ];
+
+            $sFormattedPrice = $oSuggestion->getFPrice();
+            if ($sFormattedPrice !== null) {
+                $sSign = $oCurrency->sign ?? '';
+                $sSide = $oCurrency->side ?? '';
+                $aResult['price'] = trim(($sSide === 'Front') ? $sSign . $sFormattedPrice : $sFormattedPrice . ' ' . $sSign);
+            }
+
+            $aResults[] = $aResult;
+        }
+
+        return $aResults;
+    }
 }

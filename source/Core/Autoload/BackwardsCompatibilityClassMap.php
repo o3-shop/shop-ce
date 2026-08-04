@@ -346,6 +346,7 @@ return [
     'revocation'                          => 'OxidEsales\\Eshop\\Application\\Controller\\RevocationController',
     'rss'                                 => 'OxidEsales\\Eshop\\Application\\Controller\\RssController',
     'search'                              => 'OxidEsales\\Eshop\\Application\\Controller\\SearchController',
+    'searchsuggest'                       => 'OxidEsales\\Eshop\\Application\\Controller\\SearchSuggestController',
     'start'                               => 'OxidEsales\\Eshop\\Application\\Controller\\StartController',
     'suggest'                             => 'OxidEsales\\Eshop\\Application\\Controller\\SuggestController',
     'tpl'                                 => 'OxidEsales\\Eshop\\Application\\Controller\\TemplateController',
