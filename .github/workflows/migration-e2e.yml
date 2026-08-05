@@ -19,6 +19,9 @@ on:
       - 'source/Internal/Domain/Migration/**'
       - 'tests/Migration/e2e/**'
       - '.github/workflows/migration-e2e.yml'
+  push:
+    tags:
+      - '*'          # every tag
 
 concurrency:
   group: migration-e2e-${{ github.ref }}
