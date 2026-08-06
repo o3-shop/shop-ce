@@ -82,6 +82,14 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
     protected $_sShopLogo = null;
 
     /**
+     * Resolved legal-guarantee notice URLs, keyed by sanitized language
+     * abbreviation. null values are cached results ("no artwork at all").
+     *
+     * @var array<string, string|null>
+     */
+    protected $guaranteeNoticeUrlCache = [];
+
+    /**
      * Returns shops home link
      *
      * @return string
@@ -759,6 +767,110 @@ class ViewConfig extends \OxidEsales\Eshop\Core\Base
         // login-required mode → only logged-in users see the link.
         $user = oxNew(\OxidEsales\Eshop\Application\Model\User::class);
         return (bool) $user->loadActiveUser();
+    }
+
+    /**
+     * Master switch for the per-product EU durability-guarantee labels
+     * (#219). Fresh installs default ON via initial_data.sql; the code
+     * default FALSE covers upgraded shops (operator opts in consciously).
+     *
+     * @return bool
+     */
+    public function getDurabilityGuaranteeLabelsEnabled(): bool
+    {
+        return (bool) \OxidEsales\Eshop\Core\Registry::getConfig()
+            ->getConfigParam('blShowDurabilityGuaranteeLabel', false);
+    }
+
+    /**
+     * URL of the official per-language legal-guarantee notice artwork
+     * (Reg. (EU) 2025/1960 Annex I) for the active shop language, or null
+     * when the feature is off / no artwork is available at all. Falls back
+     * to the English asset (with a logged warning) when the active
+     * language has no bundled artwork.
+     *
+     * @return string|null
+     */
+    public function getGuaranteeNoticeUrl(): ?string
+    {
+        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+        if (!$config->getConfigParam('blShowLegalGuaranteeNotice', false)) {
+            return null;
+        }
+        $abbr = \OxidEsales\Eshop\Core\Registry::getLang()
+            ->getLanguageAbbr(\OxidEsales\Eshop\Core\Registry::getLang()->getBaseLanguage());
+
+        return $this->getGuaranteeNoticeUrlForLanguage((string) $abbr);
+    }
+
+    /**
+     * Language-explicit variant (also the test seam for the fallback path).
+     * Not gated on the config switch - callers gate.
+     *
+     * Memoised per sanitized language: only notice-de/en ship, so every other
+     * shop language takes the fallback branch, and the theme footer widget calls
+     * the getter twice per render. Without the cache a non-de/en shop emitted a
+     * WARNING on every single call - 2 log lines per HTTP request, forever, for
+     * a condition the operator cannot fix without authoring artwork (#226
+     * item 3). The cache also collapses the repeated is_file() probes.
+     *
+     * @param string $abbr two-letter language abbreviation, e.g. 'de'
+     *
+     * @return string|null
+     */
+    public function getGuaranteeNoticeUrlForLanguage(string $abbr): ?string
+    {
+        // Sanitize ONCE here so the existence checks, the cache key and the
+        // emitted URL all use the exact same value (no path traversal, no
+        // case/charset drift).
+        $abbr = preg_replace('/[^a-z]/', '', strtolower($abbr));
+
+        // array_key_exists, not isset: null is a cached result ("no artwork
+        // at all"), and that is the case we least want to re-probe and re-log.
+        if (array_key_exists($abbr, $this->guaranteeNoticeUrlCache)) {
+            return $this->guaranteeNoticeUrlCache[$abbr];
+        }
+
+        return $this->guaranteeNoticeUrlCache[$abbr] = $this->resolveGuaranteeNoticeUrl($abbr);
+    }
+
+    /**
+     * @param string $abbr already-sanitized two-letter language abbreviation
+     *
+     * @return string|null
+     */
+    private function resolveGuaranteeNoticeUrl(string $abbr): ?string
+    {
+        $config = \OxidEsales\Eshop\Core\Registry::getConfig();
+
+        if ($this->guaranteeNoticeAssetExists($abbr)) {
+            return $config->getOutUrl(null, false) . 'pictures/guarantee/notice-' . $abbr . '.png';
+        }
+
+        if ($abbr !== 'en' && $this->guaranteeNoticeAssetExists('en')) {
+            \OxidEsales\Eshop\Core\Registry::getLogger()->warning(
+                __METHOD__ . " - No legal-guarantee notice artwork for language '$abbr'. Falling back to the 'en' asset. Bundle 'notice-$abbr.png' under 'out/pictures/guarantee/' to fix this."
+            );
+            return $config->getOutUrl(null, false) . 'pictures/guarantee/notice-en.png';
+        }
+
+        \OxidEsales\Eshop\Core\Registry::getLogger()->error(
+            __METHOD__ . " - No legal-guarantee notice artwork found for language '$abbr' and no 'en' fallback exists under 'out/pictures/guarantee/'. The notice cannot render."
+        );
+        return null;
+    }
+
+    /**
+     * @param string $abbr two-letter language abbreviation
+     *
+     * @return bool whether notice artwork is bundled for this language
+     */
+    protected function guaranteeNoticeAssetExists(string $abbr): bool
+    {
+        $abbr = preg_replace('/[^a-z]/', '', strtolower($abbr));
+        return is_file(
+            \OxidEsales\Eshop\Core\Registry::getConfig()->getOutDir(true) . 'pictures/guarantee/notice-' . $abbr . '.png'
+        );
     }
 
     /**
