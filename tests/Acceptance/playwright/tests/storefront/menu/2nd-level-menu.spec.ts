@@ -77,30 +77,39 @@ test.describe('storefront / 2nd-level menu (#141)', () => {
         await clearShopRuntimeCache();
     });
 
-    test('PLP renders the labelled sub-category strip with chip-styled links', async ({
+    test('PLP lists the direct sub-categories above the product grid', async ({
         storefrontPage,
     }) => {
         const plp = new StorefrontCategoryPage(storefrontPage);
         await plp.goto('/Einhoerner/');
 
-        // Eyebrow label is rendered via data-label + CSS ::before
-        const label = await plp.inlineSubcatLabel();
-        expect(label).toBe('In dieser Kategorie');
+        // Fixture: Einhörner has Unter-Einhörner as its level-2. Both
+        // renderings list the same set — assert that first, then the
+        // chrome specific to the mode this shop is configured for.
+        const titles = await plp.subcatTitles();
+        expect(titles.length).toBeGreaterThan(0);
+        expect(titles).toContain(SEED_TITLES.L2_EINHOERNER);
 
-        // ARIA label echoes the same string for screen-reader users
-        await expect(plp.inlineSubcatNav).toHaveAttribute('aria-label', 'In dieser Kategorie');
+        if ((await plp.subcatMode()) === 'tiles') {
+            // blShowSubcatTiles=1 → one product-box tile per child, each
+            // with a linked picture (or its btn fallback) and a title link.
+            const tile = plp.subcatTiles.filter({ hasText: SEED_TITLES.L2_EINHOERNER }).first();
+            await expect(tile.locator('a.component__productbox-title')).toHaveCount(1);
+            await expect(tile.locator('.component__productbox-picture a')).toHaveCount(1);
+        } else {
+            // Eyebrow label is rendered via data-label + CSS ::before
+            expect(await plp.inlineSubcatLabel()).toBe('In dieser Kategorie');
 
-        // Fixture: Einhörner has Unter-Einhörner as its level-2.
-        const chips = await plp.inlineSubcatChips();
-        expect(chips.length).toBeGreaterThan(0);
-        expect(chips).toContain(SEED_TITLES.L2_EINHOERNER);
+            // ARIA label echoes the same string for screen-reader users
+            await expect(plp.inlineSubcatNav).toHaveAttribute('aria-label', 'In dieser Kategorie');
 
-        // Chips are pill-shaped (border-radius >= 24 → effectively 999px clamped)
-        const radius = await plp.inlineSubcatNav
-            .locator('a.btn')
-            .first()
-            .evaluate((a) => parseFloat(getComputedStyle(a).borderRadius));
-        expect(radius).toBeGreaterThanOrEqual(20);
+            // Chips are pill-shaped (border-radius >= 24 → effectively 999px clamped)
+            const radius = await plp.inlineSubcatNav
+                .locator('a.btn')
+                .first()
+                .evaluate((a) => parseFloat(getComputedStyle(a).borderRadius));
+            expect(radius).toBeGreaterThanOrEqual(20);
+        }
     });
 
     test('top-nav megamenu opens with caret and styled panel (left-anchored)', async ({
@@ -182,9 +191,11 @@ test.describe('storefront / 2nd-level menu (#141)', () => {
         const level3Count = await menu.locator('a[data-level="is-level-3"]').count();
         expect(level3Count).toBe(0);
 
-        // Inline strip on the PLP shows only direct children — same depth contract
-        const chips = await plp.inlineSubcatChips();
-        expect(chips.length).toBeGreaterThan(0);
+        // Sub-category listing on the PLP shows only direct children —
+        // same depth contract, in either rendering mode.
+        const titles = await plp.subcatTitles();
+        expect(titles).toContain(SEED_TITLES.L2_PINGUINE);
+        expect(titles).not.toContain(SEED_TITLES.L3_PINGUINE);
     });
 
     test('top-nav category without sub-cats does NOT render a megamenu', async ({
