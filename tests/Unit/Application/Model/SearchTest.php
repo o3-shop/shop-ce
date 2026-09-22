@@ -843,6 +843,23 @@ class SearchTest extends UnitTestCase
         $this->assertEquals($sQ, $sFix);
     }
 
+    public function testSearchRanksMultiWordMatchesByNumberOfMatchedWords()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
+        $this->getConfig()->setConfigParam('blSearchUseAND', false);
+
+        // the adjacent phrase scores highest, then both words scattered, then a single word
+        $this->_insertSearchableArticle('_testMwPhrase', 'zzzalpha zzzbeta');
+        $this->_insertSearchableArticle('_testMwBoth', 'zzzbeta with zzzalpha');
+        $this->_insertSearchableArticle('_testMwOne', 'aaa zzzalpha only');
+
+        /** @var Search $oSearch */
+        $oSearch = oxNew('oxSearch');
+        $oSearchList = $oSearch->getSearchArticles('zzzalpha zzzbeta');
+
+        $this->assertSame(['_testMwPhrase', '_testMwBoth', '_testMwOne'], $oSearchList->arrayKeys());
+    }
+
     public function testGetWhereWithSearchIngLongDescSecondLanguage()
     {
         // forcing config
@@ -911,13 +928,13 @@ class SearchTest extends UnitTestCase
     }
 
     /**
-     * Inserts a searchable article fixture for the suggestion tests.
+     * Inserts a searchable article fixture.
      *
      * @param string $sOxid  article id
      * @param string $sTitle article title
      * @param float  $dPrice optional price
      */
-    private function _insertSuggestionArticle($sOxid, $sTitle, $dPrice = null)
+    private function _insertSearchableArticle($sOxid, $sTitle, $dPrice = null)
     {
         $oDb = $this->getDb();
         $sOxidQuoted = $oDb->quote($sOxid);
@@ -953,7 +970,7 @@ class SearchTest extends UnitTestCase
     public function testGetSearchSuggestionsReturnsMatchingArticles()
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
-        $this->_insertSuggestionArticle('_testSuggResult', 'SuggFixtureResult');
+        $this->_insertSearchableArticle('_testSuggResult', 'SuggFixtureResult');
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureResult', 10);
 
@@ -967,11 +984,47 @@ class SearchTest extends UnitTestCase
         }
     }
 
+    public function testGetSearchSuggestionsReturnsPlaintextQuotesFromRawStorage()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle('_testSuggRawQuote', 'SuggRaw "Bar" & Co');
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Size \"L\"' WHERE oxid = '_testSuggRawQuote'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggRaw');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame('SuggRaw "Bar" & Co Size "L"', $aSuggestions[0]['title']);
+    }
+
+    public function testGetSearchSuggestionsDecodesHtmlEntitiesFromStoredData()
+    {
+        $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
+        $this->_insertSearchableArticle(
+            '_testSuggEntities',
+            'SuggEnt &quot;Bar&quot; &amp; Co &#039;x&#039; <b>bold</b>'
+        );
+        $this->addToDatabase(
+            "UPDATE oxarticles SET oxvarselect = 'Var &quot;L&quot; &amp; Co' WHERE oxid = '_testSuggEntities'",
+            'oxarticles'
+        );
+
+        $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggEnt');
+
+        $this->assertCount(1, $aSuggestions);
+        $this->assertSame(
+            'SuggEnt "Bar" & Co \'x\' <b>bold</b> Var "L" & Co',
+            $aSuggestions[0]['title']
+        );
+    }
+
     public function testGetSearchSuggestionsRespectsLimit()
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle', 'oxshortdesc', 'oxsearchkeys', 'oxartnum']);
         for ($i = 1; $i <= 4; $i++) {
-            $this->_insertSuggestionArticle('_testSuggLimit' . $i, 'SuggFixtureLimit' . $i);
+            $this->_insertSearchableArticle('_testSuggLimit' . $i, 'SuggFixtureLimit' . $i);
         }
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('SuggFixtureLimit', 3);
@@ -983,7 +1036,7 @@ class SearchTest extends UnitTestCase
     {
         $this->getConfig()->setConfigParam('aSearchCols', ['oxlongdesc']);
 
-        $this->_insertSuggestionArticle('_testSuggDesc', 'NoMatchingTitle');
+        $this->_insertSearchableArticle('_testSuggDesc', 'NoMatchingTitle');
         $this->addToDatabase("REPLACE INTO oxartextends (oxid, oxlongdesc) VALUES ('_testSuggDesc', 'uniqueNeedleInLongDesc')", 'oxartextends');
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('uniqueNeedleInLongDesc');
@@ -998,7 +1051,7 @@ class SearchTest extends UnitTestCase
         $this->getConfig()->setConfigParam('blShowNetPrice', true);
         $this->getConfig()->setConfigParam('blEnterNetPrice', false);
 
-        $this->_insertSuggestionArticle('_testSuggNet', 'NetPriceTest', 100);
+        $this->_insertSearchableArticle('_testSuggNet', 'NetPriceTest', 100);
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NetPriceTest');
 
@@ -1021,7 +1074,7 @@ class SearchTest extends UnitTestCase
         $this->getConfig()->setConfigParam('aSearchCols', ['oxtitle']);
         $this->getConfig()->setConfigParam('bl_perfLoadPrice', false);
 
-        $this->_insertSuggestionArticle('_testSuggNoPrice', 'NoPriceTest');
+        $this->_insertSearchableArticle('_testSuggNoPrice', 'NoPriceTest');
 
         $aSuggestions = $this->_oSearchHandler->getSearchSuggestions('NoPriceTest');
 
