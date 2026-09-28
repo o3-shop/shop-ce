@@ -165,6 +165,9 @@ class EmailWaveTplTest extends \OxidTestCase
     public function testSendOrderEmailToUser()
     {
         $this->getConfig()->setConfigParam('blShowVATForDelivery', false);
+        // The #219 legal-guarantee notice is on by default and rendered by the theme's
+        // order_cust.tpl; switch it off so the fixture body is independent of the wave version.
+        $this->getConfig()->setConfigParam('blShowLegalGuaranteeNotice', false);
 
         $oPrice = oxNew('oxPrice');
         $oPrice->setPrice(256);
