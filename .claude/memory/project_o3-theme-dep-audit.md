@@ -13,3 +13,7 @@ type: project
 **Why not fixed yet:** o3-theme is an external git repo (not shop-ce). The fix must be committed inside the o3-theme repo's `package-lock.json` and its bundle rebuilt. This is tracked here until resolved.
 
 **How to apply:** When running the full gate and it aborts at npm audit, verify this is the same pre-existing vulnerability and not a new one. Run the PHP tests directly with `./docker.sh test --fast` to bypass the audit gate for PHP-only changes.
+
+## `npx gulp prod` on o3-theme main regresses committed `out/` files (2026-09-28)
+- The build overwrites `out/o3-theme/src/js/widget/{filter,rating,remove-from-notice,shippingaddress}.js` with older German-comment versions from the build sources — someone edited `out/` directly, so source and output have drifted. It also re-adds vendor prefixes to `main.css`.
+- **How to apply:** after `npm audit fix` for build-only deps, commit just `package-lock.json` and discard the rebuild (`git checkout -- out/`). Only rebuild when shipped runtime code actually changed, and diff `out/` before committing. Done this way in o3-Theme#61.
