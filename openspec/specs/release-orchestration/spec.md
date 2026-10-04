@@ -59,9 +59,11 @@ Before performing any state-changing action (commit, push, tag, release creation
 
 #### Scenario: Unmerged merge-back PR from previous release
 
-- **WHEN** any release-eligible repo has an open PR from its release
-  branch into `main` matching the title pattern `Merge v<x>.<y>.<z>
-  release into main`
+- **WHEN** any release-eligible repo whose release branch is not `main`
+  has an open PR into `main` matching the title pattern
+  `Merge v<x>.<y>.<z> release into main`, from any head branch and for
+  any release line (a pending `v1.6.x` merge-back also blocks a `v1.7.x`
+  release, because `main` drifts either way)
 - **THEN** the CLI aborts with a message listing the open merge-back PR
   URLs and the repos affected
 
@@ -119,9 +121,9 @@ The CLI SHALL classify open PRs in each release-eligible repo into two
 groups:
 - **Incoming PRs** (open PRs targeting the release branch) → log a
   warning, proceed.
-- **Outgoing merge-back PRs** (open PRs from the release branch into
-  `main` matching `Merge v<x>.<y>.<z> release into main`) → abort
-  the release.
+- **Outgoing merge-back PRs** (open PRs into `main` matching
+  `Merge v<x>.<y>.<z> release into main`, from any head branch) →
+  abort the release.
 
 #### Scenario: Incoming feature PR is open
 
@@ -132,9 +134,9 @@ groups:
 
 #### Scenario: Outgoing merge-back PR is unmerged
 
-- **WHEN** a release-eligible repo has an open PR from the release
-  branch into `main` whose title matches `Merge v<x>.<y>.<z> release
-  into main`
+- **WHEN** a release-eligible repo has an open PR into `main` whose
+  title matches `Merge v<x>.<y>.<z> release into main`, from any head
+  branch
 - **THEN** the CLI aborts before any state-changing action and lists
   the unmerged merge-back PR URLs
 
@@ -152,13 +154,34 @@ When a dependent repo's `require` or `require-dev` constraint changes, the CLI S
 
 ### Requirement: Auto-opened merge-back PR for final releases
 
-For final shop releases (target tag without `-rc`/`-alpha`/`-beta` suffix), the CLI SHALL auto-open one PR per release-eligible repo titled `Merge v<x>.<y>.<z> release into main`, with `head` = the release branch and `base` = `main`. For pre-release shop targets, no merge-back PR is opened.
+For final shop releases (target tag without `-rc`/`-alpha`/`-beta` suffix), the CLI SHALL auto-open one PR per repo that had a tag cut in the run, plus `o3-shop`, whose release branch is not `main`, titled `Merge v<x>.<y>.<z> release into main` (the shop version), with `base` = `main` and `head` = `merge-back-<tag>`, where `<tag>` is the tag just cut in that repo. Before opening the PR, the CLI SHALL push `merge-back-<tag>` pointing exactly at the tag's commit. The `head` MUST NOT be the release branch, because the release branch keeps moving and a pending merge-back would pick up unreleased commits. For pre-release shop targets, no merge-back PR is opened. Repos released from `main` get no merge-back PR.
 
 #### Scenario: Final release of v1.6.2
 
 - **WHEN** the CLI completes a release with `--to v1.6.2`
-- **THEN** every release-eligible repo has a new open PR titled
-  `Merge v1.6.2 release into main` from the release branch into `main`
+- **THEN** every repo that had a tag cut in this run, plus `o3-shop`,
+  whose release branch is not `main` has a new open PR titled
+  `Merge v1.6.2 release into main`
+  from `merge-back-<tag>` into `main`, where `merge-back-<tag>` points
+  exactly at the tag cut in that repo
+
+#### Scenario: Release branch moves on after the release
+
+- **WHEN** commits land on the release branch after the merge-back PR
+  was opened
+- **THEN** the merge-back PR still contains exactly the release tag
+
+#### Scenario: Repo released from main
+
+- **WHEN** a final release cuts a new tag in a repo whose release
+  branch is `main`
+- **THEN** no merge-back PR is opened for that repo
+
+#### Scenario: merge-back branch already exists
+
+- **WHEN** `merge-back-<tag>` already exists on the remote
+- **THEN** the CLI reuses it if it points at the tag's commit, and
+  otherwise fails with a message naming the branch and the tag
 
 #### Scenario: RC release of v1.7.0-RC1
 

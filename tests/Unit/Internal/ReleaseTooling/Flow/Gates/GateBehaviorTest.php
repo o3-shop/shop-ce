@@ -263,10 +263,10 @@ class GateBehaviorTest extends TestCase
 
     public function testMergeBackPrGatePassesWhenNoOpenPrs(): void
     {
-        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --head b-1.6 --json number,title,url --limit 50';
+        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --search "release into main" in:title --json number,title,url --limit 50';
         $exec = new FakeProcessExecutor([
             $cmd => new ProcessOutcome(0, "[]\n", ''),
-        ]);
+        ], $this->unexpectedCommand());
         $outcome = (new MergeBackPrGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
         $this->assertTrue($outcome->isPassed());
     }
@@ -276,10 +276,10 @@ class GateBehaviorTest extends TestCase
         $body = json_encode([
             ['number' => 50, 'title' => 'docs: fix typo', 'url' => 'https://github.com/o3-shop/shop-ce/pull/50'],
         ]);
-        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --head b-1.6 --json number,title,url --limit 50';
+        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --search "release into main" in:title --json number,title,url --limit 50';
         $exec = new FakeProcessExecutor([
             $cmd => new ProcessOutcome(0, $body, ''),
-        ]);
+        ], $this->unexpectedCommand());
         $outcome = (new MergeBackPrGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
         $this->assertTrue($outcome->isPassed());
     }
@@ -293,7 +293,7 @@ class GateBehaviorTest extends TestCase
                 'url' => 'https://github.com/o3-shop/shop-ce/pull/42',
             ],
         ]);
-        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --head b-1.6 --json number,title,url --limit 50';
+        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --search "release into main" in:title --json number,title,url --limit 50';
         $exec = new FakeProcessExecutor([
             $cmd => new ProcessOutcome(0, $body, ''),
         ]);
@@ -304,14 +304,52 @@ class GateBehaviorTest extends TestCase
         $this->assertStringContainsString('v1.6.0', $messages);
     }
 
+    public function testMergeBackPrGateAbortsOnMergeBackFromTagPinnedBranch(): void
+    {
+        // bin/release opens merge-backs from merge-back-<tag>, not the
+        // release branch, so the gate must not filter by head branch.
+        $body = json_encode([
+            [
+                'number' => 243,
+                'title' => 'Merge v1.7.1 release into main',
+                'url' => 'https://github.com/o3-shop/shop-ce/pull/243',
+            ],
+        ]);
+        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --search "release into main" in:title --json number,title,url --limit 50';
+        $exec = new FakeProcessExecutor([
+            $cmd => new ProcessOutcome(0, $body, ''),
+        ]);
+        $outcome = (new MergeBackPrGate($exec))->evaluate('/repo', 'b-1.7', 'o3-shop/shop-ce');
+        $this->assertTrue($outcome->aborts());
+        $this->assertStringContainsString('#243', implode("\n", $outcome->messages()));
+    }
+
+    public function testMergeBackPrGatePassesForMainLineRepoWithoutQueryingGh(): void
+    {
+        $exec = new FakeProcessExecutor([], new ProcessOutcome(1, '', 'must not be called'));
+        $outcome = (new MergeBackPrGate($exec))->evaluate('/repo', 'main', 'o3-shop/o3-theme');
+        $this->assertTrue($outcome->isPassed());
+        $this->assertSame([], $exec->commands());
+    }
+
     public function testMergeBackPrGateAbortsWhenGhFails(): void
     {
-        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --head b-1.6 --json number,title,url --limit 50';
+        $cmd = 'gh pr list --repo o3-shop/shop-ce --state open --base main --search "release into main" in:title --json number,title,url --limit 50';
         $exec = new FakeProcessExecutor([
             $cmd => new ProcessOutcome(1, '', 'gh: not authenticated'),
         ]);
         $outcome = (new MergeBackPrGate($exec))->evaluate('/repo', 'b-1.6', 'o3-shop/shop-ce');
         $this->assertTrue($outcome->aborts());
         $this->assertStringContainsString('cannot verify', $outcome->messages()[0]);
+    }
+
+    /**
+     * Default outcome for commands a test did not expect: a failing gh
+     * call, which the gates turn into an abort. Keeps "passes" tests from
+     * passing vacuously when the gate sends a different argv.
+     */
+    private function unexpectedCommand(): ProcessOutcome
+    {
+        return new ProcessOutcome(1, '', 'unexpected command');
     }
 }

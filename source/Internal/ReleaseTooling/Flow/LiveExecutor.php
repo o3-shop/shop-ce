@@ -216,22 +216,28 @@ class LiveExecutor
      */
     private function openMergeBackPrs(ReleasePlan $plan, array $repoPaths): void
     {
-        $packages = [];
+        /** @var array<string,string> $tagsByPackage package => the tag just cut in it */
+        $tagsByPackage = [];
         foreach ($plan->candidates() as $candidate) {
             if ($candidate->tagCut() !== null) {
-                $packages[] = $candidate->package();
+                $tagsByPackage[$candidate->package()] = $candidate->chosenVersion();
             }
         }
-        $packages[] = self::O3_SHOP_PROJECT;
+        $tagsByPackage[self::O3_SHOP_PROJECT] = $plan->toTag();
 
-        foreach ($packages as $package) {
+        foreach ($tagsByPackage as $package => $tag) {
             if (!isset($repoPaths[$package])) {
                 continue;
             }
             $branch = ($this->branchResolver)($package);
-            $this->log(sprintf('[%s] open merge-back PR (%s -> main)', $package, $branch));
+            if ($branch === 'main') {
+                // Released straight from main: the tag is already on main.
+                $this->log(sprintf('[%s] releases from main; no merge-back PR needed', $package));
+                continue;
+            }
+            $this->log(sprintf('[%s] open merge-back PR (%s -> main)', $package, $tag));
             try {
-                $url = $this->actions->openMergeBackPr($package, $branch, $plan->toTag());
+                $url = $this->actions->openMergeBackPr($package, $repoPaths[$package], $tag, $plan->toTag());
                 $this->mergeBackUrls[$package] = $url;
                 $this->log(sprintf('[%s] merge-back PR: %s', $package, $url));
             } catch (Throwable $e) {

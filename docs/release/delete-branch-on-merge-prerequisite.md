@@ -14,11 +14,16 @@ branches"** setting **off** (`delete_branch_on_merge = false`):
 
 ## Why
 
-`bin/release` opens its merge-back PR with the **release branch itself**
-as the head (`b-1.x → main`). With auto-delete on, merging that PR
-**deletes the release line branch**. The next release then walks the
-(now missing) `b-1.x` and fails. This bit v1.6.1: merging merge-back
-PR #168 deleted `shop-ce@b-1.6`.
+A merge-back PR whose head is the **release branch itself**
+(`b-1.x → main`) deletes the release line branch when merged with
+auto-delete on. The next release then walks the (now missing) `b-1.x`
+and fails. This bit v1.6.1: merging merge-back PR #168 deleted
+`shop-ce@b-1.6`.
+
+Since o3-shop/o3-shop#241, `bin/release` opens merge-backs from a
+tag-pinned `merge-back-vX.Y.Z` branch instead, which is safe to
+auto-delete. Older and hand-opened merge-backs still use the release
+branch as head, so keep auto-delete off.
 
 ## Verify (per repo)
 
