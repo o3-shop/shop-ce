@@ -29,8 +29,8 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 
 /**
- * Gate 10.6: detect open PRs from the release branch into `main`
- * matching the canonical merge-back title pattern.
+ * Gate 10.6: detect open PRs into `main` matching the canonical
+ * merge-back title pattern, whichever branch they come from.
  *
  * Per spec this is a HARD ABORT: the previous release's merge-back
  * must be merged before the next release runs, otherwise main drifts
@@ -49,6 +49,9 @@ class MergeBackPrGate implements PreFlightGate
      */
     public const MERGE_BACK_BASE = 'main';
 
+    /** Server-side pre-filter for the canonical merge-back title. */
+    public const TITLE_SEARCH = '"release into main" in:title';
+
     private ProcessExecutor $exec;
     private string $ghBin;
 
@@ -65,13 +68,25 @@ class MergeBackPrGate implements PreFlightGate
 
     public function evaluate(string $repoPath, string $expectedBranch, string $packageName): GateOutcome
     {
+        if ($expectedBranch === self::MERGE_BACK_BASE) {
+            return GateOutcome::passed(self::NAME);
+        }
+
+        // No --head filter: merge-backs come from a tag-pinned
+        // `merge-back-<tag>` branch (older ones from the release branch),
+        // so the canonical title is the only reliable signal. --search
+        // narrows on the server so unrelated PRs into main cannot push a
+        // pending merge-back past --limit; the regex below stays exact.
+        // GitHub search is eventually consistent: a merge-back merged or
+        // opened seconds ago may still show its old state. A pending
+        // merge-back of ANY release line blocks, since main drifts either way.
         $outcome = $this->exec->execute(
             [
                 $this->ghBin, 'pr', 'list',
                 '--repo', PackageRepoSlug::resolve($packageName),
                 '--state', 'open',
                 '--base', self::MERGE_BACK_BASE,
-                '--head', $expectedBranch,
+                '--search', self::TITLE_SEARCH,
                 '--json', 'number,title,url',
                 '--limit', '50',
             ],

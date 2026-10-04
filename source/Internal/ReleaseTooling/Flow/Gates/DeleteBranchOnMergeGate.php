@@ -29,8 +29,10 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 
 /**
  * Verifies a release repo keeps `delete_branch_on_merge = false`, so
- * merging the merge-back PR (whose head IS the release branch) cannot
- * delete the maintenance line.
+ * merging a merge-back PR whose head is the release branch cannot
+ * delete the maintenance line. `bin/release` itself opens merge-backs
+ * from a tag-pinned `merge-back-<tag>` branch, but older and hand-opened
+ * merge-backs (`b-1.x -> main`) still exist, so the guard stays.
  *
  * Remote-only: queries GitHub via `gh api` keyed on the repo slug, so
  * it needs no local checkout (and `$repoPath` is intentionally unused).

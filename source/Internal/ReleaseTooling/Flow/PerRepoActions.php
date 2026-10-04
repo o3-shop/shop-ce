@@ -32,7 +32,8 @@ use RuntimeException;
  *   commitChangesAndPush()  add + commit (+ optional .next-bump rm) + push
  *   createTag()             git tag + push tag
  *   createDraftRelease()    gh release create --draft
- *   openMergeBackPr()       gh pr create --base main --head <release-branch>
+ *   openMergeBackPr()       push merge-back-<tag> at the tag, then
+ *                           gh pr create --base main --head merge-back-<tag>
  *
  * No method does any decision-making; the orchestrator (Section 11)
  * decides whether to call openMergeBackPr() based on MergeBackPolicy.
@@ -42,6 +43,8 @@ use RuntimeException;
  */
 class PerRepoActions
 {
+    public const MERGE_BACK_BRANCH_PREFIX = 'merge-back-';
+
     private ProcessExecutor $exec;
     private string $ghBin;
 
@@ -121,37 +124,92 @@ class PerRepoActions
      * 10.11: auto-open the canonical merge-back PR. Caller (Section 11)
      * is responsible for checking `MergeBackPolicy::shouldOpenForShopTo`
      * before invoking — this method just performs the action.
+     *
+     * The PR head is a branch pinned to the package's release tag
+     * (`merge-back-<tag>`), never the release branch itself: a release
+     * branch keeps moving, so a merge-back left open would otherwise
+     * pick up unreleased commits. An existing `merge-back-<tag>` branch
+     * is reused only when it already points at the tag.
      */
-    public function openMergeBackPr(string $packageName, string $releaseBranch, string $shopVersion): string
+    public function openMergeBackPr(string $packageName, string $repoPath, string $tag, string $shopVersion): string
     {
+        $tagCommit = trim($this->run(['git', 'rev-parse', '--verify', $tag . '^{commit}'], $repoPath));
+        $branch = self::MERGE_BACK_BRANCH_PREFIX . $tag;
+
+        $ref = 'refs/heads/' . $branch;
+        $remoteCommit = $this->remoteBranchCommit(
+            $this->run(['git', 'ls-remote', '--heads', 'origin', $ref], $repoPath),
+            $ref
+        );
+        if ($remoteCommit === null) {
+            $this->run(['git', 'push', 'origin', $tagCommit . ':' . $ref], $repoPath);
+        } elseif ($remoteCommit !== $tagCommit) {
+            throw new RuntimeException(sprintf(
+                'branch %s already exists on origin of %s but does not point at %s (%s); '
+                . 'delete or fix it, then re-run',
+                $branch,
+                $packageName,
+                $tag,
+                $tagCommit
+            ));
+        }
+
         $title = MergeBackPrTitlePattern::buildTitle($shopVersion);
         $body = sprintf(
             "Auto-opened by bin/release after cutting %s.\n\n"
-            . "Merge the release-branch state back to main so subsequent\n"
-            . 'releases see the same code path.',
-            $shopVersion
+            . "Merges exactly the %s tag back to main, so main matches the\n"
+            . "release and subsequent releases see the same code path.\n\n"
+            . "Merge with \"Create a merge commit\" (never rebase), so the tag\n"
+            . "becomes part of main's history. Then delete the %s branch.",
+            $shopVersion,
+            $tag,
+            $branch
         );
         $args = [
             $this->ghBin, 'pr', 'create',
             '--repo', PackageRepoSlug::resolve($packageName),
             '--base', 'main',
-            '--head', $releaseBranch,
+            '--head', $branch,
             '--title', $title,
             '--body', $body,
         ];
         $outcome = $this->exec->execute($args, null, 120);
         if (!$outcome->isSuccess()) {
             throw new RuntimeException(sprintf(
-                'gh pr create failed for %s on %s: %s',
+                'gh pr create failed for %s on %s: %s. Branch %s is on origin at %s; '
+                . 'open the PR by hand (base main, head %s, title "%s")',
                 $packageName,
-                $releaseBranch,
-                trim($outcome->stderr())
+                $branch,
+                trim($outcome->stderr()),
+                $branch,
+                $tag,
+                $branch,
+                $title
             ));
         }
         return trim($outcome->stdout());
     }
 
-    private function run(array $command, string $repoPath): void
+    /**
+     * Picks the commit for exactly `$ref` from `git ls-remote` output.
+     * ls-remote matches its pattern as a path suffix, so other refs
+     * ending in the same name may be listed too.
+     */
+    private function remoteBranchCommit(string $lsRemoteOutput, string $ref): ?string
+    {
+        foreach (preg_split('/\R/', trim($lsRemoteOutput)) ?: [] as $line) {
+            $parts = preg_split('/\s+/', trim($line));
+            if ($parts !== false && count($parts) === 2 && $parts[1] === $ref) {
+                return $parts[0];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return string the command's stdout
+     */
+    private function run(array $command, string $repoPath): string
     {
         $outcome = $this->exec->execute($command, $repoPath, 120);
         if (!$outcome->isSuccess()) {
@@ -163,5 +221,6 @@ class PerRepoActions
                 trim($outcome->stderr())
             ));
         }
+        return $outcome->stdout();
     }
 }
