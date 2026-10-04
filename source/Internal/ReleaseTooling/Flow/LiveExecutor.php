@@ -255,7 +255,8 @@ class LiveExecutor
         if ($failed !== []) {
             throw new RuntimeException(
                 sprintf(
-                    '%d merge-back PR(s) failed; finish each by hand, following its error: %s',
+                    '%d merge-back PR(s) failed. For each: fix the cause, push merge-back-<tag> '
+                    . 'at the tag and open the PR into main with the canonical title. Errors: %s',
                     count($failed),
                     implode(' | ', $failed)
                 ),

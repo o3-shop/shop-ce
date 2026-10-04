@@ -291,10 +291,11 @@ final class LiveExecutorTest extends TestCase
         }
 
         $this->assertNotNull($thrown, 'the failed merge-back is still reported');
-        $this->assertStringStartsWith('1 merge-back PR(s) failed; finish each by hand, following its error', $thrown->getMessage());
+        $this->assertStringStartsWith('1 merge-back PR(s) failed. For each: fix the cause, push merge-back-<tag>', $thrown->getMessage());
         $this->assertStringContainsString('o3-shop/shop-doctrine-migration-wrapper (v1.0.3)', $thrown->getMessage());
         $this->assertStringContainsString('git rev-parse --verify v1.0.3^{commit} failed', $thrown->getMessage());
-        $this->assertInstanceOf(\RuntimeException::class, $thrown->getPrevious(), 'original failure is chained');
+        $this->assertNotNull($thrown->getPrevious(), 'original failure is chained');
+        $this->assertStringContainsString('git rev-parse --verify v1.0.3^{commit} failed', $thrown->getPrevious()->getMessage());
         $this->assertSame(['o3-shop/o3-shop'], array_keys($executor->mergeBackUrls()), 'o3-shop still gets its PR');
     }
 
