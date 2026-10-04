@@ -357,10 +357,9 @@ class ReleaseCommand extends Command
             // PR — that gate points at pending merge-backs, this one
             // proves merging one whose head is the release branch (older
             // or hand-opened ones) cannot delete that branch. Placement
-            // is presentational only: the runner
-            // evaluates every gate unconditionally and never
-            // short-circuits, so order affects the report, not control
-            // flow.
+            // is presentational only: the runner evaluates every gate
+            // unconditionally and never short-circuits, so order affects
+            // the report, not control flow.
             new DeleteBranchOnMergeGate($exec),
             new MergeBackPrGate($exec),
         ]);

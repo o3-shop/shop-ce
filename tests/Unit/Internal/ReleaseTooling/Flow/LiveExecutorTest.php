@@ -256,6 +256,48 @@ final class LiveExecutorTest extends TestCase
         $this->assertSame($o3ShopPath, $cwdByCommand['git push origin ' . self::TAG_SHA . ':refs/heads/merge-back-v1.6.1']);
     }
 
+    public function testFailedMergeBackDoesNotStopTheRemainingRepos(): void
+    {
+        $wrapperPath = $this->mkRepo('{"require":{}}');
+        $o3ShopPath = $this->mkRepo('{"require":{}}');
+        $responses = $this->mergeBackGitResponses(['v1.0.3', 'v1.6.1']);
+        $responses['git rev-parse --verify v1.0.3^{commit}'] = new ProcessOutcome(128, '', 'fatal: Needed a single revision');
+        $exec = new FakeProcessExecutor($responses, new ProcessOutcome(0, 'https://example.invalid/url', ''));
+
+        $plan = $this->buildPlan(
+            'v1.6.0',
+            'v1.6.1',
+            [
+                $this->cuttingCandidate('o3-shop/shop-doctrine-migration-wrapper', 'v1.0.2', 'v1.0.3'),
+            ],
+            [],
+            ''
+        );
+
+        $executor = new LiveExecutor(
+            new PerRepoActions($exec),
+            new ComposerJsonConstraintWriter(),
+            new DefaultBranchResolver()
+        );
+
+        $thrown = null;
+        try {
+            $executor->execute($plan, [
+                'o3-shop/shop-doctrine-migration-wrapper' => $wrapperPath,
+                'o3-shop/o3-shop' => $o3ShopPath,
+            ]);
+        } catch (\RuntimeException $e) {
+            $thrown = $e;
+        }
+
+        $this->assertNotNull($thrown, 'the failed merge-back is still reported');
+        $this->assertStringStartsWith('1 merge-back PR(s) failed; finish each by hand, following its error', $thrown->getMessage());
+        $this->assertStringContainsString('o3-shop/shop-doctrine-migration-wrapper (v1.0.3)', $thrown->getMessage());
+        $this->assertStringContainsString('git rev-parse --verify v1.0.3^{commit} failed', $thrown->getMessage());
+        $this->assertInstanceOf(\RuntimeException::class, $thrown->getPrevious(), 'original failure is chained');
+        $this->assertSame(['o3-shop/o3-shop'], array_keys($executor->mergeBackUrls()), 'o3-shop still gets its PR');
+    }
+
     public function testFinalShopToSkipsMergeBackForMainLineRepos(): void
     {
         $themePath = $this->mkRepo('{"require":{}}');

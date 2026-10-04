@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\MergeBackPolicy;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 
@@ -70,7 +71,7 @@ class DeleteBranchOnMergeGate implements PreFlightGate
 
     public function evaluate(string $repoPath, string $expectedBranch, string $packageName): GateOutcome
     {
-        if ($expectedBranch === MergeBackPrGate::MERGE_BACK_BASE) {
+        if ($expectedBranch === MergeBackPolicy::BASE_BRANCH) {
             return GateOutcome::passed(self::NAME); // no merge-back possible, nothing to guard
         }
 
