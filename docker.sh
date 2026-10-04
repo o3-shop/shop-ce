@@ -283,8 +283,9 @@ run_npm_audits() {
   # @popperjs/core, splide), which are bundled into out/. The build tooling
   # (gulp, del, …) is skipped: its known advisory (GHSA-vfj7-8cjw-p6xm in
   # braces, no patched version) would otherwise block every test run — see
-  # o3-shop/o3-shop#243. Not covered: PhotoSwipe, which ships as a vendored
-  # copy in out/…/js/libs but is declared as a devDependency.
+  # o3-shop/o3-shop#243. Not covered: hand-vendored copies in out/…/js —
+  # PhotoSwipe 4.1.1 (a devDependency, o3-shop#245) and jQuery 2.2.4 (not in
+  # package.json, loaded only with the theme option activateJquery, o3-shop#246).
   echo "---------------------------"
   echo "Running npm audit (runtime dependencies):"
   echo "---------------------------"
