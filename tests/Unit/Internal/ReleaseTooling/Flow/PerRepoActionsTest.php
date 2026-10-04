@@ -29,6 +29,8 @@ use RuntimeException;
 
 class PerRepoActionsTest extends TestCase
 {
+    private const TAG_SHA = '1111111111111111111111111111111111111111';
+
     /* ---------- 10.8 — commit + push ---------- */
 
     public function testCommitChangesAndPushIssuesGitAddCommitPushSequence(): void
@@ -162,8 +164,6 @@ class PerRepoActionsTest extends TestCase
     }
 
     /* ---------- 10.11 — auto-merge-back PR ---------- */
-
-    private const TAG_SHA = '1111111111111111111111111111111111111111';
 
     public function testOpenMergeBackPrPushesBranchAtTagAndOpensPrFromIt(): void
     {

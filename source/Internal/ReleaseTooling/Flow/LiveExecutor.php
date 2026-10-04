@@ -26,7 +26,6 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ConstraintEditPla
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\DefaultBranchResolver;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Planning\ReleasePlan;
 use RuntimeException;
-use Throwable;
 
 /**
  * Executes a `ReleasePlan` against live origin: applies constraint
@@ -225,12 +224,16 @@ class LiveExecutor
         }
         $tagsByPackage[self::O3_SHOP_PROJECT] = $plan->toTag();
 
+        // A failed merge-back must not cost the remaining repos theirs:
+        // every tag is already cut, so a re-run cannot pick them up.
+        $failed = [];
+        $firstFailure = null;
         foreach ($tagsByPackage as $package => $tag) {
             if (!isset($repoPaths[$package])) {
                 continue;
             }
             $branch = ($this->branchResolver)($package);
-            if ($branch === 'main') {
+            if ($branch === MergeBackPolicy::BASE_BRANCH) {
                 // Released straight from main: the tag is already on main.
                 $this->log(sprintf('[%s] releases from main; no merge-back PR needed', $package));
                 continue;
@@ -240,10 +243,26 @@ class LiveExecutor
                 $url = $this->actions->openMergeBackPr($package, $repoPaths[$package], $tag, $plan->toTag());
                 $this->mergeBackUrls[$package] = $url;
                 $this->log(sprintf('[%s] merge-back PR: %s', $package, $url));
-            } catch (Throwable $e) {
+            } catch (RuntimeException $e) {
+                // Only the git/gh failures PerRepoActions reports; a
+                // programming error still aborts on the spot.
                 $this->log(sprintf('[%s] merge-back PR failed: %s', $package, $e->getMessage()));
-                throw $e;
+                $failed[] = sprintf('%s (%s): %s', $package, $tag, $e->getMessage());
+                $firstFailure = $firstFailure ?? $e;
             }
+        }
+
+        if ($failed !== []) {
+            throw new RuntimeException(
+                sprintf(
+                    '%d merge-back PR(s) failed. For each: fix the cause, push merge-back-<tag> '
+                    . 'at the tag and open the PR into main with the canonical title. Errors: %s',
+                    count($failed),
+                    implode(' | ', $failed)
+                ),
+                0,
+                $firstFailure
+            );
         }
     }
 

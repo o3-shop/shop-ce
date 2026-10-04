@@ -146,7 +146,7 @@ class PerRepoActions
         } elseif ($remoteCommit !== $tagCommit) {
             throw new RuntimeException(sprintf(
                 'branch %s already exists on origin of %s but does not point at %s (%s); '
-                . 'delete or fix it, then re-run',
+                . 'point it at the tag, then open the PR by hand (base main, head that branch)',
                 $branch,
                 $packageName,
                 $tag,
@@ -168,7 +168,7 @@ class PerRepoActions
         $args = [
             $this->ghBin, 'pr', 'create',
             '--repo', PackageRepoSlug::resolve($packageName),
-            '--base', 'main',
+            '--base', MergeBackPolicy::BASE_BRANCH,
             '--head', $branch,
             '--title', $title,
             '--body', $body,

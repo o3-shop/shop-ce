@@ -24,6 +24,7 @@ namespace OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\Gates;
 
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Composer\PackageRepoSlug;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\GateOutcome;
+use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\MergeBackPolicy;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\MergeBackPrTitlePattern;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\PreFlightGate;
 use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
@@ -39,15 +40,6 @@ use OxidEsales\EshopCommunity\Internal\ReleaseTooling\Flow\ProcessExecutor;
 class MergeBackPrGate implements PreFlightGate
 {
     public const NAME = 'merge-back-pending';
-
-    /**
-     * Branch every merge-back PR targets. Also the signal for "this
-     * repo has no separate maintenance line": a package released from
-     * this branch cannot have a merge-back PR at all, since base and
-     * head would coincide. DeleteBranchOnMergeGate keys its skip on
-     * this, so the two gates cannot drift apart.
-     */
-    public const MERGE_BACK_BASE = 'main';
 
     /** Server-side pre-filter for the canonical merge-back title. */
     public const TITLE_SEARCH = '"release into main" in:title';
@@ -68,7 +60,7 @@ class MergeBackPrGate implements PreFlightGate
 
     public function evaluate(string $repoPath, string $expectedBranch, string $packageName): GateOutcome
     {
-        if ($expectedBranch === self::MERGE_BACK_BASE) {
+        if ($expectedBranch === MergeBackPolicy::BASE_BRANCH) {
             return GateOutcome::passed(self::NAME);
         }
 
@@ -85,7 +77,7 @@ class MergeBackPrGate implements PreFlightGate
                 $this->ghBin, 'pr', 'list',
                 '--repo', PackageRepoSlug::resolve($packageName),
                 '--state', 'open',
-                '--base', self::MERGE_BACK_BASE,
+                '--base', MergeBackPolicy::BASE_BRANCH,
                 '--search', self::TITLE_SEARCH,
                 '--json', 'number,title,url',
                 '--limit', '50',
