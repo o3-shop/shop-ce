@@ -61,3 +61,16 @@ so auto-delete there is harmless feature-branch hygiene and must not block
 the release.
 
 See also [[release-tooling-intermediate-node-retag-gap]].
+
+## The auto-opened merge-back PR goes stale (2026-10-04)
+
+`bin/release` opens `Merge vX.Y.Z release into main` with head = the moving
+release branch (`b-1.7`), not the tag. If it sits unmerged, the release branch
+moves on and the PR silently drags unreleased commits into `main` (v1.7.1:
+#234 had 10 post-release commits). Meanwhile `MergeBackPrGate` blocks the next
+release. Fix used: close the stale PR, push a branch pointing exactly at the
+tag (`git push origin 'vX.Y.Z^{commit}:refs/heads/merge-back-vX.Y.Z'`), open a
+PR with the same title (the gate matches `MergeBackPrTitlePattern`), merge it
+with a merge commit (never rebase — the tag must become an ancestor of `main`).
+Check with `git merge-tree --write-tree origin/main vX.Y.Z` + `git diff` that
+the result equals the tag. Lasting fix: open merge-backs from the tag.
