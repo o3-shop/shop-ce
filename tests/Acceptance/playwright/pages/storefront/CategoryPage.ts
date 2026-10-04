@@ -75,16 +75,53 @@ export class StorefrontCategoryPage extends BaseStorefrontPage {
         return await menu.locator('a[data-level="is-level-2"]').allTextContents();
     }
 
-    // ─── Inline sub-category strip on the PLP ─────────────────────────────────
+    // ─── Sub-category listing on the PLP ──────────────────────────────────────
+    //
+    // o3-theme 1.5 gained the `blShowSubcatTiles` display setting. With it
+    // OFF (theme default) `page/list/list.tpl` renders the direct children
+    // as a labelled pill strip; with it ON it renders them as
+    // product-box-style tiles *instead*. Both list exactly the visible
+    // direct children, so every depth assertion in the #141 specs holds in
+    // either mode — the accessors below hide the difference, and only the
+    // genuinely mode-specific chrome (eyebrow label, pill radius, tile
+    // picture) is asserted per mode by the specs.
 
-    /** The labelled <nav> rendered above the product grid. */
+    /** The labelled <nav> rendered above the product grid (pill mode). */
     get inlineSubcatNav(): Locator {
         return this.page.locator('nav.alist__orga-subcats');
     }
 
-    /** Texts of the chip links in the inline strip. */
-    async inlineSubcatChips(): Promise<string[]> {
-        return await this.inlineSubcatNav.locator('a.btn').allTextContents();
+    /**
+     * The sub-category tiles rendered above the product grid (tile mode).
+     *
+     * Scoped to `.alist__orga`: `.component__productbox` is also the
+     * product grid's box class, and that grid lives outside this container.
+     */
+    get subcatTiles(): Locator {
+        return this.page.locator('.alist__orga .component__productbox');
+    }
+
+    /** Which of the two renderings this shop is configured for. */
+    async subcatMode(): Promise<'tiles' | 'pills'> {
+        return (await this.subcatTiles.count()) > 0 ? 'tiles' : 'pills';
+    }
+
+    /** The link to the sub-category named `title`, in whichever mode is active. */
+    subcatLink(title: string): Locator {
+        return this.page
+            .locator(
+                '.alist__orga a.component__productbox-title, nav.alist__orga-subcats a.btn',
+            )
+            .filter({ hasText: title });
+    }
+
+    /** Titles of the listed direct sub-categories, in whichever mode is active. */
+    async subcatTitles(): Promise<string[]> {
+        const links =
+            (await this.subcatMode()) === 'tiles'
+                ? this.subcatTiles.locator('a.component__productbox-title')
+                : this.inlineSubcatNav.locator('a.btn');
+        return (await links.allTextContents()).map((text) => text.trim());
     }
 
     /** Eyebrow label text, read from the data-label attribute (rendered via ::before). */

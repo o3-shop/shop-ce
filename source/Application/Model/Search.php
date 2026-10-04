@@ -262,9 +262,12 @@ class Search extends Base
     }
 
     /**
-     * Builds a relevance ORDER BY clause ranked by field priority from aSearchCols config.
-     * Title match ranks highest; each subsequent configured field ranks lower.
-     * Used as default sort when no explicit sort is requested.
+     * Builds a relevance ORDER BY clause for the search string.
+     *
+     * Multi-word queries are tokenized the same way as in _getWhere(), so rows are ranked by how many
+     * of the query words they match (the whole phrase counts as an extra word, lifting adjacent matches).
+     * Within the same score, the first matching field from the aSearchCols config wins - title match ranks
+     * highest, each subsequent configured field lower. Used as default sort when no explicit sort is requested.
      *
      * @param string $sSearchString
      *
@@ -278,28 +281,70 @@ class Search extends Base
             return '';
         }
 
-        $oDb = DatabaseProvider::getDb();
         $sArticleTable = Registry::get(TableViewNameGenerator::class)->getViewName('oxarticles', $this->_iLanguage);
-        $myUtilsString = Registry::getUtilsString();
-        $sUml = $myUtilsString->prepareStrForSearch($sSearchString);
+        $aWords = array_filter(explode(' ', $sSearchString), 'strlen');
+        // the whole phrase is ranked alongside the single words, so adjacent matches score one point higher
+        $aTerms = array_unique(array_merge([$sSearchString], $aWords));
 
-        $cases = [];
-        $rank = 1;
+        $aFields = [];
         foreach ($aSearchCols as $sField) {
-            $sSearchField = $this->getSearchField($sArticleTable, $sField);
-            $condition = "{$sSearchField} LIKE " . $oDb->quote("%{$sSearchString}%");
-            if ($sUml) {
-                $condition .= " OR {$sSearchField} LIKE " . $oDb->quote("%{$sUml}%");
-            }
-            $cases[] = "WHEN ({$condition}) THEN {$rank}";
-            $rank++;
+            $aFields[] = $this->getSearchField($sArticleTable, $sField);
         }
 
-        if (!$cases) {
+        $aCases = [];
+        $iRank = 1;
+        foreach ($aFields as $sSearchField) {
+            $aMatches = [];
+            foreach ($aTerms as $sTerm) {
+                $aMatches[] = $this->getRelevanceMatch($sSearchField, $sTerm);
+            }
+            $aCases[] = 'WHEN (' . implode(' OR ', $aMatches) . ") THEN {$iRank}";
+            $iRank++;
+        }
+
+        if (!$aCases) {
             return '';
         }
 
-        return ' ORDER BY CASE ' . implode(' ', $cases) . " ELSE {$rank} END ASC, {$sArticleTable}.oxtitle ASC";
+        $sOrder = ' ORDER BY ';
+
+        // a single-word query matches every returned row exactly once, so the score is constant and pointless
+        if (count($aTerms) > 1) {
+            $aScores = [];
+            foreach ($aTerms as $sTerm) {
+                $aMatches = [];
+                foreach ($aFields as $sSearchField) {
+                    $aMatches[] = $this->getRelevanceMatch($sSearchField, $sTerm);
+                }
+                // IS TRUE turns the match into 1/0 - a NULL column (left joined long description) must not
+                // poison the whole sum
+                $aScores[] = '((' . implode(' OR ', $aMatches) . ') IS TRUE)';
+            }
+            $sOrder .= implode(' + ', $aScores) . ' DESC, ';
+        }
+
+        return $sOrder . 'CASE ' . implode(' ', $aCases) . " ELSE {$iRank} END ASC, {$sArticleTable}.oxtitle ASC";
+    }
+
+    /**
+     * Builds the LIKE condition matching a single search term against one field, special chars included.
+     *
+     * @param string $sSearchField
+     * @param string $sTerm
+     *
+     * @return string
+     * @throws DatabaseConnectionException
+     */
+    protected function getRelevanceMatch(string $sSearchField, string $sTerm): string
+    {
+        $oDb = DatabaseProvider::getDb();
+        $sCondition = "{$sSearchField} LIKE " . $oDb->quote("%{$sTerm}%");
+
+        if (($sUml = Registry::getUtilsString()->prepareStrForSearch($sTerm))) {
+            $sCondition .= " OR {$sSearchField} LIKE " . $oDb->quote("%{$sUml}%");
+        }
+
+        return $sCondition;
     }
 
     /**
